@@ -13,7 +13,7 @@ const useMap = (mapContainerRef) => {
     const initializeMap = () => {
       const mapInstance = new maplibregl.Map({
         container: mapContainerRef.current,
-        style: "https://demotiles.maplibre.org/style.json",
+        style: "https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=5f0299a14c344b3399f76c8bc70db6ca",
         center: [-2.597, 53.39],
         zoom: 6
       })

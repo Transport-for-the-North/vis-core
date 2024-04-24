@@ -3,8 +3,9 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import useMap from '../../hooks/useMap';
-import useDidMountEffect from '../../hooks/useDidMountEffect';
+import { api } from 'services';
+import useMap from 'hooks/useMap';
+import useDidMountEffect from 'hooks/useDidMountEffect';
 import { useFilter } from './FilterContext';
 
 const StyledMapContainer = styled.div`
@@ -52,9 +53,7 @@ const Map = ({ layers }) => {
     if (isMapReady) {
       const addLayersFromGeoJSON = async () => {
         const fetchLayer = async (layer) => {
-          const response = await fetch(`https://localhost:7127${layer.path}`);
-          const data = await response.json();
-          const geojson = JSON.parse(data[0].json_build_object)
+          const geojson = await api.geodataService.getLayer(layer)
           return { id: layer.name, geojson: geojson, geometryType: layer.geometryType };
         };
   
@@ -94,8 +93,6 @@ const Map = ({ layers }) => {
           .catch((error) => console.error('Error fetching GeoJSON:', error));
       };
       if (layers.length > 0) addLayersFromGeoJSON();
-    }
-    return () => {
     }
   }, [layers, isMapReady, map]);
 
