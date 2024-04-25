@@ -1,6 +1,5 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
-import useDidMountEffect from "./useDidMountEffect";
 
 export const useMap = (mapContainerRef) => {
   const [map, setMap] = useState(null);
