@@ -9,7 +9,7 @@ import { useFilter } from './FilterContext';
 
 const StyledMapContainer = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 75px);
 `;
 
 const Map = ({ layers }) => {
@@ -19,7 +19,7 @@ const Map = ({ layers }) => {
 
   useEffect(() => {
     if (isMapReady) {
-      cleanMap(map, layers); // Clean up existing layers first
+      // cleanMap(map, layers); // Clean up existing layers first
       addLayersFromGeoJSON(map, layers); // Then add new layers
     }
 
@@ -65,8 +65,7 @@ const addLayersFromGeoJSON = async (map, layers) => {
     .then((geojsonLayers) => {
       geojsonLayers.forEach(({ id, geojson, geometryType }) => {
         if (map.getSource(id)) {
-          map.removeLayer(id);
-          map.removeSource(id);
+          return;
         }
 
         map.addSource(id, { type: 'geojson', data: geojson });

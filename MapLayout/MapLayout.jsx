@@ -8,15 +8,8 @@ import { FilterProvider } from "./FilterContext";
 
 const LayoutContainer = styled.div`
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 75px);
 `;
-
-// const SidebarContainer = styled.div`
-//   width: 300px; /* Adjust width as needed */
-//   background-color: #fff; /* Example background color */
-//   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Example shadow */
-//   z-index: 2; /* Ensure sidebar overlays the map */
-// `;
 
 const MapContainer = styled.div`
   flex: 1;

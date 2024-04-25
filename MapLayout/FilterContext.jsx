@@ -10,6 +10,7 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'UPDATE_FILTER':
+      console.log('UPDATE_FILTER')
       return {
         ...state,
         filters: state.filters.map((filter) =>
