@@ -1,13 +1,12 @@
 import { useRef, useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
+import useDidMountEffect from "./useDidMountEffect";
 
-// maplibregl.workerClass = require("worker-loader!maplibre-gl/dist/maplibre-gl-csp-worker").default;
-
-const useMap = (mapContainerRef) => {
+export const useMap = (mapContainerRef) => {
   const [map, setMap] = useState(null);
   const [isMapStyleLoaded, setIsMapStyleLoaded] = useState(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const isMapReady = isMapLoaded && isMapStyleLoaded
+  const isMapReady = isMapLoaded && isMapStyleLoaded;
 
   useEffect(() => {
     const initializeMap = () => {
@@ -35,14 +34,11 @@ const useMap = (mapContainerRef) => {
     return () => {
       if (map) {
         map.remove();
-        setMap(null);
         setIsMapLoaded(false);
         setIsMapStyleLoaded(false);
       }
     };
-  }, [mapContainerRef, map]);
+  }, []);
 
   return { map, isMapStyleLoaded, isMapLoaded, isMapReady };
 };
-
-export default useMap;

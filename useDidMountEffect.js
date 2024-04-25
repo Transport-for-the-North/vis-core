@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const useDidMountEffect = (callback, dependencies) => {
+export const useDidMountEffect = (callback, dependencies) => {
   const didMount = useRef(false);
   useEffect(() => {
     if (didMount.current) {
@@ -10,5 +10,3 @@ const useDidMountEffect = (callback, dependencies) => {
     }
   }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
 };
-
-export default useDidMountEffect;
