@@ -1,11 +1,10 @@
+import { useContext } from "react";
+
 import Map from "./Map";
 import styled from 'styled-components';
 import Sidebar from './Sidebar';
-import config from './config';
+import { AppConfigContext, PageConfigContext } from 'contexts';
 import { FilterProvider } from "./FilterContext";
-
-const pageConfig = config.appPages[0].config;
-const { layers, filters } = pageConfig
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -24,12 +23,14 @@ const MapContainer = styled.div`
   position: relative;
 `;
 
-const MapLayout = () => {
-  
-    return (
+export const MapLayout = () => {
+  const appConfig = useContext(AppConfigContext)
+  const pageConfig = useContext(PageConfigContext)
+  const { layers, filters } = pageConfig.config
+  return (
       <FilterProvider>
       <LayoutContainer>
-          <Sidebar filters={filters} />
+        <Sidebar filters={filters} />
         <MapContainer>
           <Map layers={layers}></Map>
         </MapContainer>
@@ -38,4 +39,3 @@ const MapLayout = () => {
     );
   };
   
-export default MapLayout;
