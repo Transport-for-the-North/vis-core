@@ -29,7 +29,7 @@ const reducer = (state, action) => {
 };
 
 // Create context
-const FilterContext = createContext();
+export const FilterContext = createContext();
 
 // Create context provider
 export const FilterProvider = ({ children }) => {

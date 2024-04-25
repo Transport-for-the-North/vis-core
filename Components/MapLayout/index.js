@@ -1,3 +1,1 @@
-import MapLayout from "./MapLayout";
-
-export default MapLayout 
+export * from "./MapLayout";
