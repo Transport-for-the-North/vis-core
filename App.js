@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <AppConfigContext.Provider value={appConfig}>
         <Navbar />
-        <Dashboard>
+        <Dashboard >
           <Routes>
             <Route key={'home'} path={'/'} element={<HomePage />} />
             {appConfig.appPages.map((page) => (

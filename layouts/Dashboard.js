@@ -14,7 +14,7 @@ export default function Dashboard({ children }) {
 }
 
 function DashboardWrapper({ children }) {
-  return <div className="fill-vp" >{children}</div>;
+  return <div className="fill-vp" height={'calc(100vh-75px)'}>{children}</div>;
   // Style hack prevents redundant scrollbars.
 }
 
