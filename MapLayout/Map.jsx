@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { api } from 'services';
-import {useMap, useDidMountEffect } from 'hooks';
+import { useMap } from 'hooks';
 import { useFilter } from './FilterContext';
 
 const StyledMapContainer = styled.div`
@@ -15,7 +15,7 @@ const StyledMapContainer = styled.div`
 const Map = ({ layers }) => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
-  const { state, dispatch } = useFilter()
+  const { dispatch } = useFilter()
 
   useEffect(() => {
     if (isMapReady) {
@@ -37,7 +37,7 @@ const Map = ({ layers }) => {
     return () => {
       cleanMap(map, layers)
     }
-  }, [layers, isMapReady, map]);
+  }, [dispatch, layers, isMapReady, map]);
 
   return <StyledMapContainer ref={mapContainerRef} />;
 };
@@ -92,6 +92,8 @@ const addLayersFromGeoJSON = async (map, layers) => {
                 'fill-opacity': 0.8
               }
             });
+            break;
+          default:
             break;
         }
       });
