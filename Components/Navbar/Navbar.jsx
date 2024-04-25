@@ -2,8 +2,7 @@ import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { AppConfigContext } from 'contexts'; 
-import { HomePage } from 'Components/HomePage';
+import { AppConfigContext } from 'contexts';
 
 const Nav = styled.nav`
   background: #333;

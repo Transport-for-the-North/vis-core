@@ -10,15 +10,15 @@ function App() {
   return (
     <div className="App">
       <AppConfigContext.Provider value={appConfig}>
-      <Navbar />
-      <Dashboard>
-        <Routes>
-          <Route key={'home'} path={'/'} element={<HomePage />} />
-          {appConfig.appPages.map((page) => (
+        <Navbar />
+        <Dashboard>
+          <Routes>
+            <Route key={'home'} path={'/'} element={<HomePage />} />
+            {appConfig.appPages.map((page) => (
               <Route key={page.pageName} exact path={page.url} element={<PageSwitch pageConfig={page} />} />
-          ))}
-        </Routes>
-      </Dashboard>
+            ))}
+          </Routes>
+        </Dashboard>
       </AppConfigContext.Provider>
     </div>
   );
