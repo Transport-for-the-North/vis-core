@@ -1,52 +1,70 @@
-import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
-import styled from 'styled-components';
+import { useEffect, useState, useContext } from "react";
+import { Link, useLocation } from "react-router-dom";
+import styled from "styled-components";
 
-import { AppConfigContext } from 'contexts';
+import { AppConfigContext } from "contexts";
 
-const Nav = styled.nav`
-  background: #333;
-  color: white;
-  padding: 1rem;
-`;
+import { Button } from "./Button";
+import { LateralNavbar } from "./LateralNavbar";
+import { Logo } from "./Logo";
+import "./Navbar.styles.css"
 
-const NavList = styled.ul`
-  list-style: none;
+const StyledNavbar = styled.nav`
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: start;
+  padding: 0px;
+  background-color: #f8f9fa; // Example background color, adjust as needed
 `;
 
-const NavItem = styled.li`
-  margin-right: 1rem;
-`;
+export function Navbar() {
+  const location = useLocation()
+  const [isClicked, setIsClicked] = useState(false);
+  const [activeLink, setActiveLink] = useState("");
+  const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
+  const appConfig = useContext(AppConfigContext);
 
-const StyledNavLink = styled(NavLink)`
-  color: white;
-  text-decoration: none;
+  const updateMenu = () => {
+    if (!isClicked) {
+      setSideNavOpen("sideNavbar-shown");
+    } else {
+      setSideNavOpen("sideNavbar-notShown");
+    }
+    setIsClicked(!isClicked);
+  };
 
-  &.active {
-    font-weight: bold;
-  }
-`;
+  const handleClick = () => {
+    setSideNavOpen("sideNavbar-notShown");
+    setIsClicked(!isClicked);
+  };
 
-export const Navbar = () => {
-    const appConfig = useContext(AppConfigContext); 
-    return (
-    <Nav>
-      <NavList>
-        <NavItem key={'home'}>
-            <StyledNavLink to={'/'} activeclassname="active">
-              Home
-            </StyledNavLink>
-          </NavItem>
+  useEffect(() => {
+    setActiveLink(location.pathname)
+    if (sideNavOpen === "sideNavbar-shown") updateMenu();
+  }, [location]);
+
+  return (
+    <>
+      <StyledNavbar className="navbar">
+        <Logo className="logoNav" />
+        <LateralNavbar className={sideNavOpen} handleClick={handleClick} />
+        <Link className={activeLink==="/" ? "ActiveNavButton" : "NavButton"} to={"/"}>
+          Home
+        </Link>
         {appConfig.appPages.map((page) => (
-          <NavItem key={page.pageName}>
-            <StyledNavLink to={page.url} activeclassname="active">
+            <Link key={page.pageName} className={activeLink===page.url ? "ActiveNavButton" : "NavButton"} to={page.url} >
               {page.pageName}
-            </StyledNavLink>
-          </NavItem>
+            </Link>
         ))}
-      </NavList>
-    </Nav>
+        
+        <Button
+          className="navbarMobile"
+          src="/img/burgerIcon.png"
+          alt="Burger Button Navbar"
+          onClick={updateMenu}
+        />
+      </StyledNavbar>
+      <div className="empty-blank-nav"></div>
+    </>
   );
-};
+}
