@@ -2,10 +2,10 @@ import React, { useContext } from "react";
 import parse from "html-react-parser";
 
 import "./HomePage.styles.css";
-import { AppConfigContext } from 'contexts';
+import { AppContext } from 'contexts';
 
 export const HomePage = () => {
-  const appConfig = useContext(AppConfigContext);
+  const appContext = useContext(AppContext);
   
   return (
     <div className="landing">
@@ -14,25 +14,25 @@ export const HomePage = () => {
         placeholder="Background Image for the header"
       >
         <div className="container">
-          <h1 className="header-title">{appConfig.title}</h1>
+          <h1 className="header-title">{appContext.title}</h1>
         </div>
       </div>
-      {appConfig.introduction !== "" && (
+      {appContext.introduction !== "" && (
         <section className="introduction">
           <h2>About this tool</h2>
-          <p className="container-intro">{appConfig.introduction}</p>
+          <p className="container-intro">{appContext.introduction}</p>
         </section>
       )}
-      {appConfig.background !== "" && (
+      {appContext.background !== "" && (
         <section className="background">
           <h2>Background of the app</h2>
-          <p className="container-bg">{parse(appConfig.background)}</p>
+          <p className="container-bg">{parse(appContext.background)}</p>
         </section>
       )}
       <div className="contacts">
-        <p>{appConfig.contactText}</p>
-        <a className="contact" href={"mailto:" + appConfig.contactEmail}>
-          {"Email "+ appConfig.contactEmail}
+        <p>{appContext.contactText}</p>
+        <a className="contact" href={"mailto:" + appContext.contactEmail}>
+          {"Email "+ appContext.contactEmail}
         </a>
       </div>
     </div>
