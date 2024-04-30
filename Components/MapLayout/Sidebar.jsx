@@ -1,6 +1,8 @@
-// import React, { useState, useEffect } from 'react';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+
+import { PageContext } from 'contexts';
+import { useMapContext } from 'hooks';
 
 // Styled components for the sidebar
 const SidebarContainer = styled.div`
@@ -31,54 +33,61 @@ const StyledDropdown = styled.select`
 `;
 
 const DropdownFilter = ({ filter, onChange }) => {
-  
+  const handleDropdownChange = (e) => {
+    const selectedValue = e.target.value;
+    const selectedOption = filter.values.values.find(option => option.displayValue === selectedValue);
+    if (selectedOption) {
+      onChange(filter, selectedOption.paramValue);
+    }
+  };
+
   return (
-    <StyledDropdown onChange={(e) => onChange(filter.paramName, e.target.value)}>
+    <StyledDropdown onChange={handleDropdownChange}>
       {filter.values.values.map((option) => (
-        <option key={option.id} value={option.id}>
-          {option.friendly}
+        <option key={option.paramValue} value={option.displayValue}>
+          {option.displayValue}
         </option>
       ))}
     </StyledDropdown>
   );
 };
 
+
 const SliderFilter = ({ filter, onChange }) => {
-  
   return (
     <StyledSlider
       type="range"
       min={filter.min}
       max={filter.max}
       step={filter.interval}
-      onChange={(e) => onChange(filter.paramName, e.target.value)}
+      onChange={(e) => onChange(filter, e.target.value)}
     />
   );
 };
 
-const Sidebar = ({ filters }) => {
 
-  const handleFilterChange = (actionType, paramName, value) => {
-    
-    console.log(actionType)
-    // if (actionType === 'getGeometry') {
-    //   dispatch(updateGeometryFilter(paramName, value));
-    // } else if (actionType === 'getVisData') {
-    //   dispatch(updateVisDataFilter(paramName, value));
-    // }
+const Sidebar = () => {
+  const { state, dispatch } = useMapContext();
+  const pageContext = useContext(PageContext);
+
+  const handleFilterChange = (filter, value) => {
+    dispatch({
+      type: filter.action,
+      payload: { filter, value }
+    });
   };
 
   return (
-    <SidebarContainer>
-      {filters.map((filter) => (
+    <SidebarContainer key={pageContext.pageName}>
+      {pageContext.config.filters.map((filter) => (
         <FilterContainer key={filter.filterName}>
           <FilterLabel htmlFor={filter.paramName}>{filter.filterName}</FilterLabel>
           {filter.type === 'dropdown' && (
             <DropdownFilter
               key={filter.filterName}
               filter={filter}
-              onChange={(paramName, value) =>
-                handleFilterChange(filter.action, paramName, value)
+              onChange={(filter, value) =>
+                handleFilterChange(filter, value)
               }
             />
           )}
@@ -86,8 +95,8 @@ const Sidebar = ({ filters }) => {
             <SliderFilter
               key={filter.filterName}
               filter={filter}
-              onChange={(paramName, value) =>
-                handleFilterChange(filter.action, paramName, value)
+              onChange={(value) =>
+                handleFilterChange(filter, value)
               }
             />
           )}

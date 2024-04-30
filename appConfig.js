@@ -16,10 +16,11 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        name: "BSIP Zone NE",
+                        uniqueId: "BsipZone",
+                        name: "BSIP Zone",
                         type: "geojson",
                         source: "api",
-                        path: "/api/zones/2", // matches the path in swagger.json
+                        path: "/api/zones/{zoneTypeId}", // matches the path in swagger.json
                         geojsonField: "geojson",
                         geometryType: "polygon"
                     },
@@ -47,25 +48,25 @@ export const appConfig = {
                         filterName: "Region",
                         paramName: "zoneTypeId",
                         target: "api",
-                        action: "GET_GEOMETRY",
+                        action: "UPDATE_PARAMETERISED_LAYER",
                         layer: "BSIP Zone",
                         type: "dropdown",
                         values: {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "North East MSOA",
-                                    id: 1
+                                    displayValue: "North East MSOA",
+                                    paramValue: 2
                                 
                                 },
                                 { 
-                                    friendly: "North West MSOA",
-                                    id: 2
+                                    displayValue: "North West MSOA",
+                                    paramValue: 3
                                 
                                 },
                                 { 
-                                    friendly: "Yorkshire and Humber MSOA",
-                                    id: 3
+                                    displayValue: "Yorkshire and Humber MSOA",
+                                    paramValue: 4
                                 
                                 }
                             ]
@@ -82,8 +83,8 @@ export const appConfig = {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "2024-04-09",
-                                    id: 2
+                                    displayValue: "2024-04-09",
+                                    paramValue: 2
                                 
                                 }                                
                             ]
@@ -100,8 +101,8 @@ export const appConfig = {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "2024-04-09 Dummy",
-                                    id: 7
+                                    displayValue: "2024-04-09 Dummy",
+                                    paramValue: 7
                                 
                                 }                                
                             ]
@@ -148,9 +149,11 @@ export const appConfig = {
                 visualisations: [
                     {
                         name: "Links",
-                        type: "geojson",
-                        style: "categorical",
-                        valueField: "id",
+                        type: "join",
+                        joinLayer: "NoHAM Links",
+                        style: "line-continuous",
+                        joinField: "id",
+                        valueField: "value",
                         source: "api",
                         path: "/api/noham/link-results"
                     }
@@ -169,13 +172,13 @@ export const appConfig = {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "Base",
-                                    id: "base"
+                                    displayValue: "Base",
+                                    paramValue: "base"
                                 
                                 },
                                 { 
-                                    friendly: "Do minimum",
-                                    id: "dm"
+                                    displayValue: "Do minimum",
+                                    paramValue: "dm"
                                 
                                 }
                             ]
@@ -192,13 +195,13 @@ export const appConfig = {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "Base",
-                                    id: "base"
+                                    displayValue: "Base",
+                                    paramValue: "base"
                                 
                                 },
                                 { 
-                                    friendly: "Core",
-                                    id: "core"
+                                    displayValue: "Core",
+                                    paramValue: "core"
                                 
                                 }
                             ]
@@ -215,13 +218,13 @@ export const appConfig = {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "2018",
-                                    id: 2018
+                                    displayValue: "2018",
+                                    paramValue: 2018
                                 
                                 },
                                 { 
-                                    friendly: "2033",
-                                    id: 2033
+                                    displayValue: "2033",
+                                    paramValue: 2033
                                 
                                 }                                
                             ]
@@ -238,18 +241,18 @@ export const appConfig = {
                             source: "local",
                             values: [
                                 { 
-                                    friendly: "AM",
-                                    id: "am"
+                                    displayValue: "AM",
+                                    paramValue: "am"
                                 
                                 },
                                 { 
-                                    friendly: "IP",
-                                    id: "ip"
+                                    displayValue: "IP",
+                                    paramValue: "ip"
                                 
                                 },
                                 { 
-                                    friendly: "PM",
-                                    id: "pm"
+                                    displayValue: "PM",
+                                    paramValue: "pm"
                                 
                                 }                              
                             ]

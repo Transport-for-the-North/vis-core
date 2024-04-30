@@ -4,19 +4,23 @@ provided page.
 */
 import React from "react";
 import { MapLayout } from "Components";
-import { PageConfigContext } from "contexts";
+import { MapProvider, PageContext } from "contexts";
 
 export const PageSwitch = ({ pageConfig }) => {
   return (
-    <PageConfigContext.Provider value={pageConfig}>
+    <PageContext.Provider value={pageConfig}>
       {(() => {
         switch (pageConfig.type) {
           case "MapLayout":
-            return <MapLayout />;
+            return (
+              <MapProvider>
+                <MapLayout />
+              </MapProvider>
+            );
           default:
             return <div>Nothing</div>;
         }
       })()}
-    </PageConfigContext.Provider>
+    </PageContext.Provider>
   );
 };
