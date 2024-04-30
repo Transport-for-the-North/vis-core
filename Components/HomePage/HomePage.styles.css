@@ -93,7 +93,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: url("./img/hero-image.jpg");
+    background-image: url("../../../public/img/hero-image.jpg");
     background-size: 100vw;
     position: relative;
   }
