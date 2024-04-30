@@ -46,7 +46,7 @@ class GeodataService extends BaseService {
   }
 
   async getLayer(layerConfig) {
-    const cacheKey = this._getCacheKeyForLayer(layerConfig.name);
+    const cacheKey = this._getCacheKeyForLayer(layerConfig.path);
     let cachedLayer = cache.getLayer(cacheKey);
 
     if (!cachedLayer) {
