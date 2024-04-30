@@ -4,12 +4,12 @@ import './App.css';
 import { appConfig } from 'appConfig';
 import { PageSwitch, HomePage, Navbar } from 'Components';
 import { Dashboard } from 'layouts';
-import { AppConfigContext } from 'contexts';
+import { AppContext } from 'contexts';
 
 function App() {
   return (
     <div className="App">
-      <AppConfigContext.Provider value={appConfig}>
+      <AppContext.Provider value={appConfig}>
         <Navbar />
         <Dashboard >
           <Routes>
@@ -19,7 +19,7 @@ function App() {
             ))}
           </Routes>
         </Dashboard>
-      </AppConfigContext.Provider>
+      </AppContext.Provider>
     </div>
   );
 }

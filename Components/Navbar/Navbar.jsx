@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-import { AppConfigContext } from "contexts";
+import { AppContext } from "contexts";
 
 import { Button } from "./Button";
 import { LateralNavbar } from "./LateralNavbar";
@@ -22,7 +22,7 @@ export function Navbar() {
   const [isClicked, setIsClicked] = useState(false);
   const [activeLink, setActiveLink] = useState("");
   const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
-  const appConfig = useContext(AppConfigContext);
+  const appContext = useContext(AppContext);
 
   const updateMenu = () => {
     if (!isClicked) {
@@ -51,7 +51,7 @@ export function Navbar() {
         <Link className={activeLink==="/" ? "ActiveNavButton" : "NavButton"} to={"/"}>
           Home
         </Link>
-        {appConfig.appPages.map((page) => (
+        {appContext.appPages.map((page) => (
             <Link key={page.pageName} className={activeLink===page.url ? "ActiveNavButton" : "NavButton"} to={page.url} >
               {page.pageName}
             </Link>
