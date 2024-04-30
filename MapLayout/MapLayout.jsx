@@ -1,10 +1,8 @@
-import { useContext } from "react";
-
 import Map from "./Map";
 import styled from 'styled-components';
 import Sidebar from './Sidebar';
-import { PageConfigContext } from 'contexts';
-import { FilterProvider } from "./FilterContext";
+import { Dimmer } from "Components/Dimmer";
+import { useMapContext } from "hooks";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -17,17 +15,14 @@ const MapContainer = styled.div`
 `;
 
 export const MapLayout = () => {
-  const pageConfig = useContext(PageConfigContext)
-  const { layers, filters } = pageConfig.config
   return (
-      <FilterProvider>
-      <LayoutContainer>
-        <Sidebar filters={filters} />
-        <MapContainer>
-          <Map layers={layers} />
-        </MapContainer>
-      </LayoutContainer>
-      </FilterProvider>
-    );
-  };
+    <LayoutContainer>
+      <Sidebar />
+      <MapContainer>
+        <Map />
+      </MapContainer>
+      {/* <Dimmer dimmed={state.isloading} showLoader={true}/> */}
+    </LayoutContainer>
+  );
+};
   

@@ -1,74 +1,40 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { api } from 'services';
-import { useMap } from 'hooks';
-import { useFilter } from './FilterContext';
+import { useMap, useMapContext } from 'hooks';
 
 const StyledMapContainer = styled.div`
   width: 100%;
   height: calc(100vh - 75px);
 `;
 
-const Map = ({ layers }) => {
+const Map = () => {
   const mapContainerRef = useRef(null);
+  const geoJsonCacheRef = useRef({});
   const { map, isMapReady } = useMap(mapContainerRef);
-  const { dispatch } = useFilter()
+  const { state, dispatch } = useMapContext()
 
-  useEffect(() => {
-    if (isMapReady) {
-      // cleanMap(map, layers); // Clean up existing layers first
-      addLayersFromGeoJSON(map, layers); // Then add new layers
-    }
-
-    // Cleanup function to remove layers when the component unmounts or layers change
-    return () => {
-      cleanMap(map, layers);
+  const addLayersFromGeoJSON = useCallback(async (map, layers) => {
+    const fetchLayer = async (layer) => {
+      // Check if the layer data is already cached
+      if (!geoJsonCacheRef.current[layer.path]) {
+        const geojson = await api.geodataService.getLayer(layer);
+        geoJsonCacheRef.current[layer.path] = { geojson, geometryType: layer.geometryType };
+      }
+      return { id: layer.name, ...geoJsonCacheRef.current[layer.path] };
     };
-  }, [layers, isMapReady, map]);
 
-  useEffect(() => {
-    if (isMapReady){
-      map.on('click', (e) => handleMapClick(e, map, layers, dispatch))
-    }
+    const geojsonLayers = await Promise.all(layers.map(fetchLayer));
 
-    return () => {
-      cleanMap(map, layers)
-    }
-  }, [dispatch, layers, isMapReady, map]);
-
-  return <StyledMapContainer ref={mapContainerRef} />;
-};
-
-const cleanMap = (map, layers) => {
-  if (map) {
-    layers.forEach((layer) => {
-      if (map.getLayer(layer.name)) {
-        map.removeLayer(layer.name);
+    geojsonLayers.forEach(({ id, geojson, geometryType }) => {
+      if (map.getSource(id)) {
+        return;
       }
-      if (map.getSource(layer.name)) {
-        map.removeSource(layer.name);
-      }
-    });
-  }
-};
 
-const addLayersFromGeoJSON = async (map, layers) => {
-  const fetchLayer = async (layer) => {
-    const geojson = await api.geodataService.getLayer(layer)
-    return { id: layer.name, geojson: geojson, geometryType: layer.geometryType };
-  };
-
-  Promise.all(layers.map(fetchLayer))
-    .then((geojsonLayers) => {
-      geojsonLayers.forEach(({ id, geojson, geometryType }) => {
-        if (map.getSource(id)) {
-          return;
-        }
-
-        map.addSource(id, { type: 'geojson', data: geojson });
+      map.addSource(id, { type: 'geojson', data: geojson });
         switch (geometryType) {
           case 'line':
             map.addLayer({
@@ -95,9 +61,50 @@ const addLayersFromGeoJSON = async (map, layers) => {
           default:
             break;
         }
-      });
-    })
-    .catch((error) => console.error('Error fetching GeoJSON:', error));
+    });
+  }, []);
+
+  useEffect(() => {
+    if (isMapReady) {
+      console.log('Map load within Map component')
+      addLayersFromGeoJSON(map, Object.values(state.layers)); // Then add new layers
+    }
+
+    // Remove layers when the component unmounts or layers change
+    return () => {
+      console.log("Map unmount")
+      cleanMap(map, Object.values(state.layers));
+    };
+  }, [state.layers, isMapReady, map]);
+
+  useEffect(() => {
+    if (isMapReady) {
+      const handleMapClickWrapped = (e) => handleMapClick(e, map, Object.values(state.layers), dispatch);
+      map.on('click', handleMapClickWrapped);
+  
+      return () => {
+        map.off('click', handleMapClickWrapped);
+        cleanMap(map, Object.values(state.layers));
+      };
+    }
+  }, [dispatch, state.layers, isMapReady, map]);
+
+  return <StyledMapContainer ref={mapContainerRef} />;
+};
+
+
+// Helper functions
+const cleanMap = (map, layers) => {
+  if (map) {
+    layers.forEach((layer) => {
+      if (map.getLayer(layer.name)) {
+        map.removeLayer(layer.name);
+      }
+      if (map.getSource(layer.name)) {
+        map.removeSource(layer.name);
+      }
+    });
+  }
 };
 
 // Event handler for map click
@@ -131,5 +138,5 @@ const updateMapFilters = (clickedFeatures, dispatch) => {
   });
 };
 
-export default Map;
+export default React.memo(Map);
 
