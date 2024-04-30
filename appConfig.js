@@ -149,13 +149,13 @@ export const appConfig = {
                 visualisations: [
                     {
                         name: "Links",
-                        type: "join",
+                        type: "joinDataToMap",
                         joinLayer: "NoHAM Links",
                         style: "line-continuous",
                         joinField: "id",
                         valueField: "value",
-                        source: "api",
-                        path: "/api/noham/link-results"
+                        dataSource: "api",
+                        dataPath: "/api/noham/link-results"
                     }
                 ],
                 metadataLayers: [
@@ -166,7 +166,7 @@ export const appConfig = {
                         paramName: "networkScenarioName",
                         target: "api",
                         action: "GET_VIS_DATA",
-                        layer: "NoHAM Links",
+                        visualisations: ["NoHAM Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -189,7 +189,7 @@ export const appConfig = {
                         paramName: "demandScenarioName",
                         target: "api",
                         action: "GET_VIS_DATA",
-                        layer: "NoHAM Links",
+                        visualisations: ["NoHAM Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -212,7 +212,7 @@ export const appConfig = {
                         paramName: "year",
                         target: "api",
                         action: "GET_VIS_DATA",
-                        visualisation: "NoHAM Links",
+                        visualisations: ["NoHAM Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -235,7 +235,7 @@ export const appConfig = {
                         paramName: "timePeriodCode",
                         target: "api",
                         action: "GET_VIS_DATA",
-                        visualisation: "NoHAM Links",
+                        visualisations: ["NoHAM Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
