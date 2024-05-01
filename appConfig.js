@@ -16,14 +16,14 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "BsipZone",
-                        name: "BSIP Zone",
-                        type: "geojson",
+                        uniqueId: "BsipZoneVectorTile",
+                        name: "BSIP Zone Vector Tile",
+                        type: "tile",
                         source: "api",
-                        path: "/api/zones/{zoneTypeId}", // matches the path in swagger.json
-                        geojsonField: "geojson",
+                        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "zones",
                         geometryType: "polygon"
-                    },
+                    }
                 ],
                 visualisations: [
                     {
@@ -49,14 +49,14 @@ export const appConfig = {
                         paramName: "zoneTypeId",
                         target: "api",
                         action: "UPDATE_PARAMETERISED_LAYER",
-                        layer: "BSIP Zone",
+                        layer: "BSIP Zone Vector Tile",
                         type: "dropdown",
                         values: {
                             source: "local",
                             values: [
                                 { 
                                     displayValue: "North East MSOA",
-                                    paramValue: 2
+                                    paramValue: 2,
                                 
                                 },
                                 { 
