@@ -69,6 +69,13 @@ class GeodataService extends BaseService {
 
     return cachedLayer;
   }
+  
+  buildTileLayerUrl(path) {
+    /* Builds the path to a tile layer from the provided path (allow for dev and prod workloads)
+    */
+    return super._buildUrl(path)
+  };
+
 
   _getCacheKeyForLayer(layerName) {
     return `layer_${layerName}`;
