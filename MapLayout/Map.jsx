@@ -1,4 +1,3 @@
-
 import React, { useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -13,130 +12,118 @@ const StyledMapContainer = styled.div`
 
 const Map = () => {
   const mapContainerRef = useRef(null);
-  const geoJsonCacheRef = useRef({});
   const { map, isMapReady } = useMap(mapContainerRef);
-  const { state, dispatch } = useMapContext()
+  const { state, dispatch } = useMapContext();
 
-  const addLayersFromGeoJSON = useCallback(async (map, layers) => {
-    const fetchLayer = async (layer) => {
-      // Check if the layer data is already cached
-      if (!geoJsonCacheRef.current[layer.path]) {
-        const geojson = await api.geodataService.getLayer(layer);
-        geoJsonCacheRef.current[layer.path] = { geojson, geometryType: layer.geometryType };
+  const getLayerStyle = (geometryType) => {
+    switch (geometryType) {
+      case 'polygon':
+        return {
+          'id': '',
+          'type': 'fill',
+          'source': '',
+          'paint': {
+            'fill-color': 'black',
+            'fill-opacity': 0.1
+          }
+        };
+      case 'line':
+        return {
+          'id': '',
+          'type': 'line',
+          'source': '',
+          'paint': {
+            'line-color': 'black',
+            'line-opacity': 0.1
+          }
+        };
+      case 'point':
+        return {
+          'id': '',
+          'type': 'circle',
+          'source': '',
+          'paint': {
+            'circle-radius': 5,
+            'circle-color': 'black'
+          }
+        };
+      default:
+        return {};
+    }
+  };
+
+  const addLayerToMap = useCallback((layer) => {
+    if (!map.getSource(layer.name)) {
+      let sourceConfig = {};
+      let layerConfig = getLayerStyle(layer.geometryType);
+      layerConfig.id = layer.name;
+
+      if (layer.type === 'geojson') {
+        // Fetch and add a GeoJSON layer
+        api.geodataService.getLayer(layer).then((geojson) => {
+          sourceConfig.type = 'geojson';
+          sourceConfig.data = geojson;
+          map.addSource(layer.name, sourceConfig);
+          map.addLayer({ ...layerConfig, 'source': layer.name });
+        });
+      } else if (layer.type === 'tile') {
+        // Add a tile layer
+        const url = layer.source === 'api' ? api.geodataService.buildTileLayerUrl(layer.path) : layer.path;
+        sourceConfig.type = 'vector';
+        sourceConfig.tiles = [url];
+        map.addSource(layer.name, sourceConfig);
+        map.addLayer({ ...layerConfig, 'source': layer.name, 'source-layer': layer.sourceLayer });
       }
-      return { id: layer.name, ...geoJsonCacheRef.current[layer.path] };
-    };
-
-    const geojsonLayers = await Promise.all(layers.map(fetchLayer));
-
-    geojsonLayers.forEach(({ id, geojson, geometryType }) => {
-      if (map.getSource(id)) {
-        return;
-      }
-
-      map.addSource(id, { type: 'geojson', data: geojson });
-        switch (geometryType) {
-          case 'line':
-            map.addLayer({
-              'id': id,
-              'type': 'line',
-              'source': id,
-              'paint': {
-                'line-color': 'black',
-                'line-opacity': 0.8
-              }
-            });
-            break;
-          case 'polygon':
-            map.addLayer({
-              'id': id,
-              'type': 'fill',
-              'source': id,
-              'paint': {
-                'fill-color': 'black',
-                'fill-opacity': 0.8
-              }
-            });
-            break;
-          default:
-            break;
-        }
-    });
-  }, []);
+    }
+  }, [map]);
 
   useEffect(() => {
     if (isMapReady) {
-      console.log('Map load within Map component')
-      addLayersFromGeoJSON(map, Object.values(state.layers)); // Then add new layers
+      console.log('Map load within Map component');
+      Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
     }
 
     // Remove layers when the component unmounts or layers change
     return () => {
-      console.log("Map unmount")
-      cleanMap(map, Object.values(state.layers));
+      console.log("Map unmount");
+      if (map) {
+        Object.values(state.layers).forEach((layer) => {
+          if (map.getLayer(layer.name)) {
+            map.removeLayer(layer.name);
+          }
+          if (map.getSource(layer.name)) {
+            map.removeSource(layer.name);
+          }
+        });
+      }
     };
-  }, [state.layers, isMapReady, map]);
-
-  useEffect(() => {
-    if (isMapReady) {
-      const handleMapClickWrapped = (e) => handleMapClick(e, map, Object.values(state.layers), dispatch);
-      map.on('click', handleMapClickWrapped);
-  
-      return () => {
-        map.off('click', handleMapClickWrapped);
-        cleanMap(map, Object.values(state.layers));
-      };
-    }
-  }, [dispatch, state.layers, isMapReady, map]);
+  }, [state.layers, isMapReady, map, addLayerToMap]);
 
   return <StyledMapContainer ref={mapContainerRef} />;
 };
 
-
-// Helper functions
-const cleanMap = (map, layers) => {
-  if (map) {
-    layers.forEach((layer) => {
-      if (map.getLayer(layer.name)) {
-        map.removeLayer(layer.name);
-      }
-      if (map.getSource(layer.name)) {
-        map.removeSource(layer.name);
-      }
-    });
-  }
-};
-
-// Event handler for map click
 const handleMapClick = (e, map, layers, dispatch) => {
   const clickedFeatures = [];
-  
-  if (!layers) return
-  // Loop through each layer
+  if (!layers) return;
+
   layers.forEach((layer) => {
     const features = map.queryRenderedFeatures(e.point, { layers: [layer.name] });
-    
-    // Add matched features to the clickedFeatures array
     clickedFeatures.push(...features);
   });
-  // Call updateMapFilters with the clicked features
+
   updateMapFilters(clickedFeatures, dispatch);
 };
 
 const updateMapFilters = (clickedFeatures, dispatch) => {
-  // Iterate through all clicked features
   clickedFeatures.forEach((clickedFeature) => {
-    // Check if the feature's layer matches the layer specified in any filter with a 'map' type
     dispatch({
       type: "UPDATE_FILTER",
       payload: {
         filterName: 'test',
-        value: clickedFeature.properties.id
-      }
-    }
-  );
+        value: clickedFeature.properties.id,
+      },
+    });
   });
 };
 
 export default React.memo(Map);
-
