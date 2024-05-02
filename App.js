@@ -2,7 +2,7 @@ import {useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
 
 import './App.css';
-import { appConfig } from 'appConfig';
+import { appConfig as initialAppConfig } from 'appConfig';
 import { PageSwitch, HomePage, Navbar } from 'Components';
 import { Dashboard } from 'layouts';
 import { AppContext } from 'contexts';
@@ -10,11 +10,20 @@ import { api } from 'services';
 
 function App() {
 
+  const [appConfig, setAppConfig] = useState({
+    ...initialAppConfig,
+    apiSchema: null
+  });
+
   useEffect(() => {
     const fetchSwaggerDefinition = async () => {
       try {
         const apiSchema = await api.metadataService.getSwaggerFile();
-        appConfig.apiSchema = apiSchema;
+        // TODO add timeout
+        setAppConfig((prevConfig) => ({
+          ...prevConfig,
+          apiSchema: apiSchema,
+        }));
       } catch (error) {
         console.error('Failed to fetch Swagger definition:', error);
       }
@@ -23,9 +32,11 @@ function App() {
     fetchSwaggerDefinition();
   }, []);
 
+  // TODO add loading overlay
   if (!appConfig.apiSchema) {
-    // Do nothing for now, but we should be loading.
+    return <div>Loading...</div>;
   }
+
 
   return (
     <div className="App">
