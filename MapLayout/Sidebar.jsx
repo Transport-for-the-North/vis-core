@@ -67,8 +67,20 @@ const SliderFilter = ({ filter, onChange }) => {
 
 
 const Sidebar = () => {
-  const { state, dispatch } = useMapContext();
+  const { dispatch } = useMapContext();
   const pageContext = useContext(PageContext);
+
+  useEffect(() => {
+    // Initialize query params for each filter with a defaultValue
+    pageContext.config.filters.forEach((filter) => {
+      if (filter.action === 'UPDATE_QUERY_PARAMS') {
+        const defaultValue = filter.values?.values[0]?.paramValue
+        if (defaultValue !== undefined) {
+          handleFilterChange(filter, defaultValue);
+        }
+      }
+    });
+  }, [pageContext.config.filters, dispatch]);
 
   const handleFilterChange = (filter, value) => {
     dispatch({
@@ -95,7 +107,7 @@ const Sidebar = () => {
             <SliderFilter
               key={filter.filterName}
               filter={filter}
-              onChange={(value) =>
+              onChange={(filter, value) =>
                 handleFilterChange(filter, value)
               }
             />
