@@ -1,8 +1,9 @@
-import React, { createContext, useEffect, useContext, useReducer } from 'react';
-
+import React, { createContext, useCallback, useEffect, useContext, useReducer } from 'react';
+import { debounce } from 'lodash'
 import { actionTypes, mapReducer } from 'reducers';
 import { hasRouteParameter, replaceRouteParameter } from 'utils';
 import { AppContext, PageContext } from 'contexts';
+import { api } from 'services';
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -16,15 +17,40 @@ const initialState = {
   isMapReady: false
 };
 
-// Create a custom hook to use the app config context
 export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
+
+  // Fetches the data from the API then updates in the visualisation
+  const fetchDataForVisualisation = useCallback(
+    debounce((visualisationName) => {
+      // Construct the API path and query parameters
+      const visualisation = state.visualisations[visualisationName];
+      if (visualisation && visualisation.queryParams) {
+        const path = visualisation.dataPath;
+        const queryParams = visualisation.queryParams;
+
+        // Use the debouncedGet method from your API service
+        api.baseService.get(path, { queryParams }).then((data) => {
+          dispatch({
+            type: actionTypes.UPDATE_VIS_DATA,
+            payload: { visualisationName, data },
+          });
+        }).catch((error) => {
+          console.error('Error fetching data for visualisation:', error);
+        });
+      }
+    }, 500),
+    [state.visualisations, dispatch]
+  );
+
+
   const contextValue = React.useMemo(() => {
-    return { state, dispatch };
-  }, [state, dispatch]);
+    return { state, dispatch, fetchDataForVisualisation };
+  }, [state, dispatch, fetchDataForVisualisation]);
+  
 
   useEffect(() => {
     // Initialise non-parameterised layers
