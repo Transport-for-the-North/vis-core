@@ -2,14 +2,14 @@ import React, { createContext, useEffect, useContext, useReducer } from 'react';
 
 import { actionTypes, mapReducer } from 'reducers';
 import { hasRouteParameter, replaceRouteParameter } from 'utils';
-import { PageContext } from 'contexts';
+import { AppContext, PageContext } from 'contexts';
 
 // Create a context for the app configuration
 export const MapContext = createContext();
 
 const initialState = {
-  layers: {}, // Changed from an array to an object
-  visualisations: [],
+  layers: {},
+  visualisations: {},
   metadataLayers: [],
   filters: [],
   map: null,
@@ -18,6 +18,7 @@ const initialState = {
 
 // Create a custom hook to use the app config context
 export const MapProvider = ({ children }) => {
+  const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
@@ -29,7 +30,7 @@ export const MapProvider = ({ children }) => {
     // Initialise non-parameterised layers
     const nonParameterisedLayers = pageContext.config.layers.filter(layer => !hasRouteParameter(layer.path));
     nonParameterisedLayers.forEach(layer => {
-      // Fetch and add non-parameterized layers to the map
+      // Fetch and add non-parameterised layers to the map
       dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: layer } });
     });
 
@@ -50,6 +51,32 @@ export const MapProvider = ({ children }) => {
         });
       }
     });
+    
+    // Initialise visualisations
+    const visualisationConfig = pageContext.config.visualisations;
+    const apiSchema = appContext.apiSchema;
+    visualisationConfig.forEach(visConfig => {
+      const queryParams = {};
+      const apiRoute = visConfig.dataPath;
+      const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+      apiParameters.forEach(param => {
+        if (param.in === "query") {
+          queryParams[param.name] = ""; // To be populated by update param value action
+        }
+      });
+      const visualisation = {
+        ...visConfig,
+        dataPath: apiRoute,
+        queryParams: queryParams,
+        data: [], // To be populated by data fetch
+        paintProperty: {}
+      };
+      dispatch({
+        type: actionTypes.ADD_VISUALISATION,
+        payload: { [visConfig.name]: visualisation }
+      });
+    });
+
     return () => {
       console.log("Map context unmount")
       dispatch({

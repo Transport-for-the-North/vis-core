@@ -30,9 +30,9 @@ export const appConfig = {
                         name: "Reliability",
                         type: "geojson",
                         style: "categorical",
-                        valueField: "id",
-                        source: "api",
-                        path: "/api/bsip/reliability"
+                        valueField: "category",
+                        dataSource: "api",
+                        dataPath: "/api/bsip/reliability"
                     }
                 ],
                 metadataLayers: [
@@ -76,8 +76,8 @@ export const appConfig = {
                         filterName: "Base timetable",
                         paramName: "baseTimetableId",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisation: "Reliability",
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Reliability"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -94,8 +94,8 @@ export const appConfig = {
                         filterName: "Adjusted timetable",
                         paramName: "adjustedTimetableId",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisation: "Reliability",
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Reliability"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -112,8 +112,8 @@ export const appConfig = {
                         filterName: "Median duration (secs)",
                         paramName: "medianDurationSecs",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisation: "Reliability",
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Reliability"],
                         type: "slider",
                         min: 0,
                         max: 12000,
@@ -123,8 +123,8 @@ export const appConfig = {
                         filterName: "Origin Zone ID",
                         paramName: "originZoneId",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisation: "Reliability",
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Reliability"],
                         type: "map",
                         layer: "BSIP Zone",
                         field: "zone_id"
@@ -165,8 +165,8 @@ export const appConfig = {
                         filterName: "Network scenario",
                         paramName: "networkScenarioName",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisations: ["NoHAM Links"],
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -188,8 +188,8 @@ export const appConfig = {
                         filterName: "Demand scenario",
                         paramName: "demandScenarioName",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisations: ["NoHAM Links"],
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -211,8 +211,8 @@ export const appConfig = {
                         filterName: "Year",
                         paramName: "year",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisations: ["NoHAM Links"],
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
@@ -234,8 +234,8 @@ export const appConfig = {
                         filterName: "Time period",
                         paramName: "timePeriodCode",
                         target: "api",
-                        action: "GET_VIS_DATA",
-                        visualisations: ["NoHAM Links"],
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Links"],
                         type: "dropdown",
                         values: {
                             source: "local",
