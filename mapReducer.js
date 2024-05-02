@@ -9,7 +9,7 @@ export const actionTypes = {
     UPDATE_PARAMETERISED_LAYER: 'UPDATE_PARAMETERISED_LAYER',
     ADD_VISUALISATION: 'ADD_VISUALISATION',
     UPDATE_QUERY_PARAMS: 'UPDATE_QUERY_PARAMS',
-    FETCH_DATA: 'FETCH_DATA',
+    UPDATE_VIS_DATA: 'UPDATE_VIS_DATA',
     JOIN_DATA: 'JOIN_DATA',
     SET_IS_LOADING: 'SET_IS_LOADING'
 };
@@ -19,7 +19,7 @@ export const mapReducer = (state, action) => {
         case actionTypes.RESET_CONTEXT:
             return { ...state, layers: {}, visualisations: {} };
         case actionTypes.SET_PAGE_INFO:
-            return { ...state, pageInfo: action.payload} 
+            return { ...state, pageInfo: action.payload};
         case actionTypes.INITIALISE_SIDEBAR:
             return { ...state, filters: action.payload };
         case actionTypes.ADD_LAYER:
@@ -48,6 +48,7 @@ export const mapReducer = (state, action) => {
             // Logic to add a visualisation
             return { ...state, visualisations: { ...state.visualisations, ...action.payload } };
         }
+
         case actionTypes.UPDATE_QUERY_PARAMS: {
             const visualisationNames = action.payload.filter.visualisations;
             const paramName = action.payload.filter.paramName;
@@ -73,9 +74,19 @@ export const mapReducer = (state, action) => {
                 visualisations: updatedVisualisations,
             };
         }
-        case actionTypes.FETCH_DATA:
-            // Logic to fetch data
-            break;
+
+        case actionTypes.UPDATE_VIS_DATA: {return {
+            ...state,
+            visualisations: {
+                ...state.visualisations,
+                [action.payload.visualisationName]: {
+                ...state.visualisations[action.payload.visualisationName],
+                data: action.payload.data,
+              },
+            },
+          };
+        }
+
         case actionTypes.JOIN_DATA:
             // Logic to join data
             break;
