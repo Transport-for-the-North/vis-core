@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { PageContext } from 'contexts';
@@ -67,20 +67,31 @@ const SliderFilter = ({ filter, onChange }) => {
 
 
 const Sidebar = () => {
-  const { dispatch } = useMapContext();
+  const { state, dispatch } = useMapContext();
   const pageContext = useContext(PageContext);
+  const initializedRef = useRef(false); // Ref to track if initialisation has occurred
+  // Destructure visualisations from state
+  const { visualisations } = state;
 
   useEffect(() => {
-    // Initialize query params for each filter with a defaultValue
-    pageContext.config.filters.forEach((filter) => {
-      if (filter.action === 'UPDATE_QUERY_PARAMS') {
-        const defaultValue = filter.values?.values[0]?.paramValue
-        if (defaultValue !== undefined) {
-          handleFilterChange(filter, defaultValue);
+    // Check if visualisations are ready and initialisation has not occurred yet
+    if (!initializedRef.current && Object.keys(visualisations).length > 0) {
+      // Initialize query params for each filter with a defaultValue
+      pageContext.config.filters.forEach((filter) => {
+        if (filter.action === 'UPDATE_QUERY_PARAMS') {
+          const defaultValue = filter.values?.values[0]?.paramValue;
+          if (defaultValue !== undefined) {
+            dispatch({
+              type: filter.action,
+              payload: { filter, value: defaultValue }
+            });
+          }
         }
-      }
-    });
-  }, [pageContext.config.filters, dispatch]);
+      });
+      // Mark initialisation as done
+      initializedRef.current = true;
+    }
+  }, [pageContext.config.filters, dispatch, visualisations]);
 
   const handleFilterChange = (filter, value) => {
     dispatch({
