@@ -162,6 +162,24 @@ export const appConfig = {
                 ],
                 filters: [
                     {
+                        filterName: "Delivery programme",
+                        paramName: "deliveryProgrammeName",
+                        target: "api",
+                        action: "UPDATE_QUERY_PARAMS",
+                        visualisations: ["Links"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                { 
+                                    displayValue: "Default",
+                                    paramValue: ''
+                                
+                                }
+                            ]
+                        }
+                    },
+                    {
                         filterName: "Network scenario",
                         paramName: "networkScenarioName",
                         target: "api",
