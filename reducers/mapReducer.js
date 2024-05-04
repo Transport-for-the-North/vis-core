@@ -87,6 +87,20 @@ export const mapReducer = (state, action) => {
           };
         }
 
+        case actionTypes.SET_MAP: {
+            const { visualisationName, map } = action.payload;
+            return {
+                ...state,
+                visualisations: {
+                ...state.visualisations,
+                [visualisationName]: {
+                    ...state.visualisations[visualisationName],
+                    map: map,
+                },
+                },
+            };
+        }
+        
         case actionTypes.JOIN_DATA:
             // Logic to join data
             break;

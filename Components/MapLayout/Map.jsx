@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { api } from 'services';
 import { useMap, useMapContext } from 'hooks';
+import { Visualisation } from './Visualisation'
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -99,7 +100,13 @@ const Map = () => {
     };
   }, [state.layers, isMapReady, map, addLayerToMap]);
 
-  return <StyledMapContainer ref={mapContainerRef} />;
+  return (
+    <StyledMapContainer ref={mapContainerRef}>
+      {Object.values(state.visualisations).map((visConfig) => (
+        <Visualisation key={visConfig.name} visualisationName={visConfig.name} />
+      ))}
+    </StyledMapContainer>
+  );
 };
 
 const handleMapClick = (e, map, layers, dispatch) => {
