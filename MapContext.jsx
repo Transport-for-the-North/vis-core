@@ -23,33 +23,12 @@ export const MapProvider = ({ children }) => {
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
 
-  // Fetches the data from the API then updates in the visualisation
-  const fetchDataForVisualisation = useCallback(
-    debounce((visualisationName) => {
-      // Construct the API path and query parameters
-      const visualisation = state.visualisations[visualisationName];
-      if (visualisation && visualisation.queryParams) {
-        const path = visualisation.dataPath;
-        const queryParams = visualisation.queryParams;
-
-        // Use the debouncedGet method from your API service
-        api.baseService.get(path, { queryParams }).then((data) => {
-          dispatch({
-            type: actionTypes.UPDATE_VIS_DATA,
-            payload: { visualisationName, data },
-          });
-        }).catch((error) => {
-          console.error('Error fetching data for visualisation:', error);
-        });
-      }
-    }, 500),
-    [state.visualisations, dispatch]
-  );
+  
 
 
   const contextValue = React.useMemo(() => {
-    return { state, dispatch, fetchDataForVisualisation };
-  }, [state, dispatch, fetchDataForVisualisation]);
+    return { state, dispatch };
+  }, [state, dispatch]);
   
 
   useEffect(() => {
@@ -87,7 +66,7 @@ export const MapProvider = ({ children }) => {
       const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
       apiParameters.forEach(param => {
         if (param.in === "query") {
-          queryParams[param.name] = ""; // To be populated by update param value action
+          queryParams[param.name] = null; // To be populated by update param value action
         }
       });
       const visualisation = {
