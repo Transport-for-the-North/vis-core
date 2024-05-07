@@ -11,7 +11,7 @@
     --standardFontFamily: 'Hanken Grotesk', sans-serif;
   }
   .NavButton {
-    color: black;
+    color: #4b3e91;
     font-family: var(--standardFontFamily);
     font-size: larger;
     text-decoration: 0;
