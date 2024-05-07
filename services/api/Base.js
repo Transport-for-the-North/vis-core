@@ -66,8 +66,6 @@ class BaseService {
         method: "GET",
         ...addOptions,
       };
-  
-      console.log(url)
       const result = await fetch(url, options).catch(error => console.log(error));
       const data = await result.json();
   

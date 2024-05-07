@@ -9,7 +9,95 @@ export const appConfig = {
     contactEmail:
         "abrereton-halls@systra.com",
     appPages: [
-        {
+        // Inside app pages array
+			{
+                pageName: "Bus Accessibility",
+                url: "/bus-accessibility",
+                type: "MapLayout",
+                config: {
+                    layers: [
+                        {
+                            uniqueId: "BsipZoneVectorTile",
+                            name: "BSIP Zone Vector Tile",
+                            type: "tile",
+                            source: "api",
+                            path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
+                            sourceLayer: "zones",
+                            geometryType: "polygon"
+                        }
+                    ],
+                    visualisations: [
+                        {
+                            name: "Accessibility",
+                            type: "joinDataToMap",
+                            joinLayer: "BSIP Zone Vector Tile",
+                            style: "polygon-continuous",
+                            joinField: "id",
+                            valueField: "value",
+                            dataSource: "api",
+                            dataPath: "/accessibility"
+                        }
+                    ],
+                    metadataLayers: [
+                    ],
+                    filters: [
+                        {
+                            filterName: "Timetable",
+                            paramName: "timetable_id",
+                            target: "api",
+                            action: "UPDATE_QUERY_PARAMS",
+                            visualisations: ["Accessibility"],
+                            type: "dropdown",
+                            values: {
+                                source: "local",
+                                values: [
+                                    { 
+                                        displayValue: "2024-04-09",
+                                        paramValue: 2
+                                    },
+                                    { 
+                                        displayValue: "2024-04-09 Dummy",
+                                        paramValue: 7
+                                    }                                
+                                ]
+                            }
+                        },
+                        {
+                            filterName: "Value type",
+                            paramName: "valueType",
+                            target: "api",
+                            action: "UPDATE_QUERY_PARAMS",
+                            visualisations: ["Accessibility"],
+                            type: "dropdown",
+                            values: {
+                                source: "local",
+                                values: [
+                                    { 
+                                        displayValue: "Jobs",
+                                        paramValue: "jobs"
+                                    },
+                                    { 
+                                        displayValue: "Schools",
+                                        paramValue: "schools"
+                                    }                                
+                                ]
+                            }
+                        },
+                        {
+                            filterName: "Cutoff Time",
+                            paramName: "cutoffTimeMinutes",
+                            target: "api",
+                            action: "UPDATE_QUERY_PARAMS",
+                            visualisations: ["Accessibility"],
+                            type: "slider",
+                            min: 15,
+                            max: 225,
+                            interval: 15
+                        }
+                    ]
+                }
+            }
+        ,{
             pageName: "Reliability",
             url: "/reliability",
             type: "MapLayout",

@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback, useRef } from 'react';
-import styled from 'styled-components';
-import 'maplibre-gl/dist/maplibre-gl.css';
+import React, { useEffect, useCallback, useRef } from "react";
+import styled from "styled-components";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 import { api } from 'services';
 import { useMap, useMapContext } from 'hooks';
@@ -11,76 +11,88 @@ const StyledMapContainer = styled.div`
   height: calc(100vh - 75px);
 `;
 
+//{mapData, colourScheme}
 const Map = () => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
   const { state, dispatch } = useMapContext();
-
+  
+  // calculateBins().then((response) => console.log(response))
   const getLayerStyle = (geometryType) => {
     switch (geometryType) {
-      case 'polygon':
+      case "polygon":
         return {
-          'id': '',
-          'type': 'fill',
-          'source': '',
-          'paint': {
-            'fill-color': 'black',
-            'fill-opacity': 0.1
-          }
+          id: "",
+          type: "fill",
+          source: "",
+          paint: {
+            "fill-color": "black",
+            "fill-opacity": 0.1,
+          },
         };
-      case 'line':
+      case "line":
         return {
-          'id': '',
-          'type': 'line',
-          'source': '',
-          'paint': {
-            'line-color': 'black',
-            'line-opacity': 0.1
-          }
+          id: "",
+          type: "line",
+          source: "",
+          paint: {
+            "line-color": "black",
+            "line-opacity": 0.1,
+          },
         };
-      case 'point':
+      case "point":
         return {
-          'id': '',
-          'type': 'circle',
-          'source': '',
-          'paint': {
-            'circle-radius': 5,
-            'circle-color': 'black'
-          }
+          id: "",
+          type: "circle",
+          source: "",
+          paint: {
+            "circle-radius": 5,
+            "circle-color": "black",
+          },
         };
       default:
         return {};
     }
   };
 
-  const addLayerToMap = useCallback((layer) => {
-    if (!map.getSource(layer.name)) {
-      let sourceConfig = {};
-      let layerConfig = getLayerStyle(layer.geometryType);
-      layerConfig.id = layer.name;
+  const addLayerToMap = useCallback(
+    (layer) => {
+      if (!map.getSource(layer.name)) {
+        let sourceConfig = {};
+        let layerConfig = getLayerStyle(layer.geometryType);
+        layerConfig.id = layer.name;
 
-      if (layer.type === 'geojson') {
-        // Fetch and add a GeoJSON layer
-        api.geodataService.getLayer(layer).then((geojson) => {
-          sourceConfig.type = 'geojson';
-          sourceConfig.data = geojson;
+        if (layer.type === "geojson") {
+          // Fetch and add a GeoJSON layer
+          api.geodataService.getLayer(layer).then((geojson) => {
+            sourceConfig.type = "geojson";
+            sourceConfig.data = geojson;
+            map.addSource(layer.name, sourceConfig);
+            map.addLayer({ ...layerConfig, source: layer.name });
+          });
+        } else if (layer.type === "tile") {
+          // Add a tile layer
+          const url =
+            layer.source === "api"
+              ? api.geodataService.buildTileLayerUrl(layer.path)
+              : layer.path;
+          sourceConfig.type = "vector";
+          sourceConfig.tiles = [url];
           map.addSource(layer.name, sourceConfig);
-          map.addLayer({ ...layerConfig, 'source': layer.name });
-        });
-      } else if (layer.type === 'tile') {
-        // Add a tile layer
-        const url = layer.source === 'api' ? api.geodataService.buildTileLayerUrl(layer.path) : layer.path;
-        sourceConfig.type = 'vector';
-        sourceConfig.tiles = [url];
-        map.addSource(layer.name, sourceConfig);
-        map.addLayer({ ...layerConfig, 'source': layer.name, 'source-layer': layer.sourceLayer });
+          map.addLayer({
+            ...layerConfig,
+            source: layer.name,
+            "source-layer": layer.sourceLayer,
+          });
+        }
       }
-    }
-  }, [map]);
+    },
+    [map]
+  );
 
   useEffect(() => {
     if (isMapReady) {
-      console.log('Map load within Map component');
+      console.log("Map load within Map component");
       Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
     }
 
@@ -114,7 +126,9 @@ const handleMapClick = (e, map, layers, dispatch) => {
   if (!layers) return;
 
   layers.forEach((layer) => {
-    const features = map.queryRenderedFeatures(e.point, { layers: [layer.name] });
+    const features = map.queryRenderedFeatures(e.point, {
+      layers: [layer.name],
+    });
     clickedFeatures.push(...features);
   });
 
@@ -126,11 +140,13 @@ const updateMapFilters = (clickedFeatures, dispatch) => {
     dispatch({
       type: "UPDATE_FILTER",
       payload: {
-        filterName: 'test',
+        filterName: "test",
         value: clickedFeature.properties.id,
       },
     });
   });
 };
+
+
 
 export default React.memo(Map);
