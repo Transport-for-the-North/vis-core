@@ -1,8 +1,8 @@
-import Map from "./Map";
 import styled from 'styled-components';
+import Map from "./Map";
 import Sidebar from './Sidebar';
-import { Dimmer } from "Components/Dimmer";
-import { useMapContext } from "hooks";
+
+
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -14,15 +14,18 @@ const MapContainer = styled.div`
   position: relative;
 `;
 
+
 export const MapLayout = () => {
+
   return (
     <LayoutContainer>
       <Sidebar />
       <MapContainer>
-        <Map />
+        <Map/>
       </MapContainer>
       {/* <Dimmer dimmed={state.isloading} showLoader={true}/> */}
     </LayoutContainer>
   );
 };
+
   

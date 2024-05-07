@@ -1,5 +1,7 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react';
+import chroma from 'chroma-js';
+import colorbrewer from 'colorbrewer';
 import { debounce } from 'lodash';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useMapContext } from 'hooks';
 import { actionTypes } from 'reducers';
@@ -7,6 +9,7 @@ import { api } from 'services';
 
 // Debounced fetchDataForVisualisation function
 const fetchDataForVisualisation = debounce(async (visualisation, dispatch, setLoading) => {
+    console.log("sucess")
     if (visualisation && visualisation.queryParams) {
         setLoading(true); // Set loading to true
         const path = visualisation.dataPath;
@@ -38,27 +41,102 @@ export const Visualisation = ({ visualisationName }) => {
         // Reclassify data if needed
         const reclassifiedData = reclassifyData(data);
 
+        const colourPalette = calculateColours("rgb", reclassifiedData);
+
         // Update the map style based on the type of map, reclassified data, and color palette
-        const paintProperty = createPaintProperty(reclassifiedData, visualisation.type);
+        const paintProperty = createPaintProperty(reclassifiedData, visualisation.type, colourPalette);
         dispatch({
             type: 'UPDATE_MAP_STYLE',
             payload: { visualisationName, paintProperty },
         });
     }, [visualisation.type, dispatch, visualisationName]);
 
-    // Function to reclassify data if needed
-    const reclassifyData = useCallback((data) => {
-        // Placeholder
+    // Function to recalculate bins if needed
+    const reclassifyData = ((data) => {
+        let values = []
+        data.map((value) => {
+            values.push(value.value)
+            return values
+        })
         console.log("Bins recalculated")
-        return [];
-    }, []);
+        return chroma.limits(values, 'q', 4);
+    });
 
-    // Function to create a paint property for Maplibre based on the visualisation type and data
-    const createPaintProperty = useCallback((data, type) => {
-        // Placeholder
-        console.log("Paint property updated")
-        return {};
-    }, []);
+    // Function to create a paint property for Maplibre based on the visualisation type and bins
+    const createPaintProperty = ((bins, type, colours) => {
+        let colors = []
+        for (var i = 0; i < bins.length; i++){
+            colors.push(bins[i])
+            colors.push(colours[i])
+        }
+            
+        switch (type) {
+            case 'fill':
+                return {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'value'],
+                        ...colors,
+                    ],
+                    'fill-opacity': [
+                        "case",
+                        ["in", ["feature-state", "value"], ["literal", [0, null]]],
+                        0,
+                        1.0
+                    ],
+                };
+            case 'line':
+                return {
+                    'line-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'value'],
+                        ...colors,
+                    ]
+                };
+            case 'circle': {
+                return {
+                    'circle-color': [
+                        [
+                            'interpolate',
+                            ['linear'],
+                            ['get', 'value'],
+                            ...colors
+                        ],
+                    ],
+                    'circle-stroke-width': [
+                        "case",
+                        ["in", ["feature-state", "value"], ["literal", [0, null]]],
+                        0.0,
+                        1.0
+                    ],
+                    'circle-opacity': [
+                        "case",
+                        ["in", ["feature-state", "value"], ["literal", [0, null]]],
+                        0.0,
+                        1.0
+                    ],
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['to-number', ['feature-state', 'valueAbs']],
+                        ...colors
+                    ],
+                    'circle-stroke-color': [
+                        '#000000'
+                    ]
+                }
+            }
+            default:
+                return {};
+        }
+    });
+
+    // Function to calculate the colour palette based on the filters
+    const calculateColours = ((colourScheme, bins) => {
+        return colorbrewer["Reds"][bins.length]
+    })
 
     useEffect(() => {
         // Stringify the current queryParams for comparison
@@ -79,7 +157,7 @@ export const Visualisation = ({ visualisationName }) => {
 
     useEffect(() => {
         // Check if the data has changed
-        if (visualisation.data && visualisation.data !== prevDataRef.current) {
+        if (visualisation.data.length !== 0 && visualisation.data !== prevDataRef.current) {
             // Reclassify and update the map style
             reclassifyAndStyleMap(visualisation.data);
             // Update the ref to the current data
