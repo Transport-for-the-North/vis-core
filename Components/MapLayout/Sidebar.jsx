@@ -7,10 +7,16 @@ import { useMapContext } from 'hooks';
 // Styled components for the sidebar
 const SidebarContainer = styled.div`
   width: 300px;
-  background-color: #f0f0f0;
+  background-color: rgba(240, 240, 240, 0.65);
   padding: 20px;
   overflow-y: auto;
   text-align: left;
+  position: fixed;
+  left: 20px;
+  top: 95px;
+  z-index: 1000;
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
 `;
 
 const FilterContainer = styled.div`
