@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { PageContext } from 'contexts';
@@ -10,6 +10,7 @@ const SidebarContainer = styled.div`
   background-color: #f0f0f0;
   padding: 20px;
   overflow-y: auto;
+  text-align: left;
 `;
 
 const FilterContainer = styled.div`
@@ -21,10 +22,25 @@ const FilterLabel = styled.label`
   margin-bottom: 5px;
 `;
 
+const StyledSliderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const StyledSlider = styled.input`
-    width: 100%;
-    /* Add any other CSS styles you want to apply to your slider here */
-  `;
+  flex: 3;
+  width: 75%;
+  margin-right: 10%;
+`;
+
+const SliderValue = styled.span`
+  width: 25%;
+  text-align: right;
+  padding: 5px;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+`;
 
 const StyledDropdown = styled.select`
   width: 100%;
@@ -54,14 +70,45 @@ const DropdownFilter = ({ filter, onChange }) => {
 
 
 const SliderFilter = ({ filter, onChange }) => {
+  const [value, setValue] = useState(filter.min); // Initialize the state with the minimum value
+
+  const getDisplayValue = (sliderValue) => {
+    if (filter.displayAs) {
+      const { operation, operand, unit } = filter.displayAs;
+      let result = sliderValue;
+
+      switch (operation) {
+        case 'divide':
+          result = operand ? sliderValue / operand : sliderValue;
+          break;
+        // Add more cases for different operations if needed
+        default:
+          result = sliderValue;
+      }
+
+      return `${result} ${unit || ''}`;
+    }
+    return sliderValue;
+  };
+
+  const handleSliderChange = (e) => {
+    const newValue = e.target.value;
+    setValue(newValue); // Update the state with the new value
+    onChange(filter, newValue); // Call the onChange handler with the new value
+  };
+
   return (
-    <StyledSlider
-      type="range"
-      min={filter.min}
-      max={filter.max}
-      step={filter.interval}
-      onChange={(e) => onChange(filter, e.target.value)}
-    />
+    <StyledSliderContainer>
+      <StyledSlider
+        type="range"
+        min={filter.min}
+        max={filter.max}
+        step={filter.interval}
+        value={value} // Set the value of the slider to the state value
+        onChange={handleSliderChange}
+      />
+      <SliderValue>{getDisplayValue(value)}</SliderValue>
+    </StyledSliderContainer>
   );
 };
 
