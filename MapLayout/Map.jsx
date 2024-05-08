@@ -17,7 +17,6 @@ const Map = () => {
   const { map, isMapReady } = useMap(mapContainerRef);
   const { state, dispatch } = useMapContext();
   
-  // calculateBins().then((response) => console.log(response))
   const getLayerStyle = (geometryType) => {
     switch (geometryType) {
       case "polygon":
@@ -67,8 +66,9 @@ const Map = () => {
           api.geodataService.getLayer(layer).then((geojson) => {
             sourceConfig.type = "geojson";
             sourceConfig.data = geojson;
+            sourceConfig.promoteId = "id";
             map.addSource(layer.name, sourceConfig);
-            map.addLayer({ ...layerConfig, source: layer.name });
+            map.addLayer({ ...layerConfig, source: layer.name});
           });
         } else if (layer.type === "tile") {
           // Add a tile layer
@@ -85,9 +85,25 @@ const Map = () => {
             "source-layer": layer.sourceLayer,
           });
         }
+        // if (state.visualisations[layer.visualisationName].data && state.visualisations[layer.visualisationName].data.length > 0) {
+        //   state.visualisations[layer.visualisationName].data.forEach((row) => {
+        //     map.setFeatureState(
+        //       {
+        //         source: layer.name,
+        //         sourceLayer: layer,
+        //         id: layerConfig.id
+        //       },
+        //       {
+        //         value: row["value"],
+        //         valueAbs: Math.abs(row["value"]),
+        //         filter: row["filter"]
+        //       }
+        //     )
+        //   })
+        // }
       }
     },
-    [map]
+    [map, state.visualisations]
   );
 
   useEffect(() => {
@@ -115,7 +131,7 @@ const Map = () => {
   return (
     <StyledMapContainer ref={mapContainerRef}>
       {Object.values(state.visualisations).map((visConfig) => (
-        <Visualisation key={visConfig.name} visualisationName={visConfig.name} />
+        <Visualisation key={visConfig.name} visualisationName={visConfig.name} map={map} />
       ))}
     </StyledMapContainer>
   );
