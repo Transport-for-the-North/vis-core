@@ -34,8 +34,8 @@ const AccordionContent = styled.div`
   border-radius: 0 0 5px 5px;
 `;
 
-export const AccordionSection = ({ title, children }) => {
-  const [isOpen, setIsOpen] = useState(true);
+export const AccordionSection = ({ title, children, defaultValue }) => {
+  const [isOpen, setIsOpen] = useState(defaultValue);
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);

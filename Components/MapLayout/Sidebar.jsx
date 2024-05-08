@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import parse from "html-react-parser";
 
-import { PageContext } from 'contexts';
+import { PageContext, AppContext } from 'contexts';
 import { useMapContext } from 'hooks';
 import { AccordionSection } from 'Components';
 
@@ -197,6 +198,7 @@ const SliderFilter = ({ filter, onChange }) => {
 const Sidebar = () => {
   const { state, dispatch } = useMapContext();
   const pageContext = useContext(PageContext);
+  const appContext = useContext(AppContext)
   const initializedRef = useRef(false); // Ref to track if initialisation has occurred
   // Destructure visualisations from state
   const { visualisations } = state;
@@ -240,7 +242,7 @@ const Sidebar = () => {
       <AccordionSection title="About this visualisation">
         <p>PLACEHOLDER</p>
       </AccordionSection>
-      <AccordionSection title="Filtering and data selection">
+      <AccordionSection title="Filtering and data selection"  defaultValue={true}>
         {pageContext.config.filters.map((filter) => (
           <FilterContainer key={filter.filterName}>
             <FilterLabel 
@@ -268,6 +270,9 @@ const Sidebar = () => {
             )}
           </FilterContainer>
         ))}
+      </AccordionSection>
+      <AccordionSection title="Legal Mentions">
+        {parse(appContext.legalText)}
       </AccordionSection>
     </SidebarContainer>
   );
