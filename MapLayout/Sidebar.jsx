@@ -5,16 +5,64 @@ import { PageContext } from 'contexts';
 import { useMapContext } from 'hooks';
 import { AccordionSection } from 'Components';
 
+const InfoButton = styled.button`
+  background: #e6e6e6;
+  border: none;
+  padding: 0 5px 0 5px;
+  margin-left: 5px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 2px; 
+
+  &:hover {
+    background: #cccccc; // Change color on hover
+  }
+
+  &:hover span {
+    visibility: visible;
+    opacity: 1;
+  }
+`;
+
+const TooltipText = styled.span`
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 9999; // Ensures it appears above all interface components
+  bottom: 125%; // Positions the tooltip above the button
+  left: 50%;
+  margin-left: -60px; // Centers the tooltip
+  opacity: 0;
+  transition: opacity 0.3s;
+  overflow: visible;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+  }
+`;
+
 // Styled components for the sidebar
 const SidebarContainer = styled.div`
   width: 300px;
   background-color: rgba(240, 240, 240, 0.65);
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto;
   text-align: left;
   position: fixed;
-  left: 20px;
-  top: 95px;
+  left: 10px;
+  top: 85px;
   z-index: 1000;
   border-radius: 10px;
   backdrop-filter: blur(8px);
@@ -24,10 +72,22 @@ const FilterContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const FilterLabel = styled.label`
-  display: block;
+const FilterLabelWithInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 5px;
 `;
+
+const FilterLabel = ({ text, info }) => (
+  <FilterLabelWithInfo>
+    <span>{text}</span>
+    {/* <InfoButton>
+      ℹ
+      <TooltipText>{info}</TooltipText>
+    </InfoButton> */}
+  </FilterLabelWithInfo>
+);
 
 const StyledSliderContainer = styled.div`
   display: flex;
@@ -162,7 +222,11 @@ const Sidebar = () => {
       <AccordionSection title="Filtering and data selection">
         {pageContext.config.filters.map((filter) => (
           <FilterContainer key={filter.filterName}>
-            <FilterLabel htmlFor={filter.paramName}>{filter.filterName}</FilterLabel>
+            <FilterLabel 
+              htmlFor={filter.paramName}
+              text={filter.filterName}
+              info="Placeholder text for information"
+            />
             {filter.type === 'dropdown' && (
               <DropdownFilter
                 key={filter.filterName}
