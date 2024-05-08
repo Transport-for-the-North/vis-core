@@ -1,5 +1,3 @@
-import { Visualisation } from "Components/MapLayout/Visualisation";
-
 export const appConfig = {
   title: "TAME React Template",
   introduction:
