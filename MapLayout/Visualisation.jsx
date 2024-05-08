@@ -44,12 +44,12 @@ export const Visualisation = ({ visualisationName }) => {
         const colourPalette = calculateColours("rgb", reclassifiedData);
 
         // Update the map style based on the type of map, reclassified data, and color palette
-        const paintProperty = createPaintProperty(reclassifiedData, visualisation.type, colourPalette);
+        const paintProperty = createPaintProperty(reclassifiedData, visualisation.style, colourPalette);
         dispatch({
             type: 'UPDATE_MAP_STYLE',
             payload: { visualisationName, paintProperty },
         });
-    }, [visualisation.type, dispatch, visualisationName]);
+    }, [visualisation.style, dispatch, visualisationName]);
 
     // Function to recalculate bins if needed
     const reclassifyData = ((data) => {
@@ -63,15 +63,15 @@ export const Visualisation = ({ visualisationName }) => {
     });
 
     // Function to create a paint property for Maplibre based on the visualisation type and bins
-    const createPaintProperty = ((bins, type, colours) => {
+    const createPaintProperty = ((bins, style, colours) => {
         let colors = []
         for (var i = 0; i < bins.length; i++){
             colors.push(bins[i])
             colors.push(colours[i])
         }
             
-        switch (type) {
-            case 'fill':
+        switch (style) {
+            case 'polygon-continuous':
                 return {
                     'fill-color': [
                         'interpolate',
