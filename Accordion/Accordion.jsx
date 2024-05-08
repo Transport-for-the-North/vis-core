@@ -35,7 +35,7 @@ const AccordionContent = styled.div`
 `;
 
 export const AccordionSection = ({ title, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
