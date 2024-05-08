@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { PageContext } from 'contexts';
 import { useMapContext } from 'hooks';
+import { AccordionSection } from 'Components';
 
 // Styled components for the sidebar
 const SidebarContainer = styled.div`
@@ -155,29 +156,34 @@ const Sidebar = () => {
 
   return (
     <SidebarContainer key={pageContext.pageName}>
-      {pageContext.config.filters.map((filter) => (
-        <FilterContainer key={filter.filterName}>
-          <FilterLabel htmlFor={filter.paramName}>{filter.filterName}</FilterLabel>
-          {filter.type === 'dropdown' && (
-            <DropdownFilter
-              key={filter.filterName}
-              filter={filter}
-              onChange={(filter, value) =>
-                handleFilterChange(filter, value)
-              }
-            />
-          )}
-          {filter.type === 'slider' && (
-            <SliderFilter
-              key={filter.filterName}
-              filter={filter}
-              onChange={(filter, value) =>
-                handleFilterChange(filter, value)
-              }
-            />
-          )}
-        </FilterContainer>
-      ))}
+      <AccordionSection title="About this visualisation">
+        <p>PLACEHOLDER</p>
+      </AccordionSection>
+      <AccordionSection title="Filtering and data selection">
+        {pageContext.config.filters.map((filter) => (
+          <FilterContainer key={filter.filterName}>
+            <FilterLabel htmlFor={filter.paramName}>{filter.filterName}</FilterLabel>
+            {filter.type === 'dropdown' && (
+              <DropdownFilter
+                key={filter.filterName}
+                filter={filter}
+                onChange={(filter, value) =>
+                  handleFilterChange(filter, value)
+                }
+              />
+            )}
+            {filter.type === 'slider' && (
+              <SliderFilter
+                key={filter.filterName}
+                filter={filter}
+                onChange={(filter, value) =>
+                  handleFilterChange(filter, value)
+                }
+              />
+            )}
+          </FilterContainer>
+        ))}
+      </AccordionSection>
     </SidebarContainer>
   );
 };
