@@ -193,7 +193,13 @@ const Sidebar = () => {
       // Initialize query params for each filter with a defaultValue
       pageContext.config.filters.forEach((filter) => {
         if (filter.action === 'UPDATE_QUERY_PARAMS') {
-          const defaultValue = filter.values?.values[0]?.paramValue;
+          let defaultValue;
+          if (filter.type === 'dropdown') {
+            defaultValue = filter.values?.values[0]?.paramValue;
+          } else if (filter.type === 'slider') {
+            defaultValue = filter.min;
+          }
+  
           if (defaultValue !== undefined) {
             dispatch({
               type: filter.action,
