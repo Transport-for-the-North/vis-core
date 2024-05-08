@@ -67,6 +67,7 @@ const SidebarHeader = styled.h2`
 
 const SidebarContainer = styled.div`
   width: 300px;
+  max-height: calc(100vh - 235px);
   background-color: rgba(240, 240, 240, 0.65);
   padding: 10px;
   overflow-y: auto;
@@ -77,6 +78,8 @@ const SidebarContainer = styled.div`
   z-index: 1000;
   border-radius: 10px;
   backdrop-filter: blur(8px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 `;
 
 const FilterContainer = styled.div`
