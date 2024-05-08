@@ -325,6 +325,34 @@ export const appConfig = {
                 ],
                 filters: [
                     {
+                        filterName: "Region",
+                        paramName: "zoneTypeId",
+                        target: "api",
+                        action: "UPDATE_PARAMETERISED_LAYER",
+                        layer: "BSIP Zone Vector Tile",
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                { 
+                                    displayValue: "North East MSOA",
+                                    paramValue: 2,
+                                
+                                },
+                                { 
+                                    displayValue: "North West MSOA",
+                                    paramValue: 3
+                                
+                                },
+                                { 
+                                    displayValue: "Yorkshire and Humber MSOA",
+                                    paramValue: 4
+                                
+                                }
+                            ]
+                        }
+                    },
+                    {
                         filterName: "Timetable",
                         paramName: "timetable_id",
                         target: "api",
