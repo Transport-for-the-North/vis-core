@@ -1,3 +1,5 @@
+import { Visualisation } from "Components/MapLayout/Visualisation";
+
 export const appConfig = {
     title: "TAME React Template",
     introduction: 
@@ -22,7 +24,8 @@ export const appConfig = {
                         source: "api",
                         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "zones",
-                        geometryType: "polygon"
+                        geometryType: "polygon",
+                        visualisationName: "Reliability"
                     }
                 ],
                 visualisations: [
@@ -148,7 +151,9 @@ export const appConfig = {
                         type: "geojson",
                         source: "api",
                         path: "/api/noham/links",
-                        geometryType: "line"
+                        geometryType: "line",
+                        visualisationName: "Links"
+
                     },
                     {
                         uniqueId: "NormsLinksVectorTile",
@@ -157,7 +162,8 @@ export const appConfig = {
                         source: "api",
                         path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
-                        geometryType: "line"
+                        geometryType: "line",
+                        visualisationName: "Links"
                     }
                 ],
                 visualisations: [
@@ -306,7 +312,8 @@ export const appConfig = {
                         source: "api",
                         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "zones",
-                        geometryType: "polygon"
+                        geometryType: "polygon", 
+                        visualisationName: "Accessibility"
                     }
                 ],
                 visualisations: [
