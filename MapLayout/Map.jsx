@@ -1,10 +1,11 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useContext } from "react";
 import styled from "styled-components";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { api } from 'services';
 import { useMap, useMapContext } from 'hooks';
 import { Visualisation } from './Visualisation'
+import { PageContext } from "contexts";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -15,6 +16,7 @@ const StyledMapContainer = styled.div`
 const Map = () => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
+  const pageContext = useContext(PageContext)
   const { state, dispatch } = useMapContext();
   
   const getLayerStyle = (geometryType) => {
@@ -103,8 +105,54 @@ const Map = () => {
         // }
       }
     },
-    [map, state.visualisations]
+    [map]
   );
+
+  
+  // Function to handle map click events
+  const handleMapClick = useCallback((event) => {
+    if (!isMapReady || !map) return;
+
+    // Get the point where the map is clicked
+    const point = event.point;
+
+    // Get all map filters
+    const mapFilters = pageContext.config.filters.filter(filter => filter.type === 'map');
+
+    // For each map filter, check if the clicked point has a feature from the layer
+    mapFilters.forEach(filter => {
+      const features = map.queryRenderedFeatures(point, { layers: [filter.layer] });
+      if (features.length > 0) {
+        // Assuming the first feature is the one we're interested in
+        const feature = features[0];
+        const value = feature.properties[filter.field];
+        console.log(`Updating ${filter.field}`)
+        // Dispatch the action with the value from the clicked feature
+        dispatch({
+          type: filter.action,
+          payload: { filter, value }
+        });
+      }
+    });
+  }, [isMapReady, map, pageContext.config.filters, dispatch]);
+  
+  // Set up the click event listener
+  useEffect(() => {
+    if (isMapReady) {
+      // Check if there is a map filter before adding the click handler
+      const hasMapFilter = pageContext.config.filters.some(filter => filter.type === 'map');
+      if (hasMapFilter) {
+        map.on('click', handleMapClick);
+      }
+    }
+
+    // Remove the click event listener when the component unmounts or dependencies change
+    return () => {
+      if (map) {
+        map.off('click', handleMapClick);
+      }
+    };
+  }, [isMapReady, map, handleMapClick]);
 
   useEffect(() => {
     if (isMapReady) {
@@ -136,33 +184,5 @@ const Map = () => {
     </StyledMapContainer>
   );
 };
-
-const handleMapClick = (e, map, layers, dispatch) => {
-  const clickedFeatures = [];
-  if (!layers) return;
-
-  layers.forEach((layer) => {
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: [layer.name],
-    });
-    clickedFeatures.push(...features);
-  });
-
-  updateMapFilters(clickedFeatures, dispatch);
-};
-
-const updateMapFilters = (clickedFeatures, dispatch) => {
-  clickedFeatures.forEach((clickedFeature) => {
-    dispatch({
-      type: "UPDATE_FILTER",
-      payload: {
-        filterName: "test",
-        value: clickedFeature.properties.id,
-      },
-    });
-  });
-};
-
-
 
 export default React.memo(Map);
