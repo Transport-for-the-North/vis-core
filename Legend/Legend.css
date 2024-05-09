@@ -9,6 +9,7 @@
     z-index: 1;
     width: fit-content;
     height: fit-content;
+    font-family: "Hanken Grotesk", sans-serif;
   }
   
   .legend-section {
@@ -25,9 +26,11 @@
     flex-direction: column;
   }
   
-  .legend label {
+  .legend-label {
+    font-size: small;
     font-weight: 600;
     margin-right: 8px;
+
   }
   
   .legend-section__date {
