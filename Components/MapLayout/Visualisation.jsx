@@ -3,7 +3,7 @@ import colorbrewer from "colorbrewer";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useMap, useMapContext } from "hooks";
+import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
 
@@ -41,11 +41,11 @@ export const Visualisation = ({ visualisationName, map }) => {
 
   // Function to reclassify data and update the map style
   const reclassifyAndStyleMap = useCallback(
-    (data) => {
+    (data, style) => {
       // Reclassify data if needed
-      const reclassifiedData = reclassifyData(data);
+      const reclassifiedData = reclassifyData(data, style);
 
-      const colourPalette = calculateColours("rgb", reclassifiedData);
+      const colourPalette = calculateColours("Reds", reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
       const paintProperty = createPaintProperty(
@@ -63,15 +63,91 @@ export const Visualisation = ({ visualisationName, map }) => {
     [visualisation.style, dispatch, visualisationName]
   );
 
+  // Function to add or update a GeoJSON source and layer and style it
+  const reclassifyAndStyleGeoJSONMap = useCallback(
+    (featureCollection, style) => {
+      if (!featureCollection) {
+        return;
+      }
+      if (!checkGeometryNotNull(featureCollection)) {
+        return;
+      }
+      if (!map.getSource(visualisationName)) {
+        // Add a new source
+        map.addSource(visualisationName, {
+          type: "geojson",
+          data: featureCollection,
+        });
+      } else {
+        // Update the existing source
+        map.getSource(visualisationName).setData(featureCollection);
+      }
+      // Reclassify data if needed
+      const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
+      const colourPalette = calculateColours("Paired", reclassifiedData);
+
+      // Update the map style based on the type of map, reclassified data, and color palette
+      const paintProperty = createPaintProperty(
+        reclassifiedData,
+        style,
+        colourPalette
+      );
+
+      if (!map.getLayer(visualisationName)) {
+        // Add a new layer (over the top of the existing one if need be)
+        map.addLayer({
+          id: visualisationName,
+          type: "fill",
+          source: visualisationName,
+          paint: paintProperty,
+        });
+      } else {
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(
+          paintProperty
+        )) {
+          map.setPaintProperty(
+            visualisationName,
+            paintPropertyName,
+            paintPropertyArray
+          );
+        }
+      }
+    },
+    [map, visualisationName]
+  );
+
   // Function to recalculate bins if needed
-  const reclassifyData = (data) => {
-    let values = [];
-    data.map((value) => {
-      values.push(value.value);
-      return values;
-    });
-    console.log("Bins recalculated");
-    return chroma.limits(values, "q", 4);
+  const reclassifyData = (data, style) => {
+    if (style.includes("continuous")) {
+      let values = data.map((value) => value.value);
+      console.log("Bins recalculated for continuous data");
+      return chroma.limits(values, "q", 4);
+    } else if (style.includes("categorical")) {
+      console.log("Categorical classification not implemented for joined data");
+      return;
+    } else {
+      console.log("Style not recognized");
+      return [];
+    }
+  };
+
+  const reclassifyGeoJSONData = (data, style) => {
+    if (style.includes("continuous")) {
+      console.log("Continuous classification not implemented for GeoJSON data");
+      return;
+    } else if (style.includes("categorical")) {
+      let categories = new Set();
+      data.features.forEach((feature) => {
+        if (feature.properties.hasOwnProperty("category")) {
+          categories.add(feature.properties.category);
+        }
+      });
+      console.log("Unique categories identified for categorical data");
+      return Array.from(categories);
+    } else {
+      console.log("Style not recognized");
+      return [];
+    }   
   };
 
   // Function to create a paint property for Maplibre based on the visualisation type and bins
@@ -97,6 +173,18 @@ export const Visualisation = ({ visualisationName, map }) => {
             0,
             1.0,
           ],
+        };
+      case "polygon-categorical":
+        // Assuming 'bins' is an array of category values and 'colours' is an array of corresponding colors
+        let categoricalColors = [];
+        for (let i = 0; i < bins.length; i++) {
+          categoricalColors.push(bins[i]); // Category value
+          categoricalColors.push(colours[i]); // Color for the category
+        }
+        categoricalColors.push(colours[colours.length - 1]); // Default color if no match is found
+        return {
+          "fill-color": ["match", ["get", "category"], ...categoricalColors],
+          "fill-opacity": 1.0,
         };
       case "line":
         return {
@@ -155,13 +243,21 @@ export const Visualisation = ({ visualisationName, map }) => {
           );
         });
       }
-      map.setPaintProperty(layer.name, paintProperty);
+      for (const [paintPropertyName, paintPropertyArray] of Object.entries(
+        paintProperty
+      )) {
+        map.setPaintProperty(
+          layer.name,
+          paintPropertyName,
+          paintPropertyArray
+        );
+      }
     });
   };
 
   // Function to calculate the colour palette based on the filters
   const calculateColours = (colourScheme, bins) => {
-    return colorbrewer["Reds"][bins.length];
+    return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
   };
 
   useEffect(() => {
@@ -184,19 +280,6 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
   }, [visualisation.queryParams, visualisationName, dispatch]);
 
-  useEffect(() => {
-    // Check if the data has changed
-    if (
-      visualisation.data.length !== 0 &&
-      visualisation.data !== prevDataRef.current
-    ) {
-      // Reclassify and update the map style
-      reclassifyAndStyleMap(visualisation.data);
-      // Update the ref to the current data
-      prevDataRef.current = visualisation.data;
-    }
-  }, [visualisation.data, reclassifyAndStyleMap, dispatch]);
-
   // Log loading status to console
   useEffect(() => {
     if (isLoading) {
@@ -205,6 +288,89 @@ export const Visualisation = ({ visualisationName, map }) => {
       console.log("Visualisation data finished loading.");
     }
   }, [isLoading]);
+
+  // GeoJSON Stuff
+  function checkGeometryNotNull(featureCollection) {
+    // Check if the feature collection is provided
+    if (
+      !featureCollection ||
+      !featureCollection.features ||
+      featureCollection.features.length === 0
+    ) {
+      return false; // Return false if the feature collection is empty or undefined
+    }
+
+    // Iterate through each feature in the feature collection
+    for (let feature of featureCollection.features) {
+      // Check if the geometry property exists and is not null
+      if (!feature.geometry || feature.geometry === null) {
+        return false; // Return false if geometry is null for any feature
+      }
+    }
+
+    return true; // Return true if geometry is not null for all features
+  }
+
+  function getUniqueCategories(featureCollection) {
+    const uniqueCategories = new Set(); // Use a Set to store unique values
+
+    // Iterate over each feature in the feature collection
+    featureCollection.features.forEach((feature) => {
+      if (feature.properties && feature.properties.category) {
+        // Add the category value to the Set
+        uniqueCategories.add(feature.properties.category);
+      }
+    });
+
+    // Convert the Set back to an Array to return the unique values
+    return Array.from(uniqueCategories);
+  }
+
+  useEffect(() => {
+    const dataHasChanged =
+      visualisation.data.length !== 0 &&
+      visualisation.data !== prevDataRef.current;
+    if (!dataHasChanged) {
+      return;
+    }
+
+    switch (visualisation.type) {
+      case "geojson": {
+        reclassifyAndStyleGeoJSONMap(
+          JSON.parse(visualisation.data[0].feature_collection),
+          visualisation.style
+        );
+        break;
+      }
+
+      case "joinDataToMap": {
+        // Reclassify and update the map style
+        reclassifyAndStyleMap(visualisation.data, visualisation.style);
+        break;
+      }
+    }
+    // Update the ref to the current data
+    prevDataRef.current = visualisation.data;
+
+    return () => {
+      console.log("Map unmount");
+      if (map && visualisation.type === 'geojson') {
+        if (map.getLayer(visualisation.name)) {
+          map.removeLayer(visualisation.name);
+        }
+        if (map.getSource(visualisation.name)) {
+          map.removeSource(visualisation.name);
+        }
+      }
+    };
+  }, [
+    visualisation,
+    reclassifyAndStyleGeoJSONMap,
+    setLoading,
+    visualisation.data,
+    reclassifyAndStyleMap,
+    dispatch,
+  ]);
 
   // Data component, renders nothing
   return null;

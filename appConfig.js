@@ -16,7 +16,7 @@ export const appConfig = {
         layers: [
           {
             uniqueId: "BsipZoneVectorTile",
-            name: "BSIP Zone Vector Tile",
+            name: "BSIP Zone",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
@@ -29,7 +29,7 @@ export const appConfig = {
           {
             name: "Reliability",
             type: "geojson",
-            style: "categorical",
+            style: "polygon-categorical",
             valueField: "category",
             dataSource: "api",
             dataPath: "/api/bsip/reliability",
@@ -48,7 +48,7 @@ export const appConfig = {
             paramName: "zoneTypeId",
             target: "api",
             action: "UPDATE_PARAMETERISED_LAYER",
-            layer: "BSIP Zone Vector Tile",
+            layer: "BSIP Zone",
             type: "dropdown",
             values: {
               source: "local",
@@ -109,7 +109,7 @@ export const appConfig = {
             action: "UPDATE_QUERY_PARAMS",
             visualisations: ["Reliability"],
             type: "slider",
-            min: 0,
+            min: 600,
             max: 12000,
             interval: 300,
             displayAs: {
@@ -126,7 +126,7 @@ export const appConfig = {
             visualisations: ["Reliability"],
             type: "map",
             layer: "BSIP Zone",
-            field: "zone_id",
+            field: "id",
           },
         ],
       },
@@ -286,7 +286,7 @@ export const appConfig = {
         layers: [
           {
             uniqueId: "BsipZoneVectorTile",
-            name: "BSIP Zone Vector Tile",
+            name: "BSIP Zone",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
@@ -299,7 +299,7 @@ export const appConfig = {
           {
             name: "Accessibility",
             type: "joinDataToMap",
-            joinLayer: "BSIP Zone Vector Tile",
+            joinLayer: "BSIP Zone",
             style: "polygon-continuous",
             joinField: "id",
             valueField: "value",
@@ -314,7 +314,7 @@ export const appConfig = {
             paramName: "zoneTypeId",
             target: "api",
             action: "UPDATE_PARAMETERISED_LAYER",
-            layer: "BSIP Zone Vector Tile",
+            layer: "BSIP Zone",
             type: "dropdown",
             values: {
               source: "local",
