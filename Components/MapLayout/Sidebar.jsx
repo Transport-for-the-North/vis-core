@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 import parse from "html-react-parser";
 
-import { PageContext, AppContext } from 'contexts';
-import { useMapContext } from 'hooks';
-import { AccordionSection } from 'Components';
+import { PageContext, AppContext } from "contexts";
+import { useMapContext } from "hooks";
+import { AccordionSection } from "Components";
 
 const InfoButton = styled.button`
   background: #e6e6e6;
@@ -13,7 +13,7 @@ const InfoButton = styled.button`
   margin-left: 5px;
   cursor: pointer;
   position: relative;
-  border-radius: 2px; 
+  border-radius: 2px;
 
   &:hover {
     background: #cccccc; // Change color on hover
@@ -63,7 +63,7 @@ const SidebarHeader = styled.h2`
   padding-left: 5px;
   color: #333;
   user-select: none;
-  background-color: rgba(255,255,255,0)
+  background-color: rgba(255, 255, 255, 0);
 `;
 
 const SidebarContainer = styled.div`
@@ -133,7 +133,9 @@ const StyledDropdown = styled.select`
 const DropdownFilter = ({ filter, onChange }) => {
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
-    const selectedOption = filter.values.values.find(option => option.displayValue === selectedValue);
+    const selectedOption = filter.values.values.find(
+      (option) => option.displayValue === selectedValue
+    );
     if (selectedOption) {
       onChange(filter, selectedOption.paramValue);
     }
@@ -150,7 +152,6 @@ const DropdownFilter = ({ filter, onChange }) => {
   );
 };
 
-
 const SliderFilter = ({ filter, onChange }) => {
   const [value, setValue] = useState(filter.min); // Initialize the state with the minimum value
 
@@ -160,7 +161,7 @@ const SliderFilter = ({ filter, onChange }) => {
       let result = sliderValue;
 
       switch (operation) {
-        case 'divide':
+        case "divide":
           result = operand ? sliderValue / operand : sliderValue;
           break;
         // Add more cases for different operations if needed
@@ -168,7 +169,7 @@ const SliderFilter = ({ filter, onChange }) => {
           result = sliderValue;
       }
 
-      return `${result} ${unit || ''}`;
+      return `${result} ${unit || ""}`;
     }
     return sliderValue;
   };
@@ -194,11 +195,10 @@ const SliderFilter = ({ filter, onChange }) => {
   );
 };
 
-
 const Sidebar = () => {
   const { state, dispatch } = useMapContext();
   const pageContext = useContext(PageContext);
-  const appContext = useContext(AppContext)
+  const appContext = useContext(AppContext);
   const initializedRef = useRef(false); // Ref to track if initialisation has occurred
   // Destructure visualisations from state
   const { visualisations } = state;
@@ -208,18 +208,18 @@ const Sidebar = () => {
     if (!initializedRef.current && Object.keys(visualisations).length > 0) {
       // Initialize query params for each filter with a defaultValue
       pageContext.config.filters.forEach((filter) => {
-        if (filter.action === 'UPDATE_QUERY_PARAMS') {
+        if (filter.action === "UPDATE_QUERY_PARAMS") {
           let defaultValue;
-          if (filter.type === 'dropdown') {
+          if (filter.type === "dropdown") {
             defaultValue = filter.values?.values[0]?.paramValue;
-          } else if (filter.type === 'slider') {
+          } else if (filter.type === "slider") {
             defaultValue = filter.min;
           }
-  
+
           if (defaultValue !== undefined) {
             dispatch({
               type: filter.action,
-              payload: { filter, value: defaultValue }
+              payload: { filter, value: defaultValue },
             });
           }
         }
@@ -232,40 +232,41 @@ const Sidebar = () => {
   const handleFilterChange = (filter, value) => {
     dispatch({
       type: filter.action,
-      payload: { filter, value }
+      payload: { filter, value },
     });
   };
 
   return (
     <SidebarContainer key={pageContext.pageName}>
-      <SidebarHeader>{pageContext.pageName || 'Visualisation Framework'}</SidebarHeader>
+      <SidebarHeader>
+        {pageContext.pageName || "Visualisation Framework"}
+      </SidebarHeader>
       <AccordionSection title="About this visualisation">
         <p>PLACEHOLDER</p>
       </AccordionSection>
-      <AccordionSection title="Filtering and data selection"  defaultValue={true}>
+      <AccordionSection
+        title="Filtering and data selection"
+        defaultValue={true}
+      >
         {pageContext.config.filters.map((filter) => (
           <FilterContainer key={filter.filterName}>
-            <FilterLabel 
+            <FilterLabel
               htmlFor={filter.paramName}
               text={filter.filterName}
               info="Placeholder text for information"
             />
-            {filter.type === 'dropdown' && (
+            {filter.type === "dropdown" && (
               <DropdownFilter
                 key={filter.filterName}
                 filter={filter}
-                onChange={(filter, value) =>
-                  handleFilterChange(filter, value)
-                }
+                onChange={(filter, value) => handleFilterChange(filter, value)}
               />
             )}
-            {filter.type === 'slider' && (
+            {filter.type === "slider" && (
               <SliderFilter
                 key={filter.filterName}
                 filter={filter}
-                onChange={(filter, value) =>
-                  handleFilterChange(filter, value)
-                }
+                onChange={(filter, value) => handleFilterChange(filter, value)}
               />
             )}
           </FilterContainer>
