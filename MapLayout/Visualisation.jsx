@@ -189,14 +189,21 @@ export const Visualisation = ({ visualisationName, map }) => {
           "fill-color": ["match", ["get", "category"], ...categoricalColors],
           "fill-opacity": 0.35,
         };
-      case "line":
+      case "line-continuous":
         return {
           "line-color": [
-            "interpolate",
-            ["linear"],
-            ["get", "value"],
-            ...colors,
+            "case",
+            ["<", ["feature-state", "value"], 0], "rgba(255, 0, 0, 1)", // Red for negative values
+            [">", ["feature-state", "value"], 0], "rgba(0, 0, 255, 1)", // Blue for positive values
+            "rgba(0, 0, 0, 0.0)" // Make zero invisible
           ],
+          "line-width": [
+            "interpolate", ["linear"],
+            ["to-number", ["feature-state", "valueAbs"]],
+            0.1, 0.1, // Line width starts at 1 at the value of 0
+            Math.max(...bins), 20
+          ],
+          "line-opacity": 1
         };
       case "circle": {
         return {
