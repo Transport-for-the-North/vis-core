@@ -340,6 +340,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         reclassifyAndStyleMap(visualisation.data, visualisation.style);
         break;
       }
+        default: break
     }
     // Update the ref to the current data
     prevDataRef.current = visualisation.data;
@@ -362,6 +363,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     visualisation.data,
     reclassifyAndStyleMap,
     dispatch,
+    map
   ]);
 
   return (
