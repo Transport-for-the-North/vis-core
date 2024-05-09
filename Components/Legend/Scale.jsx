@@ -2,7 +2,7 @@ import React from "react";
 
 function myRound(value, places) {
   const multiplier = Math.pow(10, places);
-  return Math.round(value * multiplier) / multiplier;
+  return Math.round(value / multiplier) * multiplier;
 }
 
 function numberWithCommas(x) {
@@ -26,7 +26,7 @@ const Scale = ({
         let { value, color } = step;
         const borderOpacity = (index + 2) / 10;
         if (typeof value === "number") {
-          value = Math.round(value);
+          value = myRound(value, 2);
           if (!isCategorical && (value < binMin || value > binMax)) return null;
         }else value = value.charAt(0).toUpperCase() + value.slice(1)
 
@@ -58,7 +58,7 @@ const Scale = ({
       sizeScale.map((step, index) => {
         let [value, size] = step;
         if (typeof value === "number") {
-          value = Math.round(value);
+          value = myRound(value, 2);
           if (!isCategorical && (value < binMin || value > binMax)) return null;
         } else value = value.charAt(0).toUpperCase() + value.slice(1)
 
