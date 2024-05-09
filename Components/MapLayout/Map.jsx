@@ -27,8 +27,8 @@ const Map = () => {
           type: "fill",
           source: "",
           paint: {
-            "fill-color": "black",
-            "fill-opacity": 0.1,
+            "fill-color": "rgba(255, 255, 0, 0)",
+            "fill-outline-color": "rgba(195, 195, 195, 1)"
           },
         };
       case "line":
@@ -38,7 +38,7 @@ const Map = () => {
           source: "",
           paint: {
             "line-color": "black",
-            "line-opacity": 0.1,
+            "line-opacity": 0.8,
           },
         };
       case "point":
@@ -68,7 +68,6 @@ const Map = () => {
           api.geodataService.getLayer(layer).then((geojson) => {
             sourceConfig.type = "geojson";
             sourceConfig.data = geojson;
-            sourceConfig.promoteId = "id";
             map.addSource(layer.name, sourceConfig);
             map.addLayer({ ...layerConfig, source: layer.name});
           });
@@ -80,6 +79,7 @@ const Map = () => {
               : layer.path;
           sourceConfig.type = "vector";
           sourceConfig.tiles = [url];
+          sourceConfig.promoteId = "id";
           map.addSource(layer.name, sourceConfig);
           map.addLayer({
             ...layerConfig,
@@ -87,22 +87,6 @@ const Map = () => {
             "source-layer": layer.sourceLayer,
           });
         }
-        // if (state.visualisations[layer.visualisationName].data && state.visualisations[layer.visualisationName].data.length > 0) {
-        //   state.visualisations[layer.visualisationName].data.forEach((row) => {
-        //     map.setFeatureState(
-        //       {
-        //         source: layer.name,
-        //         sourceLayer: layer,
-        //         id: layerConfig.id
-        //       },
-        //       {
-        //         value: row["value"],
-        //         valueAbs: Math.abs(row["value"]),
-        //         filter: row["filter"]
-        //       }
-        //     )
-        //   })
-        // }
       }
     },
     [map]

@@ -103,7 +103,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Median duration (secs)",
+            filterName: "Journey time limit",
             paramName: "medianDurationSecs",
             target: "api",
             action: "UPDATE_QUERY_PARAMS",
@@ -137,20 +137,20 @@ export const appConfig = {
       type: "MapLayout",
       config: {
         layers: [
-          {
-            name: "NoHAM Links",
-            type: "geojson",
-            source: "api",
-            path: "/api/noham/links",
-            geometryType: "line",
-            visualisationName: "Links",
-          },
+        //   {
+        //     name: "NoHAM Links",
+        //     type: "geojson",
+        //     source: "api",
+        //     path: "/api/noham/links",
+        //     geometryType: "line",
+        //     visualisationName: "Links",
+        //   },
           {
             uniqueId: "NormsLinksVectorTile",
-            name: "NoRMS Links Vector Tile",
+            name: "NoHAM Links",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
             visualisationName: "Links",
@@ -275,6 +275,79 @@ export const appConfig = {
               ],
             },
           },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            action: "UPDATE_QUERY_PARAMS",
+            visualisations: ["Links"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Net speed (kph)",
+                  paramValue: "netspd_kph",
+                },
+                {
+                  displayValue: "Total time (secs)",
+                  paramValue: "total_time_secs",
+                },
+                {
+                  displayValue: "Car EB vehicles",
+                  paramValue: "car_eb_vehs",
+                },
+                {
+                  displayValue: "Car commuter vehicles",
+                  paramValue: "car_comm_vehs",
+                },
+                {
+                  displayValue: "Car other vehicles",
+                  paramValue: "car_other_vehs",
+                },
+                {
+                  displayValue: "LGV flow vehicles",
+                  paramValue: "lgv_flow_vehs",
+                },
+                {
+                  displayValue: "HGV flow vehicles",
+                  paramValue: "hgv_flow_vehs",
+                },
+                {
+                  displayValue: "Total flow vehicles",
+                  paramValue: "total_flow_vehs",
+                },
+                {
+                  displayValue: "Link VOC",
+                  paramValue: "link_voc",
+                },
+                {
+                  displayValue: "Link delay (secs)",
+                  paramValue: "link_delay_secs",
+                },
+                {
+                  displayValue: "Link queues (secs)",
+                  paramValue: "link_queues_secs",
+                },
+                {
+                  displayValue: "Number of lanes",
+                  paramValue: "number_lanes",
+                },
+                {
+                  displayValue: "Speed flow curve",
+                  paramValue: "speed_flow_curve",
+                },
+                {
+                  displayValue: "Speed limit",
+                  paramValue: "speed_limit",
+                },
+                {
+                  displayValue: "Carbon emissions (tCO2)",
+                  paramValue: "carbon_emissions_tco2",
+                },
+              ],
+            },
+          }
         ],
       },
     },
