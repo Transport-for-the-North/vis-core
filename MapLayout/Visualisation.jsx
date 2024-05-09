@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
+import { Legend } from "Components/Legend";
 
 // Debounced fetchDataForVisualisation function
 const fetchDataForVisualisation = debounce(
@@ -38,6 +39,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   const prevDataRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
+  const [colors, setColors] = useState([]);
 
   // Function to reclassify data and update the map style
   const reclassifyAndStyleMap = useCallback(
@@ -147,17 +149,19 @@ export const Visualisation = ({ visualisationName, map }) => {
     } else {
       console.log("Style not recognized");
       return [];
-    }   
+    }
   };
 
   // Function to create a paint property for Maplibre based on the visualisation type and bins
   const createPaintProperty = (bins, style, colours) => {
     let colors = [];
+    let colorObject = [];
     for (var i = 0; i < bins.length; i++) {
       colors.push(bins[i]);
       colors.push(colours[i]);
+      colorObject.push({ value: bins[i], color: colours[i] });
     }
-
+    setColors(colorObject);
     switch (style) {
       case "polygon-continuous":
         return {
@@ -246,11 +250,7 @@ export const Visualisation = ({ visualisationName, map }) => {
       for (const [paintPropertyName, paintPropertyArray] of Object.entries(
         paintProperty
       )) {
-        map.setPaintProperty(
-          layer.name,
-          paintPropertyName,
-          paintPropertyArray
-        );
+        map.setPaintProperty(layer.name, paintPropertyName, paintPropertyArray);
       }
     });
   };
@@ -354,7 +354,7 @@ export const Visualisation = ({ visualisationName, map }) => {
 
     return () => {
       console.log("Map unmount");
-      if (map && visualisation.type === 'geojson') {
+      if (map && visualisation.type === "geojson") {
         if (map.getLayer(visualisation.name)) {
           map.removeLayer(visualisation.name);
         }
@@ -372,6 +372,18 @@ export const Visualisation = ({ visualisationName, map }) => {
     dispatch,
   ]);
 
-  // Data component, renders nothing
-  return null;
+  return (
+    <>
+      {visualisation.data.length > 0 && colors.length > 0 ? (
+        <Legend
+          colorScale={colors}
+          selectedVariable={visualisation.name}
+          binMin={colors[0].value}
+          binMax={colors[colors.length - 1].value}
+        />
+      ) : (
+        ""
+      )}
+    </>
+  );
 };
