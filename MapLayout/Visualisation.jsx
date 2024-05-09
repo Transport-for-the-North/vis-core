@@ -46,7 +46,6 @@ export const Visualisation = ({ visualisationName, map }) => {
     (data, style) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(data, style);
-
       const colourPalette = calculateColours("Reds", reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
@@ -56,13 +55,13 @@ export const Visualisation = ({ visualisationName, map }) => {
         colourPalette
       );
 
-      addFeaturesToMap(map, paintProperty, state.layers);
+      addFeaturesToMap(map, paintProperty, state.layers, data);
       dispatch({
         type: "UPDATE_MAP_STYLE",
         payload: { visualisationName, paintProperty },
       });
     },
-    [visualisation.style, dispatch, visualisationName]
+    [visualisation.style, visualisationName]
   );
 
   // Function to add or update a GeoJSON source and layer and style it
@@ -166,17 +165,17 @@ export const Visualisation = ({ visualisationName, map }) => {
       case "polygon-continuous":
         return {
           "fill-color": [
-            "interpolate",
-            ["linear"],
-            ["get", "value"],
+            "interpolate", ["linear"],
+            ["feature-state", "value"],
             ...colors,
           ],
           "fill-opacity": [
             "case",
             ["in", ["feature-state", "value"], ["literal", [0, null]]],
             0,
-            1.0,
+            0.65,
           ],
+          "fill-outline-color": "rgba(255, 255, 0, 0)"
         };
       case "polygon-categorical":
         // Assuming 'bins' is an array of category values and 'colours' is an array of corresponding colors
@@ -188,7 +187,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         categoricalColors.push(colours[colours.length - 1]); // Default color if no match is found
         return {
           "fill-color": ["match", ["get", "category"], ...categoricalColors],
-          "fill-opacity": 1.0,
+          "fill-opacity": 0.35,
         };
       case "line":
         return {
@@ -230,15 +229,20 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
   };
 
-  const addFeaturesToMap = (map, paintProperty, layers) => {
+  const addFeaturesToMap = (map, paintProperty, layers, data) => {
     Object.values(layers).forEach((layer) => {
-      if (visualisation.data && visualisation.data.length > 0) {
-        visualisation.data.forEach((row) => {
+      if (data && data.length > 0 && map.getLayer(layer.name)) {
+        
+        map.removeFeatureState({ 
+          source: layer.name,
+          sourceLayer: 'zones'
+        })
+        data.forEach((row) => {
           map.setFeatureState(
             {
               source: layer.name,
-              sourceLayer: layer.name,
-              id: row["id"],
+              sourceLayer: layer.sourceLayer,
+              id: Number(row["id"]),
             },
             {
               value: row["value"],
@@ -246,11 +250,15 @@ export const Visualisation = ({ visualisationName, map }) => {
             }
           );
         });
-      }
-      for (const [paintPropertyName, paintPropertyArray] of Object.entries(
-        paintProperty
-      )) {
-        map.setPaintProperty(layer.name, paintPropertyName, paintPropertyArray);
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(
+          paintProperty
+        )) {
+          map.setPaintProperty(
+            layer.name,
+            paintPropertyName,
+            paintPropertyArray
+          );
+        }
       }
     });
   };
@@ -289,7 +297,6 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
   }, [isLoading]);
 
-  // GeoJSON Stuff
   function checkGeometryNotNull(featureCollection) {
     // Check if the feature collection is provided
     if (
@@ -309,21 +316,6 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
 
     return true; // Return true if geometry is not null for all features
-  }
-
-  function getUniqueCategories(featureCollection) {
-    const uniqueCategories = new Set(); // Use a Set to store unique values
-
-    // Iterate over each feature in the feature collection
-    featureCollection.features.forEach((feature) => {
-      if (feature.properties && feature.properties.category) {
-        // Add the category value to the Set
-        uniqueCategories.add(feature.properties.category);
-      }
-    });
-
-    // Convert the Set back to an Array to return the unique values
-    return Array.from(uniqueCategories);
   }
 
   useEffect(() => {
