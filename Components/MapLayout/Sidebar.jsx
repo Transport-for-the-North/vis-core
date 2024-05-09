@@ -229,6 +229,11 @@ const Sidebar = () => {
     }
   }, [pageContext.config.filters, dispatch, visualisations]);
 
+  useEffect(() => {
+    // Effect to reset initialised when pageContext changes.
+    initializedRef.current = false
+  }, [pageContext])
+
   const handleFilterChange = (filter, value) => {
     dispatch({
       type: filter.action,
