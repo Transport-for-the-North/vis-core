@@ -46,7 +46,6 @@ export const Visualisation = ({ visualisationName, map }) => {
     (data, style) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(data, style);
-
       const colourPalette = calculateColours("Reds", reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
@@ -348,6 +347,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         reclassifyAndStyleMap(visualisation.data, visualisation.style);
         break;
       }
+        default: break
     }
     // Update the ref to the current data
     prevDataRef.current = visualisation.data;
@@ -370,6 +370,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     visualisation.data,
     reclassifyAndStyleMap,
     dispatch,
+    map
   ]);
 
   return (

@@ -24,9 +24,11 @@ const Scale = ({
       scale &&
       scale.map((step, index) => {
         let { value, color } = step;
-        value = myRound(value, 2);
         const borderOpacity = (index + 2) / 10;
-        if (!isCategorical && (value < binMin || value > binMax)) return null;
+        if (typeof value === "number") {
+          value = Math.round(value);
+          if (!isCategorical && (value < binMin || value > binMax)) return null;
+        }else value = value.charAt(0).toUpperCase() + value.slice(1)
 
         return (
           <div
@@ -37,8 +39,8 @@ const Scale = ({
             <span
               className="legend-scale__step-swatch"
               style={{
-                width: "12px",
-                height: "12px",
+                width: "9px",
+                height: "9px",
                 backgroundColor: color,
                 border: `1px solid rgba(0, 0, 0, ${borderOpacity})`,
               }}
@@ -55,8 +57,10 @@ const Scale = ({
       sizeScale &&
       sizeScale.map((step, index) => {
         let [value, size] = step;
-        value = myRound(value, 2);
-        console.log(size);
+        if (typeof value === "number") {
+          value = Math.round(value);
+          if (!isCategorical && (value < binMin || value > binMax)) return null;
+        } else value = value.charAt(0).toUpperCase() + value.slice(1)
 
         return (
           <div
@@ -85,7 +89,7 @@ const Scale = ({
       <div className="legend-section legend-section--column">
         <div className="legend-label">{selectedVariable}</div>
         <div className="legend-scale">
-          {isCategorical ? renderColorScale() : renderColorScale()}
+          {renderColorScale()}
         </div>
       </div>
 
