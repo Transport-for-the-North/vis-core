@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Map from "./Map";
-import Sidebar from './Sidebar';
+import { Sidebar } from 'Components';
 
 
 
