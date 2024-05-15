@@ -39,6 +39,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   const prevDataRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
+  const layer = state.layers[visualisationName];
   const [colors, setColors] = useState([]);
 
   // Function to reclassify data and update the map style
@@ -275,6 +276,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
   };
 
+  // Effect to update the data if queryParams change
   useEffect(() => {
     // Stringify the current queryParams for comparison
     const currentQueryParamsStr = JSON.stringify(visualisation.queryParams);
@@ -325,6 +327,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     return true; // Return true if geometry is not null for all features
   }
 
+  // Effect to restyle the map if data has changed
   useEffect(() => {
     const dataHasChanged =
       visualisation.data.length !== 0 &&
@@ -372,6 +375,27 @@ export const Visualisation = ({ visualisationName, map }) => {
     dispatch,
     map
   ]);
+
+  // Effect to update the map style when the color scheme changes
+  useEffect(() => {
+    const colorPalettes = getColorPalettes(visualisation.style);
+    const newColorScheme = colorScheme in colorPalettes ? colorScheme : colorPalettes[0];
+    const colourPalette = calculateColours(newColorScheme, reclassifiedData);
+
+    // Update the map style based on the new color scheme
+    const paintProperty = createPaintProperty(
+      reclassifiedData,
+      visualisation.style,
+      colourPalette
+    );
+
+    addFeaturesToMap(map, paintProperty, state.layers, visualisation.data);
+    dispatch({
+      type: actionTypes.UPDATE_MAP_STYLE,
+      payload: { visualisationName, paintProperty },
+    });
+  }, [colorScheme, visualisation.style, visualisation.data, map, dispatch]);
+
 
   return (
     <>

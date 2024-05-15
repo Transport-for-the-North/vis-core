@@ -1,0 +1,173 @@
+import React, { useState, useEffect, memo } from "react";
+import _ from 'lodash'
+import styled from "styled-components";
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/20/solid'; // Assuming you're using Heroicons
+
+import { useMapContext } from "hooks";
+import { AccordionSection } from "Components";
+import { ColourSchemeDropdown } from "../Selectors";
+import { SelectorLabel } from "../Selectors/SelectorLabel";
+import { actionTypes } from "reducers";
+
+
+
+const LayerControlContainer = styled.div`
+  margin-bottom: 10px;
+`;
+
+const LayerHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LayerName = styled.span`
+  font-weight: bold;
+`;
+
+const VisibilityToggle = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+`;
+
+const OpacityControl = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+`;
+
+const OpacityLabel = styled.span`
+  margin-right: 10px;
+`;
+
+const OpacitySlider = styled.input`
+  flex-grow: 1;
+  margin-right: 10px;
+`;
+
+const ColorSchemeSelector = styled.select`
+  margin-top: 5px;
+  width: 100%;
+`;
+
+const LayerControlEntry = memo(({ layer, map }) => {
+  // Fetch the current paint properties for 'fill-opacity'
+  const currentOpacity = map.getPaintProperty(layer.id, 'fill-opacity');
+
+  // Determine if the current opacity is an expression that includes the feature state logic
+  const isFeatureStateExpression = Array.isArray(currentOpacity) && currentOpacity[0] === 'case';
+  const initialOpacity = isFeatureStateExpression ? currentOpacity[currentOpacity.length - 1] : currentOpacity;
+
+  const [visibility, setVisibility] = useState(layer.layout?.visibility || 'visible');
+  const [opacity, setOpacity] = useState(initialOpacity || 1);
+
+  const toggleVisibility = () => {
+    const newVisibility = visibility === "visible" ? "none" : "visible";
+    map.setLayoutProperty(layer.id, "visibility", newVisibility);
+    setVisibility(newVisibility);
+  };
+
+  const handleOpacityChange = (e) => {
+    const newOpacity = parseFloat(e.target.value);
+    let opacityExpression;
+
+    // Apply the logic to filter out nulls and zeroes only if it was originally present
+    if (isFeatureStateExpression) {
+      opacityExpression = [
+        "case",
+        ["in", ["feature-state", "value"], ["literal", [0, null]]],
+        0, // Set opacity to 0 for null or zero values
+        newOpacity, // Set opacity to the slider value otherwise
+      ];
+    } else {
+      opacityExpression = newOpacity;
+    }
+
+    map.setPaintProperty(layer.id, "fill-opacity", opacityExpression);
+    setOpacity(newOpacity);
+  };
+
+  return (
+    <LayerControlContainer>
+      <LayerHeader>
+        <LayerName>{layer.id}</LayerName>
+        <VisibilityToggle onClick={toggleVisibility}>
+          {visibility === 'visible' ? <EyeIcon /> : <EyeSlashIcon />}
+        </VisibilityToggle>
+      </LayerHeader>
+      <SelectorLabel text="Opacity" />
+      <OpacityControl>
+        <OpacitySlider
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={opacity}
+          onChange={handleOpacityChange}
+        />
+      </OpacityControl>
+      <ColourSchemeDropdown defaultPalette='Reds'/>
+    </LayerControlContainer>
+  );
+});
+
+/**
+ * MapLayerSection component is responsible for rendering the layer controls
+ * for the map. It allows users to toggle the visibility and adjust the opacity
+ * of map layers.
+ *
+ * Props:
+ * - map: A reference to the map instance.
+ * - layers: An array of layer objects that the component will use to create
+ *   controls for each layer.
+ */
+export const MapLayerSection = () => {
+  const { state } = useMapContext();
+  const { map } = state;
+  const [layers, setLayers] = useState([]);
+
+  useEffect(() => {
+    if (map) {
+      const updateLayers = () => {
+        const newLayers = map.getStyle().layers;
+        // Perform deep comparison to check if layers have actually changed
+        if (!_.isEqual(newLayers, layers)) {
+          setLayers(
+            newLayers.filter(
+              (layer) =>
+                (layer.type === 'fill' ||
+                 layer.type === 'line' ||
+                 layer.type === 'circle') &&
+                layer.source !== 'default'
+            )
+          );
+        }
+      };
+
+      map.on("styledata", updateLayers);
+      return () => {
+        map.off("styledata", updateLayers);
+      };
+    }
+  }, [map, layers]); // Only re-run the effect if map or layers change
+
+
+  // If map is not yet available...
+  if (!map) {
+    return <div>Loading map layers...</div>;
+  }
+
+  return (
+    <AccordionSection title="Map layer control">
+      {layers.map((layer) => (
+        <LayerControlEntry key={layer.id} layer={layer} map={map} />
+      ))}
+    </AccordionSection>
+  );
+};
