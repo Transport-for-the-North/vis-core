@@ -27,8 +27,8 @@ const Map = () => {
           type: "fill",
           source: "",
           paint: {
-            "fill-color": "rgba(255, 255, 0, 0)",
-            "fill-outline-color": "rgba(195, 195, 195, 1)"
+            "fill-color": "rgb(255, 255, 0, 0)",
+            "fill-outline-color": "rgba(195, 195, 195, 1)",
           },
         };
       case "line":
@@ -62,6 +62,7 @@ const Map = () => {
         let sourceConfig = {};
         let layerConfig = getLayerStyle(layer.geometryType);
         layerConfig.id = layer.name;
+        layerConfig.visibility = 'visible'
 
         if (layer.type === "geojson") {
           // Fetch and add a GeoJSON layer
@@ -84,7 +85,7 @@ const Map = () => {
           map.addLayer({
             ...layerConfig,
             source: layer.name,
-            "source-layer": layer.sourceLayer,
+            "source-layer": layer.sourceLayer
           });
         }
       }
@@ -119,6 +120,16 @@ const Map = () => {
       }
     });
   }, [isMapReady, map, pageContext.config.filters, dispatch]);
+  
+  // Run once to set the state of the map
+  useEffect(() => {
+    if (isMapReady) {
+      dispatch({
+        type: 'SET_MAP',
+        payload: { map },
+      });
+    }
+  }, [isMapReady, map, dispatch]);
   
   // Set up the click event listener
   useEffect(() => {

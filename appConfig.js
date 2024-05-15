@@ -16,7 +16,7 @@ export const appConfig = {
         layers: [
           {
             uniqueId: "BsipZoneVectorTile",
-            name: "BSIP Zone",
+            name: "Origin Zones",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
@@ -48,7 +48,7 @@ export const appConfig = {
             paramName: "zoneTypeId",
             target: "api",
             action: "UPDATE_PARAMETERISED_LAYER",
-            layer: "BSIP Zone",
+            layer: "Origin Zones",
             type: "dropdown",
             values: {
               source: "local",
@@ -125,7 +125,7 @@ export const appConfig = {
             action: "UPDATE_QUERY_PARAMS",
             visualisations: ["Reliability"],
             type: "map",
-            layer: "BSIP Zone",
+            layer: "Origin Zones",
             field: "id",
           },
         ],
@@ -359,7 +359,7 @@ export const appConfig = {
         layers: [
           {
             uniqueId: "BsipZoneVectorTile",
-            name: "BSIP Zone",
+            name: "Accessibility",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
@@ -372,7 +372,7 @@ export const appConfig = {
           {
             name: "Accessibility",
             type: "joinDataToMap",
-            joinLayer: "BSIP Zone",
+            joinLayer: "Accessibility",
             style: "polygon-continuous",
             joinField: "id",
             valueField: "value",
@@ -387,7 +387,7 @@ export const appConfig = {
             paramName: "zoneTypeId",
             target: "api",
             action: "UPDATE_PARAMETERISED_LAYER",
-            layer: "BSIP Zone",
+            layer: "Accessibility",
             type: "dropdown",
             values: {
               source: "local",

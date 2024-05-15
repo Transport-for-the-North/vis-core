@@ -4,9 +4,11 @@ import { replaceRouteParameter } from "utils";
 export const actionTypes = {
     INITIALISE_SIDEBAR: 'INITIALISE_SIDEBAR',
     SET_PAGE_INFO: 'SET_PAGE_INFO',
+    SET_MAP: 'SET_MAP',
     ADD_LAYER: 'ADD_LAYER',
     ADD_PARAMETERISED_LAYER: 'ADD_PARAMETERISED_LAYER',
     UPDATE_PARAMETERISED_LAYER: 'UPDATE_PARAMETERISED_LAYER',
+    UPDATE_LAYER_PAINT: 'UPDATE_LAYER_PAINT',
     ADD_VISUALISATION: 'ADD_VISUALISATION',
     UPDATE_QUERY_PARAMS: 'UPDATE_QUERY_PARAMS',
     UPDATE_VIS_DATA: 'UPDATE_VIS_DATA',
@@ -44,6 +46,23 @@ export const mapReducer = (state, action) => {
                 }
             };
         }
+        case actionTypes.UPDATE_LAYER_PAINT: {
+            const { layerName, paintProperty } = action.payload;
+            return {
+              ...state,
+              layers: {
+                ...state.layers,
+                [layerName]: {
+                  ...state.layers[layerName],
+                  paint: {
+                    ...state.layers[layerName].paint,
+                    ...paintProperty,
+                  },
+                },
+              },
+            };
+          }
+        
         case actionTypes.ADD_VISUALISATION: {
             // Logic to add a visualisation
             return { ...state, visualisations: { ...state.visualisations, ...action.payload } };
@@ -88,16 +107,10 @@ export const mapReducer = (state, action) => {
         }
 
         case actionTypes.SET_MAP: {
-            const { visualisationName, map } = action.payload;
+            const { map } = action.payload;
             return {
                 ...state,
-                visualisations: {
-                ...state.visualisations,
-                [visualisationName]: {
-                    ...state.visualisations[visualisationName],
-                    map: map,
-                },
-                },
+                map: map, // Store the map instance directly in the state
             };
         }
         

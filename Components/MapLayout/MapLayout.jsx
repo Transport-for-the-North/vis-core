@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import Map from "./Map";
 import { Sidebar } from 'Components';
+import { MapLayerSection } from 'Components';
 import { PageContext, MapContext } from 'contexts';
 import { loremIpsum } from 'utils';
 
@@ -16,6 +17,15 @@ const MapContainer = styled.div`
   position: relative;
 `;
 
+/**
+ * MapLayout component is the main layout component that composes the Map,
+ * Sidebar, and MapLayerSection components. It serves as the container for
+ * the map visualisation and its associated controls.
+ *
+ * The component uses the MapContext to manage the state of the map and its
+ * layers, and it provides the necessary props to the Sidebar and MapLayerSection
+ * components.
+ */
 export const MapLayout = () => {
   const { state, dispatch } = useContext(MapContext);
   const pageContext = useContext(PageContext);
@@ -56,7 +66,9 @@ export const MapLayout = () => {
         filters={pageContext.config.filters}
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
-      />
+      >
+        <MapLayerSection />
+      </Sidebar>
       <MapContainer>
         <Map/>
       </MapContainer>
