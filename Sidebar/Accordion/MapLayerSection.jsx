@@ -1,13 +1,12 @@
-import React, { useState, useEffect, memo } from "react";
-import _ from 'lodash'
-import styled from "styled-components";
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/20/solid'; // Assuming you're using Heroicons
+import _ from 'lodash';
+import { memo, useEffect, useState } from "react";
+import styled from "styled-components";
 
-import { useMapContext } from "hooks";
 import { AccordionSection } from "Components";
+import { useMapContext } from "hooks";
 import { ColourSchemeDropdown } from "../Selectors";
 import { SelectorLabel } from "../Selectors/SelectorLabel";
-import { actionTypes } from "reducers";
 
 
 
@@ -56,7 +55,7 @@ const ColorSchemeSelector = styled.select`
   width: 100%;
 `;
 
-const LayerControlEntry = memo(({ layer, map, handleColorChange}) => {
+const LayerControlEntry = memo(({ layer, map, defaultColor, handleColorChange}) => {
   // Fetch the current paint properties for 'fill-opacity'
   const currentOpacity = map.getPaintProperty(layer.id, 'fill-opacity');
 
@@ -112,7 +111,7 @@ const LayerControlEntry = memo(({ layer, map, handleColorChange}) => {
           onChange={handleOpacityChange}
         />
       </OpacityControl>
-      <ColourSchemeDropdown defaultPalette={{ value: "Reds", label: 'Reds'}} handleColorChange={handleColorChange}/>
+      <ColourSchemeDropdown defaultPalette={defaultColor} handleColorChange={handleColorChange}/>
     </LayerControlContainer>
   );
 });
@@ -166,7 +165,7 @@ export const MapLayerSection = ({handleColorChange}) => {
   return (
     <AccordionSection title="Map layer control">
       {layers.map((layer) => (
-        <LayerControlEntry key={layer.id} layer={layer} map={map} handleColorChange={(color) => handleColorChange(color)} />
+        <LayerControlEntry key={layer.id} layer={layer} map={map} defaultColor={state.color_scheme ??{ value: "Reds", label: 'Reds'}} handleColorChange={(color) => handleColorChange(color)} />
       ))}
     </AccordionSection>
   );
