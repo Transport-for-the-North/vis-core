@@ -87,8 +87,8 @@ export const Visualisation = ({ visualisationName, map }) => {
       }
       // Reclassify data if needed
       const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
-      const colourPalette = calculateColours("Paired", reclassifiedData);
-
+      const colourPalette = calculateColours(state.color_scheme.value ?? "Accent", reclassifiedData);
+      
       // Update the map style based on the type of map, reclassified data, and color palette
       const paintProperty = createPaintProperty(
         reclassifiedData,
@@ -116,7 +116,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         }
       }
     },
-    [map, visualisationName]
+    [map, visualisationName, state.color_scheme]
   );
 
   // Function to recalculate bins if needed
@@ -328,26 +328,15 @@ export const Visualisation = ({ visualisationName, map }) => {
     return true; // Return true if geometry is not null for all features
   }
 
-  function getColorPalettes(style) {
-    switch (style) {
-      case "diverging":
-        break;
-      case "polygon-continuous":
-        console.log("test")
-        return "Blues";
-      case "categorical":
-        break;
-      default : break
-  }
-  }
-
   // Effect to restyle the map if data has changed
   useEffect(() => {
-    const colorHasChanged = state.color_scheme !== null && state.color_scheme !== prevColorRef.current
     const dataHasChanged =
-      visualisation.data.length !== 0 &&
-      visualisation.data !== prevDataRef.current;
-    if (!dataHasChanged && !colorHasChanged) {
+    visualisation.data.length !== 0 &&
+    visualisation.data !== prevDataRef.current;
+    const colorHasChanged = state.color_scheme !== null && state.color_scheme !== prevColorRef.current
+    const needUpdate = dataHasChanged || (colorHasChanged && visualisation.data.length !== 0)
+
+    if (!needUpdate) {
       return;
     }
 
