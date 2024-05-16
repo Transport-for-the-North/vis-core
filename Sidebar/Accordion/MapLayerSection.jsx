@@ -112,7 +112,7 @@ const LayerControlEntry = memo(({ layer, map }) => {
           onChange={handleOpacityChange}
         />
       </OpacityControl>
-      <ColourSchemeDropdown defaultPalette='Reds'/>
+      <ColourSchemeDropdown defaultPalette={{ value: "Reds", label: 'Reds'}} />
     </LayerControlContainer>
   );
 });

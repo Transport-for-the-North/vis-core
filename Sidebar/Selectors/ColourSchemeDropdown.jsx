@@ -51,7 +51,7 @@ const colorPalettes = {
 
 // Custom style for the react-select options
 const colourStyles = {
-  menuPortal: base => ({
+  menuPortal: (base) => ({
     ...base,
     zIndex: 9999, // Adjust zIndex to be higher than everything else
   }),
@@ -110,16 +110,17 @@ export const ColourSchemeDropdown = ({ defaultPalette }) => {
 
   return (
     <>
-    <SelectorLabel text="Colour scheme" />
-    <Select
-      components={animatedComponents}
-      options={options}
-      formatOptionLabel={formatOptionLabel}
-      styles={colourStyles}
-      menuPlacement="auto"
-      menuPortalTarget={document.body} // Use a portal to render the menu
-      onChange={setSelectedPalette}
-    />
+      <SelectorLabel text="Colour scheme" />
+      <Select
+        components={animatedComponents}
+        options={options}
+        defaultValue={selectedPalette}
+        formatOptionLabel={formatOptionLabel}
+        styles={colourStyles}
+        menuPlacement="auto"
+        menuPortalTarget={document.body} // Use a portal to render the menu
+        onChange={setSelectedPalette}
+      />
     </>
   );
 };
