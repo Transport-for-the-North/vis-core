@@ -61,7 +61,7 @@ export const MapLayout = () => {
   const handleColorChange = (color) => { 
     dispatch({
       type: "UPDATE_COLOR_SCHEME",
-      payload: { color_scheme: color  }
+      payload: { color_scheme: color }
     })
   };
   

@@ -40,7 +40,6 @@ export const Visualisation = ({ visualisationName, map }) => {
   const prevColorRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
-  const layer = state.layers[visualisationName];
   const [colors, setColors] = useState([]);
 
   // Function to reclassify data and update the map style
@@ -296,7 +295,7 @@ export const Visualisation = ({ visualisationName, map }) => {
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
     }
-  }, [visualisation.queryParams, visualisationName, dispatch]);
+  }, [visualisation.queryParams, visualisationName, dispatch, visualisation]);
 
   // Log loading status to console
   useEffect(() => {
