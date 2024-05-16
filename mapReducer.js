@@ -12,6 +12,7 @@ export const actionTypes = {
     ADD_VISUALISATION: 'ADD_VISUALISATION',
     UPDATE_QUERY_PARAMS: 'UPDATE_QUERY_PARAMS',
     UPDATE_VIS_DATA: 'UPDATE_VIS_DATA',
+    UPDATE_COLOR_SCHEME: 'UPDATE_COLOR_SCHEME',
     JOIN_DATA: 'JOIN_DATA',
     SET_IS_LOADING: 'SET_IS_LOADING'
 };
@@ -19,7 +20,7 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {} };
+            return { ...state, layers: {}, visualisations: {}, color_scheme: { value: "Reds", label: 'Reds'}};
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload};
         case actionTypes.INITIALISE_SIDEBAR:
@@ -61,7 +62,15 @@ export const mapReducer = (state, action) => {
                 },
               },
             };
-          }
+        }
+            
+        case actionTypes.UPDATE_COLOR_SCHEME: { 
+            const { color_scheme } = action.payload;
+            return {
+                ...state,
+                color_scheme: color_scheme,
+            };
+        }
         
         case actionTypes.ADD_VISUALISATION: {
             // Logic to add a visualisation
