@@ -20,7 +20,7 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}, color_scheme: { value: "Reds", label: 'Reds'}};
+            return { ...state, layers: {}, visualisations: {}};
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload};
         case actionTypes.INITIALISE_SIDEBAR:
@@ -119,7 +119,8 @@ export const mapReducer = (state, action) => {
             const { map } = action.payload;
             return {
                 ...state,
-                map: map, // Store the map instance directly in the state
+                map: map,
+                color_scheme: { value: "Reds", label: 'Reds'}// Store the map instance directly in the state
             };
         }
         
