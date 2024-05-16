@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import Select from "react-select";
 import chroma from "chroma-js";
-import styled from "styled-components";
+import Select from "react-select";
 import makeAnimated from "react-select/animated";
+import styled from "styled-components";
 
 import { SelectorLabel } from "./SelectorLabel";
 
@@ -81,8 +80,7 @@ const ColorBox = styled.div`
   margin-right: 4px;
 `;
 
-export const ColourSchemeDropdown = ({ defaultPalette }) => {
-  const [selectedPalette, setSelectedPalette] = useState(defaultPalette);
+export const ColourSchemeDropdown = ({ defaultPalette, handleColorChange }) => {
   const animatedComponents = makeAnimated();
 
   const formatOptionLabel = ({ value, label }) => (
@@ -114,12 +112,12 @@ export const ColourSchemeDropdown = ({ defaultPalette }) => {
       <Select
         components={animatedComponents}
         options={options}
-        defaultValue={selectedPalette}
+        defaultValue={defaultPalette}
         formatOptionLabel={formatOptionLabel}
         styles={colourStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body} // Use a portal to render the menu
-        onChange={setSelectedPalette}
+        onChange={(color) => handleColorChange(color)}
       />
     </>
   );

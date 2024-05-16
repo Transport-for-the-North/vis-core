@@ -37,6 +37,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   const { state, dispatch } = useMapContext();
   const [isLoading, setLoading] = useState(false); // State to track loading
   const prevDataRef = useRef();
+  const prevColorRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
   const layer = state.layers[visualisationName];
@@ -47,7 +48,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     (data, style) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(data, style);
-      const colourPalette = calculateColours("Reds", reclassifiedData);
+      const colourPalette = calculateColours(state.color_scheme.value ?? "Reds", reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
       const paintProperty = createPaintProperty(
@@ -62,7 +63,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         payload: { visualisationName, paintProperty },
       });
     },
-    [visualisation.style, visualisationName]
+    [dispatch, map, state.color_scheme, state.layers, visualisation.style, visualisationName]
   );
 
   // Function to add or update a GeoJSON source and layer and style it
@@ -342,10 +343,11 @@ export const Visualisation = ({ visualisationName, map }) => {
 
   // Effect to restyle the map if data has changed
   useEffect(() => {
+    const colorHasChanged = state.color_scheme !== null && state.color_scheme !== prevColorRef.current
     const dataHasChanged =
       visualisation.data.length !== 0 &&
       visualisation.data !== prevDataRef.current;
-    if (!dataHasChanged) {
+    if (!dataHasChanged && !colorHasChanged) {
       return;
     }
 
@@ -367,6 +369,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
     // Update the ref to the current data
     prevDataRef.current = visualisation.data;
+    prevColorRef.current = state.color_scheme;
 
     return () => {
       console.log("Map unmount");
@@ -386,32 +389,10 @@ export const Visualisation = ({ visualisationName, map }) => {
     visualisation.data,
     reclassifyAndStyleMap,
     dispatch,
-    map
+    map, 
+    state.color_scheme
   ]);
 
-  // Effect to update the map style when the color scheme changes
-  useEffect(() => {
-    const colorPalettes = getColorPalettes(visualisation.style);
-    console.log(visualisation.style)
-    // const newColorScheme = colorScheme in colorPalettes ? colorScheme : colorPalettes[0];
-    const newColorScheme = colorPalettes?.colorScheme ?? colorPalettes[0]
-    reclassifyAndStyleMap(visualisation.data, newColorScheme);
-    // const colourPalette = calculateColours(newColorScheme, reclassifiedData);
-
-    // // Update the map style based on the new color scheme
-    // const paintProperty = createPaintProperty(
-    //   reclassifiedData,
-    //   visualisation.style,
-    //   colourPalette
-    // );
-
-    // addFeaturesToMap(map, paintProperty, state.layers, visualisation.data);
-    // dispatch({
-    //   type: actionTypes.UPDATE_MAP_STYLE,
-    //   payload: { visualisationName, paintProperty },
-    // });
-    // }, [colorScheme, visualisation.style, visualisation.data, map, dispatch]);
-  }, [visualisation.style]);
 
 
   return (

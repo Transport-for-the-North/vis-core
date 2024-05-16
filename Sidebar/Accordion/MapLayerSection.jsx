@@ -56,7 +56,7 @@ const ColorSchemeSelector = styled.select`
   width: 100%;
 `;
 
-const LayerControlEntry = memo(({ layer, map }) => {
+const LayerControlEntry = memo(({ layer, map, handleColorChange}) => {
   // Fetch the current paint properties for 'fill-opacity'
   const currentOpacity = map.getPaintProperty(layer.id, 'fill-opacity');
 
@@ -112,7 +112,7 @@ const LayerControlEntry = memo(({ layer, map }) => {
           onChange={handleOpacityChange}
         />
       </OpacityControl>
-      <ColourSchemeDropdown defaultPalette={{ value: "Reds", label: 'Reds'}} />
+      <ColourSchemeDropdown defaultPalette={{ value: "Reds", label: 'Reds'}} handleColorChange={handleColorChange}/>
     </LayerControlContainer>
   );
 });
@@ -127,7 +127,7 @@ const LayerControlEntry = memo(({ layer, map }) => {
  * - layers: An array of layer objects that the component will use to create
  *   controls for each layer.
  */
-export const MapLayerSection = () => {
+export const MapLayerSection = ({handleColorChange}) => {
   const { state } = useMapContext();
   const { map } = state;
   const [layers, setLayers] = useState([]);
@@ -166,7 +166,7 @@ export const MapLayerSection = () => {
   return (
     <AccordionSection title="Map layer control">
       {layers.map((layer) => (
-        <LayerControlEntry key={layer.id} layer={layer} map={map} />
+        <LayerControlEntry key={layer.id} layer={layer} map={map} handleColorChange={(color) => handleColorChange(color)} />
       ))}
     </AccordionSection>
   );
