@@ -3,10 +3,10 @@ import colorbrewer from "colorbrewer";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Legend } from "Components/Legend";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
-import { Legend } from "Components/Legend";
 
 // Debounced fetchDataForVisualisation function
 const fetchDataForVisualisation = debounce(
@@ -327,6 +327,19 @@ export const Visualisation = ({ visualisationName, map }) => {
     return true; // Return true if geometry is not null for all features
   }
 
+  function getColorPalettes(style) {
+    switch (style) {
+      case "diverging":
+        break;
+      case "polygon-continuous":
+        console.log("test")
+        return "Blues";
+      case "categorical":
+        break;
+      default : break
+  }
+  }
+
   // Effect to restyle the map if data has changed
   useEffect(() => {
     const dataHasChanged =
@@ -379,22 +392,26 @@ export const Visualisation = ({ visualisationName, map }) => {
   // Effect to update the map style when the color scheme changes
   useEffect(() => {
     const colorPalettes = getColorPalettes(visualisation.style);
-    const newColorScheme = colorScheme in colorPalettes ? colorScheme : colorPalettes[0];
-    const colourPalette = calculateColours(newColorScheme, reclassifiedData);
+    console.log(visualisation.style)
+    // const newColorScheme = colorScheme in colorPalettes ? colorScheme : colorPalettes[0];
+    const newColorScheme = colorPalettes?.colorScheme ?? colorPalettes[0]
+    reclassifyAndStyleMap(visualisation.data, newColorScheme);
+    // const colourPalette = calculateColours(newColorScheme, reclassifiedData);
 
-    // Update the map style based on the new color scheme
-    const paintProperty = createPaintProperty(
-      reclassifiedData,
-      visualisation.style,
-      colourPalette
-    );
+    // // Update the map style based on the new color scheme
+    // const paintProperty = createPaintProperty(
+    //   reclassifiedData,
+    //   visualisation.style,
+    //   colourPalette
+    // );
 
-    addFeaturesToMap(map, paintProperty, state.layers, visualisation.data);
-    dispatch({
-      type: actionTypes.UPDATE_MAP_STYLE,
-      payload: { visualisationName, paintProperty },
-    });
-  }, [colorScheme, visualisation.style, visualisation.data, map, dispatch]);
+    // addFeaturesToMap(map, paintProperty, state.layers, visualisation.data);
+    // dispatch({
+    //   type: actionTypes.UPDATE_MAP_STYLE,
+    //   payload: { visualisationName, paintProperty },
+    // });
+    // }, [colorScheme, visualisation.style, visualisation.data, map, dispatch]);
+  }, [visualisation.style]);
 
 
   return (
