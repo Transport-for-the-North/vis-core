@@ -1,11 +1,11 @@
-import { useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import Map from "./Map";
-import { Sidebar } from 'Components';
-import { MapLayerSection } from 'Components';
-import { PageContext, MapContext } from 'contexts';
+import { MapLayerSection, Sidebar } from 'Components';
+import { PageContext } from 'contexts';
+import { useMapContext } from 'hooks';
 import { loremIpsum } from 'utils';
+import Map from "./Map";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -27,7 +27,7 @@ const MapContainer = styled.div`
  * components.
  */
 export const MapLayout = () => {
-  const { state, dispatch } = useContext(MapContext);
+  const { state, dispatch } = useMapContext();
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
 
@@ -57,6 +57,13 @@ export const MapLayout = () => {
       payload: { filter, value },
     });
   };
+
+  const handleColorChange = (color) => { 
+    dispatch({
+      type: "UPDATE_COLOR_SCHEME",
+      payload: { color_scheme: color  }
+    })
+  };
   
   return (
     <LayoutContainer>
@@ -67,7 +74,7 @@ export const MapLayout = () => {
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
       >
-        <MapLayerSection />
+        <MapLayerSection handleColorChange={handleColorChange}/>
       </Sidebar>
       <MapContainer>
         <Map/>
