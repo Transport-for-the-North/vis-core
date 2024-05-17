@@ -22,14 +22,9 @@ export const MapProvider = ({ children }) => {
   const pageContext = useContext(PageContext);
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
-
-  
-
-
   const contextValue = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
-  
 
   useEffect(() => {
     // Initialise non-parameterised layers
