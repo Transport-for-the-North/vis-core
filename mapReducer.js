@@ -14,13 +14,14 @@ export const actionTypes = {
     UPDATE_VIS_DATA: 'UPDATE_VIS_DATA',
     UPDATE_COLOR_SCHEME: 'UPDATE_COLOR_SCHEME',
     JOIN_DATA: 'JOIN_DATA',
-    SET_IS_LOADING: 'SET_IS_LOADING'
+    SET_IS_LOADING: 'SET_IS_LOADING',
+    SET_LOADING_FINISHED: 'SET_LOADING_FINISHED'
 };
 
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}};
+            return { ...state, layers: {}, visualisations: {}, isLoading: true};
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload};
         case actionTypes.INITIALISE_SIDEBAR:
@@ -123,14 +124,14 @@ export const mapReducer = (state, action) => {
                 color_scheme: { value: "Reds", label: 'Reds'}// Store the map instance directly in the state
             };
         }
-        
-        case actionTypes.JOIN_DATA:
-            // Logic to join data
-            break;
-        case actionTypes.SET_IS_LOADING:
+        case actionTypes.SET_IS_LOADING: {
+            console.log('Loading started');
             return { ...state, isLoading: true };
-        case actionTypes.SET_LOADING_FINISHED:
+        }
+        case actionTypes.SET_LOADING_FINISHED: {
+            console.log('Loading finished');
             return { ...state, isLoading: false };
+        }
         default:
             return state;
     }
