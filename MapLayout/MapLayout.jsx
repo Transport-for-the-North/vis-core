@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import { MapLayerSection, Sidebar } from 'Components';
+import { Dimmer, MapLayerSection, Sidebar } from 'Components';
 import { PageContext } from 'contexts';
 import { useMapContext } from 'hooks';
 import { loremIpsum } from 'utils';
@@ -28,6 +28,7 @@ const MapContainer = styled.div`
  */
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
+  const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
 
@@ -62,11 +63,12 @@ export const MapLayout = () => {
     dispatch({
       type: "UPDATE_COLOR_SCHEME",
       payload: { color_scheme: color }
-    })
+    });
   };
   
   return (
     <LayoutContainer>
+      <Dimmer dimmed={isLoading} showLoader={true}/>
       <Sidebar 
         pageName={pageContext.pageName}
         aboutVisualisationText={loremIpsum}
@@ -79,7 +81,6 @@ export const MapLayout = () => {
       <MapContainer>
         <Map/>
       </MapContainer>
-      {/* <Dimmer dimmed={state.isloading} showLoader={true}/> */}
     </LayoutContainer>
   );
 };
