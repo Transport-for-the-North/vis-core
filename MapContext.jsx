@@ -1,9 +1,7 @@
-import React, { createContext, useCallback, useEffect, useContext, useReducer } from 'react';
-import { debounce } from 'lodash'
+import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { actionTypes, mapReducer } from 'reducers';
 import { hasRouteParameter, replaceRouteParameter } from 'utils';
 import { AppContext, PageContext } from 'contexts';
-import { api } from 'services';
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -14,7 +12,8 @@ const initialState = {
   metadataLayers: [],
   filters: [],
   map: null,
-  isMapReady: false
+  isMapReady: false,
+  isLoading: true
 };
 
 export const MapProvider = ({ children }) => {
@@ -27,6 +26,7 @@ export const MapProvider = ({ children }) => {
   }, [state, dispatch]);
 
   useEffect(() => {
+    dispatch({ type: actionTypes.SET_IS_LOADING });
     // Initialise non-parameterised layers
     const nonParameterisedLayers = pageContext.config.layers.filter(layer => !hasRouteParameter(layer.path));
     nonParameterisedLayers.forEach(layer => {
