@@ -13,7 +13,7 @@ const fetchDataForVisualisation = debounce(
   async (visualisation, dispatch, setLoading) => {
     console.log("sucess");
     if (visualisation && visualisation.queryParams) {
-      setLoading(true); // Set loading to true
+      setLoading(true)
       const path = visualisation.dataPath;
       const queryParams = visualisation.queryParams;
       const visualisationName = visualisation.name;
@@ -23,7 +23,7 @@ const fetchDataForVisualisation = debounce(
           type: actionTypes.UPDATE_VIS_DATA,
           payload: { visualisationName, data },
         });
-        setLoading(false); // Set loading to false when finished
+        setLoading(false)
       } catch (error) {
         console.error("Error fetching data for visualisation:", error);
         setLoading(false); // Set loading to false in case of error
@@ -295,14 +295,16 @@ export const Visualisation = ({ visualisationName, map }) => {
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
     }
-  }, [visualisation.queryParams, visualisationName, dispatch, visualisation]);
+  }, [visualisation.queryParams, visualisationName, visualisation]);
 
   // Log loading status to console
   useEffect(() => {
     if (isLoading) {
       console.log("Visualisation data is loading...");
+      dispatch({ type: actionTypes.SET_IS_LOADING });
     } else {
       console.log("Visualisation data finished loading.");
+      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
   }, [isLoading]);
 
@@ -336,25 +338,32 @@ export const Visualisation = ({ visualisationName, map }) => {
     const needUpdate = dataHasChanged || (colorHasChanged && visualisation.data.length !== 0)
 
     if (!needUpdate) {
+      setLoading(false);
       return;
     }
 
     switch (visualisation.type) {
       case "geojson": {
+        setLoading(true);
         reclassifyAndStyleGeoJSONMap(
           JSON.parse(visualisation.data[0].feature_collection),
           visualisation.style
         );
+        
         break;
       }
 
       case "joinDataToMap": {
+        
         // Reclassify and update the map style
+        setLoading(true);
         reclassifyAndStyleMap(visualisation.data, visualisation.style);
         break;
       }
-        default: break
-    }
+      default:
+        break;
+    };
+    setLoading(false);
     // Update the ref to the current data
     prevDataRef.current = visualisation.data;
     prevColorRef.current = state.color_scheme;
@@ -370,16 +379,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         }
       }
     };
-  }, [
-    visualisation,
-    reclassifyAndStyleGeoJSONMap,
-    setLoading,
-    visualisation.data,
-    reclassifyAndStyleMap,
-    dispatch,
-    map, 
-    state.color_scheme
-  ]);
+  }, [map, state.color_scheme, visualisation.style, visualisation.data]);
 
 
 

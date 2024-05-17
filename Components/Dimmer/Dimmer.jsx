@@ -4,7 +4,7 @@ import styled from "styled-components";
 const Dimmed = styled.div`
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 999998;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -22,7 +22,7 @@ export const Dimmer = ({ dimmed, showLoader }) => {
     <>
       {showLoader ? (
         <Spinner
-          style={{ zIndex: 1000 }}
+          style={{ zIndex: 999999 }}
           animation="grow"
           className="position-center"
         />
