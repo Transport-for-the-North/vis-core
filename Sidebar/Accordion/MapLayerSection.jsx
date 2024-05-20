@@ -101,6 +101,7 @@ const LayerControlEntry = memo(
         <SelectorLabel text="Opacity" />
         <OpacityControl>
           <OpacitySlider
+            id={"opacity-" + layer.id}
             type="range"
             min="0"
             max="1"
