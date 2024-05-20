@@ -127,6 +127,7 @@ export const Visualisation = ({ visualisationName, map }) => {
           paint: paintProperty,
           metadata: {
             colorStyle: style.split("-")[1],
+            isStylable: true
           },
         });
       } else {
@@ -272,7 +273,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
       if (data && data.length > 0 && map.getLayer(layer.name)) {
-        map.getLayer(layer.name).metadata = { colorStyle: style.split("-")[1] };
+        map.getLayer(layer.name).metadata = { ...map.getLayer(layer.name).metadata, colorStyle: style.split("-")[1] };
         map.removeFeatureState({
           source: layer.name,
           sourceLayer: "zones",

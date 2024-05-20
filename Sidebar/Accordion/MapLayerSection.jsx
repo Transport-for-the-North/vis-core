@@ -64,7 +64,7 @@ const LayerControlEntry = memo(
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
-    const [opacity, setOpacity] = useState(initialOpacity || 1);
+    const [opacity, setOpacity] = useState(initialOpacity || 0.5);
 
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
@@ -142,14 +142,16 @@ export const MapLayerSection = ({ handleColorChange }) => {
         const newLayers = map.getStyle().layers;
         // Perform deep comparison to check if layers have actually changed
         if (!_.isEqual(newLayers, layers)) {
+          const filteredLayers = newLayers.filter(
+            (layer) =>
+              (layer.type === "fill" ||
+                layer.type === "line" ||
+                layer.type === "circle") &&
+              layer.source !== "default" &&
+              layer.metadata.isStylable
+          );
           setLayers(
-            newLayers.filter(
-              (layer) =>
-                (layer.type === "fill" ||
-                  layer.type === "line" ||
-                  layer.type === "circle") &&
-                layer.source !== "default"
-            )
+            filteredLayers
           );
         }
       };

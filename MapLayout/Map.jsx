@@ -139,7 +139,7 @@ const Map = () => {
         let layerConfig = getLayerStyle(layer.geometryType);
         layerConfig.id = layer.name;
         layerConfig.visibility = "visible";
-        layerConfig.visibility = "visible";
+        layerConfig.metadata = { ...layerConfig.metadata, isStylable: layer.isStylable ?? false }
 
         // console.log(map)
         if (layer.type === "geojson") {
@@ -167,7 +167,7 @@ const Map = () => {
             ...layerConfig,
             source: layer.name,
             "source-layer": layer.sourceLayer,
-            "source-layer": layer.sourceLayer,
+            metadata: { isStylable: layer.isStylable ?? false }
           });
 
           if (layer.isHoverable) {
@@ -175,6 +175,7 @@ const Map = () => {
             hoverLayerConfig.id = `${layer.name}-hover`;
             hoverLayerConfig.source = layer.name;
             hoverLayerConfig["source-layer"] = layer.sourceLayer;
+            hoverLayerConfig.metadata = { ...hoverLayerConfig.metadata, isStylable: false }
             map.addLayer(hoverLayerConfig);
           }
         }
@@ -281,7 +282,7 @@ const Map = () => {
         payload: { map },
       });
     }
-  }, [isMapReady, map]);
+  }, [isMapReady]);
 
   /**
    * Effect to add click event listener to the map if there are map filters.
