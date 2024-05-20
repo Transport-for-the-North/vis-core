@@ -23,6 +23,8 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Reliability",
+            isHoverable: true,
+            isStylable: false
           },
         ],
         visualisations: [
