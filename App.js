@@ -9,7 +9,6 @@ import { AppContext } from 'contexts';
 import { api } from 'services';
 
 function App() {
-
   const [appConfig, setAppConfig] = useState({
     ...initialAppConfig,
     apiSchema: null
