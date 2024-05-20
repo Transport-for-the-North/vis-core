@@ -156,6 +156,8 @@ export const appConfig = {
             sourceLayer: "geometry",
             geometryType: "line",
             visualisationName: "Links",
+            isHoverable: false,
+            isStylable: true
           },
         ],
         visualisations: [
@@ -368,6 +370,8 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Accessibility",
+            isHoverable: false,
+            isStylable: true
           },
         ],
         visualisations: [
