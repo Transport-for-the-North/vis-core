@@ -39,18 +39,9 @@ const OpacityControl = styled.div`
   margin-top: 5px;
 `;
 
-const OpacityLabel = styled.span`
-  margin-right: 10px;
-`;
-
 const OpacitySlider = styled.input`
   flex-grow: 1;
   margin-right: 10px;
-`;
-
-const ColorSchemeSelector = styled.select`
-  margin-top: 5px;
-  width: 100%;
 `;
 
 const LayerControlEntry = memo(
@@ -96,11 +87,9 @@ const LayerControlEntry = memo(
       } else {
         opacityExpression = newOpacity;
       }
-
       map.setPaintProperty(layer.id, "fill-opacity", opacityExpression);
       setOpacity(newOpacity);
     };
-
     return (
       <LayerControlContainer>
         <LayerHeader>
@@ -120,10 +109,12 @@ const LayerControlEntry = memo(
             onChange={handleOpacityChange}
           />
         </OpacityControl>
-        {layer.id!=="Origin Zones" && <ColourSchemeDropdown
-          defaultPalette={defaultColor}
-          handleColorChange={handleColorChange}
-        />}
+        {layer.id !== "Origin Zones" && (
+          <ColourSchemeDropdown
+            colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
+            handleColorChange={handleColorChange}
+          />
+        )}
       </LayerControlContainer>
     );
   }
@@ -175,13 +166,12 @@ export const MapLayerSection = ({ handleColorChange }) => {
   }
 
   return (
-    <AccordionSection title="Map layer control">
+    <AccordionSection title="Map layer control" defaultValue={true}>
       {layers.map((layer) => (
         <LayerControlEntry
           key={layer.id}
           layer={layer}
           map={map}
-          defaultColor={state.color_scheme ?? { value: "Reds", label: "Reds" }}
           handleColorChange={(color) => handleColorChange(color)}
         />
       ))}

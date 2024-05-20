@@ -47,7 +47,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     (data, style) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(data, style);
-      const colourPalette = calculateColours(state.color_scheme.value ?? "Reds", reclassifiedData);
+      const colourPalette = calculateColours(state.color_scheme?.value ?? "Reds", reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
       const paintProperty = createPaintProperty(
@@ -56,7 +56,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         colourPalette
       );
 
-      addFeaturesToMap(map, paintProperty, state.layers, data);
+      addFeaturesToMap(map, paintProperty, state.layers, data, style);
       dispatch({
         type: "UPDATE_MAP_STYLE",
         payload: { visualisationName, paintProperty },
@@ -102,6 +102,9 @@ export const Visualisation = ({ visualisationName, map }) => {
           type: "fill",
           source: visualisationName,
           paint: paintProperty,
+          metadata: {
+            colorStyle: style.split("-")[1]
+          },
         });
       } else {
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(
@@ -237,10 +240,10 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
   };
 
-  const addFeaturesToMap = (map, paintProperty, layers, data) => {
+  const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
       if (data && data.length > 0 && map.getLayer(layer.name)) {
-        
+        map.getLayer(layer.name).metadata = {colorStyle: style.split("-")[1]}
         map.removeFeatureState({ 
           source: layer.name,
           sourceLayer: 'zones'
