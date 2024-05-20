@@ -47,22 +47,37 @@ export const Visualisation = ({ visualisationName, map }) => {
     (data, style) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(data, style);
-      const colourPalette = calculateColours(state.color_scheme.value ?? "Reds", reclassifiedData);
+      const colourPalette = calculateColours(
+        state.color_scheme?.value ?? "Reds",
+        reclassifiedData
+      );
 
       // Update the map style based on the type of map, reclassified data, and color palette
+
+      const opacityValue = document.getElementById(
+        "opacity-" + visualisationName
+      )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
         visualisation.style,
-        colourPalette
+        colourPalette, 
+        opacityValue ? parseFloat(opacityValue) : 0.65
       );
 
-      addFeaturesToMap(map, paintProperty, state.layers, data);
+      addFeaturesToMap(map, paintProperty, state.layers, data, style);
       dispatch({
         type: "UPDATE_MAP_STYLE",
         payload: { visualisationName, paintProperty },
       });
     },
-    [dispatch, map, state.color_scheme, state.layers, visualisation.style, visualisationName]
+    [
+      dispatch,
+      map,
+      state.color_scheme,
+      state.layers,
+      visualisation.style,
+      visualisationName,
+    ]
   );
 
   // Function to add or update a GeoJSON source and layer and style it
@@ -86,13 +101,21 @@ export const Visualisation = ({ visualisationName, map }) => {
       }
       // Reclassify data if needed
       const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
-      const colourPalette = calculateColours(state.color_scheme.value ?? "Accent", reclassifiedData);
-      
+      const colourPalette = calculateColours(
+        state.color_scheme.value ?? "Accent",
+        reclassifiedData
+      );
+
       // Update the map style based on the type of map, reclassified data, and color palette
+
+      const opacityValue = document.getElementById(
+        "opacity-" + visualisationName
+      )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
         style,
-        colourPalette
+        colourPalette,
+        opacityValue ? parseFloat(opacityValue) : 0.65
       );
 
       if (!map.getLayer(visualisationName)) {
@@ -102,6 +125,9 @@ export const Visualisation = ({ visualisationName, map }) => {
           type: "fill",
           source: visualisationName,
           paint: paintProperty,
+          metadata: {
+            colorStyle: style.split("-")[1],
+          },
         });
       } else {
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(
@@ -153,7 +179,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   };
 
   // Function to create a paint property for Maplibre based on the visualisation type and bins
-  const createPaintProperty = (bins, style, colours) => {
+  const createPaintProperty = (bins, style, colours, opacityValue) => {
     let colors = [];
     let colorObject = [];
     for (var i = 0; i < bins.length; i++) {
@@ -166,7 +192,8 @@ export const Visualisation = ({ visualisationName, map }) => {
       case "polygon-continuous":
         return {
           "fill-color": [
-            "interpolate", ["linear"],
+            "interpolate",
+            ["linear"],
             ["feature-state", "value"],
             ...colors,
           ],
@@ -174,9 +201,9 @@ export const Visualisation = ({ visualisationName, map }) => {
             "case",
             ["in", ["feature-state", "value"], ["literal", [0, null]]],
             0,
-            0.65,
+            opacityValue ?? 0.65,
           ],
-          "fill-outline-color": "rgba(255, 255, 0, 0)"
+          "fill-outline-color": "rgba(255, 255, 0, 0)",
         };
       case "polygon-categorical":
         // Assuming 'bins' is an array of category values and 'colours' is an array of corresponding colors
@@ -188,23 +215,28 @@ export const Visualisation = ({ visualisationName, map }) => {
         categoricalColors.push(colours[colours.length - 1]); // Default color if no match is found
         return {
           "fill-color": ["match", ["get", "category"], ...categoricalColors],
-          "fill-opacity": 0.35,
+          "fill-opacity": opacityValue ?? 0.65,
         };
       case "line-continuous":
         return {
           "line-color": [
             "case",
-            ["<", ["feature-state", "value"], 0], "rgba(255, 0, 0, 1)", // Red for negative values
-            [">", ["feature-state", "value"], 0], "rgba(0, 0, 255, 1)", // Blue for positive values
-            "rgba(0, 0, 0, 0.0)" // Make zero invisible
+            ["<", ["feature-state", "value"], 0],
+            "rgba(255, 0, 0, 1)", // Red for negative values
+            [">", ["feature-state", "value"], 0],
+            "rgba(0, 0, 255, 1)", // Blue for positive values
+            "rgba(0, 0, 0, 0.0)", // Make zero invisible
           ],
           "line-width": [
-            "interpolate", ["linear"],
+            "interpolate",
+            ["linear"],
             ["to-number", ["feature-state", "valueAbs"]],
-            0.1, 0.1, // Line width starts at 1 at the value of 0
-            Math.max(...bins), 20
+            0.1,
+            0.1, // Line width starts at 1 at the value of 0
+            Math.max(...bins),
+            20,
           ],
-          "line-opacity": 1
+          "line-opacity": 1,
         };
       case "circle": {
         return {
@@ -237,14 +269,14 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
   };
 
-  const addFeaturesToMap = (map, paintProperty, layers, data) => {
+  const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
       if (data && data.length > 0 && map.getLayer(layer.name)) {
-        
-        map.removeFeatureState({ 
+        map.getLayer(layer.name).metadata = { colorStyle: style.split("-")[1] };
+        map.removeFeatureState({
           source: layer.name,
-          sourceLayer: 'zones'
-        })
+          sourceLayer: "zones",
+        });
         data.forEach((row) => {
           map.setFeatureState(
             {
@@ -332,10 +364,13 @@ export const Visualisation = ({ visualisationName, map }) => {
   // Effect to restyle the map if data has changed
   useEffect(() => {
     const dataHasChanged =
-    visualisation.data.length !== 0 &&
-    visualisation.data !== prevDataRef.current;
-    const colorHasChanged = state.color_scheme !== null && state.color_scheme !== prevColorRef.current
-    const needUpdate = dataHasChanged || (colorHasChanged && visualisation.data.length !== 0)
+      visualisation.data.length !== 0 &&
+      visualisation.data !== prevDataRef.current;
+    const colorHasChanged =
+      state.color_scheme !== null &&
+      state.color_scheme !== prevColorRef.current;
+    const needUpdate =
+      dataHasChanged || (colorHasChanged && visualisation.data.length !== 0);
 
     if (!needUpdate) {
       setLoading(false);
@@ -379,9 +414,16 @@ export const Visualisation = ({ visualisationName, map }) => {
         }
       }
     };
-  }, [map, state.color_scheme, visualisation.style, visualisation.data]);
-
-
+  }, [
+    visualisation,
+    reclassifyAndStyleGeoJSONMap,
+    setLoading,
+    visualisation.data,
+    reclassifyAndStyleMap,
+    dispatch,
+    map,
+    state.color_scheme,
+  ]);
 
   return (
     <>
