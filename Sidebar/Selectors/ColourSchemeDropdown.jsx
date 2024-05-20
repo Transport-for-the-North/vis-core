@@ -1,12 +1,12 @@
 import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
-import styled from "styled-components";
 
+import { useEffect } from "react";
 import { SelectorLabel } from "./SelectorLabel";
 
 const colorPalettes = {
-  sequential: [
+  continuous: [
     "Blues",
     "BuGn",
     "BuPu",
@@ -72,15 +72,8 @@ const colourStyles = {
   },
 };
 
-// Styled component for color boxes
-const ColorBox = styled.div`
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 4px;
-`;
 
-export const ColourSchemeDropdown = ({ defaultPalette, handleColorChange }) => {
+export const ColourSchemeDropdown = ({ colorStyle, handleColorChange }) => {
   const animatedComponents = makeAnimated();
 
   const formatOptionLabel = ({ value, label }) => (
@@ -102,9 +95,11 @@ export const ColourSchemeDropdown = ({ defaultPalette, handleColorChange }) => {
     </div>
   );
 
-  const options = Object.keys(colorPalettes).flatMap((key) =>
-    colorPalettes[key].map((scheme) => ({ value: scheme, label: scheme }))
-  );
+  const options = colorPalettes[colorStyle].map((scheme) => ({ value: scheme, label: scheme }))
+
+  useEffect(() => {
+    handleColorChange(options[0])
+  },[])
 
   return (
     <>
@@ -112,7 +107,7 @@ export const ColourSchemeDropdown = ({ defaultPalette, handleColorChange }) => {
       <Select
         components={animatedComponents}
         options={options}
-        defaultValue={defaultPalette}
+        defaultValue={options[0]}
         formatOptionLabel={formatOptionLabel}
         styles={colourStyles}
         menuPlacement="auto"

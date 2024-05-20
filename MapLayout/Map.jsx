@@ -2,9 +2,9 @@ import React, { useEffect, useCallback, useRef, useContext } from "react";
 import styled from "styled-components";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { api } from 'services';
-import { useMap, useMapContext } from 'hooks';
-import { Visualisation } from './Visualisation'
+import { api } from "services";
+import { useMap, useMapContext } from "hooks";
+import { Visualisation } from "./Visualisation";
 import { PageContext } from "contexts";
 
 const StyledMapContainer = styled.div`
@@ -16,9 +16,9 @@ const StyledMapContainer = styled.div`
 const Map = () => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
-  const pageContext = useContext(PageContext)
+  const pageContext = useContext(PageContext);
   const { state, dispatch } = useMapContext();
-  
+
   const getLayerStyle = (geometryType) => {
     switch (geometryType) {
       case "polygon":
@@ -62,15 +62,19 @@ const Map = () => {
         let sourceConfig = {};
         let layerConfig = getLayerStyle(layer.geometryType);
         layerConfig.id = layer.name;
-        layerConfig.visibility = 'visible'
+        layerConfig.visibility = "visible";
 
+        // console.log(map)
         if (layer.type === "geojson") {
           // Fetch and add a GeoJSON layer
           api.geodataService.getLayer(layer).then((geojson) => {
             sourceConfig.type = "geojson";
             sourceConfig.data = geojson;
             map.addSource(layer.name, sourceConfig);
-            map.addLayer({ ...layerConfig, source: layer.name});
+            map.addLayer({
+              ...layerConfig,
+              source: layer.name,
+            });
           });
         } else if (layer.type === "tile") {
           // Add a tile layer
@@ -85,7 +89,7 @@ const Map = () => {
           map.addLayer({
             ...layerConfig,
             source: layer.name,
-            "source-layer": layer.sourceLayer
+            "source-layer": layer.sourceLayer,
           });
         }
       }
@@ -93,58 +97,66 @@ const Map = () => {
     [map]
   );
 
-  
   // Function to handle map click events
-  const handleMapClick = useCallback((event) => {
-    if (!isMapReady || !map) return;
+  const handleMapClick = useCallback(
+    (event) => {
+      if (!isMapReady || !map) return;
 
-    // Get the point where the map is clicked
-    const point = event.point;
+      // Get the point where the map is clicked
+      const point = event.point;
 
-    // Get all map filters
-    const mapFilters = pageContext.config.filters.filter(filter => filter.type === 'map');
+      // Get all map filters
+      const mapFilters = pageContext.config.filters.filter(
+        (filter) => filter.type === "map"
+      );
 
-    // For each map filter, check if the clicked point has a feature from the layer
-    mapFilters.forEach(filter => {
-      const features = map.queryRenderedFeatures(point, { layers: [filter.layer] });
-      if (features.length > 0) {
-        // Assuming the first feature is the one we're interested in
-        const feature = features[0];
-        const value = feature.properties[filter.field];
-        console.log(`Updating ${filter.field}`)
-        // Dispatch the action with the value from the clicked feature
-        dispatch({
-          type: filter.action,
-          payload: { filter, value }
+      // For each map filter, check if the clicked point has a feature from the layer
+      mapFilters.forEach((filter) => {
+        const features = map.queryRenderedFeatures(point, {
+          layers: [filter.layer],
         });
-      }
-    });
-  }, [isMapReady, map, pageContext.config.filters, dispatch]);
-  
+        if (features.length > 0) {
+          // Assuming the first feature is the one we're interested in
+          const feature = features[0];
+          const value = feature.properties[filter.field];
+          console.log(`Updating ${filter.field}`);
+          // Dispatch the action with the value from the clicked feature
+          dispatch({
+            type: filter.action,
+            payload: { filter, value },
+          });
+        }
+      });
+    },
+    [isMapReady, map, pageContext.config.filters, dispatch]
+  );
+
   // Run once to set the state of the map
   useEffect(() => {
     if (isMapReady) {
       dispatch({
-        type: 'SET_MAP',
+        type: "SET_MAP",
         payload: { map },
       });
     }
   }, [isMapReady, map, dispatch]);
-  
+
   // Set up the click event listener
   useEffect(() => {
     if (isMapReady) {
       // Check if there is a map filter before adding the click handler
-      const hasMapFilter = pageContext.config.filters.some(filter => filter.type === 'map');
+      const hasMapFilter = pageContext.config.filters.some(
+        (filter) => filter.type === "map"
+      );
       if (hasMapFilter) {
-        map.on('click', handleMapClick);
+        map.on("click", handleMapClick);
       }
     }
 
     // Remove the click event listener when the component unmounts or dependencies change
     return () => {
       if (map) {
-        map.off('click', handleMapClick);
+        map.off("click", handleMapClick);
       }
     };
   }, [isMapReady, map, handleMapClick]);
@@ -174,7 +186,11 @@ const Map = () => {
   return (
     <StyledMapContainer ref={mapContainerRef}>
       {Object.values(state.visualisations).map((visConfig) => (
-        <Visualisation key={visConfig.name} visualisationName={visConfig.name} map={map} />
+        <Visualisation
+          key={visConfig.name}
+          visualisationName={visConfig.name}
+          map={map}
+        />
       ))}
     </StyledMapContainer>
   );
