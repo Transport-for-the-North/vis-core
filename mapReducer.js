@@ -120,8 +120,8 @@ export const mapReducer = (state, action) => {
             const { map } = action.payload;
             return {
                 ...state,
-                map: map,
-                color_scheme: { value: "Reds", label: 'Reds'}// Store the map instance directly in the state
+                map: map,// Store the map instance directly in the state
+                color_scheme: { value: "Reds", label: 'Reds'} //Set up the default color scheme on startup only
             };
         }
         case actionTypes.SET_IS_LOADING: {
