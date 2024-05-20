@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useRef, useContext } from "react";
 import styled from "styled-components";
 import "maplibre-gl/dist/maplibre-gl.css";
+
 import { api } from "services";
 import { useMap, useMapContext } from "hooks";
 import { Visualisation } from "./Visualisation";
@@ -138,7 +139,9 @@ const Map = () => {
         let layerConfig = getLayerStyle(layer.geometryType);
         layerConfig.id = layer.name;
         layerConfig.visibility = "visible";
+        layerConfig.visibility = "visible";
 
+        // console.log(map)
         if (layer.type === "geojson") {
           api.geodataService.getLayer(layer).then((geojson) => {
             sourceConfig.type = "geojson";
@@ -163,6 +166,7 @@ const Map = () => {
           map.addLayer({
             ...layerConfig,
             source: layer.name,
+            "source-layer": layer.sourceLayer,
             "source-layer": layer.sourceLayer,
           });
 
@@ -243,18 +247,22 @@ const Map = () => {
 
       const point = event.point;
 
+      // Get all map filters
       const mapFilters = pageContext.config.filters.filter(
         (filter) => filter.type === "map"
       );
 
+      // For each map filter, check if the clicked point has a feature from the layer
       mapFilters.forEach((filter) => {
         const features = map.queryRenderedFeatures(point, {
           layers: [filter.layer],
         });
         if (features.length > 0) {
+          // Assuming the first feature is the one we're interested in
           const feature = features[0];
           const value = feature.properties[filter.field];
           console.log(`Updating ${filter.field}`);
+          // Dispatch the action with the value from the clicked feature
           dispatch({
             type: filter.action,
             payload: { filter, value },
@@ -265,9 +273,7 @@ const Map = () => {
     [isMapReady, map, pageContext.config.filters, dispatch]
   );
 
-  /**
-   * Effect to set the state of the map when it becomes ready.
-   */
+  // Run once to set the state of the map
   useEffect(() => {
     if (isMapReady) {
       dispatch({
