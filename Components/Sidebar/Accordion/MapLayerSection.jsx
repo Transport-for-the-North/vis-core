@@ -114,13 +114,11 @@ const LayerControlEntry = memo(
             onChange={handleOpacityChange}
           />
         </OpacityControl>
-        {layer.id !== "Origin Zones" && (
           <ColourSchemeDropdown
             colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
             handleColorChange={handleColorChange}
             layerName={layer.id}
           />
-        )}
       </LayerControlContainer>
     );
   }
@@ -173,10 +171,10 @@ export const MapLayerSection = ({ handleColorChange }) => {
     return <div>Loading map layers...</div>;
   }
 
-  // If layers array is empty, do not display the AccordionSection
-  if (layers.length === 0) {
-    return null; // Return a placeholder message if needed
+  if(layers.length === 0) {
+    return null;
   }
+
 
   return (
     <AccordionSection title="Map layer control">
