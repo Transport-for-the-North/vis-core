@@ -11,6 +11,7 @@ export const appConfig = {
     {
       pageName: "Reliability",
       url: "/reliability",
+      about: "<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone in the map.</p> <p>The <b>base</b> timetable refers to buses which were scheduled. </p> <p>The <b>adjusted</b> timetable refers to buses which actually ran.</p>",
       type: "MapLayout",
       config: {
         layers: [

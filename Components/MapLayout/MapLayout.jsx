@@ -71,7 +71,7 @@ export const MapLayout = () => {
       <Dimmer dimmed={isLoading} showLoader={true}/>
       <Sidebar 
         pageName={pageContext.pageName}
-        aboutVisualisationText={loremIpsum}
+        aboutVisualisationText={pageContext.about ?? loremIpsum}
         filters={pageContext.config.filters}
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
