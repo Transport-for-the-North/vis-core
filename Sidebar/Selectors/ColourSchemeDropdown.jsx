@@ -2,51 +2,10 @@ import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-import { useEffect } from "react";
+import { useMapContext } from "hooks";
+import { useMemo } from "react";
+import { colorSchemes } from "utils";
 import { SelectorLabel } from "./SelectorLabel";
-
-const colorPalettes = {
-  continuous: [
-    "Blues",
-    "BuGn",
-    "BuPu",
-    "GnBu",
-    "Greens",
-    "Greys",
-    "OrRd",
-    "PuBu",
-    "PuBuGn",
-    "PuRd",
-    "Purples",
-    "RdPu",
-    "Reds",
-    "YlGn",
-    "YlGnBu",
-    "YlOrBr",
-    "YlOrRd",
-  ],
-  diverging: [
-    "BrBG",
-    "PiYG",
-    "PRGn",
-    "PuOr",
-    "RdBu",
-    "RdGy",
-    "RdYlBu",
-    "RdYlGn",
-    "Spectral",
-  ],
-  categorical: [
-    "Accent",
-    "Dark2",
-    "Paired",
-    "Pastel1",
-    "Pastel2",
-    "Set1",
-    "Set2",
-    "Set3",
-  ],
-};
 
 // Custom style for the react-select options
 const colourStyles = {
@@ -72,8 +31,11 @@ const colourStyles = {
   },
 };
 
-
-export const ColourSchemeDropdown = ({ colorStyle, handleColorChange }) => {
+export const ColourSchemeDropdown = ({
+  colorStyle,
+  handleColorChange,
+  layerName,
+}) => {
   const animatedComponents = makeAnimated();
 
   const formatOptionLabel = ({ value, label }) => (
@@ -95,19 +57,28 @@ export const ColourSchemeDropdown = ({ colorStyle, handleColorChange }) => {
     </div>
   );
 
-  const options = colorPalettes[colorStyle].map((scheme) => ({ value: scheme, label: scheme }))
-
-  useEffect(() => {
-    handleColorChange(options[0])
-  },[])
+  const { state } = useMapContext();
+  const options = useMemo(
+    () =>
+      colorSchemes[colorStyle].map((scheme) => ({
+        value: scheme,
+        label: scheme,
+      })),
+    [colorStyle]
+  );
 
   return (
     <>
       <SelectorLabel text="Colour scheme" />
       <Select
+        id={"colors-" + layerName}
         components={animatedComponents}
         options={options}
-        defaultValue={options[0]}
+        defaultValue={
+          options.some((e) => e.value === state.color_scheme.value)
+            ? state.color_scheme
+            : options[0]
+        }
         formatOptionLabel={formatOptionLabel}
         styles={colourStyles}
         menuPlacement="auto"

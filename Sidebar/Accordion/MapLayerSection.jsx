@@ -118,6 +118,7 @@ const LayerControlEntry = memo(
           <ColourSchemeDropdown
             colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
             handleColorChange={handleColorChange}
+            layerName={layer.id}
           />
         )}
       </LayerControlContainer>
@@ -173,7 +174,7 @@ export const MapLayerSection = ({ handleColorChange }) => {
   }
 
   return (
-    <AccordionSection title="Map layer control" defaultValue={true}>
+    <AccordionSection title="Map layer control">
       {layers.map((layer) => (
         <LayerControlEntry
           key={layer.id}
