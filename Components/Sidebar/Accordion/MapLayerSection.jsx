@@ -173,6 +173,11 @@ export const MapLayerSection = ({ handleColorChange }) => {
     return <div>Loading map layers...</div>;
   }
 
+  // If layers array is empty, do not display the AccordionSection
+  if (layers.length === 0) {
+    return null; // Return a placeholder message if needed
+  }
+
   return (
     <AccordionSection title="Map layer control">
       {layers.map((layer) => (
