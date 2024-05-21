@@ -384,9 +384,11 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/accessibility",
+            infoTextTemplate: `{filterName1} accessible within {filterName2}`
           },
         ],
         metadataLayers: [],
+        
         filters: [
           {
             filterName: "Region",
@@ -395,6 +397,7 @@ export const appConfig = {
             action: "UPDATE_PARAMETERISED_LAYER",
             layer: "Accessibility",
             type: "dropdown",
+            info: "Select the region for which to view metrics.",
             values: {
               source: "local",
               values: [
@@ -420,6 +423,7 @@ export const appConfig = {
             action: "UPDATE_QUERY_PARAMS",
             visualisations: ["Accessibility"],
             type: "dropdown",
+            info: "Timetable used to calculate metrics.",
             values: {
               source: "local",
               values: [
@@ -441,6 +445,7 @@ export const appConfig = {
             action: "UPDATE_QUERY_PARAMS",
             visualisations: ["Accessibility"],
             type: "dropdown",
+            info: "Type of opportunity accessed.",
             values: {
               source: "local",
               values: [
@@ -462,6 +467,7 @@ export const appConfig = {
             action: "UPDATE_QUERY_PARAMS",
             visualisations: ["Accessibility"],
             type: "slider",
+            info: "Journey time limit by bus.",
             min: 15,
             max: 225,
             interval: 15,

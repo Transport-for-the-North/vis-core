@@ -14,7 +14,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {filters.map((filter) => (
         <SelectorContainer key={filter.filterName}>
-          <SelectorLabel htmlFor={filter.paramName} text={filter.filterName} />
+          <SelectorLabel htmlFor={filter.paramName} text={filter.filterName} info={filter.info ?? null} />
           {filter.type === 'dropdown' && (
             <Dropdown
               key={filter.filterName}
