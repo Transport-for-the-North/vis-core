@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useContext } from "react";
+import React, { useEffect, useCallback, useRef, useState, useContext } from "react";
 import styled from "styled-components";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -21,6 +21,7 @@ const Map = () => {
   const { map, isMapReady } = useMap(mapContainerRef);
   const pageContext = useContext(PageContext);
   const { state, dispatch } = useMapContext();
+  const [selectedFeatureId, setSelectedFeatureId] = useState(null);
 
   /**
    * Generates the style configuration for a regular layer based on the geometry
@@ -80,13 +81,18 @@ const Map = () => {
           id: "",
           type: "line",
           paint: {
-            "line-color": [
-              "case",
-              ["boolean", ["feature-state", "hover"], false],
-              "rgba(255, 255, 255, 1.0)", // Hover color
-              "rgba(0, 0, 0, 1.0)", // Default color
+            "line-color": "rgba(0, 0, 0, 1.0)", // Default color
+            // Zoom-dependent line width
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              // Specify zoom levels and corresponding line widths
+              5, 1, // At zoom level 5, line width will be 1
+              10, 2, // At zoom level 10, line width will be 2
+              15, 4, // At zoom level 15, line width will be 4
+              20, 8  // At zoom level 20, line width will be 8
             ],
-            "line-width": 6,
           },
           filter: ["==", "id", ""],
         };
@@ -262,6 +268,32 @@ const Map = () => {
           // Assuming the first feature is the one we're interested in
           const feature = features[0];
           const value = feature.properties[filter.field];
+
+          // Update the selected feature ID
+          setSelectedFeatureId(feature.id);
+
+          // Remove the previous selection layer if it exists
+          if (map.getLayer('selected-feature-layer')) {
+            map.removeLayer('selected-feature-layer');
+            map.removeSource('selected-feature-source');
+          }
+
+          // Add a new source and layer for the selected feature
+          map.addSource('selected-feature-source', {
+            type: 'geojson',
+            data: feature.toJSON()
+          });
+
+          map.addLayer({
+            id: 'selected-feature-layer',
+            type: 'fill',
+            source: 'selected-feature-source',
+            paint: {
+              'fill-color': '#f00',
+              'fill-opacity': 0.5
+            }
+          });
+
           console.log(`Updating ${filter.field}`);
           // Dispatch the action with the value from the clicked feature
           dispatch({
@@ -271,7 +303,7 @@ const Map = () => {
         }
       });
     },
-    [isMapReady, map, pageContext.config.filters, dispatch]
+    [isMapReady, map, pageContext.config.filters, dispatch, selectedFeatureId]
   );
 
   // Run once to set the state of the map
