@@ -7,13 +7,14 @@ import { Legend } from "Components/Legend";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
+import { colorSchemes } from "utils";
 
 // Debounced fetchDataForVisualisation function
 const fetchDataForVisualisation = debounce(
   async (visualisation, dispatch, setLoading) => {
     console.log("sucess");
     if (visualisation && visualisation.queryParams) {
-      setLoading(true)
+      setLoading(true);
       const path = visualisation.dataPath;
       const queryParams = visualisation.queryParams;
       const visualisationName = visualisation.name;
@@ -23,7 +24,7 @@ const fetchDataForVisualisation = debounce(
           type: actionTypes.UPDATE_VIS_DATA,
           payload: { visualisationName, data },
         });
-        setLoading(false)
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data for visualisation:", error);
         setLoading(false); // Set loading to false in case of error
@@ -47,8 +48,13 @@ export const Visualisation = ({ visualisationName, map }) => {
     (data, style) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(data, style);
+      const currentColor = colorSchemes[style.split("-")[1]].some(
+        (e) => e === state.color_scheme.value
+      )
+        ? state.color_scheme.value
+        : colorSchemes[style.split("-")[1]][0];
       const colourPalette = calculateColours(
-        state.color_scheme?.value ?? "Reds",
+        currentColor,
         reclassifiedData
       );
 
@@ -60,7 +66,7 @@ export const Visualisation = ({ visualisationName, map }) => {
       const paintProperty = createPaintProperty(
         reclassifiedData,
         visualisation.style,
-        colourPalette, 
+        colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
 
@@ -101,8 +107,13 @@ export const Visualisation = ({ visualisationName, map }) => {
       }
       // Reclassify data if needed
       const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
+      const currentColor = colorSchemes[style.split("-")[1]].some(
+        (e) => e === state.color_scheme.value
+      )
+        ? state.color_scheme.value
+        : colorSchemes[style.split("-")[1]][0];
       const colourPalette = calculateColours(
-        state.color_scheme.value ?? "Accent",
+        currentColor,
         reclassifiedData
       );
 
@@ -127,7 +138,7 @@ export const Visualisation = ({ visualisationName, map }) => {
           paint: paintProperty,
           metadata: {
             colorStyle: style.split("-")[1],
-            isStylable: true
+            isStylable: true,
           },
         });
       } else {
@@ -273,7 +284,10 @@ export const Visualisation = ({ visualisationName, map }) => {
   const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
       if (data && data.length > 0 && map.getLayer(layer.name)) {
-        map.getLayer(layer.name).metadata = { ...map.getLayer(layer.name).metadata, colorStyle: style.split("-")[1] };
+        map.getLayer(layer.name).metadata = {
+          ...map.getLayer(layer.name).metadata,
+          colorStyle: style.split("-")[1],
+        };
         map.removeFeatureState({
           source: layer.name,
           sourceLayer: "zones",
@@ -385,12 +399,11 @@ export const Visualisation = ({ visualisationName, map }) => {
           JSON.parse(visualisation.data[0].feature_collection),
           visualisation.style
         );
-        
+
         break;
       }
 
       case "joinDataToMap": {
-        
         // Reclassify and update the map style
         setLoading(true);
         reclassifyAndStyleMap(visualisation.data, visualisation.style);
@@ -398,7 +411,7 @@ export const Visualisation = ({ visualisationName, map }) => {
       }
       default:
         break;
-    };
+    }
     setLoading(false);
     // Update the ref to the current data
     prevDataRef.current = visualisation.data;
