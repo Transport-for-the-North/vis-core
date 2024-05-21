@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 
 
@@ -28,7 +30,7 @@ const InfoButton = styled.button`
 `;
 
 const TooltipText = styled.span`
-  visibility: hidden;
+  visibility: ${props => (props.isVisible ? 'visible' : 'hidden')};
   width: 120px;
   background-color: black;
   color: #fff;
@@ -36,32 +38,43 @@ const TooltipText = styled.span`
   border-radius: 6px;
   padding: 5px 0;
   position: absolute;
-  z-index: 9999; // Ensures it appears above all interface components
-  bottom: 125%; // Positions the tooltip above the button
+  z-index: 9999;
+  bottom: 125%;
   left: 50%;
-  margin-left: -60px; // Centers the tooltip
-  opacity: 0;
+  margin-left: -60px;
   transition: opacity 0.3s;
   overflow: visible;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: black transparent transparent transparent;
-  }
+  opacity: ${props => (props.isVisible ? 1 : 0)};
 `;
 
-export const SelectorLabel = ({ text, info }) => (
-  <StyledLabel>
-    <span>{text}</span>
-    {/* <InfoButton>
-      ℹ
-      <TooltipText>{info}</TooltipText>
-    </InfoButton> */}
-  </StyledLabel>
-);
+
+export const SelectorLabel = ({ text, info }) => {
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
+
+  const handleMouseEnter = () => {
+    setTooltipVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setTooltipVisible(false);
+  };
+
+  const renderTooltip = (info) => {
+    return createPortal(
+      <TooltipText isVisible={isTooltipVisible}>{info}</TooltipText>,
+      document.getElementById('portal-root')
+    );
+  };
+
+  return (
+    <StyledLabel>
+      <span>{text}</span>
+      {info && (
+        <InfoButton onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+          ℹ
+          {renderTooltip(info)}
+        </InfoButton>
+      )}
+    </StyledLabel>
+  );
+};
