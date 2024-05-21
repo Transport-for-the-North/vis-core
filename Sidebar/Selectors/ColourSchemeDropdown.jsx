@@ -2,8 +2,9 @@ import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { SelectorLabel } from "./SelectorLabel";
+import { useMapContext } from "hooks";
 
 const colorPalettes = {
   continuous: [
@@ -73,7 +74,7 @@ const colourStyles = {
 };
 
 
-export const ColourSchemeDropdown = ({ colorStyle, handleColorChange }) => {
+export const ColourSchemeDropdown = ({ colorStyle, handleColorChange, layerName }) => {
   const animatedComponents = makeAnimated();
 
   const formatOptionLabel = ({ value, label }) => (
@@ -95,19 +96,23 @@ export const ColourSchemeDropdown = ({ colorStyle, handleColorChange }) => {
     </div>
   );
 
-  const options = colorPalettes[colorStyle].map((scheme) => ({ value: scheme, label: scheme }))
+  const {state} = useMapContext()
+  const options = useMemo(() => colorPalettes[colorStyle].map((scheme) => ({ value: scheme, label: scheme })), [colorStyle])
 
   useEffect(() => {
-    handleColorChange(options[0])
-  },[])
+    if (!options.some(e => e.value === state.color_scheme.value)) {
+      handleColorChange(options[0])
+    }
+  },[options])
 
   return (
     <>
       <SelectorLabel text="Colour scheme" />
       <Select
+        id={"colors-" + layerName}
         components={animatedComponents}
         options={options}
-        defaultValue={options[0]}
+        defaultValue={options.some(e => e.value === state.color_scheme.value) ? state.color_scheme : options[0]}
         formatOptionLabel={formatOptionLabel}
         styles={colourStyles}
         menuPlacement="auto"
