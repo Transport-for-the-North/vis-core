@@ -53,10 +53,7 @@ export const Visualisation = ({ visualisationName, map }) => {
       )
         ? state.color_scheme.value
         : colorSchemes[style.split("-")[1]][0];
-      const colourPalette = calculateColours(
-        currentColor,
-        reclassifiedData
-      );
+      const colourPalette = calculateColours(currentColor, reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
 
@@ -86,7 +83,14 @@ export const Visualisation = ({ visualisationName, map }) => {
     ]
   );
 
-  // Function to add or update a GeoJSON source and layer and style it
+  /**
+ * Reclassifies GeoJSON data and styles the map accordingly. If the layer does not exist,
+ * it adds a new layer below any existing 'selected-feature-layer' or layers with '-hover' in their names.
+ * If the layer exists, it updates the paint properties of the layer.
+ *
+ * @param {Object} featureCollection - The GeoJSON feature collection to be added or updated on the map.
+ * @param {string} style - The style string indicating the type of visualisation (e.g., 'polygon-continuous').
+ */
   const reclassifyAndStyleGeoJSONMap = useCallback(
     (featureCollection, style) => {
       if (!featureCollection) {
@@ -112,10 +116,7 @@ export const Visualisation = ({ visualisationName, map }) => {
       )
         ? state.color_scheme.value
         : colorSchemes[style.split("-")[1]][0];
-      const colourPalette = calculateColours(
-        currentColor,
-        reclassifiedData
-      );
+      const colourPalette = calculateColours(currentColor, reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
 
@@ -129,18 +130,30 @@ export const Visualisation = ({ visualisationName, map }) => {
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
 
+      // Find the index of the layer that should be above the new layer
+      const layers = map.getStyle().layers;
+      const layerIndex = layers.findIndex(
+        (layer) =>
+          layer.id.includes("-hover") || layer.id === "selected-feature-layer"
+      );
+      const beforeLayerId =
+        layerIndex !== -1 ? layers[layerIndex].id : undefined;
+
       if (!map.getLayer(visualisationName)) {
-        // Add a new layer (over the top of the existing one if need be)
-        map.addLayer({
-          id: visualisationName,
-          type: "fill",
-          source: visualisationName,
-          paint: paintProperty,
-          metadata: {
-            colorStyle: style.split("-")[1],
-            isStylable: true,
+        // Add a new layer below the reference layer
+        map.addLayer(
+          {
+            id: visualisationName,
+            type: "fill",
+            source: visualisationName,
+            paint: paintProperty,
+            metadata: {
+              colorStyle: style.split("-")[1],
+              isStylable: true,
+            },
           },
-        });
+          beforeLayerId
+        ); // Add the new layer below the identified layer
       } else {
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(
           paintProperty
