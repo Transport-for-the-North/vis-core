@@ -358,6 +358,12 @@ const Map = () => {
           if (map.getSource(layer.name)) {
             map.removeSource(layer.name);
           }
+          if (map.getLayer('selected-feature-layer')) {
+            map.removeLayer('selected-feature-layer');
+          }
+          if (map.getSource('selected-feature-source')) {
+            map.removeSource('selected-feature-source');
+          }
         });
       }
     };
