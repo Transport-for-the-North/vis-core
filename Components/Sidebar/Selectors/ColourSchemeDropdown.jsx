@@ -2,10 +2,10 @@ import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-import { useEffect, useMemo } from "react";
-import { SelectorLabel } from "./SelectorLabel";
 import { useMapContext } from "hooks";
+import { useMemo } from "react";
 import { colorSchemes } from "utils";
+import { SelectorLabel } from "./SelectorLabel";
 
 // Custom style for the react-select options
 const colourStyles = {
