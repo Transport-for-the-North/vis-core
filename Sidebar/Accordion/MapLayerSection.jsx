@@ -7,6 +7,7 @@ import { AccordionSection } from "Components";
 import { useMapContext } from "hooks";
 import { ColourSchemeDropdown } from "../Selectors";
 import { SelectorLabel } from "../Selectors/SelectorLabel";
+import { getOpacityProperty } from "utils";
 
 const LayerControlContainer = styled.div`
   margin-bottom: 10px;
@@ -50,8 +51,10 @@ const LayerControlEntry = memo(
     // Otherwise, set the current opacity to null
 
     let currentOpacity = null;
+    
     if (map.getLayer(layer.id)) {
-      currentOpacity = map.getPaintProperty(layer.id, "fill-opacity");
+      const opacityProp = getOpacityProperty(layer.type);
+      currentOpacity = map.getPaintProperty(layer.id, opacityProp);
     }
 
     // Determine if the current opacity is an expression that includes the feature state logic
@@ -74,6 +77,7 @@ const LayerControlEntry = memo(
 
     const handleOpacityChange = (e) => {
       const newOpacity = parseFloat(e.target.value);
+      const opacityProp = getOpacityProperty(layer.type);
       let opacityExpression;
 
       // Apply the logic to filter out nulls and zeroes only if it was originally present
@@ -87,7 +91,7 @@ const LayerControlEntry = memo(
       } else {
         opacityExpression = newOpacity;
       }
-      map.setPaintProperty(layer.id, "fill-opacity", opacityExpression);
+      map.setPaintProperty(layer.id, opacityProp, opacityExpression);
       setOpacity(newOpacity);
     };
     return (
