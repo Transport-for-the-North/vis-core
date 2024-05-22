@@ -452,18 +452,5 @@ export const Visualisation = ({ visualisationName, map }) => {
     state.color_scheme,
   ]);
 
-  return (
-    <>
-      {visualisation.data.length > 0 && colors.length > 0 ? (
-        <Legend
-          colorScale={colors}
-          selectedVariable={visualisation.name}
-          binMin={colors[0].value}
-          binMax={colors[colors.length - 1].value}
-        />
-      ) : (
-        ""
-      )}
-    </>
-  );
+  return (null);
 };
