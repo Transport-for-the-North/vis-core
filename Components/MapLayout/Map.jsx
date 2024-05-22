@@ -6,6 +6,7 @@ import { api } from "services";
 import { useMap, useMapContext } from "hooks";
 import { Visualisation } from "./Visualisation";
 import { PageContext } from "contexts";
+import { DynamicLegend } from "Components";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -378,6 +379,7 @@ const Map = () => {
           map={map}
         />
       ))}
+      {isMapReady && <DynamicLegend map={map} />}
     </StyledMapContainer>
   );
 };
