@@ -7,7 +7,7 @@ import { Legend } from "Components/Legend";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
-import { colorSchemes } from "utils";
+import { colorSchemes, roundToTwoSignificantFigures } from "utils";
 
 // Debounced fetchDataForVisualisation function
 const fetchDataForVisualisation = debounce(
@@ -174,7 +174,9 @@ export const Visualisation = ({ visualisationName, map }) => {
     if (style.includes("continuous")) {
       let values = data.map((value) => value.value);
       console.log("Bins recalculated for continuous data");
-      return chroma.limits(values, "q", 4);
+      const unroundedBins = chroma.limits(values, "q", 4);
+      const roundedBins = unroundedBins.map((value) => roundToTwoSignificantFigures(value));
+      return roundedBins;
     } else if (style.includes("categorical")) {
       console.log("Categorical classification not implemented for joined data");
       return;
