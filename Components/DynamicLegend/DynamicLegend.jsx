@@ -5,13 +5,15 @@ const LegendContainer = styled.div`
   position: absolute;
   bottom: 40px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 10px;
   z-index: 10;
   max-height: 300px;
   overflow-y: auto;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font-family: "Hanken Grotesk", sans-serif;
+  font-size: medium;
 `;
 
 const LegendTitle = styled.div`
@@ -27,11 +29,12 @@ const LegendItem = styled.div`
 `;
 
 const ColorSwatch = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 15px;
+  height: 15px;
   background-color: ${(props) => props.color};
   border: 1px solid #333;
-  margin-right: 8px;
+  margin-right: 5px;
+  border-radius: 50%;
 `;
 
 const WidthSwatch = styled.div`
@@ -42,7 +45,7 @@ const WidthSwatch = styled.div`
 `;
 
 const LegendLabel = styled.span`
-  font-size: 12px;
+  font-size: small;
 `;
 
 // Utility function to interpret color expressions
