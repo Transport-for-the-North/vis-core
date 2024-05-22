@@ -20,7 +20,7 @@ export const HomePage = () => {
       {appContext.introduction !== "" && (
         <section className="introduction">
           <h2>About this tool</h2>
-          <p className="container-intro">{appContext.introduction}</p>
+          <p className="container-intro">{parse(appContext.introduction)}</p>
         </section>
       )}
       {appContext.background !== "" && (
