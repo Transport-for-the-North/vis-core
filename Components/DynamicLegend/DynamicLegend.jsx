@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { numberWithCommas } from 'utils';
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -63,7 +64,7 @@ const interpretColorExpression = (expression) => {
         const stops = expression.slice(3);
         const colorStops = [];
         for (let i = 0; i < stops.length; i += 2) {
-          colorStops.push({ value: stops[i], color: stops[i + 1] });
+          colorStops.push({ value: numberWithCommas(stops[i]), color: stops[i + 1] });
         }
         return colorStops;
       case 'match':
@@ -96,7 +97,7 @@ const interpretWidthExpression = (expression) => {
         const stops = expression.slice(3);
         const widthStops = [];
         for (let i = 0; i < stops.length; i += 2) {
-          widthStops.push({ value: stops[i], width: stops[i + 1] });
+          widthStops.push({ value: numberWithCommas(stops[i]), width: stops[i + 1] });
         }
         return widthStops;
       default:
