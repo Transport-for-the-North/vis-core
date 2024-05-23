@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import { DynamicLegend } from './DynamicLegend';
+import { DynamicLegend, interpretWidthExpression, interpretColorExpression } from './DynamicLegend';
+// TODO make sure the tests work ABH 2024/05/23
 
 // Mock the map object and its methods
 const mockMap = {
@@ -25,6 +26,44 @@ mockMap.getStyle.mockReturnValue({
     },
     // Add more layers with different paint properties as needed for testing
   ],
+});
+
+
+
+describe('interpretWidthExpression', () => {
+  it('interprets a simple numeric width expression', () => {
+    const expression = 5;
+    const result = interpretWidthExpression(expression);
+    expect(result).toEqual([{ width: 5 }]);
+  });
+
+  it('interprets a complex width expression with multiple stops', () => {
+    const expression = ['interpolate', ['linear'], ['zoom'], 5, 1, 15, 3];
+    const result = interpretWidthExpression(expression, 3); // Assuming 3 intermediate stops
+    expect(result).toHaveLength(5); // Original stops + 3 intermediate stops
+    // Add more expectations to check the correctness of the intermediate stops
+  });
+
+  // Add more test cases for different types of width expressions
+});
+
+describe('interpretColorExpression', () => {
+  it('interprets a simple color string expression', () => {
+    const expression = '#ff0000';
+    const result = interpretColorExpression(expression);
+    expect(result).toEqual([{ color: '#ff0000' }]);
+  });
+
+  it('interprets a complex color expression with match', () => {
+    const expression = ['match', ['get', 'property'], 'value1', '#ff0000', 'value2', '#00ff00', '#000000'];
+    const result = interpretColorExpression(expression);
+    expect(result).toEqual([
+      { value: 'value1', color: '#ff0000' },
+      { value: 'value2', color: '#00ff00' },
+    ]);
+  });
+
+  // Add more test cases for different types of color expressions
 });
 
 describe('DynamicLegend', () => {
