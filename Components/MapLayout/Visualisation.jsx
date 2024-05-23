@@ -3,7 +3,6 @@ import colorbrewer from "colorbrewer";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Legend } from "Components/Legend";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
