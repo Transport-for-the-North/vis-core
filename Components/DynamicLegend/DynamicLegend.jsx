@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { numberWithCommas } from 'utils';
+import { numberWithCommas, roundValue } from 'utils';
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -49,7 +49,22 @@ const LegendLabel = styled.span`
   font-size: small;
 `;
 
-// Utility function to interpret color expressions
+/**
+ * Interprets a color expression from a map style specification and returns a list of color stops.
+ * A color expression can be a simple string representing a color, or an array that defines
+ * a color interpolation or match expression.
+ *
+ * @param {string|array} expression - The color expression to interpret. This can be a simple
+ *                                    color string or an array representing an 'interpolate',
+ *                                    'step', or 'match' expression.
+ * @returns {array|null} An array of objects with 'value' and 'color' properties representing
+ *                       the color stops, or null if the expression cannot be interpreted.
+ *
+ * Example of a simple color expression: '#FF5733'
+ * Example of an interpolate expression: ['interpolate', ['linear'], ['zoom'], 5, '#F00', 10, '#0F0']
+ * Example of a step expression: ['step', ['zoom'], '#F00', 5, '#0F0']
+ * Example of a match expression: ['match', ['get', 'property'], 'value1', '#F00', 'value2', '#0F0', '#FFF']
+ */
 const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === 'string') {
@@ -82,8 +97,17 @@ const interpretColorExpression = (expression) => {
   return null;
 };
 
-// Utility function to interpret width expressions
-const interpretWidthExpression = (expression) => {
+
+/**
+ * Interprets a width expression from a map style specification and calculates
+ * intermediate width stops. The function assumes linear interpolation between stops.
+ * The number of intermediate stops is dynamic and can be specified.
+ *
+ * @param {Array|number} expression - The width expression from the map style.
+ * @param {number} [numInterpolatedStops=4] - The number of intermediate stops to calculate.
+ * @returns {Array|null} - An array of width stops or null if the expression is invalid.
+ */
+const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
   if (!expression) return null;
   if (typeof expression === 'number') {
     // Simple width value
@@ -94,10 +118,26 @@ const interpretWidthExpression = (expression) => {
       case 'interpolate':
       case 'step':
         // Extract stops from the expression
-        const stops = expression.slice(3);
+        const baseStops = expression.slice(3);
         const widthStops = [];
-        for (let i = 0; i < stops.length; i += 2) {
-          widthStops.push({ value: numberWithCommas(stops[i]), width: stops[i + 1] });
+        for (let i = 0; i < baseStops.length; i += 2) {
+          const baseValue = baseStops[i];
+          const baseWidth = baseStops[i + 1];
+          widthStops.push({ value: numberWithCommas(roundValue(baseValue)), width: baseWidth });
+
+          // Calculate intermediate stops if there is a next stop
+          if (i + 2 < baseStops.length) {
+            const nextValue = baseStops[i + 2];
+            const nextWidth = baseStops[i + 3];
+            const valueIncrement = (nextValue - baseValue) / (numInterpolatedStops + 1);
+            const widthIncrement = (nextWidth - baseWidth) / (numInterpolatedStops + 1);
+
+            for (let j = 1; j <= numInterpolatedStops; j++) {
+              const interpolatedValue = baseValue + valueIncrement * j;
+              const interpolatedWidth = baseWidth + widthIncrement * j;
+              widthStops.push({ value: numberWithCommas(roundValue(interpolatedValue)), width: interpolatedWidth });
+            }
+          }
         }
         return widthStops;
       default:
@@ -107,6 +147,27 @@ const interpretWidthExpression = (expression) => {
   return null;
 };
 
+
+/**
+ * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
+ * It listens for changes in the map's style and updates the legend items accordingly. Each legend
+ * item displays color and/or width swatches along with labels indicating the corresponding values.
+ *
+ * Props:
+ * @param {object} map - The map instance to listen for style changes. The map object should
+ *                       expose a 'getStyle' method that returns the current style and a 'on'
+ *                       method to subscribe to style changes.
+ *
+ * State:
+ * @param {array} legendItems - An array of legend items derived from the map's style layers.
+ *                              Each item contains a title, colorStops, and widthStops.
+ *
+ * Usage:
+ * <DynamicLegend map={mapInstance} />
+ *
+ * Note: The map instance is expected to be an object from MapLibre or Mapbox,
+ * which follows a specific API for style manipulation and event handling.
+ */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
 

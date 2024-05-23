@@ -49,3 +49,23 @@ export function roundToTwoSignificantFigures(value) {
   // Round the value to the nearest two significant figures
   return Math.round(value / factor) * factor;
 }
+
+
+/**
+ * Rounds a value to a specified number of decimal places based on its size.
+ * - Values less than 1 are rounded to 2 decimal places.
+ * - Values between 1 and 10 are rounded to 1 decimal place.
+ * - Values greater than or equal to 10 are rounded to 0 decimal places.
+ *
+ * @param {number} value - The value to round.
+ * @returns {number} - The rounded value.
+ */
+export const roundValue = (value) => {
+  if (value < 1) {
+    return parseFloat(value.toFixed(2));
+  } else if (value < 10) {
+    return parseFloat(value.toFixed(1));
+  } else {
+    return Math.round(value);
+  }
+};
