@@ -1,6 +1,6 @@
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid"; // Assuming you're using Heroicons
 import _ from "lodash";
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { AccordionSection } from "Components";
@@ -51,7 +51,7 @@ const LayerControlEntry = memo(
     // Otherwise, set the current opacity to null
 
     let currentOpacity = null;
-    
+
     if (map.getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = map.getPaintProperty(layer.id, opacityProp);
@@ -114,11 +114,11 @@ const LayerControlEntry = memo(
             onChange={handleOpacityChange}
           />
         </OpacityControl>
-          <ColourSchemeDropdown
-            colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
-            handleColorChange={handleColorChange}
-            layerName={layer.id}
-          />
+        <ColourSchemeDropdown
+          colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
+          handleColorChange={handleColorChange}
+          layerName={layer.id}
+        />
       </LayerControlContainer>
     );
   }
@@ -139,42 +139,41 @@ export const MapLayerSection = ({ handleColorChange }) => {
   const { map } = state;
   const [layers, setLayers] = useState([]);
 
+
+  const updateLayers = useCallback(() => {
+    const newLayers = map.getStyle().layers;
+    // Perform deep comparison to check if layers have actually changed
+    if (!_.isEqual(newLayers, layers)) {
+      const filteredLayers = newLayers.filter(
+        (layer) =>
+          (layer.type === "fill" ||
+        layer.type === "line" ||
+        layer.type === "circle") &&
+        layer.source !== "default" &&
+        layer.metadata?.isStylable
+      );
+      setLayers(filteredLayers);
+    }
+  }, [layers, map, setLayers]);
+
   useEffect(() => {
     if (map) {
-      const updateLayers = () => {
-        const newLayers = map.getStyle().layers;
-        // Perform deep comparison to check if layers have actually changed
-        if (!_.isEqual(newLayers, layers)) {
-          const filteredLayers = newLayers.filter(
-            (layer) =>
-              (layer.type === "fill" ||
-                layer.type === "line" ||
-                layer.type === "circle") &&
-              layer.source !== "default" &&
-              layer.metadata.isStylable
-          );
-          setLayers(
-            filteredLayers
-          );
-        }
-      };
-
       map.on("styledata", updateLayers);
       return () => {
         map.off("styledata", updateLayers);
       };
     }
-  }, [map, layers]); // Only re-run the effect if map or layers change
+  }, [map, updateLayers]); // Only re-run the effect if map or layers change
 
   // If map is not yet available...
   if (!map) {
     return <div>Loading map layers...</div>;
   }
+  // console.log(layers)
 
-  if(layers.length === 0) {
+  if (layers.length === 0) {
     return null;
   }
-
 
   return (
     <AccordionSection title="Map layer control">
