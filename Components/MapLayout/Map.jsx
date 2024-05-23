@@ -304,7 +304,7 @@ const Map = () => {
         }
       });
     },
-    [isMapReady, map, pageContext.config.filters, dispatch, selectedFeatureId]
+    [isMapReady, map, pageContext.config.filters, dispatch]
   );
 
   // Run once to set the state of the map
