@@ -232,6 +232,12 @@ const Map = () => {
       if (state.layers[layerId].isHoverable) {
         map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId));
         map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
+        map.on("mouseenter", layerId, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", layerId, () => {
+          map.getCanvas().style.cursor = "grab";
+        });
       }
     });
 
