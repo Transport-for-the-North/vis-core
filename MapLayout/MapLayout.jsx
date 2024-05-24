@@ -36,27 +36,32 @@ export const MapLayout = () => {
     // Effect to initialise the filters for the map page
     if (!initializedRef.current && Object.keys(state.visualisations).length > 0) {
       pageContext.config.filters.forEach((filter) => {
-        if (filter.action === "UPDATE_QUERY_PARAMS") {
-          let defaultValue = filter.defaultValue || filter.min || filter.values?.values[0]?.paramValue;
-          dispatch({
-            type: filter.action,
-            payload: { filter, value: defaultValue },
-          });
+        filter.actions.map((action) => {
+          if (action.action === "UPDATE_QUERY_PARAMS") {
+            let defaultValue = filter.defaultValue || filter.min || filter.values?.values[0]?.paramValue;
+            dispatch({
+              type: action.action,
+              payload: { filter, value: defaultValue },
+            });
+          }
+        })
         }
-      });
+    );
       initializedRef.current = true;
-    }
-  }, [pageContext.config.filters, dispatch, state.visualisations]);
+    }}
+  , [pageContext.config.filters, dispatch, state.visualisations]);
 
   useEffect(() => {
     initializedRef.current = false;
   }, [pageContext]);
 
   const handleFilterChange = (filter, value) => {
-    dispatch({
-      type: filter.action,
-      payload: { filter, value },
-    });
+    filter.actions.map((action) => {
+      dispatch({
+        type: action.action,
+        payload: {filter, value}
+      });
+    })
   };
 
   const handleColorChange = (color) => { 

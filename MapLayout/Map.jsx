@@ -7,6 +7,7 @@ import { useMap, useMapContext } from "hooks";
 import { Visualisation } from "./Visualisation";
 import { PageContext } from "contexts";
 import { DynamicLegend } from "Components";
+import { featureFilter } from "maplibre-gl";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -296,11 +297,14 @@ const Map = () => {
           });
 
           console.log(`Updating ${filter.field}`);
+          
           // Dispatch the action with the value from the clicked feature
-          dispatch({
-            type: filter.action,
-            payload: { filter, value },
-          });
+          filter.actions.map((action) => {
+              dispatch({
+                type: action.action,
+                payload: {filter, value}
+              });
+          })
         }
       });
     },
