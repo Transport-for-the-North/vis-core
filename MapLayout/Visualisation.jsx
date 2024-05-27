@@ -179,6 +179,16 @@ export const Visualisation = ({ visualisationName, map }) => {
     } else if (style.includes("categorical")) {
       console.log("Categorical classification not implemented for joined data");
       return;
+    } else if (style.includes("diverging")) {
+      const absValues = data.map((value) => Math.abs(value.value));
+      const unroundedBins = chroma.limits(absValues, "q", 3);
+      const roundedBins = unroundedBins.map((value) => roundToTwoSignificantFigures(value));
+      const negativeBins = roundedBins.toReversed().reduce((acc, val) => {
+        const negative = val * -1;
+        return acc.concat(negative)
+      }, [])
+      console.log("Bins calculated for diverging data")
+      return [...negativeBins, 0, ...roundedBins]
     } else {
       console.log("Style not recognized");
       return [];
