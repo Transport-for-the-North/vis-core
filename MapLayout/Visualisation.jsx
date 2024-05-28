@@ -83,13 +83,13 @@ export const Visualisation = ({ visualisationName, map }) => {
   );
 
   /**
- * Reclassifies GeoJSON data and styles the map accordingly. If the layer does not exist,
- * it adds a new layer below any existing 'selected-feature-layer' or layers with '-hover' in their names.
- * If the layer exists, it updates the paint properties of the layer.
- *
- * @param {Object} featureCollection - The GeoJSON feature collection to be added or updated on the map.
- * @param {string} style - The style string indicating the type of visualisation (e.g., 'polygon-continuous').
- */
+   * Reclassifies GeoJSON data and styles the map accordingly. If the layer does not exist,
+   * it adds a new layer below any existing 'selected-feature-layer' or layers with '-hover' in their names.
+   * If the layer exists, it updates the paint properties of the layer.
+   *
+   * @param {Object} featureCollection - The GeoJSON feature collection to be added or updated on the map.
+   * @param {string} style - The style string indicating the type of visualisation (e.g., 'polygon-continuous').
+   */
   const reclassifyAndStyleGeoJSONMap = useCallback(
     (featureCollection, style) => {
       if (!featureCollection) {
@@ -173,8 +173,10 @@ export const Visualisation = ({ visualisationName, map }) => {
     if (style.includes("continuous")) {
       let values = data.map((value) => value.value);
       console.log("Bins recalculated for continuous data");
-      const unroundedBins = chroma.limits(values, "q", 4);
-      const roundedBins = unroundedBins.map((value) => roundToTwoSignificantFigures(value));
+      const unroundedBins = chroma.limits(values, "q", 8);
+      const roundedBins = unroundedBins.map((value) =>
+        roundToTwoSignificantFigures(value)
+      );
       return roundedBins;
     } else if (style.includes("categorical")) {
       console.log("Categorical classification not implemented for joined data");
@@ -182,13 +184,15 @@ export const Visualisation = ({ visualisationName, map }) => {
     } else if (style.includes("diverging")) {
       const absValues = data.map((value) => Math.abs(value.value));
       const unroundedBins = chroma.limits(absValues, "q", 3);
-      const roundedBins = unroundedBins.map((value) => roundToTwoSignificantFigures(value));
+      const roundedBins = unroundedBins.map((value) =>
+        roundToTwoSignificantFigures(value)
+      );
       const negativeBins = roundedBins.toReversed().reduce((acc, val) => {
         const negative = val * -1;
-        return acc.concat(negative)
-      }, [])
-      console.log("Bins calculated for diverging data")
-      return [...negativeBins, 0, ...roundedBins]
+        return acc.concat(negative);
+      }, []);
+      console.log("Bins calculated for diverging data");
+      return [...negativeBins, 0, ...roundedBins];
     } else {
       console.log("Style not recognized");
       return [];
@@ -225,7 +229,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     }
     setColors(colorObject);
     switch (style) {
-      case "polygon-continuous":
+      case "polygon-continuous" || "polygon-diverging":
         return {
           "fill-color": [
             "interpolate",
@@ -274,7 +278,26 @@ export const Visualisation = ({ visualisationName, map }) => {
           ],
           "line-opacity": 1,
         };
-      case "circle": {
+      case "line-diverging":
+        return {
+          "line-color": [
+            "case",
+            ["==", ["feature-state", "value"], null],
+            colours[4],
+            ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
+          ],
+          "line-width": [
+            "interpolate",
+            ["linear"],
+            ["to-number", ["feature-state", "valueAbs"]],
+            0.1,
+            0.1, // Line width starts at 1 at the value of 0
+            Math.max(...bins),
+            20,
+          ],
+          "line-opacity": 1,
+        };
+      case "circle-continuous" || "circle-diverging": {
         return {
           "circle-color": [
             ["interpolate", ["linear"], ["get", "value"], ...colors],
@@ -463,5 +486,5 @@ export const Visualisation = ({ visualisationName, map }) => {
     state.color_scheme,
   ]);
 
-  return (null);
+  return null;
 };

@@ -41,7 +41,7 @@ const ColorSwatch = styled.div`
 const WidthSwatch = styled.div`
   width: 50px;
   height: ${(props) => props.width}px;
-  background-color: #333;
+  background-color: ${(props) => props.color?? "#333" };
   margin-right: 8px;
 `;
 
@@ -182,7 +182,7 @@ export const DynamicLegend = ({ map }) => {
           const title = layer.id;
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
-            paintProps['line-color'] || paintProps['circle-color'] || paintProps['fill-color']
+            paintProps['line-color']?.[3] || paintProps['line-color'] || paintProps['circle-color'] || paintProps['fill-color']
           );
           const widthStops = interpretWidthExpression(
             paintProps['line-width'] || paintProps['circle-radius']
@@ -208,15 +208,21 @@ export const DynamicLegend = ({ map }) => {
       {legendItems.map((item, index) => (
         <div key={index}>
           <LegendTitle>{item.title}</LegendTitle>
-          {item.colorStops && item.colorStops.map((stop, idx) => (
+          {item.colorStops && !item.widthStops && item.colorStops.map((stop, idx) => (
             <LegendItem key={idx}>
               <ColorSwatch color={stop.color} />
               <LegendLabel>{stop.value !== undefined ? `${stop.value}` : 'Color'}</LegendLabel>
             </LegendItem>
           ))}
-          {item.widthStops && item.widthStops.map((stop, idx) => (
+          {item.widthStops && !item.colorStops && item.widthStops.map((stop, idx) => (
             <LegendItem key={idx}>
               <WidthSwatch width={stop.width} />
+              <LegendLabel>{stop.value !== undefined ? `${stop.value}` : 'Width'}</LegendLabel>
+            </LegendItem>
+          ))}
+          {item.widthStops && item.colorStops && item.widthStops.map((stop, idx) => (
+            <LegendItem key={idx}>
+              <WidthSwatch width={stop.width} color={item.colorStops[idx].color} />
               <LegendLabel>{stop.value !== undefined ? `${stop.value}` : 'Width'}</LegendLabel>
             </LegendItem>
           ))}
