@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { AppContext } from "contexts";
@@ -23,6 +23,11 @@ export function Navbar() {
   const [activeLink, setActiveLink] = useState("");
   const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
   const appContext = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const onClick = (url) => { 
+    navigate(url);
+  }
 
   const updateMenu = () => {
     if (!isClicked) {
@@ -46,11 +51,8 @@ export function Navbar() {
   return (
     <>
       <StyledNavbar className="navbar">
-        <Logo className="logoNav" />
+        <Logo className="logoNav" onClick={() => onClick("/")}/>
         <LateralNavbar className={sideNavOpen} handleClick={handleClick} />
-        <Link className={activeLink==="/" ? "ActiveNavButton" : "NavButton"} to={"/"}>
-          Home
-        </Link>
         {appContext.appPages.map((page) => (
             <Link key={page.pageName} className={activeLink===page.url ? "ActiveNavButton" : "NavButton"} to={page.url} >
               {page.pageName}
