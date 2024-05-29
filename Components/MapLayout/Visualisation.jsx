@@ -271,10 +271,10 @@ export const Visualisation = ({ visualisationName, map }) => {
             "interpolate",
             ["linear"],
             ["to-number", ["feature-state", "valueAbs"]],
-            0.1,
+            Math.min(...bins),
             0.1, // Line width starts at 1 at the value of 0
             Math.max(...bins),
-            20,
+            15,
           ],
           "line-opacity": 1,
         };
