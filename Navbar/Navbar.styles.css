@@ -44,9 +44,11 @@
     display: none;
   }
   .sideNavbar-notShown {
-    display: none;
+    transition: left 0.5s cubic-bezier(0, 0, 0, 1.28);
   }
-  
+  .sideNavbar-shown{
+    transition: left 0.5s ease-out;
+  }
   @media only screen and (max-width: 765px) {
     .NavButton {
       display: none;
@@ -62,17 +64,18 @@
     }
   
     .sideNavbar-shown {
-      width: 100%;
+      width: 40%;
       height: 100vh;
       background-color: white;
       z-index: 1100;
       position: absolute;
       left: 0px;
       top: 75px;
+      box-shadow: 1px 0px 20px 0px black;
     }
   
     .sideNavbar-notShown {
-      width: 100%;
+      width: 40%;
       height: 100vh;
       z-index: 1100;
       position: absolute;
@@ -104,5 +107,16 @@
       align-items: center;
       width: 100%;
       padding: 4vh 0;
+    }
+  }
+  
+  @media only screen and (max-width: 500px) {
+    .sideNavbar-shown {
+      width: 100%;
+      box-shadow: none;
+    }
+  
+    .sideNavbar-notShown {
+      width: 100%;
     }
   }
