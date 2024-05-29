@@ -5,6 +5,7 @@ import { Dropdown } from "./Dropdown";
 import { Slider } from "./Slider";
 import { SelectorLabel } from "./SelectorLabel";
 import { useMapContext } from "hooks";
+import { Toggle } from './Toggle';
 
 const SelectorContainer = styled.div`
   margin-bottom: 20px;
@@ -56,6 +57,12 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
               onChange={(filter, value) => onFilterChange(filter, value)}
             />
           )}
+          {filter.type === "toggle" && (
+            <Toggle
+              key={filter.filterName}
+              filter={filter}
+              onChange={(filter, value) => onFilterChange(filter, value)}
+            />)}
         </SelectorContainer>
       ))}
       {/* Check if no data has been found and display a small message in the sidebar if so */}
