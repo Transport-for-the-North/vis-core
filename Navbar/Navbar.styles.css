@@ -45,10 +45,12 @@
   }
   .sideNavbar-notShown {
     transition: left 0.5s cubic-bezier(0, 0, 0, 1.28);
+    opacity: 0;
   }
   .sideNavbar-shown{
     transition: left 0.5s ease-out;
   }
+  
   @media only screen and (max-width: 765px) {
     .NavButton {
       display: none;
