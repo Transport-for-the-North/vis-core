@@ -25,10 +25,10 @@ export function LateralNavbar(props) {
 
   return (
     <div className={props.className}>
-      <Link className={activeLink==="/" ? "ActiveLatButton" : "LatButton"} to={"/"} onClick={setActiveLink}>
+      {props.className === "sideNavbar-shown" && <Link className={activeLink === "/" ? "ActiveLatButton" : "LatButton"} to={"/"} onClick={setActiveLink}>
         Home
-      </Link>
-      {appContext.appPages.map((page) => (
+      </Link>}
+      {props.className === "sideNavbar-shown" && appContext.appPages.map((page) => (
             <Link key={page.pageName} className={activeLink===page.url ? "ActiveLatButton" : "LatButton"} to={page.url} >
               {page.pageName}
             </Link>
