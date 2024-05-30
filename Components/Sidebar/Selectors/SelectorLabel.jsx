@@ -61,7 +61,6 @@ export const SelectorLabel = ({ text, info }) => {
   const renderTooltip = (info) => {
     return createPortal(
       <TooltipText
-        isVisible={isTooltipVisible}
         style={{
           top: `${tooltipPosition.top}px`,
           left: `${tooltipPosition.left}px`,
