@@ -1,13 +1,18 @@
-import React, { useEffect, useCallback, useRef, useState, useContext } from "react";
-import styled from "styled-components";
 import "maplibre-gl/dist/maplibre-gl.css";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef
+} from "react";
+import styled from "styled-components";
 
-import { api } from "services";
-import { useMap, useMapContext } from "hooks";
-import { Visualisation } from "./Visualisation";
-import { PageContext } from "contexts";
 import { DynamicLegend } from "Components";
-import { featureFilter } from "maplibre-gl";
+import { PageContext } from "contexts";
+import { useMap, useMapContext } from "hooks";
+import maplibregl from "maplibre-gl";
+import { api } from "services";
+import { Visualisation } from "./Visualisation";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -23,7 +28,6 @@ const Map = () => {
   const { map, isMapReady } = useMap(mapContainerRef);
   const pageContext = useContext(PageContext);
   const { state, dispatch } = useMapContext();
-  const [selectedFeatureId, setSelectedFeatureId] = useState(null);
 
   /**
    * Generates the style configuration for a regular layer based on the geometry
@@ -90,10 +94,14 @@ const Map = () => {
               ["linear"],
               ["zoom"],
               // Specify zoom levels and corresponding line widths
-              5, 1, // At zoom level 5, line width will be 1
-              10, 2, // At zoom level 10, line width will be 2
-              15, 4, // At zoom level 15, line width will be 4
-              20, 8  // At zoom level 20, line width will be 8
+              5,
+              1, // At zoom level 5, line width will be 1
+              10,
+              2, // At zoom level 10, line width will be 2
+              15,
+              4, // At zoom level 15, line width will be 4
+              20,
+              8, // At zoom level 20, line width will be 8
             ],
           },
           filter: ["==", "id", ""],
@@ -147,7 +155,10 @@ const Map = () => {
         let layerConfig = getLayerStyle(layer.geometryType);
         layerConfig.id = layer.name;
         layerConfig.visibility = "visible";
-        layerConfig.metadata = { ...layerConfig.metadata, isStylable: layer.isStylable ?? false }
+        layerConfig.metadata = {
+          ...layerConfig.metadata,
+          isStylable: layer.isStylable ?? false,
+        };
 
         // console.log(map)
         if (layer.type === "geojson") {
@@ -175,7 +186,7 @@ const Map = () => {
             ...layerConfig,
             source: layer.name,
             "source-layer": layer.sourceLayer,
-            metadata: { isStylable: layer.isStylable ?? false }
+            metadata: { isStylable: layer.isStylable ?? false },
           });
 
           if (layer.isHoverable) {
@@ -183,7 +194,10 @@ const Map = () => {
             hoverLayerConfig.id = `${layer.name}-hover`;
             hoverLayerConfig.source = layer.name;
             hoverLayerConfig["source-layer"] = layer.sourceLayer;
-            hoverLayerConfig.metadata = { ...hoverLayerConfig.metadata, isStylable: false }
+            hoverLayerConfig.metadata = {
+              ...hoverLayerConfig.metadata,
+              isStylable: false,
+            };
             map.addLayer(hoverLayerConfig);
           }
         }
@@ -199,28 +213,45 @@ const Map = () => {
    * @param {Object} e - The event object containing information about the hover event.
    * @param {string} layerId - The ID of the layer being hovered over.
    */
-  const handleLayerHover = useCallback((e, layerId) => {
-    if (!map || !e.point) return;
+  const handleLayerHover = useCallback(
+    (e, layerId) => {
+      if (!map || !e.point) return;
 
-    const features = map.queryRenderedFeatures(e.point, {
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: [layerId],
+      });
+      if (features.length > 0) {
+        const feature = features[0];
+        map.setFilter(`${layerId}-hover`, ["==", "id", feature.id]);
+      }
+    },
+    [map]
+  );
+
+  const handleLayerClick = (e, layerId) => {
+    const feature = map.queryRenderedFeatures(e.point, { 
       layers: [layerId],
     });
-
-    if (features.length > 0) {
-      const feature = features[0];
-      map.setFilter(`${layerId}-hover`, ["==", "id", feature.id]);
-    }
-  }, [map]);
+    const coordinates = e.lngLat;
+    const description = `<p>${feature[0].properties.name}</p><p>Value : ${feature[0].state.value?? 0}</p>`;
+    new maplibregl.Popup()
+      .setLngLat(coordinates)
+      .setHTML(description)
+      .addTo(map)
+  };
 
   /**
    * Handles mouse leave events for a specific layer by clearing the hover state.
    *
    * @param {string} layerId - The ID of the layer from which the mouse has left.
    */
-  const handleLayerLeave = useCallback((layerId) => {
-    if (!map) return;
-    map.setFilter(`${layerId}-hover`, ["==", "id", ""]);
-  }, [map]);
+  const handleLayerLeave = useCallback(
+    (layerId) => {
+      if (!map) return;
+      map.setFilter(`${layerId}-hover`, ["==", "id", ""]);
+    },
+    [map]
+  );
 
   /**
    * Effect to add hover and leave event listeners to hoverable layers.
@@ -232,6 +263,15 @@ const Map = () => {
       if (state.layers[layerId].isHoverable) {
         map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId));
         map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
+        map.on("mouseenter", layerId, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", layerId, () => {
+          map.getCanvas().style.cursor = "grab";
+        });
+      }
+      if (state.layers[layerId].shouldHaveTooltipOnClick) {
+        map.on("click", layerId, (e) => handleLayerClick(e, layerId));
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
         });
@@ -277,40 +317,37 @@ const Map = () => {
           const feature = features[0];
           const value = feature.properties[filter.field];
 
-          // Update the selected feature ID
-          setSelectedFeatureId(feature.id);
-
           // Remove the previous selection layer if it exists
-          if (map.getLayer('selected-feature-layer')) {
-            map.removeLayer('selected-feature-layer');
-            map.removeSource('selected-feature-source');
+          if (map.getLayer("selected-feature-layer")) {
+            map.removeLayer("selected-feature-layer");
+            map.removeSource("selected-feature-source");
           }
 
           // Add a new source and layer for the selected feature
-          map.addSource('selected-feature-source', {
-            type: 'geojson',
-            data: feature.toJSON()
+          map.addSource("selected-feature-source", {
+            type: "geojson",
+            data: feature.toJSON(),
           });
 
           map.addLayer({
-            id: 'selected-feature-layer',
-            type: 'fill',
-            source: 'selected-feature-source',
+            id: "selected-feature-layer",
+            type: "fill",
+            source: "selected-feature-source",
             paint: {
-              'fill-color': '#f00',
-              'fill-opacity': 0.5
-            }
+              "fill-color": "#f00",
+              "fill-opacity": 0.5,
+            },
           });
 
           console.log(`Updating ${filter.field}`);
-          
+
           // Dispatch the action with the value from the clicked feature
           filter.actions.map((action) => {
-              dispatch({
-                type: action.action,
-                payload: {filter, value}
-              });
-          })
+            dispatch({
+              type: action.action,
+              payload: { filter, value },
+            });
+          });
         }
       });
     },
@@ -369,11 +406,11 @@ const Map = () => {
           if (map.getSource(layer.name)) {
             map.removeSource(layer.name);
           }
-          if (map.getLayer('selected-feature-layer')) {
-            map.removeLayer('selected-feature-layer');
+          if (map.getLayer("selected-feature-layer")) {
+            map.removeLayer("selected-feature-layer");
           }
-          if (map.getSource('selected-feature-source')) {
-            map.removeSource('selected-feature-source');
+          if (map.getSource("selected-feature-source")) {
+            map.removeSource("selected-feature-source");
           }
         });
       }
