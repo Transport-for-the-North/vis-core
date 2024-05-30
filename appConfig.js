@@ -35,7 +35,8 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "Reliability",
             isHoverable: true,
-            isStylable: false
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
           },
         ],
         visualisations: [
@@ -167,7 +168,8 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "Accessibility",
             isHoverable: false,
-            isStylable: true
+            isStylable: true, 
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
@@ -303,7 +305,8 @@ export const appConfig = {
             geometryType: "line",
             visualisationName: "Links",
             isHoverable: false,
-            isStylable: true
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
           },
         ],
         visualisations: [
