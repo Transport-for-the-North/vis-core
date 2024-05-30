@@ -1,4 +1,3 @@
-import chroma from "chroma-js";
 import colorbrewer from "colorbrewer";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -6,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
-import { colorSchemes, roundToTwoSignificantFigures } from "utils";
+import { colorSchemes, reclassifyData, createPaintProperty, reclassifyGeoJSONData } from "utils";
 
 // Debounced fetchDataForVisualisation function
 const fetchDataForVisualisation = debounce(
@@ -40,7 +39,6 @@ export const Visualisation = ({ visualisationName, map }) => {
   const prevColorRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
-  const [colors, setColors] = useState([]);
 
   // Function to reclassify data and update the map style
   const reclassifyAndStyleMap = useCallback(
@@ -168,165 +166,6 @@ export const Visualisation = ({ visualisationName, map }) => {
     [map, visualisationName, state.color_scheme]
   );
 
-  // Function to recalculate bins if needed
-  const reclassifyData = (data, style) => {
-    if (style.includes("continuous")) {
-      let values = data.map((value) => value.value);
-      console.log("Bins recalculated for continuous data");
-      const unroundedBins = chroma.limits(values, "q", 8);
-      const roundedBins = unroundedBins.map((value) =>
-        roundToTwoSignificantFigures(value)
-      );
-      return roundedBins;
-    } else if (style.includes("categorical")) {
-      console.log("Categorical classification not implemented for joined data");
-      return;
-    } else if (style.includes("diverging")) {
-      const absValues = data.map((value) => Math.abs(value.value));
-      const unroundedBins = chroma.limits(absValues, "q", 3);
-      const roundedBins = unroundedBins.map((value) =>
-        roundToTwoSignificantFigures(value)
-      );
-      const negativeBins = roundedBins.toReversed().reduce((acc, val) => {
-        const negative = val * -1;
-        return acc.concat(negative);
-      }, []);
-      console.log("Bins calculated for diverging data");
-      return [...negativeBins, 0, ...roundedBins];
-    } else {
-      console.log("Style not recognized");
-      return [];
-    }
-  };
-
-  const reclassifyGeoJSONData = (data, style) => {
-    if (style.includes("continuous")) {
-      console.log("Continuous classification not implemented for GeoJSON data");
-      return;
-    } else if (style.includes("categorical")) {
-      let categories = new Set();
-      data.features.forEach((feature) => {
-        if (feature.properties.hasOwnProperty("category")) {
-          categories.add(feature.properties.category);
-        }
-      });
-      console.log("Unique categories identified for categorical data");
-      return Array.from(categories);
-    } else {
-      console.log("Style not recognized");
-      return [];
-    }
-  };
-
-  // Function to create a paint property for Maplibre based on the visualisation type and bins
-  const createPaintProperty = (bins, style, colours, opacityValue) => {
-    let colors = [];
-    let colorObject = [];
-    for (var i = 0; i < bins.length; i++) {
-      colors.push(bins[i]);
-      colors.push(colours[i]);
-      colorObject.push({ value: bins[i], color: colours[i] });
-    }
-    setColors(colorObject);
-    switch (style) {
-      case "polygon-continuous" || "polygon-diverging":
-        return {
-          "fill-color": [
-            "interpolate",
-            ["linear"],
-            ["feature-state", "value"],
-            ...colors,
-          ],
-          "fill-opacity": [
-            "case",
-            ["in", ["feature-state", "value"], ["literal", [0, null]]],
-            0,
-            opacityValue ?? 0.65,
-          ],
-          "fill-outline-color": "rgba(255, 255, 0, 0)",
-        };
-      case "polygon-categorical":
-        // Assuming 'bins' is an array of category values and 'colours' is an array of corresponding colors
-        let categoricalColors = [];
-        for (let i = 0; i < bins.length; i++) {
-          categoricalColors.push(bins[i]); // Category value
-          categoricalColors.push(colours[i]); // Color for the category
-        }
-        categoricalColors.push(colours[colours.length - 1]); // Default color if no match is found
-        return {
-          "fill-color": ["match", ["get", "category"], ...categoricalColors],
-          "fill-opacity": opacityValue ?? 0.65,
-        };
-      case "line-continuous":
-        return {
-          "line-color": [
-            "case",
-            ["<", ["feature-state", "value"], 0],
-            "rgba(255, 0, 0, 1)", // Red for negative values
-            [">", ["feature-state", "value"], 0],
-            "rgba(0, 0, 255, 1)", // Blue for positive values
-            "rgba(0, 0, 0, 0.0)", // Make zero invisible
-          ],
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["to-number", ["feature-state", "valueAbs"]],
-            Math.min(...bins),
-            0.1, // Line width starts at 1 at the value of 0
-            Math.max(...bins),
-            15,
-          ],
-          "line-opacity": 1,
-        };
-      case "line-diverging":
-        return {
-          "line-color": [
-            "case",
-            ["==", ["feature-state", "value"], null],
-            colours[4],
-            ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
-          ],
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["to-number", ["feature-state", "valueAbs"]],
-            0.1,
-            0.1, // Line width starts at 1 at the value of 0
-            Math.max(...bins),
-            20,
-          ],
-          "line-opacity": 1,
-        };
-      case "circle-continuous" || "circle-diverging": {
-        return {
-          "circle-color": [
-            ["interpolate", ["linear"], ["get", "value"], ...colors],
-          ],
-          "circle-stroke-width": [
-            "case",
-            ["in", ["feature-state", "value"], ["literal", [0, null]]],
-            0.0,
-            1.0,
-          ],
-          "circle-opacity": [
-            "case",
-            ["in", ["feature-state", "value"], ["literal", [0, null]]],
-            0.0,
-            1.0,
-          ],
-          "circle-radius": [
-            "interpolate",
-            ["linear"],
-            ["to-number", ["feature-state", "valueAbs"]],
-            ...colors,
-          ],
-          "circle-stroke-color": ["#000000"],
-        };
-      }
-      default:
-        return {};
-    }
-  };
 
   const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
