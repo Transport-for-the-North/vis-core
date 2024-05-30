@@ -47,9 +47,8 @@ export const ColourSchemeDropdown = ({
             key={color}
             style={{
               backgroundColor: color,
-              width: "20px",
-              height: "20px",
-              marginLeft: "2px",
+              width: "17px",
+              height: "20px"
             }}
           />
         ))}
