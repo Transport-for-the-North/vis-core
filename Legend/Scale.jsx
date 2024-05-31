@@ -1,6 +1,6 @@
 import React from "react";
 
-import { roundToTwoSignificantFigures } from "utils";
+import { roundToSignificantFigures } from "utils";
 
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
@@ -23,7 +23,7 @@ const Scale = ({
         let { value, color } = step;
         const borderOpacity = (index + 2) / 10;
         if (typeof value === "number") {
-          value = roundToTwoSignificantFigures(value);
+          value = roundToSignificantFigures(value);
           if (!isCategorical && (value < binMin || value > binMax)) return null;
         }else value = value.charAt(0).toUpperCase() + value.slice(1)
 
@@ -55,7 +55,7 @@ const Scale = ({
       sizeScale.map((step, index) => {
         let [value, size] = step;
         if (typeof value === "number") {
-          value = roundToTwoSignificantFigures(value);
+          value = roundToSignificantFigures(value);
           if (!isCategorical && (value < binMin || value > binMax)) return null;
         } else value = value.charAt(0).toUpperCase() + value.slice(1)
 
