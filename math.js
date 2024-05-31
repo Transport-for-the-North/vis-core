@@ -19,6 +19,7 @@ export function roundToNPlaces(value, places) {
 }
 
 /**
+ * @deprecated Use roundToSignificantFigures instead.
  * Rounds a number to the nearest two significant figures.
  *
  * @param {number} value - The number to be rounded.
@@ -47,6 +48,40 @@ export function roundToTwoSignificantFigures(value) {
   const factor = Math.pow(10, magnitude - 2);
 
   // Round the value to the nearest two significant figures
+  return Math.round(value / factor) * factor;
+}
+
+
+/**
+ * Rounds a number to a specified number of significant figures.
+ *
+ * @param {number} value - The number to be rounded.
+ * @param {number} [sigFigs=2] - The number of significant figures to round to (default is 2).
+ * @returns {number} The number rounded to the specified number of significant figures.
+ *
+ * This function works by determining the magnitude (the exponent) of the number
+ * when expressed in scientific notation. It then calculates a factor based on
+ * this magnitude to round the number to the desired number of significant figures.
+ *
+ * @example
+ * // Returns 120
+ * roundToSignificantFigures(123, 2);
+ *
+ * @example
+ * // Returns 0.12
+ * roundToSignificantFigures(0.1234, 2);
+ */
+export function roundToSignificantFigures(value, sigFigs = 2) {
+  // Handle zero case
+  if (value === 0) return 0;
+
+  // Determine the number of digits before the decimal point
+  const magnitude = Math.floor(Math.log10(Math.abs(value))) + 1;
+
+  // Calculate the factor to round to the desired number of significant figures
+  const factor = Math.pow(10, magnitude - sigFigs);
+
+  // Round the value to the nearest significant figures
   return Math.round(value / factor) * factor;
 }
 

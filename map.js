@@ -1,4 +1,4 @@
-import { roundToTwoSignificantFigures } from "./math";
+import { roundToSignificantFigures } from "./math";
 import chroma from "chroma-js";
 
 /**
@@ -146,19 +146,31 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
 }
 
 /**
- * 
- * @param {Array[Object{id, value}]} data - The differents feature that we have 
- * @param {string} style - The type of geometry we have
- * @returns The differents breaks we want for the data we have
+ * Reclassifies data based on the specified style and rounds the values to ensure
+ * that successive rounded values are not identical.
+ *
+ * @param {Array[Object{id, value}]} data - The different features that we have.
+ * @param {string} style - The type of geometry we have.
+ * @returns The different breaks we want for the data we have.
  */
 export const reclassifyData = (data, style) => {
+  // Helper function to round values and ensure successive values are not identical
+  const roundValues = (values, sigFigs) => {
+    let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
+    for (let i = 1; i < roundedValues.length; i++) {
+      while (roundedValues[i] === roundedValues[i - 1] && sigFigs < 10) {
+        sigFigs++;
+        roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
+      }
+    }
+    return roundedValues;
+  };
+
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
     console.log("Bins recalculated for continuous data");
     const unroundedBins = chroma.limits(values, "q", 8);
-    const roundedBins = unroundedBins.map((value) =>
-      roundToTwoSignificantFigures(value)
-    );
+    const roundedBins = roundValues(unroundedBins, 2);
     return roundedBins;
   } else if (style.includes("categorical")) {
     console.log("Categorical classification not implemented for joined data");
@@ -166,13 +178,8 @@ export const reclassifyData = (data, style) => {
   } else if (style.includes("diverging")) {
     const absValues = data.map((value) => Math.abs(value.value));
     const unroundedBins = chroma.limits(absValues, "q", 3);
-    const roundedBins = unroundedBins.map((value) =>
-      roundToTwoSignificantFigures(value)
-    );
-    const negativeBins = roundedBins.toReversed().reduce((acc, val) => {
-      const negative = val * -1;
-      return acc.concat(negative);
-    }, []);
+    let roundedBins = roundValues(unroundedBins, 2);
+    const negativeBins = roundedBins.slice().reverse().map(val => -val);
     console.log("Bins calculated for diverging data");
     return [...negativeBins, 0, ...roundedBins];
   } else {
