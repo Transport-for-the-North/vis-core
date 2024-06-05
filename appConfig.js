@@ -306,7 +306,7 @@ export const appConfig = {
             visualisationName: "Links",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
