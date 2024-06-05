@@ -1,10 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef
-} from "react";
+import React, { useCallback, useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
@@ -28,6 +23,8 @@ const Map = () => {
   const { map, isMapReady } = useMap(mapContainerRef);
   const pageContext = useContext(PageContext);
   const { state, dispatch } = useMapContext();
+  const popups = [];
+  const listenerCallbackRef = useRef({});
 
   /**
    * Generates the style configuration for a regular layer based on the geometry
@@ -160,7 +157,6 @@ const Map = () => {
           isStylable: layer.isStylable ?? false,
         };
 
-        // console.log(map)
         if (layer.type === "geojson") {
           api.geodataService.getLayer(layer).then((geojson) => {
             sourceConfig.type = "geojson";
@@ -186,9 +182,11 @@ const Map = () => {
             ...layerConfig,
             source: layer.name,
             "source-layer": layer.sourceLayer,
-            metadata: { isStylable: layer.isStylable ?? false },
+            metadata: {
+              isStylable: layer.isStylable ?? false,
+              bufferSize: layer.geometryType === "line" ? 7 : null,
+            },
           });
-
           if (layer.isHoverable) {
             const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
             hoverLayerConfig.id = `${layer.name}-hover`;
@@ -228,17 +226,33 @@ const Map = () => {
     [map]
   );
 
-  const handleLayerClick = (e, layerId) => {
-    const feature = map.queryRenderedFeatures(e.point, { 
-      layers: [layerId],
-    });
-    const coordinates = e.lngLat;
-    const description = `<p>${feature[0].properties.name}</p><p>Value : ${feature[0].state.value?? 0}</p>`;
-    new maplibregl.Popup()
-      .setLngLat(coordinates)
-      .setHTML(description)
-      .addTo(map)
-  };
+  const handleLayerClick = useCallback(
+    (e, layerId, bufferSize) => {
+      if (popups.length !== 0) {
+        popups.map((popup) => popup.remove());
+        popups.length = 0;
+      }
+      const bufferdPoint = [
+        [e.point.x - bufferSize, e.point.y - bufferSize],
+        [e.point.x + bufferSize, e.point.y + bufferSize],
+      ];
+      const feature = map.queryRenderedFeatures(bufferdPoint, {
+        layers: [layerId],
+      });
+      if (feature.length !== 0) {
+        const coordinates = e.lngLat;
+        const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+          feature[0].state.value ?? 0
+        }</p>`;
+        const newPopup = new maplibregl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(description)
+          .addTo(map);
+        popups.push(newPopup);
+      }
+    },
+    [map]
+  );
 
   /**
    * Handles mouse leave events for a specific layer by clearing the hover state.
@@ -271,18 +285,32 @@ const Map = () => {
         });
       }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
-        map.on("click", layerId, (e) => handleLayerClick(e, layerId));
+        const bufferSize = state.layers[layerId].bufferSize ?? 0;
+        const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
+        map.on("click", clickCallback);
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
         });
         map.on("mouseleave", layerId, () => {
           map.getCanvas().style.cursor = "grab";
         });
+        if (!listenerCallbackRef.current[layerId]) {
+          listenerCallbackRef.current[layerId] = {};
+        }
+        listenerCallbackRef.current[layerId].clickCallback = clickCallback;
       }
     });
 
     return () => {
       Object.keys(state.layers).forEach((layerId) => {
+        if (popups.length !== 0) {
+          popups.map((popup) => popup.remove());
+          popups.length = 0;
+        }
+        if (state.layers[layerId].shouldHaveTooltipOnClick) {
+          const { clickCallback } = listenerCallbackRef.current[layerId];
+          map.off("click", clickCallback);
+        }
         if (state.layers[layerId].isHoverable) {
           map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId));
           map.off("mouseleave", layerId, () => handleLayerLeave(layerId));

@@ -31,12 +31,14 @@ export const MapProvider = ({ children }) => {
     const nonParameterisedLayers = pageContext.config.layers.filter(layer => !hasRouteParameter(layer.path));
     nonParameterisedLayers.forEach(layer => {
       // Fetch and add non-parameterised layers to the map
-      dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: layer } });
+      const bufferSize = layer.geometryType === "line" ? 7 : 0;
+      dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: {...layer, bufferSize: bufferSize} } });
     });
 
     // Initialise parameterised layers based on corresponding filters
     const parameterisedLayers = pageContext.config.layers.filter(layer => hasRouteParameter(layer.path));
     parameterisedLayers.forEach(layer => {
+      const bufferSize = layer.geometryType === "line" ? 7 : 0;
       // Extract the route parameter name from the layer path
       const paramName = layer.path.match(/\{(.+?)\}/)[1];
       // Find the corresponding filter in the sidebar
@@ -47,7 +49,7 @@ export const MapProvider = ({ children }) => {
         // Dispatch action to add the parameterised layer to the map with updated path
         dispatch({ 
           type: actionTypes.ADD_LAYER, 
-          payload: { [layer.name]: { ...layer, path: updatedPath, pathTemplate: layer.path } } 
+          payload: { [layer.name]: { ...layer, path: updatedPath, pathTemplate: layer.path, bufferSize: bufferSize } } 
         });
       }
     });
