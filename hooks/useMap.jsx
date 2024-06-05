@@ -21,30 +21,7 @@ export const useMap = (mapContainerRef) => {
       });
       
       mapInstance.addControl(new maplibregl.NavigationControl(), 'bottom-left');
-      mapInstance.on("click", (e) => {
-        const features = mapInstance.queryRenderedFeatures(e.point);
 
-        // Limit the number of properties we're displaying for
-        // legibility and performance
-        const displayProperties = [
-          "type",
-          "properties",
-          "id",
-          "layer",
-          "source",
-          "sourceLayer",
-          "state",
-        ];
-
-        const displayFeatures = features.map((feat) => {
-          const displayFeat = {};
-          displayProperties.forEach((prop) => {
-            displayFeat[prop] = feat[prop];
-          });
-          return displayFeat;
-        });
-        console.log(displayFeatures);
-      });
       mapInstance.resize();
 
       setMap(mapInstance);
