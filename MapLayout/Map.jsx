@@ -157,7 +157,6 @@ const Map = () => {
           isStylable: layer.isStylable ?? false,
         };
 
-        // console.log(map)
         if (layer.type === "geojson") {
           api.geodataService.getLayer(layer).then((geojson) => {
             sourceConfig.type = "geojson";
@@ -287,15 +286,18 @@ const Map = () => {
       }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
-        // const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize)
-        console.log(layerId + "Ajouté");
-        map.on("click", (e) => handleLayerClick(e, layerId, bufferSize));
+        const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
+        map.on("click", clickCallback);
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
         });
         map.on("mouseleave", layerId, () => {
           map.getCanvas().style.cursor = "grab";
         });
+        if (!listenerCallbackRef.current[layerId]) {
+          listenerCallbackRef.current[layerId] = {};
+        }
+        listenerCallbackRef.current[layerId].clickCallback = clickCallback;
       }
     });
 
@@ -305,9 +307,10 @@ const Map = () => {
           popups.map((popup) => popup.remove());
           popups.length = 0;
         }
-        console.log(layerId + "Retiré");
-        const bufferSize = state.layers[layerId].bufferSize ?? 0;
-        map.off("click", (e) => handleLayerClick(e, layerId, bufferSize));
+        if (state.layers[layerId].shouldHaveTooltipOnClick) {
+          const { clickCallback } = listenerCallbackRef.current[layerId];
+          map.off("click", clickCallback);
+        }
         if (state.layers[layerId].isHoverable) {
           map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId));
           map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
