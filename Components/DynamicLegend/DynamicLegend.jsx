@@ -185,7 +185,7 @@ export const DynamicLegend = ({ map }) => {
             paintProps['line-color']?.[3] || paintProps['line-color'] || paintProps['circle-color'] || paintProps['fill-color']
           );
           const widthStops = interpretWidthExpression(
-            paintProps['line-width'] || paintProps['circle-radius']
+            paintProps['line-width']
           );
           return { title, colorStops, widthStops };
         });
