@@ -226,33 +226,30 @@ const Map = () => {
     [map]
   );
 
-  const handleLayerClick = useCallback(
-    (e, layerId, bufferSize) => {
-      if (popups.length !== 0) {
-        popups.map((popup) => popup.remove());
-        popups.length = 0;
-      }
-      const bufferdPoint = [
-        [e.point.x - bufferSize, e.point.y - bufferSize],
-        [e.point.x + bufferSize, e.point.y + bufferSize],
-      ];
-      const feature = map.queryRenderedFeatures(bufferdPoint, {
-        layers: [layerId],
-      });
-      if (feature.length !== 0) {
-        const coordinates = e.lngLat;
-        const description = `<p>${feature[0].properties.name}</p><p>Value : ${
-          feature[0].state.value ?? 0
-        }</p>`;
-        const newPopup = new maplibregl.Popup()
-          .setLngLat(coordinates)
-          .setHTML(description)
-          .addTo(map);
-        popups.push(newPopup);
-      }
-    },
-    [map]
-  );
+  const handleLayerClick = (e, layerId, bufferSize) => {
+    if (popups.length !== 0) {
+      popups.map((popup) => popup.remove());
+      popups.length = 0;
+    }
+    const bufferdPoint = [
+      [e.point.x - bufferSize, e.point.y - bufferSize],
+      [e.point.x + bufferSize, e.point.y + bufferSize],
+    ];
+    const feature = map.queryRenderedFeatures(bufferdPoint, {
+      layers: [layerId],
+    });
+    if (feature.length !== 0) {
+      const coordinates = e.lngLat;
+      const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+        feature[0].state.value ?? 0
+      }</p>`;
+      const newPopup = new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+      popups.push(newPopup);
+    }
+  };
 
   /**
    * Handles mouse leave events for a specific layer by clearing the hover state.
