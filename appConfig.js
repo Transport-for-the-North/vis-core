@@ -282,8 +282,10 @@ export const appConfig = {
         ],
       },
     },
+    // -----------------------------------------------------------
+    // Definition for Link Results
     {
-      pageName: "NoHAM Links",
+      pageName: "Link",
       url: "/noham-links",
       type: "MapLayout",
       config: {
@@ -497,8 +499,10 @@ export const appConfig = {
         ],
       },
     },
+    // -----------------------------------------------------------
+    // Definition for Link Difference
     {
-      pageName: "Link Result Difference",
+      pageName: "Link Difference",
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -826,9 +830,179 @@ export const appConfig = {
     },
 
     // -----------------------------------------------------------
-
+    // Definition for Node Results
     {
-      pageName: "Node Result Difference",
+      pageName: "Node",
+      url: "/node-results",
+      type: "MapLayout",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoHAMNodeResults",
+            name: "NodeResults",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NodeResults",
+            isHoverable: false,
+            isStylable: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NodeResults",
+            type: "joinDataToMap",
+            joinLayer: "NodeResults",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/noham/node-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "VOC Percentage",
+                  paramValue: "voc_perc",
+                },
+                {
+                  displayValue: "Delay (seconds)",
+                  paramValue: "delay_secs",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Delivery Program",
+            paramName: "deliveryProgrammeName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Default", //Not sure if value is empty string or null.
+                  paramValue: "",
+                },
+                {
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Network Scenario",
+            paramName: "networkScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Do Minimum",
+                  paramValue: "dm",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Year",
+            paramName: "year",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    
+    // -----------------------------------------------------------
+    // Definition for Node Difference
+    {
+      pageName: "Node Difference",
       url: "/node-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -1107,9 +1281,137 @@ export const appConfig = {
     },
 
     // -----------------------------------------------------------
-
+    // Definition for Zone Results
     {
-      pageName: "Zone Result Difference",
+      pageName: "Zone",
+      url: "/zone-results",
+      type: "MapLayout",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoHAMZoneResults",
+            name: "ZoneResults",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "ZoneResults",
+            isHoverable: false,
+            isStylable: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "ZoneResults",
+            type: "joinDataToMap",
+            joinLayer: "ZoneResults",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/noham/zone-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin Trips",
+                  paramValue: "origin_trips",
+                },
+                {
+                  displayValue: "Destination Trips",
+                  paramValue: "destination_trips",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Year",
+            paramName: "demandYear",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+
+    // -----------------------------------------------------------
+    // Definition for Zone Difference
+    {
+      pageName: "Zone Difference",
       url: "/zone-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -1285,527 +1587,10 @@ export const appConfig = {
       },
     },
 
-    // -----------------------------------------------------------
-
-    {
-      pageName: "Node Results",
-      url: "/node-results",
-      type: "MapLayout",
-      about: "", //To be added.
-      config: {
-        layers: [
-          {
-            uniqueId: "NoHAMNodeResults",
-            name: "NodeResults",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "geometry",
-            geometryType: "point",
-            visualisationName: "NodeResults",
-            isHoverable: false,
-            isStylable: true,
-          },
-        ],
-        visualisations: [
-          {
-            name: "NodeResults",
-            type: "joinDataToMap",
-            joinLayer: "NodeResults",
-            style: "circle-continuous",
-            joinField: "id",
-            valueField: "value",
-            dataSource: "api",
-            dataPath: "/api/noham/node-results",
-          },
-        ],
-        metadataLayers: [],
-        filters: [
-          {
-            filterName: "Select Column",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "VOC Percentage",
-                  paramValue: "voc_perc",
-                },
-                {
-                  displayValue: "Delay (seconds)",
-                  paramValue: "delay_secs",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Delivery Program",
-            paramName: "deliveryProgrammeName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default", //Not sure if value is empty string or null.
-                  paramValue: "",
-                },
-                {
-                  displayValue: "MRN",
-                  paramValue: "MRN",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Network Scenario",
-            paramName: "networkScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do Minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Year",
-            paramName: "year",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Scenario",
-            paramName: "demandScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-
-    // -----------------------------------------------------------
-
-    {
-      pageName: "Zone Results",
-      url: "/zone-results",
-      type: "MapLayout",
-      about: "", //To be added.
-      config: {
-        layers: [
-          {
-            uniqueId: "NoHAMZoneResults",
-            name: "ZoneResults",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "zones",
-            geometryType: "polygon",
-            visualisationName: "ZoneResults",
-            isHoverable: false,
-            isStylable: true,
-          },
-        ],
-        visualisations: [
-          {
-            name: "ZoneResults",
-            type: "joinDataToMap",
-            joinLayer: "ZoneResults",
-            style: "polygon-continuous",
-            joinField: "id",
-            valueField: "value",
-            dataSource: "api",
-            dataPath: "/api/noham/zone-results",
-          },
-        ],
-        metadataLayers: [],
-        filters: [
-          {
-            filterName: "Select Column",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Origin Trips",
-                  paramValue: "origin_trips",
-                },
-                {
-                  displayValue: "Destination Trips",
-                  paramValue: "destination_trips",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Year",
-            paramName: "demandYear",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Scenario",
-            paramName: "demandScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-
-    // -----------------------------------------------------------
-
-    {
-      pageName: "Link Results",
-      url: "/link-results",
-      type: "MapLayout",
-      about: "", //To be added.
-      config: {
-        layers: [
-          {
-            uniqueId: "NoHAMLinkResults",
-            name: "LinkResults",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "geometry",
-            geometryType: "line",
-            visualisationName: "LinkResults",
-            isHoverable: false,
-            isStylable: true,
-            shouldHaveTooltipOnClick: false,
-          },
-        ],
-        visualisations: [
-          {
-            name: "LinkResults",
-            type: "joinDataToMap",
-            joinLayer: "LinkResults",
-            style: "line-continuous",
-            joinField: "id",
-            valueField: "value",
-            dataSource: "api",
-            dataPath: "/api/noham/link-results/",
-          },
-        ],
-        metadataLayers: [],
-        filters: [
-          {
-            filterName: "Select Column",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Net Speed (kph)",
-                  paramValue: "netspd_kph",
-                },
-                {
-                  displayValue: "Total Time (seconds)",
-                  paramValue: "total_time_secs",
-                },
-                {
-                  displayValue: "car_eb_vehs",
-                  paramValue: "car_eb_vehs",
-                },
-                {
-                  displayValue: "car_comm_vehs",
-                  paramValue: "car_comm_vehs",
-                },
-                {
-                  displayValue: "LGV Flows",
-                  paramValue: "lgv_flow_vehs",
-                },
-                {
-                  displayValue: "HGV Flows",
-                  paramValue: "hgv_flow_vehs",
-                },
-                {
-                  displayValue: "Total Flows",
-                  paramValue: "total_flow_vehs",
-                },
-                {
-                  displayValue: "link_voc",
-                  paramValue: "link_voc",
-                },
-                {
-                  displayValue: "Link Delay (seconds)",
-                  paramValue: "link_delay_secs",
-                },
-                {
-                  displayValue: "Link Queue (seconds)",
-                  paramValue: "link_queues_secs",
-                },
-                {
-                  displayValue: "Number of Lanes",
-                  paramValue: "number_lanes",
-                },
-                {
-                  displayValue: "speed_flow_curv",
-                  paramValue: "speed_flow_curve",
-                },
-                {
-                  displayValue: "Speed Limit",
-                  paramValue: "speed_limit",
-                },
-                {
-                  displayValue: "Carbon Emissions",
-                  paramValue: "carbon_emissions_tco2",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Delivery Program",
-            paramName: "deliveryProgrammeName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default",
-                  paramValue: "",
-                },
-                {
-                  displayValue: "MRN",
-                  paramValue: "MRN",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Network Scenario",
-            paramName: "networkScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do Minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Year",
-            paramName: "year",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Scenario",
-            paramName: "demandScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-
     // --------------------------------------------------------------------------------------------------
-
+    // Definition for Zone Pair Difference
     {
-      pageName: "Zonal Pair Difference",
+      pageName: "Matrix Difference",
       url: "/zonal-pair-difference",
       about: "",
       type: "MapLayout",
@@ -1829,7 +1614,8 @@ export const appConfig = {
           {
             name: "ZonalPairDifference",
             type: "joinDataToMap",
-            style: "polygon-continuous",
+            style: "polygon-diverging",
+            joinField: "id",
             joinLayer: "ZonalPairDifference",
             valueField: "value",
             dataSource: "api",
@@ -1854,7 +1640,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2044,7 +1830,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2069,7 +1855,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2201,9 +1987,9 @@ export const appConfig = {
     },
 
     // --------------------------------------------------------------------------------------------------
-
+    // Definition for Zone Pair Results
     {
-      pageName: "Zonal Pair Results",
+      pageName: "Matrix",
       url: "/zonal-pair-results",
       about: "",
       type: "MapLayout",
@@ -2228,7 +2014,7 @@ export const appConfig = {
             name: "ZonalPairResults",
             type: "joinDataToMap",
             joinLayer: "ZonalPairResults",
-            style: "polygon-diverging",
+            style: "polygon-continuous",
             joinField: "id",
             valueField: "value",
             dataSource: "api",
