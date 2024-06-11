@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -7,6 +7,7 @@ import { AppContext } from "contexts";
 import { Button } from "./Button";
 import { LateralNavbar } from "./LateralNavbar";
 import { Logo } from "./Logo";
+import NavBarDropdown from "./NavBarDropdown";
 import "./Navbar.styles.css";
 
 const StyledNavbar = styled.nav`
@@ -60,22 +61,36 @@ export function Navbar() {
     if (sideNavOpen === "sideNavbar-shown") updateMenu();
   }, [location]);
 
+  const nohamItems = [];
+
   return (
     <>
       <StyledNavbar className="navbar">
         <Logo className="logoNav" onClick={() => onClick("/")} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
+
         {appContext.appPages.map((page) => (
-          <Link
-            key={page.pageName}
-            className={
-              activeLink === page.url ? "ActiveNavButton" : "NavButton"
+          
+          (() => {
+            if(page.navBarDropdown === null) {
+              return (
+                  <Link
+                  key={page.pageName}
+                  className={
+                    activeLink === page.url ? "ActiveNavButton" : "NavButton"
+                  }
+                  to={page.url}
+                >
+                  {page.pageName}
+                </Link>
+              )
+            } else if (page.navBarDropdown == 'NoHAM') {
+              nohamItems.push(page);
             }
-            to={page.url}
-          >
-            {page.pageName}
-          </Link>
+          })() 
         ))}
+        
+        <NavBarDropdown dropdownItems={nohamItems} activeLink={activeLink} dropdownName="NoHAM" />     
 
         <Button
           className="navbarMobile"
@@ -88,4 +103,6 @@ export function Navbar() {
       <div className="empty-blank-nav"></div>
     </>
   );
+
 }
+
