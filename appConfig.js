@@ -1,7 +1,6 @@
 export const appConfig = {
   title: "TAME React Vis Template",
-  introduction:
-    `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
+  introduction: `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
     <p>HTML documents are made up of elements. These elements are represented by tags, which label pieces of content such as "heading", "paragraph", "list", and so on. Browsers do not display the HTML tags but use them to render the content of the page.</p>
     <h2>Basic HTML Page Structure</h2>
     <p>An HTML document has a defined structure that includes the following main elements:</p>
@@ -14,14 +13,15 @@ export const appConfig = {
     <p>Learning HTML is the first step in creating web content and is essential for web developers. It is easy to learn and can be combined with CSS (Cascading Style Sheets) and JavaScript to create interactive and styled web pages.</p>`,
   background: "",
   legalText:
-        '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
   contactText: "Please contact [Name] for any questions on this data tool.",
   contactEmail: "firstname.lastname@transportforthenorth.com",
   appPages: [
     {
       pageName: "Bus Reliability",
       url: "/bus-reliability",
-      about: "<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone in the map.</p> <p>The <b>base</b> timetable refers to buses which were scheduled. </p> <p>The <b>adjusted</b> timetable refers to buses which actually ran.</p>",
+      about:
+        "<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone in the map.</p> <p>The <b>base</b> timetable refers to buses which were scheduled. </p> <p>The <b>adjusted</b> timetable refers to buses which actually ran.</p>",
       type: "MapLayout",
       navBarDropdown: null,
       config: {
@@ -62,7 +62,10 @@ export const appConfig = {
             filterName: "Region",
             paramName: "zoneTypeId",
             target: "api",
-            actions: [ {action: "UPDATE_PARAMETERISED_LAYER", payload: "Origin Zones"}, { action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_PARAMETERISED_LAYER", payload: "Origin Zones" },
+              { action: "UPDATE_QUERY_PARAMS" },
+            ],
             visualisations: ["Reliability"],
             layer: "Origin Zones",
             type: "dropdown",
@@ -88,7 +91,7 @@ export const appConfig = {
             filterName: "Base timetable",
             paramName: "baseTimetableId",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Reliability"],
             type: "dropdown",
             values: {
@@ -105,7 +108,7 @@ export const appConfig = {
             filterName: "Adjusted timetable",
             paramName: "adjustedTimetableId",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Reliability"],
             type: "dropdown",
             values: {
@@ -122,7 +125,7 @@ export const appConfig = {
             filterName: "Journey time limit",
             paramName: "medianDurationSecs",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Reliability"],
             type: "slider",
             min: 600,
@@ -138,7 +141,7 @@ export const appConfig = {
             filterName: "Select origin zone in map",
             paramName: "originZoneId",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Reliability"],
             type: "map",
             layer: "Origin Zones",
@@ -151,8 +154,13 @@ export const appConfig = {
       pageName: "Bus Accessibility",
       url: "/bus-accessibility",
       type: "MapLayout",
+<<<<<<< HEAD
       about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
       navBarDropdown: null,
+=======
+      about:
+        "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
       config: {
         layers: [
           {
@@ -165,7 +173,7 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "Accessibility",
             isHoverable: false,
-            isStylable: true, 
+            isStylable: true,
             shouldHaveTooltipOnClick: true,
           },
         ],
@@ -179,17 +187,23 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/accessibility",
-            infoTextTemplate: `{filterName1} accessible within {filterName2}`
+            infoTextTemplate: `{filterName1} accessible within {filterName2}`,
           },
         ],
         metadataLayers: [],
-        
+
         filters: [
           {
             filterName: "Region",
             paramName: "zoneTypeId",
             target: "api",
-            actions: [ {action: "UPDATE_PARAMETERISED_LAYER", payload: "Accessibility"}, { action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              {
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: "Accessibility",
+              },
+              { action: "UPDATE_QUERY_PARAMS" },
+            ],
             visualisations: ["Accessibility"],
             layer: "Accessibility",
             type: "dropdown",
@@ -216,7 +230,7 @@ export const appConfig = {
             filterName: "Timetable",
             paramName: "timetable_id",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Accessibility"],
             type: "dropdown",
             info: "Timetable used to calculate metrics.",
@@ -238,7 +252,7 @@ export const appConfig = {
             filterName: "Value type",
             paramName: "valueType",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Accessibility"],
             type: "dropdown",
             info: "Type of opportunity accessed.",
@@ -260,7 +274,7 @@ export const appConfig = {
             filterName: "Cutoff time",
             paramName: "cutoffTimeMinutes",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Accessibility"],
             type: "slider",
             info: "Journey time limit by bus.",
@@ -274,21 +288,15 @@ export const appConfig = {
         ],
       },
     },
+    // -----------------------------------------------------------
+    // Definition for Link Results
     {
-      pageName: "NoHAM Links",
+      pageName: "Link",
       url: "/noham-links",
       type: "MapLayout",
       navBarDropdown: null,
       config: {
         layers: [
-        //   {
-        //     name: "NoHAM Links",
-        //     type: "geojson",
-        //     source: "api",
-        //     path: "/api/noham/links",
-        //     geometryType: "line",
-        //     visualisationName: "Links",
-        //   },
           {
             uniqueId: "NormsLinksVectorTile",
             name: "NoHAM Links",
@@ -321,7 +329,7 @@ export const appConfig = {
             filterName: "Delivery programme",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
             values: {
@@ -338,7 +346,7 @@ export const appConfig = {
             filterName: "Network scenario",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
             values: {
@@ -359,7 +367,7 @@ export const appConfig = {
             filterName: "Demand scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
             values: {
@@ -380,7 +388,7 @@ export const appConfig = {
             filterName: "Year",
             paramName: "year",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
             values: {
@@ -401,7 +409,7 @@ export const appConfig = {
             filterName: "Time period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
             values: {
@@ -426,7 +434,7 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
             values: {
@@ -494,12 +502,17 @@ export const appConfig = {
                 },
               ],
             },
-          }
+          },
         ],
       },
     },
+<<<<<<< HEAD
+=======
+    // -----------------------------------------------------------
+    // Definition for Link Difference
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
     {
-      pageName: "Link Result Difference",
+      pageName: "Link Difference",
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -518,7 +531,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
-          }
+          },
         ],
         visualisations: [
           {
@@ -538,67 +551,67 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Net Speed (kph)',
-                  paramValue: 'netspd_kph'
+                  displayValue: "Net Speed (kph)",
+                  paramValue: "netspd_kph",
                 },
                 {
-                  displayValue: 'Total Time (seconds)',
-                  paramValue: 'total_time_secs'
+                  displayValue: "Total Time (seconds)",
+                  paramValue: "total_time_secs",
                 },
                 {
-                  displayValue: 'car_eb_vehs',
-                  paramValue: 'car_eb_vehs'
+                  displayValue: "car_eb_vehs",
+                  paramValue: "car_eb_vehs",
                 },
                 {
-                  displayValue: 'car_comm_vehs',
-                  paramValue: 'car_comm_vehs'
+                  displayValue: "car_comm_vehs",
+                  paramValue: "car_comm_vehs",
                 },
                 {
-                  displayValue: 'LGV Flows',
-                  paramValue: 'lgv_flow_vehs'
+                  displayValue: "LGV Flows",
+                  paramValue: "lgv_flow_vehs",
                 },
                 {
-                  displayValue: 'HGV Flows',
-                  paramValue: 'hgv_flow_vehs'
+                  displayValue: "HGV Flows",
+                  paramValue: "hgv_flow_vehs",
                 },
                 {
-                  displayValue: 'Total Flows',
-                  paramValue: 'total_flow_vehs'
+                  displayValue: "Total Flows",
+                  paramValue: "total_flow_vehs",
                 },
                 {
-                  displayValue: 'link_voc',
-                  paramValue: 'link_voc'
+                  displayValue: "link_voc",
+                  paramValue: "link_voc",
                 },
                 {
-                  displayValue: 'Link Delay (seconds)',
-                  paramValue: 'link_delay_secs'
+                  displayValue: "Link Delay (seconds)",
+                  paramValue: "link_delay_secs",
                 },
                 {
-                  displayValue: 'Link Queue (seconds)',
-                  paramValue: 'link_queues_secs'
+                  displayValue: "Link Queue (seconds)",
+                  paramValue: "link_queues_secs",
                 },
                 {
-                  displayValue: 'Number of Lanes',
-                  paramValue: 'number_lanes'
+                  displayValue: "Number of Lanes",
+                  paramValue: "number_lanes",
                 },
                 {
-                  displayValue: 'speed_flow_curv',
-                  paramValue: 'speed_flow_curve'
+                  displayValue: "speed_flow_curv",
+                  paramValue: "speed_flow_curve",
                 },
                 {
-                  displayValue: 'Speed Limit',
-                  paramValue: 'speed_limit'
+                  displayValue: "Speed Limit",
+                  paramValue: "speed_limit",
                 },
                 {
-                  displayValue: 'Carbon Emissions',
-                  paramValue: 'carbon_emissions_tco2'
+                  displayValue: "Carbon Emissions",
+                  paramValue: "carbon_emissions_tco2",
                 },
               ],
             },
@@ -607,16 +620,16 @@ export const appConfig = {
             filterName: "Network Scenario Name - DS",
             paramName: "networkScenarioNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
               ],
             },
           },
@@ -624,16 +637,16 @@ export const appConfig = {
             filterName: "Network Scenario Name - DM",
             paramName: "networkScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'DM',
-                  paramValue: 'dm'
-                }
+                  displayValue: "DM",
+                  paramValue: "dm",
+                },
               ],
             },
           },
@@ -641,16 +654,16 @@ export const appConfig = {
             filterName: "Network Year - DS",
             paramName: "networkYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
               ],
             },
           },
@@ -658,16 +671,16 @@ export const appConfig = {
             filterName: "Network Year - DM",
             paramName: "networkYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -675,16 +688,16 @@ export const appConfig = {
             filterName: "Demand Scenario - DS",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
               ],
             },
           },
@@ -692,16 +705,16 @@ export const appConfig = {
             filterName: "Demand Scenario - DM",
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Core',
-                  paramValue: 'core'
-                }
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
               ],
             },
           },
@@ -709,16 +722,16 @@ export const appConfig = {
             filterName: "Demand Year - DS",
             paramName: "demandYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
               ],
             },
           },
@@ -726,16 +739,16 @@ export const appConfig = {
             filterName: "Demand Year - DM",
             paramName: "demandYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -743,7 +756,7 @@ export const appConfig = {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
@@ -768,7 +781,7 @@ export const appConfig = {
             filterName: "Time Period - DM",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
@@ -793,16 +806,16 @@ export const appConfig = {
             filterName: "Delivery Program - DS",
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Default',
-                  paramValue: ''
-                }
+                  displayValue: "Default",
+                  paramValue: "",
+                },
               ],
             },
           },
@@ -810,13 +823,14 @@ export const appConfig = {
             filterName: "Delivery Program - DM",
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
+<<<<<<< HEAD
                   displayValue: 'MRN',
                   paramValue: 'MRN'
                 }
@@ -879,28 +893,266 @@ export const appConfig = {
                 {
                   displayValue: 'VOC Percentage',
                   paramValue: 'voc_perc'
+=======
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+
+    // -----------------------------------------------------------
+    // Definition for Node Results
+    {
+<<<<<<< HEAD
+      pageName: "Zone Result Difference",
+      url: "/zone-result-difference",
+      type: "MapLayout",
+      about: "", //To be added.
+      navBarDropdown: "NoHAM",
+=======
+      pageName: "Node",
+      url: "/node-results",
+      type: "MapLayout",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoHAMNodeResults",
+            name: "NodeResults",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NodeResults",
+            isHoverable: false,
+            isStylable: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NodeResults",
+            type: "joinDataToMap",
+            joinLayer: "NodeResults",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/noham/node-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "VOC Percentage",
+                  paramValue: "voc_perc",
                 },
                 {
-                  displayValue: 'Delay (seconds)',
-                  paramValue: 'delay_secs'
-                }
+                  displayValue: "Delay (seconds)",
+                  paramValue: "delay_secs",
+                },
               ],
-            }
+            },
           },
           {
-            filterName: "Network Scenario Name - DS",
-            paramName: "networkScenarioNameDoSomething",
+            filterName: "Delivery Program",
+            paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Default", //Not sure if value is empty string or null.
+                  paramValue: "",
+                },
+                {
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Network Scenario",
+            paramName: "networkScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Do Minimum",
+                  paramValue: "dm",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Year",
+            paramName: "year",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    
+    // -----------------------------------------------------------
+    // Definition for Node Difference
+    {
+      pageName: "Node Difference",
+      url: "/node-result-difference",
+      type: "MapLayout",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoHAMNodeResultDifference",
+            name: "NodeResultDifference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NodeResultDifference",
+            isHoverable: false,
+            isStylable: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NodeResultDifference",
+            type: "joinDataToMap",
+            joinLayer: "NodeResultDifference",
+            style: "circle-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/noham/node-results/difference",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
+                  displayValue: "VOC Percentage",
+                  paramValue: "voc_perc",
+                },
+                {
+                  displayValue: "Delay (seconds)",
+                  paramValue: "delay_secs",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Network Scenario Name - DS",
+            paramName: "networkScenarioNameDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
               ],
             },
           },
@@ -908,16 +1160,16 @@ export const appConfig = {
             filterName: "Network Scenario Name - DM",
             paramName: "networkScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'DM',
-                  paramValue: 'dm'
-                }
+                  displayValue: "DM",
+                  paramValue: "dm",
+                },
               ],
             },
           },
@@ -925,16 +1177,16 @@ export const appConfig = {
             filterName: "Network Year - DS",
             paramName: "networkYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
               ],
             },
           },
@@ -942,16 +1194,16 @@ export const appConfig = {
             filterName: "Network Year - DM",
             paramName: "networkYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -959,16 +1211,16 @@ export const appConfig = {
             filterName: "Demand Scenario - DS",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
               ],
             },
           },
@@ -976,16 +1228,16 @@ export const appConfig = {
             filterName: "Demand Scenario - DM",
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Core',
-                  paramValue: 'core'
-                }
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
               ],
             },
           },
@@ -993,16 +1245,16 @@ export const appConfig = {
             filterName: "Demand Year - DS",
             paramName: "demandYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
               ],
             },
           },
@@ -1010,16 +1262,16 @@ export const appConfig = {
             filterName: "Demand Year - DM",
             paramName: "demandYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -1027,7 +1279,7 @@ export const appConfig = {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
@@ -1052,7 +1304,7 @@ export const appConfig = {
             filterName: "Time Period - DM",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
@@ -1077,16 +1329,16 @@ export const appConfig = {
             filterName: "Delivery Program - DS",
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Default',
-                  paramValue: ''
-                }
+                  displayValue: "Default",
+                  paramValue: "",
+                },
               ],
             },
           },
@@ -1094,16 +1346,16 @@ export const appConfig = {
             filterName: "Delivery Program - DM",
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'MRN',
-                  paramValue: 'MRN'
-                }
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+                },
               ],
             },
           },
@@ -1111,16 +1363,142 @@ export const appConfig = {
       },
     },
 
+    // -----------------------------------------------------------
+    // Definition for Zone Results
+    {
+      pageName: "Zone",
+      url: "/zone-results",
+      type: "MapLayout",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoHAMZoneResults",
+            name: "ZoneResults",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "ZoneResults",
+            isHoverable: false,
+            isStylable: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "ZoneResults",
+            type: "joinDataToMap",
+            joinLayer: "ZoneResults",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/noham/zone-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin Trips",
+                  paramValue: "origin_trips",
+                },
+                {
+                  displayValue: "Destination Trips",
+                  paramValue: "destination_trips",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Year",
+            paramName: "demandYear",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
 
     // -----------------------------------------------------------
-
-
+    // Definition for Zone Difference
     {
-      pageName: "Zone Result Difference",
+      pageName: "Zone Difference",
       url: "/zone-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      navBarDropdown: "NoHAM",
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
       config: {
         layers: [
           {
@@ -1133,7 +1511,11 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "ZoneResultDifference",
             isHoverable: false,
+<<<<<<< HEAD
             isStylable: true
+=======
+            isStylable: true,
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
           },
         ],
         visualisations: [
@@ -1154,13 +1536,18 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
+<<<<<<< HEAD
                   displayValue: 'Origin Trips',
                   paramValue: 'origin_trips'
                 },
@@ -1168,6 +1555,15 @@ export const appConfig = {
                   displayValue: 'Destination Trips',
                   paramValue: 'destination_trips'
                 }
+=======
+                  displayValue: "Origin Trips",
+                  paramValue: "origin_trips",
+                },
+                {
+                  displayValue: "Destination Trips",
+                  paramValue: "destination_trips",
+                },
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
               ],
             },
           },
@@ -1175,16 +1571,26 @@ export const appConfig = {
             filterName: "Demand Scenario - DS",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
+<<<<<<< HEAD
                   displayValue: 'Base',
                   paramValue: 'base'
                 }
+=======
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
               ],
             },
           },
@@ -1192,16 +1598,26 @@ export const appConfig = {
             filterName: "Demand Scenario - DM",
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
+<<<<<<< HEAD
                   displayValue: 'Core',
                   paramValue: 'core'
                 }
+=======
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
               ],
             },
           },
@@ -1209,16 +1625,26 @@ export const appConfig = {
             filterName: "Demand Year - DS",
             paramName: "demandYearDoSomething",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
+<<<<<<< HEAD
                   displayValue: '2018',
                   paramValue: 2018
                 }
+=======
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
               ],
             },
           },
@@ -1226,16 +1652,26 @@ export const appConfig = {
             filterName: "Demand Year - DM",
             paramName: "demandYearDoMinimum",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
+<<<<<<< HEAD
                   displayValue: '2033',
                   paramValue: 2033
                 }
+=======
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
               ],
             },
           },
@@ -1243,7 +1679,11 @@ export const appConfig = {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -1268,7 +1708,11 @@ export const appConfig = {
             filterName: "Time Period - DM",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
+<<<<<<< HEAD
             actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+=======
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -1289,14 +1733,23 @@ export const appConfig = {
               ],
             },
           },
+<<<<<<< HEAD
         ]
       },
     },
 
     // -----------------------------------------------------------
 
+=======
+        ],
+      },
+    },
+
+    // --------------------------------------------------------------------------------------------------
+    // Definition for Zone Pair Difference
+>>>>>>> 4a25815563fa17de237a3a0e2a56154ed9b6162a
     {
-      pageName: "Zonal Pair Difference",
+      pageName: "Matrix Difference",
       url: "/zonal-pair-difference",
       about: "",
       type: "MapLayout",
@@ -1320,9 +1773,11 @@ export const appConfig = {
         visualisations: [
           {
             name: "ZonalPairDifference",
-            type: "geojson",
-            style: "polygon-categorical",
-            valueField: "category",
+            type: "joinDataToMap",
+            style: "polygon-diverging",
+            joinField: "id",
+            joinLayer: "ZonalPairDifference",
+            valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zone-pair-results/difference",
           },
@@ -1333,7 +1788,7 @@ export const appConfig = {
             filterName: "Select zone in map",
             paramName: "zoneId",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "map",
             layer: "ZonalPairDifference",
@@ -1343,9 +1798,9 @@ export const appConfig = {
             filterName: "Choose if selected zone is origin/destination",
             paramName: "originOrDestination",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -1356,7 +1811,7 @@ export const appConfig = {
                 {
                   displayValue: "Destination",
                   paramValue: "destination",
-                }
+                },
               ],
             },
           },
@@ -1364,31 +1819,31 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Vehicle Trips',
-                  paramValue: 'trips_veh'
+                  displayValue: "Vehicle Trips",
+                  paramValue: "trips_veh",
                 },
                 {
-                  displayValue: 'Travel Time (seconds)',
-                  paramValue: 'travel_time_secs'
+                  displayValue: "Travel Time (seconds)",
+                  paramValue: "travel_time_secs",
                 },
                 {
-                  displayValue: 'Distance (miles)',
-                  paramValue: 'distance_m'
+                  displayValue: "Distance (miles)",
+                  paramValue: "distance_m",
                 },
                 {
-                  displayValue: 'Delay (minutes)',
-                  paramValue: 'delay_mins'
+                  displayValue: "Delay (minutes)",
+                  paramValue: "delay_mins",
                 },
                 {
-                  displayValue: 'Generalised JT (seconds)',
-                  paramValue: 'generalised_jt_secs'
+                  displayValue: "Generalised JT (seconds)",
+                  paramValue: "generalised_jt_secs",
                 },
               ],
             },
@@ -1397,16 +1852,16 @@ export const appConfig = {
             filterName: "Network Scenario Name - DS",
             paramName: "networkScenarioNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
               ],
             },
           },
@@ -1414,16 +1869,16 @@ export const appConfig = {
             filterName: "Network Scenario Name - DM",
             paramName: "networkScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'DM',
-                  paramValue: 'dm'
-                }
+                  displayValue: "DM",
+                  paramValue: "dm",
+                },
               ],
             },
           },
@@ -1431,16 +1886,16 @@ export const appConfig = {
             filterName: "Network Year - DS",
             paramName: "networkYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
               ],
             },
           },
@@ -1448,16 +1903,16 @@ export const appConfig = {
             filterName: "Network Year - DM",
             paramName: "networkYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -1465,16 +1920,16 @@ export const appConfig = {
             filterName: "Demand Scenario - DS",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
               ],
             },
           },
@@ -1482,16 +1937,16 @@ export const appConfig = {
             filterName: "Demand Scenario - DM",
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Core',
-                  paramValue: 'core'
-                }
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
               ],
             },
           },
@@ -1499,16 +1954,16 @@ export const appConfig = {
             filterName: "Demand Year - DS",
             paramName: "demandYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
               ],
             },
           },
@@ -1516,16 +1971,16 @@ export const appConfig = {
             filterName: "Demand Year - DM",
             paramName: "demandYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -1533,9 +1988,9 @@ export const appConfig = {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -1558,9 +2013,9 @@ export const appConfig = {
             filterName: "Time Period - DM",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -1583,16 +2038,16 @@ export const appConfig = {
             filterName: "Delivery Program - DS",
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Default',
-                  paramValue: ''
-                }
+                  displayValue: "Default",
+                  paramValue: "",
+                },
               ],
             },
           },
@@ -1600,16 +2055,16 @@ export const appConfig = {
             filterName: "Delivery Program - DM",
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'MRN',
-                  paramValue: 'MRN'
-                }
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+                },
               ],
             },
           },
@@ -1617,7 +2072,7 @@ export const appConfig = {
             filterName: "User Class - DM",
             paramName: "userClasseDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
@@ -1625,27 +2080,27 @@ export const appConfig = {
               values: [
                 {
                   displayValue: "All Vehicles",
-                  paramValue: "all_vehicles"
+                  paramValue: "all_vehicles",
                 },
                 {
                   displayValue: "Car: Business",
-                  paramValue: "UC1-Car_Business"
+                  paramValue: "UC1-Car_Business",
                 },
                 {
                   displayValue: "Car: Commute",
-                  paramValue: "UC2-Car_Commute"
+                  paramValue: "UC2-Car_Commute",
                 },
                 {
                   displayValue: "Car: Other",
-                  paramValue: "UC3-Car_Other"
+                  paramValue: "UC3-Car_Other",
                 },
                 {
                   displayValue: "LGV",
-                  paramValue: "UC4-LGV"
+                  paramValue: "UC4-LGV",
                 },
                 {
                   displayValue: "HGV",
-                  paramValue: "UC5-HGV"
+                  paramValue: "UC5-HGV",
                 },
               ],
             },
@@ -1654,7 +2109,7 @@ export const appConfig = {
             filterName: "User Class - DS",
             paramName: "userClassDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
             values: {
@@ -1662,33 +2117,33 @@ export const appConfig = {
               values: [
                 {
                   displayValue: "All Vehicles",
-                  paramValue: "all_vehicles"
+                  paramValue: "all_vehicles",
                 },
                 {
                   displayValue: "Car: Business",
-                  paramValue: "UC1-Car_Business"
+                  paramValue: "UC1-Car_Business",
                 },
                 {
                   displayValue: "Car: Commute",
-                  paramValue: "UC2-Car_Commute"
+                  paramValue: "UC2-Car_Commute",
                 },
                 {
                   displayValue: "Car: Other",
-                  paramValue: "UC3-Car_Other"
+                  paramValue: "UC3-Car_Other",
                 },
                 {
                   displayValue: "LGV",
-                  paramValue: "UC4-LGV"
+                  paramValue: "UC4-LGV",
                 },
                 {
                   displayValue: "HGV",
-                  paramValue: "UC5-HGV"
+                  paramValue: "UC5-HGV",
                 },
               ],
             },
           },
-        ]
-      }
+        ],
+      },
     },
 
 
@@ -2215,9 +2670,9 @@ export const appConfig = {
     },
 
     // --------------------------------------------------------------------------------------------------
-
+    // Definition for Zone Pair Results
     {
-      pageName: "Zonal Pair Results",
+      pageName: "Matrix",
       url: "/zonal-pair-results",
       about: "",
       type: "MapLayout",
@@ -2241,9 +2696,11 @@ export const appConfig = {
         visualisations: [
           {
             name: "ZonalPairResults",
-            type: "geojson",
-            style: "polygon-categorical",
-            valueField: "category",
+            type: "joinDataToMap",
+            joinLayer: "ZonalPairResults",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zone-pair-results",
           },
@@ -2254,7 +2711,7 @@ export const appConfig = {
             filterName: "Select zone in map",
             paramName: "zoneId",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "map",
             layer: "ZonalPairResults",
@@ -2264,9 +2721,9 @@ export const appConfig = {
             filterName: "Choose if selected zone is origin/destination",
             paramName: "originOrDestination",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2277,7 +2734,7 @@ export const appConfig = {
                 {
                   displayValue: "Destination",
                   paramValue: "destination",
-                }
+                },
               ],
             },
           },
@@ -2285,31 +2742,31 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Vehicle Trips',
-                  paramValue: 'trips_veh'
+                  displayValue: "Vehicle Trips",
+                  paramValue: "trips_veh",
                 },
                 {
-                  displayValue: 'Travel Time (seconds)',
-                  paramValue: 'travel_time_secs'
+                  displayValue: "Travel Time (seconds)",
+                  paramValue: "travel_time_secs",
                 },
                 {
-                  displayValue: 'Distance (miles)',
-                  paramValue: 'distance_m'
+                  displayValue: "Distance (miles)",
+                  paramValue: "distance_m",
                 },
                 {
-                  displayValue: 'Delay (minutes)',
-                  paramValue: 'delay_mins'
+                  displayValue: "Delay (minutes)",
+                  paramValue: "delay_mins",
                 },
                 {
-                  displayValue: 'Generalised JT (seconds)',
-                  paramValue: 'generalised_jt_secs'
+                  displayValue: "Generalised JT (seconds)",
+                  paramValue: "generalised_jt_secs",
                 },
               ],
             },
@@ -2318,20 +2775,20 @@ export const appConfig = {
             filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base',
+                  displayValue: "Base",
+                  paramValue: "base",
                 },
                 {
-                  displayValue: 'DM',
-                  paramValue: 'dm',
-                }
+                  displayValue: "DM",
+                  paramValue: "dm",
+                },
               ],
             },
           },
@@ -2339,20 +2796,20 @@ export const appConfig = {
             filterName: "Year",
             paramName: "year",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: '2018',
-                  paramValue: 2018
+                  displayValue: "2018",
+                  paramValue: 2018,
                 },
                 {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
               ],
             },
           },
@@ -2360,20 +2817,20 @@ export const appConfig = {
             filterName: "Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Base',
-                  paramValue: 'base'
+                  displayValue: "Base",
+                  paramValue: "base",
                 },
                 {
-                  displayValue: 'Core',
-                  paramValue: 'core'
-                }
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
               ],
             },
           },
@@ -2381,7 +2838,7 @@ export const appConfig = {
             filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
@@ -2406,20 +2863,20 @@ export const appConfig = {
             filterName: "Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: 'Default',
-                  paramValue: ''
+                  displayValue: "Default",
+                  paramValue: "",
                 },
                 {
-                  displayValue: 'MRN',
-                  paramValue: 'MRN'
-                }
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+                },
               ],
             },
           },
@@ -2427,7 +2884,7 @@ export const appConfig = {
             filterName: "User Class",
             paramName: "userClass",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
             values: {
@@ -2435,31 +2892,31 @@ export const appConfig = {
               values: [
                 {
                   displayValue: "All Vehicles",
-                  paramValue: "all_vehicles"
+                  paramValue: "all_vehicles",
                 },
                 {
                   displayValue: "Car: Business",
-                  paramValue: "UC1-Car_Business"
+                  paramValue: "UC1-Car_Business",
                 },
                 {
                   displayValue: "Car: Commute",
-                  paramValue: "UC2-Car_Commute"
+                  paramValue: "UC2-Car_Commute",
                 },
                 {
                   displayValue: "Car: Other",
-                  paramValue: "UC3-Car_Other"
+                  paramValue: "UC3-Car_Other",
                 },
                 {
                   displayValue: "LGV",
-                  paramValue: "UC4-LGV"
+                  paramValue: "UC4-LGV",
                 },
                 {
                   displayValue: "HGV",
-                  paramValue: "UC5-HGV"
+                  paramValue: "UC5-HGV",
                 },
               ],
             },
-          }
+          },
         ],
       },
     },
