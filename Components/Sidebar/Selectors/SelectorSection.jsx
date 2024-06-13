@@ -13,7 +13,11 @@ const SelectorContainer = styled.div`
 
 const NoDataParagraph = styled.p`
 `
-
+/**
+ * Checks if the geometry property is not null for each feature in the provided feature collection.
+ * @param {Object} featureCollection - The GeoJSON feature collection to be checked.
+ * @returns {boolean} Returns true if the geometry is not null for all features, otherwise false.
+ */
 function checkGeometryNotNull(featureCollection) {
   // Check if the feature collection is provided
   if (
@@ -35,6 +39,12 @@ function checkGeometryNotNull(featureCollection) {
   return true; // Return true if geometry is not null for all features
 }
 
+/**
+ * Renders a section containing filter selectors for filtering and data selection.
+ * @property {Object[]} filters - An array of filter objects containing information about the filters to be rendered.
+ * @property {Function} onFilterChange - The function called when a filter value changes.
+ * @returns {JSX.Element} The rendered SelectorSection component.
+ */
 export const SelectorSection = ({ filters, onFilterChange }) => {
   const { state } = useMapContext();
 

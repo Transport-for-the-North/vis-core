@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
 
+/**
+ * Custom hook to initialize and manage a MapLibre map.
+ * @function useMap
+ * @param {React.RefObject} mapContainerRef - Ref object pointing to the map container DOM element.
+ * @returns {Object} An object containing the map instance, map style loaded state, map loaded state, and map ready state.
+ */
 export const useMap = (mapContainerRef) => {
   const [map, setMap] = useState(null);
   const [isMapStyleLoaded, setIsMapStyleLoaded] = useState(false);
@@ -8,6 +14,9 @@ export const useMap = (mapContainerRef) => {
   const isMapReady = isMapLoaded && isMapStyleLoaded;
 
   useEffect(() => {
+    /**
+     * Initializes the MapLibre map instance.
+     */
     const initializeMap = () => {
       const mapInstance = new maplibregl.Map({
         container: mapContainerRef.current,

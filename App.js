@@ -8,6 +8,11 @@ import { Dashboard } from 'layouts';
 import { AppContext } from 'contexts';
 import { api } from 'services';
 
+/**
+ * Main application component.
+ * @function App
+ * @returns {JSX.Element} The rendered application component.
+ */
 function App() {
   const [appConfig, setAppConfig] = useState({
     ...initialAppConfig,
@@ -15,6 +20,11 @@ function App() {
   });
 
   useEffect(() => {
+    /**
+     * Fetches the Swagger definition from the API.
+     * @function fetchSwaggerDefinition
+     * @async
+     */
     const fetchSwaggerDefinition = async () => {
       try {
         const apiSchema = await api.metadataService.getSwaggerFile();

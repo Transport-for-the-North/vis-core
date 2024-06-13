@@ -27,6 +27,15 @@ const StyledButton = styled.button`
   font-family: 'Hanken Grotesk', sans-serif;
 `;
 
+/**
+ * Renders a toggle switch component for selecting between multiple options.
+ * @property {Object} filter - The filter object containing information about the toggle options.
+ * @property {Array} filter.values - An array of objects representing the possible toggle values.
+ * @property {string} filter.values[].paramValue - The parameter value associated with the option.
+ * @property {string} filter.values[].displayValue - The display value shown to the user.
+ * @property {Function} onChange - The function called when a new toggle option is selected.
+ * @returns {JSX.Element} The rendered Toggle component.
+ */
 export const Toggle = ({ filter, onChange }) => {
   const [currentButton, setCurrentButton] = useState(filter.values.values[0]);
 

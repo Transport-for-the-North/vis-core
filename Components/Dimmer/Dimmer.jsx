@@ -14,6 +14,15 @@ const Dimmed = styled.div`
   background-color: #000;
 `;
 
+/**
+ * Dimmer is a React component that renders a dimming overlay and an optional loader spinner.
+ * It is typically used to indicate loading or processing states in an application.
+ * 
+ * @component
+ * @property {boolean} dimmed - Flag indicating whether the dimming overlay should be displayed.
+ * @property {boolean} showLoader - Flag indicating whether the loader spinner should be displayed.
+ * @returns {JSX.Element|null} The rendered Dimmer component or null if not dimmed.
+ */
 export const Dimmer = ({ dimmed, showLoader }) => {
   if (!dimmed) {
     return null;

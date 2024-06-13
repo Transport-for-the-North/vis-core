@@ -6,6 +6,15 @@ const StyledDropdown = styled.select`
   margin-bottom: 10px;
 `;
 
+/**
+ * Dropdown component for selecting options.
+ * @property {Object} filter - The filter object containing values.
+ * @property {Array} filter.values - An array of values for the dropdown.
+ * @property {string} filter.values[].displayValue - The display value of the option.
+ * @property {string} filter.values[].paramValue - The parameter value of the option.
+ * @property {Function} onChange - The function called when a new option is selected.
+ * @returns {JSX.Element} The Dropdown component.
+ */
 export const Dropdown = ({ filter, onChange }) => {
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;

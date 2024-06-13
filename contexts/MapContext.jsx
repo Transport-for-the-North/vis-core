@@ -16,6 +16,12 @@ const initialState = {
   isLoading: true
 };
 
+/**
+ * MapProvider component to manage map-related state and context.
+ * @function MapProvider
+ * @property {React.ReactNode} children - Child components to be wrapped by the context provider.
+ * @returns {JSX.Element} The map context provider component.
+ */
 export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);

@@ -10,6 +10,13 @@ right : 25px;
 bottom : 100px;
 `;
 
+/**
+ * Renders a lateral navigation bar component.
+ * @param {Object} props - The props for the LateralNavbar component.
+ * @property {string} props.className - The class name for styling the component.
+ * @property {Function} props.onClick - The function to handle click events.
+ * @returns {JSX.Element} The rendered LateralNavbar component.
+ */
 export function LateralNavbar(props) {
   const location = useLocation();
   const [activeLink, setActiveLink] = useState("");
