@@ -1,4 +1,11 @@
 class BaseService {
+  /**
+   * Creates an instance of BaseService.
+   * @constructor
+   * @param {Object} [config={ pathPrefix: "" }] - The configuration object.
+   * @property {string} config.pathPrefix - The prefix to be added to the path.
+   * @property {string} [config.pathPostfix] - The postfix to be added to the path.
+   */
   constructor(config = { pathPrefix: "" }) {
     const postFix = config?.pathPostfix ?? ""
     switch(process.env.REACT_APP_PROD_OR_DEV) {
@@ -30,6 +37,11 @@ class BaseService {
     
   }
 
+  /**
+   * Builds the full URL using the base URL, path prefix, and provided path.
+   * @param {string} path - The path to be appended to the base URL.
+   * @returns {string} The full URL.
+   */
   _buildUrl(path) {
     let url = this._apiBaseUrl;
     if (this._pathPrefix) url += `/${this._pathPrefix}`;
@@ -37,12 +49,24 @@ class BaseService {
     return url;
   }
 
+  /**
+   * Builds a query string from a dictionary of query parameters.
+   *
+   * @param {Object} [queryDict={}] - The dictionary of query parameters.
+   * @returns {string} The query string.
+   */
   _buildQuery(queryDict = {}) {
     const tokens = this._makeParamTokens(
       ...this._splitDuplicateAndNonDuplicateParams(queryDict))
     return tokens.map(([param, value]) => `${param}=${value}`).join("&");
   }
 
+  /**
+   * Splits the query parameters into duplicate and non-duplicate parameters.
+   *
+   * @param {Object} queryDict - The dictionary of query parameters.
+   * @returns {Array} An array containing two dictionaries: one for non-duplicate parameters and one for duplicate parameters.
+   */
   _splitDuplicateAndNonDuplicateParams(queryDict) {
     const duplicateParams = Object.fromEntries(Object.entries(queryDict)
       .filter(([_, value]) => Array.isArray(value)));
@@ -51,6 +75,13 @@ class BaseService {
     return [nonDuplicateParams, duplicateParams]
   }
 
+  /**
+   * Creates an array of parameter tokens from the non-duplicate and duplicate parameters.
+   *
+   * @param {Object} [nonDuplicateParams={}] - The dictionary of non-duplicate parameters.
+   * @param {Object} [duplicateParams={}] - The dictionary of duplicate parameters.
+   * @returns {Array} An array of parameter tokens.
+   */
   _makeParamTokens(nonDuplicateParams = {}, duplicateParams = {}) {
     const tokens = []
     Object.entries(nonDuplicateParams)
@@ -60,6 +91,13 @@ class BaseService {
     return tokens;
   }
 
+  /**
+   * Makes a GET request to the specified path with additional options.
+   *
+   * @param {string} path - The path for the GET request.
+   * @param {Object} [addOptions={}] - Additional options for the fetch request.
+   * @returns {Promise<Object>} The response data.
+   */
   async _get(path, addOptions = {}) {
     const url = this._buildUrl(path);
     const jwtToken = process.env.REACT_APP_TAME_WEB_API_JWT;
@@ -84,6 +122,14 @@ class BaseService {
     return data;
   }
 
+  /**
+   * Makes a GET request to the specified sub-path with query parameters.
+   *
+   * @param {string} [subPath=""] - The sub-path for the GET request.
+   * @param {Object} [options={}] - Additional options, including query parameters.
+   * @property {Object} [options.queryParams={}] - The query parameters for the GET request.
+   * @returns {Promise<Object>} The response data.
+   */
   async get(subPath = "", options = { queryParams: {} }) {
     const params = this._buildQuery(options?.queryParams);
     const path = `${subPath}?${params}`;
