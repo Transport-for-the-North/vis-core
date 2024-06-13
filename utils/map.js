@@ -45,11 +45,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     colors.push(colours[i]);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
-  console.log(style);
   switch (style) {
     case "polygon-diverging":
     case "polygon-continuous" : {
-      console.log(colors);
       return {
         "fill-color": [
           "interpolate",
@@ -79,16 +77,8 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "fill-opacity": opacityValue ?? 0.65,
       };
     case "line-continuous":
-      console.log(colors);
       return {
-        "line-color": [
-          "case",
-          ["<", ["feature-state", "value"], 0],
-          "rgba(255, 0, 0, 1)", // Red for negative values
-          [">", ["feature-state", "value"], 0],
-          "rgba(0, 0, 255, 1)", // Blue for positive values
-          "rgba(0, 0, 0, 0.0)", // Make zero invisible
-        ],
+        "line-color": "rgba(0, 0, 255, 1)",
         "line-width": [
           "interpolate",
           ["linear"],
@@ -104,24 +94,25 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
       return {
         "line-color": [
           "case",
-          ["==", ["feature-state", "value"], null],
-          colours[4],
-          ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
+          ["<", ["feature-state", "value"], 0],
+          "rgba(255, 0, 0, 1)", // Red for negative values
+          [">", ["feature-state", "value"], 0],
+          "rgba(0, 0, 255, 1)",
+          "rgba(0, 0, 0, 1)",
         ],
         "line-width": [
           "interpolate",
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
-          0.1,
+          Math.min(...bins),
           0.1, // Line width starts at 1 at the value of 0
           Math.max(...bins),
-          20,
+          15,
         ],
         "line-opacity": 1,
       };
     case "circle-continuous":
     case "circle-diverging": {
-      console.log(colors);
       return {
         "circle-color": 
           ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
@@ -190,6 +181,7 @@ export const reclassifyData = (data, style) => {
     let roundedBins = roundValues(unroundedBins, 2);
     // Remove any 0's in roundedBins.
     roundedBins = roundedBins.filter((value) => value !== 0)
+    if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
     console.log("Bins calculated for diverging data");
     return [...negativeBins, 0, ...roundedBins];

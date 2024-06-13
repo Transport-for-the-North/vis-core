@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { numberWithCommas, roundValue } from 'utils';
+import { forEach } from "lodash";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { numberWithCommas, roundValue } from "utils";
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -41,7 +42,7 @@ const ColorSwatch = styled.div`
 const WidthSwatch = styled.div`
   width: 50px;
   height: ${(props) => props.width}px;
-  background-color: ${(props) => props.color?? "#333" };
+  background-color: ${(props) => props.color ?? "#333"};
   margin-right: 8px;
 `;
 
@@ -67,27 +68,46 @@ const LegendLabel = styled.span`
  */
 const interpretColorExpression = (expression) => {
   if (!expression) return null;
-  if (typeof expression === 'string') {
+  if (typeof expression === "string") {
     // Simple color value
-    return [{ color: expression }];
+    return null;
   } else if (Array.isArray(expression)) {
     // Handle different types of expressions
     switch (expression[0]) {
-      case 'interpolate':
-      case 'step':
+      case "interpolate":
+      case "step":
         // Extract stops from the expression
         const stops = expression.slice(3);
         const colorStops = [];
         for (let i = 0; i < stops.length; i += 2) {
-          colorStops.push({ value: numberWithCommas(stops[i]), color: stops[i + 1] });
+          colorStops.push({
+            value: numberWithCommas(stops[i]),
+            color: stops[i + 1],
+          });
         }
         return colorStops;
-      case 'match':
+      case "case":
+        // Extract pairs of case values and colors
+        const caseValues = expression.slice(2);
+        caseValues.splice(1, 1);
+        const stop = [-1, 1, 0];
+        const caseColorStops = [];
+        forEach(caseValues, (value, index) => {
+          caseColorStops.push({
+            value: stop[index],
+            color: value,
+          });
+        });
+        return caseColorStops;
+      case "match":
         // Extract pairs of match values and colors
         const matchValues = expression.slice(2, -1);
         const matchColorStops = [];
         for (let i = 0; i < matchValues.length; i += 2) {
-          matchColorStops.push({ value: matchValues[i], color: matchValues[i + 1] });
+          matchColorStops.push({
+            value: matchValues[i],
+            color: matchValues[i + 1],
+          });
         }
         return matchColorStops;
       default:
@@ -96,7 +116,6 @@ const interpretColorExpression = (expression) => {
   }
   return null;
 };
-
 
 /**
  * Interprets a width expression from a map style specification and calculates
@@ -109,33 +128,41 @@ const interpretColorExpression = (expression) => {
  */
 const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
   if (!expression) return null;
-  if (typeof expression === 'number') {
+  if (typeof expression === "number") {
     // Simple width value
     return [{ width: expression }];
   } else if (Array.isArray(expression)) {
     // Handle different types of expressions
     switch (expression[0]) {
-      case 'interpolate':
-      case 'step':
+      case "interpolate":
+      case "step":
         // Extract stops from the expression
         const baseStops = expression.slice(3);
         const widthStops = [];
         for (let i = 0; i < baseStops.length; i += 2) {
           const baseValue = baseStops[i];
           const baseWidth = baseStops[i + 1];
-          widthStops.push({ value: numberWithCommas(roundValue(baseValue)), width: baseWidth });
+          widthStops.push({
+            value: numberWithCommas(roundValue(baseValue)),
+            width: baseWidth,
+          });
 
           // Calculate intermediate stops if there is a next stop
           if (i + 2 < baseStops.length) {
             const nextValue = baseStops[i + 2];
             const nextWidth = baseStops[i + 3];
-            const valueIncrement = (nextValue - baseValue) / (numInterpolatedStops + 1);
-            const widthIncrement = (nextWidth - baseWidth) / (numInterpolatedStops + 1);
+            const valueIncrement =
+              (nextValue - baseValue) / (numInterpolatedStops + 1);
+            const widthIncrement =
+              (nextWidth - baseWidth) / (numInterpolatedStops + 1);
 
             for (let j = 1; j <= numInterpolatedStops; j++) {
               const interpolatedValue = baseValue + valueIncrement * j;
               const interpolatedWidth = baseWidth + widthIncrement * j;
-              widthStops.push({ value: numberWithCommas(roundValue(interpolatedValue)), width: interpolatedWidth });
+              widthStops.push({
+                value: numberWithCommas(roundValue(interpolatedValue)),
+                width: interpolatedWidth,
+              });
             }
           }
         }
@@ -146,7 +173,6 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
   }
   return null;
 };
-
 
 /**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
@@ -182,50 +208,83 @@ export const DynamicLegend = ({ map }) => {
           const title = layer.id;
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
-            paintProps['line-color']?.[3] || paintProps['line-color'] || paintProps['circle-color'] || paintProps['fill-color']
+            paintProps["line-color"] ||
+              paintProps["circle-color"] ||
+              paintProps["fill-color"]
           );
-          const widthStops = interpretWidthExpression(
-            paintProps['line-width']
-          );
+          const widthStops = interpretWidthExpression(paintProps["line-width"]);
           return { title, colorStops, widthStops };
         });
       setLegendItems(items);
     };
 
-    map.on('styledata', updateLegend);
+    map.on("styledata", updateLegend);
 
     return () => {
-      map.off('styledata', updateLegend);
+      map.off("styledata", updateLegend);
     };
   }, [map]);
 
   if (legendItems.length === 0) {
-    return null
-  };
+    return null;
+  }
 
   return (
     <LegendContainer>
       {legendItems.map((item, index) => (
         <div key={index}>
           <LegendTitle>{item.title}</LegendTitle>
-          {item.colorStops && !item.widthStops && item.colorStops.map((stop, idx) => (
-            <LegendItem key={idx}>
-              <ColorSwatch color={stop.color} />
-              <LegendLabel>{stop.value !== undefined ? `${stop.value}` : 'Color'}</LegendLabel>
-            </LegendItem>
-          ))}
-          {item.widthStops && !item.colorStops && item.widthStops.map((stop, idx) => (
-            <LegendItem key={idx}>
-              <WidthSwatch width={stop.width} />
-              <LegendLabel>{stop.value !== undefined ? `${stop.value}` : 'Width'}</LegendLabel>
-            </LegendItem>
-          ))}
-          {item.widthStops && item.colorStops && item.widthStops.map((stop, idx) => (
-            <LegendItem key={idx}>
-              <WidthSwatch width={stop.width} color={item.colorStops[idx].color} />
-              <LegendLabel>{stop.value !== undefined ? `${stop.value}` : 'Width'}</LegendLabel>
-            </LegendItem>
-          ))}
+          {item.colorStops &&
+            !item.widthStops &&
+            item.colorStops.map((stop, idx) => (
+              <LegendItem key={idx}>
+                <ColorSwatch color={stop.color} />
+                <LegendLabel>
+                  {stop.value !== undefined ? `${stop.value}` : "Color"}
+                </LegendLabel>
+              </LegendItem>
+            ))}
+          {item.widthStops &&
+            !item.colorStops &&
+            item.widthStops.map((stop, idx) => (
+              <LegendItem key={idx}>
+                <WidthSwatch width={stop.width} />
+                <LegendLabel>
+                  {stop.value !== undefined ? `${stop.value}` : "Width"}
+                </LegendLabel>
+              </LegendItem>
+            ))}
+          {item.widthStops && item.colorStops && (
+            <>
+              {item.widthStops
+                .reduceRight((acc, stop) => {
+                  acc.push(stop);
+                  return acc;
+                }, [])
+                .map((stop, idx) => (
+                  <LegendItem key={idx}>
+                    <WidthSwatch
+                      width={stop.width}
+                      color={item.colorStops[0].color}
+                    />
+                    <LegendLabel>
+                      {stop.value !== undefined ? `${stop.value}` : "Width"}
+                    </LegendLabel>
+                  </LegendItem>
+                ))}
+              {item.widthStops.slice(1).map((stop, idx) => (
+                <LegendItem key={idx}>
+                  <WidthSwatch
+                    width={stop.width}
+                    color={item.colorStops[1].color}
+                  />
+                  <LegendLabel>
+                    {stop.value !== undefined ? `${stop.value}` : "Width"}
+                  </LegendLabel>
+                </LegendItem>
+              ))}
+            </>
+          )}
         </div>
       ))}
     </LegendContainer>
