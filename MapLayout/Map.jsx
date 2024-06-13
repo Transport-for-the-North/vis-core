@@ -253,12 +253,17 @@ const Map = () => {
     const feature = map.queryRenderedFeatures(bufferdPoint, {
       layers: [layerId],
     });
-    const coordinates = e.lngLat;
-    const description = `<p>${feature[0].properties.name}</p><p>Value : ${feature[0].state.value?? 0}</p>`;
-    new maplibregl.Popup()
-      .setLngLat(coordinates)
-      .setHTML(description)
-      .addTo(map)
+    if (feature.length !== 0) {
+      const coordinates = e.lngLat;
+      const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+        feature[0].state.value ?? 0
+      }</p>`;
+      const newPopup = new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+      popups.push(newPopup);
+    }
   };
 
   /**
