@@ -239,9 +239,18 @@ const Map = () => {
    * Handles click events on a layer and displays a popup with information about the clicked feature.
    * @property {Object} e - The event object containing information about the click event.
    * @property {string} layerId - The ID of the layer being clicked.
+   * @property {number} bufferSize - The size of the buffer around the click point for querying features.
    */
-  const handleLayerClick = (e, layerId) => {
-    const feature = map.queryRenderedFeatures(e.point, { 
+  const handleLayerClick = (e, layerId, bufferSize) => {
+    if (popups.length !== 0) {
+      popups.map((popup) => popup.remove());
+      popups.length = 0;
+    }
+    const bufferdPoint = [
+      [e.point.x - bufferSize, e.point.y - bufferSize],
+      [e.point.x + bufferSize, e.point.y + bufferSize],
+    ];
+    const feature = map.queryRenderedFeatures(bufferdPoint, {
       layers: [layerId],
     });
     const coordinates = e.lngLat;
