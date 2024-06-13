@@ -45,6 +45,14 @@ const OpacitySlider = styled.input`
   margin-right: 10px;
 `;
 
+/**
+ * A memoized component representing a single layer control entry in a map layer control panel.
+ * @property {object} layer - The layer object containing information about the map layer.
+ * @property {object} map - The map object on which the layer is rendered.
+ * @property {string} defaultColor - The default color for the layer.
+ * @property {Function} handleColorChange - The function to handle color changes for the layer.
+ * @returns {JSX.Element} The LayerControlEntry component.
+ */
 const LayerControlEntry = memo(
   ({ layer, map, defaultColor, handleColorChange }) => {
     // Fetch the current paint properties for 'fill-opacity' if the layer is already on the map
@@ -125,21 +133,18 @@ const LayerControlEntry = memo(
 );
 
 /**
- * MapLayerSection component is responsible for rendering the layer controls
- * for the map. It allows users to toggle the visibility and adjust the opacity
- * of map layers.
- *
- * Props:
- * - map: A reference to the map instance.
- * - layers: An array of layer objects that the component will use to create
- *   controls for each layer.
+ * Component representing a section for controlling map layers.
+ * @property {Function} handleColorChange - The function to handle color changes for the layers.
+ * @returns {JSX.Element} The MapLayerSection component.
  */
 export const MapLayerSection = ({ handleColorChange }) => {
   const { state } = useMapContext();
   const { map } = state;
   const [layers, setLayers] = useState([]);
 
-
+  /**
+   * Updates the layers based on the current map style.
+   */
   const updateLayers = useCallback(() => {
     const newLayers = map.getStyle().layers;
     // Perform deep comparison to check if layers have actually changed

@@ -4,6 +4,14 @@ import parse from "html-react-parser";
 import "./HomePage.styles.css";
 import { AppContext } from 'contexts';
 
+/**
+ * HomePage component represents the main landing page of the application.
+ * It displays information retrieved from the AppContext such as title, introduction, background,
+ * and contact details.
+ * 
+ * @component
+ * @returns {JSX.Element} The JSX element representing the HomePage.
+ */
 export const HomePage = () => {
   const appContext = useContext(AppContext);
   

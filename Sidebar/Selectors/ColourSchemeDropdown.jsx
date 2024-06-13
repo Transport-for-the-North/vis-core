@@ -31,6 +31,13 @@ const colourStyles = {
   },
 };
 
+/**
+ * Dropdown component for selecting color schemes.
+ * @property {string} colorStyle - The selected color style.
+ * @property {Function} handleColorChange - Function to handle color change.
+ * @property {string} layerName - The name of the layer.
+ * @returns {JSX.Element} The ColourSchemeDropdown component.
+ */
 export const ColourSchemeDropdown = ({
   colorStyle,
   handleColorChange,
@@ -38,6 +45,12 @@ export const ColourSchemeDropdown = ({
 }) => {
   const animatedComponents = makeAnimated();
 
+  /**
+   * Custom formatting for option label to include color swatches.
+   * @property {string} value - The value of the option.
+   * @property {string} label - The label of the option.
+   * @returns {JSX.Element} The formatted option label.
+   */
   const formatOptionLabel = ({ value, label }) => (
     <div style={{ display: "flex", alignItems: "center" }}>
       <div>{label}</div>
