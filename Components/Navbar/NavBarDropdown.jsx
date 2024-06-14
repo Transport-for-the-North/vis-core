@@ -1,103 +1,91 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Grow from '@mui/material/Grow';
-import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
-import MenuItem from '@mui/material/MenuItem';
-import MenuList from '@mui/material/MenuList';
-import Stack from '@mui/material/Stack';
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 import "./Navbar.styles.css";
 
+const DropdownContainer = styled.div`
+  position: relative;
+  display: inline-block;
+  font-family: var(--standardFontFamily);
+  font-size: larger;
+  color: #4b3e91;
+  text-decoration: 0;
+  width: 18%;
+  max-width: 270px;
+  text-align: center;
+  cursor: pointer;
+`;
+
+const DropdownMenu = styled.div`
+  display: ${(props) => (props.open ? "block" : "none")};
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+`;
+
+const DropdownItem = styled(Link)`
+  width: 100%;
+  padding: 12px 0px;
+  text-decoration: none;
+  display: block;
+  &:hover {
+    background-color: "#f1f1f1";
+  }
+    border-radius:2px;
+`;
+
 export function NavBarDropdown(props) {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
   const handleClose = (event) => {
-    console.log(anchorRef.current);
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
-
     setOpen(false);
   };
 
-  function handleListKeyDown(event) {
-    if (event.key === 'Tab') {
-      event.preventDefault();
-      setOpen(false);
-    } else if (event.key === 'Escape') {
-      setOpen(false);
-    }
-  }
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (anchorRef.current && !anchorRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
 
-  // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open);
-  React.useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current.focus();
-    }
+    document.addEventListener("click", handleOutsideClick);
 
-    prevOpen.current = open;
-  }, [open]);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
 
   return (
-    <Stack direction="row" spacing={2}>
-      <div>
-        <Button
-          ref={anchorRef}
-          onClick={handleToggle}
-          onMouseOver={handleToggle}
-        >
-          {props.dropdownName}
-        </Button>
-        <Popper
-          open={open}
-          anchorEl={anchorRef.current}
-          role={undefined}
-          placement="bottom-start"
-          transition
-          disablePortal
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{
-                transformOrigin:
-                  placement === 'bottom-start' ? 'left top' : 'left bottom',
-              }}
-            >
-              <Paper>
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList
-                    autoFocusItem={open}
-                    onKeyDown={handleListKeyDown}
-                  >
-                    {props.dropdownItems.map((page) => (
-                        <MenuItem onClick={handleClose}>
-                            <Link
-                                key={page.pageName}
-                                className={
-                                    props.activeLink === page.url ? "ActiveNavButton" : "NavButton"
-                                }
-                                to={page.url}
-                                >
-                                {page.pageName}
-                                </Link>
-                        </MenuItem>
-                    ))}
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
-      </div>
-    </Stack>
+    <DropdownContainer
+      ref={anchorRef}
+      onClick={handleToggle}
+      onMouseEnter={() => setOpen(true)}
+    >
+      {props.dropdownName}
+      <DropdownMenu onMouseLeave={handleToggle} open={open}>
+        {props.dropdownItems.map((page) => (
+          <DropdownItem
+            key={page.pageName}
+            className={
+              props.activeLink === page.url ? "ActiveNavButton" : "NavButton"
+            }
+            to={page.url}
+            onClick={handleClose}
+          >
+            {page.pageName}
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </DropdownContainer>
   );
 }
