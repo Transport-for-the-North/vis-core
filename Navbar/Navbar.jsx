@@ -69,7 +69,6 @@ export function Navbar() {
         
         {appContext.appPages.map((page) => {
           if (page.parent === null) {
-            console.log(page);
             if (
               appContext.appPages.some(
                 (pageToTest) => pageToTest.parent === page.pageName
