@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -7,7 +7,7 @@ import { AppContext } from "contexts";
 import { Button } from "./Button";
 import { LateralNavbar } from "./LateralNavbar";
 import { Logo } from "./Logo";
-import NavBarDropdown from "./NavBarDropdown";
+import { NavBarDropdown } from "./NavBarDropdown";
 import "./Navbar.styles.css";
 
 const StyledNavbar = styled.nav`
@@ -54,27 +54,41 @@ export function Navbar() {
 
   const handleLogout = () => {
     //TODO : Add the logout behavior
-  }
+  };
 
   useEffect(() => {
     setActiveLink(location.pathname);
     if (sideNavOpen === "sideNavbar-shown") updateMenu();
   }, [location]);
 
-  const nohamItems = [];
-
   return (
     <>
       <StyledNavbar className="navbar">
         <Logo className="logoNav" onClick={() => onClick("/")} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
-
-        {appContext.appPages.map((page) => (
-          
-          (() => {
-            if(page.navBarDropdown === null) {
+        
+        {appContext.appPages.map((page) => {
+          if (page.parent === null) {
+            console.log(page);
+            if (
+              appContext.appPages.some(
+                (pageToTest) => pageToTest.parent === page.pageName
+              )
+            ) {
+              const dropdownItems = appContext.appPages.filter(
+                (pageToTest) => pageToTest.parent === page.pageName
+              );
               return (
-                  <Link
+                <NavBarDropdown
+                  key={page.pageName}
+                  dropdownItems={dropdownItems}
+                  activeLink={activeLink}
+                  dropdownName={page.pageName}
+                />
+              );
+            } else {
+              return (
+                <Link
                   key={page.pageName}
                   className={
                     activeLink === page.url ? "ActiveNavButton" : "NavButton"
@@ -83,26 +97,21 @@ export function Navbar() {
                 >
                   {page.pageName}
                 </Link>
-              )
-            } else if (page.navBarDropdown == 'NoHAM') {
-              nohamItems.push(page);
+              );
             }
-          })() 
-        ))}
-        
-        <NavBarDropdown dropdownItems={nohamItems} activeLink={activeLink} dropdownName="NoHAM" />     
-
+          } else {
+            return null;
+          }
+        })}
         <Button
           className="navbarMobile"
           src="/img/burgerIcon.png"
           alt="Burger Button Navbar"
           onClick={updateMenu}
         />
-        <StyledLogout src="/img/logout.png" onClick={() => handleLogout}/>
+        <StyledLogout src="/img/logout.png" onClick={() => handleLogout} />
       </StyledNavbar>
       <div className="empty-blank-nav"></div>
     </>
   );
-
 }
-
