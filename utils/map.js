@@ -49,7 +49,8 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     colorObject.push({ value: bins[i], color: colours[i] });
   }
   switch (style) {
-    case "polygon-continuous" || "polygon-diverging":
+    case "polygon-diverging":
+    case "polygon-continuous" : {
       return {
         "fill-color": [
           "interpolate",
@@ -65,6 +66,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         ],
         "fill-outline-color": "rgba(255, 255, 0, 0)",
       };
+    }
     case "polygon-categorical":
       // Assuming 'bins' is an array of category values and 'colours' is an array of corresponding colors
       let categoricalColors = [];
@@ -79,14 +81,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
       };
     case "line-continuous":
       return {
-        "line-color": [
-          "case",
-          ["<", ["feature-state", "value"], 0],
-          "rgba(255, 0, 0, 1)", // Red for negative values
-          [">", ["feature-state", "value"], 0],
-          "rgba(0, 0, 255, 1)", // Blue for positive values
-          "rgba(0, 0, 0, 0.0)", // Make zero invisible
-        ],
+        "line-color": "rgba(0, 0, 255, 1)",
         "line-width": [
           "interpolate",
           ["linear"],
@@ -102,26 +97,28 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
       return {
         "line-color": [
           "case",
-          ["==", ["feature-state", "value"], null],
-          colours[4],
-          ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
+          ["<", ["feature-state", "value"], 0],
+          "rgba(255, 0, 0, 1)", // Red for negative values
+          [">", ["feature-state", "value"], 0],
+          "rgba(0, 0, 255, 1)",
+          "rgba(0, 0, 0, 1)",
         ],
         "line-width": [
           "interpolate",
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
-          0.1,
+          Math.min(...bins),
           0.1, // Line width starts at 1 at the value of 0
           Math.max(...bins),
-          20,
+          15,
         ],
         "line-opacity": 1,
       };
-    case "circle-continuous" || "circle-diverging": {
+    case "circle-continuous":
+    case "circle-diverging": {
       return {
-        "circle-color": [
-          ["interpolate", ["linear"], ["get", "value"], ...colors],
-        ],
+        "circle-color": 
+          ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
         "circle-stroke-width": [
           "case",
           ["in", ["feature-state", "value"], ["literal", [0, null]]],
@@ -132,15 +129,18 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           "case",
           ["in", ["feature-state", "value"], ["literal", [0, null]]],
           0.0,
-          1.0,
+          0.65,
         ],
-        "circle-radius": [
-          "interpolate",
+        "circle-radius": 
+          ["interpolate",
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
-          ...colors,
+          0,
+          0, // Line width starts at 1 at the value of 0
+          Math.max(...bins),
+          20,
         ],
-        "circle-stroke-color": ["#000000"],
+        "circle-stroke-color": "#000000"
       };
     }
     default:
@@ -172,7 +172,7 @@ export const reclassifyData = (data, style) => {
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
     console.log("Bins recalculated for continuous data");
-    const unroundedBins = chroma.limits(values, "q", 8);
+    const unroundedBins = chroma.limits(values, "e", 8);
     const roundedBins = roundValues(unroundedBins, 2);
     return roundedBins;
   } else if (style.includes("categorical")) {
@@ -180,8 +180,11 @@ export const reclassifyData = (data, style) => {
     return;
   } else if (style.includes("diverging")) {
     const absValues = data.map((value) => Math.abs(value.value));
-    const unroundedBins = chroma.limits(absValues, "q", 3);
+    const unroundedBins = chroma.limits(absValues, "e", 3);
     let roundedBins = roundValues(unroundedBins, 2);
+    // Remove any 0's in roundedBins.
+    roundedBins = roundedBins.filter((value) => value !== 0)
+    if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
     console.log("Bins calculated for diverging data");
     return [...negativeBins, 0, ...roundedBins];

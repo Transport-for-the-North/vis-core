@@ -25,7 +25,6 @@ const AccordionIcon = styled.span`
 `;
 
 const AccordionContent = styled.div`
-  max-height: ${({ $isOpen }) => ($isOpen ? '1000px' : '0')};
   overflow: hidden;
   transition: max-height 0.3s ease, padding 0.3s ease;
   padding: ${({ $isOpen }) => ($isOpen ? '15px' : '0')} 20px;

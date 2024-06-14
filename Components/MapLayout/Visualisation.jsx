@@ -17,7 +17,6 @@ import { colorSchemes, reclassifyData, createPaintProperty, reclassifyGeoJSONDat
  */
 const fetchDataForVisualisation = debounce(
   async (visualisation, dispatch, setLoading) => {
-    console.log("sucess");
     if (visualisation && visualisation.queryParams) {
       setLoading(true);
       const path = visualisation.dataPath;
