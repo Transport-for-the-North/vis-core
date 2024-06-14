@@ -21,6 +21,7 @@ const DropdownMenu = styled.div`
   position: absolute;
   background-color: #f9f9f9;
   min-width: 160px;
+  width: 100%;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 `;
@@ -30,10 +31,11 @@ const DropdownItem = styled(Link)`
   padding: 12px 0px;
   text-decoration: none;
   display: block;
+  font-size: large;
+  border-radius:2px;
   &:hover {
-    background-color: "#f1f1f1";
+    background-color:${(props) => (props.activeLink ? "none" : "#f1f1f1")} ;
   }
-    border-radius:2px;
 `;
 
 export function NavBarDropdown(props) {
@@ -81,6 +83,7 @@ export function NavBarDropdown(props) {
             }
             to={page.url}
             onClick={handleClose}
+            activeLink={props.activeLink===page.url}
           >
             {page.pageName}
           </DropdownItem>

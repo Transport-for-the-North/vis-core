@@ -66,7 +66,6 @@ export function Navbar() {
       <StyledNavbar className="navbar">
         <Logo className="logoNav" onClick={() => onClick("/")} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
-        
         {appContext.appPages.map((page) => {
           if (page.parent === null) {
             if (
@@ -77,6 +76,7 @@ export function Navbar() {
               const dropdownItems = appContext.appPages.filter(
                 (pageToTest) => pageToTest.parent === page.pageName
               );
+              dropdownItems.unshift(page)
               return (
                 <NavBarDropdown
                   key={page.pageName}
@@ -102,6 +102,7 @@ export function Navbar() {
             return null;
           }
         })}
+
         <Button
           className="navbarMobile"
           src="/img/burgerIcon.png"
