@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 import { Link } from "react-router-dom";
 import "./Navbar.styles.css";
 
-export default function NavBarDropdown(props) {
+export function NavBarDropdown(props) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
@@ -52,6 +52,7 @@ export default function NavBarDropdown(props) {
         <Button
           ref={anchorRef}
           onClick={handleToggle}
+          onMouseOver={handleToggle}
         >
           {props.dropdownName}
         </Button>
