@@ -51,6 +51,14 @@
   transition: left 0.5s ease-out;
 }
 
+.LatButton{
+  display: none;
+}
+
+.ActiveLatButton{
+  display: none;
+}
+
 @media only screen and (max-width: 765px) {
   .NavButton {
     display: none;
