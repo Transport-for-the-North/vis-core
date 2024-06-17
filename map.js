@@ -120,7 +120,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           "case",
           ["in", ["feature-state", "value"], ["literal", [0, null]]],
           0.0,
-          1.0,
+          0.8,
         ],
         "circle-opacity": [
           "case",
@@ -133,9 +133,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           0,
-          0, // Line width starts at 1 at the value of 0
+          2, // Line width starts at 1 at the value of 0
           Math.max(...bins),
-          20,
+          25,
         ],
         "circle-stroke-color": "#000000"
       };
