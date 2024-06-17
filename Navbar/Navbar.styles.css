@@ -15,7 +15,7 @@
   font-family: var(--standardFontFamily);
   font-size: larger;
   text-decoration: 0;
-  width: 18%;
+  width: 12%;
   max-width: 270px;
   text-align: center;
 }
@@ -27,7 +27,7 @@
   font-family: var(--standardFontFamily);
   font-size: larger;
   text-decoration: 0;
-  width: 18%;
+  width: 12%;
   max-width: 270px;
   text-align: center;
   height: 100%;
@@ -51,12 +51,28 @@
   transition: left 0.5s ease-out;
 }
 
-.LatButton{
+.LatButton {
   display: none;
 }
 
-.ActiveLatButton{
+.ActiveLatButton {
   display: none;
+}
+@media only screen and (max-width: 1165px) {
+  .ActiveNavButton {
+    font-size: large;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 5px;
+  }
+
+  .NavButton {
+    font-size: large;
+  }
+}
+@media only screen and (max-width: 930px) {
+  .NavButton {
+    width: 10%;
+  }
 }
 
 @media only screen and (max-width: 765px) {

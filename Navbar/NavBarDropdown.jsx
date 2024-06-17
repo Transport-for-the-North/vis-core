@@ -8,12 +8,23 @@ const DropdownContainer = styled.div`
   display: inline-block;
   font-family: var(--standardFontFamily);
   font-size: larger;
-  color: #4b3e91;
   text-decoration: 0;
-  width: 18%;
+  width: 12%;
   max-width: 270px;
   text-align: center;
   cursor: pointer;
+
+  @media only screen and (max-width: 1165px) {
+    font-size: large;
+  }
+
+  @media only screen and (max-width: 930px) {
+    width: 10%;
+  }
+
+  @media only screen and (max-width: 765px) {
+    display: none;
+  }
 `;
 
 const DropdownMenu = styled.div`
@@ -24,6 +35,7 @@ const DropdownMenu = styled.div`
   width: 100%;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  border-radius: 2px;
 `;
 
 const DropdownItem = styled(Link)`
@@ -32,9 +44,9 @@ const DropdownItem = styled(Link)`
   text-decoration: none;
   display: block;
   font-size: large;
-  border-radius:2px;
+  border-radius: 2px;
   &:hover {
-    background-color:${(props) => (props.activeLink ? "none" : "#f1f1f1")} ;
+    background-color: ${(props) => (props.$activeLink ? "none" : "#f1f1f1")};
   }
 `;
 
@@ -70,8 +82,8 @@ export function NavBarDropdown(props) {
   return (
     <DropdownContainer
       ref={anchorRef}
-      onClick={handleToggle}
-      onMouseEnter={() => setOpen(true)}
+      className="NavButton"
+      onMouseOver={()=> setOpen(true)}
     >
       {props.dropdownName}
       <DropdownMenu onMouseLeave={handleToggle} open={open}>
@@ -83,7 +95,7 @@ export function NavBarDropdown(props) {
             }
             to={page.url}
             onClick={handleClose}
-            activeLink={props.activeLink===page.url}
+            $activeLink={props.activeLink === page.url}
           >
             {page.pageName}
           </DropdownItem>
