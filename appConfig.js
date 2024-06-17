@@ -23,7 +23,7 @@ export const appConfig = {
       about:
         "<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone in the map.</p> <p>The <b>base</b> timetable refers to buses which were scheduled. </p> <p>The <b>adjusted</b> timetable refers to buses which actually ran.</p>",
       type: "MapLayout",
-      parent: null,
+      category: null,
       config: {
         layers: [
           {
@@ -155,7 +155,7 @@ export const appConfig = {
       url: "/bus-accessibility",
       type: "MapLayout",
       about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
-      parent: null,
+      category: null,
       config: {
         layers: [
           {
@@ -289,7 +289,7 @@ export const appConfig = {
       pageName: "Link",
       url: "/noham-links",
       type: "MapLayout",
-      parent: null,
+      category: "Links",
       config: {
         layers: [
           {
@@ -506,7 +506,7 @@ export const appConfig = {
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      parent: "Link",
+      category: "Links",
       config: {
         layers: [
           {
@@ -839,7 +839,7 @@ export const appConfig = {
       url: "/node-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      parent: "Link",
+      category: "Nodes",
       config: {
         layers: [
           {
@@ -897,7 +897,7 @@ export const appConfig = {
       url: "/zone-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      parent: "Link",
+      category: "Zones",
       config: {
         layers: [
           {
@@ -1077,7 +1077,7 @@ export const appConfig = {
       url: "/zonal-pair-difference",
       about: "",
       type: "MapLayout",
-      parent: "Link",
+      category: "Matrix",
       config: {
         layers: [
           {
@@ -1476,7 +1476,7 @@ export const appConfig = {
       pageName: "Link Results",
       url: "/link-results",
       type: "MapLayout",
-      parent: "Link",
+      category: "Links",
       about: "", //To be added.
       config: {
         layers: [
@@ -1697,7 +1697,7 @@ export const appConfig = {
       pageName: "Node Results",
       url: "/node-results",
       type: "MapLayout",
-      parent: "Link",
+      category: "Nodes",
       about: "", //To be added.
       config: {
         layers: [
@@ -1869,7 +1869,7 @@ export const appConfig = {
       pageName: "Zone Results",
       url: "/zone-results",
       type: "MapLayout",
-      parent: "Link",
+      category: "Zones",
       about: "", //To be added.
       config: {
         layers: [
@@ -1999,7 +1999,7 @@ export const appConfig = {
       url: "/zonal-pair-results",
       about: "",
       type: "MapLayout",
-      parent: "Link",
+      category: "Matrix",
       config: {
         layers: [
           {

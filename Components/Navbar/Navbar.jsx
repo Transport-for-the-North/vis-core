@@ -36,6 +36,7 @@ export function Navbar() {
   const [isClicked, setIsClicked] = useState(false);
   const [activeLink, setActiveLink] = useState("");
   const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
+  const listCategories = [];
   const appContext = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -67,41 +68,35 @@ export function Navbar() {
         <Logo className="logoNav" onClick={() => onClick("/")} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
         {appContext.appPages.map((page) => {
-          if (page.parent === null) {
-            if (
-              appContext.appPages.some(
-                (pageToTest) => pageToTest.parent === page.pageName
-              )
-            ) {
-              const dropdownItems = appContext.appPages.filter(
-                (pageToTest) => pageToTest.parent === page.pageName
-              );
-              dropdownItems.unshift(page)
-              return (
-                <NavBarDropdown
-                  key={page.pageName}
-                  dropdownItems={dropdownItems}
-                  activeLink={activeLink}
-                  dropdownName={page.pageName}
-                />
-              );
-            } else {
-              return (
-                <Link
-                  key={page.pageName}
-                  className={
-                    activeLink === page.url ? "ActiveNavButton" : "NavButton"
-                  }
-                  to={page.url}
-                >
-                  {page.pageName}
-                </Link>
-              );
-            }
+          if (page.category === null) {
+            return (
+              <Link
+                key={page.pageName}
+                className={
+                  activeLink === page.url ? "ActiveNavButton" : "NavButton"
+                }
+                to={page.url}
+              >
+                {page.pageName}
+              </Link>
+            );
+          }else if (!listCategories.includes(page.category)) {
+            listCategories.push(page.category);
+            const dropdownItems = appContext.appPages.filter(
+              (pageToTest) => pageToTest.category === page.category
+            );
+            return (
+              <NavBarDropdown
+                key={page.category}
+                dropdownItems={dropdownItems}
+                activeLink={activeLink}
+                dropdownName={page.category}
+              />
+            );
           } else {
             return null;
           }
-        })}
+         })}
 
         <Button
           className="navbarMobile"
