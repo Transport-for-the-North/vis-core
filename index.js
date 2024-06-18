@@ -5,6 +5,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+/**
+ * Renders the root React component.
+ * Creates a root element using ReactDOM.createRoot and renders the <App /> component wrapped in a <Router /> for routing and enclosed in a <React.StrictMode /> for development checks.
+ * @constant root
+ */
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

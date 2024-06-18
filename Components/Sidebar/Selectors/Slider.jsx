@@ -22,6 +22,19 @@ const SliderValue = styled.span`
   border-radius: 4px;
 `;
 
+/**
+ * Renders a slider input element for selecting a numeric value within a specified range.
+ * @property {Object} filter - The filter object containing information about the slider.
+ * @property {number} filter.min - The minimum value of the slider.
+ * @property {number} filter.max - The maximum value of the slider.
+ * @property {number} filter.interval - The interval between each selectable value on the slider.
+ * @property {Object} filter.displayAs - An optional object specifying how the slider value should be displayed.
+ * @property {string} filter.displayAs.operation - The operation to apply to the slider value for display.
+ * @property {number} [filter.displayAs.operand] - The operand to be used in the display operation.
+ * @property {string} [filter.displayAs.unit] - The unit to display along with the slider value.
+ * @property {Function} onChange - The function called when the slider value changes.
+ * @returns {JSX.Element} The rendered Slider component.
+ */
 export const Slider = ({ filter, onChange }) => {
     const [value, setValue] = useState(filter.min); // Initialize the state with the minimum value
   

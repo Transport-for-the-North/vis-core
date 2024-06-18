@@ -21,10 +21,12 @@ const MapContainer = styled.div`
  * MapLayout component is the main layout component that composes the Map,
  * Sidebar, and MapLayerSection components. It serves as the container for
  * the map visualisation and its associated controls.
- *
  * The component uses the MapContext to manage the state of the map and its
  * layers, and it provides the necessary props to the Sidebar and MapLayerSection
  * components.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered MapLayout component.
  */
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
