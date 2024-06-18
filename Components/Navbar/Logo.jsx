@@ -17,6 +17,12 @@ const LogoImage = styled.img`
   }
 `;
 
+/**
+ * Renders a logo component.
+ * @param {Object} props - The props for the Logo component.
+ * @property {Function} props.onClick - The function to handle click events.
+ * @returns {JSX.Element} The rendered Logo component.
+ */
 export function Logo(props) {
   const handleClick = () => {
     props.onClick();

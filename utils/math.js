@@ -1,6 +1,6 @@
 /**
  * Rounds a number to a specified number of decimal places.
- *
+ * @function roundToNPlaces
  * @param {number} value - The number to be rounded.
  * @param {number} places - The number of decimal places to round to.
  * @returns {number} The rounded number.
@@ -19,9 +19,10 @@ export function roundToNPlaces(value, places) {
 }
 
 /**
- * @deprecated Use roundToSignificantFigures instead.
  * Rounds a number to the nearest two significant figures.
- *
+ * @function roundToTwoSignificantFigures
+ * @deprecated Use roundToSignificantFigures instead.
+ * 
  * @param {number} value - The number to be rounded.
  * @returns {number} The number rounded to the nearest two significant figures.
  *
@@ -54,7 +55,7 @@ export function roundToTwoSignificantFigures(value) {
 
 /**
  * Rounds a number to a specified number of significant figures.
- *
+ * @function roundToSignificantFigures
  * @param {number} value - The number to be rounded.
  * @param {number} [sigFigs=2] - The number of significant figures to round to (default is 2).
  * @returns {number} The number rounded to the specified number of significant figures.
@@ -91,7 +92,7 @@ export function roundToSignificantFigures(value, sigFigs = 2) {
  * - Values less than 1 are rounded to 2 decimal places.
  * - Values between 1 and 10 are rounded to 1 decimal place.
  * - Values greater than or equal to 10 are rounded to 0 decimal places.
- *
+ * @function roundValue
  * @param {number} value - The value to round.
  * @returns {number} - The rounded value.
  */

@@ -2,7 +2,16 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 
 import BaseService from "./Base";
 
+/**
+ * Class for handling local storage with memory cache functionality.
+ */
 class LocalStorageMemoryCache {
+  /**
+   * Retrieves a cached layer from local storage.
+   * 
+   * @param {string} key - The key for the cached layer.
+   * @returns {any|null} The cached layer data or null if not found or expired.
+   */
   getLayer(key) {
     try {
       const compressed = localStorage.getItem(key);
@@ -21,7 +30,13 @@ class LocalStorageMemoryCache {
     }
   }
 
-
+  /**
+   * Sets a layer in the cache with a time-to-live (TTL) value.
+   * 
+   * @param {string} key - The key for the layer.
+   * @param {any} value - The value to be cached.
+   * @param {number} ttl - The time-to-live in seconds. Default is 3600 seconds.
+   */
   setLayer(key, value, ttl = 3600) { // ttl is time to live in seconds
     try {
       const expires = Date.now() + ttl * 1000; // Calculate expiration time
@@ -33,6 +48,11 @@ class LocalStorageMemoryCache {
     }
   }
 
+  /**
+   * Invalidates the cache for a specific key.
+   * 
+   * @param {string} key - The key for the cache to be invalidated.
+   */
   invalidateCache(key) {
     localStorage.removeItem(key);
   }
@@ -40,11 +60,25 @@ class LocalStorageMemoryCache {
 
 const cache = new LocalStorageMemoryCache();
 
+/**
+ * Service class for handling geodata requests.
+ */
 class GeodataService extends BaseService {
+  /**
+   * Constructs a new GeodataService instance.
+   * @constructor
+   * @param {Object} options - Optional configuration options.
+   */
   constructor(options = {}) {
     super({ pathPrefix: "", ...options });
   }
 
+  /**
+   * Retrieves a layer based on the given configuration, with caching.
+   * 
+   * @param {Object} layerConfig - The configuration for the layer.
+   * @returns {Promise<any>} The layer data.
+   */
   async getLayer(layerConfig) {
     const cacheKey = this._getCacheKeyForLayer(layerConfig.path);
     let cachedLayer = cache.getLayer(cacheKey);
@@ -70,17 +104,33 @@ class GeodataService extends BaseService {
     return cachedLayer;
   }
   
+  /**
+   * Builds the URL for a tile layer.
+   * 
+   * @param {string} path - The path to the tile layer.
+   * @returns {string} The complete URL for the tile layer.
+   */
   buildTileLayerUrl(path) {
     /* Builds the path to a tile layer from the provided path (allow for dev and prod workloads)
     */
     return super._buildUrl(path)
   };
 
-
+  /**
+   * Generates a cache key for a layer based on its name.
+   * 
+   * @param {string} layerName - The name of the layer.
+   * @returns {string} The cache key for the layer.
+   */
   _getCacheKeyForLayer(layerName) {
     return `layer_${layerName}`;
   }
 
+  /**
+   * Invalidates the cache for a specific layer.
+   * 
+   * @param {string} layerName - The name of the layer.
+   */
   invalidateCache(layerName) {
     const cacheKey = this._getCacheKeyForLayer(layerName);
     cache.invalidateCache(cacheKey);

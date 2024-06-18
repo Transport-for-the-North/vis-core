@@ -7,7 +7,14 @@ import { actionTypes } from "reducers";
 import { api } from "services";
 import { colorSchemes, reclassifyData, createPaintProperty, reclassifyGeoJSONData } from "utils";
 
-// Debounced fetchDataForVisualisation function
+/**
+ * Debounced function to fetch data for a specific visualization.
+ * 
+ * @property {Object} visualisation - The visualization object containing details like data path and query parameters.
+ * @property {Function} dispatch - The dispatch function to update the state in the context.
+ * @property {Function} setLoading - The function to update the loading state.
+ * @returns {Promise<void>} This function returns a promise.
+ */
 const fetchDataForVisualisation = debounce(
   async (visualisation, dispatch, setLoading) => {
     if (visualisation && visualisation.queryParams) {
@@ -31,6 +38,13 @@ const fetchDataForVisualisation = debounce(
   1500
 );
 
+/**
+ * A React component responsible for rendering visualizations on a map.
+ * 
+ * @property {string} props.visualisationName - The name of the visualization.
+ * @property {Object} props.map - The Mapbox GL map instance.
+ * @returns {null} This component doesn't render anything directly.
+ */
 export const Visualisation = ({ visualisationName, map }) => {
   const { state, dispatch } = useMapContext();
   const [isLoading, setLoading] = useState(false); // State to track loading
@@ -39,7 +53,16 @@ export const Visualisation = ({ visualisationName, map }) => {
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
 
-  // Function to reclassify data and update the map style
+  /**
+   * Reclassifies the provided data and updates the map style.
+   *
+   * This function reclassifies the data based on the given style and updates the map style 
+   * accordingly. It ensures that the color scheme is applied correctly and updates the paint 
+   * properties of the map layers.
+   *
+   * @param {Array} data - The data to be reclassified and styled.
+   * @param {string} style - The style to be applied for reclassification.
+   */
   const reclassifyAndStyleMap = useCallback(
     (data, style) => {
       // Reclassify data if needed
@@ -165,7 +188,19 @@ export const Visualisation = ({ visualisationName, map }) => {
     [map, visualisationName, state.color_scheme]
   );
 
-
+  /**
+   * Adds features to the map and updates their paint properties.
+   *
+   * This function iterates over the provided layers and updates the map with the new features
+   * and their corresponding paint properties. It removes the previous feature states, sets new
+   * feature states, and updates the paint properties for each layer.
+   *
+   * @param {Object} map - The map object to which features will be added.
+   * @param {Object} paintProperty - The paint properties to apply to the layers.
+   * @param {Object} layers - The layers to which the features will be added.
+   * @param {Array} data - The data containing features to be added to the map.
+   * @param {string} style - The style string indicating the type of visualisation.
+   */
   const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
       if (data && data.length > 0 && map.getLayer(layer.name)) {
@@ -203,7 +238,17 @@ export const Visualisation = ({ visualisationName, map }) => {
     });
   };
 
-  // Function to calculate the colour palette based on the filters
+  /**
+   * Calculates the color palette based on the provided color scheme and number of bins.
+   *
+   * This function calculates the color palette to be used for visualizing data based on the specified
+   * color scheme and the number of bins. It retrieves the color palette from the ColorBrewer library
+   * and ensures that the number of bins falls within a certain range (3 to 9) to avoid out-of-bounds errors.
+   *
+   * @property {string} colourScheme - The name of the color scheme to use.
+   * @property {number} bins - The number of bins representing the data distribution.
+   * @returns {string[]} An array of color values representing the color palette.
+   */
   const calculateColours = (colourScheme, bins) => {
     return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
   };

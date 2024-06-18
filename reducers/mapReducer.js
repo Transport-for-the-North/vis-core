@@ -18,6 +18,15 @@ export const actionTypes = {
     SET_LOADING_FINISHED: 'SET_LOADING_FINISHED'
 };
 
+/**
+ * Reducer function for managing map state.
+ * @function mapReducer
+ * @param {Object} state - The current state.
+ * @param {Object} action - The action to be performed.
+ * @property {string} action.type - The type of action.
+ * @property {Object} action.payload - The payload of the action.
+ * @returns {Object} The new state.
+ */
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:

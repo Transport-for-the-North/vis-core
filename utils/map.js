@@ -3,7 +3,7 @@ import chroma from "chroma-js";
 
 /**
  * Returns the opacity property name for a given layer type.
- *
+ * @function getOpacityProperty
  * @param {string} layerType - The type of the layer. Expected values are 'line', 'fill', or 'circle'.
  * @returns {string} The corresponding opacity property name.
  * @throws Will throw an error if the layer type is invalid.
@@ -30,10 +30,13 @@ export function getOpacityProperty(layerType) {
 }
 
 /**
- * 
- * @param {Array[int || string]} bins - The differents breaks used for the legend
+ * Generates a Mapbox GL paint property object based on the provided parameters.
+ * This function is designed to create paint properties for various map features such as polygons, lines, and circles.
+ *
+ * @function createPaintProperty
+ * @param {Array.<(number|string)>} bins - The differents breaks used for the legend
  * @param {string} style - The type of geometries that we want to display on the map
- * @param {Array[string]} colours - The array of colours available for the styling. Usually an array of #FFFF
+ * @param {Array.<string>} colours - The array of colours available for the styling. Usually an array of #FFFF
  * @param {float} opacityValue - the current opacity value, between 0 and 1
  * @returns The paint property for the given geometries
  */
@@ -148,10 +151,10 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
 /**
  * Reclassifies data based on the specified style and rounds the values to ensure
  * that successive rounded values are not identical.
- *
- * @param {Array[Object{id, value}]} data - The different features that we have.
+ * @function reclassifyData
+ * @param {Array.<{id: number, value: string}>} data - The different features that we have.
  * @param {string} style - The type of geometry we have.
- * @returns The different breaks we want for the data we have.
+ * @returns {Array.<number>} The different breaks we want for the data we have.
  */
 export const reclassifyData = (data, style) => {
   // Helper function to round values and ensure successive values are not identical
@@ -192,8 +195,11 @@ export const reclassifyData = (data, style) => {
 };
 
 /**
- * 
- * @param {Array[Object{id, value}]} data - The differents feature that we have 
+ * Reclassifies GeoJSON data based on the provided style.
+ * This function categorizes GeoJSON data into different groups or classes depending on the style specified.
+ *
+ * @function reclassifyGeoJSONData
+ * @param {Array.<{id: number, value: string}>} data - The differents feature that we have 
  * @param {string} style - The type of geometry we have
  * @returns The differents breaks we want for the data we have
  */

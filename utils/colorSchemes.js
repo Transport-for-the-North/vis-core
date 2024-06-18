@@ -1,3 +1,10 @@
+/**
+ * Object containing various color schemes categorized into continuous, diverging, and categorical types.
+ * @constant
+ * @property {string[]} continuous - Array of continuous color schemes.
+ * @property {string[]} diverging - Array of diverging color schemes.
+ * @property {string[]} categorical - Array of categorical color schemes.
+ */
 export const colorSchemes = {
     continuous: [
       "Blues",

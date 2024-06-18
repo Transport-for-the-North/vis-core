@@ -31,6 +31,12 @@ const StyledLogout = styled.img`
   }
 `;
 
+/**
+ * Navbar component represents the navigation bar of the application.
+ * It includes the logo, navigation links, and a button for opening/closing the side navigation menu.
+ * @function Navbar
+ * @returns {JSX.Element} The rendered Navbar component.
+ */
 export function Navbar() {
   const location = useLocation();
   const [isClicked, setIsClicked] = useState(false);
