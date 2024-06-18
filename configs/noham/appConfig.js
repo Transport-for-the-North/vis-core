@@ -25,7 +25,7 @@ export const appConfig = {
       config: {
         layers: [
           {
-            uniqueId: "NormsLinksVectorTile",
+            uniqueId: "NoHAMLinksVectorTile",
             name: "NoHAM Links",
             type: "tile",
             source: "api",
