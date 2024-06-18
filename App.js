@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 
 import './App.css';
-import { appConfig as initialAppConfig } from 'appConfig';
 import { PageSwitch, HomePage, Navbar } from 'Components';
 import { Dashboard } from 'layouts';
 import { AppContext } from 'contexts';
@@ -15,35 +14,40 @@ import { api } from 'services';
  * @returns {JSX.Element} The rendered application component.
  */
 function App() {
-  const [appConfig, setAppConfig] = useState({
-    ...initialAppConfig,
-    apiSchema: null
-  });
+  const [appConfig, setAppConfig] = useState(null);
 
   useEffect(() => {
     /**
-     * Fetches the Swagger definition from the API.
-     * @function fetchSwaggerDefinition
+     * Dynamically imports the appConfig based on the REACT_APP_NAME environment variable.
+     * @function loadAppConfig
      * @async
      */
-    const fetchSwaggerDefinition = async () => {
+    const loadAppConfig = async () => {
       try {
+        const appName = process.env.REACT_APP_NAME;
+        if (!appName) {
+          throw new Error('REACT_APP_NAME environment variable is not set');
+        }
+
+        const configModule = await import(`configs/${appName}/appConfig`);
+        const initialAppConfig = configModule.appConfig;
+
         const apiSchema = await api.metadataService.getSwaggerFile();
-        // TODO add timeout
-        setAppConfig((prevConfig) => ({
-          ...prevConfig,
+
+        setAppConfig({
+          ...initialAppConfig,
           apiSchema: apiSchema,
-        }));
+        });
       } catch (error) {
-        console.error('Failed to fetch Swagger definition:', error);
+        console.error('Failed to load app configuration:', error);
       }
     };
 
-    fetchSwaggerDefinition();
+    loadAppConfig();
   }, []);
 
   // TODO add loading overlay
-  if (!appConfig.apiSchema) {
+  if (!appConfig) {
     return <div>Loading...</div>;
   }
 
@@ -51,7 +55,7 @@ function App() {
     <div className="App">
       <AppContext.Provider value={appConfig}>
         <Navbar />
-        <Dashboard >
+        <Dashboard>
           <Routes>
             <Route key={'home'} path={'/'} element={<HomePage />} />
             {appConfig.appPages.map((page) => (
