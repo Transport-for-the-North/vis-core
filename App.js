@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
 
 import './App.css';
-import { appConfig as initialAppConfig } from 'configs/noham/appConfig';
+import { appConfig as initialAppConfig } from 'configs/norms/appConfig';
 import { PageSwitch, HomePage, Navbar } from 'Components';
 import { Dashboard } from 'layouts';
 import { AppContext } from 'contexts';
