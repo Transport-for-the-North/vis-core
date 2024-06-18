@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { withAuthenticationRequired } from "@auth0/auth0-react";
 
 import './App.css';
-import { appConfig as initialAppConfig } from 'configs/noham/appConfig';
+import { appConfig as initialAppConfig } from 'appConfig';
 import { PageSwitch, HomePage, Navbar } from 'Components';
 import { Dashboard } from 'layouts';
 import { AppContext } from 'contexts';
@@ -46,7 +47,6 @@ function App() {
     return <div>Loading...</div>;
   }
 
-
   return (
     <div className="App">
       <AppContext.Provider value={appConfig}>
@@ -64,4 +64,7 @@ function App() {
   );
 }
 
-export default App;
+const isDev = process.env.REACT_APP_NAME === 'dev';
+export default isDev ? App : withAuthenticationRequired(App, {
+  onRedirecting: () => <div>Loading...</div>,
+});
