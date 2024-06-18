@@ -33,6 +33,14 @@ const AccordionContent = styled.div`
   border-radius: 0 0 5px 5px;
 `;
 
+/**
+ * AccordionSection component represents a section in an accordion menu.
+ * It contains a title and collapsible content.
+ * @property {string} title - The title of the accordion section.
+ * @property {ReactNode} children - The content of the accordion section.
+ * @property {boolean} [defaultValue=false] - The default state of the accordion section (open or closed). Defaults to false (closed).
+ * @returns {JSX.Element} The rendered AccordionSection component.
+ */
 export const AccordionSection = ({ title, children, defaultValue }) => {
   const [isOpen, setIsOpen] = useState(defaultValue);
 

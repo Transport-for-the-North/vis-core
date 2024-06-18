@@ -33,6 +33,18 @@ const SidebarContainer = styled.div`
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 `;
 
+/**
+ * Sidebar component represents a sidebar layout for displaying additional information and options.
+ * It contains sections such as about visualisation, filters, additional sections, and legal information.
+ * @component
+ * @property {string} pageName - The name of the page or visualisation framework displayed in the sidebar header.
+ * @property {string} aboutVisualisationText - The text providing information about the visualisation.
+ * @property {Array} filters - An array of filter objects used for selecting data options.
+ * @property {string} legalText - The legal information text displayed in the sidebar.
+ * @property {function} onFilterChange - A function to handle filter changes.
+ * @property {React.ReactNode} children - Additional React components or elements to be rendered within the sidebar.
+ * @returns {JSX.Element} The rendered Sidebar component.
+ */
 export const Sidebar = ({
   pageName,
   aboutVisualisationText,
