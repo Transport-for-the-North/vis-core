@@ -49,6 +49,7 @@
 }
 .sideNavbar-shown {
   transition: left 0.5s ease-out;
+  overflow-y: auto;
 }
 
 .LatButton {
@@ -58,6 +59,15 @@
 .ActiveLatButton {
   display: none;
 }
+
+.scrollable {
+  display: none;
+}
+
+.notScrollable {
+  display: none;
+}
+
 @media only screen and (max-width: 1165px) {
   .ActiveNavButton {
     font-size: large;
@@ -133,6 +143,21 @@
     align-items: center;
     width: 100%;
     padding: 4vh 0;
+  }
+
+  .scrollable{
+    padding-bottom: 100px;
+    padding-right: 25px;
+    display: flex;
+    flex-direction: row-reverse;
+  }
+
+  .notScrollable{
+    display: inherit;
+    position: absolute;
+    bottom: 100px;
+    right: 25px;
+
   }
 }
 

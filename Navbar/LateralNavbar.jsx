@@ -6,14 +6,12 @@ import styled from "styled-components";
 import { AppContext } from "contexts";
 
 const StyledLogout = styled.img`
-  position: absolute;
-  right: 25px;
-  bottom: 100px;
 `;
 
 export function LateralNavbar(props) {
   const location = useLocation();
   const [activeLink, setActiveLink] = useState("");
+  const [scrollable, setScrollable] = useState(false);
   const listCategories = [];
   const appContext = useContext(AppContext);
 
@@ -24,6 +22,31 @@ export function LateralNavbar(props) {
   useEffect(() => {
     setActiveLink(location.pathname);
   }, [location]);
+
+  useEffect(() => {
+    const calulateOverflow = () => {
+      const elements = document.querySelector(".sideNavbar-shown")?.children;
+      if (elements) {
+        let totalHeight = 0;
+        for (let i = 0; i < elements.length; i++) {
+          totalHeight += elements[i].offsetHeight;
+        }
+        if (
+          totalHeight + 280 >
+          document.querySelector(".sideNavbar-shown").clientHeight
+        ) {
+          setScrollable(true);
+        } else {
+          setScrollable(false);
+        }
+      }
+    };
+    document.addEventListener("click", calulateOverflow);
+
+    return () => {
+      document.removeEventListener("click", calulateOverflow);
+    };
+  }, []);
 
   return (
     <div className={props.className}>
@@ -67,7 +90,7 @@ export function LateralNavbar(props) {
             return null;
           }
         })}
-      <div>
+      <div className={scrollable ? "scrollable" : "notScrollable"}>
         <StyledLogout src="/img/logout.png" onClick={handleClick} />
       </div>
     </div>
