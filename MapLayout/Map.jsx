@@ -17,6 +17,8 @@ const StyledMapContainer = styled.div`
 /**
  * Map component that renders a map using MapLibre GL and handles layers,
  * including hover and click interactions.
+ * 
+ * @returns {JSX.Element} The rendered Map component.
  */
 const Map = () => {
   const mapContainerRef = useRef(null);
@@ -30,7 +32,7 @@ const Map = () => {
    * Generates the style configuration for a regular layer based on the geometry
    * type of the layer.
    *
-   * @param {string} geometryType - The type of geometry for the layer. Possible values are "polygon", "line", or "point".
+   * @property {string} geometryType - The type of geometry for the layer. Possible values are "polygon", "line", or "point".
    * @returns {Object} The style configuration object for the layer.
    */
   const getLayerStyle = (geometryType) => {
@@ -73,8 +75,8 @@ const Map = () => {
   /**
    * Generates the style configuration for a hover layer based on the geometry
    * type of the layer.
-   *
-   * @param {string} geometryType - The type of geometry for the hover layer. Possible values are "polygon", "line", or "point".
+   * @component
+   * @property {string} geometryType - The type of geometry for the hover layer. Possible values are "polygon", "line", or "point".
    * @returns {Object} The style configuration object for the hover layer.
    */
   const getHoverLayerStyle = (geometryType) => {
@@ -142,8 +144,13 @@ const Map = () => {
    * Adds a new layer to the map based on the provided layer configuration.
    * Handles both GeoJSON and tile layers and optionally adds a hover layer
    * if the layer is marked as hoverable.
-   *
+   * 
    * @param {Object} layer - The layer configuration object containing information about the layer to be added to the map.
+   * @param {string} layer.name - The name of the layer.
+   * @param {string} layer.type - The type of layer (e.g., "geojson" or "tile").
+   * @param {string} layer.geometryType - The geometry type of the layer (e.g., "point", "line", "polygon").
+   * @param {boolean} [layer.isStylable=false] - Flag indicating whether the layer is stylable.
+   * @param {boolean} [layer.isHoverable=false] - Flag indicating whether the layer is hoverable.
    */
   const addLayerToMap = useCallback(
     (layer) => {
@@ -208,8 +215,8 @@ const Map = () => {
    * Handles hover events for a specific layer by setting the hover state
    * for features under the mouse pointer.
    *
-   * @param {Object} e - The event object containing information about the hover event.
-   * @param {string} layerId - The ID of the layer being hovered over.
+   * @property {Object} e - The event object containing information about the hover event.
+   * @property {string} layerId - The ID of the layer being hovered over.
    */
   const handleLayerHover = useCallback(
     (e, layerId) => {
@@ -226,6 +233,12 @@ const Map = () => {
     [map]
   );
 
+  /**
+   * Handles click events on a layer and displays a popup with information about the clicked feature.
+   * @property {Object} e - The event object containing information about the click event.
+   * @property {string} layerId - The ID of the layer being clicked.
+   * @property {number} bufferSize - The size of the buffer around the click point for querying features.
+   */
   const handleLayerClick = (e, layerId, bufferSize) => {
     if (popups.length !== 0) {
       popups.map((popup) => popup.remove());
@@ -254,7 +267,7 @@ const Map = () => {
   /**
    * Handles mouse leave events for a specific layer by clearing the hover state.
    *
-   * @param {string} layerId - The ID of the layer from which the mouse has left.
+   * @property {string} layerId - The ID of the layer from which the mouse has left.
    */
   const handleLayerLeave = useCallback(
     (layerId) => {
@@ -264,9 +277,6 @@ const Map = () => {
     [map]
   );
 
-  /**
-   * Effect to add hover and leave event listeners to hoverable layers.
-   */
   useEffect(() => {
     if (!map) return;
 
@@ -319,7 +329,7 @@ const Map = () => {
   /**
    * Handles map click events and dispatches actions based on the clicked feature.
    *
-   * @param {Object} event - The event object containing information about the click event.
+   * @property {Object} event - The event object containing information about the click event.
    */
   const handleMapClick = useCallback(
     (event) => {
@@ -389,9 +399,6 @@ const Map = () => {
     }
   }, [isMapReady]);
 
-  /**
-   * Effect to add click event listener to the map if there are map filters.
-   */
   useEffect(() => {
     if (isMapReady) {
       const hasMapFilter = pageContext.config.filters.some(
@@ -409,9 +416,7 @@ const Map = () => {
     };
   }, [isMapReady, map, handleMapClick]);
 
-  /**
-   * Effect to add layers to the map and clean up on component unmount.
-   */
+
   useEffect(() => {
     if (isMapReady) {
       console.log("Map load within Map component");

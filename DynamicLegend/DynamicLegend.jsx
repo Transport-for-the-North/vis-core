@@ -61,11 +61,37 @@ const LegendLabel = styled.span`
  * @returns {array|null} An array of objects with 'value' and 'color' properties representing
  *                       the color stops, or null if the expression cannot be interpreted.
  *
- * Example of a simple color expression: '#FF5733'
- * Example of an interpolate expression: ['interpolate', ['linear'], ['zoom'], 5, '#F00', 10, '#0F0']
- * Example of a step expression: ['step', ['zoom'], '#F00', 5, '#0F0']
- * Example of a match expression: ['match', ['get', 'property'], 'value1', '#F00', 'value2', '#0F0', '#FFF']
+ * @example
+ * // Simple color string
+ * const colorString = '#FF5733';
+ * const result = interpretColorExpression(colorString);
+ * // result: [{ color: '#FF5733' }]
+ * 
+ * @example
+ * // Interpolate expression
+ * const interpolateExpression = ['interpolate', ['linear'], ['zoom'], 5, '#F00', 10, '#0F0'];
+ * const result = interpretColorExpression(interpolateExpression);
+ * // result: [{ value: 5, color: '#F00' }, { value: 10, color: '#0F0' }]
+ *
+ * @example
+ * // Interpolate expression
+ * const interpolateExpression = ['interpolate', ['linear'], ['zoom'], 5, '#F00', 10, '#0F0'];
+ * const result = interpretColorExpression(interpolateExpression);
+ * // result: [{ value: 5, color: '#F00' }, { value: 10, color: '#0F0' }]
+ * 
+ * @example
+ * // Step expression
+ * const stepExpression = ['step', ['zoom'], '#F00', 5, '#0F0'];
+ * const result = interpretColorExpression(stepExpression);
+ * // result: [{ value: 5, color: '#0F0' }]
+ * 
+ *  @example
+ * // Match expression
+ * const matchExpression = ['match', ['get', 'property'], 'value1', '#F00', 'value2', '#0F0', '#FFF'];
+ * const result = interpretColorExpression(matchExpression);
+ * // result: [{ value: 'value1', color: '#F00' }, { value: 'value2', color: '#0F0' }, { value: null, color: '#FFF' }]
  */
+
 const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "string") {
@@ -121,10 +147,28 @@ const interpretColorExpression = (expression) => {
  * Interprets a width expression from a map style specification and calculates
  * intermediate width stops. The function assumes linear interpolation between stops.
  * The number of intermediate stops is dynamic and can be specified.
- *
+ * 
  * @param {Array|number} expression - The width expression from the map style.
  * @param {number} [numInterpolatedStops=4] - The number of intermediate stops to calculate.
  * @returns {Array|null} - An array of width stops or null if the expression is invalid.
+ * 
+ * @example
+ * // Simple width value
+ * const widthValue = 2;
+ * const result = interpretWidthExpression(widthValue);
+ * // result: [{ width: 2 }]
+ * 
+ * @example
+ * // Interpolate expression
+ * const interpolateExpression = ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 5];
+ * const result = interpretWidthExpression(interpolateExpression, 6);
+ * // result: [{ value: 5, width: 1 }, { value: 6.8, width: 3.4 }, { value: 8.6, width: 5 }]
+ * 
+ * @example
+ * // Step expression
+ * const stepExpression = ['step', ['zoom'], 1, 5, 3];
+ * const result = interpretWidthExpression(stepExpression);
+ * // result: [{ value: 1, width: 5 }]
  */
 const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
   if (!expression) return null;
@@ -178,20 +222,11 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
  * item displays color and/or width swatches along with labels indicating the corresponding values.
- *
- * Props:
- * @param {object} map - The map instance to listen for style changes. The map object should
- *                       expose a 'getStyle' method that returns the current style and a 'on'
- *                       method to subscribe to style changes.
- *
- * State:
- * @param {array} legendItems - An array of legend items derived from the map's style layers.
- *                              Each item contains a title, colorStops, and widthStops.
- *
- * Usage:
- * <DynamicLegend map={mapInstance} />
- *
- * Note: The map instance is expected to be an object from MapLibre or Mapbox,
+ * 
+ * @component
+ * @property {Object} map - The map instance from Mapbox or MapLibre.
+ * @returns {JSX.Element|null} The rendered legend component or null if there are no legend items.
+ * @note The map instance is expected to be an object from MapLibre or Mapbox,
  * which follows a specific API for style manipulation and event handling.
  */
 export const DynamicLegend = ({ map }) => {

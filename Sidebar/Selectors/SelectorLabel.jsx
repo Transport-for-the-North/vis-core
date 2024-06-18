@@ -38,6 +38,12 @@ const TooltipText = styled.span`
   opacity: 0; // Initially transparent, opacity controlled by state
 `;
 
+/**
+ * Component for rendering a label with optional information tooltip.
+ * @property {string} text - The text content of the label.
+ * @property {string} [info] - Optional information to be displayed in the tooltip.
+ * @returns {JSX.Element} The SelectorLabel component.
+ */
 export const SelectorLabel = ({ text, info }) => {
   const [isTooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });

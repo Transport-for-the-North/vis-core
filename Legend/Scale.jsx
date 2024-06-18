@@ -2,10 +2,29 @@ import React from "react";
 
 import { roundToSignificantFigures } from "utils";
 
+/**
+ * Function to add commas to a number for better readability.
+ * @param {number} x - The number to format.
+ * @returns {string} The formatted number with commas.
+ * @example
+ * // Returns "1,234,567"
+ * numberWithCommas(1234567);
+ */
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 }
 
+/**
+ * Component to render a scale for color or size.
+ * @component
+ * @property {array} colorScale - The color scale to render.
+ * @property {string} selectedVariable - The selected variable for the scale.
+ * @property {number} binMin - The minimum bin value.
+ * @property {number} binMax - The maximum bin value.
+ * @property {boolean} isCategorical - Indicates if the scale is categorical.
+ * @property {array} sizeScale - The size scale to render.
+ * @returns {JSX.Element} The Scale component.
+ */
 const Scale = ({
   colorScale,
   selectedVariable,
@@ -16,6 +35,11 @@ const Scale = ({
 }) => {
 
   const scale = colorScale
+
+  /**
+   * Renders the color scale.
+   * @returns {JSX.Element[]} Array of color scale elements.
+   */
   const renderColorScale = () => {
     return (
       scale &&
@@ -49,6 +73,10 @@ const Scale = ({
     );
   };
 
+  /**
+   * Renders the size scale.
+   * @returns {JSX.Element[]} Array of size scale elements.
+   */
   const renderSizeScale = () => {
     return (
       sizeScale &&
