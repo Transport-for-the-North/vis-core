@@ -59,10 +59,10 @@ export function NavBarDropdown(props) {
   };
 
   const handleClose = (event) => {
+    setOpen(false);
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
-    setOpen(false);
   };
 
   useEffect(() => {
@@ -83,7 +83,8 @@ export function NavBarDropdown(props) {
     <DropdownContainer
       ref={anchorRef}
       className="NavButton"
-      onMouseOver={()=> setOpen(true)}
+      onMouseOver={() => setOpen(true)}
+      onMouseLeave={handleClose}
     >
       {props.dropdownName}
       <DropdownMenu onMouseLeave={handleToggle} open={open}>
