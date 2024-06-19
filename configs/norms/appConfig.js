@@ -399,8 +399,9 @@ export const appConfig = {
                 sourceLayer: "zones",
                 geometryType: "polygon",
                 visualisationName: "ZoneTotals",
-                isHoverable: false,
-                isStylable: true
+                isHoverable: true,
+                isStylable: true,
+                shouldHaveTooltipOnClick: false,
               },
             ],
             visualisations: [
@@ -485,7 +486,7 @@ export const appConfig = {
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                 visualisations: ["ZoneTotals"],
-                type: "dropdown",
+                type: "toggle",
                 values: timePeriodCodeValues
               },
               {
@@ -526,8 +527,9 @@ export const appConfig = {
                 sourceLayer: "zones",
                 geometryType: "polygon",
                 visualisationName: "ZoneTotalsDifference",
-                isHoverable: false,
-                isStylable: true
+                isHoverable: true,
+                isStylable: true,
+                shouldHaveTooltipOnClick: false,
               },
             ],
             visualisations: [
@@ -612,7 +614,7 @@ export const appConfig = {
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                 visualisations: ["ZoneTotalsDifference"],
-                type: "dropdown",
+                type: "toggle",
                 values: timePeriodCodeValues
               },
               {
@@ -621,7 +623,7 @@ export const appConfig = {
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                 visualisations: ["ZoneTotalsDifference"],
-                type: "dropdown",
+                type: "toggle",
                 values: timePeriodCodeValues
               },
               {
@@ -932,7 +934,7 @@ export const appConfig = {
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
+                        type: "toggle",
                         values: timePeriodCodeValues,
                     },
                     {
@@ -1006,7 +1008,7 @@ export const appConfig = {
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
+                        type: "toggle",
                         values: timePeriodCodeValues,
                     },
                     {
@@ -1024,7 +1026,7 @@ export const appConfig = {
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
+                        type: "toggle",
                         values: timePeriodCodeValues,
                     },
                     {
