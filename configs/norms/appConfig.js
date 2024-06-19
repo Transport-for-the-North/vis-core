@@ -899,7 +899,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "NoRMS Station Totals",
                         isHoverable: false,
                         isStylable: true,
                         shouldHaveTooltipOnClick: true,
