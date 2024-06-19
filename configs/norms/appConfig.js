@@ -268,9 +268,9 @@ export const appConfig = {
                         name: "NORMS Station Pair Result",
                         type: "tile",
                         source: "api",
-                        path: "/api/vectortiles/norms_station_connectors/{z}/{x}/{y}", // matches the path in swagger.json
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
-                        geometryType: "circle",
+                        geometryType: "point",
                         visualisationName: "StationPair",
                         isHoverable: false,
                         isStylable: true,
@@ -302,7 +302,7 @@ export const appConfig = {
                     },
                     {
                         filterName: "User",
-                        paramName: "user_class_id",
+                        paramName: "userClassId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["StationPair"],
@@ -311,7 +311,7 @@ export const appConfig = {
                     },
                     {
                         filterName: "Direction",
-                        paramName: "direction_id",
+                        paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["StationPair"],
@@ -350,10 +350,129 @@ export const appConfig = {
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["StationPair"],
                         type: "map",
-                        layer: "NormsStationPairVectorTile",
+                        layer: "NORMS Station Pair Result",
                         field: "id",
                     }
                 ],
+            },
+        },
+        {
+            pageName: "Station Pair Results Difference",
+            url: "/norms-station-pair-difference",
+            type: "MapLayout",
+            category: "Station Pairs",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsStationPairDifferenceVectorTile",
+                        name: "NORMS Station Pair Result Difference",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "StationPairDifference",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "StationPairDifference",
+                        type: "joinDataToMap",
+                        joinLayer: "NORMS Station Pair Result Difference",
+                        style: "circle-diverging",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/station-pair-results/difference",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Direction",
+                        paramName: "originOrDestination",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "toggle",
+                        values: directionIdValues,
+                    },
+                    {
+                        filterName: "Column Name",
+                        paramName: "columnName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                {
+                                    displayValue: "Demand",
+                                    paramValue: "demand",
+                                },
+                                {
+                                    displayValue: "Generalised Cost",
+                                    paramValue: "gen_cost",
+                                },
+                                {
+                                    displayValue: "Generalised Journey Time",
+                                    paramValue: "gen_jt",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        filterName: "First Scenario",
+                        paramName: "scenarioCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "First User",
+                        paramName: "userClassIdDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Second Scenario",
+                        paramName: "scenarioCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "Second User",
+                        paramName: "userClassIdDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "NodeID",
+                        paramName: "nodeId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "map",
+                        layer: "NORMS Station Pair Result Difference",
+                        field: "id",
+                    }
+
+                ]
             },
         },
     ],
