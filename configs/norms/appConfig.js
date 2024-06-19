@@ -1,5 +1,3 @@
-import { filter, values } from "lodash";
-
 const scenarioCodeValues = {
     source: "local",
     values: [
