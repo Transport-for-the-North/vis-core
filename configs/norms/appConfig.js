@@ -269,6 +269,401 @@ export const appConfig = {
             },
         },
         {
+          pageName: "Link Result Difference",
+          url: "/norms-link-result-difference",
+          type: "MapLayout",
+          about: "", //to be added
+          category: "Links",
+          config: {
+              layers: [
+                  {
+                      uniqueId: "NormsLinksResultDifference",
+                      name: "NORMS Links Result Difference",
+                      type: "tile",
+                      source: "api",
+                      path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+                      sourceLayer: "geometry",
+                      geometryType: "line",
+                      visualisationName: "LinksResultDifference",
+                      isHoverable: false,
+                      isStylable: true,
+                      shouldHaveTooltipOnClick: false,
+                  },
+              ],
+              visualisations: [
+                  {
+                      name: "LinksResultDifference",
+                      type: "joinDataToMap",
+                      joinLayer: "NORMS Links Result Difference",
+                      style: "line-diverging",
+                      joinField: "id",
+                      valueField: "value",
+                      dataSource: "api",
+                      dataPath: "/api/norms/link-results/difference",
+                  }
+              ],
+              metadataLayers: [],
+              filters: [
+                  {
+                      filterName: "Scenario - DS",
+                      paramName: "scenarioCodeDoSomething",
+                      target: "api",
+                      actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                      visualisations: ["LinksResultDifference"],
+                      type: "dropdown",
+                      values: scenarioCodeValues
+                  },
+                  {
+                    filterName: "Scenario - DM",
+                    paramName: "scenarioCodeDoMinimum",
+                    target: "api",
+                    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                    visualisations: ["LinksResultDifference"],
+                    type: "dropdown",
+                    values: scenarioCodeValues
+                  },
+                  {
+                      filterName: "Time Period - DS",
+                      paramName: "timePeriodCodeDoSomething",
+                      target: "api",
+                      actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                      visualisations: ["LinksResultDifference"],
+                      type: "toggle",
+                      values: timePeriodCodeValues,
+                  },
+                  {
+                    filterName: "Time Period - DM",
+                    paramName: "timePeriodCodeDoMinimum",
+                    target: "api",
+                    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                    visualisations: ["LinksResultDifference"],
+                    type: "toggle",
+                    values: timePeriodCodeValues,
+                  },
+                  {
+                      filterName: "Property",
+                      paramName: "propertyName",
+                      target: "api",
+                      actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                      visualisations: ["LinksResultDifference"],
+                      type: "dropdown",
+                      values: {
+                          source: "local",
+                          values: [
+                              {
+                                  displayValue: "No. Passengers",
+                                  paramValue: "No. Passengers",
+                              },
+                              {
+                                  displayValue: "Total Crush Capacity",
+                                  paramValue: "Total Crush Capacity",
+                              },
+                              {
+                                  displayValue: "Total Crush Load Factor",
+                                  paramValue: "Total Crush Load Factor",
+                              },
+                              {
+                                  displayValue: "Total Seat Capacity",
+                                  paramValue: "Total Seat Capacity",
+                              },
+                              {
+                                  displayValue: "Total Seat Load Factor",
+                                  paramValue: "Total Seat Load Factor",
+                              },
+                              {
+                                  displayValue: "Trains per hour",
+                                  paramValue: "Trains per hour",
+                              },
+                          ]
+                      },
+                  },
+              ],
+          },
+        },
+
+
+        {
+          pageName: "Zone Totals",
+          url: "/zone-totals",
+          type: "MapLayout",
+          category: "Zones",
+          about: "", //To be added.
+          config: {
+            layers: [
+              {
+                uniqueId: "NormsZoneTotals",
+                name: "Norms Zone Totals",
+                type: "tile",
+                source: "api",
+                path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                sourceLayer: "zones",
+                geometryType: "polygon",
+                visualisationName: "ZoneTotals",
+                isHoverable: false,
+                isStylable: true
+              },
+            ],
+            visualisations: [
+              {
+                name: "ZoneTotals",
+                type: "joinDataToMap",
+                joinLayer: "Norms Zone Totals",
+                style: "polygon-continuous",
+                joinField: "id",
+                valueField: "value",
+                dataSource: "api",
+                dataPath: "/api/norms/zone-total-results",
+              },
+            ],
+            metadataLayers: [],
+            filters: [
+              {
+                filterName: "Select Column",
+                paramName: "columnName",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotals"],
+                type: "dropdown",
+                values: {
+                  source: "local",
+                  values: [
+                    {
+                      displayValue: 'Revenue',
+                      paramValue: 'revenue'
+                    },
+                    {
+                      displayValue: 'Demand',
+                      paramValue: 'demand'
+                    },
+                    {
+                      displayValue: 'Total Generalised Cost',
+                      paramValue: 'total_gen_cost'
+                    },
+                    {
+                      displayValue: 'IVT',
+                      paramValue: 'ivt'
+                    },
+                    {
+                      displayValue: 'Crowding',
+                      paramValue: 'crowding'
+                    },
+                    {
+                      displayValue: 'Wait Time',
+                      paramValue: 'wait_time'
+                    },
+                    {
+                      displayValue: 'Walk Time',
+                      paramValue: 'walk_time'
+                    },
+                    {
+                      displayValue: 'Penalty',
+                      paramValue: 'penalty'
+                    },
+                    {
+                      displayValue: 'Access Egress',
+                      paramValue: 'access_egress'
+                    },
+                    {
+                      displayValue: 'Value of choice',
+                      paramValue: 'value_of_choice'
+                    },
+                  ],
+                },
+              },
+              {
+                filterName: "Origin Or Destination",
+                paramName: "originOrDestination",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotals"],
+                type: "dropdown", 
+                values: originOrDestinationValues
+              },
+              {
+                filterName: "Time Period",
+                paramName: "timePeriodCode",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotals"],
+                type: "dropdown",
+                values: timePeriodCodeValues
+              },
+              {
+                filterName: "User Class",
+                paramName: "userClassId",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotals"],
+                type: "dropdown",
+                values: userClassIdValues
+              },
+              {
+                filterName: "Scenario",
+                paramName: "scenarioCode",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotals"],
+                type: "dropdown",
+                values: scenarioCodeValues
+              },
+            ]
+          }
+        },
+        {
+          pageName: "Zone Totals Difference",
+          url: "/zone-totals-difference",
+          type: "MapLayout",
+          category: "Zones",
+          about: "", //To be added.
+          config: {
+            layers: [
+              {
+                uniqueId: "NormsZoneTotalsDifference",
+                name: "Norms Zone Totals Difference",
+                type: "tile",
+                source: "api",
+                path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                sourceLayer: "zones",
+                geometryType: "polygon",
+                visualisationName: "ZoneTotalsDifference",
+                isHoverable: false,
+                isStylable: true
+              },
+            ],
+            visualisations: [
+              {
+                name: "ZoneTotalsDifference",
+                type: "joinDataToMap",
+                joinLayer: "Norms Zone Totals Difference",
+                style: "polygon-diverging",
+                joinField: "id",
+                valueField: "value",
+                dataSource: "api",
+                dataPath: "/api/norms/zone-total-results/difference",
+              },
+            ],
+            metadataLayers: [],
+            filters: [
+              {
+                filterName: "Select Column",
+                paramName: "columnName",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: {
+                  source: "local",
+                  values: [
+                    {
+                      displayValue: 'Revenue',
+                      paramValue: 'revenue'
+                    },
+                    {
+                      displayValue: 'Demand',
+                      paramValue: 'demand'
+                    },
+                    {
+                      displayValue: 'Total Generalised Cost',
+                      paramValue: 'total_gen_cost'
+                    },
+                    {
+                      displayValue: 'IVT',
+                      paramValue: 'ivt'
+                    },
+                    {
+                      displayValue: 'Crowding',
+                      paramValue: 'crowding'
+                    },
+                    {
+                      displayValue: 'Wait Time',
+                      paramValue: 'wait_time'
+                    },
+                    {
+                      displayValue: 'Walk Time',
+                      paramValue: 'walk_time'
+                    },
+                    {
+                      displayValue: 'Penalty',
+                      paramValue: 'penalty'
+                    },
+                    {
+                      displayValue: 'Access Egress',
+                      paramValue: 'access_egress'
+                    },
+                    {
+                      displayValue: 'Value of choice',
+                      paramValue: 'value_of_choice'
+                    },
+                  ],
+                },
+              },
+              {
+                filterName: "Origin Or Destination",
+                paramName: "originOrDestination",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown", 
+                values: originOrDestinationValues
+              },
+              {
+                filterName: "Time Period - DS",
+                paramName: "timePeriodCodeDoSomething",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: timePeriodCodeValues
+              },
+              {
+                filterName: "Time Period - DM",
+                paramName: "timePeriodCodeDoMinimum",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: timePeriodCodeValues
+              },
+              {
+                filterName: "User Class - DS",
+                paramName: "userClassIdDoSomething",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: userClassIdValues
+              },
+              {
+                filterName: "User Class - DM",
+                paramName: "userClassIdDoMinimum",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: userClassIdValues
+              },
+              {
+                filterName: "Scenario - DS",
+                paramName: "scenarioCodeDoSomething",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: scenarioCodeValues
+              },
+              {
+                filterName: "Scenario - DM",
+                paramName: "scenarioCodeDoMinimum",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: ["ZoneTotalsDifference"],
+                type: "dropdown",
+                values: scenarioCodeValues
+              },
+            ]
+          }
+        },
+        {
             pageName: "Station Pair Results",
             url: "/norms-station-pair",
             type: "MapLayout",
