@@ -999,6 +999,142 @@ export const appConfig = {
                     }
                 ]
             },
+        },
+        {
+            pageName: "Zones Pair Results Difference",
+            url: "/norms-zones-pair-difference",
+            type: "MapLayout",
+            category: "Zones Pairs",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsZonesPairDifferenceVectorTile",
+                        name: "NORMS Zones Pair Result Difference",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "zones",
+                        geometryType: "polygon",
+                        visualisationName: "ZonesPairDifference",
+                        isHoverable: true,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "ZonesPairDifference",
+                        type: "joinDataToMap",
+                        joinLayer: "NORMS Zones Pair Result Difference",
+                        style: "polygon-diverging",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/zones-pair-results/difference",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Direction",
+                        paramName: "originOrDestination",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "toggle",
+                        values: originOrDestinationValues,
+                    },
+                    {
+                        filterName: "Column Name",
+                        paramName: "columnName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                {
+                                    displayValue: "Demand",
+                                    paramValue: "demand",
+                                },
+                                {
+                                    displayValue: "Generalised Cost",
+                                    paramValue: "gen_cost",
+                                },
+                                {
+                                    displayValue: "Generalised Journey Time",
+                                    paramValue: "gen_jt",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        filterName: "First Scenario",
+                        paramName: "scenarioCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "First Time Period",
+                        paramName: "timePeriodCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
+                    },
+                    {
+                        filterName: "First User",
+                        paramName: "userClassIdDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Second Scenario",
+                        paramName: "scenarioCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "Second Time Period",
+                        paramName: "timePeriodCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
+                    },
+                    {
+                        filterName: "Second User",
+                        paramName: "userClassIdDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Zone ID",
+                        paramName: "zoneId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["ZonesPairDifference"],
+                        type: "map",
+                        layer: "NORMS Zones Pair Result Difference",
+                        field: "id",
+                    }
+                ]
+            },
         }
     ],
 };
