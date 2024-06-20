@@ -203,7 +203,7 @@ export const Visualisation = ({ visualisationName, map }) => {
    */
   const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
-      if (data && data.length > 0 && map.getLayer(layer.name)) {
+      if (data && data.length > 0 && map.getLayer(layer.name) && layer.isStylable) {
         map.getLayer(layer.name).metadata = {
           ...map.getLayer(layer.name).metadata,
           colorStyle: style.split("-")[1],

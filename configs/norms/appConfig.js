@@ -568,6 +568,19 @@ export const appConfig = {
             config: {
                 layers: [
                     {
+                        uniqueId: "NormsZoneVectorTile",
+                        name: "NoRMS Zones",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "zones",
+                        geometryType: "polygon",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                    {
                         uniqueId: "NormsNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
@@ -579,19 +592,6 @@ export const appConfig = {
                         isHoverable: true,
                         isStylable: false,
                         shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NormsZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
                     },
                 ],
                 visualisations: [
@@ -678,6 +678,19 @@ export const appConfig = {
             config: {
                 layers: [
                     {
+                        uniqueId: "NormsZoneVectorTile",
+                        name: "NoRMS Zones",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "zones",
+                        geometryType: "polygon",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                    {
                         uniqueId: "NormsNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
@@ -689,19 +702,6 @@ export const appConfig = {
                         isHoverable: true,
                         isStylable: false,
                         shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NormsZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
                     },
                 ],
                 visualisations: [
