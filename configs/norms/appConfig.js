@@ -176,10 +176,633 @@ export const appConfig = {
     contactEmail: "firstname.lastname@transportforthenorth.com",
     appPages: [
         {
-            pageName: "Link Results",
+            pageName: "Station Totals",
+            url: "/norms-station-totals",
+            type: "MapLayout",
+            category: "Station",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsNodeVectorTile",
+                        name: "NoRMS Nodes",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "NoRMS Station Totals",
+                        type: "joinDataToMap",
+                        joinLayer: "NoRMS Nodes",
+                        style: "circle-continuous",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/node-results",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Scenario",
+                        paramName: "scenarioCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "dropdown",
+                        values: scenarioCodeValues,
+                    },
+                    {
+                        filterName: "Time Period",
+                        paramName: "timePeriodCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
+                    },
+                    {
+                        filterName: "Metric",
+                        paramName: "propertyName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                { paramValue: "Boardings", displayValue: "Boardings" },
+                                { paramValue: "Interchanges", displayValue: "Interchanges" },
+                                { paramValue: "Egress", displayValue: "Egress" },
+                                { paramValue: "Access", displayValue: "Access" },
+                                { paramValue: "Alightings", displayValue: "Alightings" }
+                            ]
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            pageName: "Station Totals Difference",
+            url: "/norms-station-totals-difference",
+            type: "MapLayout",
+            category: "Station",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsNodeVectorTile",
+                        name: "NoRMS Nodes",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "NoRMS Station Totals",
+                        type: "joinDataToMap",
+                        joinLayer: "NoRMS Nodes",
+                        style: "circle-diverging",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/node-results/difference",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Scenario DS",
+                        paramName: "scenarioCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "dropdown",
+                        values: scenarioCodeValues,
+                    },
+                    {
+                        filterName: "Time Period DS",
+                        paramName: "timePeriodCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
+                    },
+                    {
+                        filterName: "Scenario DM",
+                        paramName: "scenarioCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "dropdown",
+                        values: scenarioCodeValues,
+                    },
+                    {
+                        filterName: "Time Period DM",
+                        paramName: "timePeriodCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
+                    },
+                    {
+                        filterName: "Metric",
+                        paramName: "propertyName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Totals"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                { paramValue: "Boardings", displayValue: "Boardings" },
+                                { paramValue: "Interchanges", displayValue: "Interchanges" },
+                                { paramValue: "Egress", displayValue: "Egress" },
+                                { paramValue: "Access", displayValue: "Access" },
+                                { paramValue: "Alightings", displayValue: "Alightings" }
+                            ]
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            pageName: "Station Pairs",
+            url: "/norms-station-pair",
+            type: "MapLayout",
+            category: "Station",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsStationPairVectorTile",
+                        name: "NORMS Station Pair Result",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "StationPair",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "StationPair",
+                        type: "joinDataToMap",
+                        joinLayer: "NORMS Station Pair Result",
+                        style: "circle-continuous",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/station-pair-results",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Scenario",
+                        paramName: "scenarioCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "User",
+                        paramName: "userClassId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Direction",
+                        paramName: "originOrDestination",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "toggle",
+                        values: originOrDestinationValues,
+                    },
+                    {
+                        filterName: "Column Name",
+                        paramName: "columnName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                {
+                                    displayValue: "Demand",
+                                    paramValue: "demand",
+                                },
+                                {
+                                    displayValue: "Generalised Cost",
+                                    paramValue: "gen_cost",
+                                },
+                                {
+                                    displayValue: "Generalised Journey Time",
+                                    paramValue: "gen_jt",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        filterName: "NodeID",
+                        paramName: "nodeId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "map",
+                        layer: "NORMS Station Pair Result",
+                        field: "id",
+                    }
+                ],
+            },
+        },
+        {
+            pageName: "Station Pairs Difference",
+            url: "/norms-station-pair-difference",
+            type: "MapLayout",
+            category: "Station",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsStationPairDifferenceVectorTile",
+                        name: "NORMS Station Pair Result Difference",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "StationPairDifference",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "StationPairDifference",
+                        type: "joinDataToMap",
+                        joinLayer: "NORMS Station Pair Result Difference",
+                        style: "circle-diverging",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/station-pair-results/difference",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Direction",
+                        paramName: "originOrDestination",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "toggle",
+                        values: originOrDestinationValues,
+                    },
+                    {
+                        filterName: "Column Name",
+                        paramName: "columnName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                {
+                                    displayValue: "Demand",
+                                    paramValue: "demand",
+                                },
+                                {
+                                    displayValue: "Generalised Cost",
+                                    paramValue: "gen_cost",
+                                },
+                                {
+                                    displayValue: "Generalised Journey Time",
+                                    paramValue: "gen_jt",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        filterName: "First Scenario",
+                        paramName: "scenarioCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "First User",
+                        paramName: "userClassIdDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Second Scenario",
+                        paramName: "scenarioCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "Second User",
+                        paramName: "userClassIdDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "NodeID",
+                        paramName: "nodeId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "map",
+                        layer: "NORMS Station Pair Result Difference",
+                        field: "id",
+                    }
+
+                ]
+            },
+        },
+        {
+            pageName: "Station Catchment",
+            url: "/norms-station-catchment",
+            type: "MapLayout",
+            category: "Station",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsNodeVectorTile",
+                        name: "NoRMS Nodes",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: true,
+                        isStylable: false,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                    {
+                        uniqueId: "NormsZoneVectorTile",
+                        name: "NoRMS Zones",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "polygon",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "NoRMS Station Catchment",
+                        type: "joinDataToMap",
+                        joinLayer: "NoRMS Zones",
+                        style: "polygon-continuous",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/node-catchment-results",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Scenario",
+                        paramName: "scenarioCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment"],
+                        type: "dropdown",
+                        values: scenarioCodeValues,
+                    },
+                    {
+                        filterName: "User Class",
+                        paramName: "userClassId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Direction",
+                        paramName: "directionId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment"],
+                        type: "toggle",
+                        values: directionIdValues,
+                    },
+                    {
+                        filterName: "Metric",
+                        paramName: "columnName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
+                                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
+                                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
+                                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
+                                { paramValue: "demand_walk", displayValue: "Demand Walk" },
+                                { paramValue: "demand_car", displayValue: "Demand Car" },
+                                { paramValue: "demand_bus", displayValue: "Demand Bus" },
+                                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
+                                { paramValue: "demand_total", displayValue: "Demand Total" }
+                            ]
+                        },
+                    },
+                    {
+                        filterName: "Select station in map",
+                        paramName: "nodeId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment"],
+                        type: "map",
+                        layer: "NoRMS Nodes",
+                        field: "id"
+                    },
+                ],
+            },
+        },
+        {
+            pageName: "Station Catchment Difference",
+            url: "/norms-station-catchment/difference",
+            type: "MapLayout",
+            category: "Station",
+            config: {
+                layers: [
+                    {
+                        uniqueId: "NormsNodeVectorTile",
+                        name: "NoRMS Nodes",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "point",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: true,
+                        isStylable: false,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                    {
+                        uniqueId: "NormsZoneVectorTile",
+                        name: "NoRMS Zones",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "geometry",
+                        geometryType: "polygon",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                ],
+                visualisations: [
+                    {
+                        name: "NoRMS Station Catchment Difference",
+                        type: "joinDataToMap",
+                        joinLayer: "NoRMS Zones",
+                        style: "polygon-continuous",
+                        joinField: "id",
+                        valueField: "value",
+                        dataSource: "api",
+                        dataPath: "/api/norms/node-catchment-results/difference",
+                    }
+                ],
+                metadataLayers: [],
+                filters: [
+                    {
+                        filterName: "Scenario DS",
+                        paramName: "scenarioCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues,
+                    },
+                    {
+                        filterName: "Scenario DM",
+                        paramName: "scenarioCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "dropdown",
+                        values: scenarioCodeValues,
+                    },
+                    {
+                        filterName: "User Class DS",
+                        paramName: "userClassIdDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "User Class DM",
+                        paramName: "userClassIdDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "dropdown",
+                        values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Direction",
+                        paramName: "directionId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "toggle",
+                        values: directionIdValues,
+                    },
+                    {
+                        filterName: "Metric",
+                        paramName: "columnName",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "dropdown",
+                        values: {
+                            source: "local",
+                            values: [
+                                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
+                                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
+                                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
+                                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
+                                { paramValue: "demand_walk", displayValue: "Demand Walk" },
+                                { paramValue: "demand_car", displayValue: "Demand Car" },
+                                { paramValue: "demand_bus", displayValue: "Demand Bus" },
+                                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
+                                { paramValue: "demand_total", displayValue: "Demand Total" }
+                            ]
+                        },
+                    },
+                    {
+                        filterName: "Select station in map",
+                        paramName: "nodeId",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["NoRMS Station Catchment Difference"],
+                        type: "map",
+                        layer: "NoRMS Nodes",
+                        field: "id"
+                    },
+                ],
+            },
+        },
+        {
+            pageName: "Link Totals",
             url: "/norms-link",
             type: "MapLayout",
-            category: "Links",
+            category: "Link",
             config: {
                 layers: [
                     {
@@ -269,11 +892,11 @@ export const appConfig = {
             },
         },
         {
-          pageName: "Link Result Difference",
+          pageName: "Link Totals Difference",
           url: "/norms-link-result-difference",
           type: "MapLayout",
           about: "", //to be added
-          category: "Links",
+          category: "Link",
           config: {
               layers: [
                   {
@@ -386,7 +1009,7 @@ export const appConfig = {
           pageName: "Zone Totals",
           url: "/zone-totals",
           type: "MapLayout",
-          category: "Zones",
+          category: "Zone",
           about: "", //To be added.
           config: {
             layers: [
@@ -399,7 +1022,7 @@ export const appConfig = {
                 sourceLayer: "zones",
                 geometryType: "polygon",
                 visualisationName: "ZoneTotals",
-                isHoverable: true,
+                isHoverable: false,
                 isStylable: true,
                 shouldHaveTooltipOnClick: false,
               },
@@ -514,7 +1137,7 @@ export const appConfig = {
           pageName: "Zone Totals Difference",
           url: "/zone-totals-difference",
           type: "MapLayout",
-          category: "Zones",
+          category: "Zone",
           about: "", //To be added.
           config: {
             layers: [
@@ -527,7 +1150,7 @@ export const appConfig = {
                 sourceLayer: "zones",
                 geometryType: "polygon",
                 visualisationName: "ZoneTotalsDifference",
-                isHoverable: true,
+                isHoverable: false,
                 isStylable: true,
                 shouldHaveTooltipOnClick: false,
               },
@@ -666,633 +1289,10 @@ export const appConfig = {
           }
         },
         {
-            pageName: "Station Pair Results",
-            url: "/norms-station-pair",
-            type: "MapLayout",
-            category: "Station Pairs",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NormsStationPairVectorTile",
-                        name: "NORMS Station Pair Result",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "StationPair",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "StationPair",
-                        type: "joinDataToMap",
-                        joinLayer: "NORMS Station Pair Result",
-                        style: "circle-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/station-pair-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "User",
-                        paramName: "userClassId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Direction",
-                        paramName: "originOrDestination",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
-                        type: "toggle",
-                        values: originOrDestinationValues,
-                    },
-                    {
-                        filterName: "Column Name",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
-                        type: "dropdown",
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "Demand",
-                                    paramValue: "demand",
-                                },
-                                {
-                                    displayValue: "Generalised Cost",
-                                    paramValue: "gen_cost",
-                                },
-                                {
-                                    displayValue: "Generalised Journey Time",
-                                    paramValue: "gen_jt",
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        filterName: "NodeID",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
-                        type: "map",
-                        layer: "NORMS Station Pair Result",
-                        field: "id",
-                    }
-                ],
-            },
-        },
-        {
-            pageName: "Station Pair Results Difference",
-            url: "/norms-station-pair-difference",
-            type: "MapLayout",
-            category: "Station Pairs",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NormsStationPairDifferenceVectorTile",
-                        name: "NORMS Station Pair Result Difference",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "StationPairDifference",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "StationPairDifference",
-                        type: "joinDataToMap",
-                        joinLayer: "NORMS Station Pair Result Difference",
-                        style: "circle-diverging",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/station-pair-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Direction",
-                        paramName: "originOrDestination",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "toggle",
-                        values: originOrDestinationValues,
-                    },
-                    {
-                        filterName: "Column Name",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "dropdown",
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "Demand",
-                                    paramValue: "demand",
-                                },
-                                {
-                                    displayValue: "Generalised Cost",
-                                    paramValue: "gen_cost",
-                                },
-                                {
-                                    displayValue: "Generalised Journey Time",
-                                    paramValue: "gen_jt",
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        filterName: "First Scenario",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "First User",
-                        paramName: "userClassIdDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Second Scenario",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "Second User",
-                        paramName: "userClassIdDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "NodeID",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "map",
-                        layer: "NORMS Station Pair Result Difference",
-                        field: "id",
-                    }
-
-                ]
-            },
-        },
-        {
-            pageName: "Station Results",
-            url: "/norms-station-totals",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NormsNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "NoRMS Station Totals",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "NoRMS Station Totals",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Nodes",
-                        style: "circle-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "propertyName",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
-                        values: {
-                            source: "local",
-                            values: [
-                                { paramValue: "Boardings", displayValue: "Boardings" },
-                                { paramValue: "Interchanges", displayValue: "Interchanges" },
-                                { paramValue: "Egress", displayValue: "Egress" },
-                                { paramValue: "Access", displayValue: "Access" },
-                                { paramValue: "Alightings", displayValue: "Alightings" }
-                            ]
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Results Difference",
-            url: "/norms-station-totals-difference",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NormsNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "NoRMS Station Totals",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Nodes",
-                        style: "circle-diverging",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario DS",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period DS",
-                        paramName: "timePeriodCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Scenario DM",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period DM",
-                        paramName: "timePeriodCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "propertyName",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
-                        type: "dropdown",
-                        values: {
-                            source: "local",
-                            values: [
-                                { paramValue: "Boardings", displayValue: "Boardings" },
-                                { paramValue: "Interchanges", displayValue: "Interchanges" },
-                                { paramValue: "Egress", displayValue: "Egress" },
-                                { paramValue: "Access", displayValue: "Access" },
-                                { paramValue: "Alightings", displayValue: "Alightings" }
-                            ]
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Catchment",
-            url: "/norms-station-catchment",
-            type: "MapLayout",
-            category: "Station Catchment",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NormsNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: true,
-                        isStylable: false,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NormsZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "NoRMS Station Catchment",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Zones",
-                        style: "polygon-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-catchment-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "User Class",
-                        paramName: "userClassId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Direction",
-                        paramName: "directionId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
-                        type: "toggle",
-                        values: directionIdValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
-                        type: "dropdown",
-                        values: {
-                            source: "local",
-                            values: [
-                                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                                { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                                { paramValue: "demand_car", displayValue: "Demand Car" },
-                                { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                                { paramValue: "demand_total", displayValue: "Demand Total" }
-                            ]
-                        },
-                    },
-                    {
-                        filterName: "Select station in map",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
-                        type: "map",
-                        layer: "NoRMS Nodes",
-                        field: "id"
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Catchment Difference",
-            url: "/norms-station-catchment/difference",
-            type: "MapLayout",
-            category: "Station Catchment",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NormsNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: true,
-                        isStylable: false,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NormsZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "NoRMS Station Catchment Difference",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Zones",
-                        style: "polygon-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-catchment-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario DS",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Scenario DM",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "User Class DS",
-                        paramName: "userClassIdDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "User Class DM",
-                        paramName: "userClassIdDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Direction",
-                        paramName: "directionId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "toggle",
-                        values: directionIdValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "dropdown",
-                        values: {
-                            source: "local",
-                            values: [
-                                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                                { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                                { paramValue: "demand_car", displayValue: "Demand Car" },
-                                { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                                { paramValue: "demand_total", displayValue: "Demand Total" }
-                            ]
-                        },
-                    },
-                    {
-                        filterName: "Select station in map",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
-                        type: "map",
-                        layer: "NoRMS Nodes",
-                        field: "id"
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Zones Pair Results",
+            pageName: "Zone Pairs",
             url: "/norms-zones-pair",
             type: "MapLayout",
-            category: "Zones Pairs",
+            category: "Zone",
             config: {
                 layers: [
                     {
@@ -1398,10 +1398,10 @@ export const appConfig = {
             },
         },
         {
-            pageName: "Zones Pair Results Difference",
+            pageName: "Zone Pairs Difference",
             url: "/norms-zones-pair-difference",
             type: "MapLayout",
-            category: "Zones Pairs",
+            category: "Zone",
             config: {
                 layers: [
                     {
