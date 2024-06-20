@@ -683,7 +683,7 @@ export const appConfig = {
                         visualisationName: "StationPair",
                         isHoverable: false,
                         isStylable: true,
-                        shouldHaveTooltipOnClick: true,
+                        shouldHaveTooltipOnClick: false,
                     },
                 ],
                 visualisations: [
@@ -783,7 +783,7 @@ export const appConfig = {
                         visualisationName: "StationPairDifference",
                         isHoverable: false,
                         isStylable: true,
-                        shouldHaveTooltipOnClick: true,
+                        shouldHaveTooltipOnClick: false,
                     },
                 ],
                 visualisations: [
