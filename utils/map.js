@@ -92,6 +92,15 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           15,
         ],
         "line-opacity": 1,
+        "line-offset": [
+          "interpolate",
+          ["linear"],
+          ["to-number", ["feature-state", "valueAbs"]],
+          Math.min(...bins),
+          0.05,
+          Math.max(...bins),
+          7.5,
+        ],
       };
     case "line-diverging":
       return {
@@ -108,11 +117,20 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           Math.min(...bins),
-          0.1, // Line width starts at 1 at the value of 0
+          0.1, 
           Math.max(...bins),
           15,
         ],
         "line-opacity": 1,
+        "line-offset": [
+          "interpolate",
+          ["linear"],
+          ["to-number", ["feature-state", "valueAbs"]],
+          Math.min(...bins),
+          0.05, // Line width starts at 1 at the value of 0
+          Math.max(...bins),
+          7.5,
+        ],
       };
     case "circle-continuous":
     case "circle-diverging": {

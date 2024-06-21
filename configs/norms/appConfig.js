@@ -928,7 +928,7 @@ export const appConfig = {
                       visualisationName: "LinksResultDifference",
                       isHoverable: false,
                       isStylable: true,
-                      shouldHaveTooltipOnClick: false,
+                      shouldHaveTooltipOnClick: true,
                   },
               ],
               visualisations: [
