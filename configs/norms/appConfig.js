@@ -357,7 +357,7 @@ export const appConfig = {
                         sourceLayer: "geometry",
                         geometryType: "point",
                         visualisationName: "StationPair",
-                        isHoverable: false,
+                        isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
                     },
@@ -384,6 +384,15 @@ export const appConfig = {
                         visualisations: ["StationPair"],
                         type: "dropdown",
                         values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "Time Period",
+                        paramName: "timePeriodCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
                     },
                     {
                         filterName: "User",
@@ -429,7 +438,7 @@ export const appConfig = {
                         }
                     },
                     {
-                        filterName: "NodeID",
+                        filterName: "Please select a station in the map",
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -484,6 +493,15 @@ export const appConfig = {
                         visualisations: ["StationPairDifference"],
                         type: "toggle",
                         values: originOrDestinationValues,
+                    },
+                    {
+                        filterName: "Time Period",
+                        paramName: "timePeriodCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
                     },
                     {
                         filterName: "Column Name",
