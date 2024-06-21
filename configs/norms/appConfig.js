@@ -357,7 +357,7 @@ export const appConfig = {
                         sourceLayer: "geometry",
                         geometryType: "point",
                         visualisationName: "StationPair",
-                        isHoverable: false,
+                        isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
                     },
@@ -384,6 +384,15 @@ export const appConfig = {
                         visualisations: ["StationPair"],
                         type: "dropdown",
                         values: scenarioCodeValues
+                    },
+                    {
+                        filterName: "Time Period",
+                        paramName: "timePeriodCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPair"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
                     },
                     {
                         filterName: "User",
@@ -429,7 +438,7 @@ export const appConfig = {
                         }
                     },
                     {
-                        filterName: "NodeID",
+                        filterName: "Please select a station in the map",
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -484,6 +493,15 @@ export const appConfig = {
                         visualisations: ["StationPairDifference"],
                         type: "toggle",
                         values: originOrDestinationValues,
+                    },
+                    {
+                        filterName: "Time Period",
+                        paramName: "timePeriodCode",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
                     },
                     {
                         filterName: "Column Name",
@@ -568,6 +586,19 @@ export const appConfig = {
             config: {
                 layers: [
                     {
+                        uniqueId: "NormsZoneVectorTile",
+                        name: "NoRMS Zones",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "zones",
+                        geometryType: "polygon",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: false,
+                    },
+                    {
                         uniqueId: "NormsNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
@@ -579,19 +610,6 @@ export const appConfig = {
                         isHoverable: true,
                         isStylable: false,
                         shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NormsZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
                     },
                 ],
                 visualisations: [
@@ -678,6 +696,19 @@ export const appConfig = {
             config: {
                 layers: [
                     {
+                        uniqueId: "NormsZoneVectorTile",
+                        name: "NoRMS Zones",
+                        type: "tile",
+                        source: "api",
+                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+                        sourceLayer: "zones",
+                        geometryType: "polygon",
+                        visualisationName: "NoRMS Station Catchment",
+                        isHoverable: false,
+                        isStylable: true,
+                        shouldHaveTooltipOnClick: true,
+                    },
+                    {
                         uniqueId: "NormsNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
@@ -689,19 +720,6 @@ export const appConfig = {
                         isHoverable: true,
                         isStylable: false,
                         shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NormsZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
                     },
                 ],
                 visualisations: [
@@ -910,7 +928,7 @@ export const appConfig = {
                       visualisationName: "LinksResultDifference",
                       isHoverable: false,
                       isStylable: true,
-                      shouldHaveTooltipOnClick: false,
+                      shouldHaveTooltipOnClick: true,
                   },
               ],
               visualisations: [
