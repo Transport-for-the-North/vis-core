@@ -183,7 +183,7 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsNodeVectorTile",
+                        uniqueId: "NoRMSNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
                         source: "api",
@@ -257,7 +257,7 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsNodeVectorTile",
+                        uniqueId: "NoRMSNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
                         source: "api",
@@ -349,8 +349,8 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsStationPairVectorTile",
-                        name: "NORMS Station Pair Result",
+                        uniqueId: "NoRMSStationPairVectorTile",
+                        name: "NoRMS Station Pair Result",
                         type: "tile",
                         source: "api",
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
@@ -366,7 +366,7 @@ export const appConfig = {
                     {
                         name: "StationPair",
                         type: "joinDataToMap",
-                        joinLayer: "NORMS Station Pair Result",
+                        joinLayer: "NoRMS Station Pair Result",
                         style: "circle-continuous",
                         joinField: "id",
                         valueField: "value",
@@ -444,7 +444,7 @@ export const appConfig = {
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["StationPair"],
                         type: "map",
-                        layer: "NORMS Station Pair Result",
+                        layer: "NoRMS Station Pair Result",
                         field: "id",
                     }
                 ],
@@ -458,15 +458,15 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsStationPairDifferenceVectorTile",
-                        name: "NORMS Station Pair Result Difference",
+                        uniqueId: "NoRMSStationPairDifferenceVectorTile",
+                        name: "NoRMS Station Pair Result Difference",
                         type: "tile",
                         source: "api",
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
                         visualisationName: "StationPairDifference",
-                        isHoverable: false,
+                        isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
                     },
@@ -475,7 +475,7 @@ export const appConfig = {
                     {
                         name: "StationPairDifference",
                         type: "joinDataToMap",
-                        joinLayer: "NORMS Station Pair Result Difference",
+                        joinLayer: "NoRMS Station Pair Result Difference",
                         style: "circle-diverging",
                         joinField: "id",
                         valueField: "value",
@@ -529,7 +529,7 @@ export const appConfig = {
                         values: scenarioCodeValues
                     },
                     {
-                        filterName: "First User",
+                        filterName: "First User Class",
                         paramName: "userClassIdDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -538,7 +538,7 @@ export const appConfig = {
                         values: userClassIdValues,
                     },
                     {
-                        filterName: "Time Period - DS",
+                        filterName: "First Time Period",
                         paramName: "timePeriodCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -556,7 +556,7 @@ export const appConfig = {
                         values: scenarioCodeValues
                     },
                     {
-                        filterName: "Second User",
+                        filterName: "Second User Class",
                         paramName: "userClassIdDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -565,7 +565,7 @@ export const appConfig = {
                         values: userClassIdValues,
                     },
                     {
-                        filterName: "Time Period - DM",
+                        filterName: "Second Time Period",
                         paramName: "timePeriodCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -574,13 +574,13 @@ export const appConfig = {
                         values: timePeriodCodeValues,
                     },
                     {
-                        filterName: "NodeID",
+                        filterName: "Please select a station in the map",
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["StationPairDifference"],
                         type: "map",
-                        layer: "NORMS Station Pair Result Difference",
+                        layer: "NoRMS Station Pair Result Difference",
                         field: "id",
                     }
 
@@ -595,7 +595,7 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsZoneVectorTile",
+                        uniqueId: "NoRMSZoneVectorTile",
                         name: "NoRMS Zones",
                         type: "tile",
                         source: "api",
@@ -608,7 +608,7 @@ export const appConfig = {
                         shouldHaveTooltipOnClick: false,
                     },
                     {
-                        uniqueId: "NormsNodeVectorTile",
+                        uniqueId: "NoRMSNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
                         source: "api",
@@ -681,15 +681,15 @@ export const appConfig = {
                         values: {
                             source: "local",
                             values: [
-                                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                                { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                                { paramValue: "demand_car", displayValue: "Demand Car" },
-                                { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                                { paramValue: "demand_total", displayValue: "Demand Total" }
+                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },  
+                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
+                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
+                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
+                              { paramValue: "demand_walk", displayValue: "Demand Walk" },
+                              { paramValue: "demand_car", displayValue: "Demand Car" },
+                              { paramValue: "demand_bus", displayValue: "Demand Bus" },
+                              { paramValue: "demand_lrt", displayValue: "Demand LRT" },
+                              { paramValue: "demand_total", displayValue: "Demand Total" }
                             ]
                         },
                     },
@@ -714,7 +714,7 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsZoneVectorTile",
+                        uniqueId: "NoRMSZoneVectorTile",
                         name: "NoRMS Zones",
                         type: "tile",
                         source: "api",
@@ -724,10 +724,10 @@ export const appConfig = {
                         visualisationName: "NoRMS Station Catchment",
                         isHoverable: false,
                         isStylable: true,
-                        shouldHaveTooltipOnClick: true,
+                        shouldHaveTooltipOnClick: false,
                     },
                     {
-                        uniqueId: "NormsNodeVectorTile",
+                        uniqueId: "NoRMSNodeVectorTile",
                         name: "NoRMS Nodes",
                         type: "tile",
                         source: "api",
@@ -745,7 +745,7 @@ export const appConfig = {
                         name: "NoRMS Station Catchment Difference",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Zones",
-                        style: "polygon-continuous",
+                        style: "polygon-diverging",
                         joinField: "id",
                         valueField: "value",
                         dataSource: "api",
@@ -755,7 +755,7 @@ export const appConfig = {
                 metadataLayers: [],
                 filters: [
                     {
-                        filterName: "Scenario DS",
+                        filterName: "First Scenario",
                         paramName: "scenarioCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -764,7 +764,7 @@ export const appConfig = {
                         values: scenarioCodeValues,
                     },
                     {
-                        filterName: "Time Period DS",
+                        filterName: "First Time Period",
                         paramName: "timePeriodCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -773,7 +773,7 @@ export const appConfig = {
                         values: timePeriodCodeValues,
                     },
                     {
-                        filterName: "User Class DS",
+                        filterName: "First User Class",
                         paramName: "userClassIdDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -782,7 +782,7 @@ export const appConfig = {
                         values: userClassIdValues,
                     },
                     {
-                        filterName: "Scenario DM",
+                        filterName: "Second Scenario",
                         paramName: "scenarioCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -791,7 +791,7 @@ export const appConfig = {
                         values: scenarioCodeValues,
                     },
                     {
-                        filterName: "Time Period DM",
+                        filterName: "Second Time Period",
                         paramName: "timePeriodCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -800,7 +800,7 @@ export const appConfig = {
                         values: timePeriodCodeValues,
                     },
                     {
-                        filterName: "User Class DM",
+                        filterName: "Second User Class",
                         paramName: "userClassIdDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -827,15 +827,15 @@ export const appConfig = {
                         values: {
                             source: "local",
                             values: [
-                                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                                { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                                { paramValue: "demand_car", displayValue: "Demand Car" },
-                                { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                                { paramValue: "demand_total", displayValue: "Demand Total" }
+                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },  
+                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
+                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
+                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
+                              { paramValue: "demand_walk", displayValue: "Demand Walk" },
+                              { paramValue: "demand_car", displayValue: "Demand Car" },
+                              { paramValue: "demand_bus", displayValue: "Demand Bus" },
+                              { paramValue: "demand_lrt", displayValue: "Demand LRT" },
+                              { paramValue: "demand_total", displayValue: "Demand Total" }
                             ]
                         },
                     },
@@ -860,8 +860,8 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsLinksVectorTile",
-                        name: "NORMS Links Result",
+                        uniqueId: "NoRMSLinksVectorTile",
+                        name: "NoRMS Links Result",
                         type: "tile",
                         source: "api",
                         path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -877,7 +877,7 @@ export const appConfig = {
                     {
                         name: "Links",
                         type: "joinDataToMap",
-                        joinLayer: "NORMS Links Result",
+                        joinLayer: "NoRMS Links Result",
                         style: "line-continuous",
                         joinField: "id",
                         valueField: "value",
@@ -906,7 +906,7 @@ export const appConfig = {
                         values: timePeriodCodeValues,
                     },
                     {
-                        filterName: "Property",
+                        filterName: "Metric",
                         paramName: "propertyName",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -954,8 +954,8 @@ export const appConfig = {
           config: {
               layers: [
                   {
-                      uniqueId: "NormsLinksResultDifference",
-                      name: "NORMS Links Result Difference",
+                      uniqueId: "NoRMSLinksResultDifference",
+                      name: "NoRMS Links Result Difference",
                       type: "tile",
                       source: "api",
                       path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -971,7 +971,7 @@ export const appConfig = {
                   {
                       name: "LinksResultDifference",
                       type: "joinDataToMap",
-                      joinLayer: "NORMS Links Result Difference",
+                      joinLayer: "NoRMS Links Result Difference",
                       style: "line-diverging",
                       joinField: "id",
                       valueField: "value",
@@ -982,7 +982,7 @@ export const appConfig = {
               metadataLayers: [],
               filters: [
                   {
-                      filterName: "Scenario - DS",
+                      filterName: "First Scenario",
                       paramName: "scenarioCodeDoSomething",
                       target: "api",
                       actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -991,7 +991,7 @@ export const appConfig = {
                       values: scenarioCodeValues
                   },
                   {
-                    filterName: "Scenario - DM",
+                    filterName: "Second Scenario",
                     paramName: "scenarioCodeDoMinimum",
                     target: "api",
                     actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1000,7 +1000,7 @@ export const appConfig = {
                     values: scenarioCodeValues
                   },
                   {
-                      filterName: "Time Period - DS",
+                      filterName: "First Time Period",
                       paramName: "timePeriodCodeDoSomething",
                       target: "api",
                       actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1009,7 +1009,7 @@ export const appConfig = {
                       values: timePeriodCodeValues,
                   },
                   {
-                    filterName: "Time Period - DM",
+                    filterName: "Second Time Period",
                     paramName: "timePeriodCodeDoMinimum",
                     target: "api",
                     actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1018,7 +1018,7 @@ export const appConfig = {
                     values: timePeriodCodeValues,
                   },
                   {
-                      filterName: "Property",
+                      filterName: "Metric",
                       paramName: "propertyName",
                       target: "api",
                       actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1068,8 +1068,8 @@ export const appConfig = {
           config: {
             layers: [
               {
-                uniqueId: "NormsZoneTotals",
-                name: "Norms Zone Totals",
+                uniqueId: "NoRMSZoneTotals",
+                name: "NoRMS Zone Totals",
                 type: "tile",
                 source: "api",
                 path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
@@ -1085,7 +1085,7 @@ export const appConfig = {
               {
                 name: "ZoneTotals",
                 type: "joinDataToMap",
-                joinLayer: "Norms Zone Totals",
+                joinLayer: "NoRMS Zone Totals",
                 style: "polygon-continuous",
                 joinField: "id",
                 valueField: "value",
@@ -1096,7 +1096,7 @@ export const appConfig = {
             metadataLayers: [],
             filters: [
               {
-                filterName: "Select Column",
+                filterName: "Metric",
                 paramName: "columnName",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1154,7 +1154,7 @@ export const appConfig = {
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                 visualisations: ["ZoneTotals"],
-                type: "dropdown", 
+                type: "toggle", 
                 values: originOrDestinationValues
               },
               {
@@ -1196,8 +1196,8 @@ export const appConfig = {
           config: {
             layers: [
               {
-                uniqueId: "NormsZoneTotalsDifference",
-                name: "Norms Zone Totals Difference",
+                uniqueId: "NoRMSZoneTotalsDifference",
+                name: "NoRMS Zone Totals Difference",
                 type: "tile",
                 source: "api",
                 path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
@@ -1213,7 +1213,7 @@ export const appConfig = {
               {
                 name: "ZoneTotalsDifference",
                 type: "joinDataToMap",
-                joinLayer: "Norms Zone Totals Difference",
+                joinLayer: "NoRMS Zone Totals Difference",
                 style: "polygon-diverging",
                 joinField: "id",
                 valueField: "value",
@@ -1224,7 +1224,7 @@ export const appConfig = {
             metadataLayers: [],
             filters: [
               {
-                filterName: "Select Column",
+                filterName: "Metric",
                 paramName: "columnName",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1286,7 +1286,7 @@ export const appConfig = {
                 values: originOrDestinationValues
               },
               {
-                filterName: "Time Period - DS",
+                filterName: "First Time Period",
                 paramName: "timePeriodCodeDoSomething",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1295,7 +1295,7 @@ export const appConfig = {
                 values: timePeriodCodeValues
               },
               {
-                filterName: "Time Period - DM",
+                filterName: "Second Time Period",
                 paramName: "timePeriodCodeDoMinimum",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1304,7 +1304,7 @@ export const appConfig = {
                 values: timePeriodCodeValues
               },
               {
-                filterName: "User Class - DS",
+                filterName: "First User Class",
                 paramName: "userClassIdDoSomething",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1313,7 +1313,7 @@ export const appConfig = {
                 values: userClassIdValues
               },
               {
-                filterName: "User Class - DM",
+                filterName: "Second User Class",
                 paramName: "userClassIdDoMinimum",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1322,7 +1322,7 @@ export const appConfig = {
                 values: userClassIdValues
               },
               {
-                filterName: "Scenario - DS",
+                filterName: "First Scenario",
                 paramName: "scenarioCodeDoSomething",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1331,7 +1331,7 @@ export const appConfig = {
                 values: scenarioCodeValues
               },
               {
-                filterName: "Scenario - DM",
+                filterName: "Second Scenario",
                 paramName: "scenarioCodeDoMinimum",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1350,8 +1350,8 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsZonesPairVectorTile",
-                        name: "NORMS Zones Pair Result",
+                        uniqueId: "NoRMSZonesPairVectorTile",
+                        name: "NoRMS Zones Pair Result",
                         type: "tile",
                         source: "api",
                         path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
@@ -1367,12 +1367,12 @@ export const appConfig = {
                     {
                         name: "ZonesPair",
                         type: "joinDataToMap",
-                        joinLayer: "NORMS Zones Pair Result",
+                        joinLayer: "NoRMS Zones Pair Result",
                         style: "polygon-continuous",
                         joinField: "id",
                         valueField: "value",
                         dataSource: "api",
-                        dataPath: "/api/norms/zones-pair-results",
+                        dataPath: "/api/norms/zone-pair-results",
                     }
                 ],
                 metadataLayers: [],
@@ -1405,16 +1405,16 @@ export const appConfig = {
                         values: userClassIdValues,
                     },
                     {
-                        filterName: "Direction",
+                        filterName: "Zone as Origin or Destination",
                         paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["ZonesPair"],
                         type: "toggle",
-                        values: directionIdValues,
+                        values: originOrDestinationValues,
                     },
                     {
-                        filterName: "Column Name",
+                        filterName: "Metric",
                         paramName: "columnName",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1439,13 +1439,13 @@ export const appConfig = {
                         }
                     },
                     {
-                        filterName: "Zone ID",
+                        filterName: "Select a zone in the map",
                         paramName: "zoneId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["ZonesPair"],
                         type: "map",
-                        layer: "NORMS Zones Pair Result",
+                        layer: "NoRMS Zones Pair Result",
                         field: "id",
                     }
                 ]
@@ -1459,8 +1459,8 @@ export const appConfig = {
             config: {
                 layers: [
                     {
-                        uniqueId: "NormsZonesPairDifferenceVectorTile",
-                        name: "NORMS Zones Pair Result Difference",
+                        uniqueId: "NoRMSZonesPairDifferenceVectorTile",
+                        name: "NoRMS Zones Pair Result Difference",
                         type: "tile",
                         source: "api",
                         path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
@@ -1476,18 +1476,18 @@ export const appConfig = {
                     {
                         name: "ZonesPairDifference",
                         type: "joinDataToMap",
-                        joinLayer: "NORMS Zones Pair Result Difference",
+                        joinLayer: "NoRMS Zones Pair Result Difference",
                         style: "polygon-diverging",
                         joinField: "id",
                         valueField: "value",
                         dataSource: "api",
-                        dataPath: "/api/norms/zones-pair-results/difference",
+                        dataPath: "/api/norms/zone-pair-results/difference",
                     }
                 ],
                 metadataLayers: [],
                 filters: [
                     {
-                        filterName: "Direction",
+                        filterName: "Zone as Origin or Destination",
                         paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1496,7 +1496,7 @@ export const appConfig = {
                         values: originOrDestinationValues,
                     },
                     {
-                        filterName: "Column Name",
+                        filterName: "Metric",
                         paramName: "columnName",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1575,13 +1575,13 @@ export const appConfig = {
                         values: userClassIdValues,
                     },
                     {
-                        filterName: "Zone ID",
+                        filterName: "Select a zone in the map",
                         paramName: "zoneId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                         visualisations: ["ZonesPairDifference"],
                         type: "map",
-                        layer: "NORMS Zones Pair Result Difference",
+                        layer: "NoRMS Zones Pair Result Difference",
                         field: "id",
                     }
                 ]
