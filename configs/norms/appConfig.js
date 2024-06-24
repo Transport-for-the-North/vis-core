@@ -495,15 +495,6 @@ export const appConfig = {
                         values: originOrDestinationValues,
                     },
                     {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
                         filterName: "Column Name",
                         paramName: "columnName",
                         target: "api",
@@ -547,6 +538,15 @@ export const appConfig = {
                         values: userClassIdValues,
                     },
                     {
+                        filterName: "Time Period - DS",
+                        paramName: "timePeriodCodeDoSomething",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
+                    },
+                    {
                         filterName: "Second Scenario",
                         paramName: "scenarioCodeDoMinimum",
                         target: "api",
@@ -563,6 +563,15 @@ export const appConfig = {
                         visualisations: ["StationPairDifference"],
                         type: "dropdown",
                         values: userClassIdValues,
+                    },
+                    {
+                        filterName: "Time Period - DM",
+                        paramName: "timePeriodCodeDoMinimum",
+                        target: "api",
+                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                        visualisations: ["StationPairDifference"],
+                        type: "toggle",
+                        values: timePeriodCodeValues,
                     },
                     {
                         filterName: "NodeID",
