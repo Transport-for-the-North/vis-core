@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import App from './App';
+import { Auth0ProviderWithHistory } from 'contexts';
 import reportWebVitals from './reportWebVitals';
 
 /**
@@ -11,12 +12,23 @@ import reportWebVitals from './reportWebVitals';
  * @constant root
  */
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const isDev = process.env.REACT_APP_NAME === 'dev';
+
 root.render(
-  <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
-  </React.StrictMode>
+  <Router>
+    {isDev ? (
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    ) : (
+      <Auth0ProviderWithHistory>
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      </Auth0ProviderWithHistory>
+    )}
+  </Router>
 );
 
 // If you want to start measuring performance in your app, pass a function

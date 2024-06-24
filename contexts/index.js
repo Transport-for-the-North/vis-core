@@ -1,3 +1,4 @@
 export * from './AppContext'
 export * from './PageContext'
 export * from './MapContext'
+export * from './auth0-provider-with-history'
