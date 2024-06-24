@@ -35,7 +35,7 @@ const fetchDataForVisualisation = debounce(
       }
     }
   },
-  1500
+  400
 );
 
 /**
