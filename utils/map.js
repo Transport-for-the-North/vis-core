@@ -189,11 +189,11 @@ export const resetPaintProperty = (style) => {
     case "circle-diverging":
     case "circle-categorical":
       return {
-        "circle-color": "rgba(0, 0, 0, 0)",
-        "circle-stroke-width": 0,
-        "circle-opacity": 0,
-        "circle-radius": 0,
-        "circle-stroke-color": "rgba(0, 0, 0, 0)",
+        "circle-color": "rgba(0, 0, 0, 100)",
+        "circle-stroke-width": 0.8,
+        "circle-opacity": 1,
+        "circle-radius": 5,
+        "circle-stroke-color": "rgba(0, 0, 0, 100)",
       };
     default:
       return {};
