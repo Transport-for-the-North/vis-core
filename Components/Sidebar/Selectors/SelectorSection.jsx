@@ -1,18 +1,17 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
 import { Slider } from "./Slider";
 import { SelectorLabel } from "./SelectorLabel";
 import { useMapContext } from "hooks";
-import { Toggle } from './Toggle';
+import { Toggle } from "./Toggle";
 
 const SelectorContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const NoDataParagraph = styled.p`
-`
+const NoDataParagraph = styled.p``;
 /**
  * Checks if the geometry property is not null for each feature in the provided feature collection.
  * @param {Object} featureCollection - The GeoJSON feature collection to be checked.
@@ -52,7 +51,11 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {filters.map((filter) => (
         <SelectorContainer key={filter.filterName}>
-          <SelectorLabel htmlFor={filter.paramName} text={filter.filterName} info={filter.info ?? null} />
+          <SelectorLabel
+            htmlFor={filter.paramName}
+            text={filter.filterName}
+            info={filter.info ?? null}
+          />
           {filter.type === "dropdown" && (
             <Dropdown
               key={filter.filterName}
@@ -72,21 +75,35 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
               key={filter.filterName}
               filter={filter}
               onChange={(filter, value) => onFilterChange(filter, value)}
-            />)}
+            />
+          )}
         </SelectorContainer>
       ))}
       {/* Check if no data has been found and display a small message in the sidebar if so */}
       {state.visualisations[Object.keys(state.visualisations)[0]]?.data[0]
-        ?.feature_collection
-        ? !checkGeometryNotNull(
-            JSON.parse(
-              state.visualisations[Object.keys(state.visualisations)[0]].data[0]
-                .feature_collection
-            )
+        ?.feature_collection ? (
+        !checkGeometryNotNull(
+          JSON.parse(
+            state.visualisations[Object.keys(state.visualisations)[0]].data[0]
+              .feature_collection
           )
-          ? <NoDataParagraph>No data available for the selected filters, please try different filters.</NoDataParagraph>
-          : null
-        : null}
+        ) ? (
+          <NoDataParagraph>
+            No data available for the selected filters, please try different
+            filters.
+          </NoDataParagraph>
+        ) : null
+      ) : state.visualisations[Object.keys(state.visualisations)[0]]?.data
+          .length === 0 &&
+        Object.values(
+          state.visualisations[Object.keys(state.visualisations)[0]]
+            ?.queryParams ?? {}
+        ).every((el) => el !== undefined) ? (
+        <NoDataParagraph>
+          No data available for the selected filters, please try different
+          filters.
+        </NoDataParagraph>
+      ) : null}
     </AccordionSection>
   );
 };
