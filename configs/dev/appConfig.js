@@ -286,14 +286,14 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Definition for Link Results
     {
-      pageName: "Link",
+      pageName: "NoHAM Link",
       url: "/noham-links",
       type: "MapLayout",
-      category: "Links",
+      category: "Link",
       config: {
         layers: [
           {
-            uniqueId: "NormsLinksVectorTile",
+            uniqueId: "NoHAMLinksVectorTile",
             name: "NoHAM Links",
             type: "tile",
             source: "api",
@@ -502,11 +502,11 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Link Difference",
+      pageName: "NoHAM Link Difference",
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      category: "Links",
+      category: "Link",
       config: {
         layers: [
           {
@@ -835,7 +835,7 @@ export const appConfig = {
 
 
     {
-      pageName: "Node Result Difference",
+      pageName: "NoHAM Node Result Difference",
       url: "/node-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -873,7 +873,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
             values: {
@@ -893,11 +893,11 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Definition for Node Results
     {
-      pageName: "Zone Result Difference",
+      pageName: "NoHAM Zone Result Difference",
       url: "/zone-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      category: "Zones",
+      category: "Zone",
       config: {
         layers: [
           {
@@ -931,7 +931,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -952,7 +952,7 @@ export const appConfig = {
             filterName: "Demand Scenario - DS",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -969,7 +969,7 @@ export const appConfig = {
             filterName: "Demand Scenario - DM",
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -986,7 +986,7 @@ export const appConfig = {
             filterName: "Demand Year - DS",
             paramName: "demandYearDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -1003,7 +1003,7 @@ export const appConfig = {
             filterName: "Demand Year - DM",
             paramName: "demandYearDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -1020,7 +1020,7 @@ export const appConfig = {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -1045,7 +1045,7 @@ export const appConfig = {
             filterName: "Time Period - DM",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
             values: {
@@ -1073,7 +1073,7 @@ export const appConfig = {
     // -----------------------------------------------------------
 
     {
-      pageName: "Matrix Difference",
+      pageName: "NoHAM Matrix Difference",
       url: "/zonal-pair-difference",
       about: "",
       type: "MapLayout",
@@ -1469,14 +1469,14 @@ export const appConfig = {
         ],
       },
     },
-    
+
     // -----------------------------------------------------------
 
     {
-      pageName: "Link Results",
+      pageName: "NoHAM Link Results",
       url: "/link-results",
       type: "MapLayout",
-      category: "Links",
+      category: "Link",
       about: "", //To be added.
       config: {
         layers: [
@@ -1512,7 +1512,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
@@ -1581,7 +1581,7 @@ export const appConfig = {
             filterName: "Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
@@ -1602,7 +1602,7 @@ export const appConfig = {
             filterName: "Network Scenario",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
@@ -1623,7 +1623,7 @@ export const appConfig = {
             filterName: "Year",
             paramName: "year",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
@@ -1644,7 +1644,7 @@ export const appConfig = {
             filterName: "Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
@@ -1665,7 +1665,7 @@ export const appConfig = {
             filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
@@ -1694,7 +1694,7 @@ export const appConfig = {
 
 
     {
-      pageName: "Node Results",
+      pageName: "NoHAM Node Results",
       url: "/node-results",
       type: "MapLayout",
       category: "Nodes",
@@ -1732,7 +1732,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
             values: {
@@ -1750,114 +1750,114 @@ export const appConfig = {
             }
           },
           {
-          filterName: "Delivery Program",
-          paramName: "deliveryProgrammeName",
-          target: "api",
-          actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
-          visualisations: ["NodeResults"],
-          type: "dropdown",
-          values: {
-            source: "local",
-            values: [
-              {
-                displayValue: "Default", //Not sure if value is empty string or null.
-                paramValue: "",
-              },
-              {
-                displayValue: "MRN",
-                paramValue: "MRN",
-              },
-            ],
+            filterName: "Delivery Program",
+            paramName: "deliveryProgrammeName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Default", //Not sure if value is empty string or null.
+                  paramValue: "",
+                },
+                {
+                  displayValue: "MRN",
+                  paramValue: "MRN",
+                },
+              ],
+            },
           },
-        },
-        {
-          filterName: "Network Scenario",
-          paramName: "networkScenarioName",
-          target: "api",
-          actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
-          visualisations: ["NodeResults"],
-          type: "dropdown",
-          values: {
-            source: "local",
-            values: [
-              {
-                displayValue: "Base",
-                paramValue: "base",
-              },
-              {
-                displayValue: "Do Minimum",
-                paramValue: "dm",
-              },
-            ],
+          {
+            filterName: "Network Scenario",
+            paramName: "networkScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Do Minimum",
+                  paramValue: "dm",
+                },
+              ],
+            },
           },
-        },
-        {
-          filterName: "Year",
-          paramName: "year",
-          target: "api",
-          actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
-          visualisations: ["NodeResults"],
-          type: "dropdown",
-          values: {
-            source: "local",
-            values: [
-              {
-                displayValue: "2018",
-                paramValue: 2018,
-              },
-              {
-                displayValue: "2033",
-                paramValue: 2033,
-              },
-            ],
+          {
+            filterName: "Year",
+            paramName: "year",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
           },
-        },
-        {
-          filterName: "Demand Scenario",
-          paramName: "demandScenarioName",
-          target: "api",
-          actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
-          visualisations: ["NodeResults"],
-          type: "dropdown",
-          values: {
-            source: "local",
-            values: [
-              {
-                displayValue: "Base",
-                paramValue: "base",
-              },
-              {
-                displayValue: "Core",
-                paramValue: "core",
-              },
-            ],
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
           },
-        },
-        {
-          filterName: "Time Period",
-          paramName: "timePeriodCode",
-          target: "api",
-          actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
-          visualisations: ["NodeResults"],
-          type: "dropdown",
-          values: {
-            source: "local",
-            values: [
-              {
-                displayValue: "AM",
-                paramValue: "am",
-              },
-              {
-                displayValue: "Inter-Peak",
-                paramValue: "ip",
-              },
-              {
-                displayValue: "PM",
-                paramValue: "pm",
-              },
-            ],
-          },
-        }]
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          }]
       },
     },
 
@@ -1866,10 +1866,10 @@ export const appConfig = {
 
 
     {
-      pageName: "Zone Results",
+      pageName: "NoHAM Zone Results",
       url: "/zone-results",
       type: "MapLayout",
-      category: "Zones",
+      category: "Zone",
       about: "", //To be added.
       config: {
         layers: [
@@ -1904,7 +1904,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
             values: {
@@ -1925,7 +1925,7 @@ export const appConfig = {
             filterName: "Demand Year",
             paramName: "demandYear",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
             values: {
@@ -1946,7 +1946,7 @@ export const appConfig = {
             filterName: "Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
             values: {
@@ -1967,7 +1967,7 @@ export const appConfig = {
             filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [ {action: "UPDATE_QUERY_PARAMS"} ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
             values: {
@@ -1995,7 +1995,7 @@ export const appConfig = {
     // --------------------------------------------------------------------------------------------------
     // Definition for Zone Pair Results
     {
-      pageName: "Matrix",
+      pageName: "NoHAM Matrix",
       url: "/zonal-pair-results",
       about: "",
       type: "MapLayout",
@@ -2243,5 +2243,3625 @@ export const appConfig = {
         ],
       },
     },
+    {
+      pageName: "NoRMS Station Totals",
+      url: "/norms-station-totals",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NoRMS Station Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Nodes",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "Boardings", displayValue: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress" },
+                { paramValue: "Access", displayValue: "Access" },
+                { paramValue: "Alightings", displayValue: "Alightings" }
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "NoRMS Station Totals Difference",
+      url: "/norms-station-totals-difference",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NoRMS Station Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Nodes",
+            style: "circle-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario DS",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period DS",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Scenario DM",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period DM",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "Boardings", displayValue: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress" },
+                { paramValue: "Access", displayValue: "Access" },
+                { paramValue: "Alightings", displayValue: "Alightings" }
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "NoRMS Station Pairs",
+      url: "/norms-station-pair",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSStationPairVectorTile",
+            name: "NoRMS Station Pair Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "StationPair",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "StationPair",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Station Pair Result",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/station-pair-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPair"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPair"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPair"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Direction",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPair"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "origin",
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "destination",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Column Name",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPair"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "Please select a station in the map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPair"],
+            type: "map",
+            layer: "NoRMS Station Pair Result",
+            field: "id",
+          }
+        ],
+      },
+    },
+    {
+      pageName: "NoRMS Station Pairs Difference",
+      url: "/norms-station-pair-difference",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSStationPairDifferenceVectorTile",
+            name: "NoRMS Station Pair Result Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "StationPairDifference",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "StationPairDifference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Station Pair Result Difference",
+            style: "circle-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/station-pair-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Direction",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "origin",
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "destination",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Column Name",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Please select a station in the map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["StationPairDifference"],
+            type: "map",
+            layer: "NoRMS Station Pair Result Difference",
+            field: "id",
+          }
+
+        ]
+      },
+    },
+    {
+      pageName: "NoRMS Station Catchment",
+      url: "/norms-station-catchment",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneVectorTile",
+            name: "NoRMS Zones",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: true,
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NoRMS Station Catchment",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-catchment-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Direction",
+            paramName: "directionId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment"],
+            type: "toggle",
+            values: {
+    source: "local",
+    values: [
+        {
+            displayValue: "Access",
+            paramValue: "0",
+        },
+        {
+            displayValue: "Egress",
+            paramValue: "1",
+        },
+    ],
+},
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk" },
+                { paramValue: "demand_car", displayValue: "Demand Car" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
+                { paramValue: "demand_total", displayValue: "Demand Total" }
+              ]
+            },
+          },
+          {
+            filterName: "Select station in map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment"],
+            type: "map",
+            layer: "NoRMS Nodes",
+            field: "id"
+          },
+        ],
+      },
+    },
+    {
+      pageName: "NoRMS Station Catchment Difference",
+      url: "/norms-station-catchment/difference",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneVectorTile",
+            name: "NoRMS Zones",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: true,
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NoRMS Station Catchment Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones",
+            style: "polygon-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-catchment-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Direction",
+            paramName: "directionId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "toggle",
+            values: {
+    source: "local",
+    values: [
+        {
+            displayValue: "Access",
+            paramValue: "0",
+        },
+        {
+            displayValue: "Egress",
+            paramValue: "1",
+        },
+    ],
+},
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk" },
+                { paramValue: "demand_car", displayValue: "Demand Car" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
+                { paramValue: "demand_total", displayValue: "Demand Total" }
+              ]
+            },
+          },
+          {
+            filterName: "Select station in map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Catchment Difference"],
+            type: "map",
+            layer: "NoRMS Nodes",
+            field: "id"
+          },
+        ],
+      },
+    },
+    {
+      pageName: "NoRMS Link Totals",
+      url: "/norms-link",
+      type: "MapLayout",
+      category: "Link",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "NoRMS Links Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Links",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Links",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Links Result",
+            style: "line-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/link-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Links"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Links"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Links"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "No. Passengers",
+                  paramValue: "No. Passengers",
+                },
+                {
+                  displayValue: "Total Crush Capacity",
+                  paramValue: "Total Crush Capacity",
+                },
+                {
+                  displayValue: "Total Crush Load Factor",
+                  paramValue: "Total Crush Load Factor",
+                },
+                {
+                  displayValue: "Total Seat Capacity",
+                  paramValue: "Total Seat Capacity",
+                },
+                {
+                  displayValue: "Total Seat Load Factor",
+                  paramValue: "Total Seat Load Factor",
+                },
+                {
+                  displayValue: "Trains per hour",
+                  paramValue: "Trains per hour",
+                },
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "NoRMS Link Totals Difference",
+      url: "/norms-link-result-difference",
+      type: "MapLayout",
+      about: "", //to be added
+      category: "Link",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSLinksResultDifference",
+            name: "NoRMS Links Result Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "LinksResultDifference",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "LinksResultDifference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Links Result Difference",
+            style: "line-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/link-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinksResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinksResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinksResultDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinksResultDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinksResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "No. Passengers",
+                  paramValue: "No. Passengers",
+                },
+                {
+                  displayValue: "Total Crush Capacity",
+                  paramValue: "Total Crush Capacity",
+                },
+                {
+                  displayValue: "Total Crush Load Factor",
+                  paramValue: "Total Crush Load Factor",
+                },
+                {
+                  displayValue: "Total Seat Capacity",
+                  paramValue: "Total Seat Capacity",
+                },
+                {
+                  displayValue: "Total Seat Load Factor",
+                  paramValue: "Total Seat Load Factor",
+                },
+                {
+                  displayValue: "Trains per hour",
+                  paramValue: "Trains per hour",
+                },
+              ]
+            },
+          },
+        ],
+      },
+    },
+
+
+    {
+      pageName: "NoRMS Zone Totals",
+      url: "/zone-totals",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneTotals",
+            name: "NoRMS Zone Totals",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "ZoneTotals",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "ZoneTotals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Totals",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-total-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Revenue',
+                  paramValue: 'revenue'
+                },
+                {
+                  displayValue: 'Demand',
+                  paramValue: 'demand'
+                },
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost'
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt'
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding'
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time'
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time'
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty'
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress'
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice'
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "origin",
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "destination",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            }
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            }
+          },
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+        ]
+      }
+    },
+    {
+      pageName: "NoRMS Zone Totals Difference",
+      url: "/zone-totals-difference",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneTotalsDifference",
+            name: "NoRMS Zone Totals Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "ZoneTotalsDifference",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "ZoneTotalsDifference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Totals Difference",
+            style: "polygon-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-total-results/difference",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Revenue',
+                  paramValue: 'revenue'
+                },
+                {
+                  displayValue: 'Demand',
+                  paramValue: 'demand'
+                },
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost'
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt'
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding'
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time'
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time'
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty'
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress'
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice'
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "origin",
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "destination",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            }
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            }
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            }
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            }
+          },
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneTotalsDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+        ]
+      }
+    },
+    {
+      pageName: "NoRMS Zone Pairs",
+      url: "/norms-zones-pair",
+      type: "MapLayout",
+      category: "Zone",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZonesPairVectorTile",
+            name: "NoRMS Zones Pair Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "ZonesPair",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "ZonesPair",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones Pair Result",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-pair-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPair"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPair"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPair"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Zone as Origin or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPair"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "origin",
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "destination",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPair"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPair"],
+            type: "map",
+            layer: "NoRMS Zones Pair Result",
+            field: "id",
+          }
+        ]
+      },
+    },
+    {
+      pageName: "NoRMS Zone Pairs Difference",
+      url: "/norms-zones-pair-difference",
+      type: "MapLayout",
+      category: "Zone",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZonesPairDifferenceVectorTile",
+            name: "NoRMS Zones Pair Result Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "ZonesPairDifference",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "ZonesPairDifference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones Pair Result Difference",
+            style: "polygon-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-pair-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Zone as Origin or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "origin",
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "destination",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "First User",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            }
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Second User",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "0",
+                },
+                {
+                  displayValue: "Business, all car availabilities",
+                  paramValue: "123",
+                },
+                {
+                  displayValue: "Commuting, all car availability",
+                  paramValue: "456",
+                },
+                {
+                  displayValue: "Other, all car availabilities",
+                  paramValue: "789",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonesPairDifference"],
+            type: "map",
+            layer: "NoRMS Zones Pair Result Difference",
+            field: "id",
+          }
+        ]
+      },
+    }
   ],
 };
