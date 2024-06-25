@@ -5,11 +5,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMapContext } from "hooks";
 import { actionTypes } from "reducers";
 import { api } from "services";
-import { colorSchemes, reclassifyData, createPaintProperty, reclassifyGeoJSONData } from "utils";
+import {
+  colorSchemes,
+  createPaintProperty,
+  reclassifyData,
+  reclassifyGeoJSONData,
+  resetPaintProperty,
+} from "utils";
 
 /**
  * Debounced function to fetch data for a specific visualization.
- * 
+ *
  * @property {Object} visualisation - The visualization object containing details like data path and query parameters.
  * @property {Function} dispatch - The dispatch function to update the state in the context.
  * @property {Function} setLoading - The function to update the loading state.
@@ -28,6 +34,12 @@ const fetchDataForVisualisation = debounce(
           type: actionTypes.UPDATE_VIS_DATA,
           payload: { visualisationName, data },
         });
+        if (data.length === 0) {
+          console.warn(
+            "No data returned for visualisation:",
+            visualisationName
+          );
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data for visualisation:", error);
@@ -40,9 +52,9 @@ const fetchDataForVisualisation = debounce(
 
 /**
  * A React component responsible for rendering visualizations on a map.
- * 
+ *
  * @property {string} props.visualisationName - The name of the visualization.
- * @property {Object} props.map - The Mapbox GL map instance.
+ * @property {Object} props.map - The Maplibre JS map instance.
  * @returns {null} This component doesn't render anything directly.
  */
 export const Visualisation = ({ visualisationName, map }) => {
@@ -56,8 +68,8 @@ export const Visualisation = ({ visualisationName, map }) => {
   /**
    * Reclassifies the provided data and updates the map style.
    *
-   * This function reclassifies the data based on the given style and updates the map style 
-   * accordingly. It ensures that the color scheme is applied correctly and updates the paint 
+   * This function reclassifies the data based on the given style and updates the map style
+   * accordingly. It ensures that the color scheme is applied correctly and updates the paint
    * properties of the map layers.
    *
    * @param {Array} data - The data to be reclassified and styled.
@@ -85,7 +97,6 @@ export const Visualisation = ({ visualisationName, map }) => {
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
-
       addFeaturesToMap(map, paintProperty, state.layers, data, style);
       dispatch({
         type: "UPDATE_MAP_STYLE",
@@ -203,7 +214,12 @@ export const Visualisation = ({ visualisationName, map }) => {
    */
   const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
     Object.values(layers).forEach((layer) => {
-      if (data && data.length > 0 && map.getLayer(layer.name) && layer.isStylable) {
+      if (
+        data &&
+        data.length > 0 &&
+        map.getLayer(layer.name) &&
+        layer.isStylable
+      ) {
         map.getLayer(layer.name).metadata = {
           ...map.getLayer(layer.name).metadata,
           colorStyle: style.split("-")[1],
@@ -306,22 +322,29 @@ export const Visualisation = ({ visualisationName, map }) => {
     return true; // Return true if geometry is not null for all features
   }
 
+  /**
+   * Reset the map style to the default style.
+   * @param {string} style - The type of geometries of the visualisation.
+   */
+  const resetMapStyle = useCallback((style) => {
+    if (map) {
+      const paintProperty = resetPaintProperty(style);
+      addFeaturesToMap(map, paintProperty, state.layers, prevDataRef.current, style);
+    }
+  }, [map, state.layers]);
+
   // Effect to restyle the map if data has changed
   useEffect(() => {
     const dataHasChanged =
-      visualisation.data.length !== 0 &&
-      visualisation.data !== prevDataRef.current;
+      visualisation.data !== prevDataRef.current && prevDataRef.current !== undefined;
     const colorHasChanged =
       state.color_scheme !== null &&
       state.color_scheme !== prevColorRef.current;
-    const needUpdate =
-      dataHasChanged || (colorHasChanged && visualisation.data.length !== 0);
-
+    const needUpdate = dataHasChanged || colorHasChanged;
     if (!needUpdate) {
       setLoading(false);
       return;
     }
-
     switch (visualisation.type) {
       case "geojson": {
         setLoading(true);
@@ -334,9 +357,15 @@ export const Visualisation = ({ visualisationName, map }) => {
       }
 
       case "joinDataToMap": {
+        const dataValues = Object.groupBy(visualisation.data, ({ value }) => value);
+        if (visualisation.data.length === 0 || (Object.keys(dataValues).length === 1 && Object.keys(dataValues)[0] === 0)) {
+          resetMapStyle(visualisation.style);
+        }
         // Reclassify and update the map style
-        setLoading(true);
-        reclassifyAndStyleMap(visualisation.data, visualisation.style);
+        else {
+          setLoading(true);
+          reclassifyAndStyleMap(visualisation.data, visualisation.style);
+        }
         break;
       }
       default:
@@ -367,6 +396,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     dispatch,
     map,
     state.color_scheme,
+    resetMapStyle,
   ]);
 
   return null;
