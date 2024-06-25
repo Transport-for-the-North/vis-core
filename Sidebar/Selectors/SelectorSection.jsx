@@ -46,6 +46,8 @@ function checkGeometryNotNull(featureCollection) {
  */
 export const SelectorSection = ({ filters, onFilterChange }) => {
   const { state } = useMapContext();
+  const noDataMessage =
+    "No data available for the selected filters, please try different filters.";
 
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
@@ -88,10 +90,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
               .feature_collection
           )
         ) ? (
-          <NoDataParagraph>
-            No data available for the selected filters, please try different
-            filters.
-          </NoDataParagraph>
+          <NoDataParagraph>{noDataMessage}</NoDataParagraph>
         ) : null
       ) : state.visualisations[Object.keys(state.visualisations)[0]]?.data
           .length === 0 &&
@@ -99,10 +98,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
           state.visualisations[Object.keys(state.visualisations)[0]]
             ?.queryParams ?? {}
         ).every((el) => el !== undefined) ? (
-        <NoDataParagraph>
-          No data available for the selected filters, please try different
-          filters.
-        </NoDataParagraph>
+        <NoDataParagraph>{noDataMessage}</NoDataParagraph>
       ) : null}
     </AccordionSection>
   );
