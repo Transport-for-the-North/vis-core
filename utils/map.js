@@ -166,6 +166,40 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
   }
 }
 
+export const resetPaintProperty = (style) => { 
+  switch (style) { 
+    case "polygon-diverging":
+    case "polygon-continuous":
+    case "polygon-categorical":
+      return {
+        "fill-color": "rgba(0, 0, 0, 0)",
+        "fill-opacity": 0,
+        "fill-outline-color": "rgba(0, 0, 0, 0)",
+      };
+    case "line-continuous":
+    case "line-diverging":
+    case "line-categorical":
+      return {
+        "line-color": "rgba(0, 0, 0, 0)",
+        "line-width": 0,
+        "line-opacity": 0,
+        "line-offset": 0,
+      };
+    case "circle-continuous":
+    case "circle-diverging":
+    case "circle-categorical":
+      return {
+        "circle-color": "rgba(0, 0, 0, 0)",
+        "circle-stroke-width": 0,
+        "circle-opacity": 0,
+        "circle-radius": 0,
+        "circle-stroke-color": "rgba(0, 0, 0, 0)",
+      };
+    default:
+      return {};
+  }
+}
+
 /**
  * Reclassifies data based on the specified style and rounds the values to ensure
  * that successive rounded values are not identical.
