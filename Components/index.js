@@ -5,3 +5,6 @@ export * from './PageSwitch'
 export * from './Dimmer'
 export * from './Sidebar'
 export * from './DynamicLegend'
+export * from './Login'
+export * from './PrivateRoute'
+
