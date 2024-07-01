@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../contexts/AppContext';
 
@@ -30,13 +31,33 @@ export const Login = () => {
 
             const data = await response.json();
             const jwtToken = data.token;
-            console.log(jwtToken)
+            console.log(jwtToken,"jwtToken")
+            // Decode the JWT token to get the roles
+            const decodedToken = jwtDecode(jwtToken);
+            const userRoles = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [];
 
-            // Store the JWT token in a cookie
-            Cookies.set('token', jwtToken, { expires: 1/48, secure: true });
+            console.log('Decoded Token:', decodedToken);
+            console.log('User Roles:', userRoles);
+
+            //const userRoles = decodedToken.role || [];
+            //console.log(userRoles)
+            // Define the valid roles
+            const validRoles = ['user', 'admin', 'NoHAM_user'];
+
+            // Check if the user has at least one valid role
+            const hasValidRole = userRoles.some(role => validRoles.includes(role));
+
+            if (!hasValidRole) {
+                navigate('/unauthorized');
+                return;
+            }
+
+            // Store the JWT token in a cookie with 1 hour expiration time
+            Cookies.set('token', jwtToken, { expires: 1 / 24, secure: true });
 
             // Redirect to the home page
             navigate('/home');
+
         } catch (err) {
             console.error('Login failed:', err);
             setError('Invalid username or password');
