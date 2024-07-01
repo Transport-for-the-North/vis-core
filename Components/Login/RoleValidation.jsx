@@ -13,9 +13,11 @@ import { getRolesFromToken } from '../../utils/auth';
 export const RoleValidation = (WrappedComponent, requiredRoles = []) => {
     return (props) => {
         const token = Cookies.get('token');
+        console.log("token", token)
         const userRoles = getRolesFromToken(token) || [];
         console.log("user roles", userRoles)
         const isAuthenticated = !!token;
+        console.log("is authenticated", isAuthenticated)
         const hasRequiredRole = requiredRoles.length === 0 || userRoles.some(role => requiredRoles.includes(role));
 
         if (!isAuthenticated) {
