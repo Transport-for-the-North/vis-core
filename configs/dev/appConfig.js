@@ -883,8 +883,232 @@ export const appConfig = {
                   displayValue: 'VOC Percentage',
                   paramValue: 'voc_perc'
                 },
+                {
+                  displayValue: 'Delay',
+                  paramValue: 'delay_secs'
+                },
               ],
             },
+          },       
+          {
+            filterName: "Network Scenario Name - DS",
+            paramName: "networkScenarioNameDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Network Scenario Name - DM",
+            paramName: "networkScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "DM",
+                  paramValue: "dm",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Network Year - DS",
+            paramName: "networkYearDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Network Year - DM",
+            paramName: "networkYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Scenario - DS",
+            paramName: "demandScenarioNameDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Scenario - DM",
+            paramName: "demandScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Year - DS",
+            paramName: "demandYearDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2018",
+                  paramValue: 2018,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Demand Year - DM",
+            paramName: "demandYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "2033",
+                  paramValue: 2033,
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period - DS",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "Inter-Peak",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Delivery Program - DS",
+            paramName: "deliveryProgrammeNameDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Default",
+                  paramValue: "",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Delivery Program - DM",
+            paramName: "deliveryProgrammeNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["NodeResultDifference"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'MRN',
+                  paramValue: 'MRN'
+                }
+              ],
+            },  
           },
         ],
       },
