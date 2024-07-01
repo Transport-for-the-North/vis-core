@@ -73,6 +73,15 @@ export function Navbar() {
       <StyledNavbar className="navbar">
         <Logo className="logoNav" onClick={() => onClick("/")} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
+        <Link
+          key='Home'
+          className={
+            activeLink === "/" ? "ActiveNavButton" : "NavButton"
+          }
+          to="/"
+        >
+          Home
+        </Link>
         {appContext.appPages.map((page) => {
           if (page.category === null) {
             return (
@@ -103,7 +112,6 @@ export function Navbar() {
             return null;
           }
          })}
-
         <Button
           className="navbarMobile"
           src="/img/burgerIcon.png"
