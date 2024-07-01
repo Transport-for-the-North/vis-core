@@ -1,21 +1,14 @@
-﻿import React, { useState, useContext } from 'react';
+﻿import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { AppContext } from 'contexts/AppContext';
+import { useAppContext } from '../../contexts/AppContext';
 
-/**
- * Login component handles user authentication.
- * It sends the user's credentials to the backend API and stores the JWT token in a cookie upon successful login.
- * 
- * @component
- * @returns {JSX.Element} The JSX element representing the Login page.
- */
 export const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const appConfig = useContext(AppContext);
+    const appContext = useAppContext();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -37,12 +30,13 @@ export const Login = () => {
 
             const data = await response.json();
             const jwtToken = data.token;
+            console.log(jwtToken)
 
             // Store the JWT token in a cookie
-            Cookies.set('token', jwtToken, { expires: 2, secure: true });
+            Cookies.set('token', jwtToken, { expires: 1/48, secure: true });
 
             // Redirect to the home page
-            navigate('/');
+            navigate('/home');
         } catch (err) {
             console.error('Login failed:', err);
             setError('Invalid username or password');
@@ -59,7 +53,6 @@ export const Login = () => {
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        required
                     />
                 </div>
                 <div>
@@ -68,7 +61,6 @@ export const Login = () => {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                     />
                 </div>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
