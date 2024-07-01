@@ -208,7 +208,7 @@ export const resetPaintProperty = (style) => {
  * @param {string} style - The type of geometry we have.
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
-export const reclassifyData = (data, style) => {
+export const reclassifyData = (data, style, classificationMethod) => {
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -224,16 +224,26 @@ export const reclassifyData = (data, style) => {
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
     console.log("Bins recalculated for continuous data");
-    const unroundedBins = chroma.limits(values, "e", 8);
-    const roundedBins = roundValues(unroundedBins, 2);
+    const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
+    // New way of calculating rounded bins.
+    // const roundedBins = unroundedBins.map(function(ele){
+    //   return Math.round(ele*100)/100;
+    // });
+    // console.log(unroundedBins, roundedBins);
+    const roundedBins = [...new Set(roundValues(unroundedBins, 2))];
     return roundedBins;
   } else if (style.includes("categorical")) {
     console.log("Categorical classification not implemented for joined data");
     return;
   } else if (style.includes("diverging")) {
     const absValues = data.map((value) => Math.abs(value.value));
-    const unroundedBins = chroma.limits(absValues, "e", 3);
-    let roundedBins = roundValues(unroundedBins, 2);
+    const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
+    // New way of calculating rounded bins.
+    let roundedBins = unroundedBins.map(function(ele){
+      return Math.round(ele*100)/100;
+    });
+    console.log(unroundedBins, roundedBins);
+    //let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
     // Remove any 0's in roundedBins.
     roundedBins = roundedBins.filter((value) => value !== 0)
     if (style.includes("line")) return [0, ...roundedBins];
