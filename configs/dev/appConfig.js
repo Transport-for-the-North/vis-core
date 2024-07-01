@@ -1246,7 +1246,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -1271,7 +1271,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
