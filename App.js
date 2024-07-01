@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route} from 'react-router-dom';
+import { Routes, Route, Router} from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
-
+import { Navigate } from 'react-router-dom';
 import './App.css';
 import { PageSwitch, HomePage, Navbar, Login,Unauthorized,RoleValidation} from 'Components';
 import { Dashboard } from 'layouts';
@@ -53,27 +53,27 @@ function App() {
         return <div>Loading...</div>;
     }
 
-    // Define the valid roles
     const validRoles = ['user', 'admin', 'NoHAM_user'];
 
     return (
         <div className="App">
             <AppContext.Provider value={appConfig}>
-                <Navbar />
-                <Dashboard>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/unauthorized" element={<Unauthorized />} />
-                        <Route path="/" element={<RoleValidation WrappedComponent={HomePage} requiredRoles={validRoles} />} />
-                        {appConfig.appPages.map((page) => (
-                            <Route
-                                key={page.pageName}
-                                exact path={page.url}
-                                element={<PageSwitch pageConfig={page}/>}
-                            />
-                        ))}
-                    </Routes>
-                </Dashboard>
+                    <Navbar />
+                    <Dashboard>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/unauthorized" element={<Unauthorized />} />
+                            <Route path="/" element={<Navigate to="/login" />} />
+                            <Route path="/home" element={RoleValidation(HomePage, validRoles)} />
+                            {appConfig.appPages.map((page) => (
+                                <Route
+                                    key={page.pageName}
+                                    path={page.url}
+                                    element={RoleValidation(PageSwitch, page.roles || validRoles)}
+                                />
+                            ))}
+                        </Routes>
+                    </Dashboard>
             </AppContext.Provider>
         </div>
     );
@@ -83,3 +83,4 @@ const isDev = process.env.REACT_APP_NAME === 'dev';
 export default isDev ? App : withAuthenticationRequired(App, {
     onRedirecting: () => <div>Loading...</div>,
 });
+

@@ -14,6 +14,7 @@ export const RoleValidation = (WrappedComponent, requiredRoles = []) => {
     return (props) => {
         const token = Cookies.get('token');
         const userRoles = getRolesFromToken(token) || [];
+        console.log("user roles", userRoles)
         const isAuthenticated = !!token;
         const hasRequiredRole = requiredRoles.length === 0 || userRoles.some(role => requiredRoles.includes(role));
 
@@ -28,5 +29,3 @@ export const RoleValidation = (WrappedComponent, requiredRoles = []) => {
         return <WrappedComponent {...props} />;
     };
 };
-
-export default RoleValidation;
