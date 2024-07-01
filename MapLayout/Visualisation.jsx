@@ -64,7 +64,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   const prevColorRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
-
+ 
   /**
    * Reclassifies the provided data and updates the map style.
    *
@@ -76,9 +76,9 @@ export const Visualisation = ({ visualisationName, map }) => {
    * @param {string} style - The style to be applied for reclassification.
    */
   const reclassifyAndStyleMap = useCallback(
-    (data, style) => {
+    (data, style, classificationMethod) => {
       // Reclassify data if needed
-      const reclassifiedData = reclassifyData(data, style);
+      const reclassifiedData = reclassifyData(data, style, classificationMethod);
       const currentColor = colorSchemes[style.split("-")[1]].some(
         (e) => e === state.color_scheme.value
       )
@@ -364,7 +364,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         // Reclassify and update the map style
         else {
           setLoading(true);
-          reclassifyAndStyleMap(visualisation.data, visualisation.style);
+          reclassifyAndStyleMap(visualisation.data, visualisation.style, visualisation.queryParams.classificationMethod);
         }
         break;
       }
