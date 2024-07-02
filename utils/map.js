@@ -221,16 +221,35 @@ export const reclassifyData = (data, style, classificationMethod) => {
     return roundedValues;
   };
 
+  function replaceZeroValues(num) {
+    if (num == 0) {
+      return 0.01
+    }
+    else {
+      return num
+    }
+  }
+
+  function replaceZeroPointValues(num) {
+    if (num == 0.01) {
+      return 0
+    }
+    else {
+      return num
+    }
+  }
+
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
+    if (classificationMethod == 'l') {
+      values = values.map(replaceZeroValues)
+    }
     console.log("Bins recalculated for continuous data");
     const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
-    // New way of calculating rounded bins.
-    // const roundedBins = unroundedBins.map(function(ele){
-    //   return Math.round(ele*100)/100;
-    // });
-    // console.log(unroundedBins, roundedBins);
-    const roundedBins = [...new Set(roundValues(unroundedBins, 2))];
+    let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
+    if (classificationMethod == 'l') {
+      roundedBins = roundedBins.map(replaceZeroPointValues)
+    }
     return roundedBins;
   } else if (style.includes("categorical")) {
     console.log("Categorical classification not implemented for joined data");
@@ -242,9 +261,6 @@ export const reclassifyData = (data, style, classificationMethod) => {
     let roundedBins = unroundedBins.map(function(ele){
       return Math.round(ele*100)/100;
     });
-    console.log(unroundedBins, roundedBins);
-    //let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
-    // Remove any 0's in roundedBins.
     roundedBins = roundedBins.filter((value) => value !== 0)
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
