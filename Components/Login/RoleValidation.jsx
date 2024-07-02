@@ -1,7 +1,7 @@
 ﻿import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { getRolesFromToken } from '../../utils/auth';
+import { jwtDecode } from 'jwt-decode';
 
 /**
  * Higher-Order Component to check authentication and roles.
@@ -10,24 +10,25 @@ import { getRolesFromToken } from '../../utils/auth';
  * @param {Array<string>} requiredRoles - The roles required to access the component.
  * @returns {React.Component} - The wrapped component with role validation.
  */
-export const RoleValidation = (WrappedComponent, requiredRoles = []) => {
-    return (props) => {
-        const token = Cookies.get('token');
-        console.log("token", token)
-        const userRoles = getRolesFromToken(token) || [];
-        console.log("user roles", userRoles)
-        const isAuthenticated = !!token;
-        console.log("is authenticated", isAuthenticated)
-        const hasRequiredRole = requiredRoles.length === 0 || userRoles.some(role => requiredRoles.includes(role));
+export const RoleValidation = ({ component: WrappedComponent, requiredRoles = [] }) => {
+    const location = useLocation();
+    console.log("location", location)
+    const token = Cookies.get('token');
+    console.log("token in role validation", token)
+    const userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
+    console.log("token in userRoles", userRoles)
+    const isAuthenticated = !!token;
+    const hasRequiredRole = requiredRoles.length === 0 || userRoles.some(role => requiredRoles.includes(role));
 
-        if (!isAuthenticated) {
-            return <Navigate to="/login" />;
-        }
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} />;
+    }
 
-        if (!hasRequiredRole) {
-            return <Navigate to="/unauthorized" />;
-        }
+    if (!hasRequiredRole) {
+        return <Navigate to="/unauthorized" state={{ from: location }} />;
+    }
 
-        return <WrappedComponent {...props} />;
-    };
+    return <WrappedComponent />;
 };
+
+export default RoleValidation;

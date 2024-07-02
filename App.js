@@ -58,22 +58,21 @@ function App() {
     return (
         <div className="App">
             <AppContext.Provider value={appConfig}>
-                    <Navbar />
-                    <Dashboard>
-                        <Routes>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/unauthorized" element={<Unauthorized />} />
-                            <Route path="/" element={<Navigate to="/login" />} />
-                            <Route path="/home" element={RoleValidation(HomePage, validRoles)} />
-                            {appConfig.appPages.map((page) => (
-                                <Route
-                                    key={page.pageName}
-                                    path={page.url}
-                                    element={RoleValidation(PageSwitch, page.roles || validRoles)}
-                                />
-                            ))}
-                        </Routes>
-                    </Dashboard>
+                <Navbar />
+                <Dashboard>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/unauthorized" element={<Unauthorized />} />
+                        <Route path="/" element={<RoleValidation component={HomePage} requiredRoles={validRoles} />} />
+                        {appConfig.appPages.map((page) => (
+                            <Route
+                                key={page.pageName}
+                                path={page.url}
+                                element={<RoleValidation component={PageSwitch} requiredRoles={page.roles} />}
+                            />
+                        ))}
+                    </Routes>
+                </Dashboard>
             </AppContext.Provider>
         </div>
     );

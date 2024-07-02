@@ -54,8 +54,8 @@ export const Login = () => {
             }
 
             // Store the JWT token in a cookie with 1 hour expiration time
-            Cookies.set('token', jwtToken, { expires: 1 / 24, secure: true });
-
+            Cookies.set('token', jwtToken, { expires: 1 / 24, secure: true, sameSite: 'Lax' });
+            console.log('Token set in cookies:', Cookies.get('token')); 
             // Redirect to the home page
             navigate('/home');
 
