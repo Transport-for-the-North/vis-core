@@ -10,7 +10,8 @@ export const Unauthorized = () => {
     return (
         <div>
             <h1>Unauthorized</h1>
-            <p>You do not have permission to view this page.</p>
+            <p>You are not authorised to access this app.</p>
+            <p>If you believe this is an error, please contact someone@transportforthenorth.com</p>
         </div>
     );
 };

@@ -69,7 +69,7 @@ export function Navbar() {
   }, [location]);
 
   //Check if the current path is "/login"
-  if (location.pathname === "/login") {
+  if (location.pathname === "/login" || location.pathname === "/unauthorized") {
     return null; // Do not render the navbar
   }
 
