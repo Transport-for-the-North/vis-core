@@ -71,7 +71,8 @@ export function Navbar() {
   return (
     <>
       <StyledNavbar className="navbar">
-        <Logo className="logoNav" onClick={() => onClick("/")} />
+        <Logo className="logoNav" onClick={() => onClick("/")} 
+              logoImage={appContext.logoImage} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
         <Link
           key='Home'
@@ -114,11 +115,11 @@ export function Navbar() {
          })}
         <Button
           className="navbarMobile"
-          src="/img/burgerIcon.png"
+          src={appContext.logoutButtonImage}
           alt="Burger Button Navbar"
           onClick={updateMenu}
         />
-        <StyledLogout src="/img/logout.png" onClick={() => handleLogout} />
+        <StyledLogout src={appContext.logoutImage} onClick={() => handleLogout} />
       </StyledNavbar>
       <div className="empty-blank-nav"></div>
     </>

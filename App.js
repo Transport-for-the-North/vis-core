@@ -38,6 +38,9 @@ function App() {
           ...initialAppConfig,
           apiSchema: apiSchema,
         });
+
+        document.title = initialAppConfig.title
+
       } catch (error) {
         console.error('Failed to load app configuration:', error);
       }
