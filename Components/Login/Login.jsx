@@ -57,7 +57,7 @@ export const Login = () => {
             Cookies.set('token', jwtToken, { expires: 1 / 24, secure: true, sameSite: 'Lax' });
             console.log('Token set in cookies:', Cookies.get('token')); 
             // Redirect to the home page
-            navigate('/home');
+            navigate('/');
 
         } catch (err) {
             console.error('Login failed:', err);
