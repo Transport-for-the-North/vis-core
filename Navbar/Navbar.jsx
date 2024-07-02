@@ -68,6 +68,11 @@ export function Navbar() {
     if (sideNavOpen === "sideNavbar-shown") updateMenu();
   }, [location]);
 
+  //Check if the current path is "/login"
+  if (location.pathname === "/login") {
+    return null; // Do not render the navbar
+  }
+
   return (
     <>
       <StyledNavbar className="navbar">
