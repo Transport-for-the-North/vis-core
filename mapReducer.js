@@ -15,7 +15,8 @@ export const actionTypes = {
     UPDATE_COLOR_SCHEME: 'UPDATE_COLOR_SCHEME',
     JOIN_DATA: 'JOIN_DATA',
     SET_IS_LOADING: 'SET_IS_LOADING',
-    SET_LOADING_FINISHED: 'SET_LOADING_FINISHED'
+    SET_LOADING_FINISHED: 'SET_LOADING_FINISHED',
+    UPDATE_LEGEND_TEXT: 'UPDATE_LEGEND_TEXT'
 };
 
 /**
@@ -140,6 +141,29 @@ export const mapReducer = (state, action) => {
         case actionTypes.SET_LOADING_FINISHED: {
             console.log('Loading finished');
             return { ...state, isLoading: false };
+        }
+        case actionTypes.UPDATE_LEGEND_TEXT: { 
+            const { visualisationNames, legendText } = action.payload;
+            
+            if (!visualisationNames || !state.visualisations) {
+                return state;
+            }
+            
+            // Create a new visualisations object with updated legend text for each visualisation
+            const updatedVisualisations = { ...state.visualisations };
+            visualisationNames.forEach((visName) => {
+                if (updatedVisualisations[visName]) {
+                    updatedVisualisations[visName] = {
+                        ...updatedVisualisations[visName],
+                        legendText: legendText,
+                    };
+                }
+            });
+            // Return the new state with updated visualisations
+            return {
+                ...state,
+                visualisations: updatedVisualisations,
+            };
         }
         default:
             return state;
