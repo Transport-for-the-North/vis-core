@@ -53,8 +53,8 @@ function App() {
         return <div>Loading...</div>;
     }
 
-    const validRoles = ['user', 'admin', 'NoHAM_user'];
-
+    const validRoles = ["All_Admin", "All_superuser_role", "All_User", "SecurityAdmin_Admin"];
+    
     return (
         <div className="App">
             <AppContext.Provider value={appConfig}>
