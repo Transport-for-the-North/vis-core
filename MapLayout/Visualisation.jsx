@@ -62,6 +62,7 @@ export const Visualisation = ({ visualisationName, map }) => {
   const [isLoading, setLoading] = useState(false); // State to track loading
   const prevDataRef = useRef();
   const prevColorRef = useRef();
+  const prevClassMethodRef = useRef();
   const prevQueryParamsRef = useRef();
   const visualisation = state.visualisations[visualisationName];
  
@@ -340,7 +341,10 @@ export const Visualisation = ({ visualisationName, map }) => {
     const colorHasChanged =
       state.color_scheme !== null &&
       state.color_scheme !== prevColorRef.current;
-    const needUpdate = dataHasChanged || colorHasChanged;
+    const classificationHasChanged = 
+      state.class_method != null &&
+      state.class_method !== prevClassMethodRef.current;
+    const needUpdate = dataHasChanged || colorHasChanged || classificationHasChanged;
     if (!needUpdate) {
       setLoading(false);
       return;
@@ -364,7 +368,7 @@ export const Visualisation = ({ visualisationName, map }) => {
         // Reclassify and update the map style
         else {
           setLoading(true);
-          reclassifyAndStyleMap(visualisation.data, visualisation.style, visualisation.queryParams.classificationMethod);
+          reclassifyAndStyleMap(visualisation.data, visualisation.style, state.class_method);
         }
         break;
       }
@@ -397,6 +401,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     map,
     state.color_scheme,
     resetMapStyle,
+    state.class_method
   ]);
 
   return null;

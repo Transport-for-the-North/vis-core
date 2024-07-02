@@ -8,6 +8,7 @@ import { useMapContext } from "hooks";
 import { ColourSchemeDropdown } from "../Selectors";
 import { SelectorLabel } from "../Selectors/SelectorLabel";
 import { getOpacityProperty } from "utils";
+import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 
 const LayerControlContainer = styled.div`
   margin-bottom: 10px;
@@ -54,9 +55,16 @@ const OpacitySlider = styled.input`
  * @returns {JSX.Element} The LayerControlEntry component.
  */
 const LayerControlEntry = memo(
-  ({ layer, map, defaultColor, handleColorChange }) => {
+  ({ layer, map, defaultColor, handleColorChange, handleClassificationChange }) => {
     // Fetch the current paint properties for 'fill-opacity' if the layer is already on the map
     // Otherwise, set the current opacity to null
+
+    const classificationMethods = {
+      'Equidistant': 'e',
+      'Quantile': 'q',
+      'Logarithmic': 'l',
+      'K-Means': 'k'
+    }
 
     let currentOpacity = null;
 
@@ -104,6 +112,10 @@ const LayerControlEntry = memo(
     };
     return (
       <LayerControlContainer>
+        <ClassificationDropdown 
+          classType={classificationMethods}
+          onChange={handleClassificationChange}
+        />
         <LayerHeader>
           <LayerName>{layer.id}</LayerName>
           <VisibilityToggle onClick={toggleVisibility}>
@@ -137,7 +149,7 @@ const LayerControlEntry = memo(
  * @property {Function} handleColorChange - The function to handle color changes for the layers.
  * @returns {JSX.Element} The MapLayerSection component.
  */
-export const MapLayerSection = ({ handleColorChange }) => {
+export const MapLayerSection = ({ handleColorChange, handleClassificationChange }) => {
   const { state } = useMapContext();
   const { map } = state;
   const [layers, setLayers] = useState([]);
@@ -188,6 +200,7 @@ export const MapLayerSection = ({ handleColorChange }) => {
           layer={layer}
           map={map}
           handleColorChange={(color) => handleColorChange(color)}
+          handleClassificationChange={(classType) => handleClassificationChange(classType)}
         />
       ))}
     </AccordionSection>
