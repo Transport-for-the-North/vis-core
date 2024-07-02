@@ -429,71 +429,90 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["Links"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Net speed (kph)",
                   paramValue: "netspd_kph",
+                  legendSubtitleText: "Kilometers per hour",
                 },
                 {
                   displayValue: "Total time (secs)",
                   paramValue: "total_time_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: "Car EB vehicles",
                   paramValue: "car_eb_vehs",
+                  legendSubtitleText: "Car Eastbound vehicles",
                 },
                 {
                   displayValue: "Car commuter vehicles",
                   paramValue: "car_comm_vehs",
+                  legendSubtitleText: "Car commuter vehicles",
                 },
                 {
                   displayValue: "Car other vehicles",
                   paramValue: "car_other_vehs",
+                  legendSubtitleText: "Car other vehicles",
                 },
                 {
                   displayValue: "LGV flow vehicles",
                   paramValue: "lgv_flow_vehs",
+                  legendSubtitleText: "Light goods vehicles flow",
                 },
                 {
                   displayValue: "HGV flow vehicles",
                   paramValue: "hgv_flow_vehs",
+                  legendSubtitleText: "Heavy goods vehicles flow",
                 },
                 {
                   displayValue: "Total flow vehicles",
                   paramValue: "total_flow_vehs",
+                  legendSubtitleText: "Total flow of vehicles",
                 },
                 {
                   displayValue: "Link VOC",
                   paramValue: "link_voc",
+                  legendSubtitleText: "Vehicle operating cost",
                 },
                 {
                   displayValue: "Link delay (secs)",
                   paramValue: "link_delay_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: "Link queues (secs)",
                   paramValue: "link_queues_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: "Number of lanes",
                   paramValue: "number_lanes",
+                  legendSubtitleText: "Number of lanes",
                 },
                 {
                   displayValue: "Speed flow curve",
                   paramValue: "speed_flow_curve",
+                  legendSubtitleText: "Speed flow curve",
                 },
                 {
                   displayValue: "Speed limit",
                   paramValue: "speed_limit",
+                  legendSubtitleText: "Speed limit",
                 },
                 {
                   displayValue: "Carbon emissions (tCO2)",
                   paramValue: "carbon_emissions_tco2",
+                  legendSubtitleText: "Tons of CO2",
                 },
               ],
             },
@@ -541,67 +560,90 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: "Net Speed (kph)",
+                  displayValue: "Net speed (kph)",
                   paramValue: "netspd_kph",
+                  legendSubtitleText: "Kilometers per hour",
                 },
                 {
-                  displayValue: "Total Time (seconds)",
+                  displayValue: "Total time (secs)",
                   paramValue: "total_time_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
-                  displayValue: "car_eb_vehs",
+                  displayValue: "Car EB vehicles",
                   paramValue: "car_eb_vehs",
+                  legendSubtitleText: "Car Eastbound vehicles",
                 },
                 {
-                  displayValue: "car_comm_vehs",
+                  displayValue: "Car commuter vehicles",
                   paramValue: "car_comm_vehs",
+                  legendSubtitleText: "Car commuter vehicles",
                 },
                 {
-                  displayValue: "LGV Flows",
+                  displayValue: "Car other vehicles",
+                  paramValue: "car_other_vehs",
+                  legendSubtitleText: "Car other vehicles",
+                },
+                {
+                  displayValue: "LGV flow vehicles",
                   paramValue: "lgv_flow_vehs",
+                  legendSubtitleText: "Light goods vehicles flow",
                 },
                 {
-                  displayValue: "HGV Flows",
+                  displayValue: "HGV flow vehicles",
                   paramValue: "hgv_flow_vehs",
+                  legendSubtitleText: "Heavy goods vehicles flow",
                 },
                 {
-                  displayValue: "Total Flows",
+                  displayValue: "Total flow vehicles",
                   paramValue: "total_flow_vehs",
+                  legendSubtitleText: "Total flow of vehicles",
                 },
                 {
-                  displayValue: "link_voc",
+                  displayValue: "Link VOC",
                   paramValue: "link_voc",
+                  legendSubtitleText: "Vehicle operating cost",
                 },
                 {
-                  displayValue: "Link Delay (seconds)",
+                  displayValue: "Link delay (secs)",
                   paramValue: "link_delay_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
-                  displayValue: "Link Queue (seconds)",
+                  displayValue: "Link queues (secs)",
                   paramValue: "link_queues_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
-                  displayValue: "Number of Lanes",
+                  displayValue: "Number of lanes",
                   paramValue: "number_lanes",
+                  legendSubtitleText: "Number of lanes",
                 },
                 {
-                  displayValue: "speed_flow_curv",
+                  displayValue: "Speed flow curve",
                   paramValue: "speed_flow_curve",
+                  legendSubtitleText: "Speed flow curve",
                 },
                 {
-                  displayValue: "Speed Limit",
+                  displayValue: "Speed limit",
                   paramValue: "speed_limit",
+                  legendSubtitleText: "Speed limit",
                 },
                 {
-                  displayValue: "Carbon Emissions",
+                  displayValue: "Carbon emissions (tCO2)",
                   paramValue: "carbon_emissions_tco2",
+                  legendSubtitleText: "Tons of CO2",
                 },
               ],
             },
@@ -873,15 +915,20 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } // Add this action
+            ],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'VOC Percentage',
-                  paramValue: 'voc_perc'
+                  paramValue: 'voc_perc',
+                  legendSubtitleText: "Percentage",
                 },
               ],
             },
@@ -931,19 +978,25 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'Origin Trips',
-                  paramValue: 'origin_trips'
+                  paramValue: 'origin_trips',
+                  legendSubtitleText: "Trips",
                 },
                 {
                   displayValue: 'Destination Trips',
-                  paramValue: 'destination_trips'
+                  paramValue: 'destination_trips',
+                  legendSubtitleText: "Trips",
                 }
               ],
             },
@@ -1143,31 +1196,40 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Vehicle Trips",
                   paramValue: "trips_veh",
+                  legendSubtitleText: "Trips",
                 },
                 {
                   displayValue: "Travel Time (seconds)",
                   paramValue: "travel_time_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: "Distance (miles)",
                   paramValue: "distance_m",
+                  legendSubtitleText: "Miles",
                 },
                 {
                   displayValue: "Delay (minutes)",
                   paramValue: "delay_mins",
+                  legendSubtitleText: "Minutes",
                 },
                 {
                   displayValue: "Generalised JT (seconds)",
                   paramValue: "generalised_jt_secs",
+                  legendSubtitleText: "Seconds",
                 },
               ],
             },
@@ -1512,67 +1574,85 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["LinkResults"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'Net Speed (kph)',
-                  paramValue: 'netspd_kph'
+                  paramValue: 'netspd_kph',
+                  legendSubtitleText: "kph",
                 },
                 {
                   displayValue: 'Total Time (seconds)',
-                  paramValue: 'total_time_secs'
+                  paramValue: 'total_time_secs',
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: 'car_eb_vehs',
-                  paramValue: 'car_eb_vehs'
+                  paramValue: 'car_eb_vehs',
+                  legendSubtitleText: "Vehicles",
                 },
                 {
                   displayValue: 'car_comm_vehs',
-                  paramValue: 'car_comm_vehs'
+                  paramValue: 'car_comm_vehs',
+                  legendSubtitleText: "Vehicles",
                 },
                 {
                   displayValue: 'LGV Flows',
-                  paramValue: 'lgv_flow_vehs'
+                  paramValue: 'lgv_flow_vehs',
+                  legendSubtitleText: "Flows",
                 },
                 {
                   displayValue: 'HGV Flows',
-                  paramValue: 'hgv_flow_vehs'
+                  paramValue: 'hgv_flow_vehs',
+                  legendSubtitleText: "Flows",
                 },
                 {
                   displayValue: 'Total Flows',
-                  paramValue: 'total_flow_vehs'
+                  paramValue: 'total_flow_vehs',
+                  legendSubtitleText: "Flows",
                 },
                 {
                   displayValue: 'link_voc',
-                  paramValue: 'link_voc'
+                  paramValue: 'link_voc',
+                  legendSubtitleText: "Cost",
                 },
                 {
                   displayValue: 'Link Delay (seconds)',
-                  paramValue: 'link_delay_secs'
+                  paramValue: 'link_delay_secs',
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: 'Link Queue (seconds)',
-                  paramValue: 'link_queues_secs'
+                  paramValue: 'link_queues_secs',
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: 'Number of Lanes',
-                  paramValue: 'number_lanes'
+                  paramValue: 'number_lanes',
+                  legendSubtitleText: "Lanes",
                 },
                 {
-                  displayValue: 'speed_flow_curv',
-                  paramValue: 'speed_flow_curve'
+                  displayValue: 'Speed Flow Curve',
+                  paramValue: 'speed_flow_curve',
+                  legendSubtitleText: "Curve",
                 },
                 {
                   displayValue: 'Speed Limit',
-                  paramValue: 'speed_limit'
+                  paramValue: 'speed_limit',
+                  legendSubtitleText: "kph",
                 },
                 {
                   displayValue: 'Carbon Emissions',
-                  paramValue: 'carbon_emissions_tco2'
+                  paramValue: 'carbon_emissions_tco2',
+                  legendSubtitleText: "Tons",
                 },
               ],
             },
@@ -1732,19 +1812,25 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["NodeResults"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'VOC Percentage',
-                  paramValue: 'voc_perc'
+                  paramValue: 'voc_perc',
+                  legendSubtitleText:"Percentage"
                 },
                 {
                   displayValue: 'Delay (seconds)',
-                  paramValue: 'delay_secs'
+                  paramValue: 'delay_secs',
+                  legendSubtitleText:"Seconds"
                 }
               ],
             }
@@ -1904,19 +1990,25 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZoneResults"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'Origin Trips',
-                  paramValue: 'origin_trips'
+                  paramValue: 'origin_trips',
+                  legendSubtitleText: "Trips",
                 },
                 {
                   displayValue: 'Destination Trips',
-                  paramValue: 'destination_trips'
+                  paramValue: 'destination_trips',
+                  legendSubtitleText: "Trips",
                 }
               ],
             },
@@ -2065,31 +2157,40 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
+            containsLegendInfo: true, 
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Vehicle Trips",
                   paramValue: "trips_veh",
+                  legendSubtitleText: "Count",
                 },
                 {
                   displayValue: "Travel Time (seconds)",
                   paramValue: "travel_time_secs",
+                  legendSubtitleText: "Seconds",
                 },
                 {
                   displayValue: "Distance (miles)",
                   paramValue: "distance_m",
+                  legendSubtitleText: "Miles",
                 },
                 {
                   displayValue: "Delay (minutes)",
                   paramValue: "delay_mins",
+                  legendSubtitleText: "Minutes",
                 },
                 {
                   displayValue: "Generalised JT (seconds)",
                   paramValue: "generalised_jt_secs",
+                  legendSubtitleText: "Seconds",
                 },
               ],
             },
@@ -2404,17 +2505,21 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "propertyName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["NoRMS Station Totals"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
-                { paramValue: "Boardings", displayValue: "Boardings" },
-                { paramValue: "Interchanges", displayValue: "Interchanges" },
-                { paramValue: "Egress", displayValue: "Egress" },
-                { paramValue: "Access", displayValue: "Access" },
-                { paramValue: "Alightings", displayValue: "Alightings" }
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges"},
+                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress"},
+                { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access"},
+                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
               ]
             },
           },
@@ -2704,17 +2809,21 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "propertyName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["NoRMS Station Totals"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
-                { paramValue: "Boardings", displayValue: "Boardings" },
-                { paramValue: "Interchanges", displayValue: "Interchanges" },
-                { paramValue: "Egress", displayValue: "Egress" },
-                { paramValue: "Access", displayValue: "Access" },
-                { paramValue: "Alightings", displayValue: "Alightings" }
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText:"Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText:"Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText:"Egress" },
+                { paramValue: "Access", displayValue: "Access", legendSubtitleText:"Access" },
+                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText:"Alightings" }
               ]
             },
           },
@@ -2932,23 +3041,30 @@ export const appConfig = {
             filterName: "Column Name",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["StationPair"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Demand",
                   paramValue: "demand",
+                  legendSubtitleText: "Demand"
                 },
                 {
                   displayValue: "Generalised Cost",
                   paramValue: "gen_cost",
+                  legendSubtitleText: "Cost"
                 },
                 {
                   displayValue: "Generalised Journey Time",
                   paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds"
                 }
               ]
             }
@@ -3026,23 +3142,30 @@ export const appConfig = {
             filterName: "Column Name",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["StationPairDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Demand",
                   paramValue: "demand",
+                  legendSubtitleText: "Demand"
                 },
                 {
                   displayValue: "Generalised Cost",
                   paramValue: "gen_cost",
+                  legendSubtitleText: "Cost"
                 },
                 {
                   displayValue: "Generalised Journey Time",
                   paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds"
                 }
               ]
             }
@@ -3570,38 +3693,42 @@ export const appConfig = {
             visualisations: ["NoRMS Station Catchment"],
             type: "toggle",
             values: {
-    source: "local",
-    values: [
-        {
-            displayValue: "Access",
-            paramValue: "0",
-        },
-        {
-            displayValue: "Egress",
-            paramValue: "1",
-        },
-    ],
-},
+              source: "local",
+              values: [
+                {
+                    displayValue: "Access",
+                    paramValue: "0",
+                },
+                {
+                    displayValue: "Egress",
+                    paramValue: "1",
+                },
+              ]
+            },
           },
           {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["NoRMS Station Catchment"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
-                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                { paramValue: "demand_car", displayValue: "Demand Car" },
-                { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                { paramValue: "demand_total", displayValue: "Demand Total" }
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost"},
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
               ]
             },
           },
@@ -3976,38 +4103,42 @@ export const appConfig = {
             visualisations: ["NoRMS Station Catchment Difference"],
             type: "toggle",
             values: {
-    source: "local",
-    values: [
-        {
-            displayValue: "Access",
-            paramValue: "0",
-        },
-        {
-            displayValue: "Egress",
-            paramValue: "1",
-        },
-    ],
-},
+              source: "local",
+              values: [
+                  {
+                      displayValue: "Access",
+                      paramValue: "0",
+                  },
+                  {
+                      displayValue: "Egress",
+                      paramValue: "1",
+                  },
+              ],
+          },
           },
           {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["NoRMS Station Catchment Difference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
-                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                { paramValue: "demand_car", displayValue: "Demand Car" },
-                { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                { paramValue: "demand_total", displayValue: "Demand Total" }
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
               ]
             },
           },
@@ -4185,35 +4316,45 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "propertyName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["Links"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "No. Passengers",
                   paramValue: "No. Passengers",
+                  legendSubtitleText: "Passengers"
                 },
                 {
                   displayValue: "Total Crush Capacity",
                   paramValue: "Total Crush Capacity",
+                  legendSubtitleText: "Capacity"
                 },
                 {
                   displayValue: "Total Crush Load Factor",
                   paramValue: "Total Crush Load Factor",
+                  legendSubtitleText: "Factor"
                 },
                 {
                   displayValue: "Total Seat Capacity",
                   paramValue: "Total Seat Capacity",
+                  legendSubtitleText: "Capacity"
                 },
                 {
                   displayValue: "Total Seat Load Factor",
                   paramValue: "Total Seat Load Factor",
+                  legendSubtitleText: "Factor"
                 },
                 {
                   displayValue: "Trains per hour",
                   paramValue: "Trains per hour",
+                  legendSubtitleText: "Trains per hour"
                 },
               ]
             },
@@ -4505,35 +4646,45 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "propertyName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["LinksResultDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "No. Passengers",
                   paramValue: "No. Passengers",
+                  legendSubtitleText: "Passengers"
                 },
                 {
                   displayValue: "Total Crush Capacity",
                   paramValue: "Total Crush Capacity",
+                  legendSubtitleText: "Capacity"
                 },
                 {
                   displayValue: "Total Crush Load Factor",
                   paramValue: "Total Crush Load Factor",
+                  legendSubtitleText: "Factor"
                 },
                 {
                   displayValue: "Total Seat Capacity",
                   paramValue: "Total Seat Capacity",
+                  legendSubtitleText: "Capacity"
                 },
                 {
                   displayValue: "Total Seat Load Factor",
                   paramValue: "Total Seat Load Factor",
+                  legendSubtitleText: "Factor"
                 },
                 {
                   displayValue: "Trains per hour",
                   paramValue: "Trains per hour",
+                  legendSubtitleText: "Trains per hour"
                 },
               ]
             },
@@ -4583,51 +4734,65 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZoneTotals"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'Revenue',
-                  paramValue: 'revenue'
+                  paramValue: 'revenue',
+                  legendSubtitleText: "Revenue"
                 },
                 {
                   displayValue: 'Demand',
-                  paramValue: 'demand'
+                  paramValue: 'demand',
+                  legendSubtitleText: "Demand"
                 },
                 {
                   displayValue: 'Total Generalised Cost',
-                  paramValue: 'total_gen_cost'
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Cost"
                 },
                 {
                   displayValue: 'IVT',
-                  paramValue: 'ivt'
+                  paramValue: 'ivt',
+                  legendSubtitleText: "IVT"
                 },
                 {
                   displayValue: 'Crowding',
-                  paramValue: 'crowding'
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Crowding"
                 },
                 {
                   displayValue: 'Wait Time',
-                  paramValue: 'wait_time'
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Seconds"
                 },
                 {
                   displayValue: 'Walk Time',
-                  paramValue: 'walk_time'
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Seconds"
                 },
                 {
                   displayValue: 'Penalty',
-                  paramValue: 'penalty'
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Penalty"
                 },
                 {
                   displayValue: 'Access Egress',
-                  paramValue: 'access_egress'
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "Access Egress"
                 },
                 {
                   displayValue: 'Value of choice',
-                  paramValue: 'value_of_choice'
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "Value"
                 },
               ],
             },
@@ -4847,51 +5012,65 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZoneTotalsDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: 'Revenue',
-                  paramValue: 'revenue'
+                  paramValue: 'revenue',
+                  legendSubtitleText: "Revenue"
                 },
                 {
                   displayValue: 'Demand',
-                  paramValue: 'demand'
+                  paramValue: 'demand',
+                  legendSubtitleText: "Demand"
                 },
                 {
                   displayValue: 'Total Generalised Cost',
-                  paramValue: 'total_gen_cost'
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Cost"
                 },
                 {
                   displayValue: 'IVT',
-                  paramValue: 'ivt'
+                  paramValue: 'ivt',
+                  legendSubtitleText: "IVT"
                 },
                 {
                   displayValue: 'Crowding',
-                  paramValue: 'crowding'
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Crowding"
                 },
                 {
                   displayValue: 'Wait Time',
-                  paramValue: 'wait_time'
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Seconds"
                 },
                 {
                   displayValue: 'Walk Time',
-                  paramValue: 'walk_time'
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Seconds"
                 },
                 {
                   displayValue: 'Penalty',
-                  paramValue: 'penalty'
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Penalty"
                 },
                 {
                   displayValue: 'Access Egress',
-                  paramValue: 'access_egress'
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "Access Egress"
                 },
                 {
                   displayValue: 'Value of choice',
-                  paramValue: 'value_of_choice'
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "Value"
                 },
               ],
             },
@@ -5433,23 +5612,30 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZonesPair"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Demand",
                   paramValue: "demand",
+                  legendSubtitleText: "Demand"
                 },
                 {
                   displayValue: "Generalised Cost",
                   paramValue: "gen_cost",
+                  legendSubtitleText: "Cost"
                 },
                 {
                   displayValue: "Generalised Journey Time",
                   paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds"
                 }
               ]
             }
@@ -5527,23 +5713,30 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" } 
+            ],
             visualisations: ["ZonesPairDifference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Demand",
                   paramValue: "demand",
+                  legendSubtitleText: "Demand"
                 },
                 {
                   displayValue: "Generalised Cost",
                   paramValue: "gen_cost",
+                  legendSubtitleText: "Cost"
                 },
                 {
                   displayValue: "Generalised Journey Time",
                   paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds"
                 }
               ]
             }
@@ -5865,3 +6058,9 @@ export const appConfig = {
     }
   ],
 };
+
+// Validation to ensure only one filter has containsLegendInfo: true
+const legendFilters = appConfig.appPages.flatMap(page => page.config.filters.filter(filter => filter.containsLegendInfo));
+if (legendFilters.length > 1) {
+  throw new Error("Only one filter can have containsLegendInfo: true");
+}

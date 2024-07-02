@@ -2,6 +2,7 @@ import { forEach } from "lodash";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { numberWithCommas, roundValue } from "utils";
+import { useSelector } from "react-redux";
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -218,6 +219,9 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
   return null;
 };
 
+
+
+
 /**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
@@ -231,6 +235,7 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
  */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
+  const legendTexts = useSelector((state) => state.visualisations);
 
   useEffect(() => {
     if (!map) return;
@@ -241,6 +246,7 @@ export const DynamicLegend = ({ map }) => {
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer) => {
           const title = layer.id;
+          const legendText = legendTexts[title]?.legendText || title;
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
@@ -248,7 +254,7 @@ export const DynamicLegend = ({ map }) => {
               paintProps["fill-color"]
           );
           const widthStops = interpretWidthExpression(paintProps["line-width"]);
-          return { title, colorStops, widthStops };
+          return { title: legendText, colorStops, widthStops };
         });
       setLegendItems(items);
     };
@@ -258,7 +264,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [map]);
+  }, [map, legendTexts]);
 
   if (legendItems.length === 0) {
     return null;
