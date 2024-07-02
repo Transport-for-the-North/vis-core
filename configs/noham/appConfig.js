@@ -17,11 +17,13 @@ const originOrDestTripValues = {
   values: [
     {
       displayValue: 'Origin Trips',
-      paramValue: 'origin_trips'
+      paramValue: 'origin_trips',
+      legendSubtitleText: "unit"
     },
     {
       displayValue: 'Destination Trips',
-      paramValue: 'destination_trips'
+      paramValue: 'destination_trips',
+      legendSubtitleText: "unit"
     }
   ],
 }
@@ -90,64 +92,79 @@ const linkMetricValues = {
   source: "local",
   values: [
     {
-      displayValue: "Net speed (kph)",
+      displayValue: "Net speed",
       paramValue: "netspd_kph",
+      legendSubtitleText: "kph"
     },
     {
-      displayValue: "Total time (secs)",
+      displayValue: "Total time",
       paramValue: "total_time_secs",
+      legendSubtitleText: "seconds"
     },
     {
       displayValue: "Car EB vehicles",
       paramValue: "car_eb_vehs",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "Car commuter vehicles",
       paramValue: "car_comm_vehs",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "Car other vehicles",
       paramValue: "car_other_vehs",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "LGV flow vehicles",
       paramValue: "lgv_flow_vehs",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "HGV flow vehicles",
       paramValue: "hgv_flow_vehs",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "Total flow vehicles",
       paramValue: "total_flow_vehs",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "Link VOC",
       paramValue: "link_voc",
+      legendSubtitleText: "unit"
     },
     {
-      displayValue: "Link delay (secs)",
+      displayValue: "Link delay",
       paramValue: "link_delay_secs",
+      legendSubtitleText: "seconds"
     },
     {
-      displayValue: "Link queues (secs)",
+      displayValue: "Link queues",
       paramValue: "link_queues_secs",
+      legendSubtitleText: "seconds"
     },
     {
       displayValue: "Number of lanes",
       paramValue: "number_lanes",
+      legendSubtitleText: "unit"
     },
     {
       displayValue: "Speed flow curve",
       paramValue: "speed_flow_curve",
+      legendSubtitleText: "unknown"
     },
     {
       displayValue: "Speed limit",
       paramValue: "speed_limit",
+      legendSubtitleText: "mph"
     },
     {
-      displayValue: "Carbon emissions (tCO2)",
+      displayValue: "Carbon emissions",
       paramValue: "carbon_emissions_tco2",
+      legendSubtitleText: "tCO2"
     },
   ],
 }
@@ -156,12 +173,14 @@ const nodeMetricValues = {
   source: "local",
   values: [
     {
-      displayValue: 'VOC Percentage',
-      paramValue: 'voc_perc'
+      displayValue: 'VOC',
+      paramValue: 'voc_perc',
+      legendSubtitleText: "%"
     },
     {
-      displayValue: 'Delay (seconds)',
-      paramValue: 'delay_secs'
+      displayValue: 'Delay',
+      paramValue: 'delay_secs',
+      legendSubtitleText: "seconds"
     }
   ],
 }
@@ -172,22 +191,27 @@ const matrixMetricValues = {
     {
       displayValue: "Vehicle Trips",
       paramValue: "trips_veh",
+      legendSubtitleText: "unit"
     },
     {
-      displayValue: "Travel Time (seconds)",
+      displayValue: "Travel Time",
       paramValue: "travel_time_secs",
+      legendSubtitleText: "seconds"
     },
     {
-      displayValue: "Distance (miles)",
+      displayValue: "Distance",
       paramValue: "distance_m",
+      legendSubtitleText: "miles"
     },
     {
-      displayValue: "Delay (minutes)",
+      displayValue: "Delay",
       paramValue: "delay_mins",
+      legendSubtitleText: "minutes"
     },
     {
-      displayValue: "Generalised JT (seconds)",
+      displayValue: "Generalised JT",
       paramValue: "generalised_jt_secs",
+      legendSubtitleText: "seconds"
     },
   ],
 }
@@ -240,52 +264,36 @@ const pairMetricValues = {
   source: "local",
   values: [
     {
-      displayValue: 'VOC Percentage',
-      paramValue: 'voc_perc'
+      displayValue: 'VOC',
+      paramValue: 'voc_perc',
+      legendSubtitleText: "%"
     },
     {
       displayValue: "Vehicle Trips",
       paramValue: "trips_veh",
+      legendSubtitleText: "unit"
     },
     {
-      displayValue: "Travel Time (seconds)",
+      displayValue: "Travel Time",
       paramValue: "travel_time_secs",
+      legendSubtitleText: "seconds"
     },
     {
-      displayValue: "Distance (miles)",
+      displayValue: "Distance",
       paramValue: "distance_m",
+      legendSubtitleText: "miles"
     },
     {
-      displayValue: "Delay (minutes)",
+      displayValue: "Delay",
       paramValue: "delay_mins",
+      legendSubtitleText: "minutes"
     },
     {
-      displayValue: "Generalised JT (seconds)",
+      displayValue: "Generalised JT",
       paramValue: "generalised_jt_secs",
+      legendSubtitleText: "seconds"
     },
   ],
-}
-
-const classificationMethodValues = {
-  source: "local",
-  values: [
-    {
-      displayValue: 'Equidistant',
-      paramValue: 'e'
-    },
-    {
-      displayValue: "Quantile",
-      paramValue: "q",
-    },
-    {
-      displayValue: "Logarithmic",
-      paramValue: "l",
-    },
-    {
-      displayValue: "K-Means",
-      paramValue: "k",
-    },
-  ]
 }
 
 export const appConfig = {
@@ -343,13 +351,22 @@ export const appConfig = {
         metadataLayers: [],
         filters: [
           {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Links"],
+            type: "dropdown",
+            values: linkMetricValues,
+          },
+          {
             filterName: "Delivery programme",
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
           {
             filterName: "Network scenario",
@@ -358,7 +375,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "Demand scenario",
@@ -367,7 +384,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Year",
@@ -376,7 +393,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Time period",
@@ -385,16 +402,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: timePeriodValues
-          },
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
-            type: "dropdown",
-            values: linkMetricValues
+            values: timePeriodValues,
           },
         ],
       },
@@ -444,7 +452,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: linkMetricValues
+            values: linkMetricValues,
           },
           {
             filterName: "First Network Scenario Name",
@@ -453,7 +461,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "First Network Year",
@@ -462,7 +470,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "First Demand Scenario",
@@ -471,7 +479,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "First Demand Year",
@@ -480,7 +488,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "First Time Period",
@@ -489,7 +497,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
           {
             filterName: "First Delivery Program",
@@ -498,7 +506,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
           {
             filterName: "Second Network Scenario Name",
@@ -507,7 +515,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "Second Network Year",
@@ -516,7 +524,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Second Demand Scenario",
@@ -525,7 +533,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Second Demand Year",
@@ -534,7 +542,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Second Time Period",
@@ -543,7 +551,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
           {
             filterName: "Second Delivery Program",
@@ -552,7 +560,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
         ]
       },
@@ -602,15 +610,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: nodeMetricValues
-          },
-          {
-            filterName: "Select Classification Method",
-            paramName: "classificationMethod",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
-            type: "dropdown",
-            values: classificationMethodValues
+            values: nodeMetricValues,
           },
           {
             filterName: "Delivery Program",
@@ -619,7 +619,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
           {
             filterName: "Network Scenario",
@@ -628,7 +628,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "Year",
@@ -637,7 +637,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Demand Scenario",
@@ -646,7 +646,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Time Period",
@@ -655,7 +655,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           }]
       },
     },
@@ -705,15 +705,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
-            values: nodeMetricValues
-          },
-          {
-            filterName: "Select Classification Method",
-            paramName: "classificationMethod",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResultDifference"],
-            type: "dropdown",
-            values: classificationMethodValues
+            values: nodeMetricValues,
           },
         ],
       },
@@ -764,15 +756,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: originOrDestTripValues
-          },
-          {
-            filterName: "Select Classification Method",
-            paramName: "classificationMethod",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
-            type: "dropdown",
-            values: classificationMethodValues
+            values: originOrDestTripValues,
           },
           {
             filterName: "Demand Year",
@@ -781,7 +765,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Demand Scenario",
@@ -790,7 +774,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Time Period",
@@ -799,7 +783,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
         ]
       }
@@ -850,15 +834,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: originOrDestTripValues
-          },
-          {
-            filterName: "Select Classification Method",
-            paramName: "classificationMethod",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
-            type: "dropdown",
-            values: classificationMethodValues
+            values: originOrDestTripValues,
           },
           {
             filterName: "First Demand Scenario",
@@ -867,7 +843,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "First Demand Year",
@@ -876,7 +852,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "First Time Period",
@@ -885,7 +861,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
           {
             filterName: "Second Demand Scenario",
@@ -894,7 +870,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Second Demand Year",
@@ -903,7 +879,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Second Time Period",
@@ -912,7 +888,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
         ]
       },
@@ -967,21 +943,13 @@ export const appConfig = {
             field: "id",
           },
           {
-            filterName: "Select Classification Method",
-            paramName: "classificationMethod",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: classificationMethodValues
-          },
-          {
             filterName: "Choose if selected zone is origin/destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "toggle",
-            values: originOrDestinationValues
+            values: originOrDestinationValues,
           },
           {
             filterName: "Select Column",
@@ -990,7 +958,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: pairMetricValues
+            values: pairMetricValues,
           },
           {
             filterName: "First Network Scenario Name",
@@ -999,7 +967,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "First Network Year",
@@ -1008,7 +976,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "First Demand Scenario",
@@ -1017,7 +985,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "First Demand Year",
@@ -1026,7 +994,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "First Time Period",
@@ -1035,7 +1003,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "toggle",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
           {
             filterName: "First Delivery Program",
@@ -1044,7 +1012,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
           {
             filterName: "First User Class",
@@ -1053,7 +1021,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: userClassValues
+            values: userClassValues,
           },
           {
             filterName: "Second Network Scenario Name",
@@ -1062,7 +1030,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "Second Network Year",
@@ -1071,7 +1039,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Second Demand Scenario",
@@ -1080,7 +1048,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Second Demand Year",
@@ -1089,7 +1057,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Second Time Period",
@@ -1098,7 +1066,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "toggle",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
           {
             filterName: "Second Delivery Program",
@@ -1107,7 +1075,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
           {
             filterName: "Second User Class",
@@ -1116,7 +1084,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: userClassValues
+            values: userClassValues,
           },
         ],
       },
@@ -1177,15 +1145,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Select Classification Method",
-            paramName: "classificationMethod",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
-            type: "dropdown",
-            values: classificationMethodValues
+            values: originOrDestinationValues,
           },
           {
             filterName: "Select Column",
@@ -1194,7 +1154,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: pairMetricValues
+            values: pairMetricValues,
           },
           {
             filterName: "Network Scenario Name",
@@ -1203,7 +1163,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: networkScenarioValues
+            values: networkScenarioValues,
           },
           {
             filterName: "Year",
@@ -1212,7 +1172,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: yearValues
+            values: yearValues,
           },
           {
             filterName: "Demand Scenario",
@@ -1221,7 +1181,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: demandScenarioValues
+            values: demandScenarioValues,
           },
           {
             filterName: "Time Period",
@@ -1230,7 +1190,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: timePeriodValues
+            values: timePeriodValues,
           },
           {
             filterName: "Delivery Program",
@@ -1239,7 +1199,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: deliveryProgramValues,
           },
           {
             filterName: "User Class",
@@ -1248,7 +1208,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: userClassValues
+            values: userClassValues,
           },
         ],
       },
