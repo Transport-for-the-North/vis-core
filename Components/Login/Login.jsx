@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../contexts/AppContext';
+import './Login.css'; // Import the CSS file
 
 export const Login = () => {
     const [username, setUsername] = useState('');
@@ -42,7 +43,7 @@ export const Login = () => {
             //const userRoles = decodedToken.role || [];
             //console.log(userRoles)
             // Define the valid roles
-            const validRoles = ['user', 'admin', 'NoHAM_user'];
+            const validRoles = ["All_Admin", "All_superuser_role", "All_User", "SecurityAdmin_Admin"];
 
             // Check if the user has at least one valid role
             const hasValidRole = userRoles.some(role => validRoles.includes(role));
@@ -65,28 +66,33 @@ export const Login = () => {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Username:</label>
+        <div className="login-container">
+            <div className="login-box">
+                <img src='/img/tfn-logo-fullsize.png' alt="Transport for the North" className="login-logo" />
+                <h2>Welcome</h2>
+                <p>Log in to Transport for the North to continue to the Appraisal Platform.</p>
+                <form onSubmit={handleLogin}>
+                    <label htmlFor="username">User Name*</label>
                     <input
                         type="text"
+                        id="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        required
                     />
-                </div>
-                <div>
-                    <label>Password:</label>
+                    <label htmlFor="password">Password*</label>
                     <input
                         type="password"
+                        id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
-                </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit">Login</button>
-            </form>
+
+                    {error && <p className="error-message">{error}</p>}
+                    <button type="submit">Continue</button>
+                </form>
+            </div>
         </div>
     );
 };
