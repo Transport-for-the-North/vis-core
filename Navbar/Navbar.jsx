@@ -2,8 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { AppContext } from "contexts";
-
+import { AppContext} from "contexts";
+import { useAuth } from "contexts/AuthProvider";
 import { Button } from "./Button";
 import { LateralNavbar } from "./LateralNavbar";
 import { Logo } from "./Logo";
@@ -44,6 +44,8 @@ export function Navbar() {
   const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
   const listCategories = [];
   const appContext = useContext(AppContext);
+  const { logOut } = useAuth();
+  
   const navigate = useNavigate();
 
   const onClick = (url) => {
@@ -60,7 +62,9 @@ export function Navbar() {
   };
 
   const handleLogout = () => {
-    //TODO : Add the logout behavior
+      
+   logOut(); // Call logout function from AuthContext
+      
   };
 
   useEffect(() => {
