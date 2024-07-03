@@ -3,10 +3,12 @@ import { Routes, Route, Router} from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import { Navigate } from 'react-router-dom';
 import './App.css';
-import { PageSwitch, HomePage, Navbar, Login,Unauthorized,RoleValidation} from 'Components';
+import { PageSwitch, HomePage, Navbar, Login, Unauthorized, RoleValidation } from 'Components';
 import { Dashboard } from 'layouts';
-import { AppContext } from 'contexts';
+import { AppContext ,AuthProvider} from 'contexts';
 import { api } from 'services';
+
+//import AuthProvider from './contexts/AuthContext'; // Correct import
 
 
 /**
@@ -16,6 +18,7 @@ import { api } from 'services';
  */
 function App() {
     const [appConfig, setAppConfig] = useState(null);
+    //const { logOut } = useAuth();
 
     useEffect(() => {
         /**
@@ -57,6 +60,7 @@ function App() {
     
     return (
         <div className="App">
+        <AuthProvider>
             <AppContext.Provider value={appConfig}>
                 <Navbar />
                 <Dashboard>
@@ -74,6 +78,7 @@ function App() {
                     </Routes>
                 </Dashboard>
             </AppContext.Provider>
+            </AuthProvider >
         </div>
     );
 }
