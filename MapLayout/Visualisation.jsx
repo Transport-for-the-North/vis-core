@@ -344,7 +344,8 @@ export const Visualisation = ({ visualisationName, map }) => {
     const classificationHasChanged = 
       state.class_method != null &&
       state.class_method !== prevClassMethodRef.current;
-    const needUpdate = dataHasChanged || colorHasChanged || classificationHasChanged;
+      const
+      needUpdate = dataHasChanged || (colorHasChanged && visualisation.data[0] !== undefined) || classificationHasChanged;
     if (!needUpdate) {
       setLoading(false);
       return;
