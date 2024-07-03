@@ -25,6 +25,13 @@ const LegendTitle = styled.div`
   margin-bottom: 8px;
 `;
 
+const LegendSubtitle = styled.h2`
+  font-weight: normal;
+  text-align: left;
+  margin-bottom: 8px;
+  font-size: small;
+`;
+
 const LegendItem = styled.div`
   display: flex;
   align-items: center;
@@ -246,7 +253,9 @@ export const DynamicLegend = ({ map }) => {
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer) => {
           const title = layer.id;
-          const legendText = legendTexts[title]?.legendText || title;
+          const legendText = legendTexts[title]?.legendText || {};
+          const displayValue = legendText.displayValue || 'title1';    
+          const legendSubtitleText = legendText.legendSubtitleText || "title2";
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
@@ -254,7 +263,12 @@ export const DynamicLegend = ({ map }) => {
               paintProps["fill-color"]
           );
           const widthStops = interpretWidthExpression(paintProps["line-width"]);
-          return { title: legendText, colorStops, widthStops };
+          return { 
+            title: displayValue,
+            subtitle: legendSubtitleText,
+            colorStops, 
+            widthStops 
+          };
         });
       setLegendItems(items);
     };
@@ -275,6 +289,7 @@ export const DynamicLegend = ({ map }) => {
       {legendItems.map((item, index) => (
         <div key={index}>
           <LegendTitle>{item.title}</LegendTitle>
+          <LegendSubtitle>{item.subtitle}</LegendSubtitle>
           {item.colorStops &&
             !item.widthStops &&
             item.colorStops.map((stop, idx) => (
