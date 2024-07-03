@@ -56,29 +56,29 @@ function App() {
         return <div>Loading...</div>;
     }
 
-    const validRoles = ["All_Admin", "All_superuser_role", "All_User", "SecurityAdmin_Admin"];
     
+   
     return (
         <div className="App">
-        <AuthProvider>
-            <AppContext.Provider value={appConfig}>
-                <Navbar />
-                <Dashboard>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/unauthorized" element={<Unauthorized />} />
-                        <Route path="/" element={<RoleValidation component={HomePage} requiredRoles={validRoles} />} />
-                        {appConfig.appPages.map((page) => (
-                            <Route
-                                key={page.pageName}
-                                path={page.url}
-                                element={<RoleValidation component={PageSwitch} requiredRoles={page.roles} />}
-                            />
-                        ))}
-                    </Routes>
-                </Dashboard>
-            </AppContext.Provider>
-            </AuthProvider >
+            <AuthProvider>
+                <AppContext.Provider value={appConfig}>
+                    <Navbar />
+                    <Dashboard>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/unauthorized" element={<Unauthorized />} />
+                            <Route path="/" element={<RoleValidation component={HomePage} />} />
+                            {appConfig.appPages.map((page) => (
+                                <Route
+                                    key={page.pageName}
+                                    path={page.url}
+                                    element={<RoleValidation component={PageSwitch} />}
+                                />
+                            ))}
+                        </Routes>
+                    </Dashboard>
+                </AppContext.Provider>
+            </AuthProvider>
         </div>
     );
 }

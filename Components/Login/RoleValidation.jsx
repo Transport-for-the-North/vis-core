@@ -1,24 +1,37 @@
 ﻿import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Corrected import statement
 
 /**
  * Higher-Order Component to check authentication and roles.
  * 
  * @param {React.Component} WrappedComponent - The component to wrap.
- * @param {Array<string>} requiredRoles - The roles required to access the component.
  * @returns {React.Component} - The wrapped component with role validation.
  */
-export const RoleValidation = ({ component: WrappedComponent, requiredRoles = [] }) => {
+export const RoleValidation = ({ component: WrappedComponent }) => {
     const location = useLocation();
-    console.log("location", location)
     const token = Cookies.get('token');
-    console.log("token in role validation", token)
+    const appName = process.env.REACT_APP_NAME;
+    console.log("AppName in RoleValidation", appName);
+
     const userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
-    console.log("token in userRoles", userRoles)
     const isAuthenticated = !!token;
-    const hasRequiredRole = requiredRoles.length === 0 || userRoles.some(role => requiredRoles.includes(role));
+
+    // Define dynamic required roles based on the app name
+    const requiredRoles = [
+        `${appName}_User`,
+        `${appName}_Admin`,
+        `All_User`,
+        `All_Admin`
+    ];
+
+    const hasRequiredRole = userRoles.some(role => requiredRoles.includes(role));
+
+    console.log("isAuthenticated", isAuthenticated);
+    console.log("userRoles", userRoles);
+    console.log("requiredRoles", requiredRoles);
+    console.log("hasRequiredRole", hasRequiredRole);
 
     if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} />;
