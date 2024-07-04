@@ -142,29 +142,31 @@ export const mapReducer = (state, action) => {
             console.log('Loading finished');
             return { ...state, isLoading: false };
         }
-        case actionTypes.UPDATE_LEGEND_TEXT: { 
-            const { visualisationNames, legendText } = action.payload;
-            
-            if (!visualisationNames || !state.visualisations) {
-                return state;
-            }
-            
-            // Create a new visualisations object with updated legend text for each visualisation
-            const updatedVisualisations = { ...state.visualisations };
-            visualisationNames.forEach((visName) => {
-                if (updatedVisualisations[visName]) {
-                    updatedVisualisations[visName] = {
-                        ...updatedVisualisations[visName],
-                        legendText: legendText,
-                    };
-                }
-            });
+        case actionTypes.UPDATE_LEGEND_TEXT: {
+
+            const visualisationName = action.payload.filter.visualisations;
+            const displayValue = action.payload.filterValue;
+            const legendSubtitleText = action.payload.filterValue;
+
+            // Create a new visualisations object with updated legend text for the specified visualisation
+            const updatedVisualisations = {
+                ...state.visualisations,
+                [visualisationName]: {
+                    ...state.visualisations[visualisationName],
+                    legendText: [
+                        ...(state.visualisations[visualisationName]?.legendText || []),
+                        { displayValue, legendSubtitleText },
+                    ],
+                },
+            };
+
             // Return the new state with updated visualisations
             return {
                 ...state,
                 visualisations: updatedVisualisations,
             };
         }
+
         default:
             return state;
     }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { numberWithCommas, roundValue } from "utils";
 import { useSelector } from "react-redux";
+import {useMapContext} from "hooks";
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -242,7 +243,9 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
  */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
-  const legendTexts = useSelector((state) => state.visualisations);
+  const {state} = useMapContext();
+  const legendText = state.visualisation.legendText
+  console.log(state.visualisation)
 
   useEffect(() => {
     if (!map) return;
@@ -253,8 +256,8 @@ export const DynamicLegend = ({ map }) => {
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer) => {
           const title = layer.id;
-          const legendText = legendTexts[title]?.legendText || {};
-          const displayValue = legendText.displayValue || 'title1';    
+          //const legendText = legendTexts[title]?.legendText || {};
+          const displayValue = legendText.displayValue || title;    
           const legendSubtitleText = legendText.legendSubtitleText || "title2";
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
@@ -278,7 +281,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [map, legendTexts]);
+  }, [map, legendText]);
 
   if (legendItems.length === 0) {
     return null;

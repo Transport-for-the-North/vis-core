@@ -6060,7 +6060,7 @@ export const appConfig = {
 };
 
 // Validation to ensure only one filter has containsLegendInfo: true
-const legendFilters = appConfig.appPages.flatMap(page => page.config.filters.filter(filter => filter.containsLegendInfo));
+/* const legendFilters = appConfig.appPages.flatMap(page => page.config.filters.filter(filter => filter.containsLegendInfo));
 if (legendFilters.length > 1) {
   throw new Error("Only one filter can have containsLegendInfo: true");
-}
+} */
