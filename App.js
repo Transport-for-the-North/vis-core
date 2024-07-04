@@ -72,9 +72,10 @@ function App() {
                                 <Route
                                     key={page.pageName}
                                     path={page.url}
-                                    element={<RoleValidation component={PageSwitch} />}
+                                    element={<RoleValidation component={() => <PageSwitch pageConfig={page} />} />}
                                 />
                             ))}
+                            
                         </Routes>
                     </Dashboard>
                 </AppContext.Provider>
