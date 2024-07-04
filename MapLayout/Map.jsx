@@ -8,7 +8,7 @@ import { useMap, useMapContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 import { Visualisation } from "./Visualisation";
-import { getHoverLayerStyle, getLayerStyle } from "./utils";
+import { getHoverLayerStyle, getLayerStyle } from "utils";
 
 const StyledMapContainer = styled.div`
   width: 100%;
