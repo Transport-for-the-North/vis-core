@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
-import { syncMaps } from "@mapbox/mapbox-gl-sync-move";
-
-export const useDualMaps = (mapContainerRef) => {
+import { syncMaps } from "utils";
+/**
+ * 
+ * @param {React.RefObject} leftMapContainerRef 
+ * @param {React.RefObject} rightMapContainerRef 
+ * @returns 
+ */
+export const useDualMaps = (leftMapContainerRef, rightMapContainerRef) => {
   const [leftMap, setLeftMap] = useState(null);
   const [rightMap, setRightMap] = useState(null);
   const [isMapStyleLoaded, setIsMapStyleLoaded] = useState(false);
@@ -12,7 +17,7 @@ export const useDualMaps = (mapContainerRef) => {
   useEffect(() => {
     const initializeDualMap = () => {
       const leftMapInstance = new maplibregl.Map({
-        container: mapContainerRef.current,
+        container: leftMapContainerRef.current,
         style:
           "https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=5f0299a14c344b3399f76c8bc70db6ca",
         center: [-2.597, 53.39],
@@ -29,7 +34,7 @@ export const useDualMaps = (mapContainerRef) => {
       leftMapInstance.resize();
 
       const rightMapInstance = new maplibregl.Map({
-        container: mapContainerRef.current,
+        container: rightMapContainerRef.current,
         style:
           "https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=5f0299a14c344b3399f76c8bc70db6ca",
         center: [-2.597, 53.39],
