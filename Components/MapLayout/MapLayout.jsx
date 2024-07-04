@@ -6,6 +6,7 @@ import { PageContext } from 'contexts';
 import { useMapContext } from 'hooks';
 import { loremIpsum } from 'utils';
 import Map from "./Map";
+import DualMaps from './DualMaps';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -15,6 +16,7 @@ const LayoutContainer = styled.div`
 const MapContainer = styled.div`
   flex: 1;
   position: relative;
+  display: flex;
 `;
 
 /**
@@ -93,9 +95,12 @@ export const MapLayout = () => {
         <MapLayerSection handleColorChange={handleColorChange} 
           handleClassificationChange={handleClassificationChange}/>
       </Sidebar>
-      <MapContainer>
+      {pageContext.type === "MapLayout" && <MapContainer>
         <Map/>
-      </MapContainer>
+      </MapContainer>}
+      {pageContext.type === "DualMapLayout" && <MapContainer>
+        <DualMaps/>
+      </MapContainer>}
     </LayoutContainer>
   );
 };
