@@ -11,7 +11,11 @@ export const actionTypes = {
     UPDATE_LAYER_PAINT: 'UPDATE_LAYER_PAINT',
     ADD_VISUALISATION: 'ADD_VISUALISATION',
     UPDATE_QUERY_PARAMS: 'UPDATE_QUERY_PARAMS',
+    UPDATE_LEFT_QUERY_PARAMS: 'UPDATE_LEFT_QUERY_PARAMS',
+    UPDATE_RIGHT_QUERY_PARAMS: 'UPDATE_RIGHT_QUERY_PARAMS',
     UPDATE_VIS_DATA: 'UPDATE_VIS_DATA',
+    UPDATE_LEFT_VIS_DATA: 'UPDATE_LEFT_VIS_DATA',
+    UPDATE_RIGHT_VIS_DATA: 'UPDATE_RIGHT_VIS_DATA',
     UPDATE_COLOR_SCHEME: 'UPDATE_COLOR_SCHEME',
     JOIN_DATA: 'JOIN_DATA',
     SET_IS_LOADING: 'SET_IS_LOADING',
@@ -31,7 +35,7 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}, isLoading: true};
+            return { ...state, layers: {}, visualisations: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true};
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload};
         case actionTypes.INITIALISE_SIDEBAR:
@@ -93,7 +97,8 @@ export const mapReducer = (state, action) => {
         
         case actionTypes.ADD_VISUALISATION: {
             // Logic to add a visualisation
-            return { ...state, visualisations: { ...state.visualisations, ...action.payload } };
+            const visualisationContent = {...state.visualisations, ...action.payload};
+            return { ...state, visualisations: visualisationContent, leftVisualisations: visualisationContent, rightVisualisations: visualisationContent};
         }
 
         case actionTypes.UPDATE_QUERY_PARAMS: {
@@ -121,6 +126,46 @@ export const mapReducer = (state, action) => {
                 visualisations: updatedVisualisations,
             };
         }
+            
+        case actionTypes.UPDATE_LEFT_QUERY_PARAMS: { 
+            const visualisationNames = action.payload.filter.visualisations;
+            const paramName = action.payload.filter.paramName;
+            const newParamValue = action.payload.value;
+            const updatedVisualisations = { ...state.leftVisualisations };
+            visualisationNames.forEach((visName) => {
+                if (updatedVisualisations[visName]) {
+                    updatedVisualisations[visName] = {
+                        ...updatedVisualisations[visName],
+                        queryParams: {
+                        ...updatedVisualisations[visName].queryParams,
+                        [paramName]: newParamValue,
+                        },
+                    };
+                }
+            });
+            return {...state, leftVisualisations: updatedVisualisations};
+        }
+            
+        case actionTypes.UPDATE_RIGHT_QUERY_PARAMS: { 
+            console.log("updatedRightVisualisations")
+            const visualisationNames = action.payload.filter.visualisations;
+            const paramName = action.payload.filter.paramName;
+            const newParamValue = action.payload.value;
+            const updatedVisualisations = { ...state.rightVisualisations };
+            visualisationNames.forEach((visName) => {
+                if (updatedVisualisations[visName]) {
+                    updatedVisualisations[visName] = {
+                        ...updatedVisualisations[visName],
+                        queryParams: {
+                        ...updatedVisualisations[visName].queryParams,
+                        [paramName]: newParamValue,
+                        },
+                    };
+                }
+            });
+
+            return {...state, rightVisualisations: updatedVisualisations};
+        }
 
         case actionTypes.UPDATE_VIS_DATA: {return {
             ...state,
@@ -133,6 +178,29 @@ export const mapReducer = (state, action) => {
             },
           };
         }
+        case actionTypes.UPDATE_LEFT_VIS_DATA: {return {
+            ...state,
+            leftVisualisations: {
+                ...state.leftVisualisations,
+                [action.payload.visualisationName]: {
+                ...state.leftVisualisations[action.payload.visualisationName],
+                data: action.payload.data,
+              },
+            },
+          };
+        }
+            
+        case actionTypes.UPDATE_RIGHT_VIS_DATA: {
+            return {
+                ...state,
+                rightVisualisations: {
+                    ...state.rightVisualisations,
+                    [action.payload.visualisationName]: {
+                        ...state.rightVisualisations[action.payload.visualisationName],
+                        data: action.payload.data,
+                    },
+                },
+        }}
 
         case actionTypes.SET_MAP: {
             const { map } = action.payload;
