@@ -9,6 +9,8 @@ export const MapContext = createContext();
 const initialState = {
   layers: {},
   visualisations: {},
+  leftVisualisations: {},
+  rightVisualisations: {},
   metadataLayers: [],
   filters: [],
   map: null,
