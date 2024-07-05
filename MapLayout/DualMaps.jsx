@@ -347,21 +347,23 @@ const DualMaps = () => {
   return (
     <>
       <StyledMapContainer ref={leftMapContainerRef}>
-      {Object.values(state.visualisations).map((visConfig) => (
+      {Object.values(state.leftVisualisations).map((visConfig) => (
           <Visualisation
             key={visConfig.name}
             visualisationName={visConfig.name}
-            map={leftMap}
+          map={leftMap}
+          left={true}
         />
       ))}
         {isMapReady && <DynamicLegend map={leftMap} />}
         </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
-        {Object.values(state.visualisations).map((visConfig) => (
+        {Object.values(state.rightVisualisations).map((visConfig) => (
           <Visualisation
             key={visConfig.name}
             visualisationName={visConfig.name}
             map={rightMap}
+            left={false}
           />
         ))}
         {isMapReady && <DynamicLegend map={rightMap} />}
