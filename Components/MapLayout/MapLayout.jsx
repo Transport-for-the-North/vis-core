@@ -47,13 +47,20 @@ export const MapLayout = () => {
               type: action.action,
               payload: { filter, value: defaultValue },
             });
+          } else {
+            let defaultValue = filter.defaultValue || filter.min || filter.values?.values[0]?.paramValue;
+            dispatch({
+              type: action.action,
+              payload: { filter, value: defaultValue },
+            });
           }
         })
         }
     );
       initializedRef.current = true;
-    }}
-  , [pageContext.config.filters, dispatch, state.visualisations]);
+    } 
+  }
+  , [pageContext.config.filters, dispatch, state.visualisations, state.leftVisualisations, state.rightVisualisations]);
 
   useEffect(() => {
     initializedRef.current = false;

@@ -2726,6 +2726,306 @@ export const appConfig = {
       },
     },
     {
+      pageName: "NoRMS Station Totals Side-by-Side",
+      url: "/norms-station-totals-difference-dual",
+      type: "DualMapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "NoRMS Station Catchment",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "NoRMS Station Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Nodes",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario DS",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period DS",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Scenario DM",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "IGX 2018",
+                  paramValue: "IGX_2018",
+                },
+                {
+                  displayValue: "JPI 2042",
+                  paramValue: "JPI_2042",
+                },
+                {
+                  displayValue: "JRT 2042",
+                  paramValue: "JRT_2042",
+                },
+                {
+                  displayValue: "JRU 2052",
+                  paramValue: "JRU_2052",
+                },
+                {
+                  displayValue: "JRV 2042",
+                  paramValue: "JRV_2042",
+                },
+                {
+                  displayValue: "JRW 2052",
+                  paramValue: "JRW_2052",
+                },
+                {
+                  displayValue: "JRX 2042",
+                  paramValue: "JRX_2042",
+                },
+                {
+                  displayValue: "JRY 2052",
+                  paramValue: "JRY_2052",
+                },
+                {
+                  displayValue: "JRZ 2042",
+                  paramValue: "JRZ_2042",
+                },
+                {
+                  displayValue: "JSA 2052",
+                  paramValue: "JSA_2052",
+                },
+                {
+                  displayValue: "K9N 2042",
+                  paramValue: "K9N_2042",
+                },
+                {
+                  displayValue: "K9O 2052",
+                  paramValue: "K9O_2052",
+                },
+                {
+                  displayValue: "KZI 2042",
+                  paramValue: "KZI_2042",
+                },
+                {
+                  displayValue: "UAA 2042",
+                  paramValue: "UAA_2042",
+                },
+                {
+                  displayValue: "UAB 2052",
+                  paramValue: "UAB_2052",
+                },
+                {
+                  displayValue: "UAC 2042",
+                  paramValue: "UAC_2042",
+                },
+                {
+                  displayValue: "UAD 2052",
+                  paramValue: "UAD_2052",
+                },
+                {
+                  displayValue: "UAE 2042",
+                  paramValue: "UAE_2042",
+                },
+                {
+                  displayValue: "UAF 2052",
+                  paramValue: "UAF_2052",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period DM",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "toggle",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "All",
+                  paramValue: "all",
+                },
+                {
+                  displayValue: "AM",
+                  paramValue: "am",
+                },
+                {
+                  displayValue: "IP",
+                  paramValue: "ip",
+                },
+                {
+                  displayValue: "OP",
+                  paramValue: "op",
+                },
+                {
+                  displayValue: "PM",
+                  paramValue: "pm",
+                },
+              ]
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "Boardings", displayValue: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress" },
+                { paramValue: "Access", displayValue: "Access" },
+                { paramValue: "Alightings", displayValue: "Alightings" }
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
       pageName: "NoRMS Station Pairs",
       url: "/norms-station-pair",
       type: "MapLayout",
