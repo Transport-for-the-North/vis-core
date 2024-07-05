@@ -143,22 +143,32 @@ export const mapReducer = (state, action) => {
             return { ...state, isLoading: false };
         }
         case actionTypes.UPDATE_LEGEND_TEXT: {
-
-            const visualisationName = action.payload.filter.visualisations;
-            const displayValue = action.payload.filterValue;
-            const legendSubtitleText = action.payload.filterValue;
-
+            const visualisationNames = action.payload.filter.visualisations;
+            const values = action.payload.filter.values.values;
+            console.log("hahahaha")
+            console.log(visualisationNames)
+            console.log(values)
+        
             // Create a new visualisations object with updated legend text for the specified visualisation
-            const updatedVisualisations = {
-                ...state.visualisations,
-                [visualisationName]: {
-                    ...state.visualisations[visualisationName],
-                    legendText: [
-                        ...(state.visualisations[visualisationName]?.legendText || []),
-                        { displayValue, legendSubtitleText },
-                    ],
-                },
-            };
+            const updatedVisualisations = { ...state.visualisations };
+        
+            visualisationNames.forEach((visName) => {
+                if (updatedVisualisations[visName]) {
+                    // Iterate over the values and update legendText accordingly
+                    const newLegendText = values.map(value => ({
+                        displayValue: value.displayValue,
+                        legendSubtitleText: value.legendSubtitleText
+                    }));
+        
+                    updatedVisualisations[visName] = {
+                        ...updatedVisualisations[visName],
+                        legendText: [
+                            ...(updatedVisualisations[visName].legendText || []),
+                            ...newLegendText
+                        ]
+                    };
+                }
+            });
 
             // Return the new state with updated visualisations
             return {
@@ -166,7 +176,6 @@ export const mapReducer = (state, action) => {
                 visualisations: updatedVisualisations,
             };
         }
-
         default:
             return state;
     }
