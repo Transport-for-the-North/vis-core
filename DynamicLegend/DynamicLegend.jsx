@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { numberWithCommas, roundValue } from "utils";
 import { useSelector } from "react-redux";
 import {useMapContext} from "hooks";
+import { Visualisation } from "Components/MapLayout/Visualisation";
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -244,8 +245,24 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const {state} = useMapContext();
-  const legendText = state.visualisation.legendText
-  console.log(state.visualisation)
+
+  // Access the first key in visualisations
+  const visualisationKey = Object.keys(state.visualisations)[0];
+  console.log("Visualisation Key: ", visualisationKey);
+  const visualisation = state.visualisations[visualisationKey];
+  console.log("Visualisation: ", visualisation);
+
+  const legendTexts = visualisation?.legendText || [];
+  //const legendText = state.visualisations
+  console.log("00000000000000")
+  console.log(state.visualisations)
+  console.log("111111111111111")
+  console.log(legendTexts)
+  console.log("22222222222222")
+  //console.log(state.visualisations.visualisations.legendText[3])
+  console.log("333333333333333")
+  //console.log(state.visualisations.legendText.legendSubtitleText)
+  console.log("444444444444444")
 
   useEffect(() => {
     if (!map) return;
@@ -254,11 +271,11 @@ export const DynamicLegend = ({ map }) => {
       const layers = map.getStyle().layers;
       const items = layers
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
-        .map((layer) => {
+        .map((layer, index) => {
           const title = layer.id;
-          //const legendText = legendTexts[title]?.legendText || {};
-          const displayValue = legendText.displayValue || title;    
-          const legendSubtitleText = legendText.legendSubtitleText || "title2";
+          console.log("aaaaaaaaaaaaaaa")
+          const displayValue = legendTexts[index]?.displayValue || title;
+          const legendSubtitleText = legendTexts[index]?.legendSubtitleText || "Subtitle";
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
@@ -281,7 +298,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [map, legendText]);
+  }, [map, legendTexts]);
 
   if (legendItems.length === 0) {
     return null;
