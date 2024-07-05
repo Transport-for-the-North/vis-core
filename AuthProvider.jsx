@@ -1,8 +1,10 @@
 import React, { useContext, createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode'; // Correct the import
 import { api } from "services";
+import { jwtDecode } from 'jwt-decode'; // Correct the import
+
+//import BaseService from './BaseService'; 
 
 export const AuthContext = createContext();
 
@@ -10,25 +12,18 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(Cookies.get('token') || '');
     const navigate = useNavigate();
+  
 
     const loginAction = async (username, password) => {
         try {
             const path = '/api/webusers/login'; // The API endpoint for login
-            const response = await fetch(`https://localhost:7127${path}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
 
-            if (!response.ok) {
-                const errorMessage = await response.text();
-                throw new Error(errorMessage);
-            }
+            // Make POST request using BaseService
+            const usercred = { username, password };
+            const response = await api.baseService.post(path, usercred);
 
-            const data = await response.json();
-            const jwtToken = data.token;
+           
+            const jwtToken = response.token;
 
             // Decode the JWT token to get the roles
             const decodedToken = jwtDecode(jwtToken);
