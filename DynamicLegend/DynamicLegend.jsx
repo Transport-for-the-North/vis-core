@@ -246,28 +246,25 @@ export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const {state} = useMapContext();
 
-  // Access the first key in visualisations
-  const visualisationKey = Object.keys(state.visualisations)[0];
-  console.log("Visualisation Key: ", visualisationKey);
-  const visualisation = state.visualisations[visualisationKey];
-  console.log("Visualisation: ", visualisation);
-
-  const legendTexts = visualisation?.legendText || [];
-  //const legendText = state.visualisations
-  console.log("00000000000000")
-  console.log(state.visualisations)
-  console.log("111111111111111")
-  console.log(legendTexts)
-  console.log("22222222222222")
-  //console.log(state.visualisations.visualisations.legendText[3])
-  console.log("333333333333333")
-  //console.log(state.visualisations.legendText.legendSubtitleText)
-  console.log("444444444444444")
-
   useEffect(() => {
     if (!map) return;
 
     const updateLegend = () => {
+
+      // Access the first key in visualisations
+      const visualisationKey = Object.keys(state.visualisations)[0];
+      console.log("Visualisation Key: ", visualisationKey);
+      const visualisation = state.visualisations[visualisationKey];
+      console.log("Visualisation: ", visualisation);
+
+      const legendTexts = visualisation?.legendText || [];
+      //const legendText = state.visualisations
+      console.log("00000000000000")
+      console.log(state.visualisations)
+      console.log("111111111111111")
+      console.log(legendTexts)
+      console.log("22222222222222")
+
       const layers = map.getStyle().layers;
       const items = layers
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
@@ -295,10 +292,13 @@ export const DynamicLegend = ({ map }) => {
 
     map.on("styledata", updateLegend);
 
+    // Call updateLegend initially to set the legend items on mount
+    updateLegend();
+
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [map, legendTexts]);
+  }, [map, state.visualisations]);
 
   if (legendItems.length === 0) {
     return null;
