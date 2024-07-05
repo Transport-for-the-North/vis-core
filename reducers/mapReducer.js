@@ -147,7 +147,6 @@ export const mapReducer = (state, action) => {
         }
             
         case actionTypes.UPDATE_RIGHT_QUERY_PARAMS: { 
-            console.log("updatedRightVisualisations")
             const visualisationNames = action.payload.filter.visualisations;
             const paramName = action.payload.filter.paramName;
             const newParamValue = action.payload.value;

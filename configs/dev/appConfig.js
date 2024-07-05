@@ -2737,9 +2737,9 @@ export const appConfig = {
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "NoRMS Station Catchment",
-            isHoverable: true,
+            isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [

@@ -105,7 +105,7 @@ const DualMaps = () => {
    */
   const handleLayerHover = useCallback(
     (e, layerId) => {
-      if (!maps || !e.point) return;
+      if ((leftMap === null && rightMap === null) || !e.point) return;
       maps.forEach((map) => {
         const features = map.queryRenderedFeatures(e.point, {
           layers: [layerId],
@@ -159,7 +159,7 @@ const DualMaps = () => {
    */
   const handleLayerLeave = useCallback(
     (layerId) => {
-      if (!maps) return;
+      if ((leftMap === null && rightMap === null)) return;
       maps.forEach((map) => {
         map.setFilter(`${layerId}-hover`, ["==", "id", ""]);
       });
@@ -168,8 +168,7 @@ const DualMaps = () => {
   );
 
   useEffect(() => {
-    if (!maps) return;
-
+    if ((leftMap === null && rightMap === null)) return;
     Object.keys(state.layers).forEach((layerId) => {
       maps.forEach((map) => {
         if (state.layers[layerId].isHoverable) {
@@ -227,7 +226,7 @@ const DualMaps = () => {
    */
   const handleMapClick = useCallback(
     (event) => {
-      if (!isMapReady || !maps) return;
+      if (!isMapReady || (leftMap === null && rightMap === null)) return;
 
       const point = event.point;
 
@@ -320,7 +319,7 @@ const DualMaps = () => {
 
     return () => {
       console.log("Map unmount");
-      if (maps) {
+      if (leftMap && rightMap) {
         Object.values(state.layers).forEach((layer) => {
           maps.forEach((map) => {
             if (map.getLayer(layer.name)) {
