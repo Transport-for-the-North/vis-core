@@ -2,6 +2,7 @@ import React, { useContext, createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode'; // Correct the import
+import { api } from "services";
 
 export const AuthContext = createContext();
 
@@ -12,7 +13,8 @@ export const AuthProvider = ({ children }) => {
 
     const loginAction = async (username, password) => {
         try {
-            const response = await fetch(`https://localhost:7127/api/webusers/login`, {
+            const path = '/api/webusers/login'; // The API endpoint for login
+            const response = await fetch(`https://localhost:7127${path}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
