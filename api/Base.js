@@ -135,9 +135,8 @@ class BaseService {
     const path = params ? `${subPath}?${params}` : subPath;
     const results = await this._get(path);
     return results;
-  }
-
-  /**
+    }
+    /**
    * Makes a POST request to the specified path with data and additional options.
    *
    * @param {string} path - The path for the POST request.
@@ -146,47 +145,42 @@ class BaseService {
    * @param {boolean} [skipAuth=false] - Flag to skip adding Authorization header.
    * @returns {Promise<Object>} The response data.
    */
-  async _post(path, data, addOptions = {}, skipAuth = false) {
-    const url = this._buildUrl(path);
-    const jwtToken = process.env.REACT_APP_TAME_WEB_API_JWT; // Get the JWT token from cookies if skipAuth is false
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {}),
-        ...addOptions.headers,
-      },
-      body: JSON.stringify(data),
-      ...addOptions,
-    };
-    const result = await fetch(url, options).catch((error) =>
-      console.log(error)
-    );
-    if (!result.ok) {
-      throw new Error(`HTTP error! status: ${result.status}`);
+    async _post(path, data, addOptions = {}, skipAuth = false) {
+        const url = this._buildUrl(path);
+        const options = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json', // Adjust content type based on your API requirements
+                ...(skipAuth ? {} : {
+                    'Authorization': `Bearer ${process.env.REACT_APP_TAME_WEB_API_JWT}`, // Add the JWT token if skipAuth is false
+                }),
+                ...addOptions.headers, // Spread any additional headers provided in addOptions
+            },
+            body: JSON.stringify(data), // Convert data to JSON string for the request body
+            ...addOptions,
+        };
+        const result = await fetch(url, options).catch(error => console.log(error));
+        if (!result.ok) {
+            throw new Error(`HTTP error! status: ${result.status}`);
+        }
+        const responseData = await result.json();
+        return responseData;
     }
-    const responseData = await result.json();
-    return responseData;
-  }
-  /**
-   * Makes a POST request to the specified path with data and query parameters.
-   *
-   * @param {string} [subPath=""] - The sub-path for the POST request.
-   * @param {Object} data - The data to be sent in the request body.
-   * @param {Object} [options={}] - Additional options, including query parameters.
-   * @property {Object} [options.queryParams={}] - The query parameters for the POST request.
-   * @returns {Promise<Object>} The response data.
-   */
-  async post(
-    subPath = "",
-    data,
-    options = { queryParams: {}, skipAuth: false }
-  ) {
-    const params = this._buildQuery(options?.queryParams);
-    const path = `${subPath}?${params}`;
-    const results = await this._post(path, data, {}, options.skipAuth);
-    return results;
-  }
+    /**
+    * Makes a POST request to the specified path with data and query parameters.
+    *
+    * @param {string} [subPath=""] - The sub-path for the POST request.
+    * @param {Object} data - The data to be sent in the request body.
+    * @param {Object} [options={}] - Additional options, including query parameters.
+    * @property {Object} [options.queryParams={}] - The query parameters for the POST request.
+    * @returns {Promise<Object>} The response data.
+    */
+    async post(subPath = "", data, options = { queryParams: {} }) {
+        const params = this._buildQuery(options?.queryParams);
+        const path = `${subPath}?${params}`;
+        const results = await this._post(path, data);
+        return results;
+    }
 }
 
 export default BaseService;
