@@ -258,19 +258,14 @@ export const DynamicLegend = ({ map }) => {
       console.log("Visualisation: ", visualisation);
 
       const legendTexts = visualisation?.legendText || [];
-      //const legendText = state.visualisations
-      console.log("00000000000000")
       console.log(state.visualisations)
-      console.log("111111111111111")
       console.log(legendTexts)
-      console.log("22222222222222")
 
       const layers = map.getStyle().layers;
       const items = layers
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer, index) => {
           const title = layer.id;
-          console.log("aaaaaaaaaaaaaaa")
           const displayValue = legendTexts[index]?.displayValue || title;
           const legendSubtitleText = legendTexts[index]?.legendSubtitleText || "Subtitle";
           const paintProps = layer.paint;
