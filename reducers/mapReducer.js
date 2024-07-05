@@ -161,21 +161,18 @@ export const mapReducer = (state, action) => {
         
             visualisationNames.forEach((visName) => {
                 if (updatedVisualisations[visName]) {
-                    const newLegendText =  {
+                    const newLegendText = {
                         displayValue: required_values.displayValue,
                         legendSubtitleText: required_values.legendSubtitleText
                     };
-        
+            
                     updatedVisualisations[visName] = {
                         ...updatedVisualisations[visName],
-                        legendText: [
-                            ...(updatedVisualisations[visName].legendText || []),
-                            newLegendText
-                        ]
+                        legendText: [newLegendText] // Replace the existing legendText array with the new one
                     };
                 }
             });
-
+            
             // Return the new state with updated visualisations
             return {
                 ...state,
