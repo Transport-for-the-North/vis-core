@@ -144,17 +144,10 @@ export const mapReducer = (state, action) => {
         }
         case actionTypes.UPDATE_LEGEND_TEXT: {
             const visualisationNames = action.payload.filter.visualisations;
-            const paramName = action.payload.filter.paramName;
             const newParamValue = action.payload.value;
             const values = action.payload.filter.values.values;
             const position = values.findIndex(value => value.paramValue === newParamValue);
             const required_values = values[position]
-            console.log("hahahaha")
-            console.log(visualisationNames)
-            console.log(newParamValue)
-            console.log(values)
-            console.log(position)
-            console.log(required_values)
         
             // Create a new visualisations object with updated legend text for the specified visualisation
             const updatedVisualisations = { ...state.visualisations };
