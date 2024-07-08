@@ -314,8 +314,10 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
         setTimeout(() => {
           fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
         }, 400);
-      } else
+      } else {
+        console.log("without timeout")
         fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
+      }
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
     }
@@ -399,10 +401,10 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
     switch (visualisation.type) {
       case "geojson": {
         setLoading(true);
-        reclassifyAndStyleGeoJSONMap(
+        visualisation.data[0] ? reclassifyAndStyleGeoJSONMap(
           JSON.parse(visualisation.data[0].feature_collection),
           visualisation.style
-        );
+        ) : resetMapStyle(visualisation.style);
 
         break;
       }
