@@ -313,7 +313,8 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
         setTimeout(() => {
           fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
         }, 400);
-      } else fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
+      } else
+        fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
 
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
@@ -398,9 +399,12 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
     switch (visualisation.type) {
       case "geojson": {
         setLoading(true);
-        visualisation.data[0] ? reclassifyAndStyleGeoJSONMap(
-          JSON.parse(visualisation.data[0].feature_collection),
-          visualisation.style) : resetMapStyle(visualisation.style);
+        visualisation.data[0]
+          ? reclassifyAndStyleGeoJSONMap(
+              JSON.parse(visualisation.data[0].feature_collection),
+              visualisation.style
+            )
+          : resetMapStyle(visualisation.style);
         break;
       }
 
@@ -414,7 +418,17 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
           (Object.keys(dataValues).length === 1 &&
             Object.keys(dataValues)[0] === 0)
         ) {
-          resetMapStyle(visualisation.style);
+          const dataValues = Object.groupBy(
+            visualisation.data,
+            ({ value }) => value
+          );
+          if (
+            visualisation.data.length === 0 ||
+            (Object.keys(dataValues).length === 1 &&
+              Object.keys(dataValues)[0] === 0)
+          ) {
+            resetMapStyle(visualisation.style);
+          }
         }
         // Reclassify and update the map style
         else {
