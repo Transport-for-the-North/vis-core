@@ -300,7 +300,7 @@ export const appConfig = {
             path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "Links",
+            visualisationName: "NoHAM Link",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: true,
@@ -308,7 +308,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "Links",
+            name: "NoHAM Link",
             type: "joinDataToMap",
             joinLayer: "NoHAM Links",
             style: "line-continuous",
@@ -325,7 +325,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoHAM Link"],
             type: "dropdown",
             values: {
               source: "local",
@@ -342,7 +342,7 @@ export const appConfig = {
             paramName: "networkScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoHAM Link"],
             type: "dropdown",
             values: {
               source: "local",
@@ -363,7 +363,7 @@ export const appConfig = {
             paramName: "demandScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoHAM Link"],
             type: "dropdown",
             values: {
               source: "local",
@@ -384,7 +384,7 @@ export const appConfig = {
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoHAM Link"],
             type: "dropdown",
             values: {
               source: "local",
@@ -405,7 +405,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoHAM Link"],
             type: "dropdown",
             values: {
               source: "local",
@@ -433,7 +433,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["Links"],
+            visualisations: ["NoHAM Link"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -536,7 +536,7 @@ export const appConfig = {
             path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "LinkResultDifference",
+            visualisationName: "NoHAM Link Difference",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -544,7 +544,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "LinkResultDifference",
+            name: "NoHAM Link Difference",
             type: "joinDataToMap",
             joinLayer: "LinkResultDifference",
             style: "line-diverging",
@@ -564,7 +564,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -653,7 +653,7 @@ export const appConfig = {
             paramName: "networkScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -670,7 +670,7 @@ export const appConfig = {
             paramName: "networkScenarioNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -687,7 +687,7 @@ export const appConfig = {
             paramName: "networkYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -704,7 +704,7 @@ export const appConfig = {
             paramName: "networkYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -721,7 +721,7 @@ export const appConfig = {
             paramName: "demandScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -738,7 +738,7 @@ export const appConfig = {
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -755,7 +755,7 @@ export const appConfig = {
             paramName: "demandYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -772,7 +772,7 @@ export const appConfig = {
             paramName: "demandYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -789,7 +789,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -814,7 +814,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -839,7 +839,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -856,7 +856,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
+            visualisations: ["NoHAM Link Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -892,14 +892,14 @@ export const appConfig = {
             path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "NodeResultDifference",
+            visualisationName: "NoHAM Node Result Difference",
             isHoverable: false,
             isStylable: true
           },
         ],
         visualisations: [
           {
-            name: "NodeResultDifference",
+            name: "NoHAM Node Result Difference",
             type: "joinDataToMap",
             joinLayer: "NodeResultDifference",
             style: "circle-diverging",
@@ -919,7 +919,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } // Add this action
             ],
-            visualisations: ["NodeResultDifference"],
+            visualisations: ["NoHAM Node Result Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -955,14 +955,14 @@ export const appConfig = {
             path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZoneResultDifference",
+            visualisationName: "NoHAM Zone Result Difference",
             isHoverable: false,
             isStylable: true
           },
         ],
         visualisations: [
           {
-            name: "ZoneResultDifference",
+            name: "NoHAM Zone Result Difference",
             type: "joinDataToMap",
             joinLayer: "ZoneResultDifference",
             style: "polygon-diverging",
@@ -982,7 +982,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1006,7 +1006,7 @@ export const appConfig = {
             paramName: "demandScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1023,7 +1023,7 @@ export const appConfig = {
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1040,7 +1040,7 @@ export const appConfig = {
             paramName: "demandYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1057,7 +1057,7 @@ export const appConfig = {
             paramName: "demandYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1074,7 +1074,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1099,7 +1099,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
+            visualisations: ["NoHAM Zone Result Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1141,7 +1141,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZonalPairDifference",
+            visualisationName: "NoHAM Matrix Difference",
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
@@ -1149,7 +1149,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "ZonalPairDifference",
+            name: "NoHAM Matrix Difference",
             type: "joinDataToMap",
             style: "polygon-diverging",
             joinField: "id",
@@ -1166,7 +1166,7 @@ export const appConfig = {
             paramName: "zoneId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "map",
             layer: "ZonalPairDifference",
             field: "id",
@@ -1176,7 +1176,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -1200,7 +1200,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1239,7 +1239,7 @@ export const appConfig = {
             paramName: "networkScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1256,7 +1256,7 @@ export const appConfig = {
             paramName: "networkScenarioNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1273,7 +1273,7 @@ export const appConfig = {
             paramName: "networkYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1290,7 +1290,7 @@ export const appConfig = {
             paramName: "networkYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1307,7 +1307,7 @@ export const appConfig = {
             paramName: "demandScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1324,7 +1324,7 @@ export const appConfig = {
             paramName: "demandScenarioNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1341,7 +1341,7 @@ export const appConfig = {
             paramName: "demandYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1358,7 +1358,7 @@ export const appConfig = {
             paramName: "demandYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1375,7 +1375,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -1400,7 +1400,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -1425,7 +1425,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1442,7 +1442,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1459,7 +1459,7 @@ export const appConfig = {
             paramName: "userClasseDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1496,7 +1496,7 @@ export const appConfig = {
             paramName: "userClassDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
+            visualisations: ["NoHAM Matrix Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1550,7 +1550,7 @@ export const appConfig = {
             path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "LinkResults",
+            visualisationName: "NoHAM Link Results",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -1558,7 +1558,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "LinkResults",
+            name: "NoHAM Link Results",
             type: "joinDataToMap",
             joinLayer: "LinkResults",
             style: "line-continuous",
@@ -1578,7 +1578,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["LinkResults"],
+            visualisations: ["NoHAM Link Results"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1662,7 +1662,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
+            visualisations: ["NoHAM Link Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1683,7 +1683,7 @@ export const appConfig = {
             paramName: "networkScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
+            visualisations: ["NoHAM Link Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1704,7 +1704,7 @@ export const appConfig = {
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
+            visualisations: ["NoHAM Link Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1725,7 +1725,7 @@ export const appConfig = {
             paramName: "demandScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
+            visualisations: ["NoHAM Link Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1746,7 +1746,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
+            visualisations: ["NoHAM Link Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1789,14 +1789,14 @@ export const appConfig = {
             path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "NodeResults",
+            visualisationName: "NoHAM Node Results",
             isHoverable: false,
             isStylable: true
           },
         ],
         visualisations: [
           {
-            name: "NodeResults",
+            name: "NoHAM Node Results",
             type: "joinDataToMap",
             joinLayer: "NodeResults",
             style: "circle-continuous",
@@ -1816,7 +1816,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["NodeResults"],
+            visualisations: ["NoHAM Node Results"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1840,7 +1840,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
+            visualisations: ["NoHAM Node Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1861,7 +1861,7 @@ export const appConfig = {
             paramName: "networkScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
+            visualisations: ["NoHAM Node Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1882,7 +1882,7 @@ export const appConfig = {
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
+            visualisations: ["NoHAM Node Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1903,7 +1903,7 @@ export const appConfig = {
             paramName: "demandScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
+            visualisations: ["NoHAM Node Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1924,7 +1924,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NodeResults"],
+            visualisations: ["NoHAM Node Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -1967,14 +1967,14 @@ export const appConfig = {
             path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZoneResults",
+            visualisationName: "NoHAM Zone Results",
             isHoverable: false,
             isStylable: true
           },
         ],
         visualisations: [
           {
-            name: "ZoneResults",
+            name: "NoHAM Zone Results",
             type: "joinDataToMap",
             joinLayer: "ZoneResults",
             style: "polygon-continuous",
@@ -1994,7 +1994,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZoneResults"],
+            visualisations: ["NoHAM Zone Results"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -2018,7 +2018,7 @@ export const appConfig = {
             paramName: "demandYear",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
+            visualisations: ["NoHAM Zone Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2039,7 +2039,7 @@ export const appConfig = {
             paramName: "demandScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
+            visualisations: ["NoHAM Zone Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2060,7 +2060,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
+            visualisations: ["NoHAM Zone Results"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2102,7 +2102,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZonalPairResults",
+            visualisationName: "NoHAM Matrix",
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
@@ -2110,7 +2110,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "ZonalPairResults",
+            name: "NoHAM Matrix",
             type: "joinDataToMap",
             joinLayer: "ZonalPairResults",
             style: "polygon-continuous",
@@ -2127,7 +2127,7 @@ export const appConfig = {
             paramName: "zoneId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "map",
             layer: "ZonalPairResults",
             field: "id",
@@ -2137,7 +2137,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "toggle",
             values: {
               source: "local",
@@ -2161,7 +2161,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             containsLegendInfo: true, 
             values: {
@@ -2200,7 +2200,7 @@ export const appConfig = {
             paramName: "networkScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2221,7 +2221,7 @@ export const appConfig = {
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2242,7 +2242,7 @@ export const appConfig = {
             paramName: "demandScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2263,7 +2263,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2288,7 +2288,7 @@ export const appConfig = {
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2309,7 +2309,7 @@ export const appConfig = {
             paramName: "userClass",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["NoHAM Matrix"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2359,7 +2359,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "NoRMS Station Catchment",
+            visualisationName: "NoRMS Station Totals",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: true,
@@ -2541,7 +2541,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "NoRMS Station Catchment",
+            visualisationName: "NoRMS Station Totals Difference",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: true,
@@ -2549,7 +2549,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "NoRMS Station Totals",
+            name: "NoRMS Station Totals Difference",
             type: "joinDataToMap",
             joinLayer: "NoRMS Nodes",
             style: "circle-diverging",
@@ -2566,7 +2566,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            visualisations: ["NoRMS Station Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2655,7 +2655,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            visualisations: ["NoRMS Station Totals Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -2688,7 +2688,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            visualisations: ["NoRMS Station Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2777,7 +2777,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            visualisations: ["NoRMS Station Totals Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -2813,7 +2813,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["NoRMS Station Totals"],
+            visualisations: ["NoRMS Station Totals Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -2845,7 +2845,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "StationPair",
+            visualisationName: "NoRMS Station Pairs",
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -2853,7 +2853,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "StationPair",
+            name: "NoRMS Station Pairs",
             type: "joinDataToMap",
             joinLayer: "NoRMS Station Pair Result",
             style: "circle-continuous",
@@ -2870,7 +2870,7 @@ export const appConfig = {
             paramName: "scenarioCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPair"],
+            visualisations: ["NoRMS Station Pairs"],
             type: "dropdown",
             values: {
               source: "local",
@@ -2959,7 +2959,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPair"],
+            visualisations: ["NoRMS Station Pairs"],
             type: "toggle",
             values: {
               source: "local",
@@ -2992,7 +2992,7 @@ export const appConfig = {
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPair"],
+            visualisations: ["NoRMS Station Pairs"],
             type: "dropdown",
             values: {
               source: "local",
@@ -3021,7 +3021,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPair"],
+            visualisations: ["NoRMS Station Pairs"],
             type: "toggle",
             values: {
               source: "local",
@@ -3045,7 +3045,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["StationPair"],
+            visualisations: ["NoRMS Station Pairs"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3074,7 +3074,7 @@ export const appConfig = {
             paramName: "nodeId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPair"],
+            visualisations: ["NoRMS Station Pairs"],
             type: "map",
             layer: "NoRMS Station Pair Result",
             field: "id",
@@ -3097,7 +3097,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "StationPairDifference",
+            visualisationName: "NoRMS Station Pairs Difference",
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -3105,7 +3105,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "StationPairDifference",
+            name: "NoRMS Station Pairs Difference",
             type: "joinDataToMap",
             joinLayer: "NoRMS Station Pair Result Difference",
             style: "circle-diverging",
@@ -3122,7 +3122,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -3146,7 +3146,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3175,7 +3175,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -3264,7 +3264,7 @@ export const appConfig = {
             paramName: "userClassIdDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -3293,7 +3293,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -3326,7 +3326,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -3415,7 +3415,7 @@ export const appConfig = {
             paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -3444,7 +3444,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -3477,7 +3477,7 @@ export const appConfig = {
             paramName: "nodeId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["StationPairDifference"],
+            visualisations: ["NoRMS Station Pairs Difference"],
             type: "map",
             layer: "NoRMS Station Pair Result Difference",
             field: "id",
@@ -3760,7 +3760,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "NoRMS Station Catchment",
+            visualisationName: "NoRMS Station Catchment Difference",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -3773,7 +3773,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "NoRMS Station Catchment",
+            visualisationName: "NoRMS Station Catchment Difference",
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
@@ -4170,7 +4170,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "Links",
+            visualisationName: "NoRMS Link Totals",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: true,
@@ -4178,7 +4178,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "Links",
+            name: "NoRMS Link Totals",
             type: "joinDataToMap",
             joinLayer: "NoRMS Links Result",
             style: "line-continuous",
@@ -4195,7 +4195,7 @@ export const appConfig = {
             paramName: "scenarioCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoRMS Link Totals"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4284,7 +4284,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["NoRMS Link Totals"],
             type: "toggle",
             values: {
               source: "local",
@@ -4320,7 +4320,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["Links"],
+            visualisations: ["NoRMS Link Totals"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -4378,7 +4378,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "LinksResultDifference",
+            visualisationName: "NoRMS Link Totals Difference",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: true,
@@ -4386,7 +4386,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "LinksResultDifference",
+            name: "NoRMS Link Totals Difference",
             type: "joinDataToMap",
             joinLayer: "NoRMS Links Result Difference",
             style: "line-diverging",
@@ -4403,7 +4403,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinksResultDifference"],
+            visualisations: ["NoRMS Link Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4492,7 +4492,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinksResultDifference"],
+            visualisations: ["NoRMS Link Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4581,7 +4581,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinksResultDifference"],
+            visualisations: ["NoRMS Link Totals Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -4614,7 +4614,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinksResultDifference"],
+            visualisations: ["NoRMS Link Totals Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -4650,7 +4650,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["LinksResultDifference"],
+            visualisations: ["NoRMS Link Totals Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -4710,7 +4710,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZoneTotals",
+            visualisationName: "NoRMS Zone Totals",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -4718,7 +4718,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "ZoneTotals",
+            name: "NoRMS Zone Totals",
             type: "joinDataToMap",
             joinLayer: "NoRMS Zone Totals",
             style: "polygon-continuous",
@@ -4738,7 +4738,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZoneTotals"],
+            visualisations: ["NoRMS Zone Totals"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -4802,7 +4802,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotals"],
+            visualisations: ["NoRMS Zone Totals"],
             type: "toggle",
             values: {
               source: "local",
@@ -4823,7 +4823,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotals"],
+            visualisations: ["NoRMS Zone Totals"],
             type: "toggle",
             values: {
               source: "local",
@@ -4856,7 +4856,7 @@ export const appConfig = {
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotals"],
+            visualisations: ["NoRMS Zone Totals"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4885,7 +4885,7 @@ export const appConfig = {
             paramName: "scenarioCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotals"],
+            visualisations: ["NoRMS Zone Totals"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4988,7 +4988,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZoneTotalsDifference",
+            visualisationName: "NoRMS Zone Totals Difference",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -4996,7 +4996,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "ZoneTotalsDifference",
+            name: "NoRMS Zone Totals Difference",
             type: "joinDataToMap",
             joinLayer: "NoRMS Zone Totals Difference",
             style: "polygon-diverging",
@@ -5016,7 +5016,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -5080,7 +5080,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5101,7 +5101,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -5134,7 +5134,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -5167,7 +5167,7 @@ export const appConfig = {
             paramName: "userClassIdDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5196,7 +5196,7 @@ export const appConfig = {
             paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5225,7 +5225,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5314,7 +5314,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneTotalsDifference"],
+            visualisations: ["NoRMS Zone Totals Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5416,7 +5416,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZonesPair",
+            visualisationName: "NoRMS Zone Pairs",
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -5424,7 +5424,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "ZonesPair",
+            name: "NoRMS Zone Pairs",
             type: "joinDataToMap",
             joinLayer: "NoRMS Zones Pair Result",
             style: "polygon-continuous",
@@ -5441,7 +5441,7 @@ export const appConfig = {
             paramName: "scenarioCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPair"],
+            visualisations: ["NoRMS Zone Pairs"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5530,7 +5530,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPair"],
+            visualisations: ["NoRMS Zone Pairs"],
             type: "toggle",
             values: {
               source: "local",
@@ -5563,7 +5563,7 @@ export const appConfig = {
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPair"],
+            visualisations: ["NoRMS Zone Pairs"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5592,7 +5592,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPair"],
+            visualisations: ["NoRMS Zone Pairs"],
             type: "toggle",
             values: {
               source: "local",
@@ -5616,7 +5616,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZonesPair"],
+            visualisations: ["NoRMS Zone Pairs"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -5645,7 +5645,7 @@ export const appConfig = {
             paramName: "zoneId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPair"],
+            visualisations: ["NoRMS Zone Pairs"],
             type: "map",
             layer: "NoRMS Zones Pair Result",
             field: "id",
@@ -5668,7 +5668,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "ZonesPairDifference",
+            visualisationName: "NoRMS Zone Pairs Difference",
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
@@ -5676,7 +5676,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "ZonesPairDifference",
+            name: "NoRMS Zone Pairs Difference",
             type: "joinDataToMap",
             joinLayer: "NoRMS Zones Pair Result Difference",
             style: "polygon-diverging",
@@ -5693,7 +5693,7 @@ export const appConfig = {
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -5717,7 +5717,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" } 
             ],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -5746,7 +5746,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5835,7 +5835,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -5868,7 +5868,7 @@ export const appConfig = {
             paramName: "userClassIdDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5897,7 +5897,7 @@ export const appConfig = {
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -5986,7 +5986,7 @@ export const appConfig = {
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "toggle",
             values: {
               source: "local",
@@ -6019,7 +6019,7 @@ export const appConfig = {
             paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "dropdown",
             values: {
               source: "local",
@@ -6048,7 +6048,7 @@ export const appConfig = {
             paramName: "zoneId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonesPairDifference"],
+            visualisations: ["NoRMS Zone Pairs Difference"],
             type: "map",
             layer: "NoRMS Zones Pair Result Difference",
             field: "id",
@@ -6058,9 +6058,3 @@ export const appConfig = {
     }
   ],
 };
-
-// Validation to ensure only one filter has containsLegendInfo: true
-/* const legendFilters = appConfig.appPages.flatMap(page => page.config.filters.filter(filter => filter.containsLegendInfo));
-if (legendFilters.length > 1) {
-  throw new Error("Only one filter can have containsLegendInfo: true");
-} */
