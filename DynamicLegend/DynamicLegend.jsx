@@ -255,22 +255,15 @@ export const DynamicLegend = ({ map }) => {
 
       // Access the first key in visualisations
       const visualisationKey = Object.keys(state.visualisations)[0];
-      console.log("Visualisation Key: ", visualisationKey);
       const visualisation = state.visualisations[visualisationKey];
-      console.log("Visualisation: ", visualisation);
 
       const legendTexts = visualisation?.legendText || [];
-      console.log(state.visualisations)
-      console.log(legendTexts)
       const layers = map.getStyle().layers;
 
       const items = layers
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer, index) => {
           const title = layer.id;
-          console.log('0000000000000')
-          console.log(visualisationKey)
-          console.log(config.appPages.find(page => page.pageName === visualisationKey).config.filters.find(filter => filter.paramName === "propertyName" || filter.paramName === "columnName" ).values)
           const columnNameFilter = config.appPages.find(page => page.pageName === visualisationKey).config.filters.find(filter => filter.paramName === "propertyName" || filter.paramName === "columnName").values;
 
           // Default values from filterName
