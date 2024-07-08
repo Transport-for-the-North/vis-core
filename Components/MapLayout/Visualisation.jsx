@@ -313,8 +313,7 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
         setTimeout(() => {
           fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
         }, 400);
-      } else
-        fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
+      } else fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
 
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
