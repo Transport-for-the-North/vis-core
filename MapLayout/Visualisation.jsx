@@ -70,6 +70,7 @@ const fetchDataForVisualisation = debounce(
  *
  * @property {string} props.visualisationName - The name of the visualization.
  * @property {Object} props.map - The Maplibre JS map instance.
+ * @property {boolean} props.left - A boolean indicating whether the visualisation is for the left or the right map. Null for a single map page
  * @returns {null} This component doesn't render anything directly.
  */
 export const Visualisation = ({ visualisationName, map, left = null }) => {
@@ -308,12 +309,23 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
 
     if (allParamsPresent && queryParamsChanged) {
       // Fetch data for the visualisation
-      fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
-
+      if (!left) {
+        // Debounce the function to update both sides of the map
+        setTimeout(() => {
+          fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
+        }, 400);
+      } else
+        fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
     }
-  }, [visualisation.queryParams, visualisationName, visualisation]);
+  }, [
+    visualisation.queryParams,
+    visualisationName,
+    visualisation,
+    left,
+    dispatch,
+  ]);
 
   // Log loading status to console
   useEffect(() => {

@@ -16,7 +16,10 @@ const StyledMapContainer = styled.div`
 const DualMaps = () => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
-  const { leftMap, rightMap, isMapReady } = useDualMaps(leftMapContainerRef, rightMapContainerRef);
+  const { leftMap, rightMap, isMapReady } = useDualMaps(
+    leftMapContainerRef,
+    rightMapContainerRef
+  );
   const { state, dispatch } = useMapContext();
   const pageContext = useContext(PageContext);
   const maps = [leftMap, rightMap];
@@ -159,7 +162,7 @@ const DualMaps = () => {
    */
   const handleLayerLeave = useCallback(
     (layerId) => {
-      if ((leftMap === null && rightMap === null)) return;
+      if (leftMap === null && rightMap === null) return;
       maps.forEach((map) => {
         map.setFilter(`${layerId}-hover`, ["==", "id", ""]);
       });
@@ -168,7 +171,7 @@ const DualMaps = () => {
   );
 
   useEffect(() => {
-    if ((leftMap === null && rightMap === null)) return;
+    if (leftMap === null && rightMap === null) return;
     Object.keys(state.layers).forEach((layerId) => {
       maps.forEach((map) => {
         if (state.layers[layerId].isHoverable) {
@@ -346,16 +349,16 @@ const DualMaps = () => {
   return (
     <>
       <StyledMapContainer ref={leftMapContainerRef}>
-      {Object.values(state.leftVisualisations).map((visConfig) => (
+        {Object.values(state.leftVisualisations).map((visConfig) => (
           <Visualisation
             key={visConfig.name}
             visualisationName={visConfig.name}
-          map={leftMap}
-          left={true}
-        />
-      ))}
+            map={leftMap}
+            left={true}
+          />
+        ))}
         {isMapReady && <DynamicLegend map={leftMap} />}
-        </StyledMapContainer>
+      </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
         {Object.values(state.rightVisualisations).map((visConfig) => (
           <Visualisation
@@ -366,8 +369,7 @@ const DualMaps = () => {
           />
         ))}
         {isMapReady && <DynamicLegend map={rightMap} />}
-        </StyledMapContainer>
-      
+      </StyledMapContainer>
     </>
   );
 };
