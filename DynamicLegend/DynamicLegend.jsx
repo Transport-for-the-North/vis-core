@@ -1,10 +1,11 @@
 import { forEach } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import { numberWithCommas, roundValue } from "utils";
 import { useSelector } from "react-redux";
 import {useMapContext} from "hooks";
 import { Visualisation } from "Components/MapLayout/Visualisation";
+import { AppContext } from '../../contexts/AppContext';
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -245,6 +246,7 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const {state} = useMapContext();
+  const config = useContext(AppContext); // Accessing config from AppContext
 
   useEffect(() => {
     if (!map) return;
@@ -260,14 +262,23 @@ export const DynamicLegend = ({ map }) => {
       const legendTexts = visualisation?.legendText || [];
       console.log(state.visualisations)
       console.log(legendTexts)
-
       const layers = map.getStyle().layers;
+
       const items = layers
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer, index) => {
           const title = layer.id;
-          const displayValue = legendTexts[index]?.displayValue || title;
-          const legendSubtitleText = legendTexts[index]?.legendSubtitleText || "Subtitle";
+          console.log('0000000000000')
+          console.log(visualisationKey)
+          console.log(config.appPages.find(page => page.pageName === visualisationKey).config.filters.find(filter => filter.paramName === "propertyName" || filter.paramName === "columnName" ).values)
+          const columnNameFilter = config.appPages.find(page => page.pageName === visualisationKey).config.filters.find(filter => filter.paramName === "propertyName" || filter.paramName === "columnName").values;
+
+          // Default values from filterName
+          const defaultDisplayValue = columnNameFilter?.values[0]?.displayValue || title;
+          const defaultLegendSubtitleText = columnNameFilter?.values[0]?.legendSubtitleText || "Subtitle";
+
+          const displayValue = legendTexts[index]?.displayValue || defaultDisplayValue;
+          const legendSubtitleText = legendTexts[index]?.legendSubtitleText || defaultLegendSubtitleText;
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
@@ -293,7 +304,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [map, state.visualisations]);
+  }, [config.appPages, map, state.visualisations]);
 
   if (legendItems.length === 0) {
     return null;
