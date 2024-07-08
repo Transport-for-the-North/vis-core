@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 class BaseService {
   /**
    * Creates an instance of BaseService.
@@ -100,7 +101,8 @@ class BaseService {
    */
   async _get(path, addOptions = {}) {
     const url = this._buildUrl(path);
-    const jwtToken = process.env.REACT_APP_TAME_WEB_API_JWT;
+      //const jwtToken = process.env.REACT_APP_TAME_WEB_API_JWT;
+      const jwtToken=Cookies.get('token')
     // Ensure the JWT token is available before adding it to the headers
     if (!jwtToken) {
       throw new Error('JWT token is not available in the environment variables.');
@@ -147,16 +149,15 @@ class BaseService {
    */
     async _post(path, data, addOptions = {}, skipAuth = false) {
         const url = this._buildUrl(path);
+        const jwtToken = skipAuth ? null : Cookies.get('token'); // Get the JWT token from cookies if skipAuth is false
         const options = {
             method: "POST",
             headers: {
-                'Content-Type': 'application/json', // Adjust content type based on your API requirements
-                ...(skipAuth ? {} : {
-                    'Authorization': `Bearer ${process.env.REACT_APP_TAME_WEB_API_JWT}`, // Add the JWT token if skipAuth is false
-                }),
-                ...addOptions.headers, // Spread any additional headers provided in addOptions
+                'Content-Type': 'application/json',
+                ...(jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {}),
+                ...addOptions.headers,
             },
-            body: JSON.stringify(data), // Convert data to JSON string for the request body
+            body: JSON.stringify(data),
             ...addOptions,
         };
         const result = await fetch(url, options).catch(error => console.log(error));
@@ -175,10 +176,10 @@ class BaseService {
     * @property {Object} [options.queryParams={}] - The query parameters for the POST request.
     * @returns {Promise<Object>} The response data.
     */
-    async post(subPath = "", data, options = { queryParams: {} }) {
+    async post(subPath = "", data, options = { queryParams: {}, skipAuth: false }) {
         const params = this._buildQuery(options?.queryParams);
         const path = `${subPath}?${params}`;
-        const results = await this._post(path, data);
+        const results = await this._post(path, data, {}, options.skipAuth);
         return results;
     }
 }

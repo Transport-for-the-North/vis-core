@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
             // Make POST request using BaseService
             const usercred = { username, password };
-            const response = await api.baseService.post(path, usercred);
+            const response = await api.baseService.post(path, usercred, { skipAuth: true });
 
            
             const jwtToken = response.token;
