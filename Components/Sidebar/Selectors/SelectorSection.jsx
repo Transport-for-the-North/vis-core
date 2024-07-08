@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
+import { useMapContext } from "hooks";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
-import { Slider } from "./Slider";
 import { SelectorLabel } from "./SelectorLabel";
-import { useMapContext } from "hooks";
+import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 
 const SelectorContainer = styled.div`
