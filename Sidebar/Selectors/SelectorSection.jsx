@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
+import { useMapContext } from "hooks";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
-import { Slider } from "./Slider";
 import { SelectorLabel } from "./SelectorLabel";
-import { useMapContext } from "hooks";
+import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 
 const SelectorContainer = styled.div`
@@ -46,6 +46,34 @@ function checkGeometryNotNull(featureCollection) {
  */
 export const SelectorSection = ({ filters, onFilterChange }) => {
   const { state } = useMapContext();
+  const noDataAvailable = state.visualisations[
+    Object.keys(state.visualisations)[0]
+  ]?.data[0]?.feature_collection
+    ? !checkGeometryNotNull(
+        JSON.parse(
+          state.visualisations[Object.keys(state.visualisations)[0]].data[0]
+            .feature_collection
+        )
+      )
+    : state.visualisations[Object.keys(state.visualisations)[0]]?.data
+        .length === 0 &&
+      state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]?.data
+        .length === 0 &&
+      state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]?.data
+        .length === 0 &&
+      Object.values(
+        state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
+          ?.queryParams ?? {}
+      ).every((el) => el !== undefined) &&
+      Object.values(
+        state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]
+          ?.queryParams ?? {}
+      ).every((el) => el !== undefined) &&
+      Object.values(
+        state.visualisations[Object.keys(state.visualisations)[0]]
+          ?.queryParams ?? {}
+      ).every((el) => el !== undefined);
+
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
 
@@ -82,24 +110,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
         </SelectorContainer>
       ))}
       {/* Check if no data has been found and display a small message in the sidebar if so */}
-      {state.visualisations[Object.keys(state.visualisations)[0]]?.data[0]
-        ?.feature_collection ? (
-        !checkGeometryNotNull(
-          JSON.parse(
-            state.visualisations[Object.keys(state.visualisations)[0]].data[0]
-              .feature_collection
-          )
-        ) ? (
-          <NoDataParagraph>{noDataMessage}</NoDataParagraph>
-        ) : null
-      ) : state.visualisations[Object.keys(state.visualisations)[0]]?.data
-          .length === 0 &&
-        Object.values(
-          state.visualisations[Object.keys(state.visualisations)[0]]
-            ?.queryParams ?? {}
-        ).every((el) => el !== undefined) ? (
-        <NoDataParagraph>{noDataMessage}</NoDataParagraph>
-      ) : null}
+      {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
     </AccordionSection>
   );
 };
