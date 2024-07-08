@@ -255,13 +255,19 @@ export const reclassifyData = (data, style, classificationMethod) => {
     console.log("Categorical classification not implemented for joined data");
     return;
   } else if (style.includes("diverging")) {
-    const absValues = data.map((value) => Math.abs(value.value));
+    let absValues = data.map((value) => Math.abs(value.value));
+    if (classificationMethod == 'l') {
+      absValues = absValues.map(replaceZeroValues)
+    }
     const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
-    // New way of calculating rounded bins.
     let roundedBins = unroundedBins.map(function(ele){
       return Math.round(ele*100)/100;
     });
+    if (classificationMethod == 'l') {
+      absValues = absValues.map(replaceZeroValues)
+    }
     roundedBins = roundedBins.filter((value) => value !== 0)
+    console.log(roundedBins);
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
     console.log("Bins calculated for diverging data");
