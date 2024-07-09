@@ -2,9 +2,7 @@ import React, { useContext, createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { api } from "services";
-import { jwtDecode } from 'jwt-decode'; // Correct the import
-
-//import BaseService from './BaseService'; 
+import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
 

@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, Router} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { withAuthenticationRequired } from "@auth0/auth0-react";
-import { Navigate } from 'react-router-dom';
 import './App.css';
 import { PageSwitch, HomePage, Navbar, Login, Unauthorized, RoleValidation } from 'Components';
 import { Dashboard } from 'layouts';
-import { AppContext ,AuthProvider} from 'contexts';
+import { AppContext, AuthProvider} from 'contexts';
 import { api } from 'services';
-
-//import AuthProvider from './contexts/AuthContext'; // Correct import
 
 
 /**

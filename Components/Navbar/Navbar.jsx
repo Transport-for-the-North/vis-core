@@ -128,7 +128,7 @@ export function Navbar() {
           alt="Burger Button Navbar"
           onClick={updateMenu}
         />
-              <StyledLogout src="/img/logout.png" onClick={ handleLogout} />
+        <StyledLogout src="/img/logout.png" onClick={ handleLogout} />
       </StyledNavbar>
       <div className="empty-blank-nav"></div>
     </>

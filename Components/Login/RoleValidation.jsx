@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode'; // Corrected import statement
+import { jwtDecode } from 'jwt-decode';
 
 /**
  * Higher-Order Component to check authentication and roles.
