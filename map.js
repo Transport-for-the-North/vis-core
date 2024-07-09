@@ -241,13 +241,13 @@ export const reclassifyData = (data, style, classificationMethod) => {
 
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       values = values.map(replaceZeroValues)
     }
     console.log("Bins recalculated for continuous data");
     const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
     let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       roundedBins = roundedBins.map(replaceZeroPointValues)
     }
     return roundedBins;
@@ -256,14 +256,14 @@ export const reclassifyData = (data, style, classificationMethod) => {
     return;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       absValues = absValues.map(replaceZeroValues)
     }
     const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
     let roundedBins = unroundedBins.map(function(ele){
       return Math.round(ele*100)/100;
     });
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       absValues = absValues.map(replaceZeroValues)
     }
     roundedBins = roundedBins.filter((value) => value !== 0)
