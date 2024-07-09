@@ -351,11 +351,30 @@ const Map = () => {
           // Assuming the first feature is the one we're interested in
           const feature = features[0];
           const value = feature.properties[filter.field];
-
+          
           // Remove the previous selection layer if it exists
           if (map.getLayer("selected-feature-layer")) {
             map.removeLayer("selected-feature-layer");
             map.removeSource("selected-feature-source");
+          }
+
+          let paintProp = {}
+
+          if (feature.layer.type == 'circle') {
+            paintProp = {
+              "circle-radius": 6,
+              "circle-color": "green",
+              "circle-opacity": 0.75,
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "black"
+              
+            }
+          }
+          else if (feature.layer.type == 'fill') {
+            paintProp = {
+              "fill-color": "#f00",
+              "fill-opacity": 0.5,
+            }
           }
 
           // Add a new source and layer for the selected feature
@@ -363,15 +382,12 @@ const Map = () => {
             type: "geojson",
             data: feature.toJSON(),
           });
-
+          
           map.addLayer({
             id: "selected-feature-layer",
-            type: "fill",
+            type: feature.layer.type,
             source: "selected-feature-source",
-            paint: {
-              "fill-color": "#f00",
-              "fill-opacity": 0.5,
-            },
+            paint: paintProp,
           });
 
           console.log(`Updating ${filter.field}`);

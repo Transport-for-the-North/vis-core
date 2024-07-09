@@ -72,6 +72,13 @@ export const MapLayout = () => {
       payload: { color_scheme: color }
     });
   };
+
+  const handleClassificationChange = (classType) => {
+    dispatch({
+      type: "UPDATE_CLASSIFICATION_METHOD",
+      payload: { class_method: classType }
+    });
+  }
   
   return (
     <LayoutContainer>
@@ -83,7 +90,8 @@ export const MapLayout = () => {
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
       >
-        <MapLayerSection handleColorChange={handleColorChange}/>
+        <MapLayerSection handleColorChange={handleColorChange} 
+          handleClassificationChange={handleClassificationChange}/>
       </Sidebar>
       <MapContainer>
         <Map/>

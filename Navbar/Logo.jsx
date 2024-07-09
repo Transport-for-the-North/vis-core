@@ -29,7 +29,7 @@ export function Logo(props) {
   };
   return (
     <LogoImage
-      src={"/img/tfn-logo-fullsize.png"}
+      src={props.logoImage}
       alt="Logo"
       onClick={handleClick}
     />
