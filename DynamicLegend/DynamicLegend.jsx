@@ -2,9 +2,7 @@ import { forEach } from "lodash";
 import React, { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import { numberWithCommas, roundValue } from "utils";
-import { useSelector } from "react-redux";
-import {useMapContext} from "hooks";
-import { Visualisation } from "Components/MapLayout/Visualisation";
+import { useMapContext } from "hooks";
 import { AppContext } from '../../contexts/AppContext';
 
 const LegendContainer = styled.div`
@@ -25,14 +23,16 @@ const LegendContainer = styled.div`
 const LegendTitle = styled.div`
   font-weight: bold;
   text-align: left;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 `;
 
 const LegendSubtitle = styled.h2`
   font-weight: normal;
   text-align: left;
-  margin-bottom: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   font-size: small;
+  font-style: italic;
 `;
 
 const LegendItem = styled.div`
@@ -245,7 +245,7 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
  */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
-  const {state} = useMapContext();
+  const { state } = useMapContext();
   const config = useContext(AppContext); // Accessing config from AppContext
 
   useEffect(() => {
