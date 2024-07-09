@@ -1,3 +1,301 @@
+const networkScenarioValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Base",
+      paramValue: "base",
+    },
+    {
+      displayValue: "Do minimum",
+      paramValue: "dm",
+    },
+  ]
+}
+
+const originOrDestTripValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: 'Origin Trips',
+      paramValue: 'origin_trips',
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: 'Destination Trips',
+      paramValue: 'destination_trips',
+      legendSubtitleText: "unit"
+    }
+  ],
+}
+
+const deliveryProgramValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Default",
+      paramValue: "",
+    },
+    {
+      displayValue: "MRN",
+      paramValue: "MRN",
+    },
+  ],
+}
+
+const demandScenarioValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Base",
+      paramValue: "base",
+    },
+    {
+      displayValue: "Core",
+      paramValue: "core",
+    },
+  ],
+}
+
+const yearValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "2018",
+      paramValue: 2018,
+    },
+    {
+      displayValue: "2033",
+      paramValue: 2033,
+    },
+  ],
+}
+
+const timePeriodValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "AM",
+      paramValue: "am",
+    },
+    {
+      displayValue: "IP",
+      paramValue: "ip",
+    },
+    {
+      displayValue: "PM",
+      paramValue: "pm",
+    },
+  ],
+}
+
+const linkMetricValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Net speed",
+      paramValue: "netspd_kph",
+      legendSubtitleText: "kph"
+    },
+    {
+      displayValue: "Total time",
+      paramValue: "total_time_secs",
+      legendSubtitleText: "seconds"
+    },
+    {
+      displayValue: "Car EB vehicles",
+      paramValue: "car_eb_vehs",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Car commuter vehicles",
+      paramValue: "car_comm_vehs",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Car other vehicles",
+      paramValue: "car_other_vehs",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "LGV flow vehicles",
+      paramValue: "lgv_flow_vehs",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "HGV flow vehicles",
+      paramValue: "hgv_flow_vehs",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Total flow vehicles",
+      paramValue: "total_flow_vehs",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Link VOC",
+      paramValue: "link_voc",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Link delay",
+      paramValue: "link_delay_secs",
+      legendSubtitleText: "seconds"
+    },
+    {
+      displayValue: "Link queues",
+      paramValue: "link_queues_secs",
+      legendSubtitleText: "seconds"
+    },
+    {
+      displayValue: "Number of lanes",
+      paramValue: "number_lanes",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Speed flow curve",
+      paramValue: "speed_flow_curve",
+      legendSubtitleText: "unknown"
+    },
+    {
+      displayValue: "Speed limit",
+      paramValue: "speed_limit",
+      legendSubtitleText: "mph"
+    },
+    {
+      displayValue: "Carbon emissions",
+      paramValue: "carbon_emissions_tco2",
+      legendSubtitleText: "tCO2"
+    },
+  ],
+}
+
+const nodeMetricValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: 'VOC',
+      paramValue: 'voc_perc',
+      legendSubtitleText: "%"
+    },
+    {
+      displayValue: 'Delay',
+      paramValue: 'delay_secs',
+      legendSubtitleText: "seconds"
+    }
+  ],
+}
+
+const matrixMetricValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Vehicle Trips",
+      paramValue: "trips_veh",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Travel Time",
+      paramValue: "travel_time_secs",
+      legendSubtitleText: "seconds"
+    },
+    {
+      displayValue: "Distance",
+      paramValue: "distance_m",
+      legendSubtitleText: "miles"
+    },
+    {
+      displayValue: "Delay",
+      paramValue: "delay_mins",
+      legendSubtitleText: "minutes"
+    },
+    {
+      displayValue: "Generalised JT",
+      paramValue: "generalised_jt_secs",
+      legendSubtitleText: "seconds"
+    },
+  ],
+}
+
+const userClassValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "All Vehicles",
+      paramValue: "all_vehicles",
+    },
+    {
+      displayValue: "Car: Business",
+      paramValue: "UC1-Car_Business",
+    },
+    {
+      displayValue: "Car: Commute",
+      paramValue: "UC2-Car_Commute",
+    },
+    {
+      displayValue: "Car: Other",
+      paramValue: "UC3-Car_Other",
+    },
+    {
+      displayValue: "LGV",
+      paramValue: "UC4-LGV",
+    },
+    {
+      displayValue: "HGV",
+      paramValue: "UC5-HGV",
+    },
+  ],
+}
+
+const originOrDestinationValues = {
+  source: "local",
+  values: [
+      {
+          displayValue: "Origin",
+          paramValue: "origin",
+      },
+      {
+          displayValue: "Destination",
+          paramValue: "destination",
+      },
+  ],
+}
+
+const pairMetricValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: 'VOC',
+      paramValue: 'voc_perc',
+      legendSubtitleText: "%"
+    },
+    {
+      displayValue: "Vehicle Trips",
+      paramValue: "trips_veh",
+      legendSubtitleText: "unit"
+    },
+    {
+      displayValue: "Travel Time",
+      paramValue: "travel_time_secs",
+      legendSubtitleText: "seconds"
+    },
+    {
+      displayValue: "Distance",
+      paramValue: "distance_m",
+      legendSubtitleText: "miles"
+    },
+    {
+      displayValue: "Delay",
+      paramValue: "delay_mins",
+      legendSubtitleText: "minutes"
+    },
+    {
+      displayValue: "Generalised JT",
+      paramValue: "generalised_jt_secs",
+      legendSubtitleText: "seconds"
+    },
+  ],
+}
+
 export const appConfig = {
   title: "TAME React Vis Template",
   introduction: `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
@@ -16,6 +314,10 @@ export const appConfig = {
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
   contactText: "Please contact [Name] for any questions on this data tool.",
   contactEmail: "firstname.lastname@transportforthenorth.com",
+  logoImage: "img/tfn-logo-fullsize.png",
+  backgroundImage: "img/hero-image.jpg",
+  logoutButtonImage: "img/burgerIcon.png",
+  logoutImage: "img/logout.png",
   appPages: [
     {
       pageName: "Link",
@@ -53,21 +355,22 @@ export const appConfig = {
         metadataLayers: [],
         filters: [
           {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Links"],
+            type: "dropdown",
+            values: linkMetricValues,
+          },
+          {
             filterName: "Delivery programme",
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default",
-                  paramValue: "",
-                },
-              ],
-            },
+            values: deliveryProgramValues,
           },
           {
             filterName: "Network scenario",
@@ -76,19 +379,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioValues,
           },
           {
             filterName: "Demand scenario",
@@ -97,19 +388,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
             filterName: "Year",
@@ -118,19 +397,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
             filterName: "Time period",
@@ -139,96 +406,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "IP",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Net speed (kph)",
-                  paramValue: "netspd_kph",
-                },
-                {
-                  displayValue: "Total time (secs)",
-                  paramValue: "total_time_secs",
-                },
-                {
-                  displayValue: "Car EB vehicles",
-                  paramValue: "car_eb_vehs",
-                },
-                {
-                  displayValue: "Car commuter vehicles",
-                  paramValue: "car_comm_vehs",
-                },
-                {
-                  displayValue: "Car other vehicles",
-                  paramValue: "car_other_vehs",
-                },
-                {
-                  displayValue: "LGV flow vehicles",
-                  paramValue: "lgv_flow_vehs",
-                },
-                {
-                  displayValue: "HGV flow vehicles",
-                  paramValue: "hgv_flow_vehs",
-                },
-                {
-                  displayValue: "Total flow vehicles",
-                  paramValue: "total_flow_vehs",
-                },
-                {
-                  displayValue: "Link VOC",
-                  paramValue: "link_voc",
-                },
-                {
-                  displayValue: "Link delay (secs)",
-                  paramValue: "link_delay_secs",
-                },
-                {
-                  displayValue: "Link queues (secs)",
-                  paramValue: "link_queues_secs",
-                },
-                {
-                  displayValue: "Number of lanes",
-                  paramValue: "number_lanes",
-                },
-                {
-                  displayValue: "Speed flow curve",
-                  paramValue: "speed_flow_curve",
-                },
-                {
-                  displayValue: "Speed limit",
-                  paramValue: "speed_limit",
-                },
-                {
-                  displayValue: "Carbon emissions (tCO2)",
-                  paramValue: "carbon_emissions_tco2",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
         ],
       },
@@ -254,7 +432,7 @@ export const appConfig = {
             visualisationName: "LinkResultDifference",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
@@ -278,287 +456,115 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Net Speed (kph)",
-                  paramValue: "netspd_kph",
-                },
-                {
-                  displayValue: "Total Time (seconds)",
-                  paramValue: "total_time_secs",
-                },
-                {
-                  displayValue: "car_eb_vehs",
-                  paramValue: "car_eb_vehs",
-                },
-                {
-                  displayValue: "car_comm_vehs",
-                  paramValue: "car_comm_vehs",
-                },
-                {
-                  displayValue: "LGV Flows",
-                  paramValue: "lgv_flow_vehs",
-                },
-                {
-                  displayValue: "HGV Flows",
-                  paramValue: "hgv_flow_vehs",
-                },
-                {
-                  displayValue: "Total Flows",
-                  paramValue: "total_flow_vehs",
-                },
-                {
-                  displayValue: "link_voc",
-                  paramValue: "link_voc",
-                },
-                {
-                  displayValue: "Link Delay (seconds)",
-                  paramValue: "link_delay_secs",
-                },
-                {
-                  displayValue: "Link Queue (seconds)",
-                  paramValue: "link_queues_secs",
-                },
-                {
-                  displayValue: "Number of Lanes",
-                  paramValue: "number_lanes",
-                },
-                {
-                  displayValue: "speed_flow_curv",
-                  paramValue: "speed_flow_curve",
-                },
-                {
-                  displayValue: "Speed Limit",
-                  paramValue: "speed_limit",
-                },
-                {
-                  displayValue: "Carbon Emissions",
-                  paramValue: "carbon_emissions_tco2",
-                },
-              ],
-            },
+            values: linkMetricValues,
           },
           {
-            filterName: "Network Scenario Name - DS",
+            filterName: "First Network Scenario Name",
             paramName: "networkScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: networkScenarioValues,
           },
           {
-            filterName: "Network Scenario Name - DM",
-            paramName: "networkScenarioNameDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Network Year - DS",
+            filterName: "First Network Year",
             paramName: "networkYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
-            filterName: "Network Year - DM",
-            paramName: "networkYearDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Scenario - DS",
+            filterName: "First Demand Scenario",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
-            filterName: "Demand Scenario - DM",
-            paramName: "demandScenarioNameDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Year - DS",
+            filterName: "First Demand Year",
             paramName: "demandYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
-            filterName: "Demand Year - DM",
-            paramName: "demandYearDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Time Period - DS",
+            filterName: "First Time Period",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Delivery Program - DS",
+            filterName: "First Delivery Program",
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default",
-                  paramValue: "",
-                },
-              ],
-            },
+            values: deliveryProgramValues,
           },
           {
-            filterName: "Delivery Program - DM",
+            filterName: "Second Network Scenario Name",
+            paramName: "networkScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResultDifference"],
+            type: "dropdown",
+            values: networkScenarioValues,
+          },
+          {
+            filterName: "Second Network Year",
+            paramName: "networkYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResultDifference"],
+            type: "dropdown",
+            values: yearValues,
+          },
+          {
+            filterName: "Second Demand Scenario",
+            paramName: "demandScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResultDifference"],
+            type: "dropdown",
+            values: demandScenarioValues,
+          },
+          {
+            filterName: "Second Demand Year",
+            paramName: "demandYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResultDifference"],
+            type: "dropdown",
+            values: yearValues,
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResultDifference"],
+            type: "dropdown",
+            values: timePeriodValues,
+          },
+          {
+            filterName: "Second Delivery Program",
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'MRN',
-                  paramValue: 'MRN'
-                }
-              ],
-            },
+            values: deliveryProgramValues,
           },
         ]
       },
@@ -583,7 +589,8 @@ export const appConfig = {
             geometryType: "point",
             visualisationName: "NodeResults",
             isHoverable: false,
-            isStylable: true
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
@@ -607,19 +614,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'VOC Percentage',
-                  paramValue: 'voc_perc'
-                },
-                {
-                  displayValue: 'Delay (seconds)',
-                  paramValue: 'delay_secs'
-                }
-              ],
-            }
+            values: nodeMetricValues,
           },
           {
             filterName: "Delivery Program",
@@ -628,19 +623,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default", //Not sure if value is empty string or null.
-                  paramValue: "",
-                },
-                {
-                  displayValue: "MRN",
-                  paramValue: "MRN",
-                },
-              ],
-            },
+            values: deliveryProgramValues,
           },
           {
             filterName: "Network Scenario",
@@ -649,19 +632,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do Minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioValues,
           },
           {
             filterName: "Year",
@@ -670,19 +641,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
             filterName: "Demand Scenario",
@@ -691,19 +650,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
             filterName: "Time Period",
@@ -712,23 +659,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           }]
       },
     },
@@ -753,7 +684,8 @@ export const appConfig = {
             geometryType: "point",
             visualisationName: "NodeResultDifference",
             isHoverable: false,
-            isStylable: true
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
@@ -777,15 +709,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'VOC Percentage',
-                  paramValue: 'voc_perc'
-                },
-              ],
-            },
+            values: nodeMetricValues,
           },
         ],
       },
@@ -811,7 +735,8 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "ZoneResults",
             isHoverable: false,
-            isStylable: true
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
@@ -835,19 +760,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Origin Trips',
-                  paramValue: 'origin_trips'
-                },
-                {
-                  displayValue: 'Destination Trips',
-                  paramValue: 'destination_trips'
-                }
-              ],
-            },
+            values: originOrDestTripValues,
           },
           {
             filterName: "Demand Year",
@@ -856,19 +769,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
             filterName: "Demand Scenario",
@@ -877,19 +778,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
             filterName: "Time Period",
@@ -898,23 +787,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
         ]
       }
@@ -940,7 +813,8 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "ZoneResultDifference",
             isHoverable: false,
-            isStylable: true
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
           },
         ],
         visualisations: [
@@ -964,137 +838,61 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Origin Trips',
-                  paramValue: 'origin_trips'
-                },
-                {
-                  displayValue: 'Destination Trips',
-                  paramValue: 'destination_trips'
-                }
-              ],
-            },
+            values: originOrDestTripValues,
           },
           {
-            filterName: "Demand Scenario - DS",
+            filterName: "First Demand Scenario",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Base',
-                  paramValue: 'base'
-                }
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
-            filterName: "Demand Scenario - DM",
-            paramName: "demandScenarioNameDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Core',
-                  paramValue: 'core'
-                }
-              ],
-            },
-          },
-          {
-            filterName: "Demand Year - DS",
+            filterName: "First Demand Year",
             paramName: "demandYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: '2018',
-                  paramValue: 2018
-                }
-              ],
-            },
+            values: yearValues,
           },
           {
-            filterName: "Demand Year - DM",
-            paramName: "demandYearDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResultDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: '2033',
-                  paramValue: 2033
-                }
-              ],
-            },
-          },
-          {
-            filterName: "Time Period - DS",
+            filterName: "First Time Period",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
           {
-            filterName: "Time Period - DM",
+            filterName: "Second Demand Scenario",
+            paramName: "demandScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResultDifference"],
+            type: "dropdown",
+            values: demandScenarioValues,
+          },
+          {
+            filterName: "Second Demand Year",
+            paramName: "demandYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZoneResultDifference"],
+            type: "dropdown",
+            values: yearValues,
+          },
+          {
+            filterName: "Second Time Period",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
         ]
       },
@@ -1155,19 +953,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "toggle",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Origin",
-                  paramValue: "origin",
-                },
-                {
-                  displayValue: "Destination",
-                  paramValue: "destination",
-                },
-              ],
-            },
+            values: originOrDestinationValues,
           },
           {
             filterName: "Select Column",
@@ -1176,325 +962,133 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Vehicle Trips",
-                  paramValue: "trips_veh",
-                },
-                {
-                  displayValue: "Travel Time (seconds)",
-                  paramValue: "travel_time_secs",
-                },
-                {
-                  displayValue: "Distance (miles)",
-                  paramValue: "distance_m",
-                },
-                {
-                  displayValue: "Delay (minutes)",
-                  paramValue: "delay_mins",
-                },
-                {
-                  displayValue: "Generalised JT (seconds)",
-                  paramValue: "generalised_jt_secs",
-                },
-              ],
-            },
+            values: pairMetricValues,
           },
           {
-            filterName: "Network Scenario Name - DS",
+            filterName: "First Network Scenario Name",
             paramName: "networkScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: networkScenarioValues,
           },
           {
-            filterName: "Network Scenario Name - DM",
-            paramName: "networkScenarioNameDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Network Year - DS",
+            filterName: "First Network Year",
             paramName: "networkYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
-            filterName: "Network Year - DM",
-            paramName: "networkYearDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Scenario - DS",
+            filterName: "First Demand Scenario",
             paramName: "demandScenarioNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
-            filterName: "Demand Scenario - DM",
-            paramName: "demandScenarioNameDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Year - DS",
+            filterName: "First Demand Year",
             paramName: "demandYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
-            filterName: "Demand Year - DM",
-            paramName: "demandYearDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Time Period - DS",
+            filterName: "First Time Period",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "toggle",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "toggle",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Delivery Program - DS",
+            filterName: "First Delivery Program",
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default",
-                  paramValue: "",
-                },
-              ],
-            },
+            values: deliveryProgramValues,
           },
           {
-            filterName: "Delivery Program - DM",
-            paramName: "deliveryProgrammeNameDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "MRN",
-                  paramValue: "MRN",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClasseDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairDifference"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "All Vehicles",
-                  paramValue: "all_vehicles",
-                },
-                {
-                  displayValue: "Car: Business",
-                  paramValue: "UC1-Car_Business",
-                },
-                {
-                  displayValue: "Car: Commute",
-                  paramValue: "UC2-Car_Commute",
-                },
-                {
-                  displayValue: "Car: Other",
-                  paramValue: "UC3-Car_Other",
-                },
-                {
-                  displayValue: "LGV",
-                  paramValue: "UC4-LGV",
-                },
-                {
-                  displayValue: "HGV",
-                  paramValue: "UC5-HGV",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "User Class - DS",
+            filterName: "First User Class",
             paramName: "userClassDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "All Vehicles",
-                  paramValue: "all_vehicles",
-                },
-                {
-                  displayValue: "Car: Business",
-                  paramValue: "UC1-Car_Business",
-                },
-                {
-                  displayValue: "Car: Commute",
-                  paramValue: "UC2-Car_Commute",
-                },
-                {
-                  displayValue: "Car: Other",
-                  paramValue: "UC3-Car_Other",
-                },
-                {
-                  displayValue: "LGV",
-                  paramValue: "UC4-LGV",
-                },
-                {
-                  displayValue: "HGV",
-                  paramValue: "UC5-HGV",
-                },
-              ],
-            },
+            values: userClassValues,
+          },
+          {
+            filterName: "Second Network Scenario Name",
+            paramName: "networkScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "dropdown",
+            values: networkScenarioValues,
+          },
+          {
+            filterName: "Second Network Year",
+            paramName: "networkYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "dropdown",
+            values: yearValues,
+          },
+          {
+            filterName: "Second Demand Scenario",
+            paramName: "demandScenarioNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "dropdown",
+            values: demandScenarioValues,
+          },
+          {
+            filterName: "Second Demand Year",
+            paramName: "demandYearDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "dropdown",
+            values: yearValues,
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "toggle",
+            values: timePeriodValues,
+          },
+          {
+            filterName: "Second Delivery Program",
+            paramName: "deliveryProgrammeNameDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "dropdown",
+            values: deliveryProgramValues,
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClasseDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairDifference"],
+            type: "dropdown",
+            values: userClassValues,
           },
         ],
       },
@@ -1555,19 +1149,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "toggle",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Origin",
-                  paramValue: "origin",
-                },
-                {
-                  displayValue: "Destination",
-                  paramValue: "destination",
-                },
-              ],
-            },
+            values: originOrDestinationValues,
           },
           {
             filterName: "Select Column",
@@ -1576,31 +1158,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Vehicle Trips",
-                  paramValue: "trips_veh",
-                },
-                {
-                  displayValue: "Travel Time (seconds)",
-                  paramValue: "travel_time_secs",
-                },
-                {
-                  displayValue: "Distance (miles)",
-                  paramValue: "distance_m",
-                },
-                {
-                  displayValue: "Delay (minutes)",
-                  paramValue: "delay_mins",
-                },
-                {
-                  displayValue: "Generalised JT (seconds)",
-                  paramValue: "generalised_jt_secs",
-                },
-              ],
-            },
+            values: pairMetricValues,
           },
           {
             filterName: "Network Scenario Name",
@@ -1609,19 +1167,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioValues,
           },
           {
             filterName: "Year",
@@ -1630,19 +1176,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
+            values: yearValues,
           },
           {
             filterName: "Demand Scenario",
@@ -1651,19 +1185,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
+            values: demandScenarioValues,
           },
           {
             filterName: "Time Period",
@@ -1672,23 +1194,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
+            values: timePeriodValues,
           },
           {
             filterName: "Delivery Program",
@@ -1697,19 +1203,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Default",
-                  paramValue: "",
-                },
-                {
-                  displayValue: "MRN",
-                  paramValue: "MRN",
-                },
-              ],
-            },
+            values: deliveryProgramValues,
           },
           {
             filterName: "User Class",
@@ -1718,35 +1212,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "All Vehicles",
-                  paramValue: "all_vehicles",
-                },
-                {
-                  displayValue: "Car: Business",
-                  paramValue: "UC1-Car_Business",
-                },
-                {
-                  displayValue: "Car: Commute",
-                  paramValue: "UC2-Car_Commute",
-                },
-                {
-                  displayValue: "Car: Other",
-                  paramValue: "UC3-Car_Other",
-                },
-                {
-                  displayValue: "LGV",
-                  paramValue: "UC4-LGV",
-                },
-                {
-                  displayValue: "HGV",
-                  paramValue: "UC5-HGV",
-                },
-              ],
-            },
+            values: userClassValues,
           },
         ],
       },

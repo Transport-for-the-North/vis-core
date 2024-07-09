@@ -19,7 +19,10 @@ export const HomePage = () => {
     <div className="landing">
       <div
         className="header-landing"
-        placeholder="Background Image for the header"
+        //placeholder="Background Image for the header"
+        style={{
+           backgroundImage: `url(${appContext.backgroundImage})`
+        }}
       >
         <div className="container">
           <h1 className="header-title">{appContext.title}</h1>
