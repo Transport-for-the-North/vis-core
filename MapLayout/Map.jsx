@@ -360,9 +360,9 @@ const Map = () => {
           }
 
           let paintProp = {}
-          
-          console.log(state);
-          console.log(colourSchemeSelectionColour[state.color_scheme]);
+
+          // Here is where we should use the colourSchemeSelectionColour[state.color_scheme] 
+          // for the circle paintProp, however we currently dont have full functionality.
 
           if (feature.layer.type == 'circle') {
             paintProp = {
@@ -411,14 +411,12 @@ const Map = () => {
 
   // Run once to set the state of the map
   useEffect(() => {
-    console.log(isMapReady);
     if (isMapReady) {
       dispatch({
         type: "SET_MAP",
         payload: { map },
       });
     }
-    console.log(state);
   }, [isMapReady]);
 
   useEffect(() => {
