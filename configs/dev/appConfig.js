@@ -286,63 +286,129 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Definition for Link Results
     {
-      pageName: "NoHAM Link",
-      url: "/noham-links",
+      pageName: "NoHAM Link Results",
+      url: "/link-results",
       type: "MapLayout",
       category: "Link",
+      about: "", //To be added.
       config: {
         layers: [
           {
-            uniqueId: "NoHAMLinksVectorTile",
-            name: "NoHAM Links",
+            uniqueId: "NoHAMLinkResults",
+            name: "LinkResults",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "Links",
+            visualisationName: "LinkResults",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
-          },
+            shouldHaveTooltipOnClick: false,
+          }
         ],
         visualisations: [
           {
-            name: "Links",
+            name: "LinkResults",
             type: "joinDataToMap",
-            joinLayer: "NoHAM Links",
+            joinLayer: "LinkResults",
             style: "line-continuous",
             joinField: "id",
             valueField: "value",
             dataSource: "api",
-            dataPath: "/api/noham/link-results",
+            dataPath: "/api/noham/link-results/",
           },
         ],
         metadataLayers: [],
         filters: [
           {
-            filterName: "Delivery programme",
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Net Speed (kph)',
+                  paramValue: 'netspd_kph'
+                },
+                {
+                  displayValue: 'Total Time (seconds)',
+                  paramValue: 'total_time_secs'
+                },
+                {
+                  displayValue: 'car_eb_vehs',
+                  paramValue: 'car_eb_vehs'
+                },
+                {
+                  displayValue: 'car_comm_vehs',
+                  paramValue: 'car_comm_vehs'
+                },
+                {
+                  displayValue: 'LGV Flows',
+                  paramValue: 'lgv_flow_vehs'
+                },
+                {
+                  displayValue: 'HGV Flows',
+                  paramValue: 'hgv_flow_vehs'
+                },
+                {
+                  displayValue: 'Total Flows',
+                  paramValue: 'total_flow_vehs'
+                },
+                {
+                  displayValue: 'link_voc',
+                  paramValue: 'link_voc'
+                },
+                {
+                  displayValue: 'Link Delay (seconds)',
+                  paramValue: 'link_delay_secs'
+                },
+                {
+                  displayValue: 'Link Queue (seconds)',
+                  paramValue: 'link_queues_secs'
+                },
+                {
+                  displayValue: 'Number of Lanes',
+                  paramValue: 'number_lanes'
+                },
+                {
+                  displayValue: 'Speed Limit',
+                  paramValue: 'speed_limit'
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: "Default",
-                  paramValue: "",
+                  displayValue: 'Default',
+                  paramValue: ''
+                },
+                {
+                  displayValue: "MRN",
+                  paramValue: "MRN",
                 },
               ],
             },
           },
           {
-            filterName: "Network scenario",
+            filterName: "Network Scenario",
             paramName: "networkScenarioName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
               source: "local",
@@ -352,29 +418,8 @@ export const appConfig = {
                   paramValue: "base",
                 },
                 {
-                  displayValue: "Do minimum",
+                  displayValue: "Do Minimum",
                   paramValue: "dm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand scenario",
-            paramName: "demandScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
                 },
               ],
             },
@@ -384,7 +429,7 @@ export const appConfig = {
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["LinkResults"],
             type: "dropdown",
             values: {
               source: "local",
@@ -401,11 +446,32 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time period",
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["LinkResults"],
+            type: "dropdown",
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Base",
+                  paramValue: "base",
+                },
+                {
+                  displayValue: "Core",
+                  paramValue: "core",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
+            visualisations: ["LinkResults"],
             type: "toggle",
             values: {
               source: "local",
@@ -415,7 +481,7 @@ export const appConfig = {
                   paramValue: "am",
                 },
                 {
-                  displayValue: "IP",
+                  displayValue: "Inter-Peak",
                   paramValue: "ip",
                 },
                 {
@@ -425,76 +491,14 @@ export const appConfig = {
               ],
             },
           },
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Links"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Net speed (kph)",
-                  paramValue: "netspd_kph",
-                },
-                {
-                  displayValue: "Total time (secs)",
-                  paramValue: "total_time_secs",
-                },
-                {
-                  displayValue: "Car EB vehicles",
-                  paramValue: "car_eb_vehs",
-                },
-                {
-                  displayValue: "Car commuter vehicles",
-                  paramValue: "car_comm_vehs",
-                },
-                {
-                  displayValue: "Car other vehicles",
-                  paramValue: "car_other_vehs",
-                },
-                {
-                  displayValue: "LGV flow vehicles",
-                  paramValue: "lgv_flow_vehs",
-                },
-                {
-                  displayValue: "HGV flow vehicles",
-                  paramValue: "hgv_flow_vehs",
-                },
-                {
-                  displayValue: "Total flow vehicles",
-                  paramValue: "total_flow_vehs",
-                },
-                {
-                  displayValue: "Link VOC",
-                  paramValue: "link_voc",
-                },
-                {
-                  displayValue: "Link delay (secs)",
-                  paramValue: "link_delay_secs",
-                },
-                {
-                  displayValue: "Link queues (secs)",
-                  paramValue: "link_queues_secs",
-                },
-                {
-                  displayValue: "Number of lanes",
-                  paramValue: "number_lanes",
-                },
-                {
-                  displayValue: "Speed limit",
-                  paramValue: "speed_limit",
-                },
-              ],
-            },
-          },
-        ],
+        ]
       },
     },
+
+    // -----------------------------------------------------------
+
     {
-      pageName: "NoHAM Link Difference",
+      pageName: "NoHAM Link Results Difference",
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -1679,219 +1683,6 @@ export const appConfig = {
     },
 
     // -----------------------------------------------------------
-
-    {
-      pageName: "NoHAM Link Results",
-      url: "/link-results",
-      type: "MapLayout",
-      category: "Link",
-      about: "", //To be added.
-      config: {
-        layers: [
-          {
-            uniqueId: "NoHAMLinkResults",
-            name: "LinkResults",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "geometry",
-            geometryType: "line",
-            visualisationName: "LinkResults",
-            isHoverable: false,
-            isStylable: true,
-            shouldHaveTooltipOnClick: false,
-          }
-        ],
-        visualisations: [
-          {
-            name: "LinkResults",
-            type: "joinDataToMap",
-            joinLayer: "LinkResults",
-            style: "line-continuous",
-            joinField: "id",
-            valueField: "value",
-            dataSource: "api",
-            dataPath: "/api/noham/link-results/",
-          },
-        ],
-        metadataLayers: [],
-        filters: [
-          {
-            filterName: "Select Column",
-            paramName: "columnName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Net Speed (kph)',
-                  paramValue: 'netspd_kph'
-                },
-                {
-                  displayValue: 'Total Time (seconds)',
-                  paramValue: 'total_time_secs'
-                },
-                {
-                  displayValue: 'car_eb_vehs',
-                  paramValue: 'car_eb_vehs'
-                },
-                {
-                  displayValue: 'car_comm_vehs',
-                  paramValue: 'car_comm_vehs'
-                },
-                {
-                  displayValue: 'LGV Flows',
-                  paramValue: 'lgv_flow_vehs'
-                },
-                {
-                  displayValue: 'HGV Flows',
-                  paramValue: 'hgv_flow_vehs'
-                },
-                {
-                  displayValue: 'Total Flows',
-                  paramValue: 'total_flow_vehs'
-                },
-                {
-                  displayValue: 'link_voc',
-                  paramValue: 'link_voc'
-                },
-                {
-                  displayValue: 'Link Delay (seconds)',
-                  paramValue: 'link_delay_secs'
-                },
-                {
-                  displayValue: 'Link Queue (seconds)',
-                  paramValue: 'link_queues_secs'
-                },
-                {
-                  displayValue: 'Number of Lanes',
-                  paramValue: 'number_lanes'
-                },
-                {
-                  displayValue: 'Speed Limit',
-                  paramValue: 'speed_limit'
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Delivery Program",
-            paramName: "deliveryProgrammeName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Default',
-                  paramValue: ''
-                },
-                {
-                  displayValue: "MRN",
-                  paramValue: "MRN",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Network Scenario",
-            paramName: "networkScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do Minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Year",
-            paramName: "year",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2018",
-                  paramValue: 2018,
-                },
-                {
-                  displayValue: "2033",
-                  paramValue: 2033,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Demand Scenario",
-            paramName: "demandScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Core",
-                  paramValue: "core",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["LinkResults"],
-            type: "toggle",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "AM",
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "Inter-Peak",
-                  paramValue: "ip",
-                },
-                {
-                  displayValue: "PM",
-                  paramValue: "pm",
-                },
-              ],
-            },
-          },
-        ]
-      },
-    },
-
-    // -----------------------------------------------------------
-
 
     {
       pageName: "NoHAM Node Results",
