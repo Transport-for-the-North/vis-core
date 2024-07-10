@@ -1,4 +1,3 @@
-import { act } from "react";
 
 export const appConfig = {
   title: "TAME React Vis Template",
@@ -875,7 +874,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -944,7 +943,7 @@ export const appConfig = {
             filterName: "Network Scenario Name - Left",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -961,7 +960,7 @@ export const appConfig = {
             filterName: "Network Scenario Name - Right",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -978,7 +977,7 @@ export const appConfig = {
             filterName: "Network Year - Left",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -995,7 +994,7 @@ export const appConfig = {
             filterName: "Network Year - Right",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -1012,7 +1011,7 @@ export const appConfig = {
             filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -1029,7 +1028,7 @@ export const appConfig = {
             filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -1046,7 +1045,7 @@ export const appConfig = {
             filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -1071,7 +1070,7 @@ export const appConfig = {
             filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -1096,7 +1095,7 @@ export const appConfig = {
             filterName: "Delivery Program - Left",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -1113,7 +1112,7 @@ export const appConfig = {
             filterName: "Delivery Program - Right",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinkResultDual"],
             type: "dropdown",
             values: {
@@ -2200,7 +2199,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2221,7 +2220,7 @@ export const appConfig = {
             filterName: "Left Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2242,7 +2241,7 @@ export const appConfig = {
             filterName: "Right Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2263,7 +2262,7 @@ export const appConfig = {
             filterName: "Left Network Scenario",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2284,7 +2283,7 @@ export const appConfig = {
             filterName: "Right Network Scenario",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2305,7 +2304,7 @@ export const appConfig = {
             filterName: "Left Year",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2326,7 +2325,7 @@ export const appConfig = {
             filterName: "Right Year",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2347,7 +2346,7 @@ export const appConfig = {
             filterName: "Left Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2368,7 +2367,7 @@ export const appConfig = {
             filterName: "Right Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "dropdown",
             values: {
@@ -2389,7 +2388,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "toggle",
             values: {
@@ -2414,7 +2413,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NodeResultsDual"],
             type: "toggle",
             values: {
@@ -2608,7 +2607,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "toggle",
             values: {
@@ -2629,7 +2628,7 @@ export const appConfig = {
             filterName: "Left Demand Year",
             paramName: "demandYear",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "dropdown",
             values: {
@@ -2650,7 +2649,7 @@ export const appConfig = {
             filterName: "Left Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "dropdown",
             values: {
@@ -2671,7 +2670,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "toggle",
             values: {
@@ -2696,7 +2695,7 @@ export const appConfig = {
             filterName: "Right Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "dropdown",
             values: {
@@ -2717,7 +2716,7 @@ export const appConfig = {
             filterName: "Right Demand Year",
             paramName: "demandYear",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "dropdown",
             values: {
@@ -2738,7 +2737,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneResultsDual"],
             type: "toggle",
             values: {
@@ -3054,7 +3053,7 @@ export const appConfig = {
             filterName: "Choose if selected zone is origin/destination",
             paramName: "originOrDestination",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "toggle",
             values: {
@@ -3075,7 +3074,7 @@ export const appConfig = {
             filterName: "Select Column",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3108,7 +3107,7 @@ export const appConfig = {
             filterName: "Left Network Scenario Name",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3129,7 +3128,7 @@ export const appConfig = {
             filterName: "Left Year",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3150,7 +3149,7 @@ export const appConfig = {
             filterName: "Left Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3171,7 +3170,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3196,7 +3195,7 @@ export const appConfig = {
             filterName: "Left Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3217,7 +3216,7 @@ export const appConfig = {
             filterName: "Left User Class",
             paramName: "userClass",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3254,7 +3253,7 @@ export const appConfig = {
             filterName: "Right Network Scenario Name",
             paramName: "networkScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3275,7 +3274,7 @@ export const appConfig = {
             filterName: "Right Year",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3296,7 +3295,7 @@ export const appConfig = {
             filterName: "Right Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3317,7 +3316,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3342,7 +3341,7 @@ export const appConfig = {
             filterName: "Right Delivery Program",
             paramName: "deliveryProgrammeName",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3363,7 +3362,7 @@ export const appConfig = {
             filterName: "Right User Class",
             paramName: "userClass",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "dropdown",
             values: {
@@ -3400,7 +3399,7 @@ export const appConfig = {
             filterName: "Select zone in map",
             paramName: "zoneId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResultsDual"],
             type: "map",
             layer: "ZonalPairResultsDual",
@@ -3910,7 +3909,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "NoRMS Station Totals",
+            name: "NoRMS Station Totals Dual",
             type: "joinDataToMap",
             joinLayer: "NoRMS Nodes",
             style: "circle-continuous",
@@ -3923,11 +3922,11 @@ export const appConfig = {
         metadataLayers: [],
         filters: [
           {
-            filterName: "Scenario DS",
+            filterName: "Left Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals Dual"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4012,11 +4011,11 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period DS",
+            filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals Dual"],
             type: "toggle",
             values: {
               source: "local",
@@ -4045,11 +4044,11 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Right Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals Dual"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4134,11 +4133,11 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period DM",
+            filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals Dual"],
             type: "toggle",
             values: {
               source: "local",
@@ -4170,8 +4169,8 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "propertyName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
-            visualisations: ["NoRMS Station Totals"],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["NoRMS Station Totals Dual"],
             type: "dropdown",
             values: {
               source: "local",
@@ -4868,7 +4867,7 @@ export const appConfig = {
             filterName: "Direction",
             paramName: "originOrDestination",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "toggle",
             values: {
@@ -4889,7 +4888,7 @@ export const appConfig = {
             filterName: "Column Name",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "dropdown",
             values: {
@@ -4914,7 +4913,7 @@ export const appConfig = {
             filterName: "Left Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "dropdown",
             values: {
@@ -5003,7 +5002,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "toggle",
             values: {
@@ -5036,7 +5035,7 @@ export const appConfig = {
             filterName: "Left User",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "dropdown",
             values: {
@@ -5065,7 +5064,7 @@ export const appConfig = {
             filterName: "Right Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "dropdown",
             values: {
@@ -5154,7 +5153,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "toggle",
             values: {
@@ -5187,7 +5186,7 @@ export const appConfig = {
             filterName: "Right User",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "dropdown",
             values: {
@@ -5216,10 +5215,10 @@ export const appConfig = {
             filterName: "Please select a station in the map",
             paramName: "nodeId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["StationPairDual"],
             type: "map",
-            layer: "NoRMS Station Pair Result",
+            layer: "NoRMS Station Pair Result Side-by-Side",
             field: "id",
           }
         ],
@@ -5938,7 +5937,7 @@ export const appConfig = {
             filterName: "Direction",
             paramName: "directionId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "toggle",
             values: {
@@ -5959,7 +5958,7 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "dropdown",
             values: {
@@ -5981,7 +5980,7 @@ export const appConfig = {
             filterName: "Left Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "dropdown",
             values: {
@@ -6070,7 +6069,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "toggle",
             values: {
@@ -6103,7 +6102,7 @@ export const appConfig = {
             filterName: "Left User Class",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "dropdown",
             values: {
@@ -6132,7 +6131,7 @@ export const appConfig = {
             filterName: "Right Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "dropdown",
             values: {
@@ -6221,7 +6220,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "toggle",
             values: {
@@ -6254,7 +6253,7 @@ export const appConfig = {
             filterName: "Right User Class",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "dropdown",
             values: {
@@ -6283,7 +6282,7 @@ export const appConfig = {
             filterName: "Select station in map",
             paramName: "nodeId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["NoRMS Station Catchment Dual"],
             type: "map",
             layer: "NoRMS Nodes",
@@ -6849,7 +6848,7 @@ export const appConfig = {
             filterName: "Left Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinksResultDual"],
             type: "dropdown",
             values: {
@@ -6938,7 +6937,7 @@ export const appConfig = {
             filterName: "Right Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinksResultDual"],
             type: "dropdown",
             values: {
@@ -7027,7 +7026,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinksResultDual"],
             type: "toggle",
             values: {
@@ -7060,7 +7059,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinksResultDual"],
             type: "toggle",
             values: {
@@ -7093,7 +7092,7 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "propertyName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["LinksResultDual"],
             type: "dropdown",
             values: {
@@ -7848,7 +7847,7 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "dropdown",
             values: {
@@ -7901,7 +7900,7 @@ export const appConfig = {
             filterName: "Origin Or Destination",
             paramName: "originOrDestination",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "toggle",
             values: {
@@ -7922,7 +7921,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "toggle",
             values: {
@@ -7955,7 +7954,7 @@ export const appConfig = {
             filterName: "Left User Class",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "dropdown",
             values: {
@@ -7984,7 +7983,7 @@ export const appConfig = {
             filterName: "Left Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "dropdown",
             values: {
@@ -8073,7 +8072,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "toggle",
             values: {
@@ -8106,7 +8105,7 @@ export const appConfig = {
             filterName: "Right User Class",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "dropdown",
             values: {
@@ -8135,7 +8134,7 @@ export const appConfig = {
             filterName: "Right Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZoneTotalsDual"],
             type: "dropdown",
             values: {
@@ -8903,7 +8902,7 @@ export const appConfig = {
             filterName: "Zone as Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "toggle",
             values: {
@@ -8924,7 +8923,7 @@ export const appConfig = {
             filterName: "Metric",
             paramName: "columnName",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, { action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "dropdown",
             values: {
@@ -8949,7 +8948,7 @@ export const appConfig = {
             filterName: "Left Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "dropdown",
             values: {
@@ -9038,7 +9037,7 @@ export const appConfig = {
             filterName: "Left Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "toggle",
             values: {
@@ -9071,7 +9070,7 @@ export const appConfig = {
             filterName: "Left User",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "dropdown",
             values: {
@@ -9100,7 +9099,7 @@ export const appConfig = {
             filterName: "Right Scenario",
             paramName: "scenarioCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "dropdown",
             values: {
@@ -9189,7 +9188,7 @@ export const appConfig = {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "toggle",
             values: {
@@ -9222,7 +9221,7 @@ export const appConfig = {
             filterName: "Right User",
             paramName: "userClassId",
             target: "api",
-            actions: [{ action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "dropdown",
             values: {
@@ -9251,7 +9250,7 @@ export const appConfig = {
             filterName: "Select a zone in the map",
             paramName: "zoneId",
             target: "api",
-            actions: [{ action: "UPDATE_LEFT_QUERY_PARAMS" }, {action: "UPDATE_RIGHT_QUERY_PARAMS" }],
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["ZonesPairDual"],
             type: "map",
             layer: "NoRMS Zones Pair Result",
