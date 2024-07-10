@@ -1,3 +1,13 @@
+const networkScenarioNameValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Do minimum",
+      paramValue: "dm",
+    },
+  ],
+}
+
 export const appConfig = {
   title: "TAME React Vis Template",
   introduction: `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
@@ -76,19 +86,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Demand scenario",
@@ -331,15 +329,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Network Scenario Name - DM",
@@ -348,15 +338,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Network Year - DS",
@@ -633,19 +615,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "Do Minimum",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Year",
@@ -782,15 +752,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Network Scenario Name - DM",
@@ -799,15 +761,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResultDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Network Year - DS",
@@ -1417,15 +1371,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Network Scenario Name - DM",
@@ -1434,15 +1380,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairDifference"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Network Year - DS",
@@ -1817,19 +1755,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
             type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Base",
-                  paramValue: "base",
-                },
-                {
-                  displayValue: "DM",
-                  paramValue: "dm",
-                },
-              ],
-            },
+            values: networkScenarioNameValues
           },
           {
             filterName: "Year",
