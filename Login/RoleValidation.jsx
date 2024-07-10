@@ -17,16 +17,16 @@ export const RoleValidation = ({ component: WrappedComponent }) => {
 
     const userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
     const isAuthenticated = !!token;
-
-    // Define dynamic required roles based on the app name
+    const lowerCaseUserRoles = userRoles.map(role => role.toLowerCase());
+   
     const requiredRoles = [
-        `${appName}_User`,
-        `${appName}_Admin`,
-        `All_User`,
-        `All_Admin`
+        `${appName}_user`,
+        `${appName}_admin`,
+        `all_user`,
+        `all_admin`
     ];
 
-    const hasRequiredRole = userRoles.some(role => requiredRoles.includes(role));
+    const hasRequiredRole = lowerCaseUserRoles.some(role => requiredRoles.includes(role));
 
     console.log("isAuthenticated", isAuthenticated);
     console.log("userRoles", userRoles);
