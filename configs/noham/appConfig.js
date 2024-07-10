@@ -560,7 +560,7 @@ export const appConfig = {
       url: "/link-result-dual",
       type: "DualMapLayout",
       about: "", //To be added.
-      category: "Link",
+      category: "Links",
       config: {
         layers: [
           {
@@ -1270,7 +1270,7 @@ export const appConfig = {
       pageName: "Zone Results Side-By-Side",
       url: "/zone-results-dual",
       type: "DualMapLayout",
-      category: "Zone",
+      category: "Zones",
       about: "", //To be added.
       config: {
         layers: [
