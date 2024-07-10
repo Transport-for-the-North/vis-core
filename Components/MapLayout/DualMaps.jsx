@@ -278,7 +278,7 @@ const DualMaps = () => {
             filter.actions.map((action) => {
               dispatch({
                 type: action.action,
-                payload: { filter, value },
+                payload: { filter, value, sides: "both"},
               });
             });
           }

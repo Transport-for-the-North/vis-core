@@ -30,25 +30,10 @@ const fetchDataForVisualisation = debounce(
       const visualisationName = visualisation.name;
       try {
         const data = await api.baseService.get(path, { queryParams });
-        switch (left) {
-          case true:
-            dispatch({
-              type: actionTypes.UPDATE_LEFT_VIS_DATA,
-              payload: { visualisationName, data },
-            });
-            break;
-          case false:
-            dispatch({
-              type: actionTypes.UPDATE_RIGHT_VIS_DATA,
-              payload: { visualisationName, data },
-            });
-            break;
-          default:
-            dispatch({
-              type: actionTypes.UPDATE_VIS_DATA,
-              payload: { visualisationName, data },
-            });
-        }
+        dispatch({
+          type: actionTypes.UPDATE_ALL_DATA,
+          payload: { visualisationName, data, left },
+        })
         if (data.length === 0) {
           console.warn(
             "No data returned for visualisation:",
