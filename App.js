@@ -84,8 +84,5 @@ function App() {
     );
 }
 
-const isDev = process.env.REACT_APP_NAME === 'dev';
-export default isDev ? App : withAuthenticationRequired(App, {
-    onRedirecting: () => <div>Loading...</div>,
-});
+export default App;
 
