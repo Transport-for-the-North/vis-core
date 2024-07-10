@@ -48,21 +48,21 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
   const { state } = useMapContext();
   const noDataAvailable = state.visualisations[
     Object.keys(state.visualisations)[0]
-  ]?.data[0]?.feature_collection
+  ]?.data[0]?.feature_collection // Check if it's a GeoJSON feature collection and if it's empty
     ? !checkGeometryNotNull(
         JSON.parse(
           state.visualisations[Object.keys(state.visualisations)[0]].data[0]
             .feature_collection
         )
       )
-    : state.visualisations[Object.keys(state.visualisations)[0]]?.data
+    : state.visualisations[Object.keys(state.visualisations)[0]]?.data // If it's not a GeoJSON feature collection, check if it's an array and if it's empty for each visualisation
         .length === 0 &&
       state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]?.data
         .length === 0 &&
       state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]?.data
         .length === 0 &&
       Object.values(
-        state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
+        state.leftVisualisations[Object.keys(state.leftVisualisations)[0]] // Finally verify that all query params are defined for each visualisation
           ?.queryParams ?? {}
       ).every((el) => el !== undefined) &&
       Object.values(

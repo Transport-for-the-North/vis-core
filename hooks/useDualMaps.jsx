@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
 import { syncMaps } from "utils";
 /**
- * 
+ * Custom hook to manage two synchronized MapLibre maps.
  * @param {React.RefObject} leftMapContainerRef 
  * @param {React.RefObject} rightMapContainerRef 
  * @returns 
