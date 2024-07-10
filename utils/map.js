@@ -208,7 +208,7 @@ export const resetPaintProperty = (style) => {
  * @param {string} style - The type of geometry we have.
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
-export const reclassifyData = (data, style) => {
+export const reclassifyData = (data, style, classificationMethod) => {
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -221,21 +221,53 @@ export const reclassifyData = (data, style) => {
     return roundedValues;
   };
 
+  function replaceZeroValues(num) {
+    if (num == 0) {
+      return 0.01
+    }
+    else {
+      return num
+    }
+  }
+
+  function replaceZeroPointValues(num) {
+    if (num == 0.01) {
+      return 0
+    }
+    else {
+      return num
+    }
+  }
+
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
+    if (classificationMethod == 'l') {
+      values = values.map(replaceZeroValues)
+    }
     console.log("Bins recalculated for continuous data");
-    const unroundedBins = chroma.limits(values, "e", 8);
-    const roundedBins = roundValues(unroundedBins, 2);
+    const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
+    let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
+    if (classificationMethod == 'l') {
+      roundedBins = roundedBins.map(replaceZeroPointValues)
+    }
     return roundedBins;
   } else if (style.includes("categorical")) {
     console.log("Categorical classification not implemented for joined data");
     return;
   } else if (style.includes("diverging")) {
-    const absValues = data.map((value) => Math.abs(value.value));
-    const unroundedBins = chroma.limits(absValues, "e", 3);
-    let roundedBins = roundValues(unroundedBins, 2);
-    // Remove any 0's in roundedBins.
+    let absValues = data.map((value) => Math.abs(value.value));
+    if (classificationMethod == 'l') {
+      absValues = absValues.map(replaceZeroValues)
+    }
+    const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
+    let roundedBins = unroundedBins.map(function(ele){
+      return Math.round(ele*100)/100;
+    });
+    if (classificationMethod == 'l') {
+      absValues = absValues.map(replaceZeroValues)
+    }
     roundedBins = roundedBins.filter((value) => value !== 0)
+    console.log(roundedBins);
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
     console.log("Bins calculated for diverging data");

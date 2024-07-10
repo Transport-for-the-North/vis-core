@@ -15,7 +15,8 @@ export const actionTypes = {
     UPDATE_COLOR_SCHEME: 'UPDATE_COLOR_SCHEME',
     JOIN_DATA: 'JOIN_DATA',
     SET_IS_LOADING: 'SET_IS_LOADING',
-    SET_LOADING_FINISHED: 'SET_LOADING_FINISHED'
+    SET_LOADING_FINISHED: 'SET_LOADING_FINISHED',
+    UPDATE_CLASSIFICATION_METHOD: 'UPDATE_CLASSIFICATION_METHOD'
 };
 
 /**
@@ -79,6 +80,14 @@ export const mapReducer = (state, action) => {
             return {
                 ...state,
                 color_scheme: color_scheme,
+            };
+        }
+
+        case actionTypes.UPDATE_CLASSIFICATION_METHOD: {
+            const { class_method } = action.payload;
+            return {
+                ...state,
+                class_method: class_method
             };
         }
         
