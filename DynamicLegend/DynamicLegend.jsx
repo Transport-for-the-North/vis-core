@@ -267,16 +267,26 @@ export const DynamicLegend = ({ map }) => {
 
           const pageConfig = config.appPages.find(page => page.pageName === visualisationKey);
           const legendFilter = pageConfig.config.filters.find(filter => filter.containsLegendInfo === true);
-          const filterParamName = legendFilter.paramName;
-          const filter = pageConfig.config.filters.find(filter => filter.paramName === filterParamName);
-          const filterValues = filter.values;
+          
+          let displayValue;
+          let legendSubtitleText;
 
-          // Default values from filterName
-          const defaultDisplayValue = filterValues?.values[0]?.displayValue || title;
-          const defaultLegendSubtitleText = filterValues?.values[0]?.legendSubtitleText || "Subtitle";
+          if (legendFilter) {
+            const filterParamName = legendFilter.paramName;
+            const filter = pageConfig.config.filters.find(filter => filter.paramName === filterParamName);
+            const filterValues = filter.values;
+      
+            // Default values from filterName
+            const defaultDisplayValue = filterValues?.values[0]?.displayValue || title;
+            const defaultLegendSubtitleText = filterValues?.values[0]?.legendSubtitleText || "Subtitle";
+      
+            displayValue = legendTexts[index]?.displayValue || defaultDisplayValue;
+            legendSubtitleText = legendTexts[index]?.legendSubtitleText || defaultLegendSubtitleText;
+          } else {
+            displayValue = title;
+            legendSubtitleText = ""; // Default subtitle if legendFilter is not found
+          }
 
-          const displayValue = legendTexts[index]?.displayValue || defaultDisplayValue;
-          const legendSubtitleText = legendTexts[index]?.legendSubtitleText || defaultLegendSubtitleText;
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
