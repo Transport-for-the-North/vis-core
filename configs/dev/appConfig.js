@@ -484,16 +484,8 @@ export const appConfig = {
                   paramValue: "number_lanes",
                 },
                 {
-                  displayValue: "Speed flow curve",
-                  paramValue: "speed_flow_curve",
-                },
-                {
                   displayValue: "Speed limit",
                   paramValue: "speed_limit",
-                },
-                {
-                  displayValue: "Carbon emissions (tCO2)",
-                  paramValue: "carbon_emissions_tco2",
                 },
               ],
             },
@@ -592,16 +584,8 @@ export const appConfig = {
                   paramValue: "number_lanes",
                 },
                 {
-                  displayValue: "speed_flow_curv",
-                  paramValue: "speed_flow_curve",
-                },
-                {
                   displayValue: "Speed Limit",
                   paramValue: "speed_limit",
-                },
-                {
-                  displayValue: "Carbon Emissions",
-                  paramValue: "carbon_emissions_tco2",
                 },
               ],
             },
@@ -1787,16 +1771,8 @@ export const appConfig = {
                   paramValue: 'number_lanes'
                 },
                 {
-                  displayValue: 'speed_flow_curv',
-                  paramValue: 'speed_flow_curve'
-                },
-                {
                   displayValue: 'Speed Limit',
                   paramValue: 'speed_limit'
-                },
-                {
-                  displayValue: 'Carbon Emissions',
-                  paramValue: 'carbon_emissions_tco2'
                 },
               ],
             },
