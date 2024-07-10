@@ -22,7 +22,7 @@ import {
  * @returns {Promise<void>} This function returns a promise.
  */
 const fetchDataForVisualisation = debounce(
-  async (visualisation, dispatch, setLoading) => {
+  async (visualisation, dispatch, setLoading, left) => {
     if (visualisation && visualisation.queryParams) {
       setLoading(true);
       const path = visualisation.dataPath;
@@ -31,9 +31,9 @@ const fetchDataForVisualisation = debounce(
       try {
         const data = await api.baseService.get(path, { queryParams });
         dispatch({
-          type: actionTypes.UPDATE_VIS_DATA,
-          payload: { visualisationName, data },
-        });
+          type: actionTypes.UPDATE_ALL_DATA,
+          payload: { visualisationName, data, left },
+        })
         if (data.length === 0) {
           console.warn(
             "No data returned for visualisation:",
@@ -55,17 +55,23 @@ const fetchDataForVisualisation = debounce(
  *
  * @property {string} props.visualisationName - The name of the visualization.
  * @property {Object} props.map - The Maplibre JS map instance.
+ * @property {boolean} props.left - A boolean indicating whether the visualisation is for the left or the right map. Null for a single map page
  * @returns {null} This component doesn't render anything directly.
  */
-export const Visualisation = ({ visualisationName, map }) => {
+export const Visualisation = ({ visualisationName, map, left = null }) => {
   const { state, dispatch } = useMapContext();
   const [isLoading, setLoading] = useState(false); // State to track loading
   const prevDataRef = useRef();
   const prevColorRef = useRef();
   const prevClassMethodRef = useRef();
   const prevQueryParamsRef = useRef();
-  const visualisation = state.visualisations[visualisationName];
- 
+  const visualisation =
+    left === null
+      ? state.visualisations[visualisationName]
+      : left
+      ? state.leftVisualisations[visualisationName]
+      : state.rightVisualisations[visualisationName];
+
   /**
    * Reclassifies the provided data and updates the map style.
    *
@@ -79,7 +85,11 @@ export const Visualisation = ({ visualisationName, map }) => {
   const reclassifyAndStyleMap = useCallback(
     (data, style, classificationMethod) => {
       // Reclassify data if needed
-      const reclassifiedData = reclassifyData(data, style, classificationMethod);
+      const reclassifiedData = reclassifyData(
+        data,
+        style,
+        classificationMethod
+      );
       const currentColor = colorSchemes[style.split("-")[1]].some(
         (e) => e === state.color_scheme.value
       )
@@ -283,13 +293,24 @@ export const Visualisation = ({ visualisationName, map }) => {
       prevQueryParamsRef.current !== currentQueryParamsStr;
 
     if (allParamsPresent && queryParamsChanged) {
-      // Fetch data for the visualisation
-      fetchDataForVisualisation(visualisation, dispatch, setLoading);
+      if (!left) {
+        // Debounce the function to update both sides of the map
+        setTimeout(() => {
+          fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
+        }, 400);
+      } else
+        fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
 
       // Update the ref to the current queryParams
       prevQueryParamsRef.current = currentQueryParamsStr;
     }
-  }, [visualisation.queryParams, visualisationName, visualisation]);
+  }, [
+    visualisation.queryParams,
+    visualisationName,
+    visualisation,
+    left,
+    dispatch,
+  ]);
 
   // Log loading status to console
   useEffect(() => {
@@ -327,25 +348,35 @@ export const Visualisation = ({ visualisationName, map }) => {
    * Reset the map style to the default style.
    * @param {string} style - The type of geometries of the visualisation.
    */
-  const resetMapStyle = useCallback((style) => {
-    if (map) {
-      const paintProperty = resetPaintProperty(style);
-      addFeaturesToMap(map, paintProperty, state.layers, prevDataRef.current, style);
-    }
-  }, [map, state.layers]);
+  const resetMapStyle = useCallback(
+    (style) => {
+      if (map) {
+        const paintProperty = resetPaintProperty(style);
+        addFeaturesToMap(
+          map,
+          paintProperty,
+          state.layers,
+          prevDataRef.current,
+          style
+        );
+      }
+    },
+    [map, state.layers]
+  );
 
   // Effect to restyle the map if data has changed
   useEffect(() => {
     const dataHasChanged =
-      visualisation.data !== prevDataRef.current && prevDataRef.current !== undefined;
+      visualisation.data !== prevDataRef.current &&
+      prevDataRef.current !== undefined;
     const colorHasChanged =
       state.color_scheme !== null &&
       state.color_scheme !== prevColorRef.current;
-    const classificationHasChanged = 
+    const classificationHasChanged =
       state.class_method != null &&
       state.class_method !== prevClassMethodRef.current;
-      const
-      needUpdate = dataHasChanged || (colorHasChanged && visualisation.data[0] !== undefined) || classificationHasChanged;
+    const needUpdate =
+      dataHasChanged || colorHasChanged || classificationHasChanged;
     if (!needUpdate) {
       setLoading(false);
       return;
@@ -353,23 +384,45 @@ export const Visualisation = ({ visualisationName, map }) => {
     switch (visualisation.type) {
       case "geojson": {
         setLoading(true);
-        reclassifyAndStyleGeoJSONMap(
-          JSON.parse(visualisation.data[0].feature_collection),
-          visualisation.style
-        );
-
+        visualisation.data[0]
+          ? reclassifyAndStyleGeoJSONMap(
+              JSON.parse(visualisation.data[0].feature_collection),
+              visualisation.style
+            )
+          : resetMapStyle(visualisation.style);
         break;
       }
 
       case "joinDataToMap": {
-        const dataValues = Object.groupBy(visualisation.data, ({ value }) => value);
-        if (visualisation.data.length === 0 || (Object.keys(dataValues).length === 1 && Object.keys(dataValues)[0] === 0)) {
-          resetMapStyle(visualisation.style);
+        const dataValues = Object.groupBy(
+          visualisation.data,
+          ({ value }) => value
+        );
+        if (
+          visualisation.data.length === 0 ||
+          (Object.keys(dataValues).length === 1 &&
+            Object.keys(dataValues)[0] === 0)
+        ) {
+          const dataValues = Object.groupBy(
+            visualisation.data,
+            ({ value }) => value
+          );
+          if (
+            visualisation.data.length === 0 ||
+            (Object.keys(dataValues).length === 1 &&
+              Object.keys(dataValues)[0] === 0)
+          ) {
+            resetMapStyle(visualisation.style);
+          }
         }
         // Reclassify and update the map style
         else {
           setLoading(true);
-          reclassifyAndStyleMap(visualisation.data, visualisation.style, state.class_method);
+          reclassifyAndStyleMap(
+            visualisation.data,
+            visualisation.style,
+            state.class_method
+          );
         }
         break;
       }
@@ -402,7 +455,7 @@ export const Visualisation = ({ visualisationName, map }) => {
     map,
     state.color_scheme,
     resetMapStyle,
-    state.class_method
+    state.class_method,
   ]);
 
   return null;
