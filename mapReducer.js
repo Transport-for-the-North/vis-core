@@ -128,7 +128,6 @@ export const mapReducer = (state, action) => {
             const visualisationNames = action.payload.filter.visualisations;
             const paramName = action.payload.filter.paramName;
             const newParamValue = action.payload.value;
-            console.log(action.payload.sides)
             const updatedVisualisations = (() => {
                 switch (action.payload.sides) {
                     case "left": return [{ ...state.leftVisualisations }];
