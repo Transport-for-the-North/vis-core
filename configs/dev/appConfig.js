@@ -406,7 +406,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Links"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -732,7 +732,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -757,7 +757,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResultDifference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -1867,7 +1867,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["LinkResults"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2039,7 +2039,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["NodeResults"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2169,7 +2169,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZoneResults"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
@@ -2363,7 +2363,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["ZonalPairResults"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "local",
               values: [
