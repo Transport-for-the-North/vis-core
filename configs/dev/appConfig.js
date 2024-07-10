@@ -251,20 +251,26 @@ export const appConfig = {
             filterName: "Value type",
             paramName: "valueType",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
             visualisations: ["Bus Accessibility"],
             type: "dropdown",
             info: "Type of opportunity accessed.",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Jobs",
                   paramValue: "jobs",
+                  legendSubtitleText: "Jobs unit",
                 },
                 {
                   displayValue: "Schools",
                   paramValue: "schools",
+                  legendSubtitleText: "Schools unit",
                 },
               ],
             },
