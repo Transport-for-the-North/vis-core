@@ -15,6 +15,7 @@ export const PageSwitch = ({ pageConfig }) => {
     <PageContext.Provider value={pageConfig}>
       {(() => {
         switch (pageConfig.type) {
+          case "DualMapLayout":
           case "MapLayout":
             return (
               <MapProvider>
