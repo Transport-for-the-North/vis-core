@@ -264,11 +264,16 @@ export const DynamicLegend = ({ map }) => {
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer, index) => {
           const title = layer.id;
-          const columnNameFilter = config.appPages.find(page => page.pageName === visualisationKey).config.filters.find(filter => filter.paramName === "propertyName" || filter.paramName === "columnName").values;
+
+          const pageConfig = config.appPages.find(page => page.pageName === visualisationKey);
+          const legendFilter = pageConfig.config.filters.find(filter => filter.containsLegendInfo === true);
+          const filterParamName = legendFilter.paramName;
+          const filter = pageConfig.config.filters.find(filter => filter.paramName === filterParamName);
+          const filterValues = filter.values;
 
           // Default values from filterName
-          const defaultDisplayValue = columnNameFilter?.values[0]?.displayValue || title;
-          const defaultLegendSubtitleText = columnNameFilter?.values[0]?.legendSubtitleText || "Subtitle";
+          const defaultDisplayValue = filterValues?.values[0]?.displayValue || title;
+          const defaultLegendSubtitleText = filterValues?.values[0]?.legendSubtitleText || "Subtitle";
 
           const displayValue = legendTexts[index]?.displayValue || defaultDisplayValue;
           const legendSubtitleText = legendTexts[index]?.legendSubtitleText || defaultLegendSubtitleText;
