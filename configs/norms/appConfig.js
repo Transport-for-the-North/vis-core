@@ -175,6 +175,7 @@ export const appConfig = {
     contactText: "Please contact [Name] for any questions on this data tool.",
     contactEmail: "firstname.lastname@transportforthenorth.com",
     logoImage: "img/tfn-logo-fullsize.png",
+
     backgroundImage: "img/hero-image.jpg",
     logoutButtonImage: "img/burgerIcon.png",
     logoutImage: "img/logout.png",
@@ -194,7 +195,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "Station Totals",
                         isHoverable: false,
                         isStylable: true,
                         shouldHaveTooltipOnClick: true,
@@ -202,7 +203,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "NoRMS Station Totals",
+                        name: "Station Totals",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Nodes",
                         style: "circle-continuous",
@@ -219,7 +220,7 @@ export const appConfig = {
                         paramName: "scenarioCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        visualisations: ["Station Totals"],
                         type: "dropdown",
                         values: scenarioCodeValues,
                     },
@@ -228,7 +229,7 @@ export const appConfig = {
                         paramName: "timePeriodCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        visualisations: ["Station Totals"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -236,17 +237,21 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "propertyName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" }
+                        ],
+                        visualisations: ["Station Totals"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
-                                { paramValue: "Boardings", displayValue: "Boardings" },
-                                { paramValue: "Interchanges", displayValue: "Interchanges" },
-                                { paramValue: "Egress", displayValue: "Egress" },
-                                { paramValue: "Access", displayValue: "Access" },
-                                { paramValue: "Alightings", displayValue: "Alightings" }
+                                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText:"Boardings" },
+                                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText:"Interchanges" },
+                                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText:"Egress" },
+                                { paramValue: "Access", displayValue: "Access", legendSubtitleText:"Access" },
+                                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText:"Alightings" }
                             ]
                         },
                     },
@@ -268,7 +273,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "Station Totals Difference",
                         isHoverable: false,
                         isStylable: true,
                         shouldHaveTooltipOnClick: true,
@@ -276,7 +281,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "NoRMS Station Totals",
+                        name: "Station Totals Difference",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Nodes",
                         style: "circle-diverging",
@@ -293,7 +298,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        visualisations: ["Station Totals Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues,
                     },
@@ -302,7 +307,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        visualisations: ["Station Totals Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -311,7 +316,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        visualisations: ["Station Totals Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues,
                     },
@@ -320,7 +325,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        visualisations: ["Station Totals Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -328,17 +333,21 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "propertyName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Totals"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" }
+                        ],
+                        visualisations: ["Station Totals Difference"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
-                                { paramValue: "Boardings", displayValue: "Boardings" },
-                                { paramValue: "Interchanges", displayValue: "Interchanges" },
-                                { paramValue: "Egress", displayValue: "Egress" },
-                                { paramValue: "Access", displayValue: "Access" },
-                                { paramValue: "Alightings", displayValue: "Alightings" }
+                                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText:"Boardings" },
+                                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText:"Interchanges" },
+                                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText:"Egress" },
+                                { paramValue: "Access", displayValue: "Access", legendSubtitleText:"Access" },
+                                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText:"Alightings" }
                             ]
                         },
                     },
@@ -360,7 +369,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "StationPair",
+                        visualisationName: "Station Pairs",
                         isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
@@ -368,7 +377,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "StationPair",
+                        name: "Station Pairs",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Station Pair Result",
                         style: "circle-continuous",
@@ -385,7 +394,7 @@ export const appConfig = {
                         paramName: "scenarioCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
+                        visualisations: ["Station Pairs"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -394,7 +403,7 @@ export const appConfig = {
                         paramName: "timePeriodCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
+                        visualisations: ["Station Pairs"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -403,7 +412,7 @@ export const appConfig = {
                         paramName: "userClassId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
+                        visualisations: ["Station Pairs"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -412,7 +421,7 @@ export const appConfig = {
                         paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
+                        visualisations: ["Station Pairs"],
                         type: "toggle",
                         values: originOrDestinationValues,
                     },
@@ -420,23 +429,30 @@ export const appConfig = {
                         filterName: "Column Name",
                         paramName: "columnName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" }
+                        ],
+                        visualisations: ["Station Pairs"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
                                 {
                                     displayValue: "Demand",
                                     paramValue: "demand",
+                                    legendSubtitleText: "Demand",
                                 },
                                 {
                                     displayValue: "Generalised Cost",
                                     paramValue: "gen_cost",
+                                    legendSubtitleText: "Cost",
                                 },
                                 {
                                     displayValue: "Generalised Journey Time",
                                     paramValue: "gen_jt",
+                                    legendSubtitleText: "Seconds",
                                 }
                             ]
                         }
@@ -446,7 +462,7 @@ export const appConfig = {
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPair"],
+                        visualisations: ["Station Pairs"],
                         type: "map",
                         layer: "NoRMS Station Pair Result",
                         field: "id",
@@ -469,7 +485,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "StationPairDifference",
+                        visualisationName: "Station Pairs Difference",
                         isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
@@ -477,7 +493,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "StationPairDifference",
+                        name: "Station Pairs Difference",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Station Pair Result Difference",
                         style: "circle-diverging",
@@ -494,7 +510,7 @@ export const appConfig = {
                         paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "toggle",
                         values: originOrDestinationValues,
                     },
@@ -502,23 +518,30 @@ export const appConfig = {
                         filterName: "Column Name",
                         paramName: "columnName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" }
+                        ],
+                        visualisations: ["Station Pairs Difference"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
                                 {
                                     displayValue: "Demand",
                                     paramValue: "demand",
+                                    legendSubtitleText: "Demand",
                                 },
                                 {
                                     displayValue: "Generalised Cost",
                                     paramValue: "gen_cost",
+                                    legendSubtitleText: "Cost",
                                 },
                                 {
                                     displayValue: "Generalised Journey Time",
                                     paramValue: "gen_jt",
+                                    legendSubtitleText: "Seconds",
                                 }
                             ]
                         }
@@ -528,7 +551,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -537,7 +560,7 @@ export const appConfig = {
                         paramName: "userClassIdDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -546,7 +569,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -555,7 +578,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -564,7 +587,7 @@ export const appConfig = {
                         paramName: "userClassIdDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -573,7 +596,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -582,7 +605,7 @@ export const appConfig = {
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["StationPairDifference"],
+                        visualisations: ["Station Pairs Difference"],
                         type: "map",
                         layer: "NoRMS Station Pair Result Difference",
                         field: "id",
@@ -606,7 +629,7 @@ export const appConfig = {
                         path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "zones",
                         geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "Station Catchment",
                         isHoverable: false,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
@@ -619,7 +642,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "Station Catchment",
                         isHoverable: true,
                         isStylable: false,
                         shouldHaveTooltipOnClick: false,
@@ -627,7 +650,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "NoRMS Station Catchment",
+                        name: "Station Catchment",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Zones",
                         style: "polygon-continuous",
@@ -644,7 +667,7 @@ export const appConfig = {
                         paramName: "scenarioCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
+                        visualisations: ["Station Catchment"],
                         type: "dropdown",
                         values: scenarioCodeValues,
                     },
@@ -653,7 +676,7 @@ export const appConfig = {
                         paramName: "timePeriodCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
+                        visualisations: ["Station Catchment"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -662,7 +685,7 @@ export const appConfig = {
                         paramName: "userClassId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
+                        visualisations: ["Station Catchment"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -671,7 +694,7 @@ export const appConfig = {
                         paramName: "directionId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
+                        visualisations: ["Station Catchment"],
                         type: "toggle",
                         values: directionIdValues,
                     },
@@ -679,21 +702,25 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "columnName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" } 
+                        ],
+                        visualisations: ["Station Catchment"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
-                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },  
-                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                              { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                              { paramValue: "demand_car", displayValue: "Demand Car" },
-                              { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                              { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                              { paramValue: "demand_total", displayValue: "Demand Total" }
+                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText:"Cost" },  
+                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText:"Cost" },
+                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText:"Cost" },
+                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText:"Cost" },
+                              { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText:"Demand" },
+                              { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText:"Demand" },
+                              { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText:"Demand" },
+                              { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText:"Demand" },
+                              { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText:"Demand" }
                             ]
                         },
                     },
@@ -702,7 +729,7 @@ export const appConfig = {
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment"],
+                        visualisations: ["Station Catchment"],
                         type: "map",
                         layer: "NoRMS Nodes",
                         field: "id"
@@ -725,7 +752,7 @@ export const appConfig = {
                         path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "zones",
                         geometryType: "polygon",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "Station Catchment Difference",
                         isHoverable: false,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
@@ -738,7 +765,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "point",
-                        visualisationName: "NoRMS Station Catchment",
+                        visualisationName: "Station Catchment Difference",
                         isHoverable: true,
                         isStylable: false,
                         shouldHaveTooltipOnClick: false,
@@ -746,7 +773,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "NoRMS Station Catchment Difference",
+                        name: "Station Catchment Difference",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Zones",
                         style: "polygon-diverging",
@@ -763,7 +790,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues,
                     },
@@ -772,7 +799,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -781,7 +808,7 @@ export const appConfig = {
                         paramName: "userClassIdDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -790,7 +817,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues,
                     },
@@ -799,7 +826,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -808,7 +835,7 @@ export const appConfig = {
                         paramName: "userClassIdDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -817,7 +844,7 @@ export const appConfig = {
                         paramName: "directionId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "toggle",
                         values: directionIdValues,
                     },
@@ -825,21 +852,25 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "columnName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" }
+                        ],
+                        visualisations: ["Station Catchment Difference"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
-                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },  
-                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                              { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                              { paramValue: "demand_car", displayValue: "Demand Car" },
-                              { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                              { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                              { paramValue: "demand_total", displayValue: "Demand Total" }
+                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },  
+                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                              { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                              { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                              { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                              { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                              { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
                             ]
                         },
                     },
@@ -848,7 +879,7 @@ export const appConfig = {
                         paramName: "nodeId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["NoRMS Station Catchment Difference"],
+                        visualisations: ["Station Catchment Difference"],
                         type: "map",
                         layer: "NoRMS Nodes",
                         field: "id"
@@ -871,7 +902,7 @@ export const appConfig = {
                         path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "geometry",
                         geometryType: "line",
-                        visualisationName: "Links",
+                        visualisationName: "Link Totals",
                         isHoverable: false,
                         isStylable: true,
                         shouldHaveTooltipOnClick: true,
@@ -879,7 +910,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "Links",
+                        name: "Link Totals",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Links Result",
                         style: "line-continuous",
@@ -896,7 +927,7 @@ export const appConfig = {
                         paramName: "scenarioCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Links"],
+                        visualisations: ["Link Totals"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -905,7 +936,7 @@ export const appConfig = {
                         paramName: "timePeriodCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Links"],
+                        visualisations: ["Link Totals"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -913,35 +944,45 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "propertyName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Links"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" }
+                        ],
+                        visualisations: ["Link Totals"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
                                 {
                                     displayValue: "No. Passengers",
                                     paramValue: "No. Passengers",
+                                    legendSubtitleText: "Passengers",
                                 },
                                 {
                                     displayValue: "Total Crush Capacity",
                                     paramValue: "Total Crush Capacity",
+                                    legendSubtitleText: "Capacity",
                                 },
                                 {
                                     displayValue: "Total Crush Load Factor",
                                     paramValue: "Total Crush Load Factor",
+                                    legendSubtitleText: "Factor",
                                 },
                                 {
                                     displayValue: "Total Seat Capacity",
                                     paramValue: "Total Seat Capacity",
+                                    legendSubtitleText: "Capacity",
                                 },
                                 {
                                     displayValue: "Total Seat Load Factor",
                                     paramValue: "Total Seat Load Factor",
+                                    legendSubtitleText: "Factor",
                                 },
                                 {
                                     displayValue: "Trains per hour",
                                     paramValue: "Trains per hour",
+                                    legendSubtitleText: "units",
                                 },
                             ]
                         },
@@ -965,7 +1006,7 @@ export const appConfig = {
                       path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
                       sourceLayer: "geometry",
                       geometryType: "line",
-                      visualisationName: "LinksResultDifference",
+                      visualisationName: "Link Totals Difference",
                       isHoverable: false,
                       isStylable: true,
                       shouldHaveTooltipOnClick: true,
@@ -973,7 +1014,7 @@ export const appConfig = {
               ],
               visualisations: [
                   {
-                      name: "LinksResultDifference",
+                      name: "Link Totals Difference",
                       type: "joinDataToMap",
                       joinLayer: "NoRMS Links Result Difference",
                       style: "line-diverging",
@@ -990,7 +1031,7 @@ export const appConfig = {
                       paramName: "scenarioCodeDoSomething",
                       target: "api",
                       actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                      visualisations: ["LinksResultDifference"],
+                      visualisations: ["Link Totals Difference"],
                       type: "dropdown",
                       values: scenarioCodeValues
                   },
@@ -999,7 +1040,7 @@ export const appConfig = {
                     paramName: "scenarioCodeDoMinimum",
                     target: "api",
                     actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                    visualisations: ["LinksResultDifference"],
+                    visualisations: ["Link Totals Difference"],
                     type: "dropdown",
                     values: scenarioCodeValues
                   },
@@ -1008,7 +1049,7 @@ export const appConfig = {
                       paramName: "timePeriodCodeDoSomething",
                       target: "api",
                       actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                      visualisations: ["LinksResultDifference"],
+                      visualisations: ["Link Totals Difference"],
                       type: "toggle",
                       values: timePeriodCodeValues,
                   },
@@ -1017,7 +1058,7 @@ export const appConfig = {
                     paramName: "timePeriodCodeDoMinimum",
                     target: "api",
                     actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                    visualisations: ["LinksResultDifference"],
+                    visualisations: ["Link Totals Difference"],
                     type: "toggle",
                     values: timePeriodCodeValues,
                   },
@@ -1025,35 +1066,45 @@ export const appConfig = {
                       filterName: "Metric",
                       paramName: "propertyName",
                       target: "api",
-                      actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                      visualisations: ["LinksResultDifference"],
+                      actions: [
+                        { action: "UPDATE_QUERY_PARAMS" },
+                        { action: "UPDATE_LEGEND_TEXT" }
+                      ],
+                      visualisations: ["Link Totals Difference"],
                       type: "dropdown",
+                      containsLegendInfo: true,
                       values: {
                           source: "local",
                           values: [
                               {
                                   displayValue: "No. Passengers",
                                   paramValue: "No. Passengers",
+                                  legendSubtitleText: "Passengers",
                               },
                               {
                                   displayValue: "Total Crush Capacity",
                                   paramValue: "Total Crush Capacity",
+                                  legendSubtitleText: "Capacity",
                               },
                               {
                                   displayValue: "Total Crush Load Factor",
                                   paramValue: "Total Crush Load Factor",
+                                  legendSubtitleText: "Factor",
                               },
                               {
                                   displayValue: "Total Seat Capacity",
                                   paramValue: "Total Seat Capacity",
+                                  legendSubtitleText: "Capacity",
                               },
                               {
                                   displayValue: "Total Seat Load Factor",
                                   paramValue: "Total Seat Load Factor",
+                                  legendSubtitleText: "Factor",
                               },
                               {
                                   displayValue: "Trains per hour",
                                   paramValue: "Trains per hour",
+                                  legendSubtitleText: "units",
                               },
                           ]
                       },
@@ -1079,7 +1130,7 @@ export const appConfig = {
                 path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                 sourceLayer: "zones",
                 geometryType: "polygon",
-                visualisationName: "ZoneTotals",
+                visualisationName: "Zone Totals",
                 isHoverable: false,
                 isStylable: true,
                 shouldHaveTooltipOnClick: false,
@@ -1087,7 +1138,7 @@ export const appConfig = {
             ],
             visualisations: [
               {
-                name: "ZoneTotals",
+                name: "Zone Totals",
                 type: "joinDataToMap",
                 joinLayer: "NoRMS Zone Totals",
                 style: "polygon-continuous",
@@ -1103,51 +1154,65 @@ export const appConfig = {
                 filterName: "Metric",
                 paramName: "columnName",
                 target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotals"],
+                actions: [
+                    { action: "UPDATE_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                ],
+                visualisations: ["Zone Totals"],
                 type: "dropdown",
+                containsLegendInfo: true,
                 values: {
                   source: "local",
                   values: [
                     {
                       displayValue: 'Revenue',
-                      paramValue: 'revenue'
+                      paramValue: 'revenue',
+                      legendSubtitleText: "Revenue",
                     },
                     {
                       displayValue: 'Demand',
-                      paramValue: 'demand'
+                      paramValue: 'demand',
+                      legendSubtitleText: "Demand",
                     },
                     {
                       displayValue: 'Total Generalised Cost',
-                      paramValue: 'total_gen_cost'
+                      paramValue: 'total_gen_cost',
+                      legendSubtitleText: "Cost",
                     },
                     {
                       displayValue: 'IVT',
-                      paramValue: 'ivt'
+                      paramValue: 'ivt',
+                      legendSubtitleText: "IVT",
                     },
                     {
                       displayValue: 'Crowding',
-                      paramValue: 'crowding'
+                      paramValue: 'crowding',
+                      legendSubtitleText: "Crowding",
                     },
                     {
                       displayValue: 'Wait Time',
-                      paramValue: 'wait_time'
+                      paramValue: 'wait_time',
+                      legendSubtitleText: "Seconds",
                     },
                     {
                       displayValue: 'Walk Time',
-                      paramValue: 'walk_time'
+                      paramValue: 'walk_time',
+                      legendSubtitleText: "Seconds",
                     },
                     {
                       displayValue: 'Penalty',
-                      paramValue: 'penalty'
+                      paramValue: 'penalty',
+                      legendSubtitleText: "Penalty",
                     },
                     {
                       displayValue: 'Access Egress',
-                      paramValue: 'access_egress'
+                      paramValue: 'access_egress',
+                      legendSubtitleText: "Access Egress",
                     },
                     {
                       displayValue: 'Value of choice',
-                      paramValue: 'value_of_choice'
+                      paramValue: 'value_of_choice',
+                      legendSubtitleText: "Value",
                     },
                   ],
                 },
@@ -1157,7 +1222,7 @@ export const appConfig = {
                 paramName: "originOrDestination",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotals"],
+                visualisations: ["Zone Totals"],
                 type: "toggle", 
                 values: originOrDestinationValues
               },
@@ -1166,7 +1231,7 @@ export const appConfig = {
                 paramName: "timePeriodCode",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotals"],
+                visualisations: ["Zone Totals"],
                 type: "toggle",
                 values: timePeriodCodeValues
               },
@@ -1175,7 +1240,7 @@ export const appConfig = {
                 paramName: "userClassId",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotals"],
+                visualisations: ["Zone Totals"],
                 type: "dropdown",
                 values: userClassIdValues
               },
@@ -1184,7 +1249,7 @@ export const appConfig = {
                 paramName: "scenarioCode",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotals"],
+                visualisations: ["Zone Totals"],
                 type: "dropdown",
                 values: scenarioCodeValues
               },
@@ -1207,7 +1272,7 @@ export const appConfig = {
                 path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                 sourceLayer: "zones",
                 geometryType: "polygon",
-                visualisationName: "ZoneTotalsDifference",
+                visualisationName: "Zone Totals Difference",
                 isHoverable: false,
                 isStylable: true,
                 shouldHaveTooltipOnClick: false,
@@ -1215,7 +1280,7 @@ export const appConfig = {
             ],
             visualisations: [
               {
-                name: "ZoneTotalsDifference",
+                name: "Zone Totals Difference",
                 type: "joinDataToMap",
                 joinLayer: "NoRMS Zone Totals Difference",
                 style: "polygon-diverging",
@@ -1231,51 +1296,65 @@ export const appConfig = {
                 filterName: "Metric",
                 paramName: "columnName",
                 target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                actions: [
+                    { action: "UPDATE_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                ],
+                visualisations: ["Zone Totals Difference"],
                 type: "dropdown",
+                containsLegendInfo: true,
                 values: {
                   source: "local",
                   values: [
                     {
                       displayValue: 'Revenue',
-                      paramValue: 'revenue'
+                      paramValue: 'revenue',
+                      legendSubtitleText: "Revenue",
                     },
                     {
                       displayValue: 'Demand',
-                      paramValue: 'demand'
+                      paramValue: 'demand',
+                      legendSubtitleText: "Demand",
                     },
                     {
                       displayValue: 'Total Generalised Cost',
-                      paramValue: 'total_gen_cost'
+                      paramValue: 'total_gen_cost',
+                      legendSubtitleText: "Cost",
                     },
                     {
                       displayValue: 'IVT',
-                      paramValue: 'ivt'
+                      paramValue: 'ivt',
+                      legendSubtitleText: "IVT",
                     },
                     {
                       displayValue: 'Crowding',
-                      paramValue: 'crowding'
+                      paramValue: 'crowding',
+                      legendSubtitleText: "Crowding",
                     },
                     {
                       displayValue: 'Wait Time',
-                      paramValue: 'wait_time'
+                      paramValue: 'wait_time',
+                      legendSubtitleText: "Seconds",
                     },
                     {
                       displayValue: 'Walk Time',
-                      paramValue: 'walk_time'
+                      paramValue: 'walk_time',
+                      legendSubtitleText: "Seconds",
                     },
                     {
                       displayValue: 'Penalty',
-                      paramValue: 'penalty'
+                      paramValue: 'penalty',
+                      legendSubtitleText: "Penalty",
                     },
                     {
                       displayValue: 'Access Egress',
-                      paramValue: 'access_egress'
+                      paramValue: 'access_egress',
+                      legendSubtitleText: "Access Egress",
                     },
                     {
                       displayValue: 'Value of choice',
-                      paramValue: 'value_of_choice'
+                      paramValue: 'value_of_choice',
+                      legendSubtitleText: "Value",
                     },
                   ],
                 },
@@ -1285,7 +1364,7 @@ export const appConfig = {
                 paramName: "originOrDestination",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "dropdown", 
                 values: originOrDestinationValues
               },
@@ -1294,7 +1373,7 @@ export const appConfig = {
                 paramName: "timePeriodCodeDoSomething",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "toggle",
                 values: timePeriodCodeValues
               },
@@ -1303,7 +1382,7 @@ export const appConfig = {
                 paramName: "timePeriodCodeDoMinimum",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "toggle",
                 values: timePeriodCodeValues
               },
@@ -1312,7 +1391,7 @@ export const appConfig = {
                 paramName: "userClassIdDoSomething",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "dropdown",
                 values: userClassIdValues
               },
@@ -1321,7 +1400,7 @@ export const appConfig = {
                 paramName: "userClassIdDoMinimum",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "dropdown",
                 values: userClassIdValues
               },
@@ -1330,7 +1409,7 @@ export const appConfig = {
                 paramName: "scenarioCodeDoSomething",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "dropdown",
                 values: scenarioCodeValues
               },
@@ -1339,7 +1418,7 @@ export const appConfig = {
                 paramName: "scenarioCodeDoMinimum",
                 target: "api",
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["ZoneTotalsDifference"],
+                visualisations: ["Zone Totals Difference"],
                 type: "dropdown",
                 values: scenarioCodeValues
               },
@@ -1361,7 +1440,7 @@ export const appConfig = {
                         path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "zones",
                         geometryType: "polygon",
-                        visualisationName: "ZonesPair",
+                        visualisationName: "Zone Pairs",
                         isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
@@ -1369,7 +1448,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "ZonesPair",
+                        name: "Zone Pairs",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Zones Pair Result",
                         style: "polygon-continuous",
@@ -1386,7 +1465,7 @@ export const appConfig = {
                         paramName: "scenarioCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPair"],
+                        visualisations: ["Zone Pairs"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -1395,7 +1474,7 @@ export const appConfig = {
                         paramName: "timePeriodCode",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPair"],
+                        visualisations: ["Zone Pairs"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -1404,7 +1483,7 @@ export const appConfig = {
                         paramName: "userClassId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPair"],
+                        visualisations: ["Zone Pairs"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -1413,7 +1492,7 @@ export const appConfig = {
                         paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPair"],
+                        visualisations: ["Zone Pairs"],
                         type: "toggle",
                         values: originOrDestinationValues,
                     },
@@ -1421,23 +1500,30 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "columnName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPair"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" } 
+                        ],
+                        visualisations: ["Zone Pairs"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
                                 {
                                     displayValue: "Demand",
                                     paramValue: "demand",
+                                    legendSubtitleText: "Demand",
                                 },
                                 {
                                     displayValue: "Generalised Cost",
                                     paramValue: "gen_cost",
+                                    legendSubtitleText: "Cost",
                                 },
                                 {
                                     displayValue: "Generalised Journey Time",
                                     paramValue: "gen_jt",
+                                    legendSubtitleText: "Seconds",
                                 }
                             ]
                         }
@@ -1447,7 +1533,7 @@ export const appConfig = {
                         paramName: "zoneId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPair"],
+                        visualisations: ["Zone Pairs"],
                         type: "map",
                         layer: "NoRMS Zones Pair Result",
                         field: "id",
@@ -1470,7 +1556,7 @@ export const appConfig = {
                         path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                         sourceLayer: "zones",
                         geometryType: "polygon",
-                        visualisationName: "ZonesPairDifference",
+                        visualisationName: "Zone Pairs Difference",
                         isHoverable: true,
                         isStylable: true,
                         shouldHaveTooltipOnClick: false,
@@ -1478,7 +1564,7 @@ export const appConfig = {
                 ],
                 visualisations: [
                     {
-                        name: "ZonesPairDifference",
+                        name: "Zone Pairs Difference",
                         type: "joinDataToMap",
                         joinLayer: "NoRMS Zones Pair Result Difference",
                         style: "polygon-diverging",
@@ -1495,7 +1581,7 @@ export const appConfig = {
                         paramName: "originOrDestination",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "toggle",
                         values: originOrDestinationValues,
                     },
@@ -1503,23 +1589,30 @@ export const appConfig = {
                         filterName: "Metric",
                         paramName: "columnName",
                         target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        actions: [
+                            { action: "UPDATE_QUERY_PARAMS" },
+                            { action: "UPDATE_LEGEND_TEXT" } 
+                        ],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "dropdown",
+                        containsLegendInfo: true,
                         values: {
                             source: "local",
                             values: [
                                 {
                                     displayValue: "Demand",
                                     paramValue: "demand",
+                                    legendSubtitleText: "Demand",
                                 },
                                 {
                                     displayValue: "Generalised Cost",
                                     paramValue: "gen_cost",
+                                    legendSubtitleText: "Cost",
                                 },
                                 {
                                     displayValue: "Generalised Journey Time",
                                     paramValue: "gen_jt",
+                                    legendSubtitleText: "Seconds",
                                 }
                             ]
                         }
@@ -1529,7 +1622,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -1538,7 +1631,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -1547,7 +1640,7 @@ export const appConfig = {
                         paramName: "userClassIdDoSomething",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -1556,7 +1649,7 @@ export const appConfig = {
                         paramName: "scenarioCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "dropdown",
                         values: scenarioCodeValues
                     },
@@ -1565,7 +1658,7 @@ export const appConfig = {
                         paramName: "timePeriodCodeDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "toggle",
                         values: timePeriodCodeValues,
                     },
@@ -1574,7 +1667,7 @@ export const appConfig = {
                         paramName: "userClassIdDoMinimum",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "dropdown",
                         values: userClassIdValues,
                     },
@@ -1583,7 +1676,7 @@ export const appConfig = {
                         paramName: "zoneId",
                         target: "api",
                         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["ZonesPairDifference"],
+                        visualisations: ["Zone Pairs Difference"],
                         type: "map",
                         layer: "NoRMS Zones Pair Result Difference",
                         field: "id",
