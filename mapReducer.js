@@ -11,7 +11,8 @@ export const actionTypes = {
     UPDATE_LAYER_PAINT: 'UPDATE_LAYER_PAINT',
     ADD_VISUALISATION: 'ADD_VISUALISATION',
     UPDATE_QUERY_PARAMS: 'UPDATE_QUERY_PARAMS',
-    UPDATE_VIS_DATA: 'UPDATE_VIS_DATA',
+    UPDATE_DUAL_QUERY_PARAMS: 'UPDATE_DUAL_QUERY_PARAMS',
+    UPDATE_ALL_DATA: 'UPDATE_ALL_DATA',
     UPDATE_COLOR_SCHEME: 'UPDATE_COLOR_SCHEME',
     JOIN_DATA: 'JOIN_DATA',
     SET_IS_LOADING: 'SET_IS_LOADING',
@@ -32,9 +33,9 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}, isLoading: true};
+            return { ...state, layers: {}, visualisations: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true };
         case actionTypes.SET_PAGE_INFO:
-            return { ...state, pageInfo: action.payload};
+            return { ...state, pageInfo: action.payload };
         case actionTypes.INITIALISE_SIDEBAR:
             return { ...state, filters: action.payload };
         case actionTypes.ADD_LAYER:
@@ -62,21 +63,21 @@ export const mapReducer = (state, action) => {
         case actionTypes.UPDATE_LAYER_PAINT: {
             const { layerName, paintProperty } = action.payload;
             return {
-              ...state,
-              layers: {
-                ...state.layers,
-                [layerName]: {
-                  ...state.layers[layerName],
-                  paint: {
-                    ...state.layers[layerName].paint,
-                    ...paintProperty,
-                  },
+                ...state,
+                layers: {
+                    ...state.layers,
+                    [layerName]: {
+                        ...state.layers[layerName],
+                        paint: {
+                            ...state.layers[layerName].paint,
+                            ...paintProperty,
+                        },
+                    },
                 },
-              },
             };
         }
-            
-        case actionTypes.UPDATE_COLOR_SCHEME: { 
+
+        case actionTypes.UPDATE_COLOR_SCHEME: {
             const { color_scheme } = action.payload;
             return {
                 ...state,
@@ -91,10 +92,11 @@ export const mapReducer = (state, action) => {
                 class_method: class_method
             };
         }
-        
+
         case actionTypes.ADD_VISUALISATION: {
             // Logic to add a visualisation
-            return { ...state, visualisations: { ...state.visualisations, ...action.payload } };
+            const visualisationContent = { ...state.visualisations, ...action.payload };
+            return { ...state, visualisations: visualisationContent, leftVisualisations: visualisationContent, rightVisualisations: visualisationContent };
         }
 
         case actionTypes.UPDATE_QUERY_PARAMS: {
@@ -109,8 +111,8 @@ export const mapReducer = (state, action) => {
                     updatedVisualisations[visName] = {
                         ...updatedVisualisations[visName],
                         queryParams: {
-                        ...updatedVisualisations[visName].queryParams,
-                        [paramName]: newParamValue,
+                            ...updatedVisualisations[visName].queryParams,
+                            [paramName]: newParamValue,
                         },
                     };
                 }
@@ -123,16 +125,79 @@ export const mapReducer = (state, action) => {
             };
         }
 
-        case actionTypes.UPDATE_VIS_DATA: {return {
-            ...state,
-            visualisations: {
-                ...state.visualisations,
-                [action.payload.visualisationName]: {
-                ...state.visualisations[action.payload.visualisationName],
-                data: action.payload.data,
-              },
-            },
-          };
+        case actionTypes.UPDATE_DUAL_QUERY_PARAMS: {
+            const visualisationNames = action.payload.filter.visualisations;
+            const paramName = action.payload.filter.paramName;
+            const newParamValue = action.payload.value;
+            const updatedVisualisations = (() => {
+                switch (action.payload.sides) {
+                    case "left": return [{ ...state.leftVisualisations }];
+                    case "right": return [{ ...state.rightVisualisations }];
+                    case "both": return [{ ...state.leftVisualisations }, { ...state.rightVisualisations }];
+                    default: return [{ ...state.leftVisualisations }];
+                }
+            })();
+            updatedVisualisations.forEach((updatedVisualisation) => {
+                visualisationNames.forEach((visName) => {
+                    if (updatedVisualisation[visName]) {
+                        updatedVisualisation[visName] = {
+                            ...updatedVisualisation[visName],
+                            queryParams: {
+                                ...updatedVisualisation[visName].queryParams,
+                                [paramName]: newParamValue,
+                            },
+                        };
+                    }
+                });
+            })
+            switch (action.payload.sides) {
+                case "left": return { ...state, leftVisualisations: updatedVisualisations[0] };
+                case "right": return { ...state, rightVisualisations: updatedVisualisations[0] };
+                case "both": return { ...state, leftVisualisations: updatedVisualisations[0], rightVisualisations: updatedVisualisations[1] };
+                default: return { ...state, leftVisualisations: updatedVisualisations[0] };
+            }
+            // return { ...state, leftVisualisations: updatedVisualisations };
+        }
+
+
+        case actionTypes.UPDATE_ALL_DATA: {
+            const side = action.payload.left;
+            switch (side) {
+                case true: {
+                    return {
+                        ...state,
+                        leftVisualisations: {
+                            ...state.leftVisualisations,
+                            [action.payload.visualisationName]: {
+                                ...state.leftVisualisations[action.payload.visualisationName],
+                                data: action.payload.data,
+                            },
+                        },
+                    };
+                }
+                case false: {
+                    return {
+                        ...state,
+                        rightVisualisations: {
+                            ...state.rightVisualisations,
+                            [action.payload.visualisationName]: {
+                                ...state.rightVisualisations[action.payload.visualisationName],
+                                data: action.payload.data,
+                            },
+                        },
+                    };
+                }
+                default: return {
+                    ...state,
+                    visualisations: {
+                        ...state.visualisations,
+                        [action.payload.visualisationName]: {
+                            ...state.visualisations[action.payload.visualisationName],
+                            data: action.payload.data,
+                        },
+                    },
+                };
+            }
         }
 
         case actionTypes.SET_MAP: {
@@ -140,7 +205,7 @@ export const mapReducer = (state, action) => {
             return {
                 ...state,
                 map: map,// Store the map instance directly in the state
-                color_scheme: { value: "Reds", label: 'Reds'} //Set up the default color scheme on startup only
+                color_scheme: { value: "Reds", label: 'Reds' } //Set up the default color scheme on startup only
             };
         }
         case actionTypes.SET_IS_LOADING: {
