@@ -236,21 +236,23 @@ export const DynamicLegend = ({ map }) => {
     if (!map) return;
 
     const updateLegend = () => {
-      const layers = map.getStyle().layers;
-      const items = layers
-        .filter((layer) => layer.metadata && layer.metadata.isStylable)
-        .map((layer) => {
-          const title = layer.id;
-          const paintProps = layer.paint;
-          const colorStops = interpretColorExpression(
-            paintProps["line-color"] ||
-              paintProps["circle-color"] ||
-              paintProps["fill-color"]
-          );
-          const widthStops = interpretWidthExpression(paintProps["line-width"]);
-          return { title, colorStops, widthStops };
-        });
-      setLegendItems(items);
+
+        const layers = map.getStyle().layers;
+        const items = layers
+          .filter((layer) => layer.metadata && layer.metadata.isStylable)
+          .map((layer) => {
+            const title = layer.id;
+            const paintProps = layer.paint;
+            const colorStops = interpretColorExpression(
+              paintProps["line-color"] ||
+                paintProps["circle-color"] ||
+                paintProps["fill-color"]
+            );
+            const widthStops = interpretWidthExpression(paintProps["line-width"]);
+            return { title, colorStops, widthStops };
+          });
+        setLegendItems(items);
+
     };
 
     map.on("styledata", updateLegend);
@@ -258,6 +260,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
+
   }, [map]);
 
   if (legendItems.length === 0) {

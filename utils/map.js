@@ -244,7 +244,6 @@ export const reclassifyData = (data, style, classificationMethod) => {
     if (classificationMethod === 'l') {
       values = values.map(replaceZeroValues)
     }
-    console.log("Bins recalculated for continuous data");
     const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
     let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
     if (classificationMethod === 'l') {
@@ -252,7 +251,6 @@ export const reclassifyData = (data, style, classificationMethod) => {
     }
     return roundedBins;
   } else if (style.includes("categorical")) {
-    console.log("Categorical classification not implemented for joined data");
     return;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
@@ -270,7 +268,6 @@ export const reclassifyData = (data, style, classificationMethod) => {
     console.log(roundedBins);
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
-    console.log("Bins calculated for diverging data");
     return [...negativeBins, 0, ...roundedBins];
   } else {
     console.log("Style not recognized");

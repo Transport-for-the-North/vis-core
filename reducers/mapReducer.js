@@ -208,11 +208,9 @@ export const mapReducer = (state, action) => {
             };
         }
         case actionTypes.SET_IS_LOADING: {
-            console.log('Loading started');
             return { ...state, isLoading: true };
         }
         case actionTypes.SET_LOADING_FINISHED: {
-            console.log('Loading finished');
             return { ...state, isLoading: false };
         }
         default:

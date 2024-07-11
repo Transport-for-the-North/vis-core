@@ -88,7 +88,6 @@ export const MapProvider = ({ children }) => {
     });
 
     return () => {
-      console.log("Map context unmount")
       dispatch({
         type: actionTypes.RESET_CONTEXT
       })
