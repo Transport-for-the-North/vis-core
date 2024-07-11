@@ -256,6 +256,28 @@ const DualMaps = () => {
               map.removeSource("selected-feature-source");
             }
 
+            let paintProp = {}
+
+            // Here is where we should use the colourSchemeSelectionColour[state.color_scheme] 
+            // for the circle paintProp, however we currently dont have full functionality.
+
+            if (feature.layer.type == 'circle') {
+              paintProp = {
+                "circle-radius": 6,
+                "circle-color": "green",
+                "circle-opacity": 0.75,
+                "circle-stroke-width": 2,
+                "circle-stroke-color": "black"
+                
+              }
+            }
+            else if (feature.layer.type == 'fill') {
+              paintProp = {
+                "fill-color": "#f00",
+                "fill-opacity": 0.5,
+              }
+            }
+
             // Add a new source and layer for the selected feature
             map.addSource("selected-feature-source", {
               type: "geojson",
@@ -264,15 +286,10 @@ const DualMaps = () => {
 
             map.addLayer({
               id: "selected-feature-layer",
-              type: "fill",
+              type: feature.layer.type,
               source: "selected-feature-source",
-              paint: {
-                "fill-color": "#f00",
-                "fill-opacity": 0.5,
-              },
+              paint: paintProp,
             });
-
-            console.log(`Updating ${filter.field}`);
 
             // Dispatch the action with the value from the clicked feature
             filter.actions.map((action) => {
@@ -317,12 +334,10 @@ const DualMaps = () => {
 
   useEffect(() => {
     if (isMapReady) {
-      console.log("Map load within Map component");
       Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
     }
 
     return () => {
-      console.log("Map unmount");
       if (leftMap && rightMap) {
         Object.values(state.layers).forEach((layer) => {
           maps.forEach((map) => {
@@ -356,9 +371,9 @@ const DualMaps = () => {
             visualisationName={visConfig.name}
             map={leftMap}
             left={true}
+            maps={maps}
           />
         ))}
-        {isMapReady && <DynamicLegend map={leftMap} />}
       </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
         {Object.values(state.rightVisualisations).map((visConfig) => (
@@ -367,9 +382,19 @@ const DualMaps = () => {
             visualisationName={visConfig.name}
             map={rightMap}
             left={false}
+            maps={maps}
           />
         ))}
-        {isMapReady && <DynamicLegend map={rightMap} />}
+        {/* This below will need changing for when we have > 1 entries in each visualisation side. */}
+        {isMapReady && (
+          state.leftVisualisations[Object.keys(state.leftVisualisations)[0]].data.length === 0 && state.rightVisualisations[Object.keys(state.rightVisualisations)[0]].data.length !== 0 ? (
+            <DynamicLegend map={rightMap} />
+          ) : state.leftVisualisations[Object.keys(state.leftVisualisations)[0]].data.length !== 0 && state.rightVisualisations[Object.keys(state.rightVisualisations)[0]].data.length === 0 ? (
+            <DynamicLegend map={leftMap} />
+          ) : (
+            <DynamicLegend map={rightMap} />
+          )
+        )}
       </StyledMapContainer>
     </>
   );

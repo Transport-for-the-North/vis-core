@@ -284,8 +284,6 @@ const Map = () => {
             paint: paintProp,
           });
 
-          console.log(`Updating ${filter.field}`);
-
           // Dispatch the action with the value from the clicked feature
           filter.actions.map((action) => {
             dispatch({
@@ -329,12 +327,10 @@ const Map = () => {
 
   useEffect(() => {
     if (isMapReady) {
-      console.log("Map load within Map component");
       Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
     }
 
     return () => {
-      console.log("Map unmount");
       if (map) {
         Object.values(state.layers).forEach((layer) => {
           if (map.getLayer(layer.name)) {
@@ -364,6 +360,7 @@ const Map = () => {
           key={visConfig.name}
           visualisationName={visConfig.name}
           map={map}
+          maps={null}
         />
       ))}
       {isMapReady && <DynamicLegend map={map} />}
