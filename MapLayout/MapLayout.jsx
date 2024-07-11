@@ -1,11 +1,12 @@
-import { useContext, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import { useContext, useEffect, useRef } from "react";
+import styled from "styled-components";
 
-import { Dimmer, MapLayerSection, Sidebar } from 'Components';
-import { PageContext } from 'contexts';
-import { useMapContext } from 'hooks';
-import { loremIpsum } from 'utils';
+import { Dimmer, MapLayerSection, Sidebar } from "Components";
+import { PageContext } from "contexts";
+import { useMapContext } from "hooks";
+import { loremIpsum } from "utils";
 import Map from "./Map";
+import DualMaps from "./DualMaps";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -15,6 +16,7 @@ const LayoutContainer = styled.div`
 const MapContainer = styled.div`
   flex: 1;
   position: relative;
+  display: flex;
 `;
 
 /**
@@ -24,7 +26,7 @@ const MapContainer = styled.div`
  * The component uses the MapContext to manage the state of the map and its
  * layers, and it provides the necessary props to the Sidebar and MapLayerSection
  * components.
- * 
+ *
  * @component
  * @returns {JSX.Element} The rendered MapLayout component.
  */
@@ -36,68 +38,112 @@ export const MapLayout = () => {
 
   useEffect(() => {
     // Effect to initialise the filters for the map page
-    if (!initializedRef.current && Object.keys(state.visualisations).length > 0) {
+    if (
+      !initializedRef.current &&
+      Object.keys(state.visualisations).length > 0
+    ) {
       pageContext.config.filters.forEach((filter) => {
         filter.actions.map((action) => {
           if (action.action === "UPDATE_QUERY_PARAMS") {
-            let defaultValue = filter.defaultValue || filter.min || filter.values?.values[0]?.paramValue;
+            let defaultValue =
+              filter.defaultValue ||
+              filter.min ||
+              filter.values?.values[0]?.paramValue;
             dispatch({
               type: action.action,
               payload: { filter, value: defaultValue },
             });
+          } else {
+            let defaultValue =
+              filter.defaultValue ||
+              filter.min ||
+              filter.values?.values[0]?.paramValue;
+              var sides = ""
+              if (filter.filterName.includes("Left")) sides = "left"
+              else if (filter.filterName.includes("Right")) sides = "right"
+              else sides = "both"
+            dispatch({
+              type: action.action,
+              payload: { filter, value: defaultValue, sides: sides },
+            });
           }
-        })
-        }
-    );
+        });
+      });
       initializedRef.current = true;
-    }}
-  , [pageContext.config.filters, dispatch, state.visualisations]);
+    }
+  }, [
+    pageContext.config.filters,
+    dispatch,
+    state.visualisations,
+    state.leftVisualisations,
+    state.rightVisualisations,
+  ]);
 
   useEffect(() => {
     initializedRef.current = false;
   }, [pageContext]);
 
   const handleFilterChange = (filter, value) => {
-    filter.actions.map((action) => {
-      dispatch({
-        type: action.action,
-        payload: {filter, value}
+    if (!filter.visualisations[0].includes("Dual")) {
+      filter.actions.map((action) => {
+        dispatch({
+          type: action.action,
+          payload: { filter, value },
+        });
       });
-    })
+    } else {
+      filter.actions.map((action) => {
+        var sides = ""
+        if (filter.filterName.includes("Left")) sides = "left"
+        else if (filter.filterName.includes("Right")) sides = "right"
+        else sides = "both"
+        dispatch({
+          type: action.action,
+          payload: { filter, value, sides},
+        });
+      });
+    }
   };
 
-  const handleColorChange = (color) => { 
+  const handleColorChange = (color) => {
     dispatch({
       type: "UPDATE_COLOR_SCHEME",
-      payload: { color_scheme: color }
+      payload: { color_scheme: color },
     });
   };
 
   const handleClassificationChange = (classType) => {
     dispatch({
       type: "UPDATE_CLASSIFICATION_METHOD",
-      payload: { class_method: classType }
+      payload: { class_method: classType },
     });
-  }
-  
+  };
+
   return (
     <LayoutContainer>
-      <Dimmer dimmed={isLoading} showLoader={true}/>
-      <Sidebar 
+      <Dimmer dimmed={isLoading} showLoader={true} />
+      <Sidebar
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
         filters={pageContext.config.filters}
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
       >
-        <MapLayerSection handleColorChange={handleColorChange} 
-          handleClassificationChange={handleClassificationChange}/>
+        <MapLayerSection
+          handleColorChange={handleColorChange}
+          handleClassificationChange={handleClassificationChange}
+        />
       </Sidebar>
-      <MapContainer>
-        <Map/>
-      </MapContainer>
+      {pageContext.type === "MapLayout" && (
+        <MapContainer>
+          <Map />
+        </MapContainer>
+      )}
+      {pageContext.type === "DualMapLayout" && (
+        <MapContainer>
+          <DualMaps />
+        </MapContainer>
+      )}
     </LayoutContainer>
   );
 };
-
-  
