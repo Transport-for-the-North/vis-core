@@ -270,12 +270,12 @@ export const appConfig = {
                 {
                   displayValue: "Jobs",
                   paramValue: "jobs",
-                  legendSubtitleText: "Jobs unit",
+                  legendSubtitleText: "accessible from zone",
                 },
                 {
                   displayValue: "Schools",
                   paramValue: "schools",
-                  legendSubtitleText: "Schools unit",
+                  legendSubtitleText: "accessible from zone",
                 },
               ],
             },
