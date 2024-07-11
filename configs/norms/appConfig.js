@@ -369,7 +369,7 @@ export const appConfig = {
                   path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "geometry",
                   geometryType: "point",
-                  visualisationName: "NoRMS Station Catchment",
+                  visualisationName: "Station Totals Side-by-Side",
                   isHoverable: false,
                   isStylable: true,
                   shouldHaveTooltipOnClick: true,
@@ -377,7 +377,7 @@ export const appConfig = {
               ],
               visualisations: [
                 {
-                  name: "NoRMS Station Totals Dual",
+                  name: "Station Totals Side-by-Side",
                   type: "joinDataToMap",
                   joinLayer: "NoRMS Nodes",
                   style: "circle-continuous",
@@ -394,7 +394,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Totals Dual"],
+                  visualisations: ["Station Totals Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues,
                 },
@@ -403,7 +403,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Totals Dual"],
+                  visualisations: ["Station Totals Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -412,7 +412,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Totals Dual"],
+                  visualisations: ["Station Totals Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues,
                 },
@@ -421,7 +421,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Totals Dual"],
+                  visualisations: ["Station Totals Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -429,17 +429,21 @@ export const appConfig = {
                   filterName: "Metric",
                   paramName: "propertyName",
                   target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Totals Dual"],
+                  actions: [
+                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                  ],
+                  visualisations: ["Station Totals Side-by-Side"],
                   type: "dropdown",
+                  containsLegendInfo: true,
                   values: {
                     source: "local",
                     values: [
-                      { paramValue: "Boardings", displayValue: "Boardings" },
-                      { paramValue: "Interchanges", displayValue: "Interchanges" },
-                      { paramValue: "Egress", displayValue: "Egress" },
-                      { paramValue: "Access", displayValue: "Access" },
-                      { paramValue: "Alightings", displayValue: "Alightings" }
+                      { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
+                      { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                      { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
+                      { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
+                      { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
                     ]
                   },
                 },
@@ -721,7 +725,7 @@ export const appConfig = {
                   path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "geometry",
                   geometryType: "point",
-                  visualisationName: "StationPairDual",
+                  visualisationName: "Station Pairs Side-by-Side",
                   isHoverable: true,
                   isStylable: true,
                   shouldHaveTooltipOnClick: false,
@@ -729,7 +733,7 @@ export const appConfig = {
               ],
               visualisations: [
                 {
-                  name: "StationPairDual",
+                  name: "Station Pairs Side-by-Side",
                   type: "joinDataToMap",
                   joinLayer: "NoRMS Station Pair Result Side-by-Side",
                   style: "circle-continuous",
@@ -746,7 +750,7 @@ export const appConfig = {
                   paramName: "originOrDestination",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "toggle",
                   values: originOrDestinationValues,
                 },
@@ -754,23 +758,30 @@ export const appConfig = {
                   filterName: "Column Name",
                   paramName: "columnName",
                   target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  actions: [
+                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                  ],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "dropdown",
+                  containsLegendInfo: true,
                   values: {
                     source: "local",
                     values: [
                       {
                         displayValue: "Demand",
                         paramValue: "demand",
+                        legendSubtitleText: "Demand unit",
                       },
                       {
                         displayValue: "Generalised Cost",
                         paramValue: "gen_cost",
+                        legendSubtitleText: "Cost unit",
                       },
                       {
                         displayValue: "Generalised Journey Time",
                         paramValue: "gen_jt",
+                        legendSubtitleText: "Seconds",
                       }
                     ]
                   }
@@ -780,7 +791,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues,
                 },
@@ -789,7 +800,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -798,7 +809,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues,
                 },
@@ -807,7 +818,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues,
                 },
@@ -816,7 +827,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -825,7 +836,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues,
                 },
@@ -834,7 +845,7 @@ export const appConfig = {
                   paramName: "nodeId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["StationPairDual"],
+                  visualisations: ["Station Pairs Side-by-Side"],
                   type: "map",
                   layer: "NoRMS Station Pair Result",
                   field: "id",
@@ -1130,7 +1141,7 @@ export const appConfig = {
                   path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "zones",
                   geometryType: "polygon",
-                  visualisationName: "NoRMS Station Catchment Dual",
+                  visualisationName: "Station Catchment Side-by-Side",
                   isHoverable: false,
                   isStylable: true,
                   shouldHaveTooltipOnClick: false,
@@ -1143,7 +1154,7 @@ export const appConfig = {
                   path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "geometry",
                   geometryType: "point",
-                  visualisationName: "NoRMS Station Catchment Dual",
+                  visualisationName: "Station Catchment Side-by-Side",
                   isHoverable: true,
                   isStylable: false,
                   shouldHaveTooltipOnClick: false,
@@ -1151,7 +1162,7 @@ export const appConfig = {
               ],
               visualisations: [
                 {
-                  name: "NoRMS Station Catchment Dual",
+                  name: "Station Catchment Side-by-Side",
                   type: "joinDataToMap",
                   joinLayer: "NoRMS Zones Side-by-Side",
                   style: "polygon-continuous",
@@ -1168,7 +1179,7 @@ export const appConfig = {
                   paramName: "directionId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "toggle",
                   values: directionIdValues,
                 },
@@ -1176,21 +1187,25 @@ export const appConfig = {
                   filterName: "Metric",
                   paramName: "columnName",
                   target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  actions: [
+                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                  ],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "dropdown",
+                  containsLegendInfo: true,
                   values: {
                     source: "local",
                     values: [
-                      { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car" },
-                      { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk" },
-                      { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus" },
-                      { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT" },
-                      { paramValue: "demand_walk", displayValue: "Demand Walk" },
-                      { paramValue: "demand_car", displayValue: "Demand Car" },
-                      { paramValue: "demand_bus", displayValue: "Demand Bus" },
-                      { paramValue: "demand_lrt", displayValue: "Demand LRT" },
-                      { paramValue: "demand_total", displayValue: "Demand Total" }
+                      { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
+                      { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                      { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                      { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                      { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                      { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                      { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                      { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                      { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
                     ]
                   },
                 },
@@ -1199,7 +1214,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues,
                 },
@@ -1208,7 +1223,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -1217,7 +1232,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues,
                 },
@@ -1226,7 +1241,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues,
                 },
@@ -1235,7 +1250,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -1244,7 +1259,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues,
                 },
@@ -1253,7 +1268,7 @@ export const appConfig = {
                   paramName: "nodeId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["NoRMS Station Catchment Dual"],
+                  visualisations: ["Station Catchment Side-by-Side"],
                   type: "map",
                   layer: "NoRMS Nodes",
                   field: "id"
@@ -1502,7 +1517,7 @@ export const appConfig = {
                   path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "geometry",
                   geometryType: "line",
-                  visualisationName: "LinksResultDual",
+                  visualisationName: "Link Totals Side-by-Side",
                   isHoverable: false,
                   isStylable: true,
                   shouldHaveTooltipOnClick: true,
@@ -1510,7 +1525,7 @@ export const appConfig = {
               ],
               visualisations: [
                 {
-                  name: "LinksResultDual",
+                  name: "Link Totals Side-by-Side",
                   type: "joinDataToMap",
                   joinLayer: "NoRMS Links Result Dual",
                   style: "line-continuous",
@@ -1527,7 +1542,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["LinksResultDual"],
+                  visualisations: ["Link Totals Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues
                 },
@@ -1536,7 +1551,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["LinksResultDual"],
+                  visualisations: ["Link Totals Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues
                 },
@@ -1545,7 +1560,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["LinksResultDual"],
+                  visualisations: ["Link Totals Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -1554,7 +1569,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["LinksResultDual"],
+                  visualisations: ["Link Totals Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -1562,35 +1577,45 @@ export const appConfig = {
                   filterName: "Metric",
                   paramName: "propertyName",
                   target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["LinksResultDual"],
+                  actions: [
+                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                  ],
+                  visualisations: ["Link Totals Side-by-Side"],
                   type: "dropdown",
+                  containsLegendInfo: true,
                   values: {
                     source: "local",
                     values: [
                       {
                         displayValue: "No. Passengers",
                         paramValue: "No. Passengers",
+                        legendSubtitleText: "Passengers",
                       },
                       {
                         displayValue: "Total Crush Capacity",
                         paramValue: "Total Crush Capacity",
+                        legendSubtitleText: "Capacity",
                       },
                       {
                         displayValue: "Total Crush Load Factor",
                         paramValue: "Total Crush Load Factor",
+                        legendSubtitleText: "Load Factor",
                       },
                       {
                         displayValue: "Total Seat Capacity",
                         paramValue: "Total Seat Capacity",
+                        legendSubtitleText: "Capacity",
                       },
                       {
                         displayValue: "Total Seat Load Factor",
                         paramValue: "Total Seat Load Factor",
+                        legendSubtitleText: "Load Factor",
                       },
                       {
                         displayValue: "Trains per hour",
                         paramValue: "Trains per hour",
+                        legendSubtitleText: "Trains",
                       },
                     ]
                   },
@@ -1925,7 +1950,7 @@ export const appConfig = {
                   path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "zones",
                   geometryType: "polygon",
-                  visualisationName: "ZoneTotalsDual",
+                  visualisationName: "Zone Totals Side-by-Side",
                   isHoverable: false,
                   isStylable: true,
                   shouldHaveTooltipOnClick: false,
@@ -1933,7 +1958,7 @@ export const appConfig = {
               ],
               visualisations: [
                 {
-                  name: "ZoneTotalsDual",
+                  name: "Zone Totals Side-by-Side",
                   type: "joinDataToMap",
                   joinLayer: "NoRMS Zone Totals",
                   style: "polygon-continuous",
@@ -1949,51 +1974,65 @@ export const appConfig = {
                   filterName: "Metric",
                   paramName: "columnName",
                   target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  actions: [
+                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                  ],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "dropdown",
+                  containsLegendInfo: true,
                   values: {
                     source: "local",
                     values: [
                       {
                         displayValue: 'Revenue',
-                        paramValue: 'revenue'
+                        paramValue: 'revenue',
+                        legendSubtitleText: "Revenue",
                       },
                       {
                         displayValue: 'Demand',
-                        paramValue: 'demand'
+                        paramValue: 'demand',
+                        legendSubtitleText: "Demand",
                       },
                       {
                         displayValue: 'Total Generalised Cost',
-                        paramValue: 'total_gen_cost'
+                        paramValue: 'total_gen_cost',
+                        legendSubtitleText: "Cost",
                       },
                       {
                         displayValue: 'IVT',
-                        paramValue: 'ivt'
+                        paramValue: 'ivt',
+                        legendSubtitleText: "IVT",
                       },
                       {
                         displayValue: 'Crowding',
-                        paramValue: 'crowding'
+                        paramValue: 'crowding',
+                        legendSubtitleText: "Crowding",
                       },
                       {
                         displayValue: 'Wait Time',
-                        paramValue: 'wait_time'
+                        paramValue: 'wait_time',
+                        legendSubtitleText: "Seconds",
                       },
                       {
                         displayValue: 'Walk Time',
-                        paramValue: 'walk_time'
+                        paramValue: 'walk_time',
+                        legendSubtitleText: "Seconds",
                       },
                       {
                         displayValue: 'Penalty',
-                        paramValue: 'penalty'
+                        paramValue: 'penalty',
+                        legendSubtitleText: "Penalty",
                       },
                       {
                         displayValue: 'Access Egress',
-                        paramValue: 'access_egress'
+                        paramValue: 'access_egress',
+                        legendSubtitleText: "unit",
                       },
                       {
                         displayValue: 'Value of choice',
-                        paramValue: 'value_of_choice'
+                        paramValue: 'value_of_choice',
+                        legendSubtitleText: "unit",
                       },
                     ],
                   },
@@ -2003,7 +2042,7 @@ export const appConfig = {
                   paramName: "originOrDestination",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "toggle",
                   values: originOrDestinationValues
                 },
@@ -2012,7 +2051,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues
                 },
@@ -2021,7 +2060,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues
                 },
@@ -2030,7 +2069,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues
                 },
@@ -2039,7 +2078,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues
                 },
@@ -2048,7 +2087,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues
                 },
@@ -2057,7 +2096,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZoneTotalsDual"],
+                  visualisations: ["Zone Totals Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues
                 },
@@ -2338,7 +2377,7 @@ export const appConfig = {
                   path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
                   sourceLayer: "zones",
                   geometryType: "polygon",
-                  visualisationName: "ZonesPairDual",
+                  visualisationName: "Zone Pairs Side-by-Side",
                   isHoverable: true,
                   isStylable: true,
                   shouldHaveTooltipOnClick: false,
@@ -2346,7 +2385,7 @@ export const appConfig = {
               ],
               visualisations: [
                 {
-                  name: "ZonesPairDual",
+                  name: "Zone Pairs Side-by-Side",
                   type: "joinDataToMap",
                   joinLayer: "NoRMS Zones Pair Result",
                   style: "polygon-continuous",
@@ -2363,7 +2402,7 @@ export const appConfig = {
                   paramName: "originOrDestination",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "toggle",
                   values: originOrDestinationValues,
                 },
@@ -2371,23 +2410,30 @@ export const appConfig = {
                   filterName: "Metric",
                   paramName: "columnName",
                   target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  actions: [
+                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
+                    { action: "UPDATE_LEGEND_TEXT" }
+                  ],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "dropdown",
+                  containsLegendInfo: true,
                   values: {
                     source: "local",
                     values: [
                       {
                         displayValue: "Demand",
                         paramValue: "demand",
+                        legendSubtitleText: "Demand unit",
                       },
                       {
                         displayValue: "Generalised Cost",
                         paramValue: "gen_cost",
+                        legendSubtitleText: "Cost unit",
                       },
                       {
                         displayValue: "Generalised Journey Time",
                         paramValue: "gen_jt",
+                        legendSubtitleText: "Seconds",
                       }
                     ]
                   }
@@ -2397,7 +2443,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues
                 },
@@ -2406,7 +2452,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -2415,7 +2461,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues,
                 },
@@ -2424,7 +2470,7 @@ export const appConfig = {
                   paramName: "scenarioCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "dropdown",
                   values: scenarioCodeValues
                 },
@@ -2433,7 +2479,7 @@ export const appConfig = {
                   paramName: "timePeriodCode",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "toggle",
                   values: timePeriodCodeValues,
                 },
@@ -2442,7 +2488,7 @@ export const appConfig = {
                   paramName: "userClassId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "dropdown",
                   values: userClassIdValues,
                 },
@@ -2451,7 +2497,7 @@ export const appConfig = {
                   paramName: "zoneId",
                   target: "api",
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["ZonesPairDual"],
+                  visualisations: ["Zone Pairs Side-by-Side"],
                   type: "map",
                   layer: "NoRMS Zones Pair Result",
                   field: "id",
