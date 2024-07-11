@@ -241,13 +241,13 @@ export const reclassifyData = (data, style, classificationMethod) => {
 
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       values = values.map(replaceZeroValues)
     }
     console.log("Bins recalculated for continuous data");
     const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
     let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       roundedBins = roundedBins.map(replaceZeroPointValues)
     }
     return roundedBins;
@@ -256,14 +256,14 @@ export const reclassifyData = (data, style, classificationMethod) => {
     return;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       absValues = absValues.map(replaceZeroValues)
     }
     const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
     let roundedBins = unroundedBins.map(function(ele){
       return Math.round(ele*100)/100;
     });
-    if (classificationMethod == 'l') {
+    if (classificationMethod === 'l') {
       absValues = absValues.map(replaceZeroValues)
     }
     roundedBins = roundedBins.filter((value) => value !== 0)
@@ -303,5 +303,117 @@ export const reclassifyGeoJSONData = (data, style) => {
   } else {
     console.log("Style not recognized");
     return [];
+  }
+};
+
+/**
+   * Generates the style configuration for a regular layer based on the geometry
+   * type of the layer.
+   *
+   * @property {string} geometryType - The type of geometry for the layer. Possible values are "polygon", "line", or "point".
+   * @returns {Object} The style configuration object for the layer.
+   */
+export const getLayerStyle = (geometryType) => {
+  switch (geometryType) {
+    case "polygon":
+      return {
+        id: "",
+        type: "fill",
+        source: "",
+        paint: {
+          "fill-color": "rgb(255, 255, 0, 0)",
+          "fill-outline-color": "rgba(195, 195, 195, 1)",
+        },
+      };
+    case "line":
+      return {
+        id: "",
+        type: "line",
+        source: "",
+        paint: {
+          "line-color": "black",
+          "line-opacity": 0.8,
+        },
+      };
+    case "point":
+      return {
+        id: "",
+        type: "circle",
+        source: "",
+        paint: {
+          "circle-radius": 5,
+          "circle-color": "black",
+        },
+      };
+    default:
+      return {};
+  }
+};
+
+/**
+ * Generates the style configuration for a hover layer based on the geometry
+ * type of the layer.
+ * @component
+ * @property {string} geometryType - The type of geometry for the hover layer. Possible values are "polygon", "line", or "point".
+ * @returns {Object} The style configuration object for the hover layer.
+ */
+export const getHoverLayerStyle = (geometryType) => {
+  switch (geometryType) {
+    case "polygon":
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": "rgba(0, 0, 0, 1.0)", // Default color
+          // Zoom-dependent line width
+          "line-width": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            // Specify zoom levels and corresponding line widths
+            5,
+            1, // At zoom level 5, line width will be 1
+            10,
+            2, // At zoom level 10, line width will be 2
+            15,
+            4, // At zoom level 15, line width will be 4
+            20,
+            8, // At zoom level 20, line width will be 8
+          ],
+        },
+        filter: ["==", "id", ""],
+      };
+    case "line":
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            "rgba(255, 255, 255, 1.0)", // Hover color
+            "rgba(0, 0, 0, 1.0)", // Default color
+          ],
+          "line-opacity": 0.8,
+        },
+        filter: ["==", "id", ""],
+      };
+    case "point":
+      return {
+        id: "",
+        type: "circle",
+        paint: {
+          "circle-radius": 5,
+          "circle-color": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            "rgba(255, 255, 255, 1.0)", // Hover color
+            "rgba(0, 0, 0, 1.0)", // Default color
+          ],
+        },
+        filter: ["==", "id", ""],
+      };
+    default:
+      return {};
   }
 };
