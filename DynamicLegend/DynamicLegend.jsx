@@ -252,46 +252,45 @@ export const DynamicLegend = ({ map }) => {
     if (!map) return;
 
     const updateLegend = () => {
-
       // Access the first key in visualisations
       const visualisationKey = Object.keys(state.visualisations)[0];
       const visualisation = state.visualisations[visualisationKey];
-
+    
       const legendTexts = visualisation?.legendText || [];
       const layers = map.getStyle().layers;
-
+    
       const items = layers
         .filter((layer) => layer.metadata && layer.metadata.isStylable)
         .map((layer, index) => {
           const title = layer.id;
-
+    
           const pageConfig = config.appPages.find(page => page.pageName === visualisationKey);
-          const legendFilter = pageConfig.config.filters.find(filter => filter.containsLegendInfo === true);
-          
+          const legendFilter = pageConfig?.config?.filters?.find(filter => filter.containsLegendInfo === true);
+    
           let displayValue;
           let legendSubtitleText;
-
+    
           if (legendFilter) {
             const filterParamName = legendFilter.paramName;
             const filter = pageConfig.config.filters.find(filter => filter.paramName === filterParamName);
-            const filterValues = filter.values;
-      
+            const filterValues = filter?.values || [];
+    
             // Default values from filterName
-            const defaultDisplayValue = filterValues?.values[0]?.displayValue || title;
-            const defaultLegendSubtitleText = filterValues?.values[0]?.legendSubtitleText || "Subtitle";
-      
+            const defaultDisplayValue = filterValues[0]?.displayValue || title;
+            const defaultLegendSubtitleText = filterValues[0]?.legendSubtitleText || "";
+    
             displayValue = legendTexts[index]?.displayValue || defaultDisplayValue;
             legendSubtitleText = legendTexts[index]?.legendSubtitleText || defaultLegendSubtitleText;
           } else {
-            displayValue = title;
-            legendSubtitleText = ""; // Default subtitle if legendFilter is not found
+            displayValue = legendTexts[index]?.displayValue || title;
+            legendSubtitleText = legendTexts[index]?.legendSubtitleText || ""; // Default subtitle if legendFilter is not found
           }
-
+    
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
-              paintProps["circle-color"] ||
-              paintProps["fill-color"]
+            paintProps["circle-color"] ||
+            paintProps["fill-color"]
           );
           const widthStops = interpretWidthExpression(paintProps["line-width"]);
           return { 
