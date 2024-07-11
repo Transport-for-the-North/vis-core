@@ -43,7 +43,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "Reliability",
+            visualisationName: "Bus Reliability",
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
@@ -51,7 +51,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "Reliability",
+            name: "Bus Reliability",
             type: "geojson",
             style: "polygon-categorical",
             valueField: "category",
@@ -75,7 +75,7 @@ export const appConfig = {
               { action: "UPDATE_PARAMETERISED_LAYER", payload: "Origin Zones" },
               { action: "UPDATE_QUERY_PARAMS" },
             ],
-            visualisations: ["Reliability"],
+            visualisations: ["Bus Reliability"],
             layer: "Origin Zones",
             type: "dropdown",
             values: {
@@ -101,7 +101,7 @@ export const appConfig = {
             paramName: "baseTimetableId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Reliability"],
+            visualisations: ["Bus Reliability"],
             type: "dropdown",
             values: {
               source: "local",
@@ -118,7 +118,7 @@ export const appConfig = {
             paramName: "adjustedTimetableId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Reliability"],
+            visualisations: ["Bus Reliability"],
             type: "dropdown",
             values: {
               source: "local",
@@ -135,7 +135,7 @@ export const appConfig = {
             paramName: "medianDurationSecs",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Reliability"],
+            visualisations: ["Bus Reliability"],
             type: "slider",
             min: 600,
             max: 12000,
@@ -151,7 +151,7 @@ export const appConfig = {
             paramName: "originZoneId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Reliability"],
+            visualisations: ["Bus Reliability"],
             type: "map",
             layer: "Origin Zones",
             field: "id",
@@ -175,7 +175,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "Accessibility",
+            visualisationName: "Bus Accessibility",
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: true,
@@ -183,7 +183,7 @@ export const appConfig = {
         ],
         visualisations: [
           {
-            name: "Accessibility",
+            name: "Bus Accessibility",
             type: "joinDataToMap",
             joinLayer: "Accessibility",
             style: "polygon-continuous",
@@ -208,7 +208,7 @@ export const appConfig = {
               },
               { action: "UPDATE_QUERY_PARAMS" },
             ],
-            visualisations: ["Accessibility"],
+            visualisations: ["Bus Accessibility"],
             layer: "Accessibility",
             type: "dropdown",
             info: "Select the region for which to view metrics.",
@@ -235,7 +235,7 @@ export const appConfig = {
             paramName: "timetable_id",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Accessibility"],
+            visualisations: ["Bus Accessibility"],
             type: "dropdown",
             info: "Timetable used to calculate metrics.",
             values: {
@@ -256,20 +256,26 @@ export const appConfig = {
             filterName: "Value type",
             paramName: "valueType",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Accessibility"],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Bus Accessibility"],
             type: "dropdown",
             info: "Type of opportunity accessed.",
+            containsLegendInfo: true,
             values: {
               source: "local",
               values: [
                 {
                   displayValue: "Jobs",
                   paramValue: "jobs",
+                  legendSubtitleText: "Jobs unit",
                 },
                 {
                   displayValue: "Schools",
                   paramValue: "schools",
+                  legendSubtitleText: "Schools unit",
                 },
               ],
             },
@@ -279,7 +285,7 @@ export const appConfig = {
             paramName: "cutoffTimeMinutes",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Accessibility"],
+            visualisations: ["Bus Accessibility"],
             type: "slider",
             info: "Journey time limit by bus.",
             min: 15,
