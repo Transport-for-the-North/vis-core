@@ -58,7 +58,7 @@ const fetchDataForVisualisation = debounce(
  * @property {boolean} props.left - A boolean indicating whether the visualisation is for the left or the right map. Null for a single map page
  * @returns {null} This component doesn't render anything directly.
  */
-export const Visualisation = ({ visualisationName, map, left = null }) => {
+export const Visualisation = ({ visualisationName, map, left = null, maps }) => {
   const { state, dispatch } = useMapContext();
   const [isLoading, setLoading] = useState(false); // State to track loading
   const prevDataRef = useRef();
@@ -72,6 +72,15 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
 
+  let visualisationData = [];
+  if (left != null) {
+    visualisationData = state.leftVisualisations[visualisationName].data.concat(
+      state.rightVisualisations[visualisationName].data
+    )
+  } else {
+    visualisationData = state.visualisations[visualisationName].data
+  }
+
   /**
    * Reclassifies the provided data and updates the map style.
    *
@@ -83,10 +92,10 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
    * @param {string} style - The style to be applied for reclassification.
    */
   const reclassifyAndStyleMap = useCallback(
-    (data, style, classificationMethod) => {
+    (mapItem, mapData, data, style, classificationMethod) => {
       // Reclassify data if needed
       const reclassifiedData = reclassifyData(
-        data,
+        mapData,
         style,
         classificationMethod
       );
@@ -108,7 +117,10 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
-      addFeaturesToMap(map, paintProperty, state.layers, data, style);
+
+      addFeaturesToMap(mapItem, paintProperty, state.layers, data, style);
+
+      // addFeaturesToMap(map, paintProperty, state.layers, data, style);
       dispatch({
         type: "UPDATE_MAP_STYLE",
         payload: { visualisationName, paintProperty },
@@ -116,11 +128,10 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
     },
     [
       dispatch,
-      map,
       state.color_scheme,
       state.layers,
       visualisation.style,
-      visualisationName,
+      visualisationName
     ]
   );
 
@@ -315,10 +326,8 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
   // Log loading status to console
   useEffect(() => {
     if (isLoading) {
-      console.log("Visualisation data is loading...");
       dispatch({ type: actionTypes.SET_IS_LOADING });
     } else {
-      console.log("Visualisation data finished loading.");
       dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
   }, [isLoading]);
@@ -418,11 +427,30 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
         // Reclassify and update the map style
         else {
           setLoading(true);
-          reclassifyAndStyleMap(
-            visualisation.data,
-            visualisation.style,
-            state.class_method
-          );
+          if (left !== null) {
+            reclassifyAndStyleMap(
+              maps[0],
+              visualisationData,
+              state.leftVisualisations[visualisationName].data,
+              visualisation.style,
+              state.class_method
+            );
+            reclassifyAndStyleMap(
+              maps[1],
+              visualisationData,
+              state.rightVisualisations[visualisationName].data,
+              visualisation.style,
+              state.class_method
+            );
+          } else {
+            reclassifyAndStyleMap(
+              map,
+              visualisationData,
+              visualisation.data,
+              visualisation.style,
+              state.class_method
+            );
+          }
         }
         break;
       }
@@ -435,7 +463,6 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
     prevColorRef.current = state.color_scheme;
 
     return () => {
-      console.log("Map unmount");
       if (map && visualisation.type === "geojson") {
         if (map.getLayer(visualisation.name)) {
           map.removeLayer(visualisation.name);
@@ -455,7 +482,7 @@ export const Visualisation = ({ visualisationName, map, left = null }) => {
     map,
     state.color_scheme,
     resetMapStyle,
-    state.class_method,
+    state.class_method
   ]);
 
   return null;
