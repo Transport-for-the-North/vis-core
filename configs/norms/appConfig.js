@@ -847,7 +847,7 @@ export const appConfig = {
                   actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
                   visualisations: ["Station Pairs Side-by-Side"],
                   type: "map",
-                  layer: "NoRMS Station Pair Result",
+                  layer: "NoRMS Station Pair Result Side-by-Side",
                   field: "id",
                 }
               ],
