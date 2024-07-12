@@ -35,15 +35,22 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
+  const metadataFilters = [
+    {
+      field_name: "scenarioCode",
+      distinct_value: ["UAD_2052", "UAE_2042", "UAF_2052"],
+    },
+    { field_name: "timePeriodCode", distinct_value: ["all", "am", "ip"] },
+  ];
 
   useEffect(() => {
     // Effect to initialise the filters for the map page
     if (
       !initializedRef.current &&
       Object.keys(state.visualisations).length > 0
-    ) {
+    ) { 
       pageContext.config.filters.forEach((filter) => {
-        // if (filter.values.source === "local") {
+        if (filter.type === "map" || filter.values.source === "local") {
           filter.actions.map((action) => {
             if (action.action === "UPDATE_QUERY_PARAMS") {
               let defaultValue =
@@ -69,9 +76,27 @@ export const MapLayout = () => {
               });
             }
           });
-        // } else {
-          //implement here the dynamic population of filters
-        // }
+        } else {
+          filter.actions.map((action) => {
+            const defaultValue =
+              state.metadataFilters[0][filter.paramName][0].distinct_value[0];
+            if (action.action === "UPDATE_QUERY_PARAMS") {
+              dispatch({
+                type: action.action,
+                payload: { filter, value: defaultValue },
+              });
+            } else {
+              var sides = "";
+              if (filter.filterName.includes("Left")) sides = "left";
+              else if (filter.filterName.includes("Right")) sides = "right";
+              else sides = "both";
+              dispatch({
+                type: action.action,
+                payload: { filter, value: defaultValue, sides: sides },
+              });
+            }
+          });
+        }
       });
       initializedRef.current = true;
     }
@@ -85,7 +110,16 @@ export const MapLayout = () => {
 
   useEffect(() => {
     initializedRef.current = false;
+    const apiFilterValues = Object.groupBy(
+      metadataFilters,
+      ({ field_name }) => field_name
+    );
+    dispatch({
+      type: "UPDATE_METADATA_FILTER",
+      payload: { metadataFilters: [apiFilterValues] },
+    });
   }, [pageContext]);
+  
 
   const handleFilterChange = (filter, value) => {
     if (!filter.visualisations[0].includes("Dual")) {

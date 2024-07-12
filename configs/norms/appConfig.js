@@ -1,164 +1,164 @@
 const scenarioCodeValues = {
-    source: "local",
-    values: [
-        {
-            displayValue: "IGX 2018",
-            paramValue: "IGX_2018",
-        },
-        {
-            displayValue: "JPI 2042",
-            paramValue: "JPI_2042",
-        },
-        {
-            displayValue: "JRT 2042",
-            paramValue: "JRT_2042",
-        },
-        {
-            displayValue: "JRU 2052",
-            paramValue: "JRU_2052",
-        },
-        {
-            displayValue: "JRV 2042",
-            paramValue: "JRV_2042",
-        },
-        {
-            displayValue: "JRW 2052",
-            paramValue: "JRW_2052",
-        },
-        {
-            displayValue: "JRX 2042",
-            paramValue: "JRX_2042",
-        },
-        {
-            displayValue: "JRY 2052",
-            paramValue: "JRY_2052",
-        },
-        {
-            displayValue: "JRZ 2042",
-            paramValue: "JRZ_2042",
-        },
-        {
-            displayValue: "JSA 2052",
-            paramValue: "JSA_2052",
-        },
-        {
-            displayValue: "K9N 2042",
-            paramValue: "K9N_2042",
-        },
-        {
-            displayValue: "K9O 2052",
-            paramValue: "K9O_2052",
-        },
-        {
-            displayValue: "KZI 2042",
-            paramValue: "KZI_2042",
-        },
-        {
-            displayValue: "UAA 2042",
-            paramValue: "UAA_2042",
-        },
-        {
-            displayValue: "UAB 2052",
-            paramValue: "UAB_2052",
-        },
-        {
-            displayValue: "UAC 2042",
-            paramValue: "UAC_2042",
-        },
-        {
-            displayValue: "UAD 2052",
-            paramValue: "UAD_2052",
-        },
-        {
-            displayValue: "UAE 2042",
-            paramValue: "UAE_2042",
-        },
-        {
-            displayValue: "UAF 2052",
-            paramValue: "UAF_2052",
-        },
-    ],
+  source: "local",
+  values: [
+    {
+      displayValue: "IGX 2018",
+      paramValue: "IGX_2018",
+    },
+    {
+      displayValue: "JPI 2042",
+      paramValue: "JPI_2042",
+    },
+    {
+      displayValue: "JRT 2042",
+      paramValue: "JRT_2042",
+    },
+    {
+      displayValue: "JRU 2052",
+      paramValue: "JRU_2052",
+    },
+    {
+      displayValue: "JRV 2042",
+      paramValue: "JRV_2042",
+    },
+    {
+      displayValue: "JRW 2052",
+      paramValue: "JRW_2052",
+    },
+    {
+      displayValue: "JRX 2042",
+      paramValue: "JRX_2042",
+    },
+    {
+      displayValue: "JRY 2052",
+      paramValue: "JRY_2052",
+    },
+    {
+      displayValue: "JRZ 2042",
+      paramValue: "JRZ_2042",
+    },
+    {
+      displayValue: "JSA 2052",
+      paramValue: "JSA_2052",
+    },
+    {
+      displayValue: "K9N 2042",
+      paramValue: "K9N_2042",
+    },
+    {
+      displayValue: "K9O 2052",
+      paramValue: "K9O_2052",
+    },
+    {
+      displayValue: "KZI 2042",
+      paramValue: "KZI_2042",
+    },
+    {
+      displayValue: "UAA 2042",
+      paramValue: "UAA_2042",
+    },
+    {
+      displayValue: "UAB 2052",
+      paramValue: "UAB_2052",
+    },
+    {
+      displayValue: "UAC 2042",
+      paramValue: "UAC_2042",
+    },
+    {
+      displayValue: "UAD 2052",
+      paramValue: "UAD_2052",
+    },
+    {
+      displayValue: "UAE 2042",
+      paramValue: "UAE_2042",
+    },
+    {
+      displayValue: "UAF 2052",
+      paramValue: "UAF_2052",
+    },
+  ],
 };
 
 const timePeriodCodeValues = {
-    source: "local",
-    values: [
-        {
-            displayValue: "All",
-            paramValue: "all",
-        },
-        {
-            displayValue: "AM",
-            paramValue: "am",
-        },
-        {
-            displayValue: "IP",
-            paramValue: "ip",
-        },
-        {
-            displayValue: "OP",
-            paramValue: "op",
-        },
-        {
-            displayValue: "PM",
-            paramValue: "pm",
-        },
-    ]
+  source: "local",
+  values: [
+    {
+      displayValue: "All",
+      paramValue: "all",
+    },
+    {
+      displayValue: "AM",
+      paramValue: "am",
+    },
+    {
+      displayValue: "IP",
+      paramValue: "ip",
+    },
+    {
+      displayValue: "OP",
+      paramValue: "op",
+    },
+    {
+      displayValue: "PM",
+      paramValue: "pm",
+    },
+  ]
 }
 
 const userClassIdValues = {
-    source: "local",
-    values: [
-        {
-            displayValue: "All",
-            paramValue: "0",
-        },
-        {
-            displayValue: "Business, all car availabilities",
-            paramValue: "123",
-        },
-        {
-            displayValue: "Commuting, all car availability",
-            paramValue: "456",
-        },
-        {
-            displayValue: "Other, all car availabilities",
-            paramValue: "789",
-        },
-    ]
+  source: "local",
+  values: [
+    {
+      displayValue: "All",
+      paramValue: "0",
+    },
+    {
+      displayValue: "Business, all car availabilities",
+      paramValue: "123",
+    },
+    {
+      displayValue: "Commuting, all car availability",
+      paramValue: "456",
+    },
+    {
+      displayValue: "Other, all car availabilities",
+      paramValue: "789",
+    },
+  ]
 }
 
 const originOrDestinationValues = {
-    source: "local",
-    values: [
-        {
-            displayValue: "Origin",
-            paramValue: "origin",
-        },
-        {
-            displayValue: "Destination",
-            paramValue: "destination",
-        },
-    ],
+  source: "local",
+  values: [
+    {
+      displayValue: "Origin",
+      paramValue: "origin",
+    },
+    {
+      displayValue: "Destination",
+      paramValue: "destination",
+    },
+  ],
 }
 
 const directionIdValues = {
-    source: "local",
-    values: [
-        {
-            displayValue: "Access",
-            paramValue: "0",
-        },
-        {
-            displayValue: "Egress",
-            paramValue: "1",
-        },
-    ],
+  source: "local",
+  values: [
+    {
+      displayValue: "Access",
+      paramValue: "0",
+    },
+    {
+      displayValue: "Egress",
+      paramValue: "1",
+    },
+  ],
 }
 
 export const appConfig = {
-    title: "TAME React Vis Template",
-    introduction: `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
+  title: "TAME React Vis Template",
+  introduction: `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
       <p>HTML documents are made up of elements. These elements are represented by tags, which label pieces of content such as "heading", "paragraph", "list", and so on. Browsers do not display the HTML tags but use them to render the content of the page.</p>
       <h2>Basic HTML Page Structure</h2>
       <p>An HTML document has a defined structure that includes the following main elements:</p>
@@ -169,2342 +169,2346 @@ export const appConfig = {
           <li><strong>body element:</strong> Contains the content of the document, such as text, images, and other media.</li>
       </ul>
       <p>Learning HTML is the first step in creating web content and is essential for web developers. It is easy to learn and can be combined with CSS (Cascading Style Sheets) and JavaScript to create interactive and styled web pages.</p>`,
-    background: "",
-    legalText:
-        '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
-    contactText: "Please contact [Name] for any questions on this data tool.",
-    contactEmail: "firstname.lastname@transportforthenorth.com",
-    logoImage: "img/tfn-logo-fullsize.png",
+  background: "",
+  legalText:
+    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+  contactText: "Please contact [Name] for any questions on this data tool.",
+  contactEmail: "firstname.lastname@transportforthenorth.com",
+  logoImage: "img/tfn-logo-fullsize.png",
 
-    backgroundImage: "img/hero-image.jpg",
-    logoutButtonImage: "img/burgerIcon.png",
-    logoutImage: "img/logout.png",
-    appPages: [
-        {
-            pageName: "Station Totals",
-            url: "/norms-station-totals",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "Station Totals",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Station Totals",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Nodes",
-                        style: "circle-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Totals"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Totals"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "propertyName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" }
-                        ],
-                        visualisations: ["Station Totals"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText:"Boardings" },
-                                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText:"Interchanges" },
-                                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText:"Egress" },
-                                { paramValue: "Access", displayValue: "Access", legendSubtitleText:"Access" },
-                                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText:"Alightings" }
-                            ]
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Totals Difference",
-            url: "/norms-station-totals-difference",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "Station Totals Difference",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Station Totals Difference",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Nodes",
-                        style: "circle-diverging",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario DS",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Totals Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period DS",
-                        paramName: "timePeriodCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Totals Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Scenario DM",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Totals Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period DM",
-                        paramName: "timePeriodCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Totals Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "propertyName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" }
-                        ],
-                        visualisations: ["Station Totals Difference"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText:"Boardings" },
-                                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText:"Interchanges" },
-                                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText:"Egress" },
-                                { paramValue: "Access", displayValue: "Access", legendSubtitleText:"Access" },
-                                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText:"Alightings" }
-                            ]
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Totals Side-by-Side",
-            url: "/norms-station-totals-difference-dual",
-            type: "DualMapLayout",
-            category: "Station",
-            config: {
-              layers: [
-                {
-                  uniqueId: "NoRMSNodeVectorTile",
-                  name: "NoRMS Nodes",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "geometry",
-                  geometryType: "point",
-                  visualisationName: "Station Totals Side-by-Side",
-                  isHoverable: false,
-                  isStylable: true,
-                  shouldHaveTooltipOnClick: true,
-                },
-              ],
-              visualisations: [
-                {
-                  name: "Station Totals Side-by-Side",
-                  type: "joinDataToMap",
-                  joinLayer: "NoRMS Nodes",
-                  style: "circle-continuous",
-                  joinField: "id",
-                  valueField: "value",
-                  dataSource: "api",
-                  dataPath: "/api/norms/node-results",
-                }
-              ],
-              metadataLayers: [],
-              filters: [
-                {
-                  filterName: "Left Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues,
-                },
-                {
-                  filterName: "Left Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Totals Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Right Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues,
-                },
-                {
-                  filterName: "Right Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Totals Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Metric",
-                  paramName: "propertyName",
-                  target: "api",
-                  actions: [
-                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                  ],
-                  visualisations: ["Station Totals Side-by-Side"],
-                  type: "dropdown",
-                  containsLegendInfo: true,
-                  values: {
-                    source: "local",
-                    values: [
-                      { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
-                      { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
-                      { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
-                      { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
-                      { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
-                    ]
-                  },
-                },
-              ],
-            },
+  backgroundImage: "img/hero-image.jpg",
+  logoutButtonImage: "img/burgerIcon.png",
+  logoutImage: "img/logout.png",
+  appPages: [
+    {
+      pageName: "Station Totals",
+      url: "/norms-station-totals",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Totals",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
           },
-        {
-            pageName: "Station Pairs",
-            url: "/norms-station-pair",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSStationPairVectorTile",
-                        name: "NoRMS Station Pair Result",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "Station Pairs",
-                        isHoverable: true,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Station Pairs",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Station Pair Result",
-                        style: "circle-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/station-pair-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "User",
-                        paramName: "userClassId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Direction",
-                        paramName: "originOrDestination",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs"],
-                        type: "toggle",
-                        values: originOrDestinationValues,
-                    },
-                    {
-                        filterName: "Column Name",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" }
-                        ],
-                        visualisations: ["Station Pairs"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "Demand",
-                                    paramValue: "demand",
-                                    legendSubtitleText: "Demand",
-                                },
-                                {
-                                    displayValue: "Generalised Cost",
-                                    paramValue: "gen_cost",
-                                    legendSubtitleText: "Cost",
-                                },
-                                {
-                                    displayValue: "Generalised Journey Time",
-                                    paramValue: "gen_jt",
-                                    legendSubtitleText: "Seconds",
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        filterName: "Please select a station in the map",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs"],
-                        type: "map",
-                        layer: "NoRMS Station Pair Result",
-                        field: "id",
-                    }
-                ],
-            },
-        },
-        {
-            pageName: "Station Pairs Difference",
-            url: "/norms-station-pair-difference",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSStationPairDifferenceVectorTile",
-                        name: "NoRMS Station Pair Result Difference",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "Station Pairs Difference",
-                        isHoverable: true,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Station Pairs Difference",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Station Pair Result Difference",
-                        style: "circle-diverging",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/station-pair-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Direction",
-                        paramName: "originOrDestination",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "toggle",
-                        values: originOrDestinationValues,
-                    },
-                    {
-                        filterName: "Column Name",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" }
-                        ],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "Demand",
-                                    paramValue: "demand",
-                                    legendSubtitleText: "Demand",
-                                },
-                                {
-                                    displayValue: "Generalised Cost",
-                                    paramValue: "gen_cost",
-                                    legendSubtitleText: "Cost",
-                                },
-                                {
-                                    displayValue: "Generalised Journey Time",
-                                    paramValue: "gen_jt",
-                                    legendSubtitleText: "Seconds",
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        filterName: "First Scenario",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "First User Class",
-                        paramName: "userClassIdDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "First Time Period",
-                        paramName: "timePeriodCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Second Scenario",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "Second User Class",
-                        paramName: "userClassIdDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Second Time Period",
-                        paramName: "timePeriodCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Please select a station in the map",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Pairs Difference"],
-                        type: "map",
-                        layer: "NoRMS Station Pair Result Difference",
-                        field: "id",
-                    }
-
-                ]
-            },
-        },
-        {
-            pageName: "Station Pairs Side-by-Side",
-            url: "/norms-station-pair-dual",
-            type: "DualMapLayout",
-            category: "Station",
-            config: {
-              layers: [
-                {
-                  uniqueId: "NoRMSStationPairVectorTile",
-                  name: "NoRMS Station Pair Result Side-by-Side",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "geometry",
-                  geometryType: "point",
-                  visualisationName: "Station Pairs Side-by-Side",
-                  isHoverable: true,
-                  isStylable: true,
-                  shouldHaveTooltipOnClick: false,
-                },
-              ],
-              visualisations: [
-                {
-                  name: "Station Pairs Side-by-Side",
-                  type: "joinDataToMap",
-                  joinLayer: "NoRMS Station Pair Result Side-by-Side",
-                  style: "circle-continuous",
-                  joinField: "id",
-                  valueField: "value",
-                  dataSource: "api",
-                  dataPath: "/api/norms/station-pair-results",
-                }
-              ],
-              metadataLayers: [],
-              filters: [
-                {
-                  filterName: "Direction",
-                  paramName: "originOrDestination",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "toggle",
-                  values: originOrDestinationValues,
-                },
-                {
-                  filterName: "Column Name",
-                  paramName: "columnName",
-                  target: "api",
-                  actions: [
-                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                  ],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "dropdown",
-                  containsLegendInfo: true,
-                  values: {
-                    source: "local",
-                    values: [
-                      {
-                        displayValue: "Demand",
-                        paramValue: "demand",
-                        legendSubtitleText: "Demand unit",
-                      },
-                      {
-                        displayValue: "Generalised Cost",
-                        paramValue: "gen_cost",
-                        legendSubtitleText: "Cost unit",
-                      },
-                      {
-                        displayValue: "Generalised Journey Time",
-                        paramValue: "gen_jt",
-                        legendSubtitleText: "Seconds",
-                      }
-                    ]
-                  }
-                },
-                {
-                  filterName: "Left Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues,
-                },
-                {
-                  filterName: "Left Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Left User",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues,
-                },
-                {
-                  filterName: "Right Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues,
-                },
-                {
-                  filterName: "Right Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Right User",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues,
-                },
-                {
-                  filterName: "Please select a station in the map",
-                  paramName: "nodeId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Pairs Side-by-Side"],
-                  type: "map",
-                  layer: "NoRMS Station Pair Result",
-                  field: "id",
-                }
-              ],
-            },
-          },
-        {
-            pageName: "Station Catchment",
-            url: "/norms-station-catchment",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "zones",
-                        geometryType: "polygon",
-                        visualisationName: "Station Catchment",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NoRMSNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "Station Catchment",
-                        isHoverable: true,
-                        isStylable: false,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Station Catchment",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Zones",
-                        style: "polygon-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-catchment-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "User Class",
-                        paramName: "userClassId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Direction",
-                        paramName: "directionId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment"],
-                        type: "toggle",
-                        values: directionIdValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" } 
-                        ],
-                        visualisations: ["Station Catchment"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText:"Cost" },  
-                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText:"Cost" },
-                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText:"Cost" },
-                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText:"Cost" },
-                              { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText:"Demand" },
-                              { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText:"Demand" },
-                              { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText:"Demand" },
-                              { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText:"Demand" },
-                              { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText:"Demand" }
-                            ]
-                        },
-                    },
-                    {
-                        filterName: "Select station in map",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment"],
-                        type: "map",
-                        layer: "NoRMS Nodes",
-                        field: "id"
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Catchment Difference",
-            url: "/norms-station-catchment/difference",
-            type: "MapLayout",
-            category: "Station",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSZoneVectorTile",
-                        name: "NoRMS Zones",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "zones",
-                        geometryType: "polygon",
-                        visualisationName: "Station Catchment Difference",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                    {
-                        uniqueId: "NoRMSNodeVectorTile",
-                        name: "NoRMS Nodes",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "point",
-                        visualisationName: "Station Catchment Difference",
-                        isHoverable: true,
-                        isStylable: false,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Station Catchment Difference",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Zones",
-                        style: "polygon-diverging",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/node-catchment-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "First Scenario",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "First Time Period",
-                        paramName: "timePeriodCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "First User Class",
-                        paramName: "userClassIdDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Second Scenario",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues,
-                    },
-                    {
-                        filterName: "Second Time Period",
-                        paramName: "timePeriodCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Second User Class",
-                        paramName: "userClassIdDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Direction",
-                        paramName: "directionId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "toggle",
-                        values: directionIdValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" }
-                        ],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                              { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },  
-                              { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
-                              { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
-                              { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
-                              { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
-                              { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
-                              { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
-                              { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
-                              { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
-                            ]
-                        },
-                    },
-                    {
-                        filterName: "Select station in map",
-                        paramName: "nodeId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Station Catchment Difference"],
-                        type: "map",
-                        layer: "NoRMS Nodes",
-                        field: "id"
-                    },
-                ],
-            },
-        },
-        {
-            pageName: "Station Catchment Side-by-Side",
-            url: "/norms-station-catchment-dual",
-            type: "DualMapLayout",
-            category: "Station",
-            config: {
-              layers: [
-                {
-                  uniqueId: "NoRMSZoneVectorTile",
-                  name: "NoRMS Zones Side-by-Side",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "zones",
-                  geometryType: "polygon",
-                  visualisationName: "Station Catchment Side-by-Side",
-                  isHoverable: false,
-                  isStylable: true,
-                  shouldHaveTooltipOnClick: false,
-                },
-                {
-                  uniqueId: "NoRMSNodeVectorTile",
-                  name: "NoRMS Nodes",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "geometry",
-                  geometryType: "point",
-                  visualisationName: "Station Catchment Side-by-Side",
-                  isHoverable: true,
-                  isStylable: false,
-                  shouldHaveTooltipOnClick: false,
-                },
-              ],
-              visualisations: [
-                {
-                  name: "Station Catchment Side-by-Side",
-                  type: "joinDataToMap",
-                  joinLayer: "NoRMS Zones Side-by-Side",
-                  style: "polygon-continuous",
-                  joinField: "id",
-                  valueField: "value",
-                  dataSource: "api",
-                  dataPath: "/api/norms/node-catchment-results",
-                }
-              ],
-              metadataLayers: [],
-              filters: [
-                {
-                  filterName: "Direction",
-                  paramName: "directionId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "toggle",
-                  values: directionIdValues,
-                },
-                {
-                  filterName: "Metric",
-                  paramName: "columnName",
-                  target: "api",
-                  actions: [
-                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                  ],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "dropdown",
-                  containsLegendInfo: true,
-                  values: {
-                    source: "local",
-                    values: [
-                      { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
-                      { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
-                      { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
-                      { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
-                      { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
-                      { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
-                      { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
-                      { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
-                      { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
-                    ]
-                  },
-                },
-                {
-                  filterName: "Left Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues,
-                },
-                {
-                  filterName: "Left Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Left User Class",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues,
-                },
-                {
-                  filterName: "Right Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues,
-                },
-                {
-                  filterName: "Right Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Right User Class",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues,
-                },
-                {
-                  filterName: "Select station in map",
-                  paramName: "nodeId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Station Catchment Side-by-Side"],
-                  type: "map",
-                  layer: "NoRMS Nodes",
-                  field: "id"
-                },
-              ],
-            },
-          },
-        {
-            pageName: "Link Totals",
-            url: "/norms-link",
-            type: "MapLayout",
-            category: "Link",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSLinksVectorTile",
-                        name: "NoRMS Links Result",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "geometry",
-                        geometryType: "line",
-                        visualisationName: "Link Totals",
-                        isHoverable: false,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: true,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Link Totals",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Links Result",
-                        style: "line-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/link-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Link Totals"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Link Totals"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "propertyName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" }
-                        ],
-                        visualisations: ["Link Totals"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "No. Passengers",
-                                    paramValue: "No. Passengers",
-                                    legendSubtitleText: "Passengers",
-                                },
-                                {
-                                    displayValue: "Total Crush Capacity",
-                                    paramValue: "Total Crush Capacity",
-                                    legendSubtitleText: "Capacity",
-                                },
-                                {
-                                    displayValue: "Total Crush Load Factor",
-                                    paramValue: "Total Crush Load Factor",
-                                    legendSubtitleText: "Factor",
-                                },
-                                {
-                                    displayValue: "Total Seat Capacity",
-                                    paramValue: "Total Seat Capacity",
-                                    legendSubtitleText: "Capacity",
-                                },
-                                {
-                                    displayValue: "Total Seat Load Factor",
-                                    paramValue: "Total Seat Load Factor",
-                                    legendSubtitleText: "Factor",
-                                },
-                                {
-                                    displayValue: "Trains per hour",
-                                    paramValue: "Trains per hour",
-                                    legendSubtitleText: "units",
-                                },
-                            ]
-                        },
-                    },
-                ],
-            },
-        },
-        {
-          pageName: "Link Totals Difference",
-          url: "/norms-link-result-difference",
-          type: "MapLayout",
-          about: "", //to be added
-          category: "Link",
-          config: {
-              layers: [
-                  {
-                      uniqueId: "NoRMSLinksResultDifference",
-                      name: "NoRMS Links Result Difference",
-                      type: "tile",
-                      source: "api",
-                      path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
-                      sourceLayer: "geometry",
-                      geometryType: "line",
-                      visualisationName: "Link Totals Difference",
-                      isHoverable: false,
-                      isStylable: true,
-                      shouldHaveTooltipOnClick: true,
-                  },
-              ],
-              visualisations: [
-                  {
-                      name: "Link Totals Difference",
-                      type: "joinDataToMap",
-                      joinLayer: "NoRMS Links Result Difference",
-                      style: "line-diverging",
-                      joinField: "id",
-                      valueField: "value",
-                      dataSource: "api",
-                      dataPath: "/api/norms/link-results/difference",
-                  }
-              ],
-              metadataLayers: [],
-              filters: [
-                  {
-                      filterName: "First Scenario",
-                      paramName: "scenarioCodeDoSomething",
-                      target: "api",
-                      actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                      visualisations: ["Link Totals Difference"],
-                      type: "dropdown",
-                      values: scenarioCodeValues
-                  },
-                  {
-                    filterName: "Second Scenario",
-                    paramName: "scenarioCodeDoMinimum",
-                    target: "api",
-                    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                    visualisations: ["Link Totals Difference"],
-                    type: "dropdown",
-                    values: scenarioCodeValues
-                  },
-                  {
-                      filterName: "First Time Period",
-                      paramName: "timePeriodCodeDoSomething",
-                      target: "api",
-                      actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                      visualisations: ["Link Totals Difference"],
-                      type: "toggle",
-                      values: timePeriodCodeValues,
-                  },
-                  {
-                    filterName: "Second Time Period",
-                    paramName: "timePeriodCodeDoMinimum",
-                    target: "api",
-                    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                    visualisations: ["Link Totals Difference"],
-                    type: "toggle",
-                    values: timePeriodCodeValues,
-                  },
-                  {
-                      filterName: "Metric",
-                      paramName: "propertyName",
-                      target: "api",
-                      actions: [
-                        { action: "UPDATE_QUERY_PARAMS" },
-                        { action: "UPDATE_LEGEND_TEXT" }
-                      ],
-                      visualisations: ["Link Totals Difference"],
-                      type: "dropdown",
-                      containsLegendInfo: true,
-                      values: {
-                          source: "local",
-                          values: [
-                              {
-                                  displayValue: "No. Passengers",
-                                  paramValue: "No. Passengers",
-                                  legendSubtitleText: "Passengers",
-                              },
-                              {
-                                  displayValue: "Total Crush Capacity",
-                                  paramValue: "Total Crush Capacity",
-                                  legendSubtitleText: "Capacity",
-                              },
-                              {
-                                  displayValue: "Total Crush Load Factor",
-                                  paramValue: "Total Crush Load Factor",
-                                  legendSubtitleText: "Factor",
-                              },
-                              {
-                                  displayValue: "Total Seat Capacity",
-                                  paramValue: "Total Seat Capacity",
-                                  legendSubtitleText: "Capacity",
-                              },
-                              {
-                                  displayValue: "Total Seat Load Factor",
-                                  paramValue: "Total Seat Load Factor",
-                                  legendSubtitleText: "Factor",
-                              },
-                              {
-                                  displayValue: "Trains per hour",
-                                  paramValue: "Trains per hour",
-                                  legendSubtitleText: "units",
-                              },
-                          ]
-                      },
-                  },
-              ],
-          },
-        },
-        {
-            pageName: "Link Totals Side-by-Side",
-            url: "/norms-link-result-dual",
-            type: "DualMapLayout",
-            about: "", //to be added
-            category: "Link",
-            config: {
-              layers: [
-                {
-                  uniqueId: "NoRMSLinksResultDual",
-                  name: "NoRMS Links Result Dual",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "geometry",
-                  geometryType: "line",
-                  visualisationName: "Link Totals Side-by-Side",
-                  isHoverable: false,
-                  isStylable: true,
-                  shouldHaveTooltipOnClick: true,
-                },
-              ],
-              visualisations: [
-                {
-                  name: "Link Totals Side-by-Side",
-                  type: "joinDataToMap",
-                  joinLayer: "NoRMS Links Result Dual",
-                  style: "line-continuous",
-                  joinField: "id",
-                  valueField: "value",
-                  dataSource: "api",
-                  dataPath: "/api/norms/link-results",
-                }
-              ],
-              metadataLayers: [],
-              filters: [
-                {
-                  filterName: "Left Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Link Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues
-                },
-                {
-                  filterName: "Right Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Link Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues
-                },
-                {
-                  filterName: "Left Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Link Totals Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Right Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Link Totals Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Metric",
-                  paramName: "propertyName",
-                  target: "api",
-                  actions: [
-                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                  ],
-                  visualisations: ["Link Totals Side-by-Side"],
-                  type: "dropdown",
-                  containsLegendInfo: true,
-                  values: {
-                    source: "local",
-                    values: [
-                      {
-                        displayValue: "No. Passengers",
-                        paramValue: "No. Passengers",
-                        legendSubtitleText: "Passengers",
-                      },
-                      {
-                        displayValue: "Total Crush Capacity",
-                        paramValue: "Total Crush Capacity",
-                        legendSubtitleText: "Capacity",
-                      },
-                      {
-                        displayValue: "Total Crush Load Factor",
-                        paramValue: "Total Crush Load Factor",
-                        legendSubtitleText: "Load Factor",
-                      },
-                      {
-                        displayValue: "Total Seat Capacity",
-                        paramValue: "Total Seat Capacity",
-                        legendSubtitleText: "Capacity",
-                      },
-                      {
-                        displayValue: "Total Seat Load Factor",
-                        paramValue: "Total Seat Load Factor",
-                        legendSubtitleText: "Load Factor",
-                      },
-                      {
-                        displayValue: "Trains per hour",
-                        paramValue: "Trains per hour",
-                        legendSubtitleText: "Trains",
-                      },
-                    ]
-                  },
-                },
-              ],
-            },
-          },
-        {
-          pageName: "Zone Totals",
-          url: "/zone-totals",
-          type: "MapLayout",
-          category: "Zone",
-          about: "", //To be added.
-          config: {
-            layers: [
-              {
-                uniqueId: "NoRMSZoneTotals",
-                name: "NoRMS Zone Totals",
-                type: "tile",
-                source: "api",
-                path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                sourceLayer: "zones",
-                geometryType: "polygon",
-                visualisationName: "Zone Totals",
-                isHoverable: false,
-                isStylable: true,
-                shouldHaveTooltipOnClick: false,
-              },
-            ],
-            visualisations: [
-              {
-                name: "Zone Totals",
-                type: "joinDataToMap",
-                joinLayer: "NoRMS Zone Totals",
-                style: "polygon-continuous",
-                joinField: "id",
-                valueField: "value",
-                dataSource: "api",
-                dataPath: "/api/norms/zone-total-results",
-              },
-            ],
-            metadataLayers: [],
-            filters: [
-              {
-                filterName: "Metric",
-                paramName: "columnName",
-                target: "api",
-                actions: [
-                    { action: "UPDATE_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                ],
-                visualisations: ["Zone Totals"],
-                type: "dropdown",
-                containsLegendInfo: true,
-                values: {
-                  source: "local",
-                  values: [
-                    {
-                      displayValue: 'Revenue',
-                      paramValue: 'revenue',
-                      legendSubtitleText: "Revenue",
-                    },
-                    {
-                      displayValue: 'Demand',
-                      paramValue: 'demand',
-                      legendSubtitleText: "Demand",
-                    },
-                    {
-                      displayValue: 'Total Generalised Cost',
-                      paramValue: 'total_gen_cost',
-                      legendSubtitleText: "Cost",
-                    },
-                    {
-                      displayValue: 'IVT',
-                      paramValue: 'ivt',
-                      legendSubtitleText: "IVT",
-                    },
-                    {
-                      displayValue: 'Crowding',
-                      paramValue: 'crowding',
-                      legendSubtitleText: "Crowding",
-                    },
-                    {
-                      displayValue: 'Wait Time',
-                      paramValue: 'wait_time',
-                      legendSubtitleText: "Seconds",
-                    },
-                    {
-                      displayValue: 'Walk Time',
-                      paramValue: 'walk_time',
-                      legendSubtitleText: "Seconds",
-                    },
-                    {
-                      displayValue: 'Penalty',
-                      paramValue: 'penalty',
-                      legendSubtitleText: "Penalty",
-                    },
-                    {
-                      displayValue: 'Access Egress',
-                      paramValue: 'access_egress',
-                      legendSubtitleText: "Access Egress",
-                    },
-                    {
-                      displayValue: 'Value of choice',
-                      paramValue: 'value_of_choice',
-                      legendSubtitleText: "Value",
-                    },
-                  ],
-                },
-              },
-              {
-                filterName: "Origin Or Destination",
-                paramName: "originOrDestination",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals"],
-                type: "toggle", 
-                values: originOrDestinationValues
-              },
-              {
-                filterName: "Time Period",
-                paramName: "timePeriodCode",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals"],
-                type: "toggle",
-                values: timePeriodCodeValues
-              },
-              {
-                filterName: "User Class",
-                paramName: "userClassId",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals"],
-                type: "dropdown",
-                values: userClassIdValues
-              },
-              {
-                filterName: "Scenario",
-                paramName: "scenarioCode",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals"],
-                type: "dropdown",
-                values: scenarioCodeValues
-              },
-            ]
+        ],
+        visualisations: [
+          {
+            name: "Station Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Nodes",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-results",
           }
-        },
-        {
-          pageName: "Zone Totals Difference",
-          url: "/zone-totals-difference",
-          type: "MapLayout",
-          category: "Zone",
-          about: "", //To be added.
-          config: {
-            layers: [
-              {
-                uniqueId: "NoRMSZoneTotalsDifference",
-                name: "NoRMS Zone Totals Difference",
-                type: "tile",
-                source: "api",
-                path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                sourceLayer: "zones",
-                geometryType: "polygon",
-                visualisationName: "Zone Totals Difference",
-                isHoverable: false,
-                isStylable: true,
-                shouldHaveTooltipOnClick: false,
-              },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Totals"],
+            type: "dropdown",
+            values: {
+              source: "api"
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Totals"],
+            type: "toggle",
+            values: {
+              source: "api"
+            },
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
             ],
-            visualisations: [
-              {
-                name: "Zone Totals Difference",
-                type: "joinDataToMap",
-                joinLayer: "NoRMS Zone Totals Difference",
-                style: "polygon-diverging",
-                joinField: "id",
-                valueField: "value",
-                dataSource: "api",
-                dataPath: "/api/norms/zone-total-results/difference",
-              },
-            ],
-            metadataLayers: [],
-            filters: [
-              {
-                filterName: "Metric",
-                paramName: "columnName",
-                target: "api",
-                actions: [
-                    { action: "UPDATE_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                ],
-                visualisations: ["Zone Totals Difference"],
-                type: "dropdown",
-                containsLegendInfo: true,
-                values: {
-                  source: "local",
-                  values: [
-                    {
-                      displayValue: 'Revenue',
-                      paramValue: 'revenue',
-                      legendSubtitleText: "Revenue",
-                    },
-                    {
-                      displayValue: 'Demand',
-                      paramValue: 'demand',
-                      legendSubtitleText: "Demand",
-                    },
-                    {
-                      displayValue: 'Total Generalised Cost',
-                      paramValue: 'total_gen_cost',
-                      legendSubtitleText: "Cost",
-                    },
-                    {
-                      displayValue: 'IVT',
-                      paramValue: 'ivt',
-                      legendSubtitleText: "IVT",
-                    },
-                    {
-                      displayValue: 'Crowding',
-                      paramValue: 'crowding',
-                      legendSubtitleText: "Crowding",
-                    },
-                    {
-                      displayValue: 'Wait Time',
-                      paramValue: 'wait_time',
-                      legendSubtitleText: "Seconds",
-                    },
-                    {
-                      displayValue: 'Walk Time',
-                      paramValue: 'walk_time',
-                      legendSubtitleText: "Seconds",
-                    },
-                    {
-                      displayValue: 'Penalty',
-                      paramValue: 'penalty',
-                      legendSubtitleText: "Penalty",
-                    },
-                    {
-                      displayValue: 'Access Egress',
-                      paramValue: 'access_egress',
-                      legendSubtitleText: "Access Egress",
-                    },
-                    {
-                      displayValue: 'Value of choice',
-                      paramValue: 'value_of_choice',
-                      legendSubtitleText: "Value",
-                    },
-                  ],
-                },
-              },
-              {
-                filterName: "Origin Or Destination",
-                paramName: "originOrDestination",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "dropdown", 
-                values: originOrDestinationValues
-              },
-              {
-                filterName: "First Time Period",
-                paramName: "timePeriodCodeDoSomething",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "toggle",
-                values: timePeriodCodeValues
-              },
-              {
-                filterName: "Second Time Period",
-                paramName: "timePeriodCodeDoMinimum",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "toggle",
-                values: timePeriodCodeValues
-              },
-              {
-                filterName: "First User Class",
-                paramName: "userClassIdDoSomething",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "dropdown",
-                values: userClassIdValues
-              },
-              {
-                filterName: "Second User Class",
-                paramName: "userClassIdDoMinimum",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "dropdown",
-                values: userClassIdValues
-              },
-              {
-                filterName: "First Scenario",
-                paramName: "scenarioCodeDoSomething",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "dropdown",
-                values: scenarioCodeValues
-              },
-              {
-                filterName: "Second Scenario",
-                paramName: "scenarioCodeDoMinimum",
-                target: "api",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                visualisations: ["Zone Totals Difference"],
-                type: "dropdown",
-                values: scenarioCodeValues
-              },
-            ]
+            visualisations: ["Station Totals"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
+                { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
+                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Station Totals Difference",
+      url: "/norms-station-totals-difference",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Totals Difference",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Totals Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Nodes",
+            style: "circle-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-results/difference",
           }
-        },
-        {
-            pageName: "Zone Totals Side-by-Side",
-            url: "/zone-totals-dual",
-            type: "DualMapLayout",
-            category: "Zone",
-            about: "", //To be added.
-            config: {
-              layers: [
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario DS",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Time Period DS",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Scenario DM",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Time Period DM",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Totals Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
+                { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
+                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Station Totals Side-by-Side",
+      url: "/norms-station-totals-difference-dual",
+      type: "DualMapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Totals Side-by-Side",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Totals Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Nodes",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Left Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Right Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Totals Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
+                { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
+                { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Station Pairs",
+      url: "/norms-station-pair",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSStationPairVectorTile",
+            name: "NoRMS Station Pair Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Pairs",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Pairs",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Station Pair Result",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/station-pair-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Direction",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Column Name",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Pairs"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
                 {
-                  uniqueId: "NoRMSZoneTotalsDual",
-                  name: "NoRMS Zone Totals Dual",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "zones",
-                  geometryType: "polygon",
-                  visualisationName: "Zone Totals Side-by-Side",
-                  isHoverable: false,
-                  isStylable: true,
-                  shouldHaveTooltipOnClick: false,
-                },
-              ],
-              visualisations: [
-                {
-                  name: "Zone Totals Side-by-Side",
-                  type: "joinDataToMap",
-                  joinLayer: "NoRMS Zone Totals",
-                  style: "polygon-continuous",
-                  joinField: "id",
-                  valueField: "value",
-                  dataSource: "api",
-                  dataPath: "/api/norms/zone-total-results",
-                },
-              ],
-              metadataLayers: [],
-              filters: [
-                {
-                  filterName: "Metric",
-                  paramName: "columnName",
-                  target: "api",
-                  actions: [
-                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                  ],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "dropdown",
-                  containsLegendInfo: true,
-                  values: {
-                    source: "local",
-                    values: [
-                      {
-                        displayValue: 'Revenue',
-                        paramValue: 'revenue',
-                        legendSubtitleText: "Revenue",
-                      },
-                      {
-                        displayValue: 'Demand',
-                        paramValue: 'demand',
-                        legendSubtitleText: "Demand",
-                      },
-                      {
-                        displayValue: 'Total Generalised Cost',
-                        paramValue: 'total_gen_cost',
-                        legendSubtitleText: "Cost",
-                      },
-                      {
-                        displayValue: 'IVT',
-                        paramValue: 'ivt',
-                        legendSubtitleText: "IVT",
-                      },
-                      {
-                        displayValue: 'Crowding',
-                        paramValue: 'crowding',
-                        legendSubtitleText: "Crowding",
-                      },
-                      {
-                        displayValue: 'Wait Time',
-                        paramValue: 'wait_time',
-                        legendSubtitleText: "Seconds",
-                      },
-                      {
-                        displayValue: 'Walk Time',
-                        paramValue: 'walk_time',
-                        legendSubtitleText: "Seconds",
-                      },
-                      {
-                        displayValue: 'Penalty',
-                        paramValue: 'penalty',
-                        legendSubtitleText: "Penalty",
-                      },
-                      {
-                        displayValue: 'Access Egress',
-                        paramValue: 'access_egress',
-                        legendSubtitleText: "unit",
-                      },
-                      {
-                        displayValue: 'Value of choice',
-                        paramValue: 'value_of_choice',
-                        legendSubtitleText: "unit",
-                      },
-                    ],
-                  },
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand",
                 },
                 {
-                  filterName: "Origin Or Destination",
-                  paramName: "originOrDestination",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "toggle",
-                  values: originOrDestinationValues
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost",
                 },
                 {
-                  filterName: "Left Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues
-                },
-                {
-                  filterName: "Left User Class",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues
-                },
-                {
-                  filterName: "Left Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues
-                },
-                {
-                  filterName: "Right Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues
-                },
-                {
-                  filterName: "Right User Class",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues
-                },
-                {
-                  filterName: "Right Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Totals Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues
-                },
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
+                }
               ]
             }
           },
-        {
-            pageName: "Zone Pairs",
-            url: "/norms-zones-pair",
-            type: "MapLayout",
-            category: "Zone",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSZonesPairVectorTile",
-                        name: "NoRMS Zones Pair Result",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "zones",
-                        geometryType: "polygon",
-                        visualisationName: "Zone Pairs",
-                        isHoverable: true,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Zone Pairs",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Zones Pair Result",
-                        style: "polygon-continuous",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/zone-pair-results",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Scenario",
-                        paramName: "scenarioCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "Time Period",
-                        paramName: "timePeriodCode",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "User",
-                        paramName: "userClassId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Zone as Origin or Destination",
-                        paramName: "originOrDestination",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs"],
-                        type: "toggle",
-                        values: originOrDestinationValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" } 
-                        ],
-                        visualisations: ["Zone Pairs"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "Demand",
-                                    paramValue: "demand",
-                                    legendSubtitleText: "Demand",
-                                },
-                                {
-                                    displayValue: "Generalised Cost",
-                                    paramValue: "gen_cost",
-                                    legendSubtitleText: "Cost",
-                                },
-                                {
-                                    displayValue: "Generalised Journey Time",
-                                    paramValue: "gen_jt",
-                                    legendSubtitleText: "Seconds",
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        filterName: "Select a zone in the map",
-                        paramName: "zoneId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs"],
-                        type: "map",
-                        layer: "NoRMS Zones Pair Result",
-                        field: "id",
-                    }
-                ]
-            },
-        },
-        {
-            pageName: "Zone Pairs Difference",
-            url: "/norms-zones-pair-difference",
-            type: "MapLayout",
-            category: "Zone",
-            config: {
-                layers: [
-                    {
-                        uniqueId: "NoRMSZonesPairDifferenceVectorTile",
-                        name: "NoRMS Zones Pair Result Difference",
-                        type: "tile",
-                        source: "api",
-                        path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                        sourceLayer: "zones",
-                        geometryType: "polygon",
-                        visualisationName: "Zone Pairs Difference",
-                        isHoverable: true,
-                        isStylable: true,
-                        shouldHaveTooltipOnClick: false,
-                    },
-                ],
-                visualisations: [
-                    {
-                        name: "Zone Pairs Difference",
-                        type: "joinDataToMap",
-                        joinLayer: "NoRMS Zones Pair Result Difference",
-                        style: "polygon-diverging",
-                        joinField: "id",
-                        valueField: "value",
-                        dataSource: "api",
-                        dataPath: "/api/norms/zone-pair-results/difference",
-                    }
-                ],
-                metadataLayers: [],
-                filters: [
-                    {
-                        filterName: "Zone as Origin or Destination",
-                        paramName: "originOrDestination",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "toggle",
-                        values: originOrDestinationValues,
-                    },
-                    {
-                        filterName: "Metric",
-                        paramName: "columnName",
-                        target: "api",
-                        actions: [
-                            { action: "UPDATE_QUERY_PARAMS" },
-                            { action: "UPDATE_LEGEND_TEXT" } 
-                        ],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "dropdown",
-                        containsLegendInfo: true,
-                        values: {
-                            source: "local",
-                            values: [
-                                {
-                                    displayValue: "Demand",
-                                    paramValue: "demand",
-                                    legendSubtitleText: "Demand",
-                                },
-                                {
-                                    displayValue: "Generalised Cost",
-                                    paramValue: "gen_cost",
-                                    legendSubtitleText: "Cost",
-                                },
-                                {
-                                    displayValue: "Generalised Journey Time",
-                                    paramValue: "gen_jt",
-                                    legendSubtitleText: "Seconds",
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        filterName: "First Scenario",
-                        paramName: "scenarioCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "First Time Period",
-                        paramName: "timePeriodCodeDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "First User",
-                        paramName: "userClassIdDoSomething",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Second Scenario",
-                        paramName: "scenarioCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "dropdown",
-                        values: scenarioCodeValues
-                    },
-                    {
-                        filterName: "Second Time Period",
-                        paramName: "timePeriodCodeDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "toggle",
-                        values: timePeriodCodeValues,
-                    },
-                    {
-                        filterName: "Second User",
-                        paramName: "userClassIdDoMinimum",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "dropdown",
-                        values: userClassIdValues,
-                    },
-                    {
-                        filterName: "Select a zone in the map",
-                        paramName: "zoneId",
-                        target: "api",
-                        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                        visualisations: ["Zone Pairs Difference"],
-                        type: "map",
-                        layer: "NoRMS Zones Pair Result Difference",
-                        field: "id",
-                    }
-                ]
-            },
-        }, 
-        {
-            pageName: "Zone Pairs Side-by-Side",
-            url: "/norms-zones-pair-dual",
-            type: "DualMapLayout",
-            category: "Zone",
-            config: {
-              layers: [
+          {
+            filterName: "Please select a station in the map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs"],
+            type: "map",
+            layer: "NoRMS Station Pair Result",
+            field: "id",
+          }
+        ],
+      },
+    },
+    {
+      pageName: "Station Pairs Difference",
+      url: "/norms-station-pair-difference",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSStationPairDifferenceVectorTile",
+            name: "NoRMS Station Pair Result Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Pairs Difference",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Pairs Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Station Pair Result Difference",
+            style: "circle-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/station-pair-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Direction",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Column Name",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
                 {
-                  uniqueId: "NoRMSZonesPairVectorTile",
-                  name: "NoRMS Zones Pair Result",
-                  type: "tile",
-                  source: "api",
-                  path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
-                  sourceLayer: "zones",
-                  geometryType: "polygon",
-                  visualisationName: "Zone Pairs Side-by-Side",
-                  isHoverable: true,
-                  isStylable: true,
-                  shouldHaveTooltipOnClick: false,
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand",
                 },
-              ],
-              visualisations: [
                 {
-                  name: "Zone Pairs Side-by-Side",
-                  type: "joinDataToMap",
-                  joinLayer: "NoRMS Zones Pair Result",
-                  style: "polygon-continuous",
-                  joinField: "id",
-                  valueField: "value",
-                  dataSource: "api",
-                  dataPath: "/api/norms/zone-pair-results",
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
                 }
-              ],
-              metadataLayers: [],
-              filters: [
+              ]
+            }
+          },
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Please select a station in the map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "map",
+            layer: "NoRMS Station Pair Result Difference",
+            field: "id",
+          }
+
+        ]
+      },
+    },
+    {
+      pageName: "Station Pairs Side-by-Side",
+      url: "/norms-station-pair-dual",
+      type: "DualMapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSStationPairVectorTile",
+            name: "NoRMS Station Pair Result Side-by-Side",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Pairs Side-by-Side",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Pairs Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Station Pair Result Side-by-Side",
+            style: "circle-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/station-pair-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Direction",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Column Name",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
                 {
-                  filterName: "Zone as Origin or Destination",
-                  paramName: "originOrDestination",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "toggle",
-                  values: originOrDestinationValues,
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand unit",
                 },
                 {
-                  filterName: "Metric",
-                  paramName: "columnName",
-                  target: "api",
-                  actions: [
-                    { action: "UPDATE_DUAL_QUERY_PARAMS" },
-                    { action: "UPDATE_LEGEND_TEXT" }
-                  ],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "dropdown",
-                  containsLegendInfo: true,
-                  values: {
-                    source: "local",
-                    values: [
-                      {
-                        displayValue: "Demand",
-                        paramValue: "demand",
-                        legendSubtitleText: "Demand unit",
-                      },
-                      {
-                        displayValue: "Generalised Cost",
-                        paramValue: "gen_cost",
-                        legendSubtitleText: "Cost unit",
-                      },
-                      {
-                        displayValue: "Generalised Journey Time",
-                        paramValue: "gen_jt",
-                        legendSubtitleText: "Seconds",
-                      }
-                    ]
-                  }
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost unit",
                 },
                 {
-                  filterName: "Left Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues
-                },
-                {
-                  filterName: "Left Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Left User",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues,
-                },
-                {
-                  filterName: "Right Scenario",
-                  paramName: "scenarioCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: scenarioCodeValues
-                },
-                {
-                  filterName: "Right Time Period",
-                  paramName: "timePeriodCode",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "toggle",
-                  values: timePeriodCodeValues,
-                },
-                {
-                  filterName: "Right User",
-                  paramName: "userClassId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "dropdown",
-                  values: userClassIdValues,
-                },
-                {
-                  filterName: "Select a zone in the map",
-                  paramName: "zoneId",
-                  target: "api",
-                  actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_DUAL_QUERY_PARAMS" }],
-                  visualisations: ["Zone Pairs Side-by-Side"],
-                  type: "map",
-                  layer: "NoRMS Zones Pair Result",
-                  field: "id",
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
                 }
+              ]
+            }
+          },
+          {
+            filterName: "Left Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Left User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Right Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Right User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Please select a station in the map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Side-by-Side"],
+            type: "map",
+            layer: "NoRMS Station Pair Result",
+            field: "id",
+          }
+        ],
+      },
+    },
+    {
+      pageName: "Station Catchment",
+      url: "/norms-station-catchment",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneVectorTile",
+            name: "NoRMS Zones",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Station Catchment",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Catchment",
+            isHoverable: true,
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Catchment",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-catchment-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Direction",
+            paramName: "directionId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment"],
+            type: "toggle",
+            values: directionIdValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Catchment"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
               ]
             },
           },
-    ],
+          {
+            filterName: "Select station in map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment"],
+            type: "map",
+            layer: "NoRMS Nodes",
+            field: "id"
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Station Catchment Difference",
+      url: "/norms-station-catchment/difference",
+      type: "MapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneVectorTile",
+            name: "NoRMS Zones",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Station Catchment Difference",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Catchment Difference",
+            isHoverable: true,
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Catchment Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones",
+            style: "polygon-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-catchment-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Direction",
+            paramName: "directionId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "toggle",
+            values: directionIdValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Catchment Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
+              ]
+            },
+          },
+          {
+            filterName: "Select station in map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "map",
+            layer: "NoRMS Nodes",
+            field: "id"
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Station Catchment Side-by-Side",
+      url: "/norms-station-catchment-dual",
+      type: "DualMapLayout",
+      category: "Station",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneVectorTile",
+            name: "NoRMS Zones Side-by-Side",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Station Catchment Side-by-Side",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Catchment Side-by-Side",
+            isHoverable: true,
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Station Catchment Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones Side-by-Side",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/node-catchment-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Direction",
+            paramName: "directionId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "toggle",
+            values: directionIdValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
+                { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
+                { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
+                { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
+                { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
+              ]
+            },
+          },
+          {
+            filterName: "Left Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Left User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Right Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues,
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Select station in map",
+            paramName: "nodeId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Side-by-Side"],
+            type: "map",
+            layer: "NoRMS Nodes",
+            field: "id"
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Link Totals",
+      url: "/norms-link",
+      type: "MapLayout",
+      category: "Link",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "NoRMS Links Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Link Totals",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Link Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Links Result",
+            style: "line-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/link-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Link Totals"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "No. Passengers",
+                  paramValue: "No. Passengers",
+                  legendSubtitleText: "Passengers",
+                },
+                {
+                  displayValue: "Total Crush Capacity",
+                  paramValue: "Total Crush Capacity",
+                  legendSubtitleText: "Capacity",
+                },
+                {
+                  displayValue: "Total Crush Load Factor",
+                  paramValue: "Total Crush Load Factor",
+                  legendSubtitleText: "Factor",
+                },
+                {
+                  displayValue: "Total Seat Capacity",
+                  paramValue: "Total Seat Capacity",
+                  legendSubtitleText: "Capacity",
+                },
+                {
+                  displayValue: "Total Seat Load Factor",
+                  paramValue: "Total Seat Load Factor",
+                  legendSubtitleText: "Factor",
+                },
+                {
+                  displayValue: "Trains per hour",
+                  paramValue: "Trains per hour",
+                  legendSubtitleText: "units",
+                },
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Link Totals Difference",
+      url: "/norms-link-result-difference",
+      type: "MapLayout",
+      about: "", //to be added
+      category: "Link",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSLinksResultDifference",
+            name: "NoRMS Links Result Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Link Totals Difference",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Link Totals Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Links Result Difference",
+            style: "line-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/link-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "No. Passengers",
+                  paramValue: "No. Passengers",
+                  legendSubtitleText: "Passengers",
+                },
+                {
+                  displayValue: "Total Crush Capacity",
+                  paramValue: "Total Crush Capacity",
+                  legendSubtitleText: "Capacity",
+                },
+                {
+                  displayValue: "Total Crush Load Factor",
+                  paramValue: "Total Crush Load Factor",
+                  legendSubtitleText: "Factor",
+                },
+                {
+                  displayValue: "Total Seat Capacity",
+                  paramValue: "Total Seat Capacity",
+                  legendSubtitleText: "Capacity",
+                },
+                {
+                  displayValue: "Total Seat Load Factor",
+                  paramValue: "Total Seat Load Factor",
+                  legendSubtitleText: "Factor",
+                },
+                {
+                  displayValue: "Trains per hour",
+                  paramValue: "Trains per hour",
+                  legendSubtitleText: "units",
+                },
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Link Totals Side-by-Side",
+      url: "/norms-link-result-dual",
+      type: "DualMapLayout",
+      about: "", //to be added
+      category: "Link",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSLinksResultDual",
+            name: "NoRMS Links Result Dual",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Link Totals Side-by-Side",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Link Totals Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Links Result Dual",
+            style: "line-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/link-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Left Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Right Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "propertyName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Link Totals Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "No. Passengers",
+                  paramValue: "No. Passengers",
+                  legendSubtitleText: "Passengers",
+                },
+                {
+                  displayValue: "Total Crush Capacity",
+                  paramValue: "Total Crush Capacity",
+                  legendSubtitleText: "Capacity",
+                },
+                {
+                  displayValue: "Total Crush Load Factor",
+                  paramValue: "Total Crush Load Factor",
+                  legendSubtitleText: "Load Factor",
+                },
+                {
+                  displayValue: "Total Seat Capacity",
+                  paramValue: "Total Seat Capacity",
+                  legendSubtitleText: "Capacity",
+                },
+                {
+                  displayValue: "Total Seat Load Factor",
+                  paramValue: "Total Seat Load Factor",
+                  legendSubtitleText: "Load Factor",
+                },
+                {
+                  displayValue: "Trains per hour",
+                  paramValue: "Trains per hour",
+                  legendSubtitleText: "Trains",
+                },
+              ]
+            },
+          },
+        ],
+      },
+    },
+    {
+      pageName: "Zone Totals",
+      url: "/zone-totals",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneTotals",
+            name: "NoRMS Zone Totals",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Totals",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Totals",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-total-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Totals"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Revenue',
+                  paramValue: 'revenue',
+                  legendSubtitleText: "Revenue",
+                },
+                {
+                  displayValue: 'Demand',
+                  paramValue: 'demand',
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt',
+                  legendSubtitleText: "IVT",
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Crowding",
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Seconds",
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Seconds",
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Penalty",
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "Access Egress",
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "Value",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals"],
+            type: "dropdown",
+            values: userClassIdValues
+          },
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Totals Difference",
+      url: "/zone-totals-difference",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneTotalsDifference",
+            name: "NoRMS Zone Totals Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Totals Difference",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Totals Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Totals Difference",
+            style: "polygon-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-total-results/difference",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Revenue',
+                  paramValue: 'revenue',
+                  legendSubtitleText: "Revenue",
+                },
+                {
+                  displayValue: 'Demand',
+                  paramValue: 'demand',
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt',
+                  legendSubtitleText: "IVT",
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Crowding",
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Seconds",
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Seconds",
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Penalty",
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "Access Egress",
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "Value",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            values: userClassIdValues
+          },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            values: userClassIdValues
+          },
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Totals Side-by-Side",
+      url: "/zone-totals-dual",
+      type: "DualMapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneTotalsDual",
+            name: "NoRMS Zone Totals Dual",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Totals Side-by-Side",
+            isHoverable: false,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Totals Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Totals",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-total-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Revenue',
+                  paramValue: 'revenue',
+                  legendSubtitleText: "Revenue",
+                },
+                {
+                  displayValue: 'Demand',
+                  paramValue: 'demand',
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt',
+                  legendSubtitleText: "IVT",
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Crowding",
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Seconds",
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Seconds",
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Penalty",
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Left User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues
+          },
+          {
+            filterName: "Left Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues
+          },
+          {
+            filterName: "Right Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Pairs",
+      url: "/norms-zones-pair",
+      type: "MapLayout",
+      category: "Zone",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZonesPairVectorTile",
+            name: "NoRMS Zones Pair Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Pairs",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Pairs",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones Pair Result",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-pair-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Zone as Origin or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Pairs"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs"],
+            type: "map",
+            layer: "NoRMS Zones Pair Result",
+            field: "id",
+          }
+        ]
+      },
+    },
+    {
+      pageName: "Zone Pairs Difference",
+      url: "/norms-zones-pair-difference",
+      type: "MapLayout",
+      category: "Zone",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZonesPairDifferenceVectorTile",
+            name: "NoRMS Zones Pair Result Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Pairs Difference",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Pairs Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones Pair Result Difference",
+            style: "polygon-diverging",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-pair-results/difference",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Zone as Origin or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "First Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "First Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "First User",
+            paramName: "userClassIdDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Second Scenario",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Second Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Second User",
+            paramName: "userClassIdDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "map",
+            layer: "NoRMS Zones Pair Result Difference",
+            field: "id",
+          }
+        ]
+      },
+    },
+    {
+      pageName: "Zone Pairs Side-by-Side",
+      url: "/norms-zones-pair-dual",
+      type: "DualMapLayout",
+      category: "Zone",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZonesPairVectorTile",
+            name: "NoRMS Zones Pair Result",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Pairs Side-by-Side",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Pairs Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zones Pair Result",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/zone-pair-results",
+          }
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Zone as Origin or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Metric",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand unit",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost unit",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
+                }
+              ]
+            }
+          },
+          {
+            filterName: "Left Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Left User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Right Scenario",
+            paramName: "scenarioCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "dropdown",
+            values: scenarioCodeValues
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Right User",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdValues,
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, { action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Side-by-Side"],
+            type: "map",
+            layer: "NoRMS Zones Pair Result",
+            field: "id",
+          }
+        ]
+      },
+    },
+  ],
 };
 
