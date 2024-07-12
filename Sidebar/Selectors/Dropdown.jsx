@@ -1,4 +1,5 @@
-import styled from 'styled-components'
+import styled from "styled-components";
+import { useMapContext } from "hooks";
 
 const StyledDropdown = styled.select`
   width: 100%;
@@ -16,23 +17,40 @@ const StyledDropdown = styled.select`
  * @returns {JSX.Element} The Dropdown component.
  */
 export const Dropdown = ({ filter, onChange }) => {
+  const { state } = useMapContext();
+  const metadataFilters = state.metadataFilters[0];
+
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
-    const selectedOption = filter.values.values.find(
-      (option) => option.displayValue === selectedValue
-    );
+    const selectedOption =
+      filter.values.source === "local"
+        ? filter.values.values.find(
+            (option) => option.displayValue === selectedValue
+          ).paramValue
+        : metadataFilters[filter.paramName][0].distinct_value.find(
+            (option) => option === selectedValue
+          );
+
     if (selectedOption) {
-      onChange(filter, selectedOption.paramValue);
+      onChange(filter, selectedOption);
     }
   };
 
   return (
     <StyledDropdown onChange={handleDropdownChange}>
-      {filter.values.values.map((option) => (
-        <option key={option.paramValue} value={option.displayValue}>
-          {option.displayValue}
-        </option>
-      ))}
+      {filter.values.source === "local"
+        ? filter.values.values.map((option) => (
+            <option key={option.paramValue} value={option.displayValue}>
+              {option.displayValue}
+            </option>
+          ))
+        : metadataFilters
+        ? metadataFilters[filter.paramName][0].distinct_value.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))
+        : null}
     </StyledDropdown>
   );
 };
