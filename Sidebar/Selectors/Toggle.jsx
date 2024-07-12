@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMapContext } from "hooks";
 
 const StyledToggle = styled.div`
   width: 100%;
@@ -37,22 +38,32 @@ const StyledButton = styled.button`
  * @returns {JSX.Element} The rendered Toggle component.
  */
 export const Toggle = ({ filter, onChange }) => {
-  const [currentButton, setCurrentButton] = useState(filter.values.values[0]);
+  const { state } = useMapContext();
+  const metadataFilters = state.metadataFilters[0];
+  const [currentButton, setCurrentButton] = useState(filter.values.source === "local" ? filter.values.values[0] : null);
 
   const handleToggleChange = (e) => {
     const selectedValue = e.target.value;
-    const selectedOption = filter.values.values.find(
-      (option) => option.displayValue === selectedValue
-    );
+    const selectedOption = filter.values.source === "local"
+    ? filter.values.values.find(
+        (option) => option.displayValue === selectedValue
+      ).paramValue
+    : metadataFilters[filter.paramName][0].distinct_value.find(
+        (option) => option === selectedValue
+      );
     if (selectedOption) {
-      onChange(filter, selectedOption.paramValue);
+      onChange(filter, selectedOption);
       setCurrentButton(selectedOption);
     }
   };
 
+  useEffect(() => {
+    if(metadataFilters && currentButton === null) setCurrentButton(metadataFilters[filter.paramName][0].distinct_value[0])  
+  }, [metadataFilters, currentButton, filter.paramName])
+
   return (
     <StyledToggle>
-      {filter.values.values.map((option, index) => (
+      {filter.values.source === "local" ? filter.values.values.map((option, index) => (
         <StyledButton
           key={option.paramValue}
           value={option.displayValue}
@@ -63,7 +74,18 @@ export const Toggle = ({ filter, onChange }) => {
         >
           {option.displayValue}
         </StyledButton>
-      ))}
+      )) : metadataFilters ? metadataFilters[filter.paramName][0].distinct_value.map((option, index) => (
+        <StyledButton
+          key={option}
+          value={option}
+          onClick={handleToggleChange}
+          $isSelected={currentButton === option}
+          size={metadataFilters[filter.paramName][0].distinct_value.length}
+          index={index}
+        >
+          {option}
+        </StyledButton>
+      ) ) : null}
     </StyledToggle>
   );
 };
