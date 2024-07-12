@@ -12,6 +12,7 @@ const initialState = {
   leftVisualisations: {},
   rightVisualisations: {},
   metadataLayers: [],
+  metadataFilters: [],
   filters: [],
   map: null,
   isMapReady: false,
