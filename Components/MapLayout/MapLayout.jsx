@@ -54,6 +54,13 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
+  const metadataFilters = [
+    {
+      field_name: "scenarioCode",
+      distinct_value: ["UAD_2052", "UAE_2042", "UAF_2052"],
+    },
+    { field_name: "timePeriodCode", distinct_value: ["all", "am", "ip"] },
+  ];
 
   useEffect(() => async () => {
     // Effect to initialise the filters for the map page
