@@ -395,7 +395,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
 
-            visualisations: ["Links"],
+            visualisations: ["Link"],
             type: "toggle",
             values: timePeriodValues,
           },
