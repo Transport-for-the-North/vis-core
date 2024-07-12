@@ -45,6 +45,4 @@ async function loadAppConfigs() {
 }
 
 // Load the appConfigs and combine their appPages
-loadAppConfigs().then(() => {
-  console.log('Combined appPages:', appConfig.appPages);
-});
+loadAppConfigs();
