@@ -18,7 +18,8 @@ export const actionTypes = {
     SET_IS_LOADING: 'SET_IS_LOADING',
     SET_LOADING_FINISHED: 'SET_LOADING_FINISHED',
     UPDATE_LEGEND_TEXT: 'UPDATE_LEGEND_TEXT',
-    UPDATE_CLASSIFICATION_METHOD: 'UPDATE_CLASSIFICATION_METHOD'
+    UPDATE_CLASSIFICATION_METHOD: 'UPDATE_CLASSIFICATION_METHOD',
+    UPDATE_METADATA_FILTER: 'UPDATE_METADATA_FILTER',
 };
 
 /**
@@ -243,6 +244,9 @@ export const mapReducer = (state, action) => {
                 ...state,
                 visualisations: updatedVisualisations,
             };
+        }
+        case actionTypes.UPDATE_METADATA_FILTER: { 
+            return { ...state, metadataFilters: action.payload.metadataFilters };
         }
         default:
             return state;
