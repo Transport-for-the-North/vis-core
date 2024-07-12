@@ -43,31 +43,35 @@ export const MapLayout = () => {
       Object.keys(state.visualisations).length > 0
     ) {
       pageContext.config.filters.forEach((filter) => {
-        filter.actions.map((action) => {
-          if (action.action === "UPDATE_QUERY_PARAMS") {
-            let defaultValue =
-              filter.defaultValue ||
-              filter.min ||
-              filter.values?.values[0]?.paramValue;
-            dispatch({
-              type: action.action,
-              payload: { filter, value: defaultValue },
-            });
-          } else {
-            let defaultValue =
-              filter.defaultValue ||
-              filter.min ||
-              filter.values?.values[0]?.paramValue;
-              var sides = ""
-              if (filter.filterName.includes("Left")) sides = "left"
-              else if (filter.filterName.includes("Right")) sides = "right"
-              else sides = "both"
-            dispatch({
-              type: action.action,
-              payload: { filter, value: defaultValue, sides: sides },
-            });
-          }
-        });
+        // if (filter.values.source === "local") {
+          filter.actions.map((action) => {
+            if (action.action === "UPDATE_QUERY_PARAMS") {
+              let defaultValue =
+                filter.defaultValue ||
+                filter.min ||
+                filter.values?.values[0]?.paramValue;
+              dispatch({
+                type: action.action,
+                payload: { filter, value: defaultValue },
+              });
+            } else {
+              let defaultValue =
+                filter.defaultValue ||
+                filter.min ||
+                filter.values?.values[0]?.paramValue;
+              var sides = "";
+              if (filter.filterName.includes("Left")) sides = "left";
+              else if (filter.filterName.includes("Right")) sides = "right";
+              else sides = "both";
+              dispatch({
+                type: action.action,
+                payload: { filter, value: defaultValue, sides: sides },
+              });
+            }
+          });
+        // } else {
+          //implement here the dynamic population of filters
+        // }
       });
       initializedRef.current = true;
     }
@@ -93,13 +97,13 @@ export const MapLayout = () => {
       });
     } else {
       filter.actions.map((action) => {
-        var sides = ""
-        if (filter.filterName.includes("Left")) sides = "left"
-        else if (filter.filterName.includes("Right")) sides = "right"
-        else sides = "both"
+        var sides = "";
+        if (filter.filterName.includes("Left")) sides = "left";
+        else if (filter.filterName.includes("Right")) sides = "right";
+        else sides = "both";
         dispatch({
           type: action.action,
-          payload: { filter, value, sides},
+          payload: { filter, value, sides },
         });
       });
     }
