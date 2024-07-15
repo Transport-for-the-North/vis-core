@@ -222,7 +222,7 @@ export const reclassifyData = (data, style, classificationMethod) => {
   };
 
   function replaceZeroValues(num) {
-    if (num == 0) {
+    if (num === 0) {
       return 0.01
     }
     else {
@@ -231,7 +231,7 @@ export const reclassifyData = (data, style, classificationMethod) => {
   }
 
   function replaceZeroPointValues(num) {
-    if (num == 0.01) {
+    if (num === 0.01) {
       return 0
     }
     else {
@@ -361,8 +361,7 @@ export const getHoverLayerStyle = (geometryType) => {
         id: "",
         type: "line",
         paint: {
-          "line-color": "rgba(0, 0, 0, 1.0)", // Default color
-          // Zoom-dependent line width
+          "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
           "line-width": [
             "interpolate",
             ["linear"],
@@ -377,23 +376,16 @@ export const getHoverLayerStyle = (geometryType) => {
             20,
             8, // At zoom level 20, line width will be 8
           ],
-        },
-        filter: ["==", "id", ""],
+        }
       };
     case "line":
       return {
         id: "",
         type: "line",
         paint: {
-          "line-color": [
-            "case",
-            ["boolean", ["feature-state", "hover"], false],
-            "rgba(255, 255, 255, 1.0)", // Hover color
-            "rgba(0, 0, 0, 1.0)", // Default color
-          ],
+          "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
           "line-opacity": 0.8,
-        },
-        filter: ["==", "id", ""],
+        }
       };
     case "point":
       return {
@@ -401,16 +393,22 @@ export const getHoverLayerStyle = (geometryType) => {
         type: "circle",
         paint: {
           "circle-radius": 5,
-          "circle-color": [
-            "case",
-            ["boolean", ["feature-state", "hover"], false],
-            "rgba(255, 255, 255, 1.0)", // Hover color
-            "rgba(0, 0, 0, 1.0)", // Default color
-          ],
-        },
-        filter: ["==", "id", ""],
+          "circle-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
+        }
       };
     default:
       return {};
   }
+};
+
+/**
+ * Retrieves the source layer of a specified layer from a map.
+ *
+ * @param {Object} map - The map object from which to retrieve the layer.
+ * @param {string} layerId - The ID of the layer to retrieve the source layer from.
+ * @returns {string|null} The source layer of the specified layer, or null if the layer does not exist.
+ */
+export const getSourceLayer = (map, layerId) => {
+  const layer = map.getLayer(layerId);
+  return layer ? layer['sourceLayer'] : null;
 };
