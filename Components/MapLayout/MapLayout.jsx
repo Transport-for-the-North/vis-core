@@ -84,7 +84,7 @@ export const MapLayout = () => {
   }, [pageContext]);
 
   const handleFilterChange = (filter, value) => {
-    if (!filter.visualisations[0].includes("Dual")) {
+    if (!filter.visualisations[0].includes("Side")) {
       filter.actions.map((action) => {
         dispatch({
           type: action.action,
