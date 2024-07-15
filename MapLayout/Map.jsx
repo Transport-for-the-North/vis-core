@@ -8,8 +8,7 @@ import { useMap, useMapContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 import { Visualisation } from "./Visualisation";
-import { colourSchemeSelectionColour } from "utils";
-import { getHoverLayerStyle, getLayerStyle } from "utils";
+import { getHoverLayerStyle, getLayerStyle, getSourceLayer } from "utils";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -29,7 +28,7 @@ const Map = () => {
   const { state, dispatch } = useMapContext();
   const popups = [];
   const listenerCallbackRef = useRef({});
-
+  const hoverIdRef = useRef(99999999);
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
@@ -113,13 +112,32 @@ const Map = () => {
     (e, layerId) => {
       if (!map || !e.point) return;
 
+      const hoverLayerId = `${layerId}-hover`
       const features = map.queryRenderedFeatures(e.point, {
         layers: [layerId],
       });
-      if (features.length > 0) {
-        const feature = features[0];
-        map.setFilter(`${layerId}-hover`, ["==", "id", feature.id]);
+
+      if (features.length < 1) {
+        if (map.getLayer(hoverLayerId)) {
+          const sourceLayer = getSourceLayer(map, layerId);
+          map.setFeatureState({ source: layerId, id: hoverIdRef.current, sourceLayer }, { hover: false });
+        }
+        return;
       }
+
+      const feature = features[0];
+      const source = feature.layer.source;
+      const sourceLayer = feature.layer["source-layer"];
+
+      if (map.getLayer(hoverLayerId)) {
+        map.setFeatureState({ source, id: hoverIdRef.current, sourceLayer }, { hover: false });
+        hoverIdRef.current = feature.id;
+        map.setFeatureState({ source, id: hoverIdRef.current, sourceLayer }, { hover: true });
+        return;
+      }
+
+      hoverIdRef.current = feature.id;
+      map.setFeatureState({ source, id: hoverIdRef.current, sourceLayer }, { hover: true });
     },
     [map]
   );
@@ -163,7 +181,10 @@ const Map = () => {
   const handleLayerLeave = useCallback(
     (layerId) => {
       if (!map) return;
-      map.setFilter(`${layerId}-hover`, ["==", "id", ""]);
+      if (map.getLayer(`${layerId}-hover`)) {
+        const sourceLayer = getSourceLayer(map, layerId);
+        map.setFeatureState({ source: layerId, id: hoverIdRef.current, sourceLayer }, { hover: false });
+      }
     },
     [map]
   );

@@ -1,9 +1,10 @@
+import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useRef, useContext, useCallback, useEffect } from "react";
 import { api } from "services";
 import styled from "styled-components";
 import { useDualMaps, useMapContext } from "hooks";
 import { PageContext } from "contexts";
-import { getHoverLayerStyle, getLayerStyle } from "utils";
+import { getHoverLayerStyle, getLayerStyle, getSourceLayer } from "utils";
 import maplibregl from "maplibre-gl";
 import { Visualisation } from "./Visualisation";
 import { DynamicLegend } from "Components";
@@ -13,6 +14,12 @@ const StyledMapContainer = styled.div`
   height: 100%;
 `;
 
+/**
+ * DualMaps component that renders two maps side by side using MapLibre GL and handles layers,
+ * including hover and click interactions.
+ * 
+ * @returns {JSX.Element} The rendered DualMaps component.
+ */
 const DualMaps = () => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
@@ -25,6 +32,7 @@ const DualMaps = () => {
   const maps = [leftMap, rightMap];
   const popups = [];
   const listenerCallbackRef = useRef({});
+  const hoverIdRef = useRef({ left: 99999999, right: 99999999 });
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
@@ -107,15 +115,40 @@ const DualMaps = () => {
    * @property {string} layerId - The ID of the layer being hovered over.
    */
   const handleLayerHover = useCallback(
-    (e, layerId) => {
+    (e, layerId, mapType) => {
       if ((leftMap === null && rightMap === null) || !e.point) return;
-      maps.forEach((map) => {
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: [layerId],
+  
+      const hoverLayerId = `${layerId}-hover`;
+      const map = mapType === 'left' ? leftMap : rightMap;
+      const hoverId = mapType === 'left' ? hoverIdRef.current.left : hoverIdRef.current.right;
+  
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: [layerId],
+      });
+  
+      if (features.length < 1) {
+        maps.forEach((map) => {
+          if (map.getLayer(hoverLayerId)) {
+            const sourceLayer = getSourceLayer(map, layerId);
+            map.setFeatureState({ source: layerId, id: hoverId, sourceLayer }, { hover: false });
+          }
         });
-        if (features.length > 0) {
-          const feature = features[0];
-          map.setFilter(`${layerId}-hover`, ["==", "id", feature.id]);
+        return;
+      }
+  
+      const feature = features[0];
+      const source = feature.layer.source;
+      const sourceLayer = feature.layer["source-layer"];
+  
+      maps.forEach((map) => {
+        if (map.getLayer(hoverLayerId)) {
+          map.setFeatureState({ source, id: hoverId, sourceLayer }, { hover: false });
+          if (mapType === 'left') {
+            hoverIdRef.current.left = feature.id;
+          } else {
+            hoverIdRef.current.right = feature.id;
+          }
+          map.setFeatureState({ source, id: feature.id, sourceLayer }, { hover: true });
         }
       });
     },
@@ -161,10 +194,16 @@ const DualMaps = () => {
    * @property {string} layerId - The ID of the layer from which the mouse has left.
    */
   const handleLayerLeave = useCallback(
-    (layerId) => {
+    (layerId, mapType) => {
       if (leftMap === null && rightMap === null) return;
+      const map = mapType === 'left' ? leftMap : rightMap;
+      const hoverId = mapType === 'left' ? hoverIdRef.current.left : hoverIdRef.current.right;
+  
       maps.forEach((map) => {
-        map.setFilter(`${layerId}-hover`, ["==", "id", ""]);
+        if (map.getLayer(`${layerId}-hover`)) {
+          const sourceLayer = getSourceLayer(map, layerId);
+          map.setFeatureState({ source: layerId, id: hoverId, sourceLayer }, { hover: false });
+        }
       });
     },
     [leftMap, rightMap]
@@ -176,8 +215,8 @@ const DualMaps = () => {
     Object.keys(state.layers).forEach((layerId) => {
       maps.forEach((map) => {
         if (state.layers[layerId].isHoverable) {
-          map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId));
-          map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
+          map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId, map === leftMap ? 'left' : 'right'));
+          map.on("mouseleave", layerId, () => handleLayerLeave(layerId, map === leftMap ? 'left' : 'right'));
           map.on("mouseenter", layerId, () => {
             map.getCanvas().style.cursor = "pointer";
           });
@@ -215,8 +254,8 @@ const DualMaps = () => {
             map.off("click", clickCallback);
           }
           if (state.layers[layerId].isHoverable) {
-            map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId));
-            map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
+            map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId, map === leftMap ? 'left' : 'right'));
+            map.off("mouseleave", layerId, () => handleLayerLeave(layerId, map === leftMap ? 'left' : 'right'));
           }
         });
       });
