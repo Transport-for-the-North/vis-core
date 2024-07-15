@@ -50,7 +50,7 @@ export const MapLayout = () => {
       Object.keys(state.visualisations).length > 0
     ) { 
       pageContext.config.filters.forEach((filter) => {
-        if (filter.type === "map" || filter.values.source === "local") {
+        if (filter.type === "map" || filter.type === "slider" ||filter.values.source === "local") {
           filter.actions.map((action) => {
             if (action.action === "UPDATE_QUERY_PARAMS") {
               let defaultValue =
