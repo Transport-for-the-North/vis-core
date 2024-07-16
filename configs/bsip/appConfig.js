@@ -1,5 +1,5 @@
 export const appConfig = {
-  title: "Bus Analytical Tool",
+  title: "Bus Analytics Tool",
   introduction:
     `<p>Buses are the quickest, easiest, and most effective way to deliver far-reaching improvements to our public transport system. They account for the majority of public transport journeys across the North of England.</p>
     <p>A fast, frequent, and integrated bus network is vital to the North’s economic success. Buses also play a key role in reducing social isolation and catalysing social mobility supporting low income, young, old, and disabled passengers to access jobs, education, and services. With the appropriate investment, buses will contribute to achieving the Strategic Transport Plan ambitions:</p>
@@ -22,7 +22,7 @@ export const appConfig = {
   contactText: "Please contact Kirsten Keen for any questions on this data tool or on Transport for the North’s work supporting Bus Service Improvements.",
   contactEmail: "kirsten.keen@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
-  backgroundImage: "img/hero-image.jpg",
+  backgroundImage: "img/bsip/hero.jpg",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   appPages: [
