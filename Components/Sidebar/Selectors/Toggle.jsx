@@ -47,7 +47,7 @@ export const Toggle = ({ filter, onChange }) => {
     const selectedOption = filter.values.source === "local"
     ? filter.values.values.find(
         (option) => option.displayValue === selectedValue
-      ).paramValue
+      )
     : metadataFilters[filter.paramName][0].distinct_value.find(
         (option) => option === selectedValue
       );
