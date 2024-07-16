@@ -190,7 +190,7 @@ export const appConfig = {
             joinField: "id",
             valueField: "value",
             dataSource: "api",
-            dataPath: "/accessibility",
+            dataPath: "/api/bsip/accessibility",
             infoTextTemplate: `{filterName1} accessible within {filterName2}`,
           },
         ],
