@@ -45,6 +45,7 @@ const DropdownItem = styled(Link)`
   display: block;
   font-size: large;
   border-radius: 2px;
+  text-align: left;
   &:hover {
     background-color: ${(props) => (props.$activeLink ? "none" : "#f1f1f1")};
   }
