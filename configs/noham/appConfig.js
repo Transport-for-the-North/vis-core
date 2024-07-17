@@ -309,7 +309,7 @@ export const appConfig = {
       pageName: "Link",
       url: "/noham-links",
       type: "MapLayout",
-      category: "Links",
+      category: "Link",
       config: {
         layers: [
           {
@@ -408,7 +408,7 @@ export const appConfig = {
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      category: "Links",
+      category: "Link",
       config: {
         layers: [
           {
@@ -568,7 +568,7 @@ export const appConfig = {
       url: "/link-result-dual",
       type: "DualMapLayout",
       about: "", //To be added.
-      category: "Links",
+      category: "Link",
       config: {
         layers: [
           {
@@ -711,7 +711,7 @@ export const appConfig = {
       pageName: "Node Results",
       url: "/node-results",
       type: "MapLayout",
-      category: "Nodes",
+      category: "Node",
       about: "", //To be added.
       config: {
         layers: [
@@ -811,7 +811,7 @@ export const appConfig = {
       url: "/node-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      category: "Nodes",
+      category: "Node",
       config: {
         layers: [
           {
@@ -970,7 +970,7 @@ export const appConfig = {
       pageName: "Node Results Side-by-Side",
       url: "/node-results-dual",
       type: "DualMapLayout",
-      category: "Nodes",
+      category: "Node",
       about: "", //To be added.
       config: {
         layers: [
@@ -1114,7 +1114,7 @@ export const appConfig = {
       pageName: "Zone Results",
       url: "/zone-results",
       type: "MapLayout",
-      category: "Zones",
+      category: "Matrix Trip Ends",
       about: "", //To be added.
       config: {
         layers: [
@@ -1197,7 +1197,7 @@ export const appConfig = {
       url: "/zone-result-difference",
       type: "MapLayout",
       about: "", //To be added.
-      category: "Zones",
+      category: "Matrix Trip Ends",
       config: {
         layers: [
           {
@@ -1302,7 +1302,7 @@ export const appConfig = {
       pageName: "Zone Results Side-By-Side",
       url: "/zone-results-dual",
       type: "DualMapLayout",
-      category: "Zones",
+      category: "Matrix Trip Ends",
       about: "", //To be added.
       config: {
         layers: [
@@ -1411,7 +1411,7 @@ export const appConfig = {
       url: "/zonal-pair-difference",
       about: "",
       type: "MapLayout",
-      category: "Matrix",
+      category: "O/D Analysis",
       config: {
         layers: [
           {
@@ -1611,7 +1611,7 @@ export const appConfig = {
       url: "/zonal-pair-results",
       about: "",
       type: "MapLayout",
-      category: "Matrix",
+      category: "O/D Analysis",
       config: {
         layers: [
           {
@@ -1736,7 +1736,7 @@ export const appConfig = {
       url: "/zonal-pair-results-dual",
       about: "",
       type: "DualMapLayout",
-      category: "Matrix",
+      category: "O/D Analysis",
       config: {
         layers: [
           {
