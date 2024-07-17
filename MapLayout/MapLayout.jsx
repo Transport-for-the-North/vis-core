@@ -20,23 +20,6 @@ const MapContainer = styled.div`
   display: flex;
 `;
 
-const fetchMetadataFilters = async (pageContext, dispatch) => { 
-  const path = '/api/tame/mvdata';
-  const dataPath = { dataPath: pageContext.config.visualisations[0].dataPath };
-  try {
-    const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: true });
-    const apiFilterValues = Object.groupBy(
-      metadataFilters,
-      ({ field_name }) => field_name
-    );
-    dispatch({
-      type: "UPDATE_METADATA_FILTER",
-      payload: { metadataFilters: [apiFilterValues] },
-    });
-  }catch (error) {
-    console.error("Error fetching metadata filters", error);
-  }
-}
 
 /**
  * MapLayout component is the main layout component that composes the Map,
@@ -54,71 +37,87 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
-  const metadataFilters = [
-    {
-      field_name: "scenarioCode",
-      distinct_value: ["UAD_2052", "UAE_2042", "UAF_2052"],
-    },
-    { field_name: "timePeriodCode", distinct_value: ["all", "am", "ip"] },
-  ];
 
-  useEffect(() => async () => {
-    // Effect to initialise the filters for the map page
+  useEffect(() => {
+    initializedRef.current = false;
     // await fetchMetadataFilters(pageContext, dispatch);
+  }, [pageContext]);
+
+  useEffect(() => {
+    const fetchMetadataFilters = async (pageContext, dispatch) => { 
+      const path = '/api/tame/mvdata';
+      const dataPath = { dataPath: pageContext.config.visualisations[0].dataPath };
+      try {
+        const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: true });
+        const apiFilterValues = Object.groupBy(
+          metadataFilters,
+          ({ field_name }) => field_name
+        );
+        pageContext.config.filters.forEach((filter) => {
+          if (filter.type === "map" || filter.type === "slider" ||filter.values.source === "local") {
+            filter.actions.map((action) => {
+              if (action.action === "UPDATE_QUERY_PARAMS") {
+                let defaultValue =
+                  filter.defaultValue ||
+                  filter.min ||
+                  filter.values?.values[0]?.paramValue;
+                dispatch({
+                  type: action.action,
+                  payload: { filter, value: defaultValue },
+                });
+              } else {
+                let defaultValue =
+                  filter.defaultValue ||
+                  filter.min ||
+                  filter.values?.values[0]?.paramValue;
+                var sides = "";
+                if (filter.filterName.includes("Left")) sides = "left";
+                else if (filter.filterName.includes("Right")) sides = "right";
+                else sides = "both";
+                dispatch({
+                  type: action.action,
+                  payload: { filter, value: defaultValue, sides: sides },
+                });
+              }
+            });
+          } else {
+            filter.actions.map((action) => {
+              const defaultValue =
+                apiFilterValues[filter.paramName][0].distinct_values[0];
+              if (action.action === "UPDATE_QUERY_PARAMS") {
+                dispatch({
+                  type: action.action,
+                  payload: { filter, value: defaultValue },
+                });
+              } else {
+                var sides = "";
+                if (filter.filterName.includes("Left")) sides = "left";
+                else if (filter.filterName.includes("Right")) sides = "right";
+                else sides = "both";
+                dispatch({
+                  type: action.action,
+                  payload: { filter, value: defaultValue, sides: sides },
+                });
+              }
+            });
+          }
+        });
+        initializedRef.current = true;
+        dispatch({
+          type: "UPDATE_METADATA_FILTER",
+          payload: { metadataFilters: [apiFilterValues] },
+        });
+      }catch (error) {
+        console.error("Error fetching metadata filters", error);
+      }
+    }
+
+    // Effect to initialise the filters for the map page
     if (
       !initializedRef.current &&
       Object.keys(state.visualisations).length > 0
     ) { 
-      pageContext.config.filters.forEach((filter) => {
-        if (filter.type === "map" || filter.type === "slider" ||filter.values.source === "local") {
-          filter.actions.map((action) => {
-            if (action.action === "UPDATE_QUERY_PARAMS") {
-              let defaultValue =
-                filter.defaultValue ||
-                filter.min ||
-                filter.values?.values[0]?.paramValue;
-              dispatch({
-                type: action.action,
-                payload: { filter, value: defaultValue },
-              });
-            } else {
-              let defaultValue =
-                filter.defaultValue ||
-                filter.min ||
-                filter.values?.values[0]?.paramValue;
-              var sides = "";
-              if (filter.filterName.includes("Left")) sides = "left";
-              else if (filter.filterName.includes("Right")) sides = "right";
-              else sides = "both";
-              dispatch({
-                type: action.action,
-                payload: { filter, value: defaultValue, sides: sides },
-              });
-            }
-          });
-        } else {
-          filter.actions.map((action) => {
-            const defaultValue =
-              state.metadataFilters[0][filter.paramName][0].distinct_value[0];
-            if (action.action === "UPDATE_QUERY_PARAMS") {
-              dispatch({
-                type: action.action,
-                payload: { filter, value: defaultValue },
-              });
-            } else {
-              var sides = "";
-              if (filter.filterName.includes("Left")) sides = "left";
-              else if (filter.filterName.includes("Right")) sides = "right";
-              else sides = "both";
-              dispatch({
-                type: action.action,
-                payload: { filter, value: defaultValue, sides: sides },
-              });
-            }
-          });
-        }
-      });
-      initializedRef.current = true;
+      fetchMetadataFilters(pageContext, dispatch);
     }
   }, [
     pageContext.config.filters,
@@ -126,12 +125,11 @@ export const MapLayout = () => {
     state.visualisations,
     state.leftVisualisations,
     state.rightVisualisations,
+    state.metadataFilters,
+    pageContext,
   ]);
 
-  useEffect(() => async () => {
-    initializedRef.current = false;
-    await fetchMetadataFilters(pageContext, dispatch);
-  }, [pageContext]);
+  
   
 
   const handleFilterChange = (filter, value) => {
