@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { useMapContext } from "hooks";
+import styled from "styled-components";
 
 const StyledDropdown = styled.select`
   width: 100%;
@@ -20,6 +20,9 @@ export const Dropdown = ({ filter, onChange }) => {
   const { state } = useMapContext();
   const metadataFilters = state.metadataFilters[0];
 
+  const { state } = useMapContext();
+  const metadataFilters = state.metadataFilters[0];
+
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
     const selectedOption =
@@ -32,6 +35,7 @@ export const Dropdown = ({ filter, onChange }) => {
           );
 
     if (selectedOption) {
+      onChange(filter, selectedOption);
       onChange(filter, selectedOption);
     }
   };
