@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { useEffect, useState } from "react";
 import { useMapContext } from "hooks";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
 
 const StyledToggle = styled.div`
   width: 100%;
@@ -40,6 +40,7 @@ const StyledButton = styled.button`
 export const Toggle = ({ filter, onChange }) => {
   const { state } = useMapContext();
   const metadataFilters = state.metadataFilters[0];
+  const currentToggle = useRef(null);
   const [currentButton, setCurrentButton] = useState(filter.values.source === "local" ? filter.values.values[0] : null);
 
   const handleToggleChange = (e) => {
@@ -52,10 +53,18 @@ export const Toggle = ({ filter, onChange }) => {
         (option) => option === selectedValue
       );
     if (selectedOption) {
-      onChange(filter, selectedOption);
+      onChange(filter, filter.values.source === "local" ? selectedOption.paramValue : selectedOption);
       setCurrentButton(selectedOption);
     }
   };
+
+  //Function to reset the current button to the default value when the metadataFilters are loaded
+  useEffect(() => { 
+    if (currentToggle.current !== state.visualisations[Object.keys(state.visualisations)[0]].name && metadataFilters) {
+      currentToggle.current = state.visualisations[Object.keys(state.visualisations)[0]].name;
+      setCurrentButton(filter.values.source === "local" ? filter.values.values[0] : metadataFilters[filter.paramName][0].distinct_values[0]);
+    }
+  }, [metadataFilters, filter]);
 
   useEffect(() => {
     if(metadataFilters && currentButton === null) setCurrentButton(metadataFilters[filter.paramName][0].distinct_values[0])  
@@ -74,7 +83,7 @@ export const Toggle = ({ filter, onChange }) => {
         >
           {option.displayValue}
         </StyledButton>
-      )) : metadataFilters ? metadataFilters[filter.paramName][0].distinct_values.map((option, index) => (
+      )) : metadataFilters && metadataFilters[filter.paramName] ? metadataFilters[filter.paramName][0].distinct_values.map((option, index) => (
         <StyledButton
           key={option}
           value={option}

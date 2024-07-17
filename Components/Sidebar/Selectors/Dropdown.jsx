@@ -44,7 +44,7 @@ export const Dropdown = ({ filter, onChange }) => {
               {option.displayValue}
             </option>
           ))
-        : metadataFilters
+        : metadataFilters && metadataFilters[filter.paramName]
         ? metadataFilters[filter.paramName][0].distinct_values.map((option) => (
             <option key={option} value={option}>
               {option}
