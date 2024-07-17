@@ -27,7 +27,7 @@ export const Dropdown = ({ filter, onChange }) => {
         ? filter.values.values.find(
             (option) => option.displayValue === selectedValue
           ).paramValue
-        : metadataFilters[filter.paramName][0].distinct_value.find(
+        : metadataFilters[filter.paramName][0].distinct_values.find(
             (option) => option === selectedValue
           );
 
@@ -45,7 +45,7 @@ export const Dropdown = ({ filter, onChange }) => {
             </option>
           ))
         : metadataFilters
-        ? metadataFilters[filter.paramName][0].distinct_value.map((option) => (
+        ? metadataFilters[filter.paramName][0].distinct_values.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>

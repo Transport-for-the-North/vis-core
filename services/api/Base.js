@@ -136,6 +136,57 @@ class BaseService {
     const results = await this._get(path);
     return results;
   }
+
+  /**
+   * Makes a POST request to the specified path with data and additional options.
+   *
+   * @param {string} path - The path for the POST request.
+   * @param {Object} data - The data to be sent in the request body.
+   * @param {Object} [addOptions={}] - Additional options for the fetch request.
+   * @param {boolean} [skipAuth=false] - Flag to skip adding Authorization header.
+   * @returns {Promise<Object>} The response data.
+   */
+  async _post(path, data, addOptions = {}, skipAuth = false) {
+    const url = this._buildUrl(path);
+    const jwtToken = null; // Get the JWT token from cookies if skipAuth is false
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {}),
+        ...addOptions.headers,
+      },
+      body: JSON.stringify(data),
+      ...addOptions,
+    };
+    const result = await fetch(url, options).catch((error) =>
+      console.log(error)
+    );
+    if (!result.ok) {
+      throw new Error(`HTTP error! status: ${result.status}`);
+    }
+    const responseData = await result.json();
+    return responseData;
+  }
+  /**
+   * Makes a POST request to the specified path with data and query parameters.
+   *
+   * @param {string} [subPath=""] - The sub-path for the POST request.
+   * @param {Object} data - The data to be sent in the request body.
+   * @param {Object} [options={}] - Additional options, including query parameters.
+   * @property {Object} [options.queryParams={}] - The query parameters for the POST request.
+   * @returns {Promise<Object>} The response data.
+   */
+  async post(
+    subPath = "",
+    data,
+    options = { queryParams: {}, skipAuth: false }
+  ) {
+    const params = this._buildQuery(options?.queryParams);
+    const path = `${subPath}?${params}`;
+    const results = await this._post(path, data, {}, options.skipAuth);
+    return results;
+  }
 }
 
 export default BaseService;
