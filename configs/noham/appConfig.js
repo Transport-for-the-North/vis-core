@@ -306,7 +306,7 @@ export const appConfig = {
   logoutImage: "img/logout.png",
   appPages: [
     {
-      pageName: "Link",
+      pageName: "Single Scenario",
       url: "/noham-links",
       type: "MapLayout",
       category: "Link",
@@ -404,7 +404,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Node results definition
     {
-      pageName: "Link Difference",
+      pageName: "Difference",
       url: "/link-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -564,7 +564,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Link Side-by-Side",
+      pageName: "Side by Side",
       url: "/link-result-dual",
       type: "DualMapLayout",
       about: "", //To be added.
@@ -708,7 +708,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     //Node results definition
     {
-      pageName: "Node Results",
+      pageName: "Single Scenario",
       url: "/node-results",
       type: "MapLayout",
       category: "Node",
@@ -807,7 +807,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     //Node results difference Definition
     {
-      pageName: "Node Result Difference",
+      pageName: "Difference",
       url: "/node-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -967,7 +967,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Node Results Side-by-Side",
+      pageName: "Side by Side",
       url: "/node-results-dual",
       type: "DualMapLayout",
       category: "Node",
@@ -1111,7 +1111,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Zone results definition
     {
-      pageName: "Zone Results",
+      pageName: "Single Scenario",
       url: "/zone-results",
       type: "MapLayout",
       category: "Matrix Trip Ends",
@@ -1193,7 +1193,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     //Zone difference Definition
     {
-      pageName: "Zone Result Difference",
+      pageName: "Difference",
       url: "/zone-result-difference",
       type: "MapLayout",
       about: "", //To be added.
@@ -1299,7 +1299,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Zone Results Side-By-Side",
+      pageName: "Side By Side",
       url: "/zone-results-dual",
       type: "DualMapLayout",
       category: "Matrix Trip Ends",
@@ -1405,9 +1405,137 @@ export const appConfig = {
     },
 
     // -----------------------------------------------------------
+    // Zone Pair results definition
+    {
+      pageName: "Single Scenario",
+      url: "/zonal-pair-results",
+      about: "",
+      type: "MapLayout",
+      category: "O/D Analysis",
+      config: {
+        layers: [
+          {
+            uniqueId: "NoHAMZonalPairResults",
+            name: "ZonalPairResults",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Matrix",
+            isHoverable: true,
+            isStylable: false,
+            shouldHaveTooltipOnClick: false,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Matrix",
+            type: "joinDataToMap",
+            joinLayer: "ZonalPairResults",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/noham/zonal-pair-results",
+          },
+        ],
+        metadataLayers: [],
+        filters: [
+          {
+            filterName: "Select zone in map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "map",
+            layer: "ZonalPairResults",
+            field: "id",
+          },
+          {
+            filterName: "Choose if selected zone is origin/destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "Select Column",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: pairMetricValues,
+          },
+          {
+            filterName: "Network Scenario Name",
+            paramName: "networkScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            values: networkScenarioValues,
+          },
+          {
+            filterName: "Year",
+            paramName: "year",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            values: yearValues,
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            values: demandScenarioValues,
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["ZonalPairResults"],
+            type: "toggle",
+            values: timePeriodValues,
+          },
+          {
+            filterName: "Delivery Program",
+            paramName: "deliveryProgrammeName",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            values: deliveryProgramValues,
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClass",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            values: userClassValues,
+          },
+        ],
+      },
+    },
+
+    // -----------------------------------------------------------
     // Zone Pair difference Definition
     {
-      pageName: "Matrix Difference",
+      pageName: "Difference",
       url: "/zonal-pair-difference",
       about: "",
       type: "MapLayout",
@@ -1605,134 +1733,9 @@ export const appConfig = {
     },
 
     // -----------------------------------------------------------
-    // Zone Paire results definition
+
     {
-      pageName: "Matrix",
-      url: "/zonal-pair-results",
-      about: "",
-      type: "MapLayout",
-      category: "O/D Analysis",
-      config: {
-        layers: [
-          {
-            uniqueId: "NoHAMZonalPairResults",
-            name: "ZonalPairResults",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "zones",
-            geometryType: "polygon",
-            visualisationName: "Matrix",
-            isHoverable: true,
-            isStylable: false,
-            shouldHaveTooltipOnClick: false,
-          },
-        ],
-        visualisations: [
-          {
-            name: "Matrix",
-            type: "joinDataToMap",
-            joinLayer: "ZonalPairResults",
-            style: "polygon-continuous",
-            joinField: "id",
-            valueField: "value",
-            dataSource: "api",
-            dataPath: "/api/noham/zonal-pair-results",
-          },
-        ],
-        metadataLayers: [],
-        filters: [
-          {
-            filterName: "Select zone in map",
-            paramName: "zoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "map",
-            layer: "ZonalPairResults",
-            field: "id",
-          },
-          {
-            filterName: "Choose if selected zone is origin/destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "toggle",
-            values: originOrDestinationValues,
-          },
-          {
-            filterName: "Select Column",
-            paramName: "columnName",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: pairMetricValues,
-          },
-          {
-            filterName: "Network Scenario Name",
-            paramName: "networkScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            values: networkScenarioValues,
-          },
-          {
-            filterName: "Year",
-            paramName: "year",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            values: yearValues,
-          },
-          {
-            filterName: "Demand Scenario",
-            paramName: "demandScenarioName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            values: demandScenarioValues,
-          },
-          {
-            filterName: "Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
-            type: "toggle",
-            values: timePeriodValues,
-          },
-          {
-            filterName: "Delivery Program",
-            paramName: "deliveryProgrammeName",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            values: deliveryProgramValues,
-          },
-          {
-            filterName: "User Class",
-            paramName: "userClass",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            values: userClassValues,
-          },
-        ],
-      },
-    },
-    {
-      pageName: "Matrix Side-by-Side",
+      pageName: "Side by Side",
       url: "/zonal-pair-results-dual",
       about: "",
       type: "DualMapLayout",
