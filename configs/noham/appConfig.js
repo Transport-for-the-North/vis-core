@@ -1182,7 +1182,7 @@ export const appConfig = {
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZoneResults"],
+            visualisations: ["Zone Results"],
             type: "toggle",
             values: timePeriodValues,
           },
