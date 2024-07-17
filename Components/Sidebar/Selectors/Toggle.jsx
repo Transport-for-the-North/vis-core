@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { useEffect, useState } from "react";
 import { useMapContext } from "hooks";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
 
 const StyledToggle = styled.div`
   width: 100%;
