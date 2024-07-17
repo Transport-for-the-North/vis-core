@@ -48,7 +48,7 @@ export const Toggle = ({ filter, onChange }) => {
     ? filter.values.values.find(
         (option) => option.displayValue === selectedValue
       )
-    : metadataFilters[filter.paramName][0].distinct_value.find(
+    : metadataFilters[filter.paramName][0].distinct_values.find(
         (option) => option === selectedValue
       );
     if (selectedOption) {
@@ -58,7 +58,7 @@ export const Toggle = ({ filter, onChange }) => {
   };
 
   useEffect(() => {
-    if(metadataFilters && currentButton === null) setCurrentButton(metadataFilters[filter.paramName][0].distinct_value[0])  
+    if(metadataFilters && currentButton === null) setCurrentButton(metadataFilters[filter.paramName][0].distinct_values[0])  
   }, [metadataFilters, currentButton, filter.paramName])
 
   return (
@@ -74,13 +74,13 @@ export const Toggle = ({ filter, onChange }) => {
         >
           {option.displayValue}
         </StyledButton>
-      )) : metadataFilters ? metadataFilters[filter.paramName][0].distinct_value.map((option, index) => (
+      )) : metadataFilters ? metadataFilters[filter.paramName][0].distinct_values.map((option, index) => (
         <StyledButton
           key={option}
           value={option}
           onClick={handleToggleChange}
           $isSelected={currentButton === option}
-          size={metadataFilters[filter.paramName][0].distinct_value.length}
+          size={metadataFilters[filter.paramName][0].distinct_values.length}
           index={index}
         >
           {option}
