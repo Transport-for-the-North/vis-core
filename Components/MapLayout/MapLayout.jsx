@@ -20,23 +20,6 @@ const MapContainer = styled.div`
   display: flex;
 `;
 
-const fetchMetadataFilters = async (pageContext, dispatch) => { 
-  const path = '/api/tame/mvdata';
-  const dataPath = { dataPath: pageContext.config.visualisations[0].dataPath };
-  try {
-    const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: true });
-    const apiFilterValues = Object.groupBy(
-      metadataFilters,
-      ({ field_name }) => field_name
-    );
-    dispatch({
-      type: "UPDATE_METADATA_FILTER",
-      payload: { metadataFilters: [apiFilterValues] },
-    });
-  }catch (error) {
-    console.error("Error fetching metadata filters", error);
-  }
-}
 
 /**
  * MapLayout component is the main layout component that composes the Map,
@@ -54,13 +37,6 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
-  const metadataFilters = [
-    {
-      field_name: "scenarioCode",
-      distinct_value: ["UAD_2052", "UAE_2042", "UAF_2052"],
-    },
-    { field_name: "timePeriodCode", distinct_value: ["all", "am", "ip"] },
-  ];
 
   useEffect(() => {
     initializedRef.current = false;
