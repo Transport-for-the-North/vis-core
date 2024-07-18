@@ -1,5 +1,5 @@
 import { useMapContext } from "hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 
 const StyledToggle = styled.div`
