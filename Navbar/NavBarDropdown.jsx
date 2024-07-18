@@ -18,7 +18,7 @@ const DropdownContainer = styled.div`
   display: flex;
   align-items: center; /* Vertically centre text */
   justify-content: center; /* Centre text horizontally */
-  border-bottom-right-radius: 40px;
+  border-bottom-right-radius: 20px;
 
   @media only screen and (max-width: 1165px) {
     font-size: large;
