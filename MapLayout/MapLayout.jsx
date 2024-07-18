@@ -20,7 +20,6 @@ const MapContainer = styled.div`
   display: flex;
 `;
 
-
 /**
  * MapLayout component is the main layout component that composes the Map,
  * Sidebar, and MapLayerSection components. It serves as the container for
@@ -43,7 +42,65 @@ export const MapLayout = () => {
     // await fetchMetadataFilters(pageContext, dispatch);
   }, [pageContext]);
 
+  /**
+   * Effect to initialize the filters for the map page.
+   *
+   * This effect runs once when the component mounts and whenever the dependencies change.
+   * It checks if the filters have been initialized and if there are visualizations available in the state.
+   * If the filters are not initialized and visualizations are available, it calls the fetchMetadataFilters function.
+   *
+   * @effect
+   * @dependencies
+   * - pageContext.config.filters
+   * - dispatch
+   * - state.visualisations
+   * - state.leftVisualisations
+   * - state.rightVisualisations
+   * - state.metadataFilters
+   * - pageContext
+   */
   useEffect(() => {
+    /**
+     * Asynchronously fetches metadata filters from a specified API endpoint and updates the application state based on the retrieved data.
+     *
+     * @async
+     * @function fetchMetadataFilters
+     * @param {Object} pageContext - An object containing the configuration and context for the current page.
+     * @param {Function} dispatch - Function to dispatch actions to the application state.
+     * @returns {Promise<void>} This function does not return a value but performs side effects by dispatching actions.
+     *
+     * @example
+     * const pageContext = {
+     *   config: {
+     *     visualisations: [{ dataPath: "/path/to/data" }],
+     *     filters: [
+     *       {
+     *         type: "map",
+     *         values: { source: "api" },
+     *         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+     *         defaultValue: "default",
+     *         min: 0,
+     *         filterName: "exampleFilter",
+     *         paramName: "exampleParam",
+     *       },
+     *     ],
+     *   },
+     * };
+     *
+     * const dispatch = (action) => {
+     *   // Dispatch action to the application state
+     * };
+     *
+     * fetchMetadataFilters(pageContext, dispatch);
+     *
+     * @implementation
+     * API Call: The function makes a POST request to the /api/tame/mvdata endpoint with the dataPath from the first visualization in the pageContext.
+     * Processing Filters: It processes each filter in the pageContext.config.filters array:
+     * - For filters of type "map", "slider", or with local values, it dispatches actions to update query parameters or other states.
+     * - For other filters, it uses the apiFilterValues to determine the default value and dispatches actions accordingly.
+     * Dispatching Actions: The function dispatches actions to update the application state with the default values and metadata filters.
+     * Error Handling: If an error occurs during the API call, it logs the error to the console.
+     */
     const fetchMetadataFilters = async (pageContext, dispatch) => {
       const path = "/api/tame/mvdata";
       const dataPath = {
@@ -94,7 +151,7 @@ export const MapLayout = () => {
                 ? filter.paramName.replace("DoMinimum", "")
                 : filter.paramName.includes("DoSomething")
                 ? filter.paramName.replace("DoSomething", "")
-                  : filter.paramName;
+                : filter.paramName;
               const defaultValue =
                 apiFilterValues[baseParamName][0].distinct_values[0];
               if (action.action === "UPDATE_QUERY_PARAMS") {
@@ -125,7 +182,6 @@ export const MapLayout = () => {
       }
     };
 
-    // Effect to initialise the filters for the map page
     if (
       !initializedRef.current &&
       Object.keys(state.visualisations).length > 0
