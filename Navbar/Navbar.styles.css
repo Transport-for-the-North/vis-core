@@ -10,43 +10,50 @@
   --tfnPurple: #7317de;
   --standardFontFamily: "Hanken Grotesk", sans-serif;
 }
-.NavButton {
+
+.NavButton,
+.ActiveNavButton {
   color: #4b3e91;
   font-family: var(--standardFontFamily);
   font-size: larger;
-  text-decoration: 0;
+  text-decoration: none;
   width: 12%;
   max-width: 270px;
   text-align: center;
+  position: relative; /* Added to allow dropdown alignment */
+  height: 100%; /* Full height of navbar */
+  display: flex;
+  align-items: center; /* Vertically centre text */
+  justify-content: center; /* Centre text horizontally */
+  border-bottom-right-radius: 65px;
+  transition: background-color 0.3s;
+}
+
+.NavButton:hover,
+.ActiveNavButton:hover {
+  background-color: var(--tfnPurple);
+  color: white;
 }
 
 .ActiveNavButton {
-  display: grid;
   background-color: var(--tfnPurple);
   color: white;
-  font-family: var(--standardFontFamily);
-  font-size: larger;
-  text-decoration: 0;
-  width: 12%;
-  max-width: 270px;
-  text-align: center;
-  height: 100%;
-  align-content: center;
-  border-bottom-right-radius: 65px;
-  border-bottom-left-radius: 5px;
 }
 
 .empty-blank-nav {
   width: 100%;
   height: 75px;
 }
+
 .Button {
   display: none;
 }
+
 .sideNavbar-notShown {
   transition: left 0.5s cubic-bezier(0, 0, 0, 1.28);
   opacity: 0;
 }
+
 .sideNavbar-shown {
   transition: left 0.5s ease-out;
   overflow-y: auto;
@@ -69,26 +76,22 @@
 }
 
 @media only screen and (max-width: 1165px) {
-  .ActiveNavButton {
+  .ActiveNavButton,
+  .NavButton {
     font-size: large;
     border-bottom-right-radius: 30px;
-    border-bottom-left-radius: 5px;
-  }
-
-  .NavButton {
-    font-size: large;
   }
 }
+
 @media only screen and (max-width: 930px) {
-  .NavButton {
+  .NavButton,
+  .ActiveNavButton {
     width: 10%;
   }
 }
 
 @media only screen and (max-width: 765px) {
-  .NavButton {
-    display: none;
-  }
+  .NavButton,
   .ActiveNavButton {
     display: none;
   }
@@ -145,19 +148,18 @@
     padding: 4vh 0;
   }
 
-  .scrollable{
+  .scrollable {
     padding-bottom: 100px;
     padding-right: 25px;
     display: flex;
     flex-direction: row-reverse;
   }
 
-  .notScrollable{
+  .notScrollable {
     display: inherit;
     position: absolute;
     bottom: 100px;
     right: 25px;
-
   }
 }
 
