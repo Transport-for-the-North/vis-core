@@ -13,12 +13,12 @@ const DropdownContainer = styled.div`
   max-width: 270px;
   text-align: center;
   cursor: pointer;
-  padding: 0 5px;
+  padding: 0 5px 0 5px;
   height: 100%; /* Full height of navbar */
   display: flex;
   align-items: center; /* Vertically centre text */
   justify-content: center; /* Centre text horizontally */
-  border-bottom-right-radius: 65px;
+  border-bottom-right-radius: 40px;
 
   @media only screen and (max-width: 1165px) {
     font-size: large;
@@ -50,11 +50,11 @@ const DropdownMenu = styled.div`
 
 const DropdownItem = styled(Link)`
   width: 100%;
-  padding: 12px 10px; /* Adjusted padding */
+  padding: 12px 10px 12px 10px; /* Adjusted padding */
   text-decoration: none;
   display: block;
-  font-size: large;
-  border-radius: 2px;
+  font-size: smaller;
+  border-radius: 0px;
   text-align: left;
   box-sizing: border-box; /* Ensure padding is inside the container */
   &:hover {
