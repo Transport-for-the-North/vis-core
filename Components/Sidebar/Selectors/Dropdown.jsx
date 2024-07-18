@@ -19,6 +19,11 @@ const StyledDropdown = styled.select`
 export const Dropdown = ({ filter, onChange }) => {
   const { state } = useMapContext();
   const metadataFilters = state.metadataFilters[0];
+  const baseParamName = filter.paramName.includes("DoMinimum")
+    ? filter.paramName.replace("DoMinimum", "")
+    : filter.paramName.includes("DoSomething")
+    ? filter.paramName.replace("DoSomething", "")
+    : filter.paramName;
 
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
@@ -27,7 +32,7 @@ export const Dropdown = ({ filter, onChange }) => {
         ? filter.values.values.find(
             (option) => option.displayValue === selectedValue
           ).paramValue
-        : metadataFilters[filter.paramName][0].distinct_values.find(
+        : metadataFilters[baseParamName][0].distinct_values.find(
             (option) => option === selectedValue
           );
 
@@ -44,8 +49,8 @@ export const Dropdown = ({ filter, onChange }) => {
               {option.displayValue}
             </option>
           ))
-        : metadataFilters && metadataFilters[filter.paramName]
-        ? metadataFilters[filter.paramName][0].distinct_values.map((option) => (
+        : metadataFilters && metadataFilters[baseParamName]
+        ? metadataFilters[baseParamName][0].distinct_values.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>

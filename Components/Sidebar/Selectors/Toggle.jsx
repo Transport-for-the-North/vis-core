@@ -16,16 +16,19 @@ const StyledButton = styled.button`
   background-color: ${(props) => (props.$isSelected ? "#7317DE" : "white")};
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   //These lines are to verify if the button is at the far left and then add a border-radius on the left to be sure not overlapping the box borders
-  border-top-left-radius: ${(props) => (props.index === 0 ? "4px" : "0px")}; 
+  border-top-left-radius: ${(props) => (props.index === 0 ? "4px" : "0px")};
   border-bottom-left-radius: ${(props) => (props.index === 0 ? "4px" : "0px")};
   //These lines are to verify if the button is at the far right and then add a border-radius on the right to be sure not overlapping the box borders
-  border-top-right-radius: ${(props) => (props.index === props.size-1 ? "4px" : "0px")};
-  border-bottom-right-radius: ${(props) => (props.index === props.size - 1 ? "4px" : "0px")};
+  border-top-right-radius: ${(props) =>
+    props.index === props.size - 1 ? "4px" : "0px"};
+  border-bottom-right-radius: ${(props) =>
+    props.index === props.size - 1 ? "4px" : "0px"};
   //If the button is not at one of the extremities, add some border to make a separation
-  border-style: ${(props) => (props.index !== 0 ? "none none none solid" : "none")};
+  border-style: ${(props) =>
+    props.index !== 0 ? "none none none solid" : "none"};
   border-width: 0.25px;
   width: ${(props) => 100 / props.size + "%"};
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: "Hanken Grotesk", sans-serif;
 `;
 
 /**
@@ -41,60 +44,91 @@ export const Toggle = ({ filter, onChange }) => {
   const { state } = useMapContext();
   const metadataFilters = state.metadataFilters[0];
   const currentToggle = useRef(null);
-  const [currentButton, setCurrentButton] = useState(filter.values.source === "local" ? filter.values.values[0] : null);
+  const [currentButton, setCurrentButton] = useState(
+    filter.values.source === "local" ? filter.values.values[0] : null
+  );
+  const baseParamName = filter.paramName.includes("DoMinimum")
+    ? filter.paramName.replace("DoMinimum", "")
+    : filter.paramName.includes("DoSomething")
+    ? filter.paramName.replace("DoSomething", "")
+    : filter.paramName;
 
   const handleToggleChange = (e) => {
     const selectedValue = e.target.value;
-    const selectedOption = filter.values.source === "local"
-    ? filter.values.values.find(
-        (option) => option.displayValue === selectedValue
-      )
-    : metadataFilters[filter.paramName][0].distinct_values.find(
-        (option) => option === selectedValue
-      );
+    const selectedOption =
+      filter.values.source === "local"
+        ? filter.values.values.find(
+            (option) => option.displayValue === selectedValue
+          )
+        : metadataFilters[baseParamName][0].distinct_values.find(
+            (option) => option === selectedValue
+          );
     if (selectedOption) {
-      onChange(filter, filter.values.source === "local" ? selectedOption.paramValue : selectedOption);
+      onChange(
+        filter,
+        filter.values.source === "local"
+          ? selectedOption.paramValue
+          : selectedOption
+      );
       setCurrentButton(selectedOption);
     }
   };
 
   //Function to reset the current button to the default value when the metadataFilters are loaded
-  useEffect(() => { 
-    if (currentToggle.current !== state.visualisations[Object.keys(state.visualisations)[0]].name && metadataFilters) {
-      currentToggle.current = state.visualisations[Object.keys(state.visualisations)[0]].name;
-      setCurrentButton(filter.values.source === "local" ? filter.values.values[0] : metadataFilters[filter.paramName][0].distinct_values[0]);
+  useEffect(() => {
+    if (
+      metadataFilters &&
+      currentToggle.current !==
+        state.visualisations[Object.keys(state.visualisations)[0]].name
+    ) {
+      currentToggle.current =
+        state.visualisations[Object.keys(state.visualisations)[0]].name;
+      setCurrentButton(
+        filter.values.source === "local"
+          ? filter.values.values[0]
+          : metadataFilters[baseParamName][0].distinct_values[0]
+      );
     }
   }, [metadataFilters, filter]);
 
   useEffect(() => {
-    if(metadataFilters && currentButton === null) setCurrentButton(metadataFilters[filter.paramName][0].distinct_values[0])  
-  }, [metadataFilters, currentButton, filter.paramName])
+    if (metadataFilters && currentButton === null)
+      setCurrentButton(metadataFilters[baseParamName][0].distinct_values[0]);
+  }, [metadataFilters, currentButton, filter.paramName]);
 
   return (
     <StyledToggle>
-      {filter.values.source === "local" ? filter.values.values.map((option, index) => (
-        <StyledButton
-          key={option.paramValue}
-          value={option.displayValue}
-          onClick={handleToggleChange}
-          $isSelected={currentButton.displayValue === option.displayValue}
-          size={filter.values.values.length}
-          index={index}
-        >
-          {option.displayValue}
-        </StyledButton>
-      )) : metadataFilters && metadataFilters[filter.paramName] ? metadataFilters[filter.paramName][0].distinct_values.map((option, index) => (
-        <StyledButton
-          key={option}
-          value={option}
-          onClick={handleToggleChange}
-          $isSelected={currentButton === option}
-          size={metadataFilters[filter.paramName][0].distinct_values.length}
-          index={index}
-        >
-          {option}
-        </StyledButton>
-      ) ) : null}
+      {filter.values.source === "local"
+        ? filter.values.values.map((option, index) => (
+            <StyledButton
+              key={option.paramValue}
+              value={option.displayValue}
+              onClick={handleToggleChange}
+              $isSelected={currentButton.displayValue === option.displayValue}
+              size={filter.values.values.length}
+              index={index}
+            >
+              {option.displayValue}
+            </StyledButton>
+          ))
+        : metadataFilters && metadataFilters[baseParamName]
+        ? metadataFilters[baseParamName][0].distinct_values.map( 
+            (option, index) => (
+              <StyledButton
+                key={option}
+                value={option}
+                onClick={handleToggleChange}
+                $isSelected={currentButton === option}
+                size={
+                  metadataFilters[baseParamName][0].distinct_values.length
+                }
+                index={index}
+              >
+                {option}
+              </StyledButton>
+            )
+          )
+        : null}
     </StyledToggle>
   );
 };

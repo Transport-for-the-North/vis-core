@@ -148,7 +148,7 @@ class BaseService {
    */
   async _post(path, data, addOptions = {}, skipAuth = false) {
     const url = this._buildUrl(path);
-    const jwtToken = null; // Get the JWT token from cookies if skipAuth is false
+    const jwtToken = process.env.REACT_APP_TAME_WEB_API_JWT; // Get the JWT token from cookies if skipAuth is false
     const options = {
       method: "POST",
       headers: {
