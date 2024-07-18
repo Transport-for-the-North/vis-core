@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext } from "hooks";
-import { loremIpsum } from "utils";
-import Map from "./Map";
-import DualMaps from "./DualMaps";
 import { api } from "services";
+import { loremIpsum } from "utils";
+import DualMaps from "./DualMaps";
+import Map from "./Map";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -19,6 +19,24 @@ const MapContainer = styled.div`
   position: relative;
   display: flex;
 `;
+
+const fetchMetadataFilters = async (pageContext, dispatch) => { 
+  const path = '/api/tame/mvdata';
+  const dataPath = { dataPath: pageContext.config.visualisations[0].dataPath };
+  try {
+    const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: true });
+    const apiFilterValues = Object.groupBy(
+      metadataFilters,
+      ({ field_name }) => field_name
+    );
+    dispatch({
+      type: "UPDATE_METADATA_FILTER",
+      payload: { metadataFilters: [apiFilterValues] },
+    });
+  }catch (error) {
+    console.error("Error fetching metadata filters", error);
+  }
+}
 
 /**
  * MapLayout component is the main layout component that composes the Map,
@@ -36,6 +54,13 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
+  const metadataFilters = [
+    {
+      field_name: "scenarioCode",
+      distinct_value: ["UAD_2052", "UAE_2042", "UAF_2052"],
+    },
+    { field_name: "timePeriodCode", distinct_value: ["all", "am", "ip"] },
+  ];
 
   useEffect(() => {
     initializedRef.current = false;
@@ -155,8 +180,13 @@ export const MapLayout = () => {
         if (filter.filterName.includes("Left")) sides = "left";
         else if (filter.filterName.includes("Right")) sides = "right";
         else sides = "both";
+        var sides = "";
+        if (filter.filterName.includes("Left")) sides = "left";
+        else if (filter.filterName.includes("Right")) sides = "right";
+        else sides = "both";
         dispatch({
           type: action.action,
+          payload: { filter, value, sides },
           payload: { filter, value, sides },
         });
       });
