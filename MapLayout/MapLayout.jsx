@@ -20,7 +20,6 @@ const MapContainer = styled.div`
   display: flex;
 `;
 
-
 /**
  * MapLayout component is the main layout component that composes the Map,
  * Sidebar, and MapLayerSection components. It serves as the container for
@@ -44,17 +43,25 @@ export const MapLayout = () => {
   }, [pageContext]);
 
   useEffect(() => {
-    const fetchMetadataFilters = async (pageContext, dispatch) => { 
-      const path = '/api/tame/mvdata';
-      const dataPath = { dataPath: pageContext.config.visualisations[0].dataPath };
+    const fetchMetadataFilters = async (pageContext, dispatch) => {
+      const path = "/api/tame/mvdata";
+      const dataPath = {
+        dataPath: pageContext.config.visualisations[0].dataPath,
+      };
       try {
-        const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: true });
+        const metadataFilters = await api.baseService.post(path, dataPath, {
+          skipAuth: false,
+        });
         const apiFilterValues = Object.groupBy(
           metadataFilters,
           ({ field_name }) => field_name
         );
         pageContext.config.filters.forEach((filter) => {
-          if (filter.type === "map" || filter.type === "slider" ||filter.values.source === "local") {
+          if (
+            filter.type === "map" ||
+            filter.type === "slider" ||
+            filter.values.source === "local"
+          ) {
             filter.actions.map((action) => {
               if (action.action === "UPDATE_QUERY_PARAMS") {
                 let defaultValue =
@@ -82,8 +89,13 @@ export const MapLayout = () => {
             });
           } else {
             filter.actions.map((action) => {
+              const baseParamName = filter.paramName.includes("DoMinimum")
+                ? filter.paramName.replace("DoMinimum", "")
+                : filter.paramName.includes("DoSomething")
+                ? filter.paramName.replace("DoSomething", "")
+                  : filter.paramName;
               const defaultValue =
-                apiFilterValues[filter.paramName][0].distinct_values[0];
+                apiFilterValues[baseParamName][0].distinct_values[0];
               if (action.action === "UPDATE_QUERY_PARAMS") {
                 dispatch({
                   type: action.action,
@@ -107,16 +119,16 @@ export const MapLayout = () => {
           type: "UPDATE_METADATA_FILTER",
           payload: { metadataFilters: [apiFilterValues] },
         });
-      }catch (error) {
+      } catch (error) {
         console.error("Error fetching metadata filters", error);
       }
-    }
+    };
 
     // Effect to initialise the filters for the map page
     if (
       !initializedRef.current &&
       Object.keys(state.visualisations).length > 0
-    ) { 
+    ) {
       fetchMetadataFilters(pageContext, dispatch);
     }
   }, [
@@ -128,9 +140,6 @@ export const MapLayout = () => {
     state.metadataFilters,
     pageContext,
   ]);
-
-  
-  
 
   const handleFilterChange = (filter, value) => {
     if (!filter.visualisations[0].includes("Side")) {
