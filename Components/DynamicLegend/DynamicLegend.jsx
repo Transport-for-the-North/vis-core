@@ -107,7 +107,7 @@ const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "string") {
     // Simple color value
-    return null;
+    return expression;
   } else if (Array.isArray(expression)) {
     // Handle different types of expressions
     switch (expression[0]) {
@@ -323,7 +323,7 @@ export const DynamicLegend = ({ map }) => {
         <div key={index}>
           <LegendTitle>{item.title}</LegendTitle>
           <LegendSubtitle>{item.subtitle}</LegendSubtitle>
-          {item.colorStops &&
+          {typeof item.colorStops !== "string" &&
             !item.widthStops &&
             item.colorStops.map((stop, idx) => (
               <LegendItem key={idx}>
@@ -334,16 +334,16 @@ export const DynamicLegend = ({ map }) => {
               </LegendItem>
             ))}
           {item.widthStops &&
-            !item.colorStops &&
+            typeof item.colorStops === "string" &&
             item.widthStops.map((stop, idx) => (
               <LegendItem key={idx}>
-                <WidthSwatch width={stop.width} />
+                <WidthSwatch width={stop.width} color={item.colorStops} />
                 <LegendLabel>
                   {stop.value !== undefined ? `${stop.value}` : "Width"}
                 </LegendLabel>
               </LegendItem>
             ))}
-          {item.widthStops && item.colorStops && (
+          {item.widthStops && typeof item.colorStops !== "string" && (
             <>
               {item.widthStops.slice(1)
                 .reduceRight((acc, stop) => {
