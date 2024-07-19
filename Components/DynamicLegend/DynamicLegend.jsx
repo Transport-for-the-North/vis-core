@@ -13,7 +13,7 @@ const LegendContainer = styled.div`
   padding: 15px;
   border-radius: 10px;
   z-index: 10;
-  max-height: 300px;
+  max-height: 315px;
   overflow-y: auto;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
@@ -345,7 +345,7 @@ export const DynamicLegend = ({ map }) => {
             ))}
           {item.widthStops && item.colorStops && (
             <>
-              {item.widthStops
+              {item.widthStops.slice(1)
                 .reduceRight((acc, stop) => {
                   acc.push(stop);
                   return acc;
@@ -357,11 +357,11 @@ export const DynamicLegend = ({ map }) => {
                       color={item.colorStops[0].color}
                     />
                     <LegendLabel>
-                      {stop.value !== undefined ? `${stop.value}` : "Width"}
+                      {stop.value !== undefined ? `-${stop.value}` : "Width"}
                     </LegendLabel>
                   </LegendItem>
                 ))}
-              {item.widthStops.slice(1).map((stop, idx) => (
+              {item.widthStops.map((stop, idx) => (
                 <LegendItem key={idx}>
                   <WidthSwatch
                     width={stop.width}
