@@ -265,7 +265,6 @@ export const reclassifyData = (data, style, classificationMethod) => {
       absValues = absValues.map(replaceZeroValues)
     }
     roundedBins = roundedBins.filter((value) => value !== 0)
-    console.log(roundedBins);
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map(val => -val);
     return [...negativeBins, 0, ...roundedBins];
