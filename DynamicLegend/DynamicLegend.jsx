@@ -246,7 +246,7 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
-  const config = useContext(AppContext); // Accessing config from AppContexte
+  const config = useContext(AppContext); // Accessing config from AppContext
 
   useEffect(() => {
     if (!map) return;
@@ -293,11 +293,6 @@ export const DynamicLegend = ({ map }) => {
             paintProps["fill-color"]
           );
           const widthStops = interpretWidthExpression(paintProps["line-width"]);
-          // if (widthStops !== null) {
-          //   var index = widthStops.map(function(o) { return o.value; }).indexOf("0");
-          //   console.log(widthStops);
-          //   console.log(index);
-          // }
           return { 
             title: displayValue,
             subtitle: legendSubtitleText,
