@@ -246,7 +246,7 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
-  const config = useContext(AppContext); // Accessing config from AppContext
+  const config = useContext(AppContext); // Accessing config from AppContexte
 
   useEffect(() => {
     if (!map) return;
@@ -293,6 +293,11 @@ export const DynamicLegend = ({ map }) => {
             paintProps["fill-color"]
           );
           const widthStops = interpretWidthExpression(paintProps["line-width"]);
+          // if (widthStops !== null) {
+          //   var index = widthStops.map(function(o) { return o.value; }).indexOf("0");
+          //   console.log(widthStops);
+          //   console.log(index);
+          // }
           return { 
             title: displayValue,
             subtitle: legendSubtitleText,
@@ -345,7 +350,7 @@ export const DynamicLegend = ({ map }) => {
             ))}
           {item.widthStops && item.colorStops && (
             <>
-              {item.widthStops
+              {item.widthStops.slice(1)
                 .reduceRight((acc, stop) => {
                   acc.push(stop);
                   return acc;
@@ -357,11 +362,11 @@ export const DynamicLegend = ({ map }) => {
                       color={item.colorStops[0].color}
                     />
                     <LegendLabel>
-                      {stop.value !== undefined ? `${stop.value}` : "Width"}
+                      {stop.value !== undefined ? `-${stop.value}` : "Width"}
                     </LegendLabel>
                   </LegendItem>
                 ))}
-              {item.widthStops.slice(1).map((stop, idx) => (
+              {item.widthStops.map((stop, idx) => (
                 <LegendItem key={idx}>
                   <WidthSwatch
                     width={stop.width}
