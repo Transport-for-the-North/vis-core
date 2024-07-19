@@ -134,11 +134,11 @@ const LayerControlEntry = memo(
             onChange={handleOpacityChange}
           />
         </OpacityControl>
-        {layer.type !== "line" && <ColourSchemeDropdown
+        <ColourSchemeDropdown
           colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
           handleColorChange={handleColorChange}
           layerName={layer.id}
-        />}
+        />
       </LayerControlContainer>
     );
   }
