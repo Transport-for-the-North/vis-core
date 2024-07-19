@@ -81,7 +81,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
       };
     case "line-continuous":
       return {
-        "line-color": "rgba(0, 0, 255, 1)",
+        "line-color": colours[colours.length - 1],
         "line-width": [
           "interpolate",
           ["linear"],
