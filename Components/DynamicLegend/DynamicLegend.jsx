@@ -107,7 +107,7 @@ const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "string") {
     // Simple color value
-    return expression;
+    return null;
   } else if (Array.isArray(expression)) {
     // Handle different types of expressions
     switch (expression[0]) {
@@ -285,7 +285,6 @@ export const DynamicLegend = ({ map }) => {
             displayValue = legendTexts[index]?.displayValue || title;
             legendSubtitleText = legendTexts[index]?.legendSubtitleText || ""; // Default subtitle if legendFilter is not found
           }
-    
           const paintProps = layer.paint;
           const colorStops = interpretColorExpression(
             paintProps["line-color"] ||
@@ -297,7 +296,8 @@ export const DynamicLegend = ({ map }) => {
             title: displayValue,
             subtitle: legendSubtitleText,
             colorStops, 
-            widthStops 
+            widthStops, 
+            style: layer.metadata.colorStyle,
           };
         });
       setLegendItems(items);
@@ -323,7 +323,7 @@ export const DynamicLegend = ({ map }) => {
         <div key={index}>
           <LegendTitle>{item.title}</LegendTitle>
           <LegendSubtitle>{item.subtitle}</LegendSubtitle>
-          {typeof item.colorStops !== "string" &&
+          {item.colorStops &&
             !item.widthStops &&
             item.colorStops.map((stop, idx) => (
               <LegendItem key={idx}>
@@ -334,16 +334,16 @@ export const DynamicLegend = ({ map }) => {
               </LegendItem>
             ))}
           {item.widthStops &&
-            typeof item.colorStops === "string" &&
+            item.style === "continuous" &&
             item.widthStops.map((stop, idx) => (
               <LegendItem key={idx}>
-                <WidthSwatch width={stop.width} color={item.colorStops} />
+                <WidthSwatch width={stop.width} color={item.colorStops[idx].color} />
                 <LegendLabel>
                   {stop.value !== undefined ? `${stop.value}` : "Width"}
                 </LegendLabel>
               </LegendItem>
             ))}
-          {item.widthStops && typeof item.colorStops !== "string" && (
+          {item.widthStops && item.style === "diverging" && (
             <>
               {item.widthStops.slice(1)
                 .reduceRight((acc, stop) => {
