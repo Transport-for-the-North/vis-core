@@ -63,6 +63,18 @@ const yearValues = {
       displayValue: "2033",
       paramValue: 2033,
     },
+    {
+      displayValue: "2035",
+      paramValue: 2035,
+    },
+    {
+      displayValue: "2042",
+      paramValue: 2042,
+    },
+    {
+      displayValue: "2052",
+      paramValue: 2052,
+    },
   ],
 }
 
@@ -250,6 +262,11 @@ const pairMetricValues = {
   source: "local",
   values: [
     {
+      displayValue: "Travel Time",
+      paramValue: "travel_time_secs",
+      legendSubtitleText: "seconds"
+    },
+    {
       displayValue: 'VOC',
       paramValue: 'voc_perc',
       legendSubtitleText: "%"
@@ -258,11 +275,6 @@ const pairMetricValues = {
       displayValue: "Vehicle Trips",
       paramValue: "trips_veh",
       legendSubtitleText: "unit"
-    },
-    {
-      displayValue: "Travel Time",
-      paramValue: "travel_time_secs",
-      legendSubtitleText: "seconds"
     },
     {
       displayValue: "Distance",
@@ -1274,6 +1286,17 @@ export const appConfig = {
               source: "api",
             },
           },
+          {
+            filterName: "User Class",
+            paramName: "userClassCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Results"],
+            type: "dropdown",
+              values: {
+                  source: "api",
+                },
+            },
         ]
       }
     },
@@ -1357,9 +1380,20 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
-            type: "dropdown",
+            type: "toggle",
             values: {
               source: "api",
+            },
+          },
+          {
+            filterName: "First User Class",
+            paramName: "userClassCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Result Difference"],
+            type: "dropdown",
+            values: {
+                 source: "api",
             },
           },
           {
@@ -1395,6 +1429,17 @@ export const appConfig = {
               source: "api",
             },
           },
+          {
+            filterName: "Second User Class",
+            paramName: "userClassCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Result Difference"],
+            type: "dropdown",
+            values: {
+                source: "api",
+            },
+          }, 
         ]
       },
     },
@@ -1480,6 +1525,17 @@ export const appConfig = {
             },
           },
           {
+             filterName: "Left User Class",
+             paramName: "userClassCode",
+             target: "api",
+             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+             visualisations: ["Zone Results Side-By-Side"],
+             type: "dropdown",
+             values: {
+                 source: "api",
+             },
+          },
+          {
             filterName: "Right Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
@@ -1512,6 +1568,17 @@ export const appConfig = {
               source: "api",
             },
           },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Results Side-By-Side"],
+            type: "dropdown",
+            values: {
+              source: "api",
+            },
+          },
         ]
       }
     },
@@ -1536,7 +1603,7 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "Matrix",
             isHoverable: true,
-            isStylable: false,
+            isStylable: true,
             shouldHaveTooltipOnClick: false,
           },
         ],
@@ -1593,7 +1660,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
-            values: networkScenarioValues,
+            values: {
+              source: "api",
+            },
           },
           {
             filterName: "Year",
@@ -1611,16 +1680,20 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
-            values: demandScenarioValues,
+            values: {
+              source: "api",
+            },
           },
           {
             filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["ZonalPairResults"],
+            visualisations: ["Matrix"],
             type: "toggle",
-            values: timePeriodValues,
+            values: {
+              source: "api",
+            },
           },
           {
             filterName: "Delivery Program",
@@ -1629,7 +1702,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
-            values: deliveryProgramValues,
+            values: {
+              source: "api",
+            },
           },
           {
             filterName: "User Class",
@@ -1638,7 +1713,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
-            values: userClassValues,
+            values: {
+              source: "api",
+            },
           },
         ],
       },
@@ -1664,7 +1741,7 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "Matrix Difference",
             isHoverable: true,
-            isStylable: false,
+            isStylable: true,
             shouldHaveTooltipOnClick: false,
           },
         ],
@@ -1890,7 +1967,7 @@ export const appConfig = {
             geometryType: "polygon",
             visualisationName: "Matrix Side-by-Side",
             isHoverable: true,
-            isStylable: false,
+            isStylable: true,
             shouldHaveTooltipOnClick: false,
           },
         ],
