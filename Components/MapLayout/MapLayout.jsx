@@ -186,35 +186,41 @@ export const MapLayout = () => {
       !initializedRef.current &&
       Object.keys(state.visualisations).length > 0
     ) {
-      if (pageContext.config.visualisations[0].dataPath !== "/api/bsip/reliability") fetchMetadataFilters(pageContext, dispatch);
+      if (
+        pageContext.config.visualisations[0].dataPath !==
+        "/api/bsip/reliability"
+      )
+        fetchMetadataFilters(pageContext, dispatch);
       else {
-        pageContext.config.filters.forEach((filter) => { 
-          filter.actions.map((action) => {
-            if (action.action === "UPDATE_QUERY_PARAMS") {
-              let defaultValue =
-                filter.defaultValue ||
-                filter.min ||
-                filter.values?.values[0]?.paramValue;
-              dispatch({
-                type: action.action,
-                payload: { filter, value: defaultValue },
-              });
-            } else {
-              let defaultValue =
-                filter.defaultValue ||
-                filter.min ||
-                filter.values?.values[0]?.paramValue;
-              var sides = "";
-              if (filter.filterName.includes("Left")) sides = "left";
-              else if (filter.filterName.includes("Right")) sides = "right";
-              else sides = "both";
-              dispatch({
-                type: action.action,
-                payload: { filter, value: defaultValue, sides: sides },
-              });
-            }
+        setTimeout(() => {
+          pageContext.config.filters.forEach((filter) => {
+            filter.actions.map((action) => {
+              if (action.action === "UPDATE_QUERY_PARAMS") {
+                let defaultValue =
+                  filter.defaultValue ||
+                  filter.min ||
+                  filter.values?.values[0]?.paramValue;
+                dispatch({
+                  type: action.action,
+                  payload: { filter, value: defaultValue },
+                });
+              } else {
+                let defaultValue =
+                  filter.defaultValue ||
+                  filter.min ||
+                  filter.values?.values[0]?.paramValue;
+                var sides = "";
+                if (filter.filterName.includes("Left")) sides = "left";
+                else if (filter.filterName.includes("Right")) sides = "right";
+                else sides = "both";
+                dispatch({
+                  type: action.action,
+                  payload: { filter, value: defaultValue, sides: sides },
+                });
+              }
+            });
           });
-        });
+        }, 5);
         initializedRef.current = true;
       }
     }
