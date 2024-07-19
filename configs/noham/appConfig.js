@@ -1274,6 +1274,17 @@ export const appConfig = {
               source: "api",
             },
           },
+          {
+            filterName: "User Class",
+            paramName: "userClassCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Results"],
+            type: "dropdown",
+              values: {
+                  source: "api",
+                },
+            },
         ]
       }
     },
@@ -1361,7 +1372,18 @@ export const appConfig = {
             values: {
               source: "api",
             },
-          },
+            },
+          {
+            filterName: "First User Class",
+            paramName: "userClassCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Result Difference"],
+            type: "dropdown",
+            values: {
+                 source: "api",
+                },
+            },
           {
             filterName: "Second Demand Scenario",
             paramName: "demandScenarioNameDoMinimum",
@@ -1394,7 +1416,18 @@ export const appConfig = {
             values: {
               source: "api",
             },
-          },
+            },
+          {
+             filterName: "Second User Class",
+             paramName: "userClassCodeDoMinimum",
+             target: "api",
+             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+             visualisations: ["Zone Result Difference"],
+             type: "dropdown",
+              values: {
+                  source: "api",
+              },
+            }, 
         ]
       },
     },
@@ -1414,7 +1447,7 @@ export const appConfig = {
             path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
-            visualisationName: "Zone Results Side-By-Side",
+            visualisationName: ["Zone Results Side-By-Side"],
             isHoverable: false,
             isStylable: true
           },
@@ -1480,6 +1513,17 @@ export const appConfig = {
             },
           },
           {
+             filterName: "Left User Class",
+             paramName: "userClassCode",
+             target: "api",
+             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+             visualisations: ["Zone Results Side-By-Side"],
+             type: "dropdown",
+             values: {
+                 source: "api",
+             },
+          },
+          {
             filterName: "Right Demand Scenario",
             paramName: "demandScenarioName",
             target: "api",
@@ -1511,7 +1555,18 @@ export const appConfig = {
             values: {
               source: "api",
             },
-          },
+            },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Results Side-By-Side"],
+            type: "dropdown",
+            values: {
+                    source: "api",
+              },
+            },
         ]
       }
     },
