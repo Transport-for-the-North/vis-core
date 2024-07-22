@@ -176,7 +176,7 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Bus Accessibility",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
           },
