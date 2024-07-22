@@ -271,7 +271,7 @@ const Map = () => {
           popups.map((popup) => popup.remove());
           popups.length = 0;
         }
-        if (state.layers[layerId].shouldHaveTooltipOnClick) {
+        if (state.layers[layerId].shouldHaveTooltipOnClick|| state.layers[layerId].shouldHaveTooltipOnHover) {
           const { clickCallback, hoverCallback } = listenerCallbackRef.current[layerId];
           map.off("mousemove", hoverCallback);
           map.off("click", clickCallback);
