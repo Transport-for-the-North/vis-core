@@ -178,7 +178,7 @@ export const appConfig = {
             visualisationName: "Bus Accessibility",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [

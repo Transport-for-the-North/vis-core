@@ -335,7 +335,7 @@ export const appConfig = {
             visualisationName: "Link",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -442,7 +442,7 @@ export const appConfig = {
             visualisationName: "Link Difference",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -622,7 +622,7 @@ export const appConfig = {
             visualisationName: "Link Side-by-Side",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -782,7 +782,7 @@ export const appConfig = {
             visualisationName: "Node Results",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -887,7 +887,7 @@ export const appConfig = {
             visualisationName: "Node Result Difference",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1223,7 +1223,7 @@ export const appConfig = {
             visualisationName: "Zone Results",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1322,7 +1322,7 @@ export const appConfig = {
             visualisationName: "Zone Result Difference",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [

@@ -174,7 +174,7 @@ export const appConfig = {
             visualisationName: "Station Totals",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -256,7 +256,7 @@ export const appConfig = {
             visualisationName: "Station Totals Difference",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -360,7 +360,7 @@ export const appConfig = {
             visualisationName: "Station Totals Side-by-Side",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1356,7 +1356,7 @@ export const appConfig = {
             visualisationName: "Link Totals",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1464,7 +1464,7 @@ export const appConfig = {
             visualisationName: "Link Totals Difference",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1641,7 +1641,7 @@ export const appConfig = {
             visualisationName: "Link Totals Side-by-Side",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: true,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
