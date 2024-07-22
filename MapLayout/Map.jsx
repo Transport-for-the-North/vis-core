@@ -143,6 +143,37 @@ const Map = () => {
   );
 
   /**
+   * Handles hover events on a layer and displays a popup with information about the hovered feature.
+   * @property {Object} e - The event object containing information about the hover event.
+   * @property {string} layerId - The ID of the layer being hovered.
+   * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
+   */
+  const handleLayerHoverTooltip = useCallback((e, layerId, bufferSize) => {
+    if (popups.length !== 0) {
+      popups.map((popup) => popup.remove());
+      popups.length = 0;
+    }
+    const bufferdPoint = [
+      [e.point.x - bufferSize, e.point.y - bufferSize],
+      [e.point.x + bufferSize, e.point.y + bufferSize],
+    ];
+    const feature = map.queryRenderedFeatures(bufferdPoint, {
+      layers: [layerId],
+    });
+    if (feature.length !== 0) { 
+      const coordinates = e.lngLat;
+      const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+        feature[0].state.value ?? 0
+      }</p>`;
+      const newPopup = new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+      popups.push(newPopup);
+    }
+  }, [map, popups]);
+
+  /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
    * @property {Object} e - The event object containing information about the click event.
    * @property {string} layerId - The ID of the layer being clicked.
@@ -203,6 +234,20 @@ const Map = () => {
           map.getCanvas().style.cursor = "grab";
         });
       }
+      if (state.layers[layerId].shouldHaveTooltipOnHover) {
+        const hoverCallback = (e) => handleLayerHoverTooltip(e, layerId, state.layers[layerId].bufferSize ?? 0);
+        map.on("mousemove", hoverCallback);
+        map.on("mouseenter", layerId, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", layerId, () => {
+          map.getCanvas().style.cursor = "grab";
+        });
+        if(!listenerCallbackRef.current[layerId]) {
+          listenerCallbackRef.current[layerId] = {};
+        }
+        listenerCallbackRef.current[layerId].hoverCallback = handleLayerHoverTooltip;
+      }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
         const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
@@ -227,7 +272,8 @@ const Map = () => {
           popups.length = 0;
         }
         if (state.layers[layerId].shouldHaveTooltipOnClick) {
-          const { clickCallback } = listenerCallbackRef.current[layerId];
+          const { clickCallback, hoverCallback } = listenerCallbackRef.current[layerId];
+          map.off("mousemove", hoverCallback);
           map.off("click", clickCallback);
         }
         if (state.layers[layerId].isHoverable) {
