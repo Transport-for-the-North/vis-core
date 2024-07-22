@@ -86,14 +86,14 @@ export const Toggle = ({ filter, onChange }) => {
       setCurrentButton(
         filter.values.source === "local"
           ? filter.values.values[0]
-          : metadataFilters[baseParamName][0].distinct_values[0]
+          : metadataFilters[baseParamName]? metadataFilters[baseParamName][0].distinct_values[0] : null
       );
     }
   }, [metadataFilters, filter]);
 
   useEffect(() => {
     if (metadataFilters && currentButton === null)
-      setCurrentButton(metadataFilters[baseParamName][0].distinct_values[0]);
+      setCurrentButton(metadataFilters[baseParamName]? metadataFilters[baseParamName][0].distinct_values[0] : null);
   }, [metadataFilters, currentButton, filter.paramName]);
 
   return (
