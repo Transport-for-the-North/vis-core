@@ -622,7 +622,7 @@ export const appConfig = {
             visualisationName: "Link Side-by-Side",
             isHoverable: false,
             isStylable: true,
-            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
