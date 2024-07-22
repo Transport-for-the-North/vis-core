@@ -384,6 +384,20 @@ export const getHoverLayerStyle = (geometryType) => {
         paint: {
           "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
           "line-opacity": 0.8,
+          "line-width": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            // Specify zoom levels and corresponding line widths
+            5,
+            4, // At zoom level 5, line width will be 1
+            10,
+            8, // At zoom level 10, line width will be 2
+            15,
+            16, // At zoom level 15, line width will be 4
+            20,
+            32, // At zoom level 20, line width will be 8
+          ],
         }
       };
     case "point":

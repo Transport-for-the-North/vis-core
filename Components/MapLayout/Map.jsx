@@ -109,11 +109,15 @@ const Map = () => {
    * @property {string} layerId - The ID of the layer being hovered over.
    */
   const handleLayerHover = useCallback(
-    (e, layerId) => {
+    (e, layerId, bufferSize) => {
       if (!map || !e.point) return;
 
       const hoverLayerId = `${layerId}-hover`
-      const features = map.queryRenderedFeatures(e.point, {
+      const bufferdPoint = [
+        [e.point.x - bufferSize, e.point.y - bufferSize],
+        [e.point.x + bufferSize, e.point.y + bufferSize],
+      ];
+      const features = map.queryRenderedFeatures(bufferdPoint, {
         layers: [layerId],
       });
 
@@ -225,7 +229,7 @@ const Map = () => {
 
     Object.keys(state.layers).forEach((layerId) => {
       if (state.layers[layerId].isHoverable) {
-        map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId));
+        map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0));
         map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -277,7 +281,7 @@ const Map = () => {
           map.off("click", clickCallback);
         }
         if (state.layers[layerId].isHoverable) {
-          map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId));
+          map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0));
           map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
         }
       });
