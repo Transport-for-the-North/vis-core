@@ -248,13 +248,8 @@ export const MapLayout = () => {
         if (filter.filterName.includes("Left")) sides = "left";
         else if (filter.filterName.includes("Right")) sides = "right";
         else sides = "both";
-        var sides = "";
-        if (filter.filterName.includes("Left")) sides = "left";
-        else if (filter.filterName.includes("Right")) sides = "right";
-        else sides = "both";
         dispatch({
           type: action.action,
-          payload: { filter, value, sides },
           payload: { filter, value, sides },
         });
       });
