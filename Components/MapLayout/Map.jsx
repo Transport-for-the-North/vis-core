@@ -111,7 +111,7 @@ const Map = () => {
   const handleLayerHover = useCallback(
     (e, layerId, bufferSize) => {
       if (!map || !e.point) return;
-
+      
       const hoverLayerId = `${layerId}-hover`;
       const bufferdPoint = [
         [e.point.x - bufferSize, e.point.y - bufferSize],
@@ -120,8 +120,7 @@ const Map = () => {
       const features = map.queryRenderedFeatures(bufferdPoint, {
         layers: [layerId],
       });
-
-      if (features.length < 1) {
+      if (features.length === 0) {
         if (map.getLayer(hoverLayerId)) {
           const sourceLayer = getSourceLayer(map, layerId);
           map.setFeatureState(
@@ -131,11 +130,9 @@ const Map = () => {
         }
         return;
       }
-
       const feature = features[0];
       const source = feature.layer.source;
       const sourceLayer = feature.layer["source-layer"];
-
       if (map.getLayer(hoverLayerId)) {
         map.setFeatureState(
           { source, id: hoverIdRef.current, sourceLayer },
@@ -250,9 +247,9 @@ const Map = () => {
 
     Object.keys(state.layers).forEach((layerId) => {
       if (state.layers[layerId].isHoverable) {
-        map.on("mousemove", layerId, (e) =>
+        const layerHover = (e) =>
           handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
-        );
+        map.on("mousemove", layerHover);
         map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -260,6 +257,11 @@ const Map = () => {
         map.on("mouseleave", layerId, () => {
           map.getCanvas().style.cursor = "grab";
         });
+        if (!listenerCallbackRef.current[layerId]) {
+          listenerCallbackRef.current[layerId] = {};
+        }
+        listenerCallbackRef.current[layerId].layerHoverCallback =
+          layerHover;
       }
       if (state.layers[layerId].shouldHaveTooltipOnHover) {
         const hoverCallback = (e) =>
@@ -279,7 +281,7 @@ const Map = () => {
           listenerCallbackRef.current[layerId] = {};
         }
         listenerCallbackRef.current[layerId].hoverCallback =
-          handleLayerHoverTooltip;
+          hoverCallback;
       }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -308,9 +310,10 @@ const Map = () => {
           state.layers[layerId].shouldHaveTooltipOnClick ||
           state.layers[layerId].shouldHaveTooltipOnHover
         ) {
-          const { clickCallback, hoverCallback } =
+          const { clickCallback, hoverCallback,layerHoverCallback } =
             listenerCallbackRef.current[layerId];
           map.off("mousemove", hoverCallback);
+          map.off("mousemove", layerHoverCallback);
           map.off("click", clickCallback);
         }
         if (state.layers[layerId].isHoverable) {
