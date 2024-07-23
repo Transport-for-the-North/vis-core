@@ -18,7 +18,7 @@ const StyledMapContainer = styled.div`
 /**
  * Map component that renders a map using MapLibre GL and handles layers,
  * including hover and click interactions.
- * 
+ *
  * @returns {JSX.Element} The rendered Map component.
  */
 const Map = () => {
@@ -34,7 +34,7 @@ const Map = () => {
    * Adds a new layer to the map based on the provided layer configuration.
    * Handles both GeoJSON and tile layers and optionally adds a hover layer
    * if the layer is marked as hoverable.
-   * 
+   *
    * @param {Object} layer - The layer configuration object containing information about the layer to be added to the map.
    * @param {string} layer.name - The name of the layer.
    * @param {string} layer.type - The type of layer (e.g., "geojson" or "tile").
@@ -112,7 +112,7 @@ const Map = () => {
     (e, layerId, bufferSize) => {
       if (!map || !e.point) return;
 
-      const hoverLayerId = `${layerId}-hover`
+      const hoverLayerId = `${layerId}-hover`;
       const bufferdPoint = [
         [e.point.x - bufferSize, e.point.y - bufferSize],
         [e.point.x + bufferSize, e.point.y + bufferSize],
@@ -124,7 +124,10 @@ const Map = () => {
       if (features.length < 1) {
         if (map.getLayer(hoverLayerId)) {
           const sourceLayer = getSourceLayer(map, layerId);
-          map.setFeatureState({ source: layerId, id: hoverIdRef.current, sourceLayer }, { hover: false });
+          map.setFeatureState(
+            { source: layerId, id: hoverIdRef.current, sourceLayer },
+            { hover: false }
+          );
         }
         return;
       }
@@ -134,14 +137,23 @@ const Map = () => {
       const sourceLayer = feature.layer["source-layer"];
 
       if (map.getLayer(hoverLayerId)) {
-        map.setFeatureState({ source, id: hoverIdRef.current, sourceLayer }, { hover: false });
+        map.setFeatureState(
+          { source, id: hoverIdRef.current, sourceLayer },
+          { hover: false }
+        );
         hoverIdRef.current = feature.id;
-        map.setFeatureState({ source, id: hoverIdRef.current, sourceLayer }, { hover: true });
+        map.setFeatureState(
+          { source, id: hoverIdRef.current, sourceLayer },
+          { hover: true }
+        );
         return;
       }
 
       hoverIdRef.current = feature.id;
-      map.setFeatureState({ source, id: hoverIdRef.current, sourceLayer }, { hover: true });
+      map.setFeatureState(
+        { source, id: hoverIdRef.current, sourceLayer },
+        { hover: true }
+      );
     },
     [map]
   );
@@ -152,30 +164,36 @@ const Map = () => {
    * @property {string} layerId - The ID of the layer being hovered.
    * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
    */
-  const handleLayerHoverTooltip = useCallback((e, layerId, bufferSize) => {
-    if (popups.length !== 0) {
-      popups.map((popup) => popup.remove());
-      popups.length = 0;
-    }
-    const bufferdPoint = [
-      [e.point.x - bufferSize, e.point.y - bufferSize],
-      [e.point.x + bufferSize, e.point.y + bufferSize],
-    ];
-    const feature = map.queryRenderedFeatures(bufferdPoint, {
-      layers: [layerId],
-    });
-    if (feature.length !== 0) { 
-      const coordinates = e.lngLat;
-      const description = `<p>${feature[0].properties.name}</p><p>Value : ${
-        feature[0].state.value ?? 0
-      }</p>`;
-      const newPopup = new maplibregl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(description)
-        .addTo(map);
-      popups.push(newPopup);
-    }
-  }, [map, popups]);
+  const handleLayerHoverTooltip = useCallback(
+    (e, layerId, bufferSize) => {
+      if (popups.length !== 0) {
+        popups.map((popup) => popup.remove());
+        popups.length = 0;
+      }
+      const bufferdPoint = [
+        [e.point.x - bufferSize, e.point.y - bufferSize],
+        [e.point.x + bufferSize, e.point.y + bufferSize],
+      ];
+      let feature = [];
+      if (layerId in map.style._layers) {
+        feature = map.queryRenderedFeatures(bufferdPoint, {
+          layers: [layerId],
+        });
+      }
+      if (feature.length !== 0) {
+        const coordinates = e.lngLat;
+        const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+          feature[0].state.value ?? 0
+        }</p>`;
+        const newPopup = new maplibregl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(description)
+          .addTo(map);
+        popups.push(newPopup);
+      }
+    },
+    [map, popups]
+  );
 
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
@@ -218,7 +236,10 @@ const Map = () => {
       if (!map) return;
       if (map.getLayer(`${layerId}-hover`)) {
         const sourceLayer = getSourceLayer(map, layerId);
-        map.setFeatureState({ source: layerId, id: hoverIdRef.current, sourceLayer }, { hover: false });
+        map.setFeatureState(
+          { source: layerId, id: hoverIdRef.current, sourceLayer },
+          { hover: false }
+        );
       }
     },
     [map]
@@ -229,7 +250,9 @@ const Map = () => {
 
     Object.keys(state.layers).forEach((layerId) => {
       if (state.layers[layerId].isHoverable) {
-        map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0));
+        map.on("mousemove", layerId, (e) =>
+          handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
+        );
         map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -239,7 +262,12 @@ const Map = () => {
         });
       }
       if (state.layers[layerId].shouldHaveTooltipOnHover) {
-        const hoverCallback = (e) => handleLayerHoverTooltip(e, layerId, state.layers[layerId].bufferSize ?? 0);
+        const hoverCallback = (e) =>
+          handleLayerHoverTooltip(
+            e,
+            layerId,
+            state.layers[layerId].bufferSize ?? 0
+          );
         map.on("mousemove", hoverCallback);
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
@@ -247,10 +275,11 @@ const Map = () => {
         map.on("mouseleave", layerId, () => {
           map.getCanvas().style.cursor = "grab";
         });
-        if(!listenerCallbackRef.current[layerId]) {
+        if (!listenerCallbackRef.current[layerId]) {
           listenerCallbackRef.current[layerId] = {};
         }
-        listenerCallbackRef.current[layerId].hoverCallback = handleLayerHoverTooltip;
+        listenerCallbackRef.current[layerId].hoverCallback =
+          handleLayerHoverTooltip;
       }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -275,13 +304,19 @@ const Map = () => {
           popups.map((popup) => popup.remove());
           popups.length = 0;
         }
-        if (state.layers[layerId].shouldHaveTooltipOnClick|| state.layers[layerId].shouldHaveTooltipOnHover) {
-          const { clickCallback, hoverCallback } = listenerCallbackRef.current[layerId];
+        if (
+          state.layers[layerId].shouldHaveTooltipOnClick ||
+          state.layers[layerId].shouldHaveTooltipOnHover
+        ) {
+          const { clickCallback, hoverCallback } =
+            listenerCallbackRef.current[layerId];
           map.off("mousemove", hoverCallback);
           map.off("click", clickCallback);
         }
         if (state.layers[layerId].isHoverable) {
-          map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0));
+          map.off("mousemove", layerId, (e) =>
+            handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
+          );
           map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
         }
       });
@@ -313,33 +348,31 @@ const Map = () => {
           // Assuming the first feature is the one we're interested in
           const feature = features[0];
           const value = feature.properties[filter.field];
-          
+
           // Remove the previous selection layer if it exists
           if (map.getLayer("selected-feature-layer")) {
             map.removeLayer("selected-feature-layer");
             map.removeSource("selected-feature-source");
           }
 
-          let paintProp = {}
+          let paintProp = {};
 
-          // Here is where we should use the colourSchemeSelectionColour[state.color_scheme] 
+          // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
           // for the circle paintProp, however we currently dont have full functionality.
 
-          if (feature.layer.type == 'circle') {
+          if (feature.layer.type == "circle") {
             paintProp = {
               "circle-radius": 6,
               "circle-color": "green",
               "circle-opacity": 0.75,
               "circle-stroke-width": 2,
-              "circle-stroke-color": "black"
-              
-            }
-          }
-          else if (feature.layer.type == 'fill') {
+              "circle-stroke-color": "black",
+            };
+          } else if (feature.layer.type == "fill") {
             paintProp = {
               "fill-color": "#f00",
               "fill-opacity": 0.5,
-            }
+            };
           }
 
           // Add a new source and layer for the selected feature
@@ -347,7 +380,7 @@ const Map = () => {
             type: "geojson",
             data: feature.toJSON(),
           });
-          
+
           map.addLayer({
             id: "selected-feature-layer",
             type: feature.layer.type,
@@ -394,7 +427,6 @@ const Map = () => {
       }
     };
   }, [isMapReady, map, handleMapClick]);
-
 
   useEffect(() => {
     if (isMapReady) {
