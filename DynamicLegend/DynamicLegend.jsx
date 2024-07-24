@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
 import React, { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
-import { numberWithCommas, roundValue } from "utils";
+import { numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 import { AppContext } from '../../contexts/AppContext';
 
@@ -191,37 +191,6 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 7) => {
     switch (expression[0]) {
       case "interpolate":
       case "step":
-        // Extract stops from the expression
-        // const baseStops = expression.slice(3);
-        // const widthStops = [];
-        // for (let i = 0; i < baseStops.length; i += 2) {
-        //   const baseValue = baseStops[i];
-        //   const baseWidth = baseStops[i + 1];
-        //   widthStops.push({
-        //     value: numberWithCommas(roundValue(baseValue)),
-        //     width: baseWidth,
-        //   });
-
-        //   // Calculate intermediate stops if there is a next stop
-        //   if (i + 2 < baseStops.length) {
-        //     const nextValue = baseStops[i + 2];
-        //     const nextWidth = baseStops[i + 3];
-        //     const valueIncrement =
-        //       (nextValue - baseValue) / (numInterpolatedStops + 1);
-        //     const widthIncrement =
-        //       (nextWidth - baseWidth) / (numInterpolatedStops + 1);
-
-        //     for (let j = 1; j <= numInterpolatedStops; j++) {
-        //       const interpolatedValue = baseValue + valueIncrement * j;
-        //       const interpolatedWidth = baseWidth + widthIncrement * j;
-        //       widthStops.push({
-        //         value: numberWithCommas(roundValue(interpolatedValue)),
-        //         width: interpolatedWidth,
-        //       });
-        //     }
-        //   }
-        // }
-      // return widthStops;
       const stops = expression.slice(3);
       const widthStops = [];
       for (let i = 0; i < stops.length; i += 2) {
