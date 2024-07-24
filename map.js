@@ -41,11 +41,15 @@ export function getOpacityProperty(layerType) {
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue) {
+  const widthBins = [0.1, 1.96, 3.825, 5.69, 7.55, 9.415, 11.28, 13.145, 15];
+  let widthObject = []
   let colors = [];
   let colorObject = [];
   for (var i = 0; i < bins.length; i++) {
     colors.push(bins[i]);
     colors.push(colours[i]);
+    widthObject.push(bins[i]);
+    widthObject.push(widthBins[i]);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
   switch (style) {
@@ -90,11 +94,8 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "line-width": [
           "interpolate",
           ["linear"],
-          ["to-number", ["feature-state", "valueAbs"]],
-          Math.min(...bins),
-          0.1, // Line width starts at 1 at the value of 0
-          Math.max(...bins),
-          15,
+          ["feature-state", "value"],
+          ...widthObject,
         ],
         "line-opacity": 1,
         "line-offset": [
