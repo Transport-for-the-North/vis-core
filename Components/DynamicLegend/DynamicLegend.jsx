@@ -181,7 +181,7 @@ const interpretColorExpression = (expression) => {
  * const result = interpretWidthExpression(stepExpression);
  * // result: [{ value: 1, width: 5 }]
  */
-const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
+const interpretWidthExpression = (expression, numInterpolatedStops = 7) => {
   if (!expression) return null;
   if (typeof expression === "number") {
     // Simple width value
@@ -192,36 +192,45 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 4) => {
       case "interpolate":
       case "step":
         // Extract stops from the expression
-        const baseStops = expression.slice(3);
-        const widthStops = [];
-        for (let i = 0; i < baseStops.length; i += 2) {
-          const baseValue = baseStops[i];
-          const baseWidth = baseStops[i + 1];
-          widthStops.push({
-            value: numberWithCommas(roundValue(baseValue)),
-            width: baseWidth,
-          });
+        // const baseStops = expression.slice(3);
+        // const widthStops = [];
+        // for (let i = 0; i < baseStops.length; i += 2) {
+        //   const baseValue = baseStops[i];
+        //   const baseWidth = baseStops[i + 1];
+        //   widthStops.push({
+        //     value: numberWithCommas(roundValue(baseValue)),
+        //     width: baseWidth,
+        //   });
 
-          // Calculate intermediate stops if there is a next stop
-          if (i + 2 < baseStops.length) {
-            const nextValue = baseStops[i + 2];
-            const nextWidth = baseStops[i + 3];
-            const valueIncrement =
-              (nextValue - baseValue) / (numInterpolatedStops + 1);
-            const widthIncrement =
-              (nextWidth - baseWidth) / (numInterpolatedStops + 1);
+        //   // Calculate intermediate stops if there is a next stop
+        //   if (i + 2 < baseStops.length) {
+        //     const nextValue = baseStops[i + 2];
+        //     const nextWidth = baseStops[i + 3];
+        //     const valueIncrement =
+        //       (nextValue - baseValue) / (numInterpolatedStops + 1);
+        //     const widthIncrement =
+        //       (nextWidth - baseWidth) / (numInterpolatedStops + 1);
 
-            for (let j = 1; j <= numInterpolatedStops; j++) {
-              const interpolatedValue = baseValue + valueIncrement * j;
-              const interpolatedWidth = baseWidth + widthIncrement * j;
-              widthStops.push({
-                value: numberWithCommas(roundValue(interpolatedValue)),
-                width: interpolatedWidth,
-              });
-            }
-          }
-        }
-        return widthStops;
+        //     for (let j = 1; j <= numInterpolatedStops; j++) {
+        //       const interpolatedValue = baseValue + valueIncrement * j;
+        //       const interpolatedWidth = baseWidth + widthIncrement * j;
+        //       widthStops.push({
+        //         value: numberWithCommas(roundValue(interpolatedValue)),
+        //         width: interpolatedWidth,
+        //       });
+        //     }
+        //   }
+        // }
+      // return widthStops;
+      const stops = expression.slice(3);
+      const widthStops = [];
+      for (let i = 0; i < stops.length; i += 2) {
+        widthStops.push({
+          value: numberWithCommas(stops[i]),
+          width: stops[i + 1],
+        });
+      }
+      return widthStops;
       default:
         return null;
     }

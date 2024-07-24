@@ -117,7 +117,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
-
       addFeaturesToMap(mapItem, paintProperty, state.layers, data, style);
 
       // addFeaturesToMap(map, paintProperty, state.layers, data, style);
