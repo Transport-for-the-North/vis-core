@@ -60,8 +60,8 @@ const LayerControlEntry = memo(
     // Otherwise, set the current opacity to null
 
     const classificationMethods = {
-      'Equidistant': 'e',
       'Quantile': 'q',
+      'Equidistant': 'e',
       'Logarithmic': 'l',
       'K-Means': 'k'
     }
