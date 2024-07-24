@@ -17,7 +17,7 @@ const StyledMapContainer = styled.div`
 /**
  * DualMaps component that renders two maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
- * 
+ *
  * @returns {JSX.Element} The rendered DualMaps component.
  */
 const DualMaps = () => {
@@ -117,42 +117,88 @@ const DualMaps = () => {
   const handleLayerHover = useCallback(
     (e, layerId, mapType) => {
       if ((leftMap === null && rightMap === null) || !e.point) return;
-  
+
       const hoverLayerId = `${layerId}-hover`;
-      const map = mapType === 'left' ? leftMap : rightMap;
-      const hoverId = mapType === 'left' ? hoverIdRef.current.left : hoverIdRef.current.right;
-  
+      const map = mapType === "left" ? leftMap : rightMap;
+      const hoverId =
+        mapType === "left" ? hoverIdRef.current.left : hoverIdRef.current.right;
+
       const features = map.queryRenderedFeatures(e.point, {
         layers: [layerId],
       });
-  
+
       if (features.length < 1) {
         maps.forEach((map) => {
           if (map.getLayer(hoverLayerId)) {
             const sourceLayer = getSourceLayer(map, layerId);
-            map.setFeatureState({ source: layerId, id: hoverId, sourceLayer }, { hover: false });
+            map.setFeatureState(
+              { source: layerId, id: hoverId, sourceLayer },
+              { hover: false }
+            );
           }
         });
         return;
       }
-  
+
       const feature = features[0];
       const source = feature.layer.source;
       const sourceLayer = feature.layer["source-layer"];
-  
+
       maps.forEach((map) => {
         if (map.getLayer(hoverLayerId)) {
-          map.setFeatureState({ source, id: hoverId, sourceLayer }, { hover: false });
-          if (mapType === 'left') {
+          map.setFeatureState(
+            { source, id: hoverId, sourceLayer },
+            { hover: false }
+          );
+          if (mapType === "left") {
             hoverIdRef.current.left = feature.id;
           } else {
             hoverIdRef.current.right = feature.id;
           }
-          map.setFeatureState({ source, id: feature.id, sourceLayer }, { hover: true });
+          map.setFeatureState(
+            { source, id: feature.id, sourceLayer },
+            { hover: true }
+          );
         }
       });
     },
     [leftMap, rightMap]
+  );
+
+  /**
+   * Handles hover events on a layer and displays a popup with information about the hovered feature.
+   * @property {Object} e - The event object containing information about the hover event.
+   * @property {string} layerId - The ID of the layer being hovered.
+   * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
+   */
+  const handleLayerHoverTooltip = useCallback(
+    (e, layerId, bufferSize) => {
+      if (popups.length !== 0) {
+        popups.map((popup) => popup.remove());
+        popups.length = 0;
+      }
+      const bufferdPoint = [
+        [e.point.x - bufferSize, e.point.y - bufferSize],
+        [e.point.x + bufferSize, e.point.y + bufferSize],
+      ];
+      maps.forEach((map) => {
+        const feature = map.queryRenderedFeatures(bufferdPoint, {
+          layers: [layerId],
+        });
+        if (feature.length !== 0) {
+          const coordinates = e.lngLat;
+          const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+            feature[0].state.value ?? 0
+          }</p>`;
+          const newPopup = new maplibregl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+          popups.push(newPopup);
+        }
+      });
+    },
+    [leftMap, rightMap, popups]
   );
 
   /**
@@ -196,13 +242,16 @@ const DualMaps = () => {
   const handleLayerLeave = useCallback(
     (layerId, mapType) => {
       if (leftMap === null && rightMap === null) return;
-      const map = mapType === 'left' ? leftMap : rightMap;
-      const hoverId = mapType === 'left' ? hoverIdRef.current.left : hoverIdRef.current.right;
-  
+      const hoverId =
+        mapType === "left" ? hoverIdRef.current.left : hoverIdRef.current.right;
+
       maps.forEach((map) => {
         if (map.getLayer(`${layerId}-hover`)) {
           const sourceLayer = getSourceLayer(map, layerId);
-          map.setFeatureState({ source: layerId, id: hoverId, sourceLayer }, { hover: false });
+          map.setFeatureState(
+            { source: layerId, id: hoverId, sourceLayer },
+            { hover: false }
+          );
         }
       });
     },
@@ -215,14 +264,32 @@ const DualMaps = () => {
     Object.keys(state.layers).forEach((layerId) => {
       maps.forEach((map) => {
         if (state.layers[layerId].isHoverable) {
-          map.on("mousemove", layerId, (e) => handleLayerHover(e, layerId, map === leftMap ? 'left' : 'right'));
-          map.on("mouseleave", layerId, () => handleLayerLeave(layerId, map === leftMap ? 'left' : 'right'));
+          map.on("mousemove", layerId, (e) =>
+            handleLayerHover(e, layerId, map === leftMap ? "left" : "right")
+          );
+          map.on("mouseleave", layerId, () =>
+            handleLayerLeave(layerId, map === leftMap ? "left" : "right")
+          );
           map.on("mouseenter", layerId, () => {
             map.getCanvas().style.cursor = "pointer";
           });
           map.on("mouseleave", layerId, () => {
             map.getCanvas().style.cursor = "grab";
           });
+        }
+        if (state.layers[layerId].shouldHaveTooltipOnHover) {
+          const hoverCallback = (e) => handleLayerHoverTooltip(e, layerId, state.layers[layerId].bufferSize ?? 0);
+          map.on("mousemove", hoverCallback);
+          map.on("mouseenter", layerId, () => {
+            map.getCanvas().style.cursor = "pointer";
+          });
+          map.on("mouseleave", layerId, () => {
+            map.getCanvas().style.cursor = "grab";
+          });
+          if(!listenerCallbackRef.current[layerId]) {
+            listenerCallbackRef.current[layerId] = {};
+          }
+          listenerCallbackRef.current[layerId].hoverCallback = handleLayerHoverTooltip;
         }
         if (state.layers[layerId].shouldHaveTooltipOnClick) {
           const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -250,12 +317,17 @@ const DualMaps = () => {
         }
         maps.forEach((map) => {
           if (state.layers[layerId].shouldHaveTooltipOnClick) {
-            const { clickCallback } = listenerCallbackRef.current[layerId];
+            const { clickCallback, hoverCallback } = listenerCallbackRef.current[layerId];
             map.off("click", clickCallback);
+            map.off("mousemove", hoverCallback);
           }
           if (state.layers[layerId].isHoverable) {
-            map.off("mousemove", layerId, (e) => handleLayerHover(e, layerId, map === leftMap ? 'left' : 'right'));
-            map.off("mouseleave", layerId, () => handleLayerLeave(layerId, map === leftMap ? 'left' : 'right'));
+            map.off("mousemove", layerId, (e) =>
+              handleLayerHover(e, layerId, map === leftMap ? "left" : "right")
+            );
+            map.off("mouseleave", layerId, () =>
+              handleLayerLeave(layerId, map === leftMap ? "left" : "right")
+            );
           }
         });
       });
@@ -295,26 +367,24 @@ const DualMaps = () => {
               map.removeSource("selected-feature-source");
             }
 
-            let paintProp = {}
+            let paintProp = {};
 
-            // Here is where we should use the colourSchemeSelectionColour[state.color_scheme] 
+            // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
             // for the circle paintProp, however we currently dont have full functionality.
 
-            if (feature.layer.type == 'circle') {
+            if (feature.layer.type == "circle") {
               paintProp = {
                 "circle-radius": 6,
                 "circle-color": "green",
                 "circle-opacity": 0.75,
                 "circle-stroke-width": 2,
-                "circle-stroke-color": "black"
-                
-              }
-            }
-            else if (feature.layer.type == 'fill') {
+                "circle-stroke-color": "black",
+              };
+            } else if (feature.layer.type == "fill") {
               paintProp = {
                 "fill-color": "#f00",
                 "fill-opacity": 0.5,
-              }
+              };
             }
 
             // Add a new source and layer for the selected feature
@@ -334,7 +404,7 @@ const DualMaps = () => {
             filter.actions.map((action) => {
               dispatch({
                 type: action.action,
-                payload: { filter, value, sides: "both"},
+                payload: { filter, value, sides: "both" },
               });
             });
           }
@@ -425,15 +495,20 @@ const DualMaps = () => {
           />
         ))}
         {/* This below will need changing for when we have > 1 entries in each visualisation side. */}
-        {isMapReady && (
-          state.leftVisualisations[Object.keys(state.leftVisualisations)[0]].data.length === 0 && state.rightVisualisations[Object.keys(state.rightVisualisations)[0]].data.length !== 0 ? (
+        {isMapReady &&
+          (state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
+            .data.length === 0 &&
+          state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]
+            .data.length !== 0 ? (
             <DynamicLegend map={rightMap} />
-          ) : state.leftVisualisations[Object.keys(state.leftVisualisations)[0]].data.length !== 0 && state.rightVisualisations[Object.keys(state.rightVisualisations)[0]].data.length === 0 ? (
+          ) : state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
+              .data.length !== 0 &&
+            state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]
+              .data.length === 0 ? (
             <DynamicLegend map={leftMap} />
           ) : (
             <DynamicLegend map={rightMap} />
-          )
-        )}
+          ))}
       </StyledMapContainer>
     </>
   );
