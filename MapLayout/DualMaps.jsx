@@ -187,9 +187,9 @@ const DualMaps = () => {
         });
         if (feature.length !== 0) {
           const coordinates = e.lngLat;
-          const description = `<p>${feature[0].properties.name}</p><p>Value : ${
-            feature[0].state.value ?? 0
-          }</p>`;
+          const description = `<p>${feature[0].properties.name?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
+          feature[0].state.value ?? 0
+        }</p>`;
           const newPopup = new maplibregl.Popup()
             .setLngLat(coordinates)
             .setHTML(description)
@@ -222,7 +222,7 @@ const DualMaps = () => {
       });
       if (feature.length !== 0) {
         const coordinates = e.lngLat;
-        const description = `<p>${feature[0].properties.name}</p><p>Value : ${
+        const description = `<p>${feature[0].properties.name?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
           feature[0].state.value ?? 0
         }</p>`;
         const newPopup = new maplibregl.Popup()
