@@ -15,8 +15,8 @@ export const loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing el
   let regex = /(0{6,}\d*)$/;
   
   // Replace the matched sequence with an empty string
-  let cleanedStr = numStr.replace(regex, '');
-  
+   let cleanedStr = numStr.replace(regex, '');
+  //  cleanedStr = cleanedStr.replace(',', '');
   // Return the cleaned number, converting it back to a number type
   return parseFloat(cleanedStr);
 }
@@ -37,14 +37,14 @@ function removeRecurringDecimals(number) {
 }
 
 export function numberWithCommas(x) {
-    x = x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-    // Check if it contains a decimal.
-    if (x.toString().indexOf('.') === -1) {
-      return x
-    }
-    // Regex to remove excessive zeros.
-    x = removeExcessiveZeros(x)
-    // Regex to truncate recurring decimals.
-    x = removeRecurringDecimals(x)
+  // Check if it contains a decimal.
+  if (x.toString().indexOf('.') === -1) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+  }
+  // Regex to remove excessive zeros.
+  x = removeExcessiveZeros(x)
+  // Regex to truncate recurring decimals.
+  x = removeRecurringDecimals(x)
+  x = x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
     return x
   }
