@@ -41,7 +41,6 @@ export function getOpacityProperty(layerType) {
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue) {
-  const widthBins = [0.1, 1.96, 3.825, 5.69, 7.55, 9.415, 11.28, 13.145, 15];
   let widthObject = []
   let colors = [];
   let colorObject = [];
@@ -49,7 +48,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     colors.push(bins[i]);
     colors.push(colours[i]);
     widthObject.push(bins[i]);
-    widthObject.push(widthBins[i]);
+    widthObject.push((7.5/bins[bins.length-1]*bins[i]) + 1);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
   switch (style) {
@@ -105,7 +104,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           Math.min(...bins),
           0.05,
           Math.max(...bins),
-          7.5,
+          6,
         ],
       };
     case "line-diverging":
@@ -121,11 +120,8 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "line-width": [
           "interpolate",
           ["linear"],
-          ["to-number", ["feature-state", "valueAbs"]],
-          Math.min(...bins),
-          0.1, 
-          Math.max(...bins),
-          15,
+          ["feature-state", "valueAbs"],
+          ...widthObject,
         ],
         "line-opacity": 1,
         "line-offset": [
@@ -133,9 +129,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           Math.min(...bins),
-          0.05, // Line width starts at 1 at the value of 0
+          0.1, // Line width starts at 1 at the value of 0
           Math.max(...bins),
-          7.5,
+          15,
         ],
       };
     case "circle-continuous":
