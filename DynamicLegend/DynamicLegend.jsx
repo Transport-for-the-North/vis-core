@@ -192,13 +192,13 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 7) => {
       case "interpolate":
       case "step":
       const stops = expression.slice(3);
-      const widthStops = [];
+        const widthStops = [];
       for (let i = 0; i < stops.length; i += 2) {
         widthStops.push({
           value: numberWithCommas(stops[i]),
           width: stops[i + 1],
         });
-      }
+        }
       return widthStops;
       default:
         return null;
