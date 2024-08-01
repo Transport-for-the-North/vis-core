@@ -329,7 +329,7 @@ export const appConfig = {
           {
             filterName: "Delivery programme",
             paramName: "deliveryProgrammeName",
-            info: "Assignement delivery programme",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link"],
@@ -440,7 +440,7 @@ export const appConfig = {
             values: linkMetricValues,
           },
           {
-            filterName: "Scen. 1 Delivery Program",
+            filterName: "Scen. 1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
             info: "Assignment delivery programme",
             target: "api",
@@ -498,7 +498,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scen. 2 Delivery Program",
+            filterName: "Scen. 2 Delivery Programme",
             paramName: "deliveryProgrammeNameDoMinimum",
             info: "Assignment delivery programme",
             target: "api",
@@ -609,9 +609,9 @@ export const appConfig = {
             values: linkMetricValues,
           },
           {
-            filterName: "Delivery Program - Left",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
-            info: "Assignement delivery programme for the left map",
+            info: "Assignment delivery programme for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
@@ -665,9 +665,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Delivery Program - Right",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
-            info: "Assignement delivery programme for the right map",
+            info: "Assignment delivery programme for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
@@ -775,7 +775,7 @@ export const appConfig = {
             values: nodeMetricValues,
           },
           {
-            filterName: "Delivery Program",
+            filterName: "Delivery Programme",
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -880,7 +880,7 @@ export const appConfig = {
             values: nodeMetricValues,
           },       
           {
-            filterName: "Scen. 1 Delivery Program",
+            filterName: "Scen. 1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -933,7 +933,7 @@ export const appConfig = {
             }
           },
           {
-            filterName: "Scen. 2 Delivery Program",
+            filterName: "Scen. 2 Delivery Programme",
             paramName: "deliveryProgrammeNameDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1037,7 +1037,7 @@ export const appConfig = {
             values: nodeMetricValues,
           },
           {
-            filterName: "Left Delivery Program",
+            filterName: "Left Delivery Programme",
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1088,7 +1088,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Delivery Program",
+            filterName: "Right Delivery Programme",
             paramName: "deliveryProgrammeName",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1308,7 +1308,7 @@ export const appConfig = {
             values: originOrDestTripValues,
           },
           {
-            filterName: "Scen.1 Delivery Program",
+            filterName: "Scen.1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
             info: "Assignment delivery programme do something",
             target: "api",
@@ -1365,7 +1365,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scen.2 Delivery Program",
+            filterName: "Scen.2 Delivery Programme",
             paramName: "deliveryProgrammeNameDoMinimum",
             info: "Assignment delivery programme do minimum",
             target: "api",
@@ -1474,9 +1474,9 @@ export const appConfig = {
             values: originOrDestTripValues,
           },
           {
-            filterName: "Left Delivery Program",
+            filterName: "Left Delivery Programme",
             paramName: "deliveryProgrammeName",
-            info: "Assignement delivery programme for the left map",
+            info: "Assignment delivery programme for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
@@ -1531,9 +1531,9 @@ export const appConfig = {
              },
           },
           {
-            filterName: "Right Delivery Program",
+            filterName: "Right Delivery Programme",
             paramName: "deliveryProgrammeName",
-            info: "Assignement delivery programme for the right map",
+            info: "Assignment delivery programme for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
@@ -1664,7 +1664,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Delivery Program",
+            filterName: "Delivery Programme",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme",
             target: "api",
@@ -1807,7 +1807,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Scen.1 Delivery Program",
+            filterName: "Scen.1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
             info: "Assignment delivery programme do something",
             target: "api",
@@ -1876,7 +1876,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scen.2 Delivery Program",
+            filterName: "Scen.2 Delivery Programme",
             paramName: "deliveryProgrammeNameDoMinimum",
             info: "Assignment delivery programme do minimum",
             target: "api",
@@ -2019,7 +2019,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Left Delivery Program",
+            filterName: "Left Delivery Programme",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the left map",
             target: "api",
@@ -2086,7 +2086,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Delivery Program",
+            filterName: "Right Delivery Programme",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the right map",
             target: "api",
