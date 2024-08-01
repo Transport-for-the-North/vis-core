@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { SelectorLabel } from './SelectorLabel';
 
 const StyledDropdown = styled.select`
   width: 100%;
@@ -22,12 +23,15 @@ export const ClassificationDropdown = ({ classType, onChange }) => {
   };
 
   return (
+    <div style={{ marginTop: "10px"}}>
+    <SelectorLabel text="Symbology mode" info={"Change the calculation of the bins"}/>
     <StyledDropdown onChange={handleDropdownChange}>
       {Object.keys(classType).map((option) => (
         <option key={option} value={classType.option}>
           {option}
         </option>
       ))}
-    </StyledDropdown>
+      </StyledDropdown>
+      </div>
   );
 };

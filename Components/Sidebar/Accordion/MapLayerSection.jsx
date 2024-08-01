@@ -112,10 +112,6 @@ const LayerControlEntry = memo(
     };
     return (
       <LayerControlContainer>
-        <ClassificationDropdown 
-          classType={classificationMethods}
-          onChange={handleClassificationChange}
-        />
         <LayerHeader>
           <LayerName>{layer.id}</LayerName>
           <VisibilityToggle onClick={toggleVisibility}>
@@ -138,6 +134,10 @@ const LayerControlEntry = memo(
           colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
           handleColorChange={handleColorChange}
           layerName={layer.id}
+        />
+        <ClassificationDropdown 
+          classType={classificationMethods}
+          onChange={handleClassificationChange}
         />
       </LayerControlContainer>
     );
