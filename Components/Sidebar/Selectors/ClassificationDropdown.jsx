@@ -24,7 +24,7 @@ export const ClassificationDropdown = ({ classType, onChange }) => {
 
   return (
     <div style={{ marginTop: "10px"}}>
-    <SelectorLabel text="Symbology mode" info={"Change the calculation of the bins"}/>
+    <SelectorLabel text="Symbology mode" info={"Select symbology banding mode"}/>
     <StyledDropdown onChange={handleDropdownChange}>
       {Object.keys(classType).map((option) => (
         <option key={option} value={classType.option}>
