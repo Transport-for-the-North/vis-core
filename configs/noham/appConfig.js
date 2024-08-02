@@ -310,7 +310,7 @@ export const appConfig = {
             dataPath: "/api/noham/link-results",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Metric",
@@ -423,7 +423,7 @@ export const appConfig = {
             dataPath: "/api/noham/link-results/difference",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Metric",
@@ -592,7 +592,7 @@ export const appConfig = {
             dataPath: "/api/noham/link-results",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Metric",
@@ -759,7 +759,7 @@ export const appConfig = {
             dataPath: "/api/noham/node-results",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Metric",
@@ -864,7 +864,7 @@ export const appConfig = {
             dataPath: "/api/noham/node-results/difference",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Metric",
@@ -1021,7 +1021,7 @@ export const appConfig = {
             dataPath: "/api/noham/node-results",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Metric",
@@ -1178,7 +1178,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Trip Type",
@@ -1291,7 +1291,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand/difference",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Trip Type",
@@ -1457,7 +1457,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Trip Type",
@@ -1627,7 +1627,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Select zone in map",
@@ -1770,7 +1770,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results/difference",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Select zone in map",
@@ -1982,7 +1982,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
         filters: [
           {
             filterName: "Select zone in map",

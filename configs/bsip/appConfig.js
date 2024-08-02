@@ -59,7 +59,7 @@ export const appConfig = {
             dataPath: "/api/bsip/reliability",
           },
         ],
-        metadataLayers: [
+        metadataTables: [
           {
             name: "reliabilityOptions",
             source: "api",
@@ -194,7 +194,7 @@ export const appConfig = {
             infoTextTemplate: `{filterName1} accessible within {filterName2}`,
           },
         ],
-        metadataLayers: [],
+        metadataTables: [],
 
         filters: [
           {
