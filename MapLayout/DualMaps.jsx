@@ -346,7 +346,7 @@ const DualMaps = () => {
       const point = event.point;
 
       // Get all map filters
-      const mapFilters = pageContext.config.filters.filter(
+      const mapFilters = state.filters.filter(
         (filter) => filter.type === "map"
       );
 
@@ -411,7 +411,7 @@ const DualMaps = () => {
         });
       });
     },
-    [isMapReady, leftMap, rightMap, pageContext.config.filters, dispatch]
+    [isMapReady, leftMap, rightMap, state.filters, dispatch]
   );
 
   // Run once to set the state of the map
@@ -425,8 +425,8 @@ const DualMaps = () => {
   }, [isMapReady]);
 
   useEffect(() => {
-    if (isMapReady) {
-      const hasMapFilter = pageContext.config.filters.some(
+    if (isMapReady & state.filters.length > 0) {
+      const hasMapFilter = state.filters.some(
         (filter) => filter.type === "map"
       );
       if (hasMapFilter) {

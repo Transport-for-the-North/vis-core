@@ -17,46 +17,24 @@ const StyledDropdown = styled.select`
  * @returns {JSX.Element} The Dropdown component.
  */
 export const Dropdown = ({ filter, onChange }) => {
-  const { state } = useMapContext();
-  const metadataFilters = state.metadataFilters[0];
-  const baseParamName = filter.paramName.includes("DoMinimum")
-    ? filter.paramName.replace("DoMinimum", "")
-    : filter.paramName.includes("DoSomething")
-    ? filter.paramName.replace("DoSomething", "")
-    : filter.paramName;
-
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
-    const selectedOption =
-      filter.values.source === "local"
-        ? filter.values.values.find(
-            (option) => option.displayValue === selectedValue
-          ).paramValue
-        : metadataFilters[baseParamName][0].distinct_values.find(
-            (option) => option === selectedValue
-          );
+    const selectedOption = filter.values.values.find(
+      (option) => option.displayValue === selectedValue
+    );
 
     if (selectedOption) {
-      onChange(filter, selectedOption);
+      onChange(filter, selectedOption.paramValue);
     }
   };
 
   return (
     <StyledDropdown onChange={handleDropdownChange}>
-      {filter.values.source === "local"
-        ? filter.values.values.map((option) => (
-            <option key={option.paramValue} value={option.displayValue}>
-              {option.displayValue}
-            </option>
-          ))
-        : metadataFilters && metadataFilters[baseParamName]
-        ? metadataFilters[baseParamName][0].distinct_values.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))
-        : null}
+      {filter.values.values.map((option) => (
+        <option key={option.paramValue} value={option.displayValue}>
+          {option.displayValue}
+        </option>
+      ))}
     </StyledDropdown>
   );
 };
-
