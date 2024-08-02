@@ -8,7 +8,7 @@ import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 
 const SelectorContainer = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 `;
 
 const NoDataParagraph = styled.p``;
