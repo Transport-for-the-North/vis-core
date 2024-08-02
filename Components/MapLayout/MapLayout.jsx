@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext } from "hooks";
-import { api } from "services";
 import { loremIpsum } from "utils";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
@@ -38,201 +37,46 @@ export const MapLayout = () => {
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    initializedRef.current = false;
-    // await fetchMetadataFilters(pageContext, dispatch);
-  }, [pageContext]);
-
-  /**
-   * Effect to initialize the filters for the map page.
-   *
-   * This effect runs once when the component mounts and whenever the dependencies change.
-   * It checks if the filters have been initialized and if there are visualizations available in the state.
-   * If the filters are not initialized and visualizations are available, it calls the fetchMetadataFilters function.
-   *
-   * @effect
-   * @dependencies
-   * - pageContext.config.filters
-   * - dispatch
-   * - state.visualisations
-   * - state.leftVisualisations
-   * - state.rightVisualisations
-   * - state.metadataFilters
-   * - pageContext
-   */
-  useEffect(() => {
-    /**
-     * Asynchronously fetches metadata filters from a specified API endpoint and updates the application state based on the retrieved data.
-     *
-     * @async
-     * @function fetchMetadataFilters
-     * @param {Object} pageContext - An object containing the configuration and context for the current page.
-     * @param {Function} dispatch - Function to dispatch actions to the application state.
-     * @returns {Promise<void>} This function does not return a value but performs side effects by dispatching actions.
-     *
-     * @example
-     * const pageContext = {
-     *   config: {
-     *     visualisations: [{ dataPath: "/path/to/data" }],
-     *     filters: [
-     *       {
-     *         type: "map",
-     *         values: { source: "api" },
-     *         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-     *         defaultValue: "default",
-     *         min: 0,
-     *         filterName: "exampleFilter",
-     *         paramName: "exampleParam",
-     *       },
-     *     ],
-     *   },
-     * };
-     *
-     * const dispatch = (action) => {
-     *   // Dispatch action to the application state
-     * };
-     *
-     * fetchMetadataFilters(pageContext, dispatch);
-     *
-     * @implementation
-     * API Call: The function makes a POST request to the /api/tame/mvdata endpoint with the dataPath from the first visualization in the pageContext.
-     * Processing Filters: It processes each filter in the pageContext.config.filters array:
-     * - For filters of type "map", "slider", or with local values, it dispatches actions to update query parameters or other states.
-     * - For other filters, it uses the apiFilterValues to determine the default value and dispatches actions accordingly.
-     * Dispatching Actions: The function dispatches actions to update the application state with the default values and metadata filters.
-     * Error Handling: If an error occurs during the API call, it logs the error to the console.
-     */
-    const fetchMetadataFilters = async (pageContext, dispatch) => {
-      const path = "/api/tame/mvdata";
-      const dataPath = {
-        dataPath: pageContext.config.visualisations[0].dataPath,
-      };
-      try {
-        const metadataFilters = await api.baseService.post(path, dataPath, {
-          skipAuth: false,
-        });
-        const apiFilterValues = Object.groupBy(
-          metadataFilters,
-          ({ field_name }) => field_name
-        );
-        pageContext.config.filters.forEach((filter) => {
-          if (
-            filter.type === "map" ||
-            filter.type === "slider" ||
-            filter.values.source === "local"
-          ) {
-            filter.actions.map((action) => {
-              if (action.action === "UPDATE_QUERY_PARAMS") {
-                let defaultValue =
-                  filter.defaultValue ||
-                  filter.min ||
-                  filter.values?.values[0]?.paramValue;
-                dispatch({
-                  type: action.action,
-                  payload: { filter, value: defaultValue },
-                });
-              } else {
-                let defaultValue =
-                  filter.defaultValue ||
-                  filter.min ||
-                  filter.values?.values[0]?.paramValue;
-                var sides = "";
-                if (filter.filterName.includes("Left")) sides = "left";
-                else if (filter.filterName.includes("Right")) sides = "right";
-                else sides = "both";
-                dispatch({
-                  type: action.action,
-                  payload: { filter, value: defaultValue, sides: sides },
-                });
-              }
-            });
-          } else {
-            filter.actions.map((action) => {
-              const baseParamName = filter.paramName.includes("DoMinimum")
-                ? filter.paramName.replace("DoMinimum", "")
-                : filter.paramName.includes("DoSomething")
-                ? filter.paramName.replace("DoSomething", "")
-                : filter.paramName;
-              const defaultValue =
-                apiFilterValues[baseParamName][0].distinct_values[0];
-              if (action.action === "UPDATE_QUERY_PARAMS") {
-                dispatch({
-                  type: action.action,
-                  payload: { filter, value: defaultValue },
-                });
-              } else {
-                var sides = "";
-                if (filter.filterName.includes("Left")) sides = "left";
-                else if (filter.filterName.includes("Right")) sides = "right";
-                else sides = "both";
-                dispatch({
-                  type: action.action,
-                  payload: { filter, value: defaultValue, sides: sides },
-                });
-              }
-            });
+    if (!initializedRef.current && Object.keys(state.visualisations).length > 0 && Object.keys(state.filters).length > 0) {
+      state.filters.forEach((filter) => {
+        filter.actions.forEach((actionObj) => {
+          let defaultValue =
+            filter.defaultValue ||
+            filter.min ||
+            filter.values?.values[0]?.paramValue;
+  
+          switch (actionObj.action) {
+            case "UPDATE_QUERY_PARAMS":
+              dispatch({
+                type: actionObj.action,
+                payload: { filter, value: defaultValue },
+              });
+              break;
+  
+            case "UPDATE_DUAL_QUERY_PARAMS":
+              let sides = "";
+              if (filter.filterName.includes("Left")) sides = "left";
+              else if (filter.filterName.includes("Right")) sides = "right";
+              else sides = "both";
+  
+              dispatch({
+                type: actionObj.action,
+                payload: { filter, value: defaultValue, sides: sides },
+              });
+              break;
+  
+            default:
+              break;
           }
         });
-        initializedRef.current = true;
-        dispatch({
-          type: "UPDATE_METADATA_FILTER",
-          payload: { metadataFilters: [apiFilterValues] },
-        });
-      } catch (error) {
-        console.error("Error fetching metadata filters", error);
-      }
-    };
-
-    if (
-      !initializedRef.current &&
-      Object.keys(state.visualisations).length > 0
-    ) {
-      if (
-        pageContext.config.visualisations[0].dataPath !==
-        "/api/bsip/reliability"
-      )
-        fetchMetadataFilters(pageContext, dispatch);
-      else {
-        setTimeout(() => {
-          pageContext.config.filters.forEach((filter) => {
-            filter.actions.map((action) => {
-              if (action.action === "UPDATE_QUERY_PARAMS") {
-                let defaultValue =
-                  filter.defaultValue ||
-                  filter.min ||
-                  filter.values?.values[0]?.paramValue;
-                dispatch({
-                  type: action.action,
-                  payload: { filter, value: defaultValue },
-                });
-              } else {
-                let defaultValue =
-                  filter.defaultValue ||
-                  filter.min ||
-                  filter.values?.values[0]?.paramValue;
-                var sides = "";
-                if (filter.filterName.includes("Left")) sides = "left";
-                else if (filter.filterName.includes("Right")) sides = "right";
-                else sides = "both";
-                dispatch({
-                  type: action.action,
-                  payload: { filter, value: defaultValue, sides: sides },
-                });
-              }
-            });
-          });
-        }, 5);
-        initializedRef.current = true;
-      }
+      });
+      initializedRef.current = true;
     }
-  }, [
-    pageContext.config.filters,
-    dispatch,
-    state.visualisations,
-    state.leftVisualisations,
-    state.rightVisualisations,
-    state.metadataFilters,
-    pageContext,
-  ]);
+  }, [state.filters, dispatch, state.visualisations, state.leftVisualisations, state.rightVisualisations]);
+  
+  useEffect(() => {
+    initializedRef.current = false;
+  }, [pageContext]);
 
   const handleFilterChange = (filter, value) => {
     if (!filter.visualisations[0].includes("Side")) {
@@ -276,7 +120,7 @@ export const MapLayout = () => {
       <Sidebar
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
-        filters={pageContext.config.filters}
+        filters={state.filters}
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
       >

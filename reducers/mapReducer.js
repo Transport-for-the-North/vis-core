@@ -20,6 +20,9 @@ export const actionTypes = {
     UPDATE_LEGEND_TEXT: 'UPDATE_LEGEND_TEXT',
     UPDATE_CLASSIFICATION_METHOD: 'UPDATE_CLASSIFICATION_METHOD',
     UPDATE_METADATA_FILTER: 'UPDATE_METADATA_FILTER',
+    SET_METADATA_TABLES: 'SET_METADATA_TABLES',
+    SET_FILTERS: 'SET_FILTERS',
+    RESET_CONTEXT: 'RESET_CONTEXT',
 };
 
 /**
@@ -34,7 +37,7 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true };
+            return { ...state, layers: {}, visualisations: {}, filters: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true };
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload };
         case actionTypes.INITIALISE_SIDEBAR:
@@ -157,9 +160,7 @@ export const mapReducer = (state, action) => {
                 case "both": return { ...state, leftVisualisations: updatedVisualisations[0], rightVisualisations: updatedVisualisations[1] };
                 default: return { ...state, leftVisualisations: updatedVisualisations[0] };
             }
-            // return { ...state, leftVisualisations: updatedVisualisations };
         }
-
 
         case actionTypes.UPDATE_ALL_DATA: {
             const side = action.payload.left;
@@ -205,8 +206,8 @@ export const mapReducer = (state, action) => {
             const { map } = action.payload;
             return {
                 ...state,
-                map: map,// Store the map instance directly in the state
-                color_scheme: { value: "Reds", label: 'Reds' }, //Set up the default color scheme on startup only
+                map: map, // Store the map instance directly in the state
+                color_scheme: { value: "Reds", label: 'Reds' }, // Set up the default color scheme on startup only
                 class_method: "q"
             };
         }
@@ -221,33 +222,39 @@ export const mapReducer = (state, action) => {
             const newParamValue = action.payload.value;
             const values = action.payload.filter.values.values;
             const position = values.findIndex(value => value.paramValue === newParamValue);
-            const required_values = values[position]
-        
+            const required_values = values[position];
+
             // Create a new visualisations object with updated legend text for the specified visualisation
             const updatedVisualisations = { ...state.visualisations };
-        
+
             visualisationNames.forEach((visName) => {
                 if (updatedVisualisations[visName]) {
                     const newLegendText = {
                         displayValue: required_values.displayValue,
                         legendSubtitleText: required_values.legendSubtitleText
                     };
-            
+
                     updatedVisualisations[visName] = {
                         ...updatedVisualisations[visName],
                         legendText: [newLegendText] // Replace the existing legendText array with the new one
                     };
                 }
             });
-            
+
             // Return the new state with updated visualisations
             return {
                 ...state,
                 visualisations: updatedVisualisations,
             };
         }
-        case actionTypes.UPDATE_METADATA_FILTER: { 
+        case actionTypes.UPDATE_METADATA_FILTER: {
             return { ...state, metadataFilters: action.payload.metadataFilters };
+        }
+        case actionTypes.SET_METADATA_TABLES: {
+            return { ...state, metadataTables: action.payload };
+        }
+        case actionTypes.SET_FILTERS: {
+            return { ...state, filters: action.payload };
         }
         default:
             return state;

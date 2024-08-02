@@ -42,93 +42,46 @@ const StyledButton = styled.button`
  */
 export const Toggle = ({ filter, onChange }) => {
   const { state } = useMapContext();
-  const metadataFilters = state.metadataFilters[0];
   const currentToggle = useRef(null);
-  const [currentButton, setCurrentButton] = useState(
-    filter.values.source === "local" ? filter.values.values[0] : null
-  );
-  const baseParamName = filter.paramName.includes("DoMinimum")
-    ? filter.paramName.replace("DoMinimum", "")
-    : filter.paramName.includes("DoSomething")
-    ? filter.paramName.replace("DoSomething", "")
-    : filter.paramName;
+  const [currentButton, setCurrentButton] = useState(filter.values.values[0]);
 
   const handleToggleChange = (e) => {
     const selectedValue = e.target.value;
-    const selectedOption =
-      filter.values.source === "local"
-        ? filter.values.values.find(
-            (option) => option.displayValue === selectedValue
-          )
-        : metadataFilters[baseParamName][0].distinct_values.find(
-            (option) => option === selectedValue
-          );
+    const selectedOption = filter.values.values.find(
+      (option) => option.displayValue === selectedValue
+    );
     if (selectedOption) {
-      onChange(
-        filter,
-        filter.values.source === "local"
-          ? selectedOption.paramValue
-          : selectedOption
-      );
+      onChange(filter, selectedOption.paramValue);
       setCurrentButton(selectedOption);
     }
   };
 
-  //Function to reset the current button to the default value when the metadataFilters are loaded
+  // Function to reset the current button to the default value when the filters are loaded
   useEffect(() => {
     if (
-      metadataFilters &&
       currentToggle.current !==
-        state.visualisations[Object.keys(state.visualisations)[0]].name
+      state.visualisations[Object.keys(state.visualisations)[0]].name
     ) {
       currentToggle.current =
         state.visualisations[Object.keys(state.visualisations)[0]].name;
-      setCurrentButton(
-        filter.values.source === "local"
-          ? filter.values.values[0]
-          : metadataFilters[baseParamName]? metadataFilters[baseParamName][0].distinct_values[0] : null
-      );
+      setCurrentButton(filter.values.values[0]);
     }
-  }, [metadataFilters, filter]);
-
-  useEffect(() => {
-    if (metadataFilters && currentButton === null)
-      setCurrentButton(metadataFilters[baseParamName]? metadataFilters[baseParamName][0].distinct_values[0] : null);
-  }, [metadataFilters, currentButton, filter.paramName]);
+  }, [state.visualisations, filter]);
 
   return (
     <StyledToggle>
-      {filter.values.source === "local"
-        ? filter.values.values.map((option, index) => (
-            <StyledButton
-              key={option.paramValue}
-              value={option.displayValue}
-              onClick={handleToggleChange}
-              $isSelected={currentButton.displayValue === option.displayValue}
-              size={filter.values.values.length}
-              index={index}
-            >
-              {option.displayValue}
-            </StyledButton>
-          ))
-        : metadataFilters && metadataFilters[baseParamName]
-        ? metadataFilters[baseParamName][0].distinct_values.map( 
-            (option, index) => (
-              <StyledButton
-                key={option}
-                value={option}
-                onClick={handleToggleChange}
-                $isSelected={currentButton === option}
-                size={
-                  metadataFilters[baseParamName][0].distinct_values.length
-                }
-                index={index}
-              >
-                {option}
-              </StyledButton>
-            )
-          )
-        : null}
+      {filter.values.values.map((option, index) => (
+        <StyledButton
+          key={option.paramValue}
+          value={option.displayValue}
+          onClick={handleToggleChange}
+          $isSelected={currentButton.displayValue === option.displayValue}
+          size={filter.values.values.length}
+          index={index}
+        >
+          {option.displayValue}
+        </StyledButton>
+      ))}
     </StyledToggle>
   );
 };

@@ -1,9 +1,8 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useContext, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
-import { PageContext } from "contexts";
 import { useMap, useMapContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
@@ -24,7 +23,6 @@ const StyledMapContainer = styled.div`
 const Map = () => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
-  const pageContext = useContext(PageContext);
   const { state, dispatch } = useMapContext();
   const popups = [];
   const listenerCallbackRef = useRef({});
@@ -338,7 +336,7 @@ const Map = () => {
       const point = event.point;
 
       // Get all map filters
-      const mapFilters = pageContext.config.filters.filter(
+      const mapFilters = state.filters.filter(
         (filter) => filter.type === "map"
       );
 
@@ -401,7 +399,7 @@ const Map = () => {
         }
       });
     },
-    [isMapReady, map, pageContext.config.filters, dispatch]
+    [isMapReady, map, state.filters, dispatch]
   );
 
   // Run once to set the state of the map
@@ -415,8 +413,8 @@ const Map = () => {
   }, [isMapReady]);
 
   useEffect(() => {
-    if (isMapReady) {
-      const hasMapFilter = pageContext.config.filters.some(
+    if (isMapReady & state.filters.length > 0) {
+      const hasMapFilter = state.filters.some(
         (filter) => filter.type === "map"
       );
       if (hasMapFilter) {

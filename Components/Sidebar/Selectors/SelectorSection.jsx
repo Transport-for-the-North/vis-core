@@ -1,5 +1,4 @@
 import styled from "styled-components";
-
 import { useMapContext } from "hooks";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
@@ -12,6 +11,7 @@ const SelectorContainer = styled.div`
 `;
 
 const NoDataParagraph = styled.p``;
+
 /**
  * Checks if the geometry property is not null for each feature in the provided feature collection.
  * @param {Object} featureCollection - The GeoJSON feature collection to be checked.
@@ -79,36 +79,40 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
 
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
-      {filters.map((filter) => (
-        <SelectorContainer key={filter.filterName}>
-          <SelectorLabel
-            htmlFor={filter.paramName}
-            text={filter.filterName}
-            info={filter.info ?? null}
-          />
-          {filter.type === "dropdown" && (
-            <Dropdown
-              key={filter.filterName}
-              filter={filter}
-              onChange={(filter, value) => onFilterChange(filter, value)}
+      {Array.isArray(filters) && filters.length > 0 ? (
+        filters.map((filter) => (
+          <SelectorContainer key={filter.filterName}>
+            <SelectorLabel
+              htmlFor={filter.paramName}
+              text={filter.filterName}
+              info={filter.info ?? null}
             />
-          )}
-          {filter.type === "slider" && (
-            <Slider
-              key={filter.filterName}
-              filter={filter}
-              onChange={(filter, value) => onFilterChange(filter, value)}
-            />
-          )}
-          {filter.type === "toggle" && (
-            <Toggle
-              key={filter.filterName}
-              filter={filter}
-              onChange={(filter, value) => onFilterChange(filter, value)}
-            />
-          )}
-        </SelectorContainer>
-      ))}
+            {filter.type === "dropdown" && (
+              <Dropdown
+                key={filter.filterName}
+                filter={filter}
+                onChange={(filter, value) => onFilterChange(filter, value)}
+              />
+            )}
+            {filter.type === "slider" && (
+              <Slider
+                key={filter.filterName}
+                filter={filter}
+                onChange={(filter, value) => onFilterChange(filter, value)}
+              />
+            )}
+            {filter.type === "toggle" && (
+              <Toggle
+                key={filter.filterName}
+                filter={filter}
+                onChange={(filter, value) => onFilterChange(filter, value)}
+              />
+            )}
+          </SelectorContainer>
+        ))
+      ) : (
+        <NoDataParagraph>Loading filters...</NoDataParagraph>
+      )}
       {/* Check if no data has been found and display a small message in the sidebar if so */}
       {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
     </AccordionSection>

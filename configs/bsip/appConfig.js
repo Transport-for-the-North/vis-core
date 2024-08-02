@@ -60,11 +60,6 @@ export const appConfig = {
           },
         ],
         metadataTables: [
-          {
-            name: "reliabilityOptions",
-            source: "api",
-            path: "/bsip/reliabilityoptions",
-          },
         ],
         filters: [
           {
