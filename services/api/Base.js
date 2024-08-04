@@ -132,7 +132,7 @@ class BaseService {
    */
   async get(subPath = "", options = { queryParams: {} }) {
     const params = this._buildQuery(options?.queryParams);
-    const path = `${subPath}?${params}`;
+    const path = params ? `${subPath}?${params}` : subPath;
     const results = await this._get(path);
     return results;
   }
