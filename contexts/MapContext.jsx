@@ -1,8 +1,8 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter } from 'utils';
+import { hasRouteParameter, replaceRouteParameter, sortValues } from 'utils';
 import { AppContext, PageContext } from 'contexts';
-import { api }  from 'services'; // Adjust the import path accordingly
+import { api } from 'services';
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -17,7 +17,21 @@ const initialState = {
   filters: [],
   map: null,
   isMapReady: false,
-  isLoading: true
+  isLoading: true,
+};
+
+/**
+ * Helper function to check for duplicate values in an array.
+ * @function isDuplicateValue
+ * @param {Array} values - The array of values.
+ * @param {Object} value - The value to check for duplicates.
+ * @returns {boolean} True if the value is a duplicate, false otherwise.
+ */
+const isDuplicateValue = (values, value) => {
+  return values.some(existingValue => 
+    existingValue.paramValue === value.paramValue &&
+    existingValue.displayValue === value.displayValue
+  );
 };
 
 /**
@@ -37,154 +51,202 @@ export const MapProvider = ({ children }) => {
 
   useEffect(() => {
     dispatch({ type: actionTypes.SET_IS_LOADING });
-  
-    // Fetch and store metadata tables
+
+    /**
+     * Fetch and store metadata tables.
+     * @function fetchMetadataTables
+     * @returns {Object} Metadata tables.
+     */
     const fetchMetadataTables = async () => {
       const metadataTables = {};
       for (const table of pageContext.config.metadataTables) {
         try {
           const response = await api.baseService.get(table.path);
-          console.log(`Fetched metadata table ${table.name}:`, response); // Add logging
+          console.log(`Fetched metadata table ${table.name}:`, response);
           metadataTables[table.name] = response;
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
         }
       }
-      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
+      return metadataTables;
     };
-  
-    fetchMetadataTables();
-  
-    // Initialise non-parameterised layers
-    const nonParameterisedLayers = pageContext.config.layers.filter(layer => !hasRouteParameter(layer.path));
-    nonParameterisedLayers.forEach(layer => {
-      const bufferSize = layer.geometryType === "line" ? 7 : 0;
-      dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: {...layer, bufferSize: bufferSize} } });
-    });
-  
-    // Initialise parameterised layers based on corresponding filters
-    const parameterisedLayers = pageContext.config.layers.filter(layer => hasRouteParameter(layer.path));
-    parameterisedLayers.forEach(layer => {
-      const bufferSize = layer.geometryType === "line" ? 7 : 0;
-      const paramName = layer.path.match(/\{(.+?)\}/)[1];
-      const filter = pageContext.config.filters.find(f => f.paramName === paramName);
-      if (filter) {
-        const updatedPath = replaceRouteParameter(layer.path, paramName, filter.values.values[0].paramValue);
-        dispatch({ 
-          type: actionTypes.ADD_LAYER, 
-          payload: { [layer.name]: { ...layer, path: updatedPath, pathTemplate: layer.path, bufferSize: bufferSize } } 
-        });
-      }
-    });
-  
-    // Initialise visualisations
-    const visualisationConfig = pageContext.config.visualisations;
-    const apiSchema = appContext.apiSchema;
-    visualisationConfig.forEach(visConfig => {
-      const queryParams = {};
-      const apiRoute = visConfig.dataPath;
-      const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
-      apiParameters.forEach(param => {
-        if (param.in === "query") {
-          queryParams[param.name] = null;
-        }
-      });
-      const visualisation = {
-        ...visConfig,
-        dataPath: apiRoute,
-        queryParams: queryParams,
-        data: [],
-        paintProperty: {}
-      };
-      dispatch({
-        type: actionTypes.ADD_VISUALISATION,
-        payload: { [visConfig.name]: visualisation }
-      });
-    });
-  
-    // Initialise filters
-    const initializeFilters = async () => {
+
+    /**
+     * Initialise filters once metadata tables are fetched.
+     * @function initializeFilters
+     * @param {Object} metadataTables - Fetched metadata tables.
+     */
+    const initializeFilters = async (metadataTables) => {
       const filters = [];
       for (const filter of pageContext.config.filters) {
         switch (filter.type) {
-          case "map":
-          case "slider":
+          case 'map':
+          case 'slider':
             filters.push(filter);
             break;
           default:
             switch (filter.values.source) {
-              case "local":
+              case 'local':
                 filters.push(filter);
                 break;
-              case "api":
-                const path = "/api/tame/mvdata";
+              case 'api':
+                const path = '/api/tame/mvdata';
                 const dataPath = {
                   dataPath: pageContext.config.visualisations[0].dataPath,
                 };
                 try {
-                  const metadataFilters = await api.baseService.post(path, dataPath, {
-                    skipAuth: false,
-                  });
+                  const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: false });
                   console.log('Fetched metadata filters:', metadataFilters); // Add logging
                   const apiFilterValues = Object.groupBy(
                     metadataFilters,
                     ({ field_name }) => field_name
                   );
-                  const baseParamName = filter.paramName.includes("DoMinimum")
-                    ? filter.paramName.replace("DoMinimum", "")
-                    : filter.paramName.includes("DoSomething")
-                    ? filter.paramName.replace("DoSomething", "")
+                  const baseParamName = filter.paramName.includes('DoMinimum')
+                    ? filter.paramName.replace('DoMinimum', '')
+                    : filter.paramName.includes('DoSomething')
+                    ? filter.paramName.replace('DoSomething', '')
                     : filter.paramName;
-                  filter.values.values = apiFilterValues[baseParamName][0].distinct_values.map(v => ({
+                  filter.values.values = apiFilterValues[baseParamName][0].distinct_values.map((v) => ({
                     displayValue: v,
-                    paramValue: v
+                    paramValue: v,
                   }));
                   console.log(`Updated filter values for ${filter.filterName}:`, filter.values.values); // Add logging
                   filters.push(filter);
                 } catch (error) {
-                  console.error("Error fetching metadata filters", error);
+                  console.error('Error fetching metadata filters', error);
                 }
                 break;
-              case "metadataTable":
-                const metadataTable = state.metadataTables[filter.metadataTableName];
-                filter.values.values = metadataTable.map(option => ({
-                  displayValue: option[filter.displayColumn],
-                  paramValue: option[filter.paramColumn]
-                }));
-                filters.push(filter);
+              case 'metadataTable':
+                const metadataTable = metadataTables[filter.values.metadataTableName];
+                if (metadataTable) {
+                  let uniqueValues = [];
+                  metadataTable.forEach(option => {
+                    const value = {
+                      displayValue: option[filter.values.displayColumn],
+                      paramValue: option[filter.values.paramColumn],
+                    };
+                    if (!isDuplicateValue(uniqueValues, value)) {
+                      uniqueValues.push(value);
+                    }
+                  });
+
+                  // Apply sorting if specified
+                  if (filter.values.sort) {
+                    uniqueValues = sortValues(uniqueValues, filter.values.sort);
+                  }
+
+                  // Apply exclusion if specified
+                  if (filter.values.exclude) {
+                    uniqueValues = uniqueValues.filter(value => !filter.values.exclude.includes(value.paramValue));
+                  }
+
+                  filter.values.values = uniqueValues;
+                  filters.push(filter);
+                } else {
+                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                }
                 break;
               default:
-                console.error("Unknown filter source:", filter.values.source);
+                console.error('Unknown filter source:', filter.values.source);
             }
         }
       }
-    
+
       // Incorporate 'sides' logic
-      const updatedFilters = filters.map(filter => {
-        if (filter.visualisations[0].includes("Side")) {
-          const sides = filter.filterName.includes("Left") ? "left" :
-                        filter.filterName.includes("Right") ? "right" : "both";
+      const updatedFilters = filters.map((filter) => {
+        if (filter.visualisations[0].includes('Side')) {
+          const sides =
+            filter.filterName.includes('Left')
+              ? 'left'
+              : filter.filterName.includes('Right')
+              ? 'right'
+              : 'both';
           return { ...filter, sides };
         }
         return filter;
       });
-    
+
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
-      console.log('Updated filters:', updatedFilters); // Add logging
+      console.log('Updated filters:', updatedFilters);
     };
-  
-    initializeFilters();
-  
+
+    /**
+     * Main async function to manage the workflow.
+     * @function initializeContext
+     */
+    const initializeContext = async () => {
+      const metadataTables = await fetchMetadataTables();
+      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
+      await initializeFilters(metadataTables);
+
+      // Initialise non-parameterised layers
+      const nonParameterisedLayers = pageContext.config.layers.filter(
+        (layer) => !hasRouteParameter(layer.path)
+      );
+      nonParameterisedLayers.forEach((layer) => {
+        const bufferSize = layer.geometryType === 'line' ? 7 : 0;
+        dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: { ...layer, bufferSize } } });
+      });
+
+      // Initialise parameterised layers based on corresponding filters
+      const parameterisedLayers = pageContext.config.layers.filter(
+        (layer) => hasRouteParameter(layer.path)
+      );
+      parameterisedLayers.forEach((layer) => {
+        const bufferSize = layer.geometryType === 'line' ? 7 : 0;
+        const paramName = layer.path.match(/\{(.+?)\}/)[1];
+        const filter = pageContext.config.filters.find((f) => f.paramName === paramName);
+        if (filter) {
+          const updatedPath = replaceRouteParameter(
+            layer.path,
+            paramName,
+            filter.values.values[0].paramValue
+          );
+          dispatch({
+            type: actionTypes.ADD_LAYER,
+            payload: {
+              [layer.name]: { ...layer, path: updatedPath, pathTemplate: layer.path, bufferSize },
+            },
+          });
+        }
+      });
+
+      // Initialise visualisations
+      const visualisationConfig = pageContext.config.visualisations;
+      const apiSchema = appContext.apiSchema;
+      visualisationConfig.forEach((visConfig) => {
+        const queryParams = {};
+        const apiRoute = visConfig.dataPath;
+        const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+        apiParameters.forEach((param) => {
+          if (param.in === 'query') {
+            queryParams[param.name] = null;
+          }
+        });
+        const visualisation = {
+          ...visConfig,
+          dataPath: apiRoute,
+          queryParams,
+          data: [],
+          paintProperty: {},
+        };
+        dispatch({
+          type: actionTypes.ADD_VISUALISATION,
+          payload: { [visConfig.name]: visualisation },
+        });
+      });
+
+      dispatch({ type: actionTypes.SET_IS_LOADING, payload: false });
+    };
+
+    initializeContext();
+
     return () => {
       dispatch({
-        type: actionTypes.RESET_CONTEXT
+        type: actionTypes.RESET_CONTEXT,
       });
     };
   }, [pageContext]);
 
-  return (
-    <MapContext.Provider value={contextValue}>
-      {children}
-    </MapContext.Provider>
-  );
+  return <MapContext.Provider value={contextValue}>{children}</MapContext.Provider>;
 };
