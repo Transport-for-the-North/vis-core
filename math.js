@@ -105,3 +105,21 @@ export const roundValue = (value) => {
     return Math.round(value);
   }
 };
+
+/**
+ * Helper function to sort values based on the specified order.
+ * @function sortValues
+ * @param {Array} values - The array of values to sort.
+ * @param {string} order - The order to sort by ('ascending' or 'descending').
+ * @returns {Array} Sorted array of values.
+ */
+export const sortValues = (values, order) => {
+  return values.sort((a, b) => {
+    if (order === 'ascending') {
+      return a.displayValue > b.displayValue ? 1 : -1;
+    } else if (order === 'descending') {
+      return a.displayValue < b.displayValue ? 1 : -1;
+    }
+    return 0;
+  });
+};
