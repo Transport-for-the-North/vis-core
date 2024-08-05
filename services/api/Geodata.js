@@ -74,6 +74,33 @@ class GeodataService extends BaseService {
   }
 
   /**
+   * Fetches metadata for all features in the specified table.
+   * @param {string} tableName - The name of the table.
+   * @returns {Promise<Array>} The metadata of the features.
+   */
+  async getFeaturesMetadata(tableName) {
+    return await this.get(`/api/spatialdatafeatures/features/${tableName}`);
+  }
+
+  /**
+   * Fetches the geometry (centroid) for a specific feature.
+   * @param {string} tableName - The name of the table.
+   * @param {string} featureId - The ID of the feature.
+   * @returns {Promise<Object>} The geometry of the feature.
+   */
+  async getFeatureGeometry(tableName, featureId) {
+    try {
+      const responseObj = await this.get(`/api/spatialdatafeaturegeometry/centroid/${tableName}/${featureId}`);
+      // Read the geojson from the responseData - note janky handling as a result of mapping of sql result to api model
+      const data = JSON.parse(responseObj.centroid)
+      return data
+    } catch (error) {
+      console.error('Error fetching layer data:', error);
+      throw error;
+    }
+  }
+  
+  /**
    * Retrieves a layer based on the given configuration, with caching.
    * 
    * @param {Object} layerConfig - The configuration for the layer.
