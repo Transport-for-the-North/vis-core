@@ -50,6 +50,7 @@ const Map = () => {
         layerConfig.metadata = {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
+          tableName: layer.tableName ?? null,
         };
 
         if (layer.type === "geojson") {
@@ -78,6 +79,7 @@ const Map = () => {
             source: layer.name,
             "source-layer": layer.sourceLayer,
             metadata: {
+              ...layerConfig.metadata,
               isStylable: layer.isStylable ?? false,
               bufferSize: layer.geometryType === "line" ? 7 : null,
             },

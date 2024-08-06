@@ -66,7 +66,7 @@ export const LayerSearch = ({ map, layer }) => {
 
       setIsLoading(true);
       try {
-        const features = await api.geodataService.getFeaturesMetadata(layer.id);
+        const features = await api.geodataService.getFeaturesMetadata(layer.metadata.tableName);
         const filteredOptions = features
           .filter((feature) =>
             String(feature.name)
@@ -84,7 +84,7 @@ export const LayerSearch = ({ map, layer }) => {
         setIsLoading(false);
       }
     }, 300),
-    [layer.id]
+    [layer.metadata.tableName]
   );
 
   /**
@@ -97,7 +97,7 @@ export const LayerSearch = ({ map, layer }) => {
       if (selectedOption) {
         try {
           const centroid = await api.geodataService.getFeatureGeometry(
-            layer.id,
+            layer.metadata.tableName,
             selectedOption.value
           );
           map.flyTo({ center: centroid.coordinates, zoom: 12 });
@@ -112,7 +112,7 @@ export const LayerSearch = ({ map, layer }) => {
         }
       }
     },
-    [layer.id, map]
+    [layer.metadata.tableName, map]
   );
 
   /**
