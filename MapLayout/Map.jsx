@@ -50,7 +50,7 @@ const Map = () => {
         layerConfig.metadata = {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
-          tableName: layer.tableName ?? null,
+          path: layer.path ?? null,
         };
 
         if (layer.type === "geojson") {
