@@ -126,7 +126,7 @@ export const LayerControlEntry = memo(({ layer, map, defaultColor, handleColorCh
           {visibility === 'visible' ? <EyeIcon /> : <EyeSlashIcon />}
         </VisibilityToggle>
       </LayerHeader>
-      <LayerSearch map={map} layer={layer} />
+      {layer.metadata?.tableName && <LayerSearch map={map} layer={layer} />}
       <SelectorLabel text="Opacity" />
       <OpacityControl>
         <OpacitySlider

@@ -290,6 +290,7 @@ export const appConfig = {
             type: "tile",
             source: "api",
             path: "/api/vectortiles/noham_links/{z}/{x}/{y}", // matches the path in swagger.json
+            tableName: "noham_links", // Used for getting feature metadata
             sourceLayer: "geometry",
             geometryType: "line",
             visualisationName: "Link",
