@@ -242,21 +242,19 @@ export const DynamicLegend = ({ map }) => {
         .map((layer, index) => {
           const title = layer.id;
     
-          const pageConfig = config.appPages.find(page => page.pageName === visualisationKey);
+          const pageConfig = config.appPages.find(page => page.config.visualisations[0].name === visualisationKey);
           const legendFilter = pageConfig?.config?.filters?.find(filter => filter.containsLegendInfo === true);
     
           let displayValue;
           let legendSubtitleText;
-    
           if (legendFilter) {
             const filterParamName = legendFilter.paramName;
             const filter = pageConfig.config.filters.find(filter => filter.paramName === filterParamName);
-            const filterValues = filter?.values || [];
-    
+            const filterValues = filter?.values.values || [];
             // Default values from filterName
             const defaultDisplayValue = filterValues[0]?.displayValue || title;
             const defaultLegendSubtitleText = filterValues[0]?.legendSubtitleText || "";
-    
+            
             displayValue = legendTexts[index]?.displayValue || defaultDisplayValue;
             legendSubtitleText = legendTexts[index]?.legendSubtitleText || defaultLegendSubtitleText;
           } else {
@@ -294,7 +292,6 @@ export const DynamicLegend = ({ map }) => {
   if (legendItems.length === 0) {
     return null;
   }
-
   return (
     <LegendContainer>
       {legendItems.map((item, index) => (
