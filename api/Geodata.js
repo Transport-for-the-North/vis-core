@@ -3,6 +3,32 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import BaseService from "./Base";
 
 /**
+ * Parses a vector tile path and extracts tableName and zoneTypeId parameters (where applicable).
+ * @param {string} path - The path to be parsed.
+ * @returns {Object} An object containing the tableName and optionally the zoneTypeId.
+ */
+function parseVectorTilePath(path) {
+  if (!path.startsWith('/')) {
+    throw new Error('Path must start with a slash.');
+  }
+
+  const pathParts = path.split('/');
+  if (pathParts[2] !== 'vectortiles') {
+    throw new Error('Path must be for vectortiles.');
+  }
+
+  const isZonePath = pathParts.includes('zones');
+  const tableName = isZonePath ? 'zones' : pathParts[3];
+
+  if (isZonePath) {
+    const zoneTypeId = pathParts[4];
+    return { tableName, zoneTypeId };
+  } else {
+    return { tableName };
+  }
+}
+
+/**
  * Class for handling local storage with memory cache functionality.
  */
 class LocalStorageMemoryCache {
@@ -76,19 +102,49 @@ class GeodataService extends BaseService {
   /**
    * Fetches metadata for all features in the specified table.
    * @param {string} tableName - The name of the table.
+   * @param {Object} [options] - Additional options for the request.
+   * @param {string} [options.zoneTypeId] - The zone type ID.
    * @returns {Promise<Array>} The metadata of the features.
    */
-  async getFeaturesMetadata(tableName) {
-    return await this.get(`/api/spatialdatafeatures/features/${tableName}`);
+  async getFeaturesMetadata(tableName, options = {}) {
+    const { zoneTypeId } = options;
+    let url = `/api/spatialdatafeatures/features/${tableName}`;
+
+    if (zoneTypeId) {
+      url += `?zoneTypeId=${zoneTypeId}`;
+    }
+
+    return await this.get(url);
+  }
+
+  /**
+ * Fetches metadata based on the parsed path.
+ * @param {string} path - The path to be parsed.
+ * @returns {Promise<Array>} The metadata of the features.
+ */
+  async fetchMetadataFromPath(path) {
+    const parsedParams = parseVectorTilePath(path);
+
+    if (parsedParams.zoneTypeId) {
+      const { tableName, zoneTypeId } = parsedParams;
+      const options = { zoneTypeId };
+      return await this.getFeaturesMetadata(tableName, options);
+    } else {
+      const { tableName } = parsedParams;
+      return await this.getFeaturesMetadata(tableName);
+    }
   }
 
   /**
    * Fetches the geometry (centroid) for a specific feature.
-   * @param {string} tableName - The name of the table.
+   * @param {string} path - The vector tile path for the given table.
    * @param {string} featureId - The ID of the feature.
    * @returns {Promise<Object>} The geometry of the feature.
    */
-  async getFeatureGeometry(tableName, featureId) {
+  async getFeatureGeometry(path, featureId) {
+    const parsedParams = parseVectorTilePath(path);
+    const { tableName } = parsedParams;
+
     try {
       const responseObj = await this.get(`/api/spatialdatafeaturegeometry/centroid/${tableName}/${featureId}`);
       // Read the geojson from the responseData - note janky handling as a result of mapping of sql result to api model
