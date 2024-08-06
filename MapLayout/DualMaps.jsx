@@ -122,10 +122,12 @@ const DualMaps = () => {
       const map = mapType === "left" ? leftMap : rightMap;
       const hoverId =
         mapType === "left" ? hoverIdRef.current.left : hoverIdRef.current.right;
-
-      const features = map.queryRenderedFeatures(e.point, {
-        layers: [layerId],
-      });
+        let features = [];
+      if (layerId in map.style._layers) {
+         features = map.queryRenderedFeatures(e.point, {
+          layers: [layerId],
+        });
+      }
 
       if (features.length < 1) {
         maps.forEach((map) => {
@@ -182,14 +184,17 @@ const DualMaps = () => {
         [e.point.x + bufferSize, e.point.y + bufferSize],
       ];
       maps.forEach((map) => {
-        const feature = map.queryRenderedFeatures(bufferdPoint, {
-          layers: [layerId],
-        });
+        let feature = [];
+        if (layerId in map.style._layers) {
+          feature = map.queryRenderedFeatures(bufferdPoint, {
+            layers: [layerId],
+          });
+        }
         if (feature.length !== 0) {
           const coordinates = e.lngLat;
-          const description = `<p>Id: ${feature[0].properties.name}</p><p>Value: ${
-          feature[0].state.value ?? 0
-        }</p>`;
+          const description = `<p>Id: ${
+            feature[0].properties.name
+          }</p><p>Value: ${feature[0].state.value ?? 0}</p>`;
           const newPopup = new maplibregl.Popup()
             .setLngLat(coordinates)
             .setHTML(description)
@@ -222,7 +227,9 @@ const DualMaps = () => {
       });
       if (feature.length !== 0) {
         const coordinates = e.lngLat;
-        const description = `<p>${feature[0].properties.name?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
+        const description = `<p>${
+          feature[0].properties.name ?? ""
+        }</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
           feature[0].state.value ?? 0
         }</p>`;
         const newPopup = new maplibregl.Popup()
@@ -264,9 +271,9 @@ const DualMaps = () => {
     Object.keys(state.layers).forEach((layerId) => {
       maps.forEach((map) => {
         if (state.layers[layerId].isHoverable) {
-          map.on("mousemove", layerId, (e) =>
-            handleLayerHover(e, layerId, map === leftMap ? "left" : "right")
-          );
+          const layerHover = (e) =>
+            handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0);
+          map.on("mousemove", layerHover);
           map.on("mouseleave", layerId, () =>
             handleLayerLeave(layerId, map === leftMap ? "left" : "right")
           );
@@ -276,9 +283,18 @@ const DualMaps = () => {
           map.on("mouseleave", layerId, () => {
             map.getCanvas().style.cursor = "grab";
           });
+          if(!listenerCallbackRef.current[layerId]) {
+            listenerCallbackRef.current[layerId] = {};
+          }
+          listenerCallbackRef.current[layerId].layerHoverCallback = layerHover;
         }
         if (state.layers[layerId].shouldHaveTooltipOnHover) {
-          const hoverCallback = (e) => handleLayerHoverTooltip(e, layerId, state.layers[layerId].bufferSize ?? 0);
+          const hoverCallback = (e) =>
+            handleLayerHoverTooltip(
+              e,
+              layerId,
+              state.layers[layerId].bufferSize ?? 0
+            );
           map.on("mousemove", hoverCallback);
           map.on("mouseenter", layerId, () => {
             map.getCanvas().style.cursor = "pointer";
@@ -286,10 +302,11 @@ const DualMaps = () => {
           map.on("mouseleave", layerId, () => {
             map.getCanvas().style.cursor = "grab";
           });
-          if(!listenerCallbackRef.current[layerId]) {
+          if (!listenerCallbackRef.current[layerId]) {
             listenerCallbackRef.current[layerId] = {};
           }
-          listenerCallbackRef.current[layerId].hoverCallback = handleLayerHoverTooltip;
+          listenerCallbackRef.current[layerId].hoverCallback =
+            handleLayerHoverTooltip;
         }
         if (state.layers[layerId].shouldHaveTooltipOnClick) {
           const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -317,9 +334,11 @@ const DualMaps = () => {
         }
         maps.forEach((map) => {
           if (state.layers[layerId].shouldHaveTooltipOnClick) {
-            const { clickCallback, hoverCallback } = listenerCallbackRef.current[layerId];
+            const { clickCallback, hoverCallback, layerHoverCallback } =
+              listenerCallbackRef.current[layerId];
             map.off("click", clickCallback);
             map.off("mousemove", hoverCallback);
+            map.off("mousemove", layerHoverCallback);
           }
           if (state.layers[layerId].isHoverable) {
             map.off("mousemove", layerId, (e) =>
@@ -425,7 +444,7 @@ const DualMaps = () => {
   }, [isMapReady]);
 
   useEffect(() => {
-    if (isMapReady & state.filters.length > 0) {
+    if (isMapReady & (state.filters.length > 0)) {
       const hasMapFilter = state.filters.some(
         (filter) => filter.type === "map"
       );
