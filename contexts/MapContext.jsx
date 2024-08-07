@@ -62,7 +62,6 @@ export const MapProvider = ({ children }) => {
       for (const table of pageContext.config.metadataTables) {
         try {
           const response = await api.baseService.get(table.path);
-          console.log(`Fetched metadata table ${table.name}:`, response);
           metadataTables[table.name] = response;
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
@@ -96,7 +95,6 @@ export const MapProvider = ({ children }) => {
                 };
                 try {
                   const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: false });
-                  console.log('Fetched metadata filters:', metadataFilters); // Add logging
                   const apiFilterValues = Object.groupBy(
                     metadataFilters,
                     ({ field_name }) => field_name
@@ -110,7 +108,6 @@ export const MapProvider = ({ children }) => {
                     displayValue: v,
                     paramValue: v,
                   }));
-                  console.log(`Updated filter values for ${filter.filterName}:`, filter.values.values); // Add logging
                   filters.push(filter);
                 } catch (error) {
                   console.error('Error fetching metadata filters', error);
@@ -167,7 +164,6 @@ export const MapProvider = ({ children }) => {
       });
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
-      console.log('Updated filters:', updatedFilters);
     };
 
     /**
