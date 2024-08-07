@@ -191,8 +191,9 @@ const DualMaps = () => {
           });
         }
         if (feature.length !== 0) {
+          const style = map.getLayer(layerId).type;
           const coordinates = e.lngLat;
-          const description = `<p>Id: ${
+          const description = `<p>${style === "line" ? "Id" : "Name"}: ${
             feature[0].properties.name
           }</p><p>Value: ${feature[0].state.value ?? 0}</p>`;
           const newPopup = new maplibregl.Popup()
