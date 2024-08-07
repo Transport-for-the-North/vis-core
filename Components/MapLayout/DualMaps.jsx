@@ -1,13 +1,12 @@
+import { DynamicLegend } from "Components";
+import { useDualMaps, useMapContext } from "hooks";
+import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useRef, useContext, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { api } from "services";
 import styled from "styled-components";
-import { useDualMaps, useMapContext } from "hooks";
-import { PageContext } from "contexts";
 import { getHoverLayerStyle, getLayerStyle, getSourceLayer } from "utils";
-import maplibregl from "maplibre-gl";
 import { Visualisation } from "./Visualisation";
-import { DynamicLegend } from "Components";
 
 const StyledMapContainer = styled.div`
   width: 50%;
@@ -28,7 +27,6 @@ const DualMaps = () => {
     rightMapContainerRef
   );
   const { state, dispatch } = useMapContext();
-  const pageContext = useContext(PageContext);
   const maps = [leftMap, rightMap];
   const popups = [];
   const listenerCallbackRef = useRef({});
@@ -191,9 +189,8 @@ const DualMaps = () => {
           });
         }
         if (feature.length !== 0) {
-          const style = map.getLayer(layerId).type;
           const coordinates = e.lngLat;
-          const description = `<p>${style === "line" ? "Id" : "Name"}: ${
+          const description = `<p>Id: ${
             feature[0].properties.name
           }</p><p>Value: ${feature[0].state.value ?? 0}</p>`;
           const newPopup = new maplibregl.Popup()

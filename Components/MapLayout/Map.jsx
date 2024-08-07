@@ -179,9 +179,8 @@ const Map = () => {
         });
       }
       if (feature.length !== 0 && feature[0].state.value) {
-        const style = map.getLayer(layerId).type;
         const coordinates = e.lngLat;
-        const description = `<p>${style === "line" ? "Id" : "Name"}: ${feature[0].properties.name}</p><p>Value: ${
+        const description = `<p>Id: ${feature[0].properties.name}</p><p>Value: ${
           feature[0].state.value ?? 0
         }</p>`;
         const newPopup = new maplibregl.Popup()
