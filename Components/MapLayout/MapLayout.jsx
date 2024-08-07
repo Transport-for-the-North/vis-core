@@ -47,6 +47,7 @@ export const MapLayout = () => {
   
           switch (actionObj.action) {
             case "UPDATE_QUERY_PARAMS":
+            case "UPDATE_LEGEND_TEXT":
               dispatch({
                 type: actionObj.action,
                 payload: { filter, value: defaultValue },
@@ -64,7 +65,6 @@ export const MapLayout = () => {
                 payload: { filter, value: defaultValue, sides: sides },
               });
               break;
-  
             default:
               break;
           }
@@ -72,7 +72,7 @@ export const MapLayout = () => {
       });
       initializedRef.current = true;
     }
-  }, [state.filters, dispatch, state.visualisations, state.leftVisualisations, state.rightVisualisations]);
+  }, [pageContext, dispatch, state.visualisations, state.leftVisualisations, state.rightVisualisations]);
   
   useEffect(() => {
     initializedRef.current = false;
