@@ -227,8 +227,8 @@ export const appConfig = {
             values: {
               source: "local",
               values: [
-                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
-                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Passengers" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Passengers" },
                 { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
                 { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
                 { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
@@ -331,8 +331,8 @@ export const appConfig = {
             values: {
               source: "local",
               values: [
-                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
-                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Passengers" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Passengers" },
                 { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
                 { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
                 { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
@@ -435,8 +435,8 @@ export const appConfig = {
             values: {
               source: "local",
               values: [
-                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Boardings" },
-                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Interchanges" },
+                { paramValue: "Boardings", displayValue: "Boardings", legendSubtitleText: "Passengers" },
+                { paramValue: "Interchanges", displayValue: "Interchanges", legendSubtitleText: "Passengers" },
                 { paramValue: "Egress", displayValue: "Egress", legendSubtitleText: "Egress" },
                 { paramValue: "Access", displayValue: "Access", legendSubtitleText: "Access" },
                 { paramValue: "Alightings", displayValue: "Alightings", legendSubtitleText: "Alightings" }
@@ -823,7 +823,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left User",
+            filterName: "Left User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -856,7 +856,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right User",
+            filterName: "Right User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
