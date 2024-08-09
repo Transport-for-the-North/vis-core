@@ -247,7 +247,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
         };
         map.removeFeatureState({
           source: layer.name,
-          sourceLayer: "zones",
+          sourceLayer: layer.sourceLayer,
         });
         data.forEach((row) => {
           map.setFeatureState(
