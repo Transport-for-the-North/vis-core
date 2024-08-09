@@ -3,7 +3,6 @@ import React, { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import { numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
-import { AppContext } from '../../contexts/AppContext';
 
 const LegendContainer = styled.div`
   position: absolute;
@@ -224,7 +223,6 @@ const interpretWidthExpression = (expression, numInterpolatedStops = 7) => {
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
-  const config = useContext(AppContext); // Accessing config from AppContext
 
   useEffect(() => {
     if (!map) return;
@@ -243,7 +241,6 @@ export const DynamicLegend = ({ map }) => {
           const title = layer.id;
     
           const legendFilter = state?.filters?.find(filter => filter.containsLegendInfo === true);
-          const pageConfig = config.appPages.find(page => page.config.visualisations[0].name === visualisationKey);
     
           let displayValue;
           let legendSubtitleText;
