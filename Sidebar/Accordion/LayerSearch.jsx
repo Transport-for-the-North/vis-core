@@ -102,11 +102,61 @@ export const LayerSearch = ({ map, layer }) => {
           );
           map.flyTo({ center: centroid.coordinates, zoom: 12 });
 
-          // Reset the dropdown after 1.5 seconds
-          setTimeout(() => {
-            setSelectedOption(null);
-            setOptions([]);
-          }, 1500);
+          // Add a label for the selected feature
+          const labelLayerId = 'feature-label';
+          const labelSourceId = 'feature-label-source';
+
+          // Remove existing label if any
+          if (map.getLayer(labelLayerId)) {
+            map.removeLayer(labelLayerId);
+            map.removeSource(labelSourceId);
+          }
+
+          map.addSource(labelSourceId, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: centroid.coordinates
+              },
+              properties: {
+                name: selectedOption.label
+              }
+            }
+          });
+
+          map.addLayer({
+            id: labelLayerId,
+            type: 'symbol',
+            source: labelSourceId,
+            layout: {
+              'text-field': ['get', 'name'],
+              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], // Use the same fonts as the app
+              'text-size': 14, // Adjust the text size as needed
+              'text-offset': [0, 1.5],
+              'text-anchor': 'top'
+            },
+            paint: {
+              'text-color': '#000000', // Set the text color
+              'text-halo-color': '#ffffff', // Add a halo for better readability
+              'text-halo-width': 2
+            }
+          });
+
+          // Remove the label when the user interacts with the map
+          const removeLabel = () => {
+            if (map.getLayer(labelLayerId)) {
+              map.removeLayer(labelLayerId);
+              map.removeSource(labelSourceId);
+            }
+            map.off('move', removeLabel);
+            map.off('click', removeLabel);
+          };
+
+          map.on('move', removeLabel);
+          map.on('click', removeLabel);
+
         } catch (error) {
           console.error("Failed to fetch centroid:", error);
         }
