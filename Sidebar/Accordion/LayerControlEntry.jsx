@@ -68,12 +68,11 @@ const OpacitySlider = styled.input`
  * @param {Object} props - The component props.
  * @param {Object} props.layer - The layer object containing information about the map layer.
  * @param {Object} props.map - The MapLibre map instance.
- * @param {string} props.defaultColor - The default color for the layer.
  * @param {Function} props.handleColorChange - The function to handle color changes for the layer.
  * @param {Function} props.handleClassificationChange - The function to handle classification changes for the layer.
  * @returns {JSX.Element} The rendered LayerControlEntry component.
  */
-export const LayerControlEntry = memo(({ layer, map, defaultColor, handleColorChange, handleClassificationChange }) => {
+export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleClassificationChange }) => {
   const [visibility, setVisibility] = useState(layer.layout?.visibility || 'visible');
 
   let currentOpacity = null;

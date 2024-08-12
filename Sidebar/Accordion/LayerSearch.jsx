@@ -10,7 +10,8 @@ import { SelectorLabel } from "../Selectors/SelectorLabel";
  * Styled container for the search component.
  */
 const SearchContainer = styled.div`
-  margin-bottom: 10px;
+margin-top: 10px;
+margin-bottom: 10px;
 `;
 
 /**
