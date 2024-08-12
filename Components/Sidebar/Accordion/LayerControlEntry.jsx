@@ -138,20 +138,24 @@ export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleCl
           onChange={handleOpacityChange}
         />
       </OpacityControl>
-      <ColourSchemeDropdown
-        colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
-        handleColorChange={handleColorChange}
-        layerName={layer.id}
-      />
-      <ClassificationDropdown 
-        classType={{
-          'Quantile': 'q',
-          'Equidistant': 'e',
-          'Logarithmic': 'l',
-          'K-Means': 'k'
-        }}
-        onChange={handleClassificationChange}
-      />
+      {layer.metadata?.isStylable && (
+        <>
+          <ColourSchemeDropdown
+            colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
+            handleColorChange={handleColorChange}
+            layerName={layer.id}
+          />
+          <ClassificationDropdown 
+            classType={{
+              'Quantile': 'q',
+              'Equidistant': 'e',
+              'Logarithmic': 'l',
+              'K-Means': 'k'
+            }}
+            onChange={handleClassificationChange}
+          />
+        </>
+      )}
     </LayerControlContainer>
   );
 });

@@ -22,8 +22,7 @@ export const MapLayerSection = ({ handleColorChange, handleClassificationChange 
     const filteredLayers = newLayers.filter(
       (layer) =>
         (layer.type === 'fill' || layer.type === 'line' || layer.type === 'circle') &&
-        layer.source !== 'default' &&
-        layer.metadata?.isStylable
+        layer.source !== 'default' && !layer.id.endsWith("-hover") && layer.id !== "selected-feature-layer"
     );
     setLayers(filteredLayers);
   }, [map]);

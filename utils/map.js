@@ -321,6 +321,7 @@ export const getLayerStyle = (geometryType) => {
         paint: {
           "fill-color": "rgb(255, 255, 0, 0)",
           "fill-outline-color": "rgba(195, 195, 195, 1)",
+          "fill-opacity": 1
         },
       };
     case "line":
@@ -341,6 +342,7 @@ export const getLayerStyle = (geometryType) => {
         paint: {
           "circle-radius": 5,
           "circle-color": "black",
+          "circle-opacity": 1
         },
       };
     default:
