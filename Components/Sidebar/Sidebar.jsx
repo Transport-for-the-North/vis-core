@@ -1,5 +1,6 @@
+import React, { useState } from "react";
 import styled from "styled-components";
-
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 
@@ -24,13 +25,44 @@ const SidebarContainer = styled.div`
   overflow-y: auto;
   text-align: left;
   position: fixed;
-  left: 10px;
+  left: ${({ isVisible }) => (isVisible ? "10px" : "-320px")};
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
   backdrop-filter: blur(8px);
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  transition: left 0.3s ease-in-out;
+`;
+
+const ToggleButton = styled.button`
+  position: fixed;
+  top: 85px;
+  left: ${({ isVisible }) => (isVisible ? "320px" : "10px")};
+  z-index: 1001;
+  background-color: #4b3e91;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: left 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover::after {
+    content: ${({ isVisible }) => (isVisible ? "'Collapse Sidebar'" : "'Expand Sidebar'")};
+    position: absolute;
+    left: 100%; /* Start at the left side */
+    transform: translateX(0); /* No horizontal translation */
+    background-color: #4b3e91;
+    color: white;
+    padding: 5px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    white-space: nowrap;
+  }
 `;
 
 /**
@@ -53,20 +85,31 @@ export const Sidebar = ({
   onFilterChange,
   children, // Accept children props
 }) => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsVisible(!isVisible);
+  };
+
   return (
-    <SidebarContainer>
-      <SidebarHeader>
-        {pageName || "Visualisation Framework"}
-      </SidebarHeader>
-      <TextSection title="About this visualisation" text={aboutVisualisationText} />
-      {filters && (
-        <SelectorSection
-          filters={filters}
-          onFilterChange={(filter, value) => onFilterChange(filter, value)}
-        />
-      )}
-      {children} {/* Render additional AccordionSections passed as children */}
-      <TextSection title="Legal" text={legalText} />
-    </SidebarContainer>
+    <>
+      <SidebarContainer isVisible={isVisible}>
+        <SidebarHeader>
+          {pageName || "Visualisation Framework"}
+        </SidebarHeader>
+        <TextSection title="About this visualisation" text={aboutVisualisationText} />
+        {filters && (
+          <SelectorSection
+            filters={filters}
+            onFilterChange={(filter, value) => onFilterChange(filter, value)}
+          />
+        )}
+        {children} {/* Render additional AccordionSections passed as children */}
+        <TextSection title="Legal" text={legalText} />
+      </SidebarContainer>
+      <ToggleButton isVisible={isVisible} onClick={toggleSidebar}>
+        {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
+      </ToggleButton>
+    </>
   );
 };
