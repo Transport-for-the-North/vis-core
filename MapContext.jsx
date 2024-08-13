@@ -177,10 +177,6 @@ export const MapProvider = ({ children }) => {
      * @function initializeContext
      */
     const initializeContext = async () => {
-      const metadataTables = await fetchMetadataTables();
-      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
-      await initializeFilters(metadataTables);
-
       // Initialise non-parameterised layers
       const nonParameterisedLayers = pageContext.config.layers.filter(
         (layer) => !hasRouteParameter(layer.path)
@@ -212,6 +208,11 @@ export const MapProvider = ({ children }) => {
           });
         }
       });
+
+      // Initialise filters
+      const metadataTables = await fetchMetadataTables();
+      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
+      await initializeFilters(metadataTables);
 
       // Initialise visualisations
       const visualisationConfig = pageContext.config.visualisations;
