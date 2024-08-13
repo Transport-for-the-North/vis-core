@@ -29,16 +29,15 @@ const SidebarContainer = styled.div`
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
-  backdrop-filter: blur(8px);
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   transition: left 0.3s ease-in-out;
 `;
 
 const ToggleButton = styled.button`
-  position: fixed;
-  top: 108px;
-  left: ${({ isVisible }) => (isVisible ? "280px" : "10px")};
+  position: absolute;
+  left: 270px;
+  top: 25px;
   z-index: 1001;
   background-color: #7317de;
   color: white;
@@ -51,10 +50,16 @@ const ToggleButton = styled.button`
   align-items: center;
   justify-content: center;
 
+  ${({ $isVisible }) => !$isVisible && `
+    position: fixed;
+    top: 108px;
+    left: 10px;
+  `}
+
   &:hover::after {
-    content: ${({ isVisible }) => (isVisible ? "'Collapse Sidebar'" : "'Expand Sidebar'")};
+    content: ${({ $isVisible }) => ($isVisible ? "'Collapse Sidebar'" : "'Expand Sidebar'")};
     position: absolute;
-    left: 100%; /* Start at the left side */
+    ${({ $isVisible }) => ($isVisible ? "right: 100%;" : "left: 100%;")}
     transform: translateX(0); /* No horizontal translation */
     background-color: black;
     color: white;
@@ -97,6 +102,9 @@ export const Sidebar = ({
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
         </SidebarHeader>
+      <ToggleButton $isVisible={isVisible} onClick={toggleSidebar}>
+        {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
+      </ToggleButton>
         <TextSection title="About this visualisation" text={aboutVisualisationText} />
         {filters && (
           <SelectorSection
@@ -107,9 +115,6 @@ export const Sidebar = ({
         {children} {/* Render additional AccordionSections passed as children */}
         <TextSection title="Legal" text={legalText} />
       </SidebarContainer>
-      <ToggleButton isVisible={isVisible} onClick={toggleSidebar}>
-        {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
-      </ToggleButton>
     </>
   );
 };
