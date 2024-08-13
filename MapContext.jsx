@@ -207,12 +207,7 @@ export const MapProvider = ({ children }) => {
             },
           });
         }
-      });
-
-      // Initialise filters
-      const metadataTables = await fetchMetadataTables();
-      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
-      await initializeFilters(metadataTables);
+      })
 
       // Initialise visualisations
       const visualisationConfig = pageContext.config.visualisations;
@@ -238,6 +233,11 @@ export const MapProvider = ({ children }) => {
           payload: { [visConfig.name]: visualisation },
         });
       });
+
+      // Initialise filters
+      const metadataTables = await fetchMetadataTables();
+      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
+      await initializeFilters(metadataTables);
 
       dispatch({ type: actionTypes.SET_IS_LOADING, payload: false });
     };
