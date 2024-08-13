@@ -25,7 +25,7 @@ const SidebarContainer = styled.div`
   overflow-y: auto;
   text-align: left;
   position: fixed;
-  left: ${({ isVisible }) => (isVisible ? "10px" : "-320px")};
+  left: ${({ $isVisible }) => ($isVisible ? "10px" : "-320px")};
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
@@ -98,7 +98,7 @@ export const Sidebar = ({
 
   return (
     <>
-      <SidebarContainer isVisible={isVisible}>
+      <SidebarContainer $isVisible={isVisible}>
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
         </SidebarHeader>
