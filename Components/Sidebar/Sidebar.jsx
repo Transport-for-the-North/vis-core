@@ -37,10 +37,10 @@ const SidebarContainer = styled.div`
 
 const ToggleButton = styled.button`
   position: fixed;
-  top: 85px;
-  left: ${({ isVisible }) => (isVisible ? "320px" : "10px")};
+  top: 108px;
+  left: ${({ isVisible }) => (isVisible ? "280px" : "10px")};
   z-index: 1001;
-  background-color: #4b3e91;
+  background-color: #7317de;
   color: white;
   border: none;
   border-radius: 5px;
@@ -56,7 +56,7 @@ const ToggleButton = styled.button`
     position: absolute;
     left: 100%; /* Start at the left side */
     transform: translateX(0); /* No horizontal translation */
-    background-color: #4b3e91;
+    background-color: black;
     color: white;
     padding: 5px;
     border-radius: 6px;
