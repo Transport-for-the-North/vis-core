@@ -1,6 +1,6 @@
 import React from "react";
 import { MapLayout } from "Components";
-import { MapProvider, PageContext } from "contexts";
+import { FilterProvider, MapProvider, PageContext } from "contexts";
 
 /**
  * PageSwitch component dynamically renders different page layouts based on the provided page configuration.
@@ -18,9 +18,11 @@ export const PageSwitch = ({ pageConfig }) => {
           case "DualMapLayout":
           case "MapLayout":
             return (
-              <MapProvider>
-                <MapLayout />
-              </MapProvider>
+              <FilterProvider>
+                <MapProvider>
+                  <MapLayout />
+                </MapProvider>
+              </FilterProvider>
             );
           default:
             return <div>Nothing</div>;

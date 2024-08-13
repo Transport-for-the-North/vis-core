@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useMapContext } from "hooks";
+import { useMapContext, useFilterContext } from "hooks";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
@@ -45,32 +45,42 @@ function checkGeometryNotNull(featureCollection) {
  * @returns {JSX.Element} The rendered SelectorSection component.
  */
 export const SelectorSection = ({ filters, onFilterChange }) => {
-  const { state } = useMapContext();
-  const noDataAvailable = state.visualisations[
-    Object.keys(state.visualisations)[0]
-  ]?.data[0]?.feature_collection // Check if it's a GeoJSON feature collection and if it's empty
+  const { state: mapState } = useMapContext();
+  const { state: filterState, dispatch: filterDispatch } = useFilterContext();
+
+  const handleFilterChange = (filter, value) => {
+    filterDispatch({
+      type: 'SET_FILTER_VALUE',
+      payload: { filterId: filter.id, value },
+    });
+    onFilterChange(filter, value);
+  };
+
+  const noDataAvailable = mapState.visualisations[
+    Object.keys(mapState.visualisations)[0]
+  ]?.data[0]?.feature_collection
     ? !checkGeometryNotNull(
         JSON.parse(
-          state.visualisations[Object.keys(state.visualisations)[0]].data[0]
+          mapState.visualisations[Object.keys(mapState.visualisations)[0]].data[0]
             .feature_collection
         )
       )
-    : state.visualisations[Object.keys(state.visualisations)[0]]?.data // If it's not a GeoJSON feature collection, check if it's an array and if it's empty for each visualisation
+    : mapState.visualisations[Object.keys(mapState.visualisations)[0]]?.data // If it's not a GeoJSON feature collection, check if it's an array and if it's empty for each visualisation
         .length === 0 &&
-      state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]?.data
+      mapState.leftVisualisations[Object.keys(mapState.leftVisualisations)[0]]?.data
         .length === 0 &&
-      state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]?.data
+      mapState.rightVisualisations[Object.keys(mapState.rightVisualisations)[0]]?.data
         .length === 0 &&
       Object.values(
-        state.leftVisualisations[Object.keys(state.leftVisualisations)[0]] // Finally verify that all query params are defined for each visualisation
+        mapState.leftVisualisations[Object.keys(mapState.leftVisualisations)[0]] // Finally verify that all query params are defined for each visualisation
           ?.queryParams ?? {}
       ).every((el) => el !== undefined) &&
       Object.values(
-        state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]
+        mapState.rightVisualisations[Object.keys(mapState.rightVisualisations)[0]]
           ?.queryParams ?? {}
       ).every((el) => el !== undefined) &&
       Object.values(
-        state.visualisations[Object.keys(state.visualisations)[0]]
+        mapState.visualisations[Object.keys(mapState.visualisations)[0]]
           ?.queryParams ?? {}
       ).every((el) => el !== undefined);
 
@@ -81,7 +91,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {Array.isArray(filters) && filters.length > 0 ? (
         filters.map((filter) => (
-          <SelectorContainer key={filter.filterName}>
+          <SelectorContainer key={filter.id}>
             <SelectorLabel
               htmlFor={filter.paramName}
               text={filter.filterName}
@@ -89,23 +99,27 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
             />
             {filter.type === "dropdown" && (
               <Dropdown
-                key={filter.filterName}
+                key={filter.id}
                 filter={filter}
-                onChange={(filter, value) => onFilterChange(filter, value)}
+                value={filterState[filter.id]}
+                onChange={(filter, value) => handleFilterChange(filter, value)}
               />
             )}
             {filter.type === "slider" && (
               <Slider
-                key={filter.filterName}
+                key={filter.id}
                 filter={filter}
-                onChange={(filter, value) => onFilterChange(filter, value)}
+                value={filterState[filter.id] || filter.min}
+                onChange={(filter, value) => handleFilterChange(filter, value)}
               />
             )}
             {filter.type === "toggle" && (
               <Toggle
-                key={filter.filterName}
+                key={filter.id}
                 filter={filter}
-                onChange={(filter, value) => onFilterChange(filter, value)}
+                value={filterState[filter.id] || filter.values.values[0].paramValue}
+                onChange={(filter, value) => handleFilterChange(filter, value)}
+
               />
             )}
           </SelectorContainer>
