@@ -29,14 +29,13 @@ const SidebarContainer = styled.div`
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-width: none;
   transition: left 0.3s ease-in-out;
 `;
 
 const ToggleButton = styled.button`
   position: absolute;
-  left: 260px;
+  left: 270px;
   top: 25px;
   z-index: 1001;
   background-color: #7317de;
