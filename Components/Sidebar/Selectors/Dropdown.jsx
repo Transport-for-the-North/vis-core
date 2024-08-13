@@ -23,7 +23,7 @@ export const Dropdown = ({ filter, onChange }) => {
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
     const selectedOption = filter.values.values.find(
-      (option) => option.paramValue === selectedValue
+      (option) => option.paramValue === (isNaN(selectedValue) ? selectedValue : Number(selectedValue))
     );
 
     if (selectedOption) {
