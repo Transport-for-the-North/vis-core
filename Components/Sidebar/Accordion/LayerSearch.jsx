@@ -10,8 +10,8 @@ import { SelectorLabel } from "../Selectors/SelectorLabel";
  * Styled container for the search component.
  */
 const SearchContainer = styled.div`
-margin-top: 10px;
-margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 `;
 
 /**
@@ -187,6 +187,10 @@ export const LayerSearch = ({ map, layer }) => {
         isLoading={isLoading}
         menuIsOpen={options.length > 0} // Only show the dropdown if there are options
         maxMenuHeight={200} // Set a maximum height for the dropdown
+        menuPortalTarget={document.body}
+        styles={{
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }), 
+        }}
       />
     </SearchContainer>
   );

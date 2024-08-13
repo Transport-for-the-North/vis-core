@@ -55,6 +55,7 @@ const DualMaps = () => {
           layerConfig.metadata = {
             ...layerConfig.metadata,
             isStylable: layer.isStylable ?? false,
+            path: layer.path ?? null
           };
 
           if (layer.type === "geojson") {
@@ -83,6 +84,7 @@ const DualMaps = () => {
               source: layer.name,
               "source-layer": layer.sourceLayer,
               metadata: {
+                ...layerConfig.metadata,
                 isStylable: layer.isStylable ?? false,
                 bufferSize: layer.geometryType === "line" ? 7 : null,
               },
