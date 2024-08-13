@@ -1,5 +1,6 @@
-import styled from "styled-components";
-import { useMapContext } from "hooks";
+import React from 'react';
+import styled from 'styled-components';
+import { useFilterContext } from 'hooks';
 
 const StyledDropdown = styled.select`
   width: 100%;
@@ -17,10 +18,12 @@ const StyledDropdown = styled.select`
  * @returns {JSX.Element} The Dropdown component.
  */
 export const Dropdown = ({ filter, onChange }) => {
+  const { state: filterState } = useFilterContext();
+
   const handleDropdownChange = (e) => {
     const selectedValue = e.target.value;
     const selectedOption = filter.values.values.find(
-      (option) => option.displayValue === selectedValue
+      (option) => option.paramValue === selectedValue
     );
 
     if (selectedOption) {
@@ -29,9 +32,12 @@ export const Dropdown = ({ filter, onChange }) => {
   };
 
   return (
-    <StyledDropdown onChange={handleDropdownChange}>
+    <StyledDropdown
+      value={filterState[filter.id]}
+      onChange={handleDropdownChange}
+    >
       {filter.values.values.map((option) => (
-        <option key={option.paramValue} value={option.displayValue}>
+        <option key={option.paramValue} value={option.paramValue}>
           {option.displayValue}
         </option>
       ))}

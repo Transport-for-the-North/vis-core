@@ -1,9 +1,8 @@
 import { useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
-
 import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
-import { useMapContext } from "hooks";
+import { useMapContext, useFilterContext } from "hooks";
 import { loremIpsum } from "utils";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
@@ -32,6 +31,7 @@ const MapContainer = styled.div`
  */
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
+  const { dispatch: filterDispatch } = useFilterContext();
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
@@ -44,41 +44,32 @@ export const MapLayout = () => {
             filter.defaultValue ||
             filter.min ||
             filter.values?.values[0]?.paramValue;
-  
-          switch (actionObj.action) {
-            case "UPDATE_QUERY_PARAMS":
-            case "UPDATE_LEGEND_TEXT":
-              dispatch({
-                type: actionObj.action,
-                payload: { filter, value: defaultValue },
-              });
-              break;
-  
-            case "UPDATE_DUAL_QUERY_PARAMS":
-              let sides = "";
-              if (filter.filterName.includes("Left")) sides = "left";
-              else if (filter.filterName.includes("Right")) sides = "right";
-              else sides = "both";
-  
-              dispatch({
-                type: actionObj.action,
-                payload: { filter, value: defaultValue, sides: sides },
-              });
-              break;
-            default:
-              break;
-          }
+
+          let sides = "";
+          if (filter.filterName.includes("Left")) sides = "left";
+          else if (filter.filterName.includes("Right")) sides = "right";
+          else sides = "both";
+          dispatch({
+            type: actionObj.action,
+            payload: { filter, value: defaultValue, sides: sides },
+          });
         });
       });
       initializedRef.current = true;
     }
-  }, [pageContext, dispatch, state.visualisations, state.leftVisualisations, state.rightVisualisations]);
-  
+  }, [dispatch, state.filters, state.visualisations]);
+
   useEffect(() => {
     initializedRef.current = false;
-  }, [pageContext]);
+    filterDispatch({ type: 'RESET_FILTERS' });
+  }, [pageContext, filterDispatch]);
 
   const handleFilterChange = (filter, value) => {
+    filterDispatch({
+      type: 'SET_FILTER_VALUE',
+      payload: { filterId: filter.id, value },
+    });
+
     if (!filter.visualisations[0].includes("Side")) {
       filter.actions.map((action) => {
         dispatch({
