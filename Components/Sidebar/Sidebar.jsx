@@ -36,7 +36,7 @@ const SidebarContainer = styled.div`
 
 const ToggleButton = styled.button`
   position: absolute;
-  left: 270px;
+  left: 260px;
   top: 25px;
   z-index: 1001;
   background-color: #7317de;
