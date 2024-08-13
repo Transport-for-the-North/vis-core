@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import styled from 'styled-components'
-
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { useFilterContext } from 'hooks';
 
 const StyledSliderContainer = styled.div`
   display: flex;
@@ -36,44 +36,49 @@ const SliderValue = styled.span`
  * @returns {JSX.Element} The rendered Slider component.
  */
 export const Slider = ({ filter, onChange }) => {
-    const [value, setValue] = useState(filter.min); // Initialize the state with the minimum value
-  
-    const getDisplayValue = (sliderValue) => {
-      if (filter.displayAs) {
-        const { operation, operand, unit } = filter.displayAs;
-        let result = sliderValue;
-  
-        switch (operation) {
-          case "divide":
-            result = operand ? sliderValue / operand : sliderValue;
-            break;
-          // Add more cases for different operations if needed
-          default:
-            result = sliderValue;
-        }
-  
-        return `${result} ${unit || ""}`;
+  const { state: filterState } = useFilterContext();
+  const [value, setValue] = useState(filterState[filter.id] || filter.min);
+
+  useEffect(() => {
+    setValue(filterState[filter.id] || filter.min);
+  }, [filterState, filter.id, filter.min]);
+
+  const getDisplayValue = (sliderValue) => {
+    if (filter.displayAs) {
+      const { operation, operand, unit } = filter.displayAs;
+      let result = sliderValue;
+
+      switch (operation) {
+        case "divide":
+          result = operand ? sliderValue / operand : sliderValue;
+          break;
+        // Add more cases for different operations if needed
+        default:
+          result = sliderValue;
       }
-      return sliderValue;
-    };
-  
-    const handleSliderChange = (e) => {
-      const newValue = e.target.value;
-      setValue(newValue); // Update the state with the new value
-      onChange(filter, newValue); // Call the onChange handler with the new value
-    };
-  
-    return (
-      <StyledSliderContainer>
-        <StyledSlider
-          type="range"
-          min={filter.min}
-          max={filter.max}
-          step={filter.interval}
-          value={value} // Set the value of the slider to the state value
-          onChange={handleSliderChange}
-        />
-        <SliderValue>{getDisplayValue(value)}</SliderValue>
-      </StyledSliderContainer>
-    );
+
+      return `${result} ${unit || ""}`;
+    }
+    return sliderValue;
   };
+
+  const handleSliderChange = (e) => {
+    const newValue = e.target.value;
+    setValue(newValue); // Update the state with the new value
+    onChange(filter, newValue); // Call the onChange handler with the new value
+  };
+
+  return (
+    <StyledSliderContainer>
+      <StyledSlider
+        type="range"
+        min={filter.min}
+        max={filter.max}
+        step={filter.interval}
+        value={value} // Set the value of the slider to the state value
+        onChange={handleSliderChange}
+      />
+      <SliderValue>{getDisplayValue(value)}</SliderValue>
+    </StyledSliderContainer>
+  );
+};
