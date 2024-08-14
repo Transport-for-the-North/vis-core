@@ -1759,6 +1759,15 @@ export const appConfig = {
             type: "toggle",
             values: timePeriodValues
           },
+          {
+            filterName: "User Class",
+            paramName: "userClass",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Matrix"],
+            type: "dropdown",
+            values: userClassValues
+          },
         ],
       },
     },
