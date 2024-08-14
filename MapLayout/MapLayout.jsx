@@ -37,7 +37,7 @@ export const MapLayout = () => {
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (!initializedRef.current && Object.keys(state.visualisations).length > 0 && Object.keys(state.filters).length > 0) {
+    if (!initializedRef.current && state.pageIsReady) {
       state.filters.forEach((filter) => {
         filter.actions.forEach((actionObj) => {
           let defaultValue =
@@ -57,7 +57,7 @@ export const MapLayout = () => {
       });
       initializedRef.current = true;
     }
-  }, [dispatch, state.filters, state.visualisations]);
+  }, [dispatch, state.pageIsReady, state.filters, state.visualisations]);
 
   useEffect(() => {
     initializedRef.current = false;
@@ -70,7 +70,7 @@ export const MapLayout = () => {
       payload: { filterId: filter.id, value },
     });
   
-    if (filter.values.source === 'metadataTable') {
+    if (filter.values?.source === 'metadataTable') {
       const validatedFilters = updateFilterValidity(state, filter, value);
   
       dispatch({
