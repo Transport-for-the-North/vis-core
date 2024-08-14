@@ -102,13 +102,17 @@ export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleCl
     const opacityProp = getOpacityProperty(layer.type);
     let opacityExpression;
 
-    opacityExpression = [
-      "case",
-      ["in", ["feature-state", "value"], ["literal", [0, null]]],
-      0, // Set opacity to 0 for null or zero values
-      newOpacity, // Set opacity to the slider value otherwise
-    ];
-    
+    // Apply the logic to filter out nulls and zeroes only if it was originally present
+    if (isFeatureStateExpression) {
+      opacityExpression = [
+        "case",
+        ["in", ["feature-state", "value"], ["literal", [0, null]]],
+        0, // Set opacity to 0 for null or zero values
+        newOpacity, // Set opacity to the slider value otherwise
+      ];
+    } else {
+      opacityExpression = newOpacity;
+    }
     map.setPaintProperty(layer.id, opacityProp, opacityExpression);
     setOpacity(newOpacity);
   };
