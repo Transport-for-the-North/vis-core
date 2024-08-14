@@ -10,7 +10,7 @@ const customStyles = {
     ...base,
     zIndex: 9999, // Adjust zIndex to be higher than everything else
   }),
-  option: (styles, { data, isFocused }) => ({
+  option: (styles, { isFocused }) => ({
     ...styles,
     display: 'flex',
     justifyContent: 'space-between',
