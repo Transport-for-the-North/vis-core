@@ -8,7 +8,6 @@
  */
 export function updateFilterValidity(state, individualFilter, paramValue) {
     const sourceName = individualFilter.values?.metadataTableName;
-    const relatedFilters = state.filters.filter(filter => filter.values.metadataTableName === sourceName);
     const metadataTable = state.metadataTables[sourceName];
 
     if (!metadataTable) {
@@ -21,7 +20,7 @@ export function updateFilterValidity(state, individualFilter, paramValue) {
 
     // Create a new filters array with updated isValid values
     const updatedFilters = state.filters.map(filter => {
-        if (filter.values.metadataTableName === sourceName) {
+        if (filter.values?.metadataTableName === sourceName) {
             // Create a set of valid paramValues from the valid rows for the current filter's column
             const validParamValues = new Set();
             validRows.forEach(row => {

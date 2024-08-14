@@ -401,13 +401,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link"],
             type: "toggle",
-            values: {
-              source: "metadataTable",
-              metadataTableName: "v_input_scenarios",
-              displayColumn: "time_period_code",
-              paramColumn: "time_period_code",
-              sort: "ascending",
-            },
+            values: timePeriodValues
           },
         ],
       },
@@ -1763,13 +1757,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "toggle",
-            values: {
-              source: "metadataTable",
-              metadataTableName: "v_input_scenarios",
-              displayColumn: "time_period_code",
-              paramColumn: "time_period_code",
-              sort: "ascending",
-            },
+            values: timePeriodValues
           },
         ],
       },
