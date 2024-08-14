@@ -1652,7 +1652,12 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataTables: [],
+        metadataTables: [
+          {
+            name: "v_input_scenarios",
+            path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+          }
+        ],
         filters: [
           {
             filterName: "Select zone in map",
@@ -1689,7 +1694,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Delivery Programme",
+            filterName: "Delivery programme",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme",
             target: "api",
@@ -1697,7 +1702,11 @@ export const appConfig = {
             visualisations: ["Matrix"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1707,10 +1716,16 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_year",
+              paramColumn: "network_year",
+              sort: "ascending",
+            },
           },
           {
-            filterName: "Network Scenario Name",
+            filterName: "Network scenario",
             paramName: "networkScenarioName",
             info: "Network DM/DS",
             target: "api",
@@ -1718,11 +1733,15 @@ export const appConfig = {
             visualisations: ["Matrix"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
-            filterName: "Demand Scenario",
+            filterName: "Demand scenario",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario",
             target: "api",
@@ -1730,29 +1749,26 @@ export const appConfig = {
             visualisations: ["Matrix"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
-            filterName: "Time Period",
+            filterName: "Time period",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "toggle",
             values: {
-              source: "api",
-            },
-          },
-          {
-            filterName: "User Class",
-            paramName: "userClass",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Matrix"],
-            type: "dropdown",
-            values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "time_period_code",
+              paramColumn: "time_period_code",
+              sort: "ascending",
             },
           },
         ],
