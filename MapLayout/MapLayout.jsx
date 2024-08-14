@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext } from "hooks";
-import { loremIpsum } from "utils";
+import { loremIpsum, updateFilterValidity } from "utils";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
 
@@ -69,7 +69,16 @@ export const MapLayout = () => {
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value },
     });
-
+  
+    if (filter.values.source === 'metadataTable') {
+      const validatedFilters = updateFilterValidity(state, filter, value);
+  
+      dispatch({
+        type: 'UPDATE_FILTER_VALUES',
+        payload: { updatedFilters: validatedFilters },
+      });
+    }
+  
     if (!filter.visualisations[0].includes("Side")) {
       filter.actions.map((action) => {
         dispatch({
