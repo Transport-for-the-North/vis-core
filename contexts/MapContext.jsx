@@ -1,7 +1,8 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { actionTypes, mapReducer } from 'reducers';
 import { hasRouteParameter, replaceRouteParameter, sortValues } from 'utils';
-import { AppContext, PageContext } from 'contexts';
+import { AppContext, PageContext, FilterContext } from 'contexts';
 import { api } from 'services';
 
 // Create a context for the app configuration
@@ -18,6 +19,7 @@ const initialState = {
   map: null,
   isMapReady: false,
   isLoading: true,
+  pageIsReady: false,
 };
 
 /**
@@ -43,6 +45,7 @@ const isDuplicateValue = (values, value) => {
 export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
+  const { dispatch: filterDispatch } = useContext(FilterContext);
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
   const contextValue = React.useMemo(() => {
@@ -77,16 +80,18 @@ export const MapProvider = ({ children }) => {
      */
     const initializeFilters = async (metadataTables) => {
       const filters = [];
+      const filterState = {};
       for (const filter of pageContext.config.filters) {
+        const filterWithId = { ...filter, id: uuidv4() }; // Add unique ID to each filter
         switch (filter.type) {
           case 'map':
           case 'slider':
-            filters.push(filter);
+            filters.push(filterWithId);
             break;
           default:
             switch (filter.values.source) {
               case 'local':
-                filters.push(filter);
+                filters.push(filterWithId);
                 break;
               case 'api':
                 const path = '/api/tame/mvdata';
@@ -108,7 +113,7 @@ export const MapProvider = ({ children }) => {
                     displayValue: v,
                     paramValue: v,
                   }));
-                  filters.push(filter);
+                  filters.push(filterWithId);
                 } catch (error) {
                   console.error('Error fetching metadata filters', error);
                 }
@@ -138,7 +143,7 @@ export const MapProvider = ({ children }) => {
                   }
 
                   filter.values.values = uniqueValues;
-                  filters.push(filter);
+                  filters.push(filterWithId);    
                 } else {
                   console.error(`Metadata table ${filter.values.metadataTableName} not found`);
                 }
@@ -147,6 +152,7 @@ export const MapProvider = ({ children }) => {
                 console.error('Unknown filter source:', filter.values.source);
             }
         }
+        filterState[filterWithId.id] = filterWithId.defaultValue || filterWithId.min || filterWithId.values?.values[0]?.paramValue;
       }
 
       // Incorporate 'sides' logic
@@ -164,6 +170,10 @@ export const MapProvider = ({ children }) => {
       });
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
+      filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
+
+      // Set pageIsReady to true once all filters are initialized
+      dispatch({ type: actionTypes.SET_PAGE_IS_READY, payload: true });
     };
 
     /**
@@ -171,10 +181,6 @@ export const MapProvider = ({ children }) => {
      * @function initializeContext
      */
     const initializeContext = async () => {
-      const metadataTables = await fetchMetadataTables();
-      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
-      await initializeFilters(metadataTables);
-
       // Initialise non-parameterised layers
       const nonParameterisedLayers = pageContext.config.layers.filter(
         (layer) => !hasRouteParameter(layer.path)
@@ -232,7 +238,12 @@ export const MapProvider = ({ children }) => {
         });
       });
 
-      dispatch({ type: actionTypes.SET_IS_LOADING, payload: false });
+      // Initialise filters
+      const metadataTables = await fetchMetadataTables();
+      dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
+      await initializeFilters(metadataTables);
+
+      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     };
 
     initializeContext();
@@ -244,5 +255,9 @@ export const MapProvider = ({ children }) => {
     };
   }, [pageContext]);
 
-  return <MapContext.Provider value={contextValue}>{children}</MapContext.Provider>;
+  return (
+    <MapContext.Provider value={contextValue}>
+      {state.pageIsReady ? children : <div>Loading...</div>}
+    </MapContext.Provider>
+  );
 };

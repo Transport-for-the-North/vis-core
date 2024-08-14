@@ -29,8 +29,7 @@ const SidebarContainer = styled.div`
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-width: none;
   transition: left 0.3s ease-in-out;
 `;
 

@@ -23,6 +23,8 @@ export const actionTypes = {
     SET_METADATA_TABLES: 'SET_METADATA_TABLES',
     SET_FILTERS: 'SET_FILTERS',
     RESET_CONTEXT: 'RESET_CONTEXT',
+    UPDATE_FILTER_VALUES: 'UPDATE_FILTER_VALUES',
+
 };
 
 /**
@@ -37,7 +39,7 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}, filters: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true };
+            return { ...state, layers: {}, visualisations: {}, filters: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true, pageIsReady: false};
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload };
         case actionTypes.INITIALISE_SIDEBAR:
@@ -255,6 +257,15 @@ export const mapReducer = (state, action) => {
         }
         case actionTypes.SET_FILTERS: {
             return { ...state, filters: action.payload };
+        }
+        case actionTypes.UPDATE_FILTER_VALUES: {
+            return { ...state, filters: action.payload.updatedFilters };
+        }
+        case actionTypes.SET_PAGE_IS_READY: {
+            return {
+                ...state,
+                pageIsReady: action.payload,
+            };
         }
         default:
             return state;
