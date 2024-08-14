@@ -10,17 +10,21 @@ const customStyles = {
     ...base,
     zIndex: 9999, // Adjust zIndex to be higher than everything else
   }),
-  option: (styles, { data }) => ({
+  option: (styles, { data, isFocused }) => ({
     ...styles,
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '10px',
-    backgroundColor: data.isFocused ? 'lightgray' : 'white',
+    backgroundColor: isFocused ? 'lightgray' : 'white',
     color: 'black',
+    cursor: 'pointer', // Change cursor to pointer
     ':active': {
       ...styles[':active'],
       backgroundColor: 'lightgray',
+    },
+    ':hover': {
+      backgroundColor: 'lightgray', // Highlight on hover
     },
   }),
 };
