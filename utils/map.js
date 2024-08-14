@@ -96,7 +96,12 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["feature-state", "value"],
           ...widthObject,
         ],
-        "line-opacity": 1,
+        "line-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 1,
+        ],
         "line-offset": [
           "interpolate",
           ["linear"],
@@ -123,7 +128,12 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["feature-state", "valueAbs"],
           ...widthObject,
         ],
-        "line-opacity": 1,
+        "line-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 1,
+        ],
         "line-offset": [
           "interpolate",
           ["linear"],
@@ -143,13 +153,19 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           "case",
           ["in", ["feature-state", "value"], ["literal", [0, null]]],
           0.0,
-          0.8,
+          0.5,
         ],
         "circle-opacity": [
           "case",
-          ["in", ["feature-state", "value"], ["literal", [0, null]]],
-          0.0,
-          0.65,
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 0.65,
+        ],
+        "circle-stroke-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 0.2,
         ],
         "circle-radius": 
           ["interpolate",
@@ -191,11 +207,10 @@ export const resetPaintProperty = (style) => {
     case "circle-diverging":
     case "circle-categorical":
       return {
-        "circle-color": "rgba(0, 0, 0, 100)",
-        "circle-stroke-width": 0.8,
-        "circle-opacity": 1,
-        "circle-radius": 5,
-        "circle-stroke-color": "rgba(0, 0, 0, 100)",
+        "circle-color": "rgb(0, 0, 0)",
+        "circle-stroke-width": 0.5,
+        "circle-opacity": 0.65,
+        "circle-radius": 2,
       };
     default:
       return {};
@@ -321,6 +336,7 @@ export const getLayerStyle = (geometryType) => {
         paint: {
           "fill-color": "rgb(255, 255, 0, 0)",
           "fill-outline-color": "rgba(195, 195, 195, 1)",
+          "fill-opacity": 1
         },
       };
     case "line":
@@ -333,16 +349,26 @@ export const getLayerStyle = (geometryType) => {
           "line-opacity": 0.8,
         },
       };
-    case "point":
-      return {
-        id: "",
-        type: "circle",
-        source: "",
-        paint: {
-          "circle-radius": 5,
-          "circle-color": "black",
-        },
-      };
+      case "point":
+        return {
+          id: "",
+          type: "circle",
+          source: "",
+          paint: {
+            "circle-radius": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              0, 2,
+              12, 8,
+              22, 22
+            ],
+            "circle-color": "#1E90FF",
+            "circle-stroke-color": "#FFFFFF",
+            "circle-stroke-width": 2,
+            "circle-opacity": 0.85
+          },
+        };
     default:
       return {};
   }
