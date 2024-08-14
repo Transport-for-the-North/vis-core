@@ -35,6 +35,7 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
+  const pageRef = useRef(pageContext);
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -60,8 +61,11 @@ export const MapLayout = () => {
   }, [dispatch, state.pageIsReady, state.filters, state.visualisations]);
 
   useEffect(() => {
-    initializedRef.current = false;
-    filterDispatch({ type: 'RESET_FILTERS' });
+    if (pageRef.current !== pageContext) {
+      initializedRef.current = false;
+      pageRef.current = pageContext;
+      filterDispatch({ type: 'RESET_FILTERS' });
+    }
   }, [pageContext, filterDispatch]);
 
   const handleFilterChange = (filter, value) => {

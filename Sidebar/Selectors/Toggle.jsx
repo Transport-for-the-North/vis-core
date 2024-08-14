@@ -52,17 +52,17 @@ export const Toggle = ({ filter, onChange }) => {
   );
 
   useEffect(() => {
-    setCurrentButton(filterState[filter.id] || filter.values.values[0].displayValue);
+    setCurrentButton(filterState[filter.id] || filter.values.values[0].paramValue);
   }, [filterState]);
 
   const handleToggleChange = (e) => {
     const selectedValue = e.target.value;
     const selectedOption = filter.values.values.find(
-      (option) => option.paramValue === (isNaN(selectedValue) ? selectedValue : Number(selectedValue))
+      (option) => option.paramValue === selectedValue
     );
     if (selectedOption) {
       onChange(filter, selectedOption.paramValue);
-      setCurrentButton(selectedOption.displayValue);
+      setCurrentButton(selectedOption.paramValue);
     }
   };
 
@@ -71,9 +71,9 @@ export const Toggle = ({ filter, onChange }) => {
       {filter.values.values.map((option, index) => (
         <StyledButton
           key={option.paramValue}
-          value={option.displayValue}
+          value={option.paramValue}
           onClick={handleToggleChange}
-          $isSelected={currentButton === option.displayValue}
+          $isSelected={currentButton === option.paramValue}
           size={filter.values.values.length}
           index={index}
         >
