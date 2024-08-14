@@ -109,7 +109,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       // Update the map style based on the type of map, reclassified data, and color palette
 
       const opacityValue = document.getElementById(
-        "opacity-" + visualisationName
+        "opacity-" + visualisation.joinLayer
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
@@ -172,7 +172,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       // Update the map style based on the type of map, reclassified data, and color palette
 
       const opacityValue = document.getElementById(
-        "opacity-" + visualisationName
+        "opacity-" + visualisation.joinLayer
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
