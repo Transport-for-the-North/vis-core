@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, sortValues, updateFilterValidity } from 'utils';
+import { hasRouteParameter, replaceRouteParameter, sortValues } from 'utils';
 import { AppContext, PageContext, FilterContext } from 'contexts';
 import { api } from 'services';
 
@@ -19,6 +19,7 @@ const initialState = {
   map: null,
   isMapReady: false,
   isLoading: true,
+  pageIsReady: false,
 };
 
 /**
@@ -170,9 +171,10 @@ export const MapProvider = ({ children }) => {
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
+
+      // Set pageIsReady to true once all filters are initialized
+      dispatch({ type: actionTypes.SET_PAGE_IS_READY, payload: true });
     };
-    
-    
 
     /**
      * Main async function to manage the workflow.
@@ -209,7 +211,7 @@ export const MapProvider = ({ children }) => {
             },
           });
         }
-      })
+      });
 
       // Initialise visualisations
       const visualisationConfig = pageContext.config.visualisations;
@@ -241,7 +243,7 @@ export const MapProvider = ({ children }) => {
       dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
       await initializeFilters(metadataTables);
 
-      dispatch({ type: actionTypes.SET_IS_LOADING, payload: false });
+      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     };
 
     initializeContext();
@@ -253,5 +255,9 @@ export const MapProvider = ({ children }) => {
     };
   }, [pageContext]);
 
-  return <MapContext.Provider value={contextValue}>{children}</MapContext.Provider>;
+  return (
+    <MapContext.Provider value={contextValue}>
+      {state.pageIsReady ? children : <div>Loading...</div>}
+    </MapContext.Provider>
+  );
 };
