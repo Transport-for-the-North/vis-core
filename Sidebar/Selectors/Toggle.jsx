@@ -44,7 +44,7 @@ export const Toggle = ({ filter, onChange }) => {
   );
 
   useEffect(() => {
-    setCurrentButton(filterState[filter.id] || filter.values.values[0]);
+    setCurrentButton(filterState[filter.id] || filter.values.values[0].displayValue);
   }, [filterState]);
 
   const handleToggleChange = (e) => {
@@ -54,7 +54,7 @@ export const Toggle = ({ filter, onChange }) => {
     );
     if (selectedOption) {
       onChange(filter, selectedOption.paramValue);
-      setCurrentButton(selectedOption);
+      setCurrentButton(selectedOption.displayValue);
     }
   };
 
