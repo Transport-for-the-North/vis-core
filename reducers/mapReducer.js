@@ -39,7 +39,7 @@ export const actionTypes = {
 export const mapReducer = (state, action) => {
     switch (action.type) {
         case actionTypes.RESET_CONTEXT:
-            return { ...state, layers: {}, visualisations: {}, filters: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true };
+            return { ...state, layers: {}, visualisations: {}, filters: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true, pageIsReady: false};
         case actionTypes.SET_PAGE_INFO:
             return { ...state, pageInfo: action.payload };
         case actionTypes.INITIALISE_SIDEBAR:
@@ -260,8 +260,13 @@ export const mapReducer = (state, action) => {
         }
         case actionTypes.UPDATE_FILTER_VALUES: {
             return { ...state, filters: action.payload.updatedFilters };
-          }
-      
+        }
+        case actionTypes.SET_PAGE_IS_READY: {
+            return {
+                ...state,
+                pageIsReady: action.payload,
+            };
+        }
         default:
             return state;
     }
