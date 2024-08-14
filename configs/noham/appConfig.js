@@ -310,7 +310,12 @@ export const appConfig = {
             dataPath: "/api/noham/link-results",
           },
         ],
-        metadataTables: [],
+        metadataTables: [
+          {
+            name: "v_input_scenarios",
+            path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+          }
+        ],
         filters: [
           {
             filterName: "Metric",
@@ -335,7 +340,11 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -346,7 +355,11 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_year",
+              paramColumn: "network_year",
+              sort: "ascending",
             },
           },
           {
@@ -358,7 +371,11 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -370,7 +387,11 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -381,7 +402,11 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "toggle",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "time_period_code",
+              paramColumn: "time_period_code",
+              sort: "ascending",
             },
           },
         ],

@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, sortValues } from 'utils';
+import { hasRouteParameter, replaceRouteParameter, sortValues, updateFilterValidity } from 'utils';
 import { AppContext, PageContext, FilterContext } from 'contexts';
 import { api } from 'services';
 
@@ -142,7 +142,7 @@ export const MapProvider = ({ children }) => {
                   }
 
                   filter.values.values = uniqueValues;
-                  filters.push(filterWithId);
+                  filters.push(filterWithId);    
                 } else {
                   console.error(`Metadata table ${filter.values.metadataTableName} not found`);
                 }
@@ -171,6 +171,8 @@ export const MapProvider = ({ children }) => {
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
     };
+    
+    
 
     /**
      * Main async function to manage the workflow.

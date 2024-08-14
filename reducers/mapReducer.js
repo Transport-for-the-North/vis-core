@@ -23,6 +23,8 @@ export const actionTypes = {
     SET_METADATA_TABLES: 'SET_METADATA_TABLES',
     SET_FILTERS: 'SET_FILTERS',
     RESET_CONTEXT: 'RESET_CONTEXT',
+    UPDATE_FILTER_VALUES: 'UPDATE_FILTER_VALUES',
+
 };
 
 /**
@@ -256,6 +258,10 @@ export const mapReducer = (state, action) => {
         case actionTypes.SET_FILTERS: {
             return { ...state, filters: action.payload };
         }
+        case actionTypes.UPDATE_FILTER_VALUES: {
+            return { ...state, filters: action.payload.updatedFilters };
+          }
+      
         default:
             return state;
     }
