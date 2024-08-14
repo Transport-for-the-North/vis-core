@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useFilterContext } from 'hooks';
 
@@ -26,6 +26,13 @@ const StyledButton = styled.button`
   border-width: 0.25px;
   width: ${(props) => 100 / props.size + "%"};
   font-family: "Hanken Grotesk", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const IconWrapper = styled.span`
+  margin-left: 5px;
 `;
 
 /**
@@ -34,6 +41,7 @@ const StyledButton = styled.button`
  * @property {Array} filter.values - An array of objects representing the possible toggle values.
  * @property {string} filter.values[].paramValue - The parameter value associated with the option.
  * @property {string} filter.values[].displayValue - The display value shown to the user.
+ * @property {boolean} [filter.values[].isValid] - The validity of the option.
  * @property {Function} onChange - The function called when a new toggle option is selected.
  * @returns {JSX.Element} The rendered Toggle component.
  */
@@ -70,6 +78,11 @@ export const Toggle = ({ filter, onChange }) => {
           index={index}
         >
           {option.displayValue}
+          {option.isValid !== undefined && (
+            <IconWrapper>
+              {option.isValid ? '✅' : '⚠️'}
+            </IconWrapper>
+          )}
         </StyledButton>
       ))}
     </StyledToggle>
