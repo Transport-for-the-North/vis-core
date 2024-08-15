@@ -15,10 +15,16 @@ export const RoleValidation = ({ component: WrappedComponent }) => {
     const appName = process.env.REACT_APP_NAME;
     console.log("AppName in RoleValidation", appName);
 
-    const userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
+    let userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
+
+    // Ensure userRoles is an array
+    if (typeof userRoles === 'string') {
+        userRoles = [userRoles];
+    }
+
     const isAuthenticated = !!token;
     const lowerCaseUserRoles = userRoles.map(role => role.toLowerCase());
-   
+
     const requiredRoles = [
         `${appName}_user`,
         `${appName}_admin`,
