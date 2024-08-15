@@ -26,7 +26,7 @@ const Map = () => {
   const { state, dispatch } = useMapContext();
   const popups = [];
   const listenerCallbackRef = useRef({});
-  const hoverIdRef = useRef(99999999);
+  const hoverIdRef = useRef({});
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
@@ -127,7 +127,7 @@ const Map = () => {
         if (map.getLayer(hoverLayerId)) {
           const sourceLayer = getSourceLayer(map, layerId);
           map.setFeatureState(
-            { source: layerId, id: hoverIdRef.current, sourceLayer },
+            { source: layerId, id: hoverIdRef.current[layerId], sourceLayer },
             { hover: false }
           );
         }
@@ -138,20 +138,20 @@ const Map = () => {
       const sourceLayer = feature.layer["source-layer"];
       if (map.getLayer(hoverLayerId)) {
         map.setFeatureState(
-          { source, id: hoverIdRef.current, sourceLayer },
+          { source, id: hoverIdRef.current[layerId], sourceLayer },
           { hover: false }
         );
-        hoverIdRef.current = feature.id;
+        hoverIdRef.current[layerId] = feature.id;
         map.setFeatureState(
-          { source, id: hoverIdRef.current, sourceLayer },
+          { source, id: hoverIdRef.current[layerId], sourceLayer },
           { hover: true }
         );
         return;
       }
 
-      hoverIdRef.current = feature.id;
+      hoverIdRef.current[layerId] = feature.id;
       map.setFeatureState(
-        { source, id: hoverIdRef.current, sourceLayer },
+        { source, id: hoverIdRef.current[layerId], sourceLayer },
         { hover: true }
       );
     },
@@ -237,7 +237,7 @@ const Map = () => {
       if (map.getLayer(`${layerId}-hover`)) {
         const sourceLayer = getSourceLayer(map, layerId);
         map.setFeatureState(
-          { source: layerId, id: hoverIdRef.current, sourceLayer },
+          { source: layerId, id: hoverIdRef.current[layerId], sourceLayer },
           { hover: false }
         );
       }
