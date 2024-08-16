@@ -458,7 +458,7 @@ export const appConfig = {
             name: "NoRMS Station Pair Result",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}?station_flag=true", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Station Pairs",
@@ -581,7 +581,7 @@ export const appConfig = {
             name: "NoRMS Station Pair Result Difference",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}?station_flag=true", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Station Pairs Difference",
@@ -738,7 +738,7 @@ export const appConfig = {
             name: "NoRMS Station Pair Result Side-by-Side",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}?station_flag=true", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Station Pairs Side-by-Side",
@@ -908,7 +908,7 @@ export const appConfig = {
             name: "NoRMS Nodes",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}?station_flag=true", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Station Catchment",
@@ -1207,7 +1207,7 @@ export const appConfig = {
             name: "NoRMS Nodes",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}?station_flag=true", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Station Catchment Side-by-Side",
