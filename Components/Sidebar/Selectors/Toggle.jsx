@@ -29,6 +29,11 @@ const StyledButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:hover {
+    background-color: ${(props) => (props.$isSelected ? "#7317DE" : "white")};
+    color: ${(props) => (props.$isSelected ? "white" : "black")};
+  }
 `;
 
 const IconWrapper = styled.span`
