@@ -15,6 +15,7 @@ const SidebarHeader = styled.h2`
   color: #333;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
+  max-width: 270px
 `;
 
 const SidebarContainer = styled.div`
