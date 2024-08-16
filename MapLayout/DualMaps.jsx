@@ -5,8 +5,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useCallback, useEffect, useRef } from "react";
 import { api } from "services";
 import styled from "styled-components";
-import { getHoverLayerStyle, getLayerStyle, getSourceLayer } from "utils";
+import { getHoverLayerStyle, getLayerStyle, getSourceLayer, numberWithCommas } from "utils";
 import { Visualisation } from "./Visualisation";
+import './MapLayout.css'
 
 const StyledMapContainer = styled.div`
   width: 50%;
@@ -30,7 +31,7 @@ const DualMaps = () => {
   const maps = [leftMap, rightMap];
   const popups = [];
   const listenerCallbackRef = useRef({});
-  const hoverIdRef = useRef({ left: 99999999, right: 99999999 });
+  const hoverIdRef = useRef({ left: {}, right: {}});
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
@@ -121,7 +122,7 @@ const DualMaps = () => {
       const hoverLayerId = `${layerId}-hover`;
       const map = mapType === "left" ? leftMap : rightMap;
       const hoverId =
-        mapType === "left" ? hoverIdRef.current.left : hoverIdRef.current.right;
+        mapType === "left" ? hoverIdRef.current.left[layerId] : hoverIdRef.current.right[layerId];
         let features = [];
       if (layerId in map.style._layers) {
          features = map.queryRenderedFeatures(e.point, {
@@ -153,9 +154,9 @@ const DualMaps = () => {
             { hover: false }
           );
           if (mapType === "left") {
-            hoverIdRef.current.left = feature.id;
+            hoverIdRef.current.left[layerId] = feature.id;
           } else {
-            hoverIdRef.current.right = feature.id;
+            hoverIdRef.current.right[layerId] = feature.id;
           }
           map.setFeatureState(
             { source, id: feature.id, sourceLayer },
@@ -176,35 +177,60 @@ const DualMaps = () => {
   const handleLayerHoverTooltip = useCallback(
     (e, layerId, bufferSize) => {
       if (popups.length !== 0) {
-        popups.map((popup) => popup.remove());
+        popups.forEach((popup) => popup.remove());
         popups.length = 0;
       }
-      const bufferdPoint = [
+  
+      const bufferedPoint = [
         [e.point.x - bufferSize, e.point.y - bufferSize],
         [e.point.x + bufferSize, e.point.y + bufferSize],
       ];
+  
       maps.forEach((map) => {
-        let feature = [];
+        let features = [];
         if (layerId in map.style._layers) {
-          feature = map.queryRenderedFeatures(bufferdPoint, {
+          features = map.queryRenderedFeatures(bufferedPoint, {
             layers: [layerId],
           });
         }
-        if (feature.length !== 0) {
+  
+        if (features.length !== 0) {
           const coordinates = e.lngLat;
-          const description = `<p>Id: ${
-            feature[0].properties.name
-          }</p><p>Value: ${feature[0].state.value ?? 0}</p>`;
-          const newPopup = new maplibregl.Popup()
-            .setLngLat(coordinates)
-            .setHTML(description)
-            .addTo(map);
-          popups.push(newPopup);
+          const featureName = features[0].properties.name || '';
+          const featureValue = features[0].state.value || '';
+  
+          let description = '';
+          if (featureName && featureValue) {
+            description = `
+              <div class="popup-content">
+                <p class="feature-name">${featureName}</p>
+                <hr class="divider">
+                <p class="feature-value">${numberWithCommas(featureValue)}</p>
+              </div>`;
+          } else if (featureName) {
+            description = `
+              <div class="popup-content">
+                <p class="feature-name">${featureName}</p>
+              </div>`;
+          }
+  
+          if (description) {
+            const newPopup = new maplibregl.Popup({
+              className: 'custom-popup',
+              closeButton: false,
+              closeOnClick: false,
+            })
+              .setLngLat(coordinates)
+              .setHTML(description)
+              .addTo(map);
+            popups.push(newPopup);
+          }
         }
       });
     },
-    [leftMap, rightMap, popups]
+    [maps, popups]
   );
+  
 
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
@@ -250,7 +276,7 @@ const DualMaps = () => {
     (layerId, mapType) => {
       if (leftMap === null && rightMap === null) return;
       const hoverId =
-        mapType === "left" ? hoverIdRef.current.left : hoverIdRef.current.right;
+        mapType === "left" ? hoverIdRef.current.left[layerId] : hoverIdRef.current.right[layerId];
 
       maps.forEach((map) => {
         if (map.getLayer(`${layerId}-hover`)) {
