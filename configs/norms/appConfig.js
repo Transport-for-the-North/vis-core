@@ -915,7 +915,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
-            shouldHaveTooltipOnHover: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
