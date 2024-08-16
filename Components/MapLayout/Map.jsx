@@ -125,7 +125,7 @@ const Map = () => {
         });
       }
       if (features.length === 0) {
-        if (map.getLayer(hoverLayerId)) {
+        if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
           const sourceLayer = getSourceLayer(map, layerId);
           map.setFeatureState(
             { source: layerId, id: hoverIdRef.current[layerId], sourceLayer },
@@ -137,7 +137,7 @@ const Map = () => {
       const feature = features[0];
       const source = feature.layer.source;
       const sourceLayer = feature.layer["source-layer"];
-      if (map.getLayer(hoverLayerId)) {
+      if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
         map.setFeatureState(
           { source, id: hoverIdRef.current[layerId], sourceLayer },
           { hover: false }
