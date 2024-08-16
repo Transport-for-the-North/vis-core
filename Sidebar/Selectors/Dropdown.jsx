@@ -13,6 +13,7 @@ const customStyles = {
   option: (styles, { isFocused }) => ({
     ...styles,
     display: 'flex',
+    fontSize: '0.9rem',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '10px',
