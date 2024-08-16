@@ -1024,8 +1024,9 @@ export const appConfig = {
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Node Results Side-by-Side",
-            isHoverable: false,
-            isStylable: true
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnHover: true
           },
         ],
         visualisations: [
@@ -1460,8 +1461,9 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Zone Results Side-By-Side",
-            isHoverable: false,
-            isStylable: true
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnHover: true
           },
         ],
         visualisations: [
@@ -1632,6 +1634,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true
           },
         ],
         visualisations: [
@@ -1794,6 +1797,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true
           },
         ],
         visualisations: [
@@ -2006,6 +2010,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true
           },
         ],
         visualisations: [

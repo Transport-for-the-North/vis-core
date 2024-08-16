@@ -47,6 +47,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -186,7 +187,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/bsip/accessibility",
-            infoTextTemplate: `{filterName1} accessible within {filterName2}`,
           },
         ],
         metadataTables: [],

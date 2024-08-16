@@ -465,6 +465,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -587,6 +588,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -743,6 +745,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -895,9 +898,10 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Station Catchment",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -911,6 +915,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: false,
           },
         ],
         visualisations: [
@@ -1029,6 +1034,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1042,6 +1048,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1190,9 +1197,10 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Station Catchment Side-by-Side",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1206,6 +1214,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: false,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1769,9 +1778,10 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Zone Totals",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -1911,9 +1921,10 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Zone Totals Difference",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -2080,9 +2091,10 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Zone Totals Side-by-Side",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -2251,6 +2263,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -2367,6 +2380,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
@@ -2510,6 +2524,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
           },
         ],
         visualisations: [
