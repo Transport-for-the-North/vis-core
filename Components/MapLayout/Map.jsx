@@ -7,12 +7,51 @@ import { useMap, useMapContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 import { Visualisation } from "./Visualisation";
-import { getHoverLayerStyle, getLayerStyle, getSourceLayer } from "utils";
+import { getHoverLayerStyle, getLayerStyle, getSourceLayer, numberWithCommas } from "utils";
 
 const StyledMapContainer = styled.div`
   width: 100%;
   height: calc(100vh - 75px);
 `;
+
+const style = document.createElement('style');
+style.innerHTML = `
+  .custom-popup .maplibregl-popup-content {
+    min-width: 75px;
+    width: auto;
+    height: auto;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 'larger';
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .custom-popup .maplibregl-popup-tip {
+    border-top-color: rgba(255, 255, 255, 0.8);
+  }
+  .popup-content {
+    text-align: center;
+  }
+  .feature-name {
+    font-weight: bold;
+    margin: 0;
+  }
+  .divider {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 5px 0;
+  }
+  .feature-value {
+    margin: 0;
+  }
+`;
+document.head.appendChild(style);
 
 /**
  * Map component that renders a map using MapLibre GL and handles layers,
@@ -167,33 +206,60 @@ const Map = () => {
   const handleLayerHoverTooltip = useCallback(
     (e, layerId, bufferSize) => {
       if (popups.length !== 0) {
-        popups.map((popup) => popup.remove());
+        popups.forEach((popup) => popup.remove());
         popups.length = 0;
       }
+  
       const bufferdPoint = [
         [e.point.x - bufferSize, e.point.y - bufferSize],
         [e.point.x + bufferSize, e.point.y + bufferSize],
       ];
+  
       let feature = [];
       if (layerId in map.style._layers) {
         feature = map.queryRenderedFeatures(bufferdPoint, {
           layers: [layerId],
         });
       }
-      if (feature.length !== 0 && feature[0].state.value) {
+  
+      if (feature.length !== 0) {
         const coordinates = e.lngLat;
-        const description = `<p>Id: ${feature[0].properties.name}</p><p>Value: ${
-          feature[0].state.value ?? 0
-        }</p>`;
-        const newPopup = new maplibregl.Popup()
-          .setLngLat(coordinates)
-          .setHTML(description)
-          .addTo(map);
-        popups.push(newPopup);
+        const featureName = feature[0].properties.name || '';
+        const featureValue = feature[0].state.value || '';
+  
+        let description = '';
+        if (featureName && featureValue) {
+          description = `
+            <div class="popup-content">
+              <p class="feature-name">${featureName}</p>
+              <hr class="divider">
+              <p class="feature-value">${numberWithCommas(featureValue)}</p>
+            </div>`;
+        } else if (featureName) {
+          description = `
+            <div class="popup-content">
+              <p class="feature-name">${featureName}</p>
+            </div>`;
+        }
+  
+        if (description) {
+          const newPopup = new maplibregl.Popup({
+            className: 'custom-popup',
+            closeButton: false,
+            closeOnClick: false,
+          })
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+          popups.push(newPopup);
+        }
       }
     },
     [map, popups]
   );
+  
+  
+  
 
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
