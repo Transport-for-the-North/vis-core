@@ -32,13 +32,14 @@ function App() {
 
                 const configModule = await import(`configs/${appName}/appConfig`);
                 const initialAppConfig = configModule.appConfig;
-                const defaultBands = (await import(`configs/noham/bands`)).bands;
+                const defaultBands = await import(`configs/${appName}/bands`);
+                const bands = defaultBands.bands;
                 const apiSchema = await api.metadataService.getSwaggerFile();
 
         setAppConfig({
           ...initialAppConfig,
             apiSchema: apiSchema,
-            defaultBands: defaultBands,
+            defaultBands: bands,
         });
 
       } catch (error) {
