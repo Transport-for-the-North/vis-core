@@ -1,8 +1,9 @@
 import colorbrewer from "colorbrewer";
 import { debounce } from "lodash";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useContext } from "react";
 
 import { useMapContext } from "hooks";
+import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
 import { api } from "services";
 import {
@@ -60,6 +61,7 @@ const fetchDataForVisualisation = debounce(
  */
 export const Visualisation = ({ visualisationName, map, left = null, maps }) => {
   const { state, dispatch } = useMapContext();
+  const appContext = useContext(AppContext);
   const [isLoading, setLoading] = useState(false); // State to track loading
   const prevDataRef = useRef();
   const prevColorRef = useRef();
@@ -94,10 +96,14 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
   const reclassifyAndStyleMap = useCallback(
     (mapItem, mapData, data, style, classificationMethod) => {
       // Reclassify data if needed
+      const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
       const reclassifiedData = reclassifyData(
         mapData,
         style,
-        classificationMethod
+        classificationMethod,
+        appContext.defaultBands, 
+        currentPage,
+        state.visualisations[visualisationName].queryParams
       );
       const currentColor = colorSchemes[style.split("-")[1]].some(
         (e) => e === state.color_scheme.value
@@ -130,7 +136,9 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       state.color_scheme,
       state.layers,
       visualisation.style,
-      visualisationName
+      visualisationName,
+      appContext,
+      state.visualisations
     ]
   );
 
