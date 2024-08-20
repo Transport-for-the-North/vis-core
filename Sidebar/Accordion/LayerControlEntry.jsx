@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { getOpacityProperty } from 'utils';
@@ -6,6 +6,7 @@ import { LayerSearch } from './LayerSearch';
 import { ColourSchemeDropdown } from '../Selectors';
 import { SelectorLabel } from '../Selectors/SelectorLabel';
 import { ClassificationDropdown } from '../Selectors/ClassificationDropdown';
+import { AppContext } from 'contexts';
 
 /**
  * Styled container for the layer control entry.
@@ -72,8 +73,13 @@ const OpacitySlider = styled.input`
  * @param {Function} props.handleClassificationChange - The function to handle classification changes for the layer.
  * @returns {JSX.Element} The rendered LayerControlEntry component.
  */
-export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleClassificationChange }) => {
+export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleClassificationChange, state }) => {
   const [visibility, setVisibility] = useState(layer.layout?.visibility || 'visible');
+  const appConfig = useContext(AppContext);
+  const currentPage = appConfig.appPages.find((page) => page.url === window.location.pathname);
+  const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
+  const selectedPageBands = appConfig.defaultBands.find((band) => band.name === currentPage.category);
+  const hasDefaultBands = selectedPageBands?.metric.find((metric) => metric.name === state.visualisations[Object.keys(state.visualisations)[0]].queryParams[selectedMetricParamName.paramName])
 
   let currentOpacity = null;
 
@@ -147,12 +153,13 @@ export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleCl
           />
           <ClassificationDropdown 
             classType={{
-              'Default': 'd',
+              ...(hasDefaultBands && {'Default': 'd'}),
               'Quantile': 'q',
               'Equidistant': 'e',
               'Logarithmic': 'l',
               'K-Means': 'k'
             }}
+            classification={state.class_method ?? 'd'}
             onChange={handleClassificationChange}
           />
         </>
