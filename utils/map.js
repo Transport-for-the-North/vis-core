@@ -261,7 +261,8 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     if (classificationMethod === 'd') {
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).values;
+      if (selectedPageBands) return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).values;
+      classificationMethod = 'q';
     }
     if (classificationMethod === 'l') {
       values = values.map(replaceZeroValues)
@@ -279,7 +280,8 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     if (classificationMethod === 'd') {
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).differenceValues;
+      if (selectedPageBands) return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).differenceValues;
+      classificationMethod = 'q';
     }
     if (classificationMethod === 'l') {
       absValues = absValues.map(replaceZeroValues)
