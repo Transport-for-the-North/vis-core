@@ -225,7 +225,7 @@ export const resetPaintProperty = (style) => {
  * @param {string} style - The type of geometry we have.
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
-export const reclassifyData = (data, style, classificationMethod) => {
+export const reclassifyData = (data, style, classificationMethod, defaultBands, currentPage, queryParams) => {
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -258,6 +258,11 @@ export const reclassifyData = (data, style, classificationMethod) => {
 
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
+    if (classificationMethod === 'd') {
+      const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
+      const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
+      return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).values;
+    }
     if (classificationMethod === 'l') {
       values = values.map(replaceZeroValues)
     }
@@ -271,6 +276,11 @@ export const reclassifyData = (data, style, classificationMethod) => {
     return;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
+    if (classificationMethod === 'd') {
+      const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
+      const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
+      return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).differenceValues;
+    }
     if (classificationMethod === 'l') {
       absValues = absValues.map(replaceZeroValues)
     }
