@@ -147,6 +147,7 @@ export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleCl
           />
           <ClassificationDropdown 
             classType={{
+              'Default': 'd',
               'Quantile': 'q',
               'Equidistant': 'e',
               'Logarithmic': 'l',
