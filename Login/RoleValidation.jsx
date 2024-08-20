@@ -13,7 +13,6 @@ export const RoleValidation = ({ component: WrappedComponent }) => {
     const location = useLocation();
     const token = Cookies.get('token');
     const appName = process.env.REACT_APP_NAME;
-    console.log("AppName in RoleValidation", appName);
 
     let userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
 
@@ -34,10 +33,6 @@ export const RoleValidation = ({ component: WrappedComponent }) => {
 
     const hasRequiredRole = lowerCaseUserRoles.some(role => requiredRoles.includes(role));
 
-    console.log("isAuthenticated", isAuthenticated);
-    console.log("userRoles", userRoles);
-    console.log("requiredRoles", requiredRoles);
-    console.log("hasRequiredRole", hasRequiredRole);
 
     if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} />;
