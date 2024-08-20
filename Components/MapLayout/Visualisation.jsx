@@ -13,6 +13,7 @@ import {
   reclassifyGeoJSONData,
   resetPaintProperty,
 } from "utils";
+import chroma from "chroma-js";
 
 /**
  * Debounced function to fetch data for a specific visualization.
@@ -295,6 +296,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
    * @returns {string[]} An array of color values representing the color palette.
    */
   const calculateColours = (colourScheme, bins) => {
+    if(bins.length > 9) return chroma.scale(colourScheme).colors(bins.length);
     return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
   };
 
