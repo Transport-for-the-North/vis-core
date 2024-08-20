@@ -53,6 +53,7 @@ export const MapLayerSection = ({ handleColorChange, handleClassificationChange 
           map={map}
           handleColorChange={handleColorChange}
           handleClassificationChange={handleClassificationChange}
+          state={state}
         />
       ))}
     </AccordionSection>
