@@ -177,41 +177,52 @@ const Map = () => {
         [e.point.x + bufferSize, e.point.y + bufferSize],
       ];
   
-      let feature = [];
+      let features = [];
       if (layerId in map.style._layers) {
-        feature = map.queryRenderedFeatures(bufferdPoint, {
+        features = map.queryRenderedFeatures(bufferdPoint, {
           layers: [layerId],
         });
       }
   
-      if (feature.length !== 0) {
+      if (features.length !== 0) {
         const coordinates = e.lngLat;
-        const featureName = feature[0].properties.name || '';
-        const featureValue = feature[0].state.value || '';
+        let descriptions = '';
   
-        let description = '';
-        if (featureName && featureValue) {
-          description = `
-            <div class="popup-content">
-              <p class="feature-name">${featureName}</p>
-              <hr class="divider">
-              <p class="feature-value">${numberWithCommas(featureValue)}</p>
-            </div>`;
-        } else if (featureName) {
-          description = `
-            <div class="popup-content">
-              <p class="feature-name">${featureName}</p>
-            </div>`;
-        }
+        features.forEach((feature, index) => {
+          const featureName = feature.properties.name || '';
+          const featureValue = feature.state.value || '';
   
-        if (description) {
+          let description = '';
+          if (featureName && featureValue) {
+            description = `
+              <div class="popup-content">
+                <p class="feature-name">${featureName}</p>
+                <hr class="divider">
+                <p class="feature-value">${numberWithCommas(featureValue)}</p>
+              </div>`;
+          } else if (featureName) {
+            description = `
+              <div class="popup-content">
+                <p class="feature-name">${featureName}</p>
+              </div>`;
+          }
+  
+          if (description) {
+            descriptions += description;
+            if (index < features.length - 1) {
+              descriptions += '<hr class="thick-divider">';
+            }
+          }
+        });
+  
+        if (descriptions) {
           const newPopup = new maplibregl.Popup({
             className: 'custom-popup',
             closeButton: false,
             closeOnClick: false,
           })
             .setLngLat(coordinates)
-            .setHTML(description)
+            .setHTML(descriptions)
             .addTo(map);
           popups.push(newPopup);
         }
@@ -219,6 +230,7 @@ const Map = () => {
     },
     [map, popups]
   );
+  
   
   
   
