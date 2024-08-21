@@ -196,32 +196,43 @@ const DualMaps = () => {
   
         if (features.length !== 0) {
           const coordinates = e.lngLat;
-          const featureName = features[0].properties.name || '';
-          const featureValue = features[0].state.value || '';
-  
-          let description = '';
-          if (featureName && featureValue) {
-            description = `
-              <div class="popup-content">
-                <p class="feature-name">${featureName}</p>
-                <hr class="divider">
-                <p class="feature-value">${numberWithCommas(featureValue)}</p>
-              </div>`;
-          } else if (featureName) {
-            description = `
-              <div class="popup-content">
-                <p class="feature-name">${featureName}</p>
-              </div>`;
-          }
-  
-          if (description) {
+          let descriptions = '';
+    
+          features.forEach((feature, index) => {
+            const featureName = feature.properties.name || '';
+            const featureValue = feature.state.value || '';
+    
+            let description = '';
+            if (featureName && featureValue) {
+              description = `
+                <div class="popup-content">
+                  <p class="feature-name">${featureName}</p>
+                  <hr class="divider">
+                  <p class="feature-value">${numberWithCommas(featureValue)}</p>
+                </div>`;
+            } else if (featureName) {
+              description = `
+                <div class="popup-content">
+                  <p class="feature-name">${featureName}</p>
+                </div>`;
+            }
+    
+            if (description) {
+              descriptions += description;
+              if (index < features.length - 1) {
+                descriptions += '<hr class="thick-divider">';
+              }
+            }
+          });
+    
+          if (descriptions) {
             const newPopup = new maplibregl.Popup({
               className: 'custom-popup',
               closeButton: false,
               closeOnClick: false,
             })
               .setLngLat(coordinates)
-              .setHTML(description)
+              .setHTML(descriptions)
               .addTo(map);
             popups.push(newPopup);
           }
