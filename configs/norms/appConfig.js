@@ -164,6 +164,19 @@ export const appConfig = {
       config: {
         layers: [
           {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
+          {
             uniqueId: "NoRMSNodeVectorTile",
             name: "NoRMS Nodes",
             type: "tile",
@@ -245,6 +258,19 @@ export const appConfig = {
       category: "Station",
       config: {
         layers: [
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
           {
             uniqueId: "NoRMSNodeVectorTile",
             name: "NoRMS Nodes",
@@ -350,6 +376,19 @@ export const appConfig = {
       config: {
         layers: [
           {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
+          {
             uniqueId: "NoRMSNodeVectorTile",
             name: "NoRMS Nodes",
             type: "tile",
@@ -453,6 +492,19 @@ export const appConfig = {
       category: "Station",
       config: {
         layers: [
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
           {
             uniqueId: "NoRMSStationPairVectorTile",
             name: "NoRMS Station Pair Result",
@@ -576,6 +628,19 @@ export const appConfig = {
       category: "Station",
       config: {
         layers: [
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
           {
             uniqueId: "NoRMSStationPairDifferenceVectorTile",
             name: "NoRMS Station Pair Result Difference",
@@ -734,6 +799,32 @@ export const appConfig = {
       config: {
         layers: [
           {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
+          {
             uniqueId: "NoRMSStationPairVectorTile",
             name: "NoRMS Station Pair Result Side-by-Side",
             type: "tile",
@@ -890,6 +981,19 @@ export const appConfig = {
       config: {
         layers: [
           {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
+          {
             uniqueId: "NoRMSZoneVectorTile",
             name: "NoRMS Zones",
             type: "tile",
@@ -1023,6 +1127,19 @@ export const appConfig = {
       category: "Station",
       config: {
         layers: [
+          {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
           {
             uniqueId: "NoRMSZoneVectorTile",
             name: "NoRMS Zones",
