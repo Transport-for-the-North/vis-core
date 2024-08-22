@@ -261,7 +261,11 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     if (classificationMethod === 'd') {
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      if (selectedPageBands) return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).values;
+      if (selectedPageBands) {
+        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
+        if(metrics.length > 1) return metrics.find((metric) => metric.pageName === currentPage.name).values;
+        return metrics[0].values;
+      }
       classificationMethod = 'q';
     }
     if (classificationMethod === 'l') {
@@ -280,7 +284,14 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     if (classificationMethod === 'd') {
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      if (selectedPageBands) return selectedPageBands.metric.find((metric) => metric.name === queryParams[selectedMetricParamName.paramName]).differenceValues;
+      if (selectedPageBands) {
+        const listMetrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
+        if (listMetrics.length > 1) {
+          const metric = listMetrics.find((metric) => metric.pageName === currentPage.name);
+           return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2)
+        }
+        return !style.includes("line") ? listMetrics[0].differenceValues : listMetrics[0].differenceValues.slice(listMetrics[0].differenceValues.length / 2);
+      }
       classificationMethod = 'q';
     }
     if (classificationMethod === 'l') {
