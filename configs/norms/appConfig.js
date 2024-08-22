@@ -142,6 +142,11 @@ const originOrDestinationValues = {
   ],
 }
 
+const inputNormsScenarioMetadataTable = {
+  name: "input_norms_scenario",
+  path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
+}
+
 
 export const appConfig = {
   title: "TAME React Vis Template",
@@ -171,7 +176,6 @@ export const appConfig = {
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "Network",
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
@@ -202,8 +206,67 @@ export const appConfig = {
             dataPath: "/api/norms/node-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [
+          inputNormsScenarioMetadataTable
+        ],
         filters: [
+          {
+            filterName: "Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Demand scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
           {
             filterName: "Scenario",
             paramName: "scenarioCode",
@@ -211,8 +274,18 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
             },
           },
           {
@@ -297,7 +370,7 @@ export const appConfig = {
             dataPath: "/api/norms/node-results/difference",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Scenario DS",
@@ -414,7 +487,7 @@ export const appConfig = {
             dataPath: "/api/norms/node-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Left Scenario",
@@ -532,7 +605,7 @@ export const appConfig = {
             dataPath: "/api/norms/station-pair-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Scenario",
@@ -668,7 +741,7 @@ export const appConfig = {
             dataPath: "/api/norms/station-pair-results/difference",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Direction",
@@ -851,7 +924,7 @@ export const appConfig = {
             dataPath: "/api/norms/station-pair-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Direction",
@@ -1034,7 +1107,7 @@ export const appConfig = {
             dataPath: "/api/norms/node-catchment-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Scenario",
@@ -1181,7 +1254,7 @@ export const appConfig = {
             dataPath: "/api/norms/node-catchment-results/difference",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "First Scenario",
@@ -1347,7 +1420,7 @@ export const appConfig = {
             dataPath: "/api/norms/node-catchment-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Direction",
@@ -1511,7 +1584,7 @@ export const appConfig = {
             dataPath: "/api/norms/link-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Scenario",
@@ -1632,7 +1705,7 @@ export const appConfig = {
             dataPath: "/api/norms/link-results/difference",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "First Scenario",
@@ -1822,7 +1895,7 @@ export const appConfig = {
             dataPath: "/api/norms/link-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Left Scenario",
@@ -1953,7 +2026,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-demand-results",
           },
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Metric",
@@ -2096,7 +2169,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-demand-results/difference",
           },
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Metric",
@@ -2266,7 +2339,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-demand-results",
           },
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Metric",
@@ -2435,7 +2508,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-pair-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Scenario",
@@ -2552,7 +2625,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-pair-results/difference",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Zone as Origin or Destination",
@@ -2696,7 +2769,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-pair-results",
           }
         ],
-        metadataTables: [],
+        metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
             filterName: "Zone as Origin or Destination",

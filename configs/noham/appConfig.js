@@ -296,6 +296,14 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            filters: [
+              {
+                type: "checkbox",
+                displayText: "Show zone connectors",
+                value: "ZC",
+                property: "link_type"
+              }
+            ]
           },
         ],
         visualisations: [
@@ -339,6 +347,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link"],
             type: "dropdown",
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -354,6 +363,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link"],
             type: "dropdown",
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -370,6 +380,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link"],
             type: "dropdown",
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -386,6 +397,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link"],
             type: "dropdown",
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
