@@ -1473,6 +1473,19 @@ export const appConfig = {
       config: {
         layers: [
           {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Nodes",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
+          {
             uniqueId: "NoRMSLinksVectorTile",
             name: "NoRMS Links Result",
             type: "tile",
@@ -1580,6 +1593,19 @@ export const appConfig = {
       category: "Link",
       config: {
         layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Nodes",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
           {
             uniqueId: "NoRMSLinksResultDifference",
             name: "NoRMS Links Result Difference",
@@ -1757,6 +1783,19 @@ export const appConfig = {
       category: "Link",
       config: {
         layers: [
+          {
+            uniqueId: "NoRMSNodeVectorTile",
+            name: "NoRMS Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            visualisationName: "Station Nodes",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+          },
           {
             uniqueId: "NoRMSLinksResultDual",
             name: "NoRMS Links Result Dual",
