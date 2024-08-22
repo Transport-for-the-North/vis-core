@@ -142,6 +142,11 @@ const originOrDestinationValues = {
   ],
 }
 
+const inputNormsScenarioMetadataTable = {
+  name: "input_norms_scenario",
+  path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
+}
+
 const scenarioYearValues = {
   source: "local",
   values: [
