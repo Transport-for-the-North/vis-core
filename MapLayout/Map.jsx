@@ -29,6 +29,8 @@ const Map = () => {
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
 
+  console.log(state);
+
   /**
    * Adds a new layer to the map based on the provided layer configuration.
    * Handles both GeoJSON and tile layers and optionally adds a hover layer
@@ -198,7 +200,7 @@ const Map = () => {
               <div class="popup-content">
                 <p class="feature-name">${featureName}</p>
                 <hr class="divider">
-                <p class="feature-value">${numberWithCommas(featureValue)}</p>
+                <p class="feature-value">${numberWithCommas(featureValue)} (${state.visualisations[state.layers[layerId].visualisationName].legendText[0].legendSubtitleText})</p>
               </div>`;
           } else if (featureName) {
             description = `
@@ -228,7 +230,7 @@ const Map = () => {
         }
       }
     },
-    [map, popups]
+    [map, popups, state.visualisations]
   );
   
   
@@ -367,7 +369,7 @@ const Map = () => {
         }
       });
     };
-  }, [map, handleLayerHover, handleLayerLeave, state.layers]);
+  }, [map, handleLayerHover, handleLayerLeave, state.layers, state.visualisations]);
 
   /**
    * Handles map click events and dispatches actions based on the clicked feature.

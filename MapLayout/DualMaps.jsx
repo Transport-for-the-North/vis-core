@@ -208,7 +208,7 @@ const DualMaps = () => {
                 <div class="popup-content">
                   <p class="feature-name">${featureName}</p>
                   <hr class="divider">
-                  <p class="feature-value">${numberWithCommas(featureValue)}</p>
+                  <p class="feature-value">${numberWithCommas(featureValue)} (${state.visualisations[state.layers[layerId].visualisationName].legendText[0].legendSubtitleText})</p>
                 </div>`;
             } else if (featureName) {
               description = `
@@ -239,7 +239,7 @@ const DualMaps = () => {
         }
       });
     },
-    [maps, popups]
+    [maps, popups, state.visualisations]
   );
   
 
@@ -388,7 +388,7 @@ const DualMaps = () => {
         });
       });
     };
-  }, [leftMap, rightMap, handleLayerHover, handleLayerLeave, state.layers]);
+  }, [leftMap, rightMap, handleLayerHover, handleLayerLeave, state.layers, state.visualisations]);
 
   /**
    * Handles map click events and dispatches actions based on the clicked feature.
