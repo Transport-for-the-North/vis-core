@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import { useFilterContext } from 'hooks';
 const customStyles = {
   menuPortal: (base) => ({
     ...base,
-    zIndex: 9999, // Adjust zIndex to be higher than everything else
+    zIndex: 9999,
   }),
   option: (styles, { isFocused }) => ({
     ...styles,
@@ -19,13 +19,13 @@ const customStyles = {
     padding: '10px',
     backgroundColor: isFocused ? 'lightgray' : 'white',
     color: 'black',
-    cursor: 'pointer', // Change cursor to pointer
+    cursor: 'pointer',
     ':active': {
       ...styles[':active'],
       backgroundColor: 'lightgray',
     },
     ':hover': {
-      backgroundColor: 'lightgray', // Highlight on hover
+      backgroundColor: 'lightgray',
     },
   }),
 };
@@ -42,6 +42,7 @@ const StyledDropdown = styled.div`
  * @property {string} filter.values[].displayValue - The display value of the option.
  * @property {string} filter.values[].paramValue - The parameter value of the option.
  * @property {boolean} filter.values[].isValid - Indicates if the option is valid.
+ * @property {boolean} filter.shouldBeBlankOnInit - Indicates if the filter should be blank on initialization.
  * @property {Function} onChange - The function called when a new option is selected.
  * @returns {JSX.Element} The Dropdown component.
  */
@@ -51,17 +52,34 @@ export const Dropdown = ({ filter, onChange }) => {
 
   const options = useMemo(
     () =>
-      filter.values.values.map((option) => ({
-        value: option.paramValue,
-        label: option.displayValue,
-        isValid: option?.isValid,
-      })),
+      filter.values.values
+        // .filter(option => !option.isHidden)
+        .map((option) => ({
+          value: option.paramValue,
+          label: option.displayValue,
+          isValid: option?.isValid,
+        })),
     [filter.values.values]
   );
 
-  const handleDropdownChange = (selectedOption) => {
-    if (selectedOption) {
-      onChange(filter, selectedOption.value);
+  const selectedOptions = Array.isArray(filterState[filter.id])
+    ? options.filter(option => filterState[filter.id]?.includes(option.value))
+    : options.find(option => option.value === filterState[filter.id]);
+
+  useEffect(() => {
+    if (!filter.shouldBeBlankOnInit && selectedOptions === undefined && filterState[filter.id] !== null) {
+      onChange(filter, null);
+    }
+  }, [selectedOptions, filterState, filter, onChange]);
+
+  const handleDropdownChange = (selectedOptions) => {
+    if (Array.isArray(selectedOptions)) {
+      const values = selectedOptions.map(option => option.value);
+      onChange(filter, values);
+    } else if (selectedOptions) {
+      onChange(filter, selectedOptions.value);
+    } else {
+      onChange(filter, null);
     }
   };
 
@@ -79,12 +97,14 @@ export const Dropdown = ({ filter, onChange }) => {
       <Select
         components={animatedComponents}
         options={options}
-        value={options.find(option => option.value === filterState[filter.id])}
+        value={selectedOptions}
         onChange={handleDropdownChange}
         formatOptionLabel={formatOptionLabel}
         styles={customStyles}
         menuPlacement="auto"
-        menuPortalTarget={document.body} // Use a portal to render the menu
+        menuPortalTarget={document.body}
+        isClearable={filter.isClearable || false}
+        isMulti={filter.multiSelect || false}
       />
     </StyledDropdown>
   );
