@@ -990,6 +990,7 @@ export const appConfig = {
             values: {
               source: "local",
               values: [
+                { paramValue: "gen_cost_tot", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
