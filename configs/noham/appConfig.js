@@ -103,7 +103,7 @@ const linkMetricValues = {
       displayValue: "Distance (m)",
       paramValue: "distance_m",
       legendSubtitleText: "m"
-  },
+    },
     {
       displayValue: "Number of lanes",
       paramValue: "number_lanes",
@@ -222,14 +222,14 @@ const userClassValues = {
 const originOrDestinationValues = {
   source: "local",
   values: [
-      {
-          displayValue: "Origin",
-          paramValue: "origin",
-      },
-      {
-          displayValue: "Destination",
-          paramValue: "destination",
-      },
+    {
+      displayValue: "Origin",
+      paramValue: "origin",
+    },
+    {
+      displayValue: "Destination",
+      paramValue: "destination",
+    },
   ],
 }
 
@@ -554,7 +554,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Demand Scenario",
             paramName: "demandScenarioNameDoMinimum",
-            info: "Matrix demand scenario do minimum",  
+            info: "Matrix demand scenario do minimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
@@ -897,7 +897,7 @@ export const appConfig = {
             type: "dropdown",
             containsLegendInfo: true,
             values: nodeMetricValues,
-          },       
+          },
           {
             filterName: "Scen. 1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
@@ -1211,7 +1211,6 @@ export const appConfig = {
             ],
             visualisations: ["Zone Results"],
             type: "toggle",
-            containsLegendInfo: true,
             values: originOrDestTripValues,
           },
           {
@@ -1267,10 +1266,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Results"],
             type: "dropdown",
-              values: {
-                  source: "api",
-                },
+            containsLegendInfo: true,
+            values: {
+              source: "api",
+              legendSubtitleText: "unit"
             },
+          },
         ]
       }
     },
@@ -1324,7 +1325,6 @@ export const appConfig = {
             ],
             visualisations: ["Zone Result Difference"],
             type: "toggle",
-            containsLegendInfo: true,
             values: originOrDestTripValues,
           },
           {
@@ -1380,8 +1380,10 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
-                 source: "api",
+              source: "api",
+              legendSubtitleText: "unit"
             },
           },
           {
@@ -1437,10 +1439,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            containsLegendInfo: true,
             values: {
-                source: "api",
+              source: "api",
+              legendSubtitleText: "unit"
             },
-          }, 
+          },
         ]
       },
     },
@@ -1541,15 +1545,15 @@ export const appConfig = {
             },
           },
           {
-             filterName: "Left User Class",
-             paramName: "userClassCode",
-             target: "api",
-             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-             visualisations: ["Zone Results Side-By-Side"],
-             type: "dropdown",
-             values: {
-                 source: "api",
-             },
+            filterName: "Left User Class",
+            paramName: "userClassCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Results Side-By-Side"],
+            type: "dropdown",
+            values: {
+              source: "api",
+            },
           },
           {
             filterName: "Right Delivery Programme",
