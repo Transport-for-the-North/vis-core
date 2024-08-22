@@ -322,7 +322,6 @@ export const appConfig = {
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "Network",
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
