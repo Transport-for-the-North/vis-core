@@ -31,7 +31,7 @@ const MapContainer = styled.div`
  */
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
-  const { dispatch: filterDispatch } = useFilterContext();
+  const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const isLoading = state.isLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
@@ -70,39 +70,41 @@ export const MapLayout = () => {
 
   const handleFilterChange = (filter, value) => {
     filterDispatch({
-      type: 'SET_FILTER_VALUE',
-      payload: { filterId: filter.id, value },
+        type: 'SET_FILTER_VALUE',
+        payload: { filterId: filter.id, value },
     });
-  
-    if (filter.values?.source === 'metadataTable') {
-      const validatedFilters = updateFilterValidity(state, filter, value);
-  
-      dispatch({
-        type: 'UPDATE_FILTER_VALUES',
-        payload: { updatedFilters: validatedFilters },
-      });
-    }
-  
-    if (!filter.visualisations[0].includes("Side")) {
-      filter.actions.map((action) => {
-        dispatch({
-          type: action.action,
-          payload: { filter, value },
-        });
-      });
-    } else {
-      filter.actions.map((action) => {
-        var sides = "";
-        if (filter.filterName.includes("Left")) sides = "left";
-        else if (filter.filterName.includes("Right")) sides = "right";
-        else sides = "both";
-        dispatch({
-          type: action.action,
-          payload: { filter, value, sides },
-        });
-      });
-    }
-  };
+};
+
+useEffect(() => {
+  const validatedFilters = updateFilterValidity(state, filterState);
+
+  dispatch({
+      type: 'UPDATE_FILTER_VALUES',
+      payload: { updatedFilters: validatedFilters },
+  });
+
+  state.filters.forEach(filter => {
+      if (!filter.visualisations[0].includes("Side")) {
+          filter.actions.forEach(action => {
+              dispatch({
+                  type: action.action,
+                  payload: { filter, value: filterState[filter.id] },
+              });
+          });
+      } else {
+          filter.actions.forEach(action => {
+              let sides = "";
+              if (filter.filterName.includes("Left")) sides = "left";
+              else if (filter.filterName.includes("Right")) sides = "right";
+              else sides = "both";
+              dispatch({
+                  type: action.action,
+                  payload: { filter, value: filterState[filter.id], sides },
+              });
+          });
+      }
+  });
+}, [filterState, state.metadataTables, dispatch]);
 
   const handleColorChange = (color) => {
     dispatch({
