@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import styled from 'styled-components';
@@ -49,6 +49,7 @@ const StyledDropdown = styled.div`
 export const Dropdown = ({ filter, onChange }) => {
   const { state: filterState } = useFilterContext();
   const animatedComponents = makeAnimated();
+  const [loading, setLoading] = useState(false);
 
   const options = useMemo(
     () =>
@@ -71,6 +72,15 @@ export const Dropdown = ({ filter, onChange }) => {
       onChange(filter, null);
     }
   }, [selectedOptions, filterState, filter, onChange]);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [filterState]);
 
   const handleDropdownChange = (selectedOptions) => {
     if (Array.isArray(selectedOptions)) {
@@ -103,8 +113,9 @@ export const Dropdown = ({ filter, onChange }) => {
         styles={customStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body}
-        isClearable={filter.isClearable || false}
-        isMulti={filter.multiSelect || false}
+        isClearable={filter.isClearable}
+        isMulti={filter.multiSelect}
+        isLoading={filter.shouldFilterOthers === false && loading}
       />
     </StyledDropdown>
   );
