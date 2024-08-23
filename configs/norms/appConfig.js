@@ -211,7 +211,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Network",
+            filterName: "Filter Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals"],
@@ -219,7 +219,8 @@ export const appConfig = {
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
             shouldFilterOthers: true,
-            multiSelect: true,
+            multiSelect: false,
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
@@ -230,7 +231,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand scenario",
+            filterName: "Filter Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals"],
@@ -238,7 +239,8 @@ export const appConfig = {
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
             shouldFilterOthers: true,
-            multiSelect: true,
+            multiSelect: false,
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
@@ -249,7 +251,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Year",
+            filterName: "Filter Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals"],
@@ -257,7 +259,8 @@ export const appConfig = {
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
             shouldFilterOthers: true,
-            multiSelect: true,
+            multiSelect: false,
+            isClearable: true,
             values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
