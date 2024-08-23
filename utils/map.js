@@ -263,7 +263,7 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
       if (selectedPageBands) {
         const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
-        if(metrics.length > 1) return metrics.find((metric) => metric.pageName === currentPage.pageName).values;
+        if(metrics.length > 1) return metrics.find((metric) => currentPage.pageName.includes(metric.pageName)).values;
         return metrics[0].values;
       }
       classificationMethod = 'q';
