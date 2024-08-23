@@ -274,7 +274,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(
           paintProperty
         )) {
-          console.log(paintProperty)
           map.setPaintProperty(
             layer.name,
             paintPropertyName,
