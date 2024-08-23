@@ -1,6 +1,7 @@
 /**
  * Updates the validity of filter values based on the metadata table.
  * If `shouldFilterOnValidate` is true, filters out invalid options; otherwise, only updates the `isValid` property.
+ * The validation is done within groups identified by the filter name (e.g., DM, DS).
  * @function updateFilterValidity
  * @param {Object} state - The current state.
  * @param {Object} filterState - The current filter state.
@@ -21,24 +22,47 @@ export function updateFilterValidity(state, filterState) {
         }
     });
 
-    // Update validValuesMap based on selected values of other filters
-    activeFilters.forEach(filter => {
-        const selectedValues = filterState[filter.id];
-        if (selectedValues && selectedValues.length > 0) {
-            const sourceName = filter.values.metadataTableName;
-            const metadataTable = state.metadataTables[sourceName];
-            const validRows = metadataTable.filter(row => selectedValues.includes(row[filter.values.paramColumn]));
+    // List of possible identifiers
+    const identifiers = ['DM', 'DS', 'Scen. 1', 'Scen. 2', 'Left', 'Right'];
 
-            activeFilters.forEach(otherFilter => {
-                if (otherFilter.id !== filter.id && otherFilter.values.metadataTableName === sourceName) {
-                    const validParamValues = new Set();
-                    validRows.forEach(row => {
-                        validParamValues.add(row[otherFilter.values.paramColumn]);
-                    });
-                    validValuesMap[otherFilter.id] = new Set([...validValuesMap[otherFilter.id]].filter(value => validParamValues.has(value)));
-                }
-            });
+    // Group filters by their identifier
+    const filterGroups = activeFilters.reduce((groups, filter) => {
+        const groupName = identifiers.find(id => filter.filterName.includes(id));
+        if (groupName) {
+            if (!groups[groupName]) {
+                groups[groupName] = [];
+            }
+            groups[groupName].push(filter);
+        } else {
+            // If no identifier is found, group under a default key
+            if (!groups['default']) {
+                groups['default'] = [];
+            }
+            groups['default'].push(filter);
         }
+        return groups;
+    }, {});
+
+    // Update validValuesMap based on selected values within each group
+    Object.values(filterGroups).forEach(groupFilters => {
+        groupFilters.forEach(filter => {
+            const selectedValues = filterState[filter.id];
+            if (selectedValues && selectedValues.length > 0) {
+                const sourceName = filter.values.metadataTableName;
+                const metadataTable = state.metadataTables[sourceName];
+                const validRows = metadataTable.filter(row => selectedValues.includes(row[filter.values.paramColumn]));
+
+                groupFilters.forEach(otherFilter => {
+                    if (otherFilter.id !== filter.id && otherFilter.values.metadataTableName === sourceName) {
+                        const validParamValues = new Set();
+                        validRows.forEach(row => {
+                            validParamValues.add(row[otherFilter.values.paramColumn]);
+                        });
+                        validValuesMap[otherFilter.id] = new Set([...validValuesMap[otherFilter.id]].filter(value => validParamValues.has(value)));
+                    }
+                });
+            }
+        });
     });
 
     // Create a new filters array with updated isValid values

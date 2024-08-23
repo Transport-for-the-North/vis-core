@@ -454,7 +454,12 @@ export const appConfig = {
             dataPath: "/api/noham/link-results/difference",
           },
         ],
-        metadataTables: [],
+        metadataTables: [
+          {
+            name: "v_input_scenarios",
+            path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+          }
+        ],
         filters: [
           {
             filterName: "Metric",
@@ -478,8 +483,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -489,8 +499,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_year",
+              paramColumn: "network_year",
+              sort: "ascending",
             }
           },
           {
@@ -501,9 +516,14 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Scen. 1 Demand Scenario",
@@ -513,8 +533,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -524,9 +549,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "Scen. 2 Delivery Programme",
@@ -536,8 +559,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -547,8 +575,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_year",
+              paramColumn: "network_year",
+              sort: "ascending",
             },
           },
           {
@@ -559,8 +592,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -571,8 +609,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "dropdown",
+            isClearable: true,
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -582,9 +625,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
         ]
       },
