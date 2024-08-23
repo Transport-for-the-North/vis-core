@@ -86,7 +86,7 @@ export const LayerControlEntry = memo(
     const selectedPageBands = appConfig.defaultBands.find(
       (band) => band.name === currentPage.category
     );
-    const visualisation = currentPage.pageName.includes("Side-by-Side")
+    const visualisation = currentPage.pageName.includes("Side-by-Side") || currentPage.pageName.includes("Side by Side")
       ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
       : state.visualisations[Object.keys(state.visualisations)[0]];
     const hasDefaultBands = selectedPageBands?.metric.find(
