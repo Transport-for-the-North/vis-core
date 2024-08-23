@@ -564,9 +564,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            }
+            values: timePeriodValues
           },
           {
             filterName: "Scen. 2 Delivery Programme",
@@ -642,9 +640,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            }
+            values: timePeriodValues
           },
         ]
       },
