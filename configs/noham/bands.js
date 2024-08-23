@@ -130,7 +130,7 @@ export const bands = [
             {
                 name: "trips_veh",
                 values: [0, 0.01, 0.25, 0.5, 1, 5, 10, 100, 1000, 120000],
-                differenceValues: [-120000, 50, -0.5, -0.25, -0.01, 0, 0.01, 0.25, 0.5, 50, 120000],
+                differenceValues: [-120000, -50, -0.5, -0.25, -0.01, 0, 0.01, 0.25, 0.5, 50, 120000],
             },
             {
                 name: "travel_time_secs",
