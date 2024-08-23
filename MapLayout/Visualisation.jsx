@@ -104,7 +104,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
         classificationMethod,
         appContext.defaultBands, 
         currentPage,
-        state.visualisations[visualisationName].queryParams
+        visualisation.queryParams
       );
       const currentColor = colorSchemes[style.split("-")[1]].some(
         (e) => e === state.color_scheme.value
@@ -274,6 +274,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(
           paintProperty
         )) {
+          console.log(paintProperty)
           map.setPaintProperty(
             layer.name,
             paintPropertyName,
