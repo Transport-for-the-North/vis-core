@@ -64,47 +64,47 @@ export const MapLayout = () => {
     if (pageRef.current !== pageContext) {
       initializedRef.current = false;
       pageRef.current = pageContext;
-      filterDispatch({ type: 'RESET_FILTERS' });
+      filterDispatch({ type: "RESET_FILTERS" });
     }
   }, [pageContext, filterDispatch]);
 
   const handleFilterChange = (filter, value) => {
     filterDispatch({
-        type: 'SET_FILTER_VALUE',
-        payload: { filterId: filter.id, value },
+      type: "SET_FILTER_VALUE",
+      payload: { filterId: filter.id, value },
     });
-};
+  };
 
-useEffect(() => {
-  const validatedFilters = updateFilterValidity(state, filterState);
+  useEffect(() => {
+    const validatedFilters = updateFilterValidity(state, filterState);
 
-  dispatch({
-      type: 'UPDATE_FILTER_VALUES',
+    dispatch({
+      type: "UPDATE_FILTER_VALUES",
       payload: { updatedFilters: validatedFilters },
-  });
+    });
 
-  state.filters.forEach(filter => {
+    state.filters.forEach((filter) => {
       if (!filter.visualisations[0].includes("Side")) {
-          filter.actions.forEach(action => {
-              dispatch({
-                  type: action.action,
-                  payload: { filter, value: filterState[filter.id] },
-              });
+        filter.actions.forEach((action) => {
+          dispatch({
+            type: action.action,
+            payload: { filter, value: filterState[filter.id] },
           });
+        });
       } else {
-          filter.actions.forEach(action => {
-              let sides = "";
-              if (filter.filterName.includes("Left")) sides = "left";
-              else if (filter.filterName.includes("Right")) sides = "right";
-              else sides = "both";
-              dispatch({
-                  type: action.action,
-                  payload: { filter, value: filterState[filter.id], sides },
-              });
+        filter.actions.forEach((action) => {
+          let sides = "";
+          if (filter.filterName.includes("Left")) sides = "left";
+          else if (filter.filterName.includes("Right")) sides = "right";
+          else sides = "both";
+          dispatch({
+            type: action.action,
+            payload: { filter, value: filterState[filter.id], sides },
           });
+        });
       }
-  });
-}, [filterState, state.metadataTables, dispatch]);
+    });
+  }, [filterState, state.metadataTables, dispatch]);
 
   const handleColorChange = (color) => {
     dispatch({
