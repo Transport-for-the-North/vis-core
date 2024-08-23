@@ -6,7 +6,7 @@ import { LayerSearch } from './LayerSearch';
 import { ColourSchemeDropdown } from '../Selectors';
 import { SelectorLabel } from '../Selectors/SelectorLabel';
 import { ClassificationDropdown } from '../Selectors/ClassificationDropdown';
-import { AppContext } from 'contexts';
+import { AppContext, PageContext } from 'contexts';
 
 /**
  * Styled container for the layer control entry.
@@ -75,8 +75,8 @@ const OpacitySlider = styled.input`
  */
 export const LayerControlEntry = memo(({ layer, map, handleColorChange, handleClassificationChange, state }) => {
   const [visibility, setVisibility] = useState(layer.layout?.visibility || 'visible');
+  const currentPage = useContext(PageContext);
   const appConfig = useContext(AppContext);
-  const currentPage = appConfig.appPages.find((page) => page.url === window.location.pathname);
   const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
   const selectedPageBands = appConfig.defaultBands.find((band) => band.name === currentPage.category);
   const hasDefaultBands = selectedPageBands?.metric.find((metric) => metric.name === state.visualisations[Object.keys(state.visualisations)[0]].queryParams[selectedMetricParamName.paramName])
