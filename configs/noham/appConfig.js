@@ -849,7 +849,10 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [],
+        metadataTables: [{
+          name: "v_input_scenarios",
+          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+        }],
         filters: [
           {
             filterName: "Metric",
@@ -871,7 +874,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "dropdown",
-            values: deliveryProgramValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+            },
           },
           {
             filterName: "Year",
@@ -880,7 +888,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_year",
+              paramColumn: "network_year",
+            },
           },
           {
             filterName: "Network Scenario",
@@ -890,7 +903,10 @@ export const appConfig = {
             visualisations: ["Node Results"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
             },
           },
           {
@@ -901,7 +917,10 @@ export const appConfig = {
             visualisations: ["Node Results"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
             },
           },
           {
@@ -959,7 +978,10 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [],
+        metadataTables: [{
+          name: "v_input_scenarios",
+          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+        }],
         filters: [
           {
             filterName: "Metric",
@@ -981,7 +1003,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+            },
           },
           {
             filterName: "Scen. 1 Year",
@@ -991,8 +1018,11 @@ export const appConfig = {
             visualisations: ["Node Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_year",
+              paramColumn: "network_year",
+            },
           },
           {
             filterName: "Scen. 1 Network Scenario Name",
@@ -1002,8 +1032,11 @@ export const appConfig = {
             visualisations: ["Node Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+            },
           },
           {
             filterName: "Scen. 1 Demand Scenario",
@@ -1013,8 +1046,11 @@ export const appConfig = {
             visualisations: ["Node Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+            },
           },
           {
             filterName: "Scen. 1 Time Period",
@@ -1034,7 +1070,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
-            values: deliveryProgramValues
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+            },
           },
           {
             filterName: "Scen. 2 Year",
@@ -1044,8 +1085,11 @@ export const appConfig = {
             visualisations: ["Node Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+            },
           },
           {
             filterName: "Scen. 2 Network Scenario Name",
@@ -1055,8 +1099,11 @@ export const appConfig = {
             visualisations: ["Node Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+            },
           },
           {
             filterName: "Scen. 2 Demand Scenario",
@@ -1066,8 +1113,11 @@ export const appConfig = {
             visualisations: ["Node Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+            },
           },
           {
             filterName: "Scen. 2 Time Period",
@@ -1281,7 +1331,10 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [],
+        metadataTables: [{
+          name: "v_input_scenarios",
+          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+        }],
         filters: [
           {
             filterName: "Trip Type",
@@ -1306,7 +1359,10 @@ export const appConfig = {
             visualisations: ["Zone Results"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
             },
           },
           {
@@ -1317,7 +1373,10 @@ export const appConfig = {
             visualisations: ["Zone Results"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
             },
           },
           {
@@ -1329,7 +1388,10 @@ export const appConfig = {
             visualisations: ["Zone Results"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
             },
           },
           {
@@ -1397,7 +1459,10 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand/difference",
           },
         ],
-        metadataTables: [],
+        metadataTables: [{
+          name: "v_input_scenarios",
+          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+        }],
         filters: [
           {
             filterName: "Trip Type",
@@ -1422,7 +1487,10 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
             },
           },
           {
@@ -1433,7 +1501,10 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
             },
           },
           {
@@ -1445,7 +1516,10 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
             },
           },
           {
@@ -1481,7 +1555,10 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
             },
           },
           {
@@ -1492,7 +1569,10 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
             },
           },
           {
@@ -1504,7 +1584,10 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
             },
           },
           {
