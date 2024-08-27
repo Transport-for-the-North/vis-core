@@ -142,6 +142,134 @@ const originOrDestinationValues = {
   ],
 }
 
+const scenarioYearValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "0",
+      paramValue: "0",
+    },
+    {
+      displayValue: "2018",
+      paramValue: "2018",
+    },
+    {
+      displayValue: "2042",
+      paramValue: "2042",
+    },
+    {
+      displayValue: "2052",
+      paramValue: "2052",
+    },
+  ],
+}
+
+const networkSpecValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Base",
+      paramValue: "Base",
+    },
+    {
+      displayValue: "DM6_09",
+      paramValue: "DM6_09",
+    },
+    {
+      displayValue: "DM8_02",
+      paramValue: "DM8_02",
+    },
+    {
+      displayValue: "NA",
+      paramValue: "NA",
+    },
+    {
+      displayValue: "NPR10_03",
+      paramValue: "NPR10_03",
+    },
+    {
+      displayValue: "NPR6_04",
+      paramValue: "NPR6_04",
+    },
+  ],
+}
+
+const demandCodeValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "d058_17",
+      paramValue: "d058_17",
+    },
+    {
+      displayValue: "d058_42",
+      paramValue: "d058_42",
+    },
+    {
+      displayValue: "d083",
+      paramValue: "d083",
+    },
+    {
+      displayValue: "d084",
+      paramValue: "d084",
+    },
+    {
+      displayValue: "d088",
+      paramValue: "d088",
+    },
+    {
+      displayValue: "d089",
+      paramValue: "d089",
+    },
+    {
+      displayValue: "NA",
+      paramValue: "NA",
+    },
+  ],
+}
+
+const userClassIdsValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "1",
+      paramValue: "1",
+    },
+    {
+      displayValue: "2",
+      paramValue: "2",
+    },
+    {
+      displayValue: "3",
+      paramValue: "3",
+    },
+    {
+      displayValue: "4",
+      paramValue: "4",
+    },
+    {
+      displayValue: "5",
+      paramValue: "5",
+    },
+    {
+      displayValue: "6",
+      paramValue: "6",
+    },
+    {
+      displayValue: "7",
+      paramValue: "7",
+    },
+    {
+      displayValue: "8",
+      paramValue: "8",
+    },
+    {
+      displayValue: "9",
+      paramValue: "9",
+    },
+  ],
+}
+
 const inputNormsScenarioMetadataTable = {
   name: "input_norms_scenario",
   path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
