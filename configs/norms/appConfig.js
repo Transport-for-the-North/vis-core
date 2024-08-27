@@ -233,6 +233,24 @@ const demandCodeValues = {
   ],
 }
 
+const timePeriodCodesValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "AM",
+      paramValue: "am",
+    },
+    {
+      displayValue: "IP",
+      paramValue: "ip",
+    },
+    {
+      displayValue: "PM",
+      paramValue: "pm",
+    },
+  ]
+}
+
 const userClassIdsValues = {
   source: "local",
   values: [
@@ -4507,7 +4525,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "User Class",
@@ -4701,7 +4719,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "Time Period - DM",
@@ -4710,7 +4728,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "User Class - DS",
@@ -4913,7 +4931,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Side-by-Side"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "Right Time Period",
@@ -4922,7 +4940,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Side-by-Side"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "Left User Class",
@@ -5900,7 +5918,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "User Class",
@@ -6104,7 +6122,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "Time Period - DM",
@@ -6113,7 +6131,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "User Class - DS",
@@ -6266,15 +6284,6 @@ export const appConfig = {
             field: "id",
           },
           {
-            filterName: "Zone ID",
-            paramName: "zoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Side-by-Side"],
-            type: "dropdown",
-            values: scenarioYearValues
-          },
-          {
             filterName: "Scenario Year",
             paramName: "scenarioYear",
             target: "api",
@@ -6335,7 +6344,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Side-by-Side"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "Right Time Period",
@@ -6344,7 +6353,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Side-by-Side"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: timePeriodCodesValues
           },
           {
             filterName: "Left User Class",
