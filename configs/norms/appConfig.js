@@ -147,6 +147,134 @@ const inputNormsScenarioMetadataTable = {
   path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
 }
 
+const scenarioYearValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "0",
+      paramValue: "0",
+    },
+    {
+      displayValue: "2018",
+      paramValue: "2018",
+    },
+    {
+      displayValue: "2042",
+      paramValue: "2042",
+    },
+    {
+      displayValue: "2052",
+      paramValue: "2052",
+    },
+  ],
+}
+
+const networkSpecValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Base",
+      paramValue: "Base",
+    },
+    {
+      displayValue: "DM6_09",
+      paramValue: "DM6_09",
+    },
+    {
+      displayValue: "DM8_02",
+      paramValue: "DM8_02",
+    },
+    {
+      displayValue: "NA",
+      paramValue: "NA",
+    },
+    {
+      displayValue: "NPR10_03",
+      paramValue: "NPR10_03",
+    },
+    {
+      displayValue: "NPR6_04",
+      paramValue: "NPR6_04",
+    },
+  ],
+}
+
+const demandCodeValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "d058_17",
+      paramValue: "d058_17",
+    },
+    {
+      displayValue: "d058_42",
+      paramValue: "d058_42",
+    },
+    {
+      displayValue: "d083",
+      paramValue: "d083",
+    },
+    {
+      displayValue: "d084",
+      paramValue: "d084",
+    },
+    {
+      displayValue: "d088",
+      paramValue: "d088",
+    },
+    {
+      displayValue: "d089",
+      paramValue: "d089",
+    },
+    {
+      displayValue: "NA",
+      paramValue: "NA",
+    },
+  ],
+}
+
+const userClassIdsValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "1",
+      paramValue: "1",
+    },
+    {
+      displayValue: "2",
+      paramValue: "2",
+    },
+    {
+      displayValue: "3",
+      paramValue: "3",
+    },
+    {
+      displayValue: "4",
+      paramValue: "4",
+    },
+    {
+      displayValue: "5",
+      paramValue: "5",
+    },
+    {
+      displayValue: "6",
+      paramValue: "6",
+    },
+    {
+      displayValue: "7",
+      paramValue: "7",
+    },
+    {
+      displayValue: "8",
+      paramValue: "8",
+    },
+    {
+      displayValue: "9",
+      paramValue: "9",
+    },
+  ],
+}
+
 
 export const appConfig = {
   title: "TAME React Vis Template",
@@ -4231,6 +4359,608 @@ export const appConfig = {
         ]
       }
     },
+
+    {
+      pageName: "Zone Accessibility Totals",
+      url: "/zone-accessibility-totals",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneAccessibilityTotals",
+            name: "NoRMS Zone Accessibility Totals",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Accessibility Totals",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Accessibility Totals",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Accessibility Totals",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/accessibility-key-locations-total",
+          },
+        ],
+        metadataTables: [],
+        filters: [
+          {
+            filterName: "Key Location Type Id",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: '1',
+                  paramValue: '1',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '2',
+                  paramValue: '2',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '3',
+                  paramValue: '3',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '4',
+                  paramValue: '4',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '5',
+                  paramValue: '5',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '6',
+                  paramValue: '6',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '7',
+                  paramValue: '7',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '8',
+                  paramValue: '8',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '9',
+                  paramValue: '9',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '10',
+                  paramValue: '10',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Network Specification",
+            paramName: "networkSpec",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Demand Code",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Threshold Value",
+            paramName: "thresholdValue",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "slider",
+            info: "Threshold value to filter data",
+            min: 5,
+            max: 300,
+            interval: 15,
+            displayAs: {
+              unit: "mins",
+            },
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Accessibility Totals Difference",
+      url: "/zone-accessibility-totals-difference",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneAccessibilityTotalsDifference",
+            name: "NoRMS Zone Accessibility Totals Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Accessibility Totals Difference",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Accessibility Totals Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Accessibility Totals Difference",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/accessibility-key-locations-total/difference",
+          },
+        ],
+        metadataTables: [],
+        filters: [
+          {
+            filterName: "Key Location Type Id",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: '1',
+                  paramValue: '1',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '2',
+                  paramValue: '2',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '3',
+                  paramValue: '3',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '4',
+                  paramValue: '4',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '5',
+                  paramValue: '5',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '6',
+                  paramValue: '6',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '7',
+                  paramValue: '7',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '8',
+                  paramValue: '8',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '9',
+                  paramValue: '9',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '10',
+                  paramValue: '10',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Network Specification - DS",
+            paramName: "networkSpecDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Network Specification - DM",
+            paramName: "networkSpecDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Demand Code - DS",
+            paramName: "demandCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Demand Code - DM",
+            paramName: "demandCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Time Period - DS",
+            paramName: "timePeriodCodesDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodesDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "User Class - DS",
+            paramName: "userClassIdsDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "User Class - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Threshold Value",
+            paramName: "thresholdValue",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "slider",
+            info: "Journey time limit by bus.",
+            min: 5,
+            max: 300,
+            interval: 15,
+            displayAs: {
+              unit: "mins",
+            },
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Accessibility Totals Side-by-Side",
+      url: "/zone-accessibility-totals-dual",
+      type: "DualMapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneAccessibilityTotals",
+            name: "NoRMS Zone Accessibility Totals",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Accessibility Totals Side-by-Side",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Accessibility Totals Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Accessibility Totals",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/accessibility-key-locations-total",
+          },
+        ],
+        metadataTables: [],
+        filters: [
+          {
+            filterName: "Key Location Type Id",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: '1',
+                  paramValue: '1',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '2',
+                  paramValue: '2',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '3',
+                  paramValue: '3',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '4',
+                  paramValue: '4',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '5',
+                  paramValue: '5',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '6',
+                  paramValue: '6',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '7',
+                  paramValue: '7',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '8',
+                  paramValue: '8',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '9',
+                  paramValue: '9',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '10',
+                  paramValue: '10',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Left Network Specification",
+            paramName: "networkSpec",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Right Network Specification",
+            paramName: "networkSpec",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Left Demand Code",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Right Demand Code",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Left User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Threshold Value",
+            paramName: "thresholdValue",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Side-by-Side"],
+            type: "slider",
+            info: "Journey time limit by bus.",
+            min: 5,
+            max: 300,
+            interval: 15,
+            displayAs: {
+              unit: "mins",
+            },
+          },
+        ]
+      }
+    },
+    
     {
       pageName: "Zone Pairs",
       url: "/norms-zones-pair",
@@ -5010,6 +5740,647 @@ export const appConfig = {
           }
         ]
       },
+    },
+
+
+    {
+      pageName: "Zone Accessibility Pair",
+      url: "/zone-accessibility-pair",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneAccessibilityPair",
+            name: "NoRMS Zone Accessibility Pair",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Accessibility Pair",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Accessibility Pair",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Accessibility Pair",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/accessibility-key-locations-od",
+          },
+        ],
+        metadataTables: [],
+        filters: [
+          {
+            filterName: "Key Location Type Id",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: '1',
+                  paramValue: '1',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '2',
+                  paramValue: '2',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '3',
+                  paramValue: '3',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '4',
+                  paramValue: '4',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '5',
+                  paramValue: '5',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '6',
+                  paramValue: '6',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '7',
+                  paramValue: '7',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '8',
+                  paramValue: '8',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '9',
+                  paramValue: '9',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '10',
+                  paramValue: '10',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "map",
+            layer: "NoRMS Zone Accessibility Pair",
+            field: "id",
+          },
+          {
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Network Specification",
+            paramName: "networkSpec",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Demand Code",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Threshold Value",
+            paramName: "thresholdValue",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair"],
+            type: "slider",
+            info: "Threshold value to filter data",
+            min: 5,
+            max: 300,
+            interval: 15,
+            displayAs: {
+              unit: "mins",
+            },
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Accessibility Pair Difference",
+      url: "/zone-accessibility-pair-difference",
+      type: "MapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneAccessibilityPairDifference",
+            name: "NoRMS Zone Accessibility Pair Difference",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Accessibility Pair Difference",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Accessibility Pair Difference",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Accessibility Pair Difference",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/accessibility-key-locations-od/difference",
+          },
+        ],
+        metadataTables: [],
+        filters: [
+          {
+            filterName: "Key Location Type Id",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: '1',
+                  paramValue: '1',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '2',
+                  paramValue: '2',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '3',
+                  paramValue: '3',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '4',
+                  paramValue: '4',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '5',
+                  paramValue: '5',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '6',
+                  paramValue: '6',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '7',
+                  paramValue: '7',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '8',
+                  paramValue: '8',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '9',
+                  paramValue: '9',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '10',
+                  paramValue: '10',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "map",
+            layer: "NoRMS Zone Accessibility Pair Difference",
+            field: "id",
+          },
+          {
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Network Specification - DS",
+            paramName: "networkSpecDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Network Specification - DM",
+            paramName: "networkSpecDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Demand Code - DS",
+            paramName: "demandCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Demand Code - DM",
+            paramName: "demandCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Time Period - DS",
+            paramName: "timePeriodCodesDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodesDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "User Class - DS",
+            paramName: "userClassIdsDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "User Class - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Threshold Value",
+            paramName: "thresholdValue",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "slider",
+            info: "Journey time limit by bus.",
+            min: 5,
+            max: 300,
+            interval: 15,
+            displayAs: {
+              unit: "mins",
+            },
+          },
+        ]
+      }
+    },
+    {
+      pageName: "Zone Accessibility Pair Side-by-Side",
+      url: "/zone-accessibility-pair-dual",
+      type: "DualMapLayout",
+      category: "Zone",
+      about: "", //To be added.
+      config: {
+        layers: [
+          {
+            uniqueId: "NoRMSZoneAccessibilityPair",
+            name: "NoRMS Zone Accessibility Pair",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            visualisationName: "Zone Accessibility Pair Side-by-Side",
+            isHoverable: true,
+            isStylable: true,
+            shouldHaveTooltipOnClick: false,
+            shouldHaveTooltipOnHover: true,
+          },
+        ],
+        visualisations: [
+          {
+            name: "Zone Accessibility Pair Side-by-Side",
+            type: "joinDataToMap",
+            joinLayer: "NoRMS Zone Accessibility Pair",
+            style: "polygon-continuous",
+            joinField: "id",
+            valueField: "value",
+            dataSource: "api",
+            dataPath: "/api/norms/accessibility-key-locations-od",
+          },
+        ],
+        metadataTables: [],
+        filters: [
+          {
+            filterName: "Key Location Type Id",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_DUAL_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: '1',
+                  paramValue: '1',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '2',
+                  paramValue: '2',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '3',
+                  paramValue: '3',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '4',
+                  paramValue: '4',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '5',
+                  paramValue: '5',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '6',
+                  paramValue: '6',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '7',
+                  paramValue: '7',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '8',
+                  paramValue: '8',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '9',
+                  paramValue: '9',
+                  legendSubtitleText: "unit",
+                },
+                {
+                  displayValue: '10',
+                  paramValue: '10',
+                  legendSubtitleText: "unit",
+                },
+              ],
+            },
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, { action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "map",
+            layer: "NoRMS Zone Accessibility Pair",
+            field: "id",
+          },
+          {
+            filterName: "Zone ID",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: scenarioYearValues
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Left Network Specification",
+            paramName: "networkSpec",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Right Network Specification",
+            paramName: "networkSpec",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: networkSpecValues
+          },
+          {
+            filterName: "Left Demand Code",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Right Demand Code",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: demandCodeValues
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Left User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "dropdown",
+            values: userClassIdsValues
+          },
+          {
+            filterName: "Threshold Value",
+            paramName: "thresholdValue",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Side-by-Side"],
+            type: "slider",
+            info: "Journey time limit by bus.",
+            min: 5,
+            max: 300,
+            interval: 15,
+            displayAs: {
+              unit: "mins",
+            },
+          },
+        ]
+      }
     },
   ],
 };
