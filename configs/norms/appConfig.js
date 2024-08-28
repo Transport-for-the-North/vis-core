@@ -4511,7 +4511,7 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Totals"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldBeValidated: false,
             shouldFilterOthers: true,
             multiSelect: true,
