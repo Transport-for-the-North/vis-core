@@ -29,8 +29,6 @@ const Map = () => {
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
 
-  console.log(state);
-
   /**
    * Adds a new layer to the map based on the provided layer configuration.
    * Handles both GeoJSON and tile layers and optionally adds a hover layer
@@ -290,7 +288,56 @@ const Map = () => {
   useEffect(() => {
     if (!map) return;
 
+    const handleZoom = (labelZoomLevel, layerId, sourceLayerName) => {
+      const mapZoomLevel = map.getZoom();
+      if (mapZoomLevel <= labelZoomLevel) {
+        if (map.getLayer(`${layerId}-label`)) {
+          map.setLayoutProperty(`${layerId}-label`, 'visibility', 'none');
+        }
+      } else {
+        if (!map.getLayer(`${layerId}-label`)) {
+          // Create the layer if it does not exist
+          map.addLayer({
+            id: `${layerId}-label`,
+            type: 'symbol',
+            source: layerId,
+            'source-layer': sourceLayerName,
+            layout: {
+              'text-field': ['get', 'name'],
+              'text-size': 12,
+              'text-anchor': 'center',
+              'text-offset': [0, 0.5],
+              'text-allow-overlap': false,  // Prevent overlapping labels
+              'text-ignore-placement': true,
+            },
+            paint: {
+              'text-color': '#000000',  // Black text
+              'text-halo-color': '#ffffff',  // White halo for readability
+              'text-halo-width': 1.5,
+            }
+          });
+        }
+        else {
+          map.setLayoutProperty(`${layerId}-label`, 'visibility', 'visible');
+        }
+      }
+    };
+
     Object.keys(state.layers).forEach((layerId) => {
+
+      if (state.layers[layerId].isStylable) {
+        const layerData = state.visualisations[state.layers[layerId].visualisationName];
+        const zoomLevel = layerData.labelZoomLevel;
+        const sourceLayer = state.layers[layerId].sourceLayer;
+        if (zoomLevel != null) {
+          const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer);
+          map.on('zoomend', zoomHandler);
+          if (!listenerCallbackRef.current[layerId]) {
+            listenerCallbackRef.current[layerId] = {};
+          }
+          listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+        }
+      }
       if (state.layers[layerId].isHoverable) {
         const layerHover = (e) =>
           handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
@@ -355,17 +402,25 @@ const Map = () => {
           state.layers[layerId].shouldHaveTooltipOnClick ||
           state.layers[layerId].shouldHaveTooltipOnHover
         ) {
-          const { clickCallback, hoverCallback,layerHoverCallback } =
+          const { clickCallback, hoverCallback,layerHoverCallback, zoomHandler } =
             listenerCallbackRef.current[layerId];
           map.off("mousemove", hoverCallback);
           map.off("mousemove", layerHoverCallback);
           map.off("click", clickCallback);
+          map.off('zoomend', zoomHandler);
         }
         if (state.layers[layerId].isHoverable) {
           map.off("mousemove", layerId, (e) =>
             handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
           );
           map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
+        }
+        if (state.layers[layerId].isStylable) {
+          const zoomLevel = state.visualisations[state.layers[layerId].visualisationName].labelZoomLevel;
+          if (zoomLevel != null) {
+            const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
+            map.off('zoomend', zoomHandler);
+          }
         }
       });
     };
