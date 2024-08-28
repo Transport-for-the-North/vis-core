@@ -4388,7 +4388,7 @@ export const appConfig = {
     },
 
     {
-      pageName: "Key Location Totals",
+      pageName: "Key Location Accessibility (Zone Totals)",
       url: "/accessibility-key-location-totals",
       type: "MapLayout",
       category: "Accessibility",
