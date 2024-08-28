@@ -1,3 +1,5 @@
+import { type } from "@testing-library/user-event/dist/type";
+
 /**
  * Updates the validity of filter values based on the metadata table.
  * If `shouldFilterOnValidate` is true, filters out invalid options; otherwise, only updates the `isValid` property.
@@ -47,11 +49,15 @@ export function updateFilterValidity(state, filterState) {
     Object.values(filterGroups).forEach(groupFilters => {
         groupFilters.forEach(filter => {
             const selectedValues = filterState[filter.id];
-            if (selectedValues && selectedValues.length > 0) {
+            if (selectedValues && (!Array.isArray(selectedValues) || (Array.isArray(selectedValues) && selectedValues.length > 0))) {
                 const sourceName = filter.values.metadataTableName;
                 const metadataTable = state.metadataTables[sourceName];
-                const validRows = metadataTable.filter(row => selectedValues.includes(row[filter.values.paramColumn]));
-
+    
+                // Ensure selectedValues is an array before using .includes
+                const validRows = Array.isArray(selectedValues) 
+                    ? metadataTable.filter(row => selectedValues.includes(row[filter.values.paramColumn]))
+                    : metadataTable.filter(row => row[filter.values.paramColumn] === selectedValues);
+    
                 groupFilters.forEach(otherFilter => {
                     if (otherFilter.id !== filter.id && otherFilter.values.metadataTableName === sourceName) {
                         const validParamValues = new Set();
@@ -64,7 +70,7 @@ export function updateFilterValidity(state, filterState) {
             }
         });
     });
-
+    // console.log(validValuesMap);
     // Create a new filters array with updated isValid values
     const updatedFilters = state.filters.map(filter => {
         if (filter.values && filter.values.metadataTableName) {
