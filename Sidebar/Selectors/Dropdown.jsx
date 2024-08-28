@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import styled from 'styled-components';
@@ -50,6 +50,9 @@ export const Dropdown = ({ filter, onChange }) => {
   const { state: filterState } = useFilterContext();
   const animatedComponents = makeAnimated();
   const [loading, setLoading] = useState(false);
+  const prevOptionsRef = useRef([]);
+  const prevSelectedOptionsRef = useRef(null);
+  const [isAllSelected, setIsAllSelected] = useState(false);
 
   const options = useMemo(() => {
     const filteredOptions = filter.values.values
@@ -71,13 +74,13 @@ export const Dropdown = ({ filter, onChange }) => {
 
   const selectedOptions = useMemo(() => {
     if (Array.isArray(filterState[filter.id])) {
-      if (filterState[filter.id].length === options.length - 1) {
+      if (isAllSelected) {
         return options.slice(1).filter(option => filterState[filter.id]?.includes(option.value));
       }
       return options.slice(1).filter(option => filterState[filter.id]?.includes(option.value));
     }
     return options.find(option => option.value === filterState[filter.id]);
-  }, [filterState, filter.id, options]);
+  }, [filterState, filter.id, options, isAllSelected]);
 
   useEffect(() => {
     if (!filter.shouldBeBlankOnInit && selectedOptions === undefined && filterState[filter.id] !== null) {
@@ -94,20 +97,43 @@ export const Dropdown = ({ filter, onChange }) => {
     return () => clearTimeout(timer);
   }, [filterState]);
 
+  useEffect(() => {
+    const prevOptions = prevOptionsRef.current;
+    const currentOptions = options.slice(1).map(option => option.value);
+
+    if (Array.isArray(filterState[filter.id]) && isAllSelected) {
+      if (JSON.stringify(prevOptions) !== JSON.stringify(currentOptions)) {
+        onChange(filter, currentOptions);
+      }
+    }
+
+    prevOptionsRef.current = currentOptions;
+  }, [options, filterState, filter, onChange, isAllSelected]);
+
   const handleDropdownChange = (selectedOptions) => {
     if (Array.isArray(selectedOptions)) {
       if (selectedOptions.some(option => option.value === 'all')) {
+        setIsAllSelected(true);
         onChange(filter, options.slice(1).map(option => option.value));
       } else {
+        setIsAllSelected(false);
         const values = selectedOptions.map(option => option.value);
         onChange(filter, values);
       }
     } else if (selectedOptions) {
+      setIsAllSelected(false);
       onChange(filter, selectedOptions.value);
     } else {
+      // Set state to null when cleared
+      setIsAllSelected(false);
       onChange(filter, null);
     }
   };
+
+  useEffect(() => {
+    // Update the previous selected options ref whenever the selection changes
+    prevSelectedOptionsRef.current = filterState[filter.id];
+  }, [filterState, filter.id]);
 
   const formatOptionLabel = ({ label, isValid }) => (
     <div style={{ display: 'flex', alignItems: 'center' }}>
