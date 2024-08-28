@@ -51,21 +51,33 @@ export const Dropdown = ({ filter, onChange }) => {
   const animatedComponents = makeAnimated();
   const [loading, setLoading] = useState(false);
 
-  const options = useMemo(
-    () =>
-      filter.values.values
-        // .filter(option => !option.isHidden)
-        .map((option) => ({
-          value: option.paramValue,
-          label: option.displayValue,
-          isValid: option?.isValid,
-        })),
-    [filter.values.values]
-  );
+  const options = useMemo(() => {
+    const filteredOptions = filter.values.values
+      .filter(option => !option.isHidden)
+      .map((option) => ({
+        value: option.paramValue,
+        label: option.displayValue,
+        isValid: option?.isValid,
+      }));
+    if (filter.multiSelect) {
+      const allOption = {
+        value: 'all',
+        label: 'All',
+      };
+      return [allOption, ...filteredOptions];
+    }
+    return filteredOptions;
+  }, [filter.values.values, filter.multiSelect]);
 
-  const selectedOptions = Array.isArray(filterState[filter.id])
-    ? options.filter(option => filterState[filter.id]?.includes(option.value))
-    : options.find(option => option.value === filterState[filter.id]);
+  const selectedOptions = useMemo(() => {
+    if (Array.isArray(filterState[filter.id])) {
+      if (filterState[filter.id].length === options.length - 1) {
+        return options.slice(1).filter(option => filterState[filter.id]?.includes(option.value));
+      }
+      return options.slice(1).filter(option => filterState[filter.id]?.includes(option.value));
+    }
+    return options.find(option => option.value === filterState[filter.id]);
+  }, [filterState, filter.id, options]);
 
   useEffect(() => {
     if (!filter.shouldBeBlankOnInit && selectedOptions === undefined && filterState[filter.id] !== null) {
@@ -84,8 +96,12 @@ export const Dropdown = ({ filter, onChange }) => {
 
   const handleDropdownChange = (selectedOptions) => {
     if (Array.isArray(selectedOptions)) {
-      const values = selectedOptions.map(option => option.value);
-      onChange(filter, values);
+      if (selectedOptions.some(option => option.value === 'all')) {
+        onChange(filter, options.slice(1).map(option => option.value));
+      } else {
+        const values = selectedOptions.map(option => option.value);
+        onChange(filter, values);
+      }
     } else if (selectedOptions) {
       onChange(filter, selectedOptions.value);
     } else {
