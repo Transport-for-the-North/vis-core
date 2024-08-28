@@ -147,6 +147,16 @@ const inputNormsScenarioMetadataTable = {
   path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
 }
 
+const keyLocationTypeMetadataTable = {
+  name: "key_location_type_list",
+  path: "/api/getgenericdataset?dataset_id=foreign_keys.key_location_type_list"
+}
+
+const userClassMetadataTable = {
+  name: "norms_userclass_list",
+  path: "/api/getgenericdataset?dataset_id=foreign_keys.norms_userclass_list"
+}
+
 const scenarioYearValues = {
   source: "local",
   values: [
@@ -368,7 +378,7 @@ export const appConfig = {
             visualisations: ["Station Totals"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldFilterOthers: true,
             multiSelect: false,
             isClearable: true,
@@ -388,7 +398,7 @@ export const appConfig = {
             visualisations: ["Station Totals"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldFilterOthers: true,
             multiSelect: false,
             isClearable: true,
@@ -408,7 +418,7 @@ export const appConfig = {
             visualisations: ["Station Totals"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldFilterOthers: true,
             multiSelect: false,
             isClearable: true,
@@ -4378,10 +4388,10 @@ export const appConfig = {
     },
 
     {
-      pageName: "Zone Accessibility Totals",
-      url: "/zone-accessibility-totals",
+      pageName: "Key Location Totals",
+      url: "/accessibility-key-location-totals",
       type: "MapLayout",
-      category: "Zone",
+      category: "Accessibility",
       about: "", //To be added.
       config: {
         layers: [
@@ -4412,73 +4422,52 @@ export const appConfig = {
             dataPath: "/api/norms/accessibility-key-locations-total",
           },
         ],
-        metadataTables: [],
+        metadataTables: [
+          inputNormsScenarioMetadataTable,
+          keyLocationTypeMetadataTable,
+          userClassMetadataTable
+        ],
         filters: [
           {
-            filterName: "Key Location Type Id",
-            paramName: "keyLocationTypeId",
+            filterName: "Network",
+            paramName: "networkSpec",
             target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
             type: "dropdown",
-            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
             values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: '1',
-                  paramValue: '1',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '2',
-                  paramValue: '2',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '3',
-                  paramValue: '3',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '4',
-                  paramValue: '4',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '5',
-                  paramValue: '5',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '6',
-                  paramValue: '6',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '7',
-                  paramValue: '7',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '8',
-                  paramValue: '8',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '9',
-                  paramValue: '9',
-                  legendSubtitleText: "unit",
-                },
-                {
-                  displayValue: '10',
-                  paramValue: '10',
-                  legendSubtitleText: "unit",
-                },
-              ],
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
             },
           },
           {
@@ -4488,7 +4477,123 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
             type: "dropdown",
-            values: scenarioYearValues
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCodes",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Filter User Class by Segment",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "Filter User Class by Car Availability",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassIds",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Key Location Type",
+            paramName: "keyLocationTypeId",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Accessibility Totals"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "key_location_type_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              legendSubtitleTextColumn: "name"
+            },
           },
           {
             filterName: "Origin Or Destination",
@@ -4500,42 +4605,6 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Network Specification",
-            paramName: "networkSpec",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals"],
-            type: "dropdown",
-            values: networkSpecValues
-          },
-          {
-            filterName: "Demand Code",
-            paramName: "demandCode",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals"],
-            type: "dropdown",
-            values: demandCodeValues
-          },
-          {
-            filterName: "Time Period",
-            paramName: "timePeriodCodes",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals"],
-            type: "toggle",
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "User Class",
-            paramName: "userClassIds",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals"],
-            type: "dropdown",
-            values: userClassIdsValues
-          },
-          {
             filterName: "Threshold Value",
             paramName: "thresholdValue",
             target: "api",
@@ -4543,7 +4612,7 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Totals"],
             type: "slider",
             info: "Threshold value to filter data",
-            min: 5,
+            min: 15,
             max: 300,
             interval: 15,
             displayAs: {
