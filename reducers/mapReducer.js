@@ -108,8 +108,13 @@ export const mapReducer = (state, action) => {
         case actionTypes.UPDATE_QUERY_PARAMS: {
             const visualisationNames = action.payload.filter.visualisations;
             const paramName = action.payload.filter.paramName;
-            const newParamValue = action.payload.value;
-
+            let newParamValue = action.payload.value;
+        
+            // If newParamValue is an array, convert it to a comma-delimited string
+            if (Array.isArray(newParamValue)) {
+                newParamValue = newParamValue.join(',');
+            }
+        
             // Create a new visualisations object with updated query params for each visualisation
             const updatedVisualisations = { ...state.visualisations };
             visualisationNames.forEach((visName) => {
