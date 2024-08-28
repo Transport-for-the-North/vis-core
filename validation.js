@@ -77,7 +77,7 @@ export function updateFilterValidity(state, filterState) {
             const updatedValues = filter.values.values.map(value => ({
                 ...value,
                 isValid: validValuesMap[filter.id].has(value.paramValue),
-                isHidden: !validValuesMap[filter.id].has(value.paramValue)
+                isHidden: filter.shouldFilterOnValidation && !validValuesMap[filter.id].has(value.paramValue)
             }));
 
             return {
