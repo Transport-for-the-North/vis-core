@@ -103,7 +103,7 @@ const linkMetricValues = {
       displayValue: "Distance (m)",
       paramValue: "distance_m",
       legendSubtitleText: "m"
-    },
+  },
     {
       displayValue: "Number of lanes",
       paramValue: "number_lanes",
@@ -222,14 +222,14 @@ const userClassValues = {
 const originOrDestinationValues = {
   source: "local",
   values: [
-    {
-      displayValue: "Origin",
-      paramValue: "origin",
-    },
-    {
-      displayValue: "Destination",
-      paramValue: "destination",
-    },
+      {
+          displayValue: "Origin",
+          paramValue: "origin",
+      },
+      {
+          displayValue: "Destination",
+          paramValue: "destination",
+      },
   ],
 }
 
@@ -316,6 +316,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/link-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -452,6 +453,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/link-results/difference",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -604,7 +606,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Demand Scenario",
             paramName: "demandScenarioNameDoMinimum",
-            info: "Matrix demand scenario do minimum",
+            info: "Matrix demand scenario do minimum",  
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
@@ -662,6 +664,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/link-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -829,6 +832,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/node-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -934,6 +938,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/node-results/difference",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -950,7 +955,7 @@ export const appConfig = {
             type: "dropdown",
             containsLegendInfo: true,
             values: nodeMetricValues,
-          },
+          },       
           {
             filterName: "Scen. 1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
@@ -1092,6 +1097,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/node-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -1249,6 +1255,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/matrix-demand",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -1264,6 +1271,7 @@ export const appConfig = {
             ],
             visualisations: ["Zone Results"],
             type: "toggle",
+            containsLegendInfo: true,
             values: originOrDestTripValues,
           },
           {
@@ -1363,6 +1371,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/matrix-demand/difference",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -1378,6 +1387,7 @@ export const appConfig = {
             ],
             visualisations: ["Zone Result Difference"],
             type: "toggle",
+            containsLegendInfo: true,
             values: originOrDestTripValues,
           },
           {
@@ -1497,7 +1507,7 @@ export const appConfig = {
               source: "api",
               legendSubtitleText: "unit"
             },
-          },
+          }, 
         ]
       },
     },
@@ -1533,6 +1543,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/matrix-demand",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -1598,15 +1609,15 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left User Class",
-            paramName: "userClassCode",
-            target: "api",
-            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-            visualisations: ["Zone Results Side-By-Side"],
-            type: "dropdown",
-            values: {
-              source: "api",
-            },
+             filterName: "Left User Class",
+             paramName: "userClassCode",
+             target: "api",
+             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+             visualisations: ["Zone Results Side-By-Side"],
+             type: "dropdown",
+             values: {
+                 source: "api",
+             },
           },
           {
             filterName: "Right Delivery Programme",
@@ -1704,6 +1715,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zonal-pair-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -1867,6 +1879,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zonal-pair-results/difference",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -2080,6 +2093,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zonal-pair-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],

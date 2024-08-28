@@ -176,6 +176,7 @@ export const appConfig = {
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
             geometryType: "line",
+            visualisationName: "Network",
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
@@ -204,6 +205,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-results",
+            labelZoomLevel: 10
           }
         ],
         metadataTables: [
@@ -371,6 +373,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-results/difference",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -488,6 +491,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -606,6 +610,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/station-pair-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -742,6 +747,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/station-pair-results/difference",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -925,6 +931,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/station-pair-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1108,6 +1115,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-catchment-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1255,6 +1263,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-catchment-results/difference",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1421,6 +1430,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-catchment-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1585,6 +1595,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/link-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1706,6 +1717,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/link-results/difference",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1896,6 +1908,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/link-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2027,6 +2040,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-demand-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2170,6 +2184,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-demand-results/difference",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2340,6 +2355,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-demand-results",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2509,6 +2525,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-pair-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2626,6 +2643,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-pair-results/difference",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2770,6 +2788,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-pair-results",
+            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],

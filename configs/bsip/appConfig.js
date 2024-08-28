@@ -58,6 +58,7 @@ export const appConfig = {
             valueField: "category",
             dataSource: "api",
             dataPath: "/api/bsip/reliability",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -187,6 +188,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/bsip/accessibility",
+            labelZoomLevel: null
           },
         ],
         metadataTables: [],
