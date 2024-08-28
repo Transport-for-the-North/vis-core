@@ -109,7 +109,7 @@ export const Dropdown = ({ filter, onChange }) => {
         options={options}
         value={selectedOptions}
         onChange={handleDropdownChange}
-        formatOptionLabel={formatOptionLabel}
+        formatOptionLabel={filter.shouldBeValidated ?? formatOptionLabel}
         styles={customStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body}
