@@ -329,11 +329,9 @@ const Map = () => {
 
       if (state.layers[layerId].shouldHaveLabel) {
         const layerData = state.layers[layerId];
-        let zoomLevel = layerData.labelZoomLevel;
+        const zoomLevel = layerData.labelZoomLevel || 12;
         const sourceLayer = layerData.sourceLayer;
-        if (zoomLevel == null) {
-          zoomLevel = 12
-        }
+        
         const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer);
         map.on('zoomend', zoomHandler);
         if (!listenerCallbackRef.current[layerId]) {
@@ -405,7 +403,7 @@ const Map = () => {
           state.layers[layerId].shouldHaveTooltipOnClick ||
           state.layers[layerId].shouldHaveTooltipOnHover
         ) {
-          const { clickCallback, hoverCallback,layerHoverCallback, zoomHandler } =
+          const { clickCallback, hoverCallback, layerHoverCallback, zoomHandler } =
             listenerCallbackRef.current[layerId];
           map.off("mousemove", hoverCallback);
           map.off("mousemove", layerHoverCallback);
