@@ -21,7 +21,7 @@ export const useMap = (mapContainerRef) => {
       const mapInstance = new maplibregl.Map({
         container: mapContainerRef.current,
         style: "https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=5f0299a14c344b3399f76c8bc70db6ca",
-        center: [-2.597, 53.39],
+        center: [-2.6394653, 54.075506],
         zoom: 7
       })
       .on('style.load', () => setIsMapStyleLoaded(true))
