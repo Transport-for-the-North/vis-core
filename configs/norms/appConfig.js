@@ -254,7 +254,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
             labelNulls: true,
             hoverNulls: true
           },
@@ -426,7 +426,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
@@ -686,7 +686,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
@@ -947,7 +947,7 @@ export const appConfig = {
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: false,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
@@ -1166,7 +1166,7 @@ export const appConfig = {
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
@@ -1498,7 +1498,7 @@ export const appConfig = {
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
@@ -1844,7 +1844,7 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelNulls: true,
-            labelZoomLevel: 10,
+            labelZoomLevel: 9,
             hoverNulls: true
           },
         ],
@@ -2073,7 +2073,7 @@ export const appConfig = {
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 10,
+            labelZoomLevel: 9,
             labelNulls: true
           },
         ],
@@ -2415,7 +2415,7 @@ export const appConfig = {
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 10,
+            labelZoomLevel: 9,
             labelNulls: true
           },
         ],
@@ -2740,7 +2740,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
@@ -2933,7 +2933,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
             labelNulls: false,
             hoverNulls: false
           },
@@ -3265,7 +3265,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
-            labelZoomLevel: 12,
+            labelZoomLevel: 9,
           },
         ],
         visualisations: [
