@@ -25,7 +25,7 @@ const Map = () => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
   const { state, dispatch } = useMapContext();
-  const popups = [];
+  const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
 
@@ -104,15 +104,18 @@ const Map = () => {
 
   /**
    * Handles hover events for a specific layer by setting the hover state
-   * for features under the mouse pointer.
+   * for features under the mouse pointer. If hoverNulls is false, only sets
+   * the hover state for features where feature-state value is not null or undefined.
    *
    * @property {Object} e - The event object containing information about the hover event.
    * @property {string} layerId - The ID of the layer being hovered over.
+   * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
+   * @property {boolean} hoverNulls - Flag indicating whether to set hover state for features with null feature-state values.
    */
   const handleLayerHover = useCallback(
-    (e, layerId, bufferSize) => {
+    (e, layerId, bufferSize, hoverNulls) => {
       if (!map || !e.point) return;
-      
+
       const hoverLayerId = `${layerId}-hover`;
       const bufferdPoint = [
         [e.point.x - bufferSize, e.point.y - bufferSize],
@@ -137,6 +140,12 @@ const Map = () => {
       const feature = features[0];
       const source = feature.layer.source;
       const sourceLayer = feature.layer["source-layer"];
+
+      // Check hoverNulls and feature-state value
+      if (!hoverNulls && (feature.state.value === null || feature.state.value === undefined)) {
+        return; // Skip setting hover state if hoverNulls is false and feature-state value is null or undefined
+      }
+
       if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
         map.setFeatureState(
           { source, id: hoverIdRef.current[layerId], sourceLayer },
@@ -160,16 +169,19 @@ const Map = () => {
   );
 
   /**
-   * Handles hover events on a layer and displays a popup with information about the hovered feature.
-   * @property {Object} e - The event object containing information about the hover event.
-   * @property {string} layerId - The ID of the layer being hovered.
-   * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
-   */
+ * Handles hover events on a layer and displays a popup with information about the hovered feature.
+ * If hoverNulls is false, the hover tooltip does not render for features where the feature-state value is null.
+ *
+ * @param {Object} e - The event object containing information about the hover event.
+ * @param {string} layerId - The ID of the layer being hovered.
+ * @param {number} bufferSize - The size of the buffer around the hover point for querying features.
+ * @param {boolean} hoverNulls - Flag indicating whether to show tooltips for features with null feature-state values.
+ */
   const handleLayerHoverTooltip = useCallback(
-    (e, layerId, bufferSize) => {
-      if (popups.length !== 0) {
-        popups.forEach((popup) => popup.remove());
-        popups.length = 0;
+    (e, layerId, bufferSize, hoverNulls) => {
+      if (popups[layerId]?.length) {
+        popups[layerId].forEach((popup) => popup.remove());
+        popups[layerId] = [];
       }
   
       const bufferdPoint = [
@@ -192,6 +204,10 @@ const Map = () => {
           const featureName = feature.properties.name || '';
           const featureValue = feature.state.value || '';
   
+          if (!hoverNulls && featureValue === '') {
+            return;
+          }
+
           let description = '';
           if (featureName && featureValue) {
             description = `
@@ -224,7 +240,10 @@ const Map = () => {
             .setLngLat(coordinates)
             .setHTML(descriptions)
             .addTo(map);
-          popups.push(newPopup);
+          if (!popups[layerId]) {
+            popups[layerId] = [];
+          }
+          popups[layerId].push(newPopup);
         }
       }
     },
@@ -242,9 +261,9 @@ const Map = () => {
    * @property {number} bufferSize - The size of the buffer around the click point for querying features.
    */
   const handleLayerClick = (e, layerId, bufferSize) => {
-    if (popups.length !== 0) {
-      popups.map((popup) => popup.remove());
-      popups.length = 0;
+    if (popups[layerId]?.length) {
+      popups[layerId].forEach((popup) => popup.remove());
+      popups[layerId] = [];
     }
     const bufferdPoint = [
       [e.point.x - bufferSize, e.point.y - bufferSize],
@@ -255,14 +274,17 @@ const Map = () => {
     });
     if (feature.length !== 0) {
       const coordinates = e.lngLat;
-      const description = `<p>${feature[0].properties.name?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
+      const description = `<p>${feature[0].properties.name ?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
           feature[0].state.value ?? 0
         }</p>`;
       const newPopup = new maplibregl.Popup()
         .setLngLat(coordinates)
         .setHTML(description)
         .addTo(map);
-      popups.push(newPopup);
+      if (!popups[layerId]) {
+        popups[layerId] = [];
+      }
+      popups[layerId].push(newPopup);
     }
   };
 
@@ -285,6 +307,15 @@ const Map = () => {
     [map]
   );
 
+  /**
+ * Handles zoom events to control the visibility and creation of label layers.
+ * If labelNulls is true, labels all features. If false, only labels features where feature-state is not null.
+ *
+ * @param {number} labelZoomLevel - The zoom level at which labels should start appearing.
+ * @param {string} layerId - The ID of the layer for which labels are being controlled.
+ * @param {string} sourceLayerName - The name of the source layer.
+ * @param {boolean} labelNulls - Flag indicating whether to label features with null feature-state values.
+ */
   const handleZoom = useCallback(
     (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       const mapZoomLevel = map.getZoom();
@@ -327,13 +358,12 @@ const Map = () => {
     if (!map) return;
 
     Object.keys(state.layers).forEach((layerId) => {
-
       if (state.layers[layerId].shouldHaveLabel) {
         const layerData = state.layers[layerId];
         const zoomLevel = layerData.labelZoomLevel || 12;
         const sourceLayer = layerData.sourceLayer;
         const labelNulls = layerData.labelNulls;
-  
+
         const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
         map.on('zoomend', zoomHandler);
         if (!listenerCallbackRef.current[layerId]) {
@@ -342,8 +372,9 @@ const Map = () => {
         listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
       }
       if (state.layers[layerId].isHoverable) {
+        const hoverNulls = state.layers[layerId].hoverNulls ?? true
         const layerHover = (e) =>
-          handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
+          handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0, hoverNulls)
         map.on("mousemove", layerHover);
         map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
         map.on("mouseenter", layerId, () => {
@@ -359,11 +390,13 @@ const Map = () => {
           layerHover;
       }
       if (state.layers[layerId].shouldHaveTooltipOnHover) {
+        const hoverNulls = state.layers[layerId].hoverNulls ?? true
         const hoverCallback = (e) =>
           handleLayerHoverTooltip(
             e,
             layerId,
-            state.layers[layerId].bufferSize ?? 0
+            state.layers[layerId].bufferSize ?? 0,
+            hoverNulls
           );
         map.on("mousemove", hoverCallback);
         map.on("mouseenter", layerId, () => {
@@ -397,9 +430,9 @@ const Map = () => {
 
     return () => {
       Object.keys(state.layers).forEach((layerId) => {
-        if (popups.length !== 0) {
-          popups.map((popup) => popup.remove());
-          popups.length = 0;
+        if (popups[layerId]?.length) {
+          popups[layerId].forEach((popup) => popup.remove());
+          popups[layerId] = [];
         }
         if (
           state.layers[layerId].shouldHaveTooltipOnClick ||

@@ -298,6 +298,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
             filters: [
               {
                 type: "checkbox",
@@ -444,6 +446,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
           },
         ],
         visualisations: [
@@ -656,6 +660,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
           },
         ],
         visualisations: [
@@ -826,6 +832,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
           },
         ],
         visualisations: [
@@ -934,6 +942,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
           },
         ],
         visualisations: [
@@ -1095,6 +1105,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
           },
         ],
         visualisations: [
