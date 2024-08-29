@@ -286,7 +286,7 @@ const Map = () => {
   );
 
   const handleZoom = useCallback(
-    (labelZoomLevel, layerId, sourceLayerName) => {
+    (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       const mapZoomLevel = map.getZoom();
       if (mapZoomLevel <= labelZoomLevel) {
         if (map.getLayer(`${layerId}-label`)) {
@@ -311,16 +311,17 @@ const Map = () => {
               'text-color': '#000000',  // Black text
               'text-halo-color': '#ffffff',  // White halo for readability
               'text-halo-width': 2.5,
+              'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
             }
           });
-        }
-        else {
+        } else {
           map.setLayoutProperty(`${layerId}-label`, 'visibility', 'visible');
         }
       }
     },
     [map]
   );
+  
 
   useEffect(() => {
     if (!map) return;
@@ -331,8 +332,9 @@ const Map = () => {
         const layerData = state.layers[layerId];
         const zoomLevel = layerData.labelZoomLevel || 12;
         const sourceLayer = layerData.sourceLayer;
-        
-        const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer);
+        const labelNulls = layerData.labelNulls;
+  
+        const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
         map.on('zoomend', zoomHandler);
         if (!listenerCallbackRef.current[layerId]) {
           listenerCallbackRef.current[layerId] = {};
