@@ -255,23 +255,18 @@ const pairMetricValues = {
 }
 
 export const appConfig = {
-  title: "TAME React Vis Template",
-  introduction: `<p>HTML, or HyperText Markup Language, is the standard markup language used to create web pages. It provides the structure of a webpage, allowing for the insertion of text, images, and other multimedia elements. HTML is not a programming language; it is a markup language that defines the content of web pages.</p>
-      <p>HTML documents are made up of elements. These elements are represented by tags, which label pieces of content such as "heading", "paragraph", "list", and so on. Browsers do not display the HTML tags but use them to render the content of the page.</p>
-      <h2>Basic HTML Page Structure</h2>
-      <p>An HTML document has a defined structure that includes the following main elements:</p>
-      <ul>
-          <li><strong>DOCTYPE declaration:</strong> Defines the document type and version of HTML.</li>
-          <li><strong>html element:</strong> This is the root element that encloses all the content of an HTML document.</li>
-          <li><strong>head element:</strong> Contains meta-information about the document, such as its title and links to scripts and stylesheets.</li>
-          <li><strong>body element:</strong> Contains the content of the document, such as text, images, and other media.</li>
-      </ul>
-      <p>Learning HTML is the first step in creating web content and is essential for web developers. It is easy to learn and can be combined with CSS (Cascading Style Sheets) and JavaScript to create interactive and styled web pages.</p>`,
+  title: "TfN’s Northern Highway Assignment Model (NoHAM) Visualiser",
+  introduction: `<p>The TfN’s Northern Highway Assignment Model (NoHAM) Visualiser aims to collate and visualise outputs from the Transport for the North Northern Highway Assignment Model (NoHAM), that is part of the Northern Transport Modelling System (NorTMS).
+   NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments. The purpose of this platform is to collate and visualise highway model data in an interactive, intuitive,
+   web-based format. This instance of the platform presents information from the {insert project name or study} project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
+   based on scenario testing done using NoHAM.</p><p>Is the app is for a specific project, we could then have a short description of the project for example ADV says for NPR - “NPR is a large-scale programme
+   of investment in the North’s rail network between six major cities, the North’s largest airport and other significant economic centres. The investment options under consideration consist of sections of wholly
+   new line, major upgrades and use of planned HS2 infrastructure.</p>`,
   background: "",
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
-  contactText: "Please contact [Name] for any questions on this data tool.",
-  contactEmail: "firstname.lastname@transportforthenorth.com",
+  contactText: "Please contact Luke MONAGHAN for any questions on this data tool.",
+  contactEmail: "luke.monaghan@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
   backgroundImage: "img/hero-image.jpg",
   logoutButtonImage: "img/burgerIcon.png",
@@ -282,6 +277,15 @@ export const appConfig = {
       url: "/noham-links",
       type: "MapLayout",
       category: "Link",
+      about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
+      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination
+      of road section attributes and comparisons of modelled traffic conditions in different scenarios.</p>
+      <p>Currently includes: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction</li>
+      <li>Traffic flow – represents the flow, by vehicle type and journey purpose, in an average hour traversing the road section,</li>
+      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a v/c ration of 1.00/100% indicates the link is operating at 100% of it’s capacity,</li>
+      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Average speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
+      <li>Delays – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time.</li>
+      <li>Queues – the average queue length over the average hour, reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       config: {
         layers: [
           {
@@ -428,7 +432,15 @@ export const appConfig = {
       pageName: "Difference",
       url: "/link-result-difference",
       type: "MapLayout",
-      about: "", //To be added.
+      about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
+      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination
+      of road section attributes and comparisons of modelled traffic conditions in different scenarios.</p>
+      <p>Currently includes: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction</li>
+      <li>Traffic flow – represents the flow, by vehicle type and journey purpose, in an average hour traversing the road section,</li>
+      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a v/c ration of 1.00/100% indicates the link is operating at 100% of it’s capacity,</li>
+      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Average speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
+      <li>Delays – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time.</li>
+      <li>Queues – the average queue length over the average hour, reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       category: "Link",
       config: {
         layers: [
@@ -642,7 +654,15 @@ export const appConfig = {
       pageName: "Side by Side",
       url: "/link-result-dual",
       type: "DualMapLayout",
-      about: "", //To be added.
+      about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
+      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination
+      of road section attributes and comparisons of modelled traffic conditions in different scenarios.</p>
+      <p>Currently includes: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction</li>
+      <li>Traffic flow – represents the flow, by vehicle type and journey purpose, in an average hour traversing the road section,</li>
+      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a v/c ration of 1.00/100% indicates the link is operating at 100% of it’s capacity,</li>
+      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Average speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
+      <li>Delays – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time.</li>
+      <li>Queues – the average queue length over the average hour, reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       category: "Link",
       config: {
         layers: [
@@ -815,7 +835,15 @@ export const appConfig = {
       url: "/node-results",
       type: "MapLayout",
       category: "Node",
-      about: "", //To be added.
+      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. 
+      Some junctions  are not represented because the model is a simplification. This visualistion allows for the examination
+      of junction attributes and the comparison of junction performance in different scenarios. </p><p>Currently includes: <ul>
+      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation and performance of the junction.
+      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a v/c of 1.00/100%
+      indicates the junction is operating at capacity.</li>
+      <li>Junction delay – is the additional travel time experience by a vehicle beyond uncongested conditions.
+      It is a measured as the time difference between the congested travel time and free-flow travel time, at junctions
+      delay includes time being held at red lights, or waiting to turn right. </li></ul></p>`,
       config: {
         layers: [
           {
@@ -943,7 +971,15 @@ export const appConfig = {
       pageName: "Difference",
       url: "/node-result-difference",
       type: "MapLayout",
-      about: "", //To be added.
+      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. 
+      Some junctions  are not represented because the model is a simplification. This visualistion allows for the examination
+      of junction attributes and the comparison of junction performance in different scenarios. </p><p>Currently includes: <ul>
+      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation and performance of the junction.
+      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a v/c of 1.00/100%
+      indicates the junction is operating at capacity.</li>
+      <li>Junction delay – is the additional travel time experience by a vehicle beyond uncongested conditions.
+      It is a measured as the time difference between the congested travel time and free-flow travel time, at junctions
+      delay includes time being held at red lights, or waiting to turn right. </li></ul></p>`,
       category: "Node",
       config: {
         layers: [
@@ -1138,7 +1174,15 @@ export const appConfig = {
       url: "/node-results-dual",
       type: "DualMapLayout",
       category: "Node",
-      about: "", //To be added.
+      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. 
+      Some junctions  are not represented because the model is a simplification. This visualistion allows for the examination
+      of junction attributes and the comparison of junction performance in different scenarios. </p><p>Currently includes: <ul>
+      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation and performance of the junction.
+      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a v/c of 1.00/100%
+      indicates the junction is operating at capacity.</li>
+      <li>Junction delay – is the additional travel time experience by a vehicle beyond uncongested conditions.
+      It is a measured as the time difference between the congested travel time and free-flow travel time, at junctions
+      delay includes time being held at red lights, or waiting to turn right. </li></ul></p>`,
       config: {
         layers: [
           {
@@ -1300,7 +1344,10 @@ export const appConfig = {
       url: "/zone-results",
       type: "MapLayout",
       category: "Matrix Trip Ends",
-      about: "", //To be added.
+      about: `<p>NoHAM travel demand trip ends at an origin or destination. This visualisation 
+      shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle
+      type and journey purpose as a choropleth. Zones are generalised geographic areas they share
+       similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA).</p>`,
       config: {
         layers: [
           {
@@ -1428,7 +1475,10 @@ export const appConfig = {
       pageName: "Difference",
       url: "/zone-result-difference",
       type: "MapLayout",
-      about: "", //To be added.
+      about: `<p>NoHAM travel demand trip ends at an origin or destination. This visualisation 
+      shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle
+      type and journey purpose as a choropleth. Zones are generalised geographic areas they share
+       similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA).</p>`,
       category: "Matrix Trip Ends",
       config: {
         layers: [
@@ -1622,7 +1672,10 @@ export const appConfig = {
       url: "/zone-results-dual",
       type: "DualMapLayout",
       category: "Matrix Trip Ends",
-      about: "", //To be added.
+      about: `<p>NoHAM travel demand trip ends at an origin or destination. This visualisation 
+      shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle
+      type and journey purpose as a choropleth. Zones are generalised geographic areas they share
+       similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA).</p>`,
       config: {
         layers: [
           {
@@ -1791,7 +1844,14 @@ export const appConfig = {
     {
       pageName: "Single Scenario",
       url: "/zonal-pair-results",
-      about: "",
+      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone. 
+      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation
+       to other zones. So by seleclting origin and clicking a zone, the demand to all other zones is shown as a choropleth.</p>
+      <p>Currently includes: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone</li>
+      <li>Average time – the travel time at an origin or destination level with respect to the selected zone, selecting an origin zone will show
+      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth</li>
+      <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
+      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth</li></ul></p>`,
       type: "MapLayout",
       category: "O/D Analysis",
       config: {
@@ -1955,7 +2015,14 @@ export const appConfig = {
     {
       pageName: "Difference",
       url: "/zonal-pair-difference",
-      about: "",
+      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone. 
+      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation
+       to other zones. So by seleclting origin and clicking a zone, the demand to all other zones is shown as a choropleth.</p>
+      <p>Currently includes: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone</li>
+      <li>Average time – the travel time at an origin or destination level with respect to the selected zone, selecting an origin zone will show
+      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth</li>
+      <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
+      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth</li></ul></p>`,
       type: "MapLayout",
       category: "O/D Analysis",
       config: {
@@ -2169,7 +2236,14 @@ export const appConfig = {
     {
       pageName: "Side by Side",
       url: "/zonal-pair-results-dual",
-      about: "",
+      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone. 
+      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation
+       to other zones. So by seleclting origin and clicking a zone, the demand to all other zones is shown as a choropleth.</p>
+      <p>Currently includes: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone</li>
+      <li>Average time – the travel time at an origin or destination level with respect to the selected zone, selecting an origin zone will show
+      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth</li>
+      <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
+      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth</li></ul></p>`,
       type: "DualMapLayout",
       category: "O/D Analysis",
       config: {
