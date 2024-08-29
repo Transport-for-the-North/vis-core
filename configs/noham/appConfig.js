@@ -254,6 +254,11 @@ const pairMetricValues = {
   ],
 }
 
+const normsMetadataTable = {
+  name: "v_input_scenarios",
+  path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
+};
+
 export const appConfig = {
   title: "TfN’s Northern Highway Assignment Model (NoHAM) Visualiser",
   introduction: `<p>The TfN’s Northern Highway Assignment Model (NoHAM) Visualiser aims to collate and visualise outputs from the Transport for the North Northern Highway Assignment Model (NoHAM), that is part of the Northern Transport Modelling System (NorTMS).
@@ -326,12 +331,7 @@ export const appConfig = {
             dataPath: "/api/noham/link-results",
           },
         ],
-        metadataTables: [
-          {
-            name: "v_input_scenarios",
-            path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-          }
-        ],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -475,10 +475,7 @@ export const appConfig = {
           },
         ],
         metadataTables: [
-          {
-            name: "v_input_scenarios",
-            path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-          }
+          normsMetadataTable
         ],
         filters: [
           {
@@ -569,7 +566,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "toggle",
-            values: timePeriodValues
+            values: {
+              source: "api",
+            }
           },
           {
             filterName: "Scen. 2 Delivery Programme",
@@ -645,7 +644,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Difference"],
             type: "toggle",
-            values: timePeriodValues
+            values: {
+              source: "api",
+            }
           },
         ]
       },
@@ -697,7 +698,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [],
+        metadataTables: [ normsMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -722,7 +723,11 @@ export const appConfig = {
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -732,7 +737,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Network Scenario Name - Left",
@@ -743,7 +754,11 @@ export const appConfig = {
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -755,7 +770,11 @@ export const appConfig = {
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -778,7 +797,11 @@ export const appConfig = {
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -788,7 +811,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Network Scenario Name - Right",
@@ -799,8 +828,12 @@ export const appConfig = {
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
-            }
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Demand Scenario - Right",
@@ -811,7 +844,11 @@ export const appConfig = {
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -877,10 +914,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [{
-          name: "v_input_scenarios",
-          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-        }],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -1018,10 +1052,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [{
-          name: "v_input_scenarios",
-          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-        }],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -1228,7 +1259,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -1250,7 +1281,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
-            values: deliveryProgramValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Left Year",
@@ -1259,7 +1296,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Left Network Scenario",
@@ -1269,7 +1312,11 @@ export const appConfig = {
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1280,7 +1327,11 @@ export const appConfig = {
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1301,7 +1352,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
-            values: deliveryProgramValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Right Year",
@@ -1310,7 +1367,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Right Network Scenario",
@@ -1320,7 +1383,11 @@ export const appConfig = {
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1331,7 +1398,11 @@ export const appConfig = {
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1390,10 +1461,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [{
-          name: "v_input_scenarios",
-          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-        }],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Trip Type",
@@ -1524,10 +1592,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand/difference",
           },
         ],
-        metadataTables: [{
-          name: "v_input_scenarios",
-          path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-        }],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Trip Type",
@@ -1726,7 +1791,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand",
           },
         ],
-        metadataTables: [],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Trip Type",
@@ -1751,7 +1816,11 @@ export const appConfig = {
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1762,7 +1831,11 @@ export const appConfig = {
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -1773,8 +1846,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
-            values: {
-              source: "api",
+            values:{
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1808,7 +1885,11 @@ export const appConfig = {
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1819,7 +1900,11 @@ export const appConfig = {
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -1831,7 +1916,11 @@ export const appConfig = {
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1905,12 +1994,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataTables: [
-          {
-            name: "v_input_scenarios",
-            path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
-          }
-        ],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Select zone in map",
@@ -2016,7 +2100,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "toggle",
-            values: timePeriodValues
+            values: {
+              source: "api",
+            }
           },
           {
             filterName: "User Class",
@@ -2076,7 +2162,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results/difference",
           },
         ],
-        metadataTables: [],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Select zone in map",
@@ -2121,7 +2207,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -2132,7 +2222,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -2144,7 +2238,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2156,7 +2254,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2190,7 +2292,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -2201,7 +2307,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -2213,7 +2323,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2225,7 +2339,11 @@ export const appConfig = {
             visualisations: ["Matrix Difference"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2246,7 +2364,9 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
-            values: userClassValues,
+            values: {
+              source: "api",
+            }
           },
         ],
       },
@@ -2297,7 +2417,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataTables: [],
+        metadataTables: [normsMetadataTable],
         filters: [
           {
             filterName: "Select zone in map",
@@ -2342,7 +2462,11 @@ export const appConfig = {
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -2352,7 +2476,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
-            values: yearValues,
+            values:{
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Left Network Scenario Name",
@@ -2363,7 +2493,11 @@ export const appConfig = {
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2375,7 +2509,11 @@ export const appConfig = {
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2409,7 +2547,11 @@ export const appConfig = {
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -2419,7 +2561,13 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
-            values: yearValues,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
           },
           {
             filterName: "Right Network Scenario Name",
@@ -2430,7 +2578,11 @@ export const appConfig = {
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "network_scenario_name",
+              paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -2442,7 +2594,11 @@ export const appConfig = {
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
             values: {
-              source: "api",
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
