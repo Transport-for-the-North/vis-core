@@ -196,6 +196,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: true,
+            hoverNulls: true
           },
         ],
         visualisations: [
@@ -1106,7 +1108,10 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false,
+            shouldHaveLabel: true,
+            labelNulls: true,
+            labelZoomLevel: 10,
+            hoverNulls: true
           },
         ],
         visualisations: [
@@ -1181,7 +1186,6 @@ export const appConfig = {
             values: {
               source: "local",
               values: [
-                { paramValue: "gen_cost_tot", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
@@ -1237,11 +1241,12 @@ export const appConfig = {
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Station Catchment Difference",
-            isHoverable: false,
+            isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: false,
+            hoverNulls: false
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1256,7 +1261,9 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false
+            shouldHaveLabel: true,
+            labelZoomLevel: 10,
+            labelNulls: true
           },
         ],
         visualisations: [
@@ -1425,6 +1432,7 @@ export const appConfig = {
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: false,
+            hoverNulls: false
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1439,7 +1447,9 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false,
+            shouldHaveLabel: true,
+            labelZoomLevel: 10,
+            labelNulls: true
           },
         ],
         visualisations: [
