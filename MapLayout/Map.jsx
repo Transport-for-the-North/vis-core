@@ -47,8 +47,10 @@ const Map = () => {
       if (!map.getSource(layer.name)) {
         let sourceConfig = {};
         let layerConfig = getLayerStyle(layer.geometryType);
+        const layerLayout = {}
         layerConfig.id = layer.name;
-        layerConfig.visibility = "visible";
+        layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible"
+        layerConfig.layout = layerLayout
         layerConfig.metadata = {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
