@@ -254,7 +254,7 @@ const pairMetricValues = {
   ],
 }
 
-const normsMetadataTable = {
+const inputScenariosMetadataTable = {
   name: "v_input_scenarios",
   path: "/api/getgenericdataset?dataset_id=road_data.v_input_scenarios"
 };
@@ -262,18 +262,16 @@ const normsMetadataTable = {
 export const appConfig = {
   title: "TfN’s Northern Highway Assignment Model (NoHAM) Visualiser",
   introduction: `<p>The TfN’s Northern Highway Assignment Model (NoHAM) Visualiser aims to collate and visualise outputs from the Transport for the North Northern Highway Assignment Model (NoHAM), that is part of the Northern Transport Modelling System (NorTMS).
-   NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments. The purpose of this platform is to collate and visualise highway model data in an interactive, intuitive,
+   NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise highway model data in an interactive, intuitive,
    web-based format. This instance of the platform presents information from the {insert project name or study} project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
-   based on scenario testing done using NoHAM.</p><p>Is the app is for a specific project, we could then have a short description of the project for example ADV says for NPR - “NPR is a large-scale programme
-   of investment in the North’s rail network between six major cities, the North’s largest airport and other significant economic centres. The investment options under consideration consist of sections of wholly
-   new line, major upgrades and use of planned HS2 infrastructure.</p>`,
+   based on scenario testing done using NoHAM.</p>`,
   background: "",
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
-  contactText: "Please contact Luke MONAGHAN for any questions on this data tool.",
+  contactText: "Please contact Luke Monaghan for any questions on this data tool.",
   contactEmail: "luke.monaghan@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
-  backgroundImage: "img/hero-image.jpg",
+  backgroundImage: "img/noham/hero.jpg",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   appPages: [
@@ -331,7 +329,7 @@ export const appConfig = {
             dataPath: "/api/noham/link-results",
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -475,7 +473,7 @@ export const appConfig = {
           },
         ],
         metadataTables: [
-          normsMetadataTable
+          inputScenariosMetadataTable
         ],
         filters: [
           {
@@ -698,7 +696,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [ normsMetadataTable],
+        metadataTables: [ inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -914,7 +912,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -1052,7 +1050,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -1259,7 +1257,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Metric",
@@ -1461,7 +1459,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Trip Type",
@@ -1592,7 +1590,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand/difference",
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Trip Type",
@@ -1791,7 +1789,7 @@ export const appConfig = {
             dataPath: "/api/noham/matrix-demand",
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Trip Type",
@@ -1994,7 +1992,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Select zone in map",
@@ -2162,7 +2160,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results/difference",
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Select zone in map",
@@ -2417,7 +2415,7 @@ export const appConfig = {
             dataPath: "/api/noham/zonal-pair-results",
           },
         ],
-        metadataTables: [normsMetadataTable],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
             filterName: "Select zone in map",

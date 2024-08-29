@@ -157,7 +157,7 @@ export const appConfig = {
   contactText: "Please contact [Name] for any questions on this data tool.",
   contactEmail: "firstname.lastname@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
-  backgroundImage: "img/hero-image.jpg",
+  backgroundImage: "img/norms/hero.jpg",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   appPages: [
