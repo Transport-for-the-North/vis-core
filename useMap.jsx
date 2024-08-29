@@ -22,7 +22,7 @@ export const useMap = (mapContainerRef) => {
         container: mapContainerRef.current,
         style: "https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=5f0299a14c344b3399f76c8bc70db6ca",
         center: [-2.597, 53.39],
-        zoom: 8
+        zoom: 7
       })
       .on('style.load', () => setIsMapStyleLoaded(true))
         .on('load', () => {
