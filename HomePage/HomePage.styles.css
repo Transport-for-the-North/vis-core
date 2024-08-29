@@ -67,6 +67,7 @@
       color: white;
       font-size: large;
       text-align: start;
+      text-indent: 2em;
     }
   }
   
@@ -86,6 +87,7 @@
       background-color: #7317de;
       color: white;
       font-size: large;
+      text-indent: 2em;
     }
   }
   
