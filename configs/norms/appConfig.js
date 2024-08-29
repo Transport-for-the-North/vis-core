@@ -963,7 +963,7 @@ export const appConfig = {
             
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Filter Scenario by Network",
@@ -1053,9 +1053,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "User",
@@ -1064,8 +1062,19 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -1173,7 +1182,7 @@ export const appConfig = {
             
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Origin or Destination",
@@ -1278,7 +1287,7 @@ export const appConfig = {
           },
           {
             filterName: "DM Scenario",
-            paramName: "scenarioCodeDoSomething",
+            paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
@@ -1298,26 +1307,35 @@ export const appConfig = {
             },
           },
           {
-            filterName: "First User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "DM User Class",
+            paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
-            filterName: "First Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "DM Time Period",
+            paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter DS Scenario by Network",
@@ -1381,7 +1399,7 @@ export const appConfig = {
           },
           {
             filterName: "DS Scenario",
-            paramName: "scenarioCodeDoMinimum",
+            paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
@@ -1401,26 +1419,35 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Second User Class",
-            paramName: "userClassIdDoMinimum",
+            filterName: "DS User Class",
+            paramName: "userClassIdDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
-            filterName: "Second Time Period",
-            paramName: "timePeriodCodeDoMinimum",
+            filterName: "DS Time Period",
+            paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Please select a station in the map",
@@ -1486,7 +1513,7 @@ export const appConfig = {
             dataPath: "/api/norms/station-pair-results",
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Origin or Destination",
@@ -1514,7 +1541,7 @@ export const appConfig = {
                 {
                   displayValue: "Demand",
                   paramValue: "demand",
-                  legendSubtitleText: "Demand unit",
+                  legendSubtitleText: "Passengers",
                 },
                 {
                   displayValue: "Generalised Cost",
@@ -1617,9 +1644,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Left User Class",
@@ -1628,8 +1653,19 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -1720,9 +1756,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Right User Class",
@@ -1731,8 +1765,19 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -1815,7 +1860,7 @@ export const appConfig = {
             dataPath: "/api/norms/node-catchment-results",
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Filter Scenario by Network",
@@ -1905,9 +1950,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "User Class",
@@ -1916,8 +1959,19 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -2036,7 +2090,7 @@ export const appConfig = {
             
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Filter DM Scenario by Network",
@@ -2100,7 +2154,7 @@ export const appConfig = {
           },
           {
             filterName: "DM Scenario",
-            paramName: "scenarioCodeDoSomething",
+            paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
@@ -2120,25 +2174,34 @@ export const appConfig = {
             },
           },
           {
-            filterName: "First Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "DM Time Period",
+            paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "First User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "DM User Class",
+            paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -2203,7 +2266,7 @@ export const appConfig = {
           },
           {
             filterName: "DS Scenario",
-            paramName: "scenarioCodeDoMinimum",
+            paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
@@ -2223,25 +2286,34 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Second Time Period",
-            paramName: "timePeriodCodeDoMinimum",
+            filterName: "DS Time Period",
+            paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "Second User Class",
-            paramName: "userClassIdDoMinimum",
+            filterName: "DS User Class",
+            paramName: "userClassIdDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -2360,7 +2432,7 @@ export const appConfig = {
             
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Origin or Destination",
@@ -2485,9 +2557,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Left User Class",
@@ -2496,8 +2566,19 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -2588,9 +2669,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Right User Class",
@@ -2599,8 +2678,19 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
             type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -2756,9 +2846,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric",
@@ -2846,6 +2934,8 @@ export const appConfig = {
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false
           },
         ],
         visualisations: [
@@ -2863,87 +2953,6 @@ export const appConfig = {
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
-          {
-            filterName: "Filter DS Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Link Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Link Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Link Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DS Scenario",
-            paramName: "scenarioCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Link Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
           {
             filterName: "Filter DM Scenario by Network",
             target: "validate",
@@ -3026,30 +3035,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "First Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Link Totals Difference"],
-            type: "toggle",
-            values: {
-              source: "api"
-            },
-          },
-          {
-            filterName: "Second Time Period",
+            filterName: "DM Time Period",
             paramName: "timePeriodCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric DS",
-            paramName: "propertyNameDoSomething",
+            filterName: "Metric DM",
+            paramName: "propertyNameDoMinimum",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -3095,8 +3091,98 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Metric DM",
-            paramName: "propertyNameDoMinimum",
+            filterName: "Filter DS Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter DS Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter DS Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "DS Scenario",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "DS Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric DS",
+            paramName: "propertyNameDoSomething",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -3279,6 +3365,15 @@ export const appConfig = {
             },
           },
           {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Link Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
             filterName: "Filter Right Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -3360,26 +3455,13 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-            visualisations: ["Link Totals Side-by-Side"],
-            type: "toggle",
-            values: {
-              source: "api"
-            },
-          },
-          {
             filterName: "Right Time Period",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Totals Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric",
@@ -3468,7 +3550,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Metric",
@@ -3553,9 +3635,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "User Class",
@@ -3564,7 +3644,20 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals"],
             type: "dropdown",
-            values: userClassIdValues
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
           },
           {
             filterName: "Filter Scenario by Network",
@@ -3687,7 +3780,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Metric",
@@ -3766,44 +3859,116 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "First Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            filterName: "Filter DM Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
-            type: "toggle",
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
             },
           },
           {
-            filterName: "Second Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            filterName: "Filter DM Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
-            type: "toggle",
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
             values: {
-              source: "api"
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
             },
           },
           {
-            filterName: "First User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "Filter DM Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "DM Scenario",
+            paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Difference"],
             type: "dropdown",
-            values: userClassIdValues
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
           },
           {
-            filterName: "Second User Class",
+            filterName: "DM User Class",
             paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Difference"],
             type: "dropdown",
-            values: userClassIdValues
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
+          },
+          {
+            filterName: "DM Time Period",
+            paramName: "timePeriodCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter DS Scenario by Network",
@@ -3887,85 +4052,35 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DM Scenario",
-            paramName: "scenarioCodeDoMinimum",
+            filterName: "DS User Class",
+            paramName: "userClassIdDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Difference"],
             type: "dropdown",
             shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
             shouldFilterOthers: false,
-            isClearable: true,
             multiSelect: false,
+            isClearable: false,
             values: {
               source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
+          },
+          {
+            filterName: "DS Time Period",
+            paramName: "timePeriodCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
           },
         ]
       }
@@ -4007,7 +4122,7 @@ export const appConfig = {
             
           },
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Metric",
@@ -4084,26 +4199,6 @@ export const appConfig = {
             visualisations: ["Zone Totals Side-by-Side"],
             type: "toggle",
             values: originOrDestinationValues
-          },
-          {
-            filterName: "Left Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Side-by-Side"],
-            type: "toggle",
-            values: {
-              source: "api"
-            },
-          },
-          {
-            filterName: "Left User Class",
-            paramName: "userClassId",
-            target: "api",
-            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Side-by-Side"],
-            type: "dropdown",
-            values: userClassIdValues
           },
           {
             filterName: "Filter Left Scenario by Network",
@@ -4187,24 +4282,35 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
-            paramName: "timePeriodCode",
-            target: "api",
-            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Side-by-Side"],
-            type: "toggle",
-            values: {
-              source: "api"
-            },
-          },
-          {
-            filterName: "Right User Class",
+            filterName: "Left User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
             type: "dropdown",
-            values: userClassIdValues
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
+          },
+          {
+            filterName: "Left Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "toggle",
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter Right Scenario by Network",
@@ -4287,10 +4393,42 @@ export const appConfig = {
               exclude: ["NA"]
             },
           },
+          {
+            filterName: "Right User Class",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
+          },
+          {
+            filterName: "Right Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Side-by-Side"],
+            type: "toggle",
+            values: {
+              source: "api"
+            },
+          },
         ]
       }
     },
-
     {
       pageName: "Key Location Accessibility (Zone Totals)",
       url: "/accessibility-key-location-totals",
@@ -4516,7 +4654,7 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Totals"],
             type: "slider",
             info: "Threshold value to filter data",
-            min: 15,
+            min: 45,
             max: 300,
             interval: 15,
             displayAs: {
@@ -4568,8 +4706,8 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Network - DS",
-            paramName: "networkSpecDoSomething",
+            filterName: "Network - DM",
+            paramName: "networkSpecDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -4589,8 +4727,108 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network - DM",
-            paramName: "networkSpecDoMinimum",
+            filterName: "Demand Code - DM",
+            paramName: "demandCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodesDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Filter User Class by Segment - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          
+          {
+            filterName: "Filter User Class by Car Availability - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "User Class - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Network - DS",
+            paramName: "networkSpecDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -4631,48 +4869,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand Code - DM",
-            paramName: "demandCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Scenario Year",
-            paramName: "scenarioYear",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodesDoSomething",
             target: "api",
@@ -4685,42 +4881,8 @@ export const appConfig = {
             values: timePeriodCodesValues
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
             filterName: "Filter User Class by Segment - DS",
             paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -4763,28 +4925,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
             filterName: "User Class - DS",
             paramName: "userClassIdsDoSomething",
             target: "api",
@@ -4807,26 +4947,34 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
               sort: "ascending",
-              exclude: [0, 123, 456, 789]
+              exclude: [0]
             },
+          },
+          {
+            filterName: "Origin Or Destination",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
           },
           {
             filterName: "Key Location Type",
@@ -4855,15 +5003,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
             filterName: "Threshold Value",
             paramName: "thresholdValue",
             target: "api",
@@ -4881,7 +5020,6 @@ export const appConfig = {
         ]
       }
     },
-    
     {
       pageName: "Zone Pairs",
       url: "/norms-zones-pair",
@@ -4917,7 +5055,7 @@ export const appConfig = {
             dataPath: "/api/norms/zonal-pair-results",
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Filter Scenario by Network",
@@ -5007,18 +5145,29 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "User",
+            filterName: "User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs"],
             type: "dropdown",
-            values: userClassIdValues,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
           },
           {
             filterName: "Zone as Origin or Destination",
@@ -5110,7 +5259,7 @@ export const appConfig = {
             
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Zone as Origin or Destination",
@@ -5215,7 +5364,7 @@ export const appConfig = {
           },
           {
             filterName: "DM Scenario",
-            paramName: "scenarioCodeDoSomething",
+            paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
@@ -5235,24 +5384,35 @@ export const appConfig = {
             },
           },
           {
-            filterName: "First Time Period",
+            filterName: "DM Time Period",
             paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "First User",
-            paramName: "userClassIdDoSomething",
+            filterName: "DM User Class",
+            paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
             type: "dropdown",
-            values: userClassIdValues,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
           },
           {
             filterName: "Filter DS Scenario by Network",
@@ -5316,7 +5476,7 @@ export const appConfig = {
           },
           {
             filterName: "DS Scenario",
-            paramName: "scenarioCodeDoMinimum",
+            paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
@@ -5336,24 +5496,35 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Second Time Period",
-            paramName: "timePeriodCodeDoMinimum",
+            filterName: "DS Time Period",
+            paramName: "timePeriodCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues
           },
           {
-            filterName: "Second User",
+            filterName: "DS User Class",
             paramName: "userClassIdDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
             type: "dropdown",
-            values: userClassIdValues,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
           },
           {
             filterName: "Select a zone in the map",
@@ -5404,7 +5575,7 @@ export const appConfig = {
             
           }
         ],
-        metadataTables: [ inputNormsScenarioMetadataTable ],
+        metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
             filterName: "Zone as Origin or Destination",
@@ -5535,18 +5706,29 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "Left User",
+            filterName: "Left User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
             type: "dropdown",
-            values: userClassIdValues,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
           },
           {
             filterName: "Filter Right Scenario by Network",
@@ -5636,18 +5818,29 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
-            filterName: "Right User",
+            filterName: "Right User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
             type: "dropdown",
-            values: userClassIdValues,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
           },
           {
             filterName: "Select a zone in the map",
@@ -5950,8 +6143,8 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Network - DS",
-            paramName: "networkSpecDoSomething",
+            filterName: "Network - DM",
+            paramName: "networkSpecDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -5971,8 +6164,107 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network - DM",
-            paramName: "networkSpecDoMinimum",
+            filterName: "Demand Scenario - DM",
+            paramName: "demandCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodesDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Filter User Class by Segment - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "Filter User Class by Car Availability - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "User Class - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Network - DS",
+            paramName: "networkSpecDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6013,48 +6305,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand Scenario - DM",
-            paramName: "demandCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Scenario Year",
-            paramName: "scenarioYear",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodesDoSomething",
             target: "api",
@@ -6067,42 +6317,8 @@ export const appConfig = {
             values: timePeriodCodesValues
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
             filterName: "Filter User Class by Segment - DS",
             paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6145,28 +6361,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
             filterName: "User Class - DS",
             paramName: "userClassIdsDoSomething",
             target: "api",
@@ -6189,25 +6383,24 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
               sort: "ascending",
-              exclude: [0, 123, 456, 789]
+              exclude: [0]
             },
           },
           {
@@ -6614,8 +6807,8 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Network - DS",
-            paramName: "networkSpecDoSomething",
+            filterName: "Network - DM",
+            paramName: "networkSpecDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -6634,9 +6827,110 @@ export const appConfig = {
               exclude: ["NA"]
             },
           },
+          
           {
-            filterName: "Network - DM",
-            paramName: "networkSpecDoMinimum",
+            filterName: "Demand Scenario - DM",
+            paramName: "demandCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodesDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Filter User Class by Segment - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "Filter User Class by Car Availability - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          
+          {
+            filterName: "User Class - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Network - DS",
+            paramName: "networkSpecDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -6677,62 +6971,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand Scenario - DM",
-            paramName: "demandCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Scenario Year",
-            paramName: "scenarioYear",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodesDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -6764,53 +7004,10 @@ export const appConfig = {
               exclude: ['All']
             },
           },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
+          
           {
             filterName: "Filter User Class by Car Availability - DS",
             paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -6853,25 +7050,24 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
               sort: "ascending",
-              exclude: [0, 123, 456, 789]
+              exclude: [0]
             },
           },
           {
@@ -6963,7 +7159,7 @@ export const appConfig = {
             values: landuseExogValues
           },
           {
-            filterName: "Origin Or Destination",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6979,7 +7175,7 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Totals Difference"],
             type: "slider",
             info: "Threshold value to filter data",
-            min: 15,
+            min: 45,
             max: 300,
             interval: 15,
             displayAs: {
@@ -7339,9 +7535,10 @@ export const appConfig = {
           userClassMetadataTable
         ],
         filters: [
+          
           {
-            filterName: "Network - DS",
-            paramName: "networkSpecDoSomething",
+            filterName: "Network - DM",
+            paramName: "networkSpecDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -7360,9 +7557,109 @@ export const appConfig = {
               exclude: ["NA"]
             },
           },
+          
           {
-            filterName: "Network - DM",
-            paramName: "networkSpecDoMinimum",
+            filterName: "Demand Scenario - DM",
+            paramName: "demandCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Time Period - DM",
+            paramName: "timePeriodCodesDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Filter User Class by Segment - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "Filter User Class by Car Availability - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "User Class - DM",
+            paramName: "userClassIdsDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Network - DS",
+            paramName: "networkSpecDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -7403,48 +7700,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand Scenario - DM",
-            paramName: "demandCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Scenario Year",
-            paramName: "scenarioYear",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
             filterName: "Time Period - DS",
             paramName: "timePeriodCodesDoSomething",
             target: "api",
@@ -7457,42 +7712,8 @@ export const appConfig = {
             values: timePeriodCodesValues
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
             filterName: "Filter User Class by Segment - DS",
             paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -7535,28 +7756,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
             filterName: "User Class - DS",
             paramName: "userClassIdsDoSomething",
             target: "api",
@@ -7579,25 +7778,24 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
+            filterName: "Scenario Year",
+            paramName: "scenarioYear",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
               sort: "ascending",
-              exclude: [0, 123, 456, 789]
+              exclude: [0]
             },
           },
           {
@@ -7715,7 +7913,7 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Pair Difference"],
             type: "slider",
             info: "Threshold value to filter data",
-            min: 15,
+            min: 45,
             max: 300,
             interval: 15,
             displayAs: {
