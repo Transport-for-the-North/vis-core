@@ -460,7 +460,7 @@ export const getHoverLayerStyle = (geometryType) => {
             10,
             2, // At zoom level 10, line width will be 2
             15,
-            4, // At zoom level 15, line width will be 4
+            6, // At zoom level 15, line width will be 4
             20,
             8, // At zoom level 20, line width will be 8
           ],
