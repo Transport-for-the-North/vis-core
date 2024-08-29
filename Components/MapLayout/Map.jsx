@@ -285,10 +285,8 @@ const Map = () => {
     [map]
   );
 
-  useEffect(() => {
-    if (!map) return;
-
-    const handleZoom = (labelZoomLevel, layerId, sourceLayerName) => {
+  const handleZoom = useCallback(
+    (labelZoomLevel, layerId, sourceLayerName) => {
       const mapZoomLevel = map.getZoom();
       if (mapZoomLevel <= labelZoomLevel) {
         if (map.getLayer(`${layerId}-label`)) {
@@ -304,16 +302,15 @@ const Map = () => {
             'source-layer': sourceLayerName,
             layout: {
               'text-field': ['get', 'name'],
-              'text-size': 12,
+              'text-size': 14,
               'text-anchor': 'center',
-              'text-offset': [0, 0.5],
-              'text-allow-overlap': false,  // Prevent overlapping labels
-              'text-ignore-placement': true,
+              'text-offset': [0, 1.5],
+              'text-allow-overlap': false, 
             },
             paint: {
               'text-color': '#000000',  // Black text
               'text-halo-color': '#ffffff',  // White halo for readability
-              'text-halo-width': 1.5,
+              'text-halo-width': 2.5,
             }
           });
         }
@@ -321,22 +318,28 @@ const Map = () => {
           map.setLayoutProperty(`${layerId}-label`, 'visibility', 'visible');
         }
       }
-    };
+    },
+    [map]
+  );
+
+  useEffect(() => {
+    if (!map) return;
 
     Object.keys(state.layers).forEach((layerId) => {
 
-      if (state.layers[layerId].isStylable) {
-        const layerData = state.visualisations[state.layers[layerId].visualisationName];
-        const zoomLevel = layerData.labelZoomLevel;
-        const sourceLayer = state.layers[layerId].sourceLayer;
-        if (zoomLevel != null) {
-          const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer);
-          map.on('zoomend', zoomHandler);
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+      if (state.layers[layerId].shouldHaveLabel) {
+        const layerData = state.layers[layerId];
+        let zoomLevel = layerData.labelZoomLevel;
+        const sourceLayer = layerData.sourceLayer;
+        if (zoomLevel == null) {
+          zoomLevel = 12
         }
+        const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer);
+        map.on('zoomend', zoomHandler);
+        if (!listenerCallbackRef.current[layerId]) {
+          listenerCallbackRef.current[layerId] = {};
+        }
+        listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
       }
       if (state.layers[layerId].isHoverable) {
         const layerHover = (e) =>
@@ -415,12 +418,9 @@ const Map = () => {
           );
           map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
         }
-        if (state.layers[layerId].isStylable) {
-          const zoomLevel = state.visualisations[state.layers[layerId].visualisationName].labelZoomLevel;
-          if (zoomLevel != null) {
-            const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-            map.off('zoomend', zoomHandler);
-          }
+        if (state.layers[layerId].shouldHaveLabel) {
+          const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
+          map.off('zoomend', zoomHandler);
         }
       });
     };

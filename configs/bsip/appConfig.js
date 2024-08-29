@@ -48,6 +48,7 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -58,7 +59,6 @@ export const appConfig = {
             valueField: "category",
             dataSource: "api",
             dataPath: "/api/bsip/reliability",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -176,6 +176,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -188,7 +189,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/bsip/accessibility",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [],

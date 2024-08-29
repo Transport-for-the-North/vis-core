@@ -180,6 +180,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -193,6 +194,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -204,8 +207,7 @@ export const appConfig = {
             joinField: "id",
             valueField: "value",
             dataSource: "api",
-            dataPath: "/api/norms/node-results",
-            labelZoomLevel: 10
+            dataPath: "/api/norms/node-results"
           }
         ],
         metadataTables: [
@@ -348,6 +350,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -361,6 +364,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -373,7 +378,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-results/difference",
-            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -466,6 +470,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -479,6 +484,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -491,7 +498,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-results",
-            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -584,6 +590,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSStationPairVectorTile",
@@ -598,6 +605,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -610,7 +619,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/station-pair-results",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -721,6 +730,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSStationPairDifferenceVectorTile",
@@ -735,6 +745,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -747,7 +759,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/station-pair-results/difference",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -892,19 +904,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
-          },
-          {
-            uniqueId: "NoRMSLinksVectorTile",
-            name: "Network",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
-            sourceLayer: "geometry",
-            geometryType: "line",
-            visualisationName: "Network",
-            isHoverable: false,
-            isStylable: false,
-            shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSStationPairVectorTile",
@@ -919,6 +919,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -931,7 +933,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/station-pair-results",
-            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1075,6 +1076,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSZoneVectorTile",
@@ -1089,6 +1091,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1103,6 +1106,7 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1115,7 +1119,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-catchment-results",
-            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1223,6 +1226,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSZoneVectorTile",
@@ -1237,6 +1241,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1251,6 +1256,7 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false
           },
         ],
         visualisations: [
@@ -1263,7 +1269,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-catchment-results/difference",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1392,6 +1398,20 @@ export const appConfig = {
       config: {
         layers: [
           {
+            uniqueId: "NoRMSLinksVectorTile",
+            name: "Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Network",
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
+          },
+          {
             uniqueId: "NoRMSZoneVectorTile",
             name: "NoRMS Zones Side-by-Side",
             type: "tile",
@@ -1404,6 +1424,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSNodeVectorTile",
@@ -1418,6 +1439,7 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1430,7 +1452,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/node-catchment-results",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1570,6 +1592,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSLinksVectorTile",
@@ -1583,6 +1606,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -1595,7 +1620,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/link-results",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1692,6 +1717,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSLinksResultDifference",
@@ -1705,6 +1731,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -1717,7 +1745,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/link-results/difference",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -1883,6 +1911,7 @@ export const appConfig = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
           },
           {
             uniqueId: "NoRMSLinksResultDual",
@@ -1896,6 +1925,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -1908,7 +1939,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/link-results",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2028,6 +2059,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -2040,7 +2072,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-demand-results",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2172,7 +2204,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-          },
+            shouldHaveLabel: false,
+          }
         ],
         visualisations: [
           {
@@ -2184,7 +2217,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-demand-results/difference",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2343,7 +2376,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-          },
+            shouldHaveLabel: false,
+          }
         ],
         visualisations: [
           {
@@ -2355,7 +2389,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-demand-results",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2513,7 +2547,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-          },
+            shouldHaveLabel: false,
+          }
         ],
         visualisations: [
           {
@@ -2525,7 +2560,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-pair-results",
-            labelZoomLevel: null
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2631,6 +2665,7 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -2643,7 +2678,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-pair-results/difference",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],
@@ -2776,7 +2811,8 @@ export const appConfig = {
             isStylable: true,
             shouldHaveTooltipOnClick: false,
             shouldHaveTooltipOnHover: true,
-          },
+            shouldHaveLabel: false,
+          }
         ],
         visualisations: [
           {
@@ -2788,7 +2824,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/norms/zonal-pair-results",
-            labelZoomLevel: null
+            
           }
         ],
         metadataTables: [ inputNormsScenarioMetadataTable ],

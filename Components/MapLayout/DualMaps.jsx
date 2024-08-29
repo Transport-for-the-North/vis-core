@@ -302,11 +302,65 @@ const DualMaps = () => {
     [leftMap, rightMap]
   );
 
+  const handleZoom = useCallback(
+    (labelZoomLevel, layerId, sourceLayerName) => {
+
+      maps.forEach((map) => {
+        const mapZoomLevel = map.getZoom();
+        if (mapZoomLevel <= labelZoomLevel) {
+          if (map.getLayer(`${layerId}-label`)) {
+            map.setLayoutProperty(`${layerId}-label`, 'visibility', 'none');
+          }
+        } else {
+          if (!map.getLayer(`${layerId}-label`)) {
+            // Create the layer if it does not exist
+            map.addLayer({
+              id: `${layerId}-label`,
+              type: 'symbol',
+              source: layerId,
+              'source-layer': sourceLayerName,
+              layout: {
+                'text-field': ['get', 'name'],
+                'text-size': 14,
+                'text-anchor': 'center',
+                'text-offset': [0, 1.5],
+                'text-allow-overlap': false, 
+              },
+              paint: {
+                'text-color': '#000000',  // Black text
+                'text-halo-color': '#ffffff',  // White halo for readability
+                'text-halo-width': 2.5,
+              }
+            });
+          }
+          else {
+            map.setLayoutProperty(`${layerId}-label`, 'visibility', 'visible');
+          }
+        }
+      });
+    },
+    [leftMap, rightMap]
+  );
+
   useEffect(() => {
     if (leftMap === null && rightMap === null) return;
 
     Object.keys(state.layers).forEach((layerId) => {
       maps.forEach((map) => {
+        if (state.layers[layerId].shouldHaveLabel) {
+          const layerData = state.layers[layerId];
+          let zoomLevel = layerData.labelZoomLevel;
+          const sourceLayer = layerData.sourceLayer;
+          if (zoomLevel == null) {
+            zoomLevel = 12
+          }
+          const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer);
+          map.on('zoomend', zoomHandler);
+          if (!listenerCallbackRef.current[layerId]) {
+            listenerCallbackRef.current[layerId] = {};
+          }
+          listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+        }
         if (state.layers[layerId].isHoverable) {
           const layerHover = (e) =>
             handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0);
@@ -371,11 +425,12 @@ const DualMaps = () => {
         }
         maps.forEach((map) => {
           if (state.layers[layerId].shouldHaveTooltipOnClick) {
-            const { clickCallback, hoverCallback, layerHoverCallback } =
+            const { clickCallback, hoverCallback, layerHoverCallback, zoomHandler } =
               listenerCallbackRef.current[layerId];
             map.off("click", clickCallback);
             map.off("mousemove", hoverCallback);
             map.off("mousemove", layerHoverCallback);
+            map.off('zoomend', zoomHandler);
           }
           if (state.layers[layerId].isHoverable) {
             map.off("mousemove", layerId, (e) =>
@@ -384,6 +439,10 @@ const DualMaps = () => {
             map.off("mouseleave", layerId, () =>
               handleLayerLeave(layerId, map === leftMap ? "left" : "right")
             );
+          }
+          if (state.layers[layerId].shouldHaveLabel) {
+            const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
+            map.off('zoomend', zoomHandler);
           }
         });
       });

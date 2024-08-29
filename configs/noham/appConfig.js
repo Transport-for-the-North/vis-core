@@ -296,6 +296,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
             filters: [
               {
                 type: "checkbox",
@@ -316,7 +318,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/link-results",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -441,6 +442,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -453,7 +456,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/link-results/difference",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -652,6 +654,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -664,7 +668,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/link-results",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [],
@@ -820,6 +824,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -832,7 +838,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/node-results",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [],
@@ -926,6 +932,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -938,7 +946,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/node-results/difference",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [],
@@ -1084,7 +1092,9 @@ export const appConfig = {
             visualisationName: "Node Results Side-by-Side",
             isHoverable: true,
             isStylable: true,
-            shouldHaveTooltipOnHover: true
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
           },
         ],
         visualisations: [
@@ -1097,7 +1107,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/node-results",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [],
@@ -1243,6 +1253,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1255,7 +1266,7 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/matrix-demand",
-            labelZoomLevel: null
+            
           },
         ],
         metadataTables: [],
@@ -1359,6 +1370,7 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1371,7 +1383,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/matrix-demand/difference",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -1530,7 +1541,8 @@ export const appConfig = {
             visualisationName: "Zone Results Side-By-Side",
             isHoverable: true,
             isStylable: true,
-            shouldHaveTooltipOnHover: true
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1543,7 +1555,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/matrix-demand",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -1702,7 +1713,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
-            shouldHaveTooltipOnHover: true
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1715,7 +1727,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zonal-pair-results",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [
@@ -1866,7 +1877,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
-            shouldHaveTooltipOnHover: true
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -1879,7 +1891,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zonal-pair-results/difference",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [],
@@ -2080,7 +2091,8 @@ export const appConfig = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnClick: false,
-            shouldHaveTooltipOnHover: true
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
           },
         ],
         visualisations: [
@@ -2093,7 +2105,6 @@ export const appConfig = {
             valueField: "value",
             dataSource: "api",
             dataPath: "/api/noham/zonal-pair-results",
-            labelZoomLevel: null
           },
         ],
         metadataTables: [],
