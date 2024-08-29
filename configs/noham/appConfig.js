@@ -907,6 +907,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "delivery_programme_name",
               paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -921,6 +922,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "network_year",
               paramColumn: "network_year",
+              sort: "ascending",
             },
           },
           {
@@ -935,6 +937,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "network_scenario_name",
               paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -949,6 +952,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_scenario_name",
               paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1044,6 +1048,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "delivery_programme_name",
               paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1058,6 +1063,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "network_year",
               paramColumn: "network_year",
+              sort: "ascending",
             },
           },
           {
@@ -1072,6 +1078,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "network_scenario_name",
               paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1086,6 +1093,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_scenario_name",
               paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1111,6 +1119,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "delivery_programme_name",
               paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1125,6 +1134,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_year",
               paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -1139,6 +1149,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "network_scenario_name",
               paramColumn: "network_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1153,6 +1164,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_scenario_name",
               paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1410,6 +1422,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "delivery_programme_name",
               paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1424,6 +1437,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_year",
               paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -1439,6 +1453,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_scenario_name",
               paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1541,6 +1556,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "delivery_programme_name",
               paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1555,6 +1571,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_year",
               paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -1570,6 +1587,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_scenario_name",
               paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
@@ -1609,6 +1627,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "delivery_programme_name",
               paramColumn: "delivery_programme_name",
+              sort: "ascending",
             },
           },
           {
@@ -1623,6 +1642,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_year",
               paramColumn: "demand_year",
+              sort: "ascending",
             },
           },
           {
@@ -1638,6 +1658,7 @@ export const appConfig = {
               metadataTableName: "v_input_scenarios",
               displayColumn: "demand_scenario_name",
               paramColumn: "demand_scenario_name",
+              sort: "ascending",
             },
           },
           {
