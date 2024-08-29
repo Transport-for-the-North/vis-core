@@ -43,7 +43,7 @@ export const HomePage = () => {
       <div className="contacts">
         <p>{appContext.contactText}</p>
         <a className="contact" href={"mailto:" + appContext.contactEmail}>
-          {"Email "+ appContext.contactEmail}
+          {"Email: "+ appContext.contactEmail}
         </a>
       </div>
     </div>
