@@ -1010,7 +1010,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Direction",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1019,7 +1019,7 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "Column Name",
+            filterName: "Metric",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -1117,7 +1117,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Direction",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1126,7 +1126,7 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "Column Name",
+            filterName: "Metric",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -1430,7 +1430,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Direction",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1439,7 +1439,7 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "Column Name",
+            filterName: "Metric",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -1862,15 +1862,13 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Direction",
+            filterName: "Origin or Destination",
             paramName: "directionId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: originOrDestinationValues,
           },
           {
             filterName: "Metric",
@@ -2188,15 +2186,13 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Direction",
+            filterName: "Origin or Destination",
             paramName: "directionId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: originOrDestinationValues,
           },
           {
             filterName: "Metric",
@@ -2308,15 +2304,13 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Direction",
+            filterName: "Origin or Destination",
             paramName: "directionId",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: originOrDestinationValues,
           },
           {
             filterName: "Metric",
@@ -3485,7 +3479,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -3704,7 +3698,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -4024,7 +4018,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
+            filterName: "Origin or Destination",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
