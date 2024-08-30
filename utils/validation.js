@@ -92,4 +92,52 @@ export function updateFilterValidity(state, filterState) {
     });
 
     return updatedFilters;
-}
+};
+
+/**
+ * Check if the condition is valid.
+ * @function isValidCondition
+ * @param {Object} condition - The condition to validate.
+ * @returns {boolean} True if the condition is valid, false otherwise.
+ */
+export const isValidCondition = (condition) => {
+  const validOperands = ['=', '!=', '>', '<', '>=', '<=', 'IN', 'NOT IN'];
+  return condition &&
+    typeof condition.column === 'string' &&
+    validOperands.includes(condition.operand) &&
+    (typeof condition.value !== 'undefined' || Array.isArray(condition.values));
+};
+
+/**
+ * Apply a condition to filter the data.
+ * @function applyCondition
+ * @param {Array} data - The data to filter.
+ * @param {Object} condition - The condition to apply.
+ * @returns {Array} The filtered data.
+ */
+export const applyCondition = (data, condition) => {
+  const { column, operand, value, values } = condition;
+
+  return data.filter(item => {
+    switch (operand) {
+      case '=':
+        return item[column] === value;
+      case '!=':
+        return item[column] !== value;
+      case '>':
+        return item[column] > value;
+      case '<':
+        return item[column] < value;
+      case '>=':
+        return item[column] >= value;
+      case '<=':
+        return item[column] <= value;
+      case 'IN':
+        return Array.isArray(values) && values.includes(item[column]);
+      case 'NOT IN':
+        return Array.isArray(values) && !values.includes(item[column]);
+      default:
+        return true;
+    }
+  });
+};
