@@ -4667,7 +4667,7 @@ export const appConfig = {
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldFilterOthers: true,
-            isClearable: true,
+            isClearable: false,
             multiSelect: false,
             values: {
               source: "metadataTable",
