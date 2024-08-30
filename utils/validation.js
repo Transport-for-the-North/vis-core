@@ -1,5 +1,3 @@
-import { type } from "@testing-library/user-event/dist/type";
-
 /**
  * Updates the validity of filter values based on the metadata table.
  * If `shouldFilterOnValidate` is true, filters out invalid options; otherwise, only updates the `isValid` property.
@@ -25,16 +23,18 @@ export function updateFilterValidity(state, filterState) {
     });
 
     // List of possible identifiers
-    const identifiers = ['DM', 'DS', 'Scen. 1', 'Scen. 2', 'Left', 'Right'];
+    const identifiers = ['DM', 'DS', 'Scen. 1', 'Scen. 2', 'Left', 'Right', 'Scenario 1', 'Scenario 2'];
 
-    // Group filters by their identifier
+    // Group filters by their identifiers
     const filterGroups = activeFilters.reduce((groups, filter) => {
-        const groupName = identifiers.find(id => filter.filterName.includes(id));
-        if (groupName) {
-            if (!groups[groupName]) {
-                groups[groupName] = [];
-            }
-            groups[groupName].push(filter);
+        const groupNames = identifiers.filter(id => filter.filterName.includes(id));
+        if (groupNames.length > 0) {
+            groupNames.forEach(groupName => {
+                if (!groups[groupName]) {
+                    groups[groupName] = [];
+                }
+                groups[groupName].push(filter);
+            });
         } else {
             // If no identifier is found, group under a default key
             if (!groups['default']) {
@@ -70,7 +70,7 @@ export function updateFilterValidity(state, filterState) {
             }
         });
     });
-    // console.log(validValuesMap);
+
     // Create a new filters array with updated isValid values
     const updatedFilters = state.filters.map(filter => {
         if (filter.values && filter.values.metadataTableName) {
