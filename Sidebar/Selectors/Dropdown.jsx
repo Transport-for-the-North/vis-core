@@ -135,6 +135,13 @@ export const Dropdown = ({ filter, onChange }) => {
     prevSelectedOptionsRef.current = filterState[filter.id];
   }, [filterState, filter.id]);
 
+  useEffect(() => {
+    // Automatically select the only option if there's just one available
+    if (options.length === 1 && filterState[filter.id] !== options[0].value) {
+      onChange(filter, options[0].value);
+    }
+  }, [options, filter, onChange, filterState]);
+
   const formatOptionLabel = ({ label, isValid }) => (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {isValid !== undefined && (
