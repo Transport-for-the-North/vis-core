@@ -1,5 +1,5 @@
 import { DynamicLegend } from "Components";
-import { useDualMaps, useMapContext } from "hooks";
+import { useDualMaps, useMapContext, useFilterContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -27,6 +27,7 @@ const DualMaps = () => {
     leftMapContainerRef,
     rightMapContainerRef
   );
+  const { dispatch: filterDispatch } = useFilterContext();
   const { state, dispatch } = useMapContext();
   const maps = [leftMap, rightMap];
   const popups = {};
@@ -548,6 +549,10 @@ const DualMaps = () => {
             });
 
             // Dispatch the action with the value from the clicked feature
+            filterDispatch({
+              type: 'SET_FILTER_VALUE',
+              payload: { filterId: filter.id, value },
+            });
             filter.actions.map((action) => {
               dispatch({
                 type: action.action,
