@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, sortValues } from 'utils';
+import { hasRouteParameter, replaceRouteParameter, sortValues, isValidCondition, applyCondition } from 'utils';
 import { AppContext, PageContext, FilterContext } from 'contexts';
 import { api } from 'services';
 
@@ -62,14 +62,28 @@ export const MapProvider = ({ children }) => {
      */
     const fetchMetadataTables = async () => {
       const metadataTables = {};
+      
       for (const table of pageContext.config.metadataTables) {
         try {
           const response = await api.baseService.get(table.path);
-          metadataTables[table.name] = response;
+          let filteredData = response;
+
+          if (table.where && Array.isArray(table.where)) {
+            for (const condition of table.where) {
+              if (isValidCondition(condition)) {
+                filteredData = applyCondition(filteredData, condition);
+              } else {
+                console.error(`Invalid condition in metadata table ${table.name}:`, condition);
+              }
+            }
+          }
+
+          metadataTables[table.name] = filteredData;
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
         }
       }
+
       return metadataTables;
     };
 
