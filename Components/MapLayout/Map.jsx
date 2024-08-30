@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
-import { useMap, useMapContext } from "hooks";
+import { useMap, useMapContext, useFilterContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 import { Visualisation } from "./Visualisation";
@@ -25,6 +25,7 @@ const Map = () => {
   const mapContainerRef = useRef(null);
   const { map, isMapReady } = useMap(mapContainerRef);
   const { state, dispatch } = useMapContext();
+  const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
@@ -523,8 +524,11 @@ const Map = () => {
             source: "selected-feature-source",
             paint: paintProp,
           });
-
           // Dispatch the action with the value from the clicked feature
+          filterDispatch({
+            type: 'SET_FILTER_VALUE',
+            payload: { filterId: filter.id, value },
+          });
           filter.actions.map((action) => {
             dispatch({
               type: action.action,
