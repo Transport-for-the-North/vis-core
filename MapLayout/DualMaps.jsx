@@ -192,6 +192,8 @@ const DualMaps = () => {
         popups[layerId].forEach((popup) => popup.remove());
         popups[layerId] = [];
       }
+
+      const shouldIncludeMetadata = state.layers[layerId]?.hoverTipShouldIncludeMetadata ?? false;
   
       const bufferedPoint = [
         [e.point.x - bufferSize, e.point.y - bufferSize],
@@ -224,13 +226,34 @@ const DualMaps = () => {
                 <div class="popup-content">
                   <p class="feature-name">${featureName}</p>
                   <hr class="divider">
-                  <p class="feature-value">${numberWithCommas(featureValue)} (${state.visualisations[state.layers[layerId].visualisationName].legendText[0].legendSubtitleText})</p>
+                  <div class="metadata-item">
+                    <span class="metadata-key">Value:</span>
+                    <span class="metadata-value">${numberWithCommas(featureValue)} (${state.visualisations[state.layers[layerId].visualisationName].legendText[0].legendSubtitleText})</span>
+                  </div>
                 </div>`;
             } else if (featureName) {
               description = `
                 <div class="popup-content">
                   <p class="feature-name">${featureName}</p>
                 </div>`;
+            }
+
+            // Extract additional metadata columns
+            const metadataKeys = Object.keys(feature.properties).filter(
+              key => !['id', 'name', 'value'].includes(key)
+            );
+    
+            if (metadataKeys.length > 0 && shouldIncludeMetadata) {
+              let metadataDescription = '<div class="metadata-section">';
+              metadataKeys.forEach(key => {
+                metadataDescription += `
+                  <div class="metadata-item">
+                    <span class="metadata-key">${key}:</span>
+                    <span class="metadata-value">${feature.properties[key]}</span>
+                  </div>`;
+              });
+              metadataDescription += '</div>';
+              description += metadataDescription;
             }
     
             if (description) {
