@@ -7328,10 +7328,10 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Totals"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7353,7 +7353,7 @@ export const appConfig = {
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7370,7 +7370,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
-            type: "toggle",
+            type: "dropdown",
             values: landuseReferenceValues
           },
           {
@@ -7807,10 +7807,10 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Totals Difference"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7832,7 +7832,7 @@ export const appConfig = {
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7849,7 +7849,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
+            type: "dropdown",
             values: landuseReferenceValues
           },
           {
@@ -8124,10 +8124,10 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Pair"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -8149,7 +8149,7 @@ export const appConfig = {
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -8166,7 +8166,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
-            type: "toggle",
+            type: "dropdown",
             values: landuseReferenceValues
           },
           {
@@ -8611,10 +8611,10 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Pair Difference"],
             type: "dropdown",
             shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
+            shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -8636,7 +8636,7 @@ export const appConfig = {
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
-            multiSelect: true,
+            multiSelect: false,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -8653,7 +8653,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
+            type: "dropdown",
             values: landuseReferenceValues
           },
           {
