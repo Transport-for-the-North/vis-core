@@ -105,9 +105,9 @@ const linkMetricValues = {
       legendSubtitleText: "m"
   },
     {
-      displayValue: "Number of lanes",
+      displayValue: "Number of lanes (lanes)",
       paramValue: "number_lanes",
-      legendSubtitleText: "unit"
+      legendSubtitleText: "lane(s)"
     },
     {
       displayValue: "Car business vehicles (vehs)",
