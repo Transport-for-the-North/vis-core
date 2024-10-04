@@ -23,13 +23,14 @@ const SliderValue = styled.span`
 `;
 
 /**
- * Renders a slider input element for selecting a numeric value within a specified range.
+ * Renders a slider input element for selecting a numeric value within a specified range or from an array of values.
  * @property {Object} filter - The filter object containing information about the slider.
- * @property {number} filter.min - The minimum value of the slider.
- * @property {number} filter.max - The maximum value of the slider.
- * @property {number} filter.interval - The interval between each selectable value on the slider.
- * @property {Object} filter.displayAs - An optional object specifying how the slider value should be displayed.
- * @property {string} filter.displayAs.operation - The operation to apply to the slider value for display.
+ * @property {number} [filter.min] - The minimum value of the slider.
+ * @property {number} [filter.max] - The maximum value of the slider.
+ * @property {number} [filter.interval] - The interval between each selectable value on the slider.
+ * @property {Array} [filter.values] - An array of values to display on the slider.
+ * @property {Object} [filter.displayAs] - An optional object specifying how the slider value should be displayed.
+ * @property {string} [filter.displayAs.operation] - The operation to apply to the slider value for display.
  * @property {number} [filter.displayAs.operand] - The operand to be used in the display operation.
  * @property {string} [filter.displayAs.unit] - The unit to display along with the slider value.
  * @property {Function} onChange - The function called when the slider value changes.
@@ -37,11 +38,12 @@ const SliderValue = styled.span`
  */
 export const Slider = ({ filter, onChange }) => {
   const { state: filterState } = useFilterContext();
-  const [value, setValue] = useState(filterState[filter.id] || filter.min);
+  const initialValue = filter.values ? filter.values[0] : filter.min;
+  const [value, setValue] = useState(filterState[filter.id] || initialValue);
 
   useEffect(() => {
-    setValue(filterState[filter.id] || filter.min);
-  }, [filterState, filter.id, filter.min]);
+    setValue(filterState[filter.id] || initialValue);
+  }, [filterState, filter.id, initialValue]);
 
   const getDisplayValue = (sliderValue) => {
     if (filter.displayAs) {
@@ -68,15 +70,32 @@ export const Slider = ({ filter, onChange }) => {
     onChange(filter, newValue); // Call the onChange handler with the new value
   };
 
+  const sliderProps = filter.values
+    ? {
+        min: 0,
+        max: filter.values.length - 1,
+        step: 1,
+        value: filter.values.indexOf(value),
+        onChange: (e) => {
+          const newIndex = e.target.value;
+          const newValue = filter.values[newIndex];
+          setValue(newValue);
+          onChange(filter, newValue);
+        },
+      }
+    : {
+        min: filter.min,
+        max: filter.max,
+        step: filter.interval,
+        value: value,
+        onChange: handleSliderChange,
+      };
+
   return (
     <StyledSliderContainer>
       <StyledSlider
         type="range"
-        min={filter.min}
-        max={filter.max}
-        step={filter.interval}
-        value={value} // Set the value of the slider to the state value
-        onChange={handleSliderChange}
+        {...sliderProps}
       />
       <SliderValue>{getDisplayValue(value)}</SliderValue>
     </StyledSliderContainer>
