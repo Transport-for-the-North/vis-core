@@ -121,7 +121,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
               <Slider
                 key={filter.id}
                 filter={filter}
-                value={filterState[filter.id] || filter.min}
+                value={filterState[filter.id] || filter.min || filter.values[0]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
               />
             )}
