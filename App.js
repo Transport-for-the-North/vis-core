@@ -55,7 +55,8 @@ function App() {
         return <div>Loading...</div>;
     }
 
-    
+    // Check if authentication is required globally for the app
+    const isAuthRequired = appConfig.authenticationRequired !== undefined ? appConfig.authenticationRequired : true;
    
     return (
         <div className="App">
@@ -63,19 +64,26 @@ function App() {
                 <AppContext.Provider value={appConfig}>
                     <Navbar />
                     <Dashboard>
+
                         <Routes>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/unauthorized" element={<Unauthorized />} />
-                            <Route path="/" element={<RoleValidation component={HomePage} />} />
-                            {appConfig.appPages.map((page) => (
-                                <Route
-                                    key={page.pageName}
-                                    path={page.url}
-                                    element={<RoleValidation component={() => <PageSwitch pageConfig={page} />} />}
-                                />
-                            ))}
-                            
+                            {isAuthRequired ? (
+                                <>
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/unauthorized" element={<Unauthorized />} />
+                                    <Route path="/" element={<RoleValidation component={HomePage} />} />
+                                    {appConfig.appPages.map((page) => (
+                                        <Route
+                                            key={page.pageName}
+                                            path={page.url}
+                                            element={<RoleValidation component={() => <PageSwitch pageConfig={page} />} />}
+                                        />
+                                    ))}
+                                </>
+                            ) : (
+                                <Route path="/" element={<HomePage />} />
+                            )}
                         </Routes>
+
                     </Dashboard>
                 </AppContext.Provider>
             </AuthProvider>
