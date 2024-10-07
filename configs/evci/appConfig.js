@@ -16,6 +16,7 @@ export const appConfig = {
   backgroundImage: "img/hero-image.jpg",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
+  authenticationRequired: false,
   appPages: [
   ],
 };
