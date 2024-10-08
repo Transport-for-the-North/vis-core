@@ -56,7 +56,7 @@ function App() {
     }
 
     // Check if authentication is required globally for the app
-    const isAuthRequired = appConfig.authenticationRequired !== undefined ? appConfig.authenticationRequired : true;
+    const isAuthRequired = appConfig.authenticationRequired ?? true;
    
     return (
         <div className="App">
