@@ -65,24 +65,18 @@ function App() {
                     <Navbar />
                     <Dashboard>
 
-                        <Routes>
-                            {isAuthRequired ? (
-                                <>
-                                    <Route path="/login" element={<Login />} />
-                                    <Route path="/unauthorized" element={<Unauthorized />} />
-                                    <Route path="/" element={<RoleValidation component={HomePage} />} />
-                                    {appConfig.appPages.map((page) => (
-                                        <Route
-                                            key={page.pageName}
-                                            path={page.url}
-                                            element={<RoleValidation component={() => <PageSwitch pageConfig={page} />} />}
-                                        />
-                                    ))}
-                                </>
-                            ) : (
-                                <Route path="/" element={<HomePage />} />
-                            )}
-                        </Routes>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/unauthorized" element={<Unauthorized />} />
+                        <Route path="/" element={isAuthRequired ? <RoleValidation component={HomePage} /> : <HomePage />} />
+                        {appConfig.appPages.map((page) => (
+                            <Route
+                                key={page.pageName}
+                                path={page.url}
+                                element={isAuthRequired ? <RoleValidation component={() => <PageSwitch pageConfig={page} />} /> : <PageSwitch pageConfig={page} />}
+                            />
+                        ))}
+                    </Routes>
 
                     </Dashboard>
                 </AppContext.Provider>
