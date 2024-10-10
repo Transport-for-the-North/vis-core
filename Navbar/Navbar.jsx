@@ -29,12 +29,14 @@ export function Navbar() {
   const listCategories = [];
   const appContext = useContext(AppContext);
   const [ logoImage, setLogoImage ] = useState("img/tfn-logo-fullsize.png");
+  const [ bgColor, setBgColor] = useState("#7317de")
   
   const navigate = useNavigate();
 
-  const onClick = (url, newLogo) => {
+  const onClick = (url, newLogo, navColor) => {
     setLogoImage(newLogo);
     navigate(url);
+    setBgColor(navColor);
   };
 
   const updateMenu = () => {
@@ -59,7 +61,7 @@ export function Navbar() {
   return (
     <>
       <StyledNavbar className="navbar">
-        <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick("/","img/tfn-logo-fullsize.png")} />
+        <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null,logoImage)} />
         <Link
           key='Home'
           className={
