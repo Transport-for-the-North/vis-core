@@ -29,18 +29,16 @@ const fetchDataForVisualisation = debounce(
       setLoading(true);
       const path = visualisation.dataPath;
       const queryParams = visualisation.queryParams;
+      const requiresAuth = visualisation.requiresAuth;
       const visualisationName = visualisation.name;
       try {
-        const data = await api.baseService.get(path, { queryParams });
+        const data = await api.baseService.get(path, { queryParams, skipAuth: !requiresAuth });
         dispatch({
           type: actionTypes.UPDATE_ALL_DATA,
           payload: { visualisationName, data, left },
-        })
+        });
         if (data.length === 0) {
-          console.warn(
-            "No data returned for visualisation:",
-            visualisationName
-          );
+          console.warn("No data returned for visualisation:", visualisationName);
         }
         setLoading(false);
       } catch (error) {
