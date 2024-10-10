@@ -107,7 +107,10 @@ export function NavBarDropdown(props) {
               props.activeLink === page.url ? "ActiveNavButton" : "NavButton"
             }
             to={page.url}
-            onClick={handleClose}
+            onClick={(e) => {
+              props.onClick(page.url, page.customLogoPath);
+              handleClose(e);
+            }}
             $activeLink={props.activeLink === page.url}
           >
             {page.pageName}
