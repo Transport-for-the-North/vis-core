@@ -14,12 +14,12 @@ export const actualLocation = {
   config: {
     layers: [
       {
-        name: "Administrative Boundaries",
+        name: "Charging Sites",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-        sourceLayer: "zones",
-        geometryType: "polygon",
+        path: "/api/vectortiles/evci_actual_charging_sites/{z}/{x}/{y}", // matches the path in swagger.json
+        sourceLayer: "geometry",
+        geometryType: "point",
         visualisationName: "Actual Location",
         isHoverable: true,
         isStylable: true,
@@ -35,8 +35,8 @@ export const actualLocation = {
       {
         name: "Actual Location",
         type: "joinDataToMap",
-        joinLayer: "Administrative Boundaries",
-        style: "polygon-continuous",
+        joinLayer: "Charging Location",
+        style: "point-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
