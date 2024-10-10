@@ -1,8 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 
 export const enrouteChargingSites = {
-  pageName: "Enroute Charging Sites",
-  url: "/@stbTag@/enroute-charging-sites",
+  pageName: "Potential Charging Sites",
+  url: "/@stbTag@/potential-charging-sites",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
@@ -14,13 +14,13 @@ export const enrouteChargingSites = {
   config: {
     layers: [
       {
-        name: "Administrative Boundaries",
+        name: "Potential Charging Sites",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-        sourceLayer: "zones",
-        geometryType: "polygon",
-        visualisationName: "Enroute Charging Sites",
+        path: "/api/vectortiles/evci_potential_charging_sites/{z}/{x}/{y}", // matches the path in swagger.json
+        sourceLayer: "geometry",
+        geometryType: "point",
+        visualisationName: "Potential Charging Sites",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,19 +33,19 @@ export const enrouteChargingSites = {
     ],
     visualisations: [
       {
-        name: "Enroute Charging Sites",
+        name: "Potential Charging Sites",
         type: "joinDataToMap",
-        joinLayer: "Administrative Boundaries",
-        style: "polygon-continuous",
+        joinLayer: "Potential Charging Sites",
+        style: "point-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/enroute-charging-sites",
+        dataPath: "/api/evci/potential-charging-sites",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.vehicleType, visualisations: ['Enroute Charging Sites'] },
+      { ...selectors.vehicleType, visualisations: ['Potential Charging Sites'] },
     ],
   },
 };
