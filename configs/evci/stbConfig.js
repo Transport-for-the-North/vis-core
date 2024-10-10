@@ -18,7 +18,7 @@ export const stbConfig = [
     secondaryBgColour: '#00dec6',
     primaryFontColour: '#000000',
     secondaryFontColour: '#00dec6',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites','actualArea','actualLocation','actualRoad']
   },
   {
     stbName: "Transport for the South East",
@@ -36,7 +36,7 @@ export const stbConfig = [
     secondaryBgColour: '#ec6c60',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
   },
   {
     stbName: "Midlands Connect",
@@ -54,7 +54,7 @@ export const stbConfig = [
     secondaryBgColour: '#272b30',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
   },
   {
     stbName: "England's Economic Heartland",
@@ -72,7 +72,7 @@ export const stbConfig = [
     secondaryBgColour: '#6b004c',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
   },
   {
     stbName: "Peninsula Transport",
@@ -90,7 +90,7 @@ export const stbConfig = [
     secondaryBgColour: '#80ff00',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
   },
   {
     stbName: "Transport East",
@@ -108,7 +108,7 @@ export const stbConfig = [
     secondaryBgColour: '#0E9059',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
   },
   {
     stbName: "Western Gateway",
@@ -126,6 +126,6 @@ export const stbConfig = [
     secondaryBgColour: '#ffffff',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
   }
 ];
