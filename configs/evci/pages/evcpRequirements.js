@@ -1,8 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 
-export const evUptake = {
-  pageName: "EV Uptake",
-  url: "/@stbTag@/ev-uptake",
+export const evcpRequirements = {
+  pageName: "EVCP Requirements",
+  url: "/@stbTag@/evcp-requirements",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
@@ -20,7 +20,7 @@ export const evUptake = {
         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
-        visualisationName: "EV Uptake",
+        visualisationName: "EVCP Requirements",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,25 +33,24 @@ export const evUptake = {
     ],
     visualisations: [
       {
-        name: "EV Uptake",
+        name: "EVCP Requirements",
         type: "joinDataToMap",
         joinLayer: "Administrative Boundaries",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/ev-uptake",
+        dataPath: "/api/evci/evcp-requirements",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.year, visualisations: ['EV Uptake'] },
-      { ...selectors.administrativeBoundary, visualisations: ['EV Uptake'] },
-      { ...selectors.travelScenario, visualisations: ['EV Uptake'] },
-      { ...selectors.behaviouralScenario, visualisations: ['EV Uptake'] },
-      { ...selectors.vehicleType, visualisations: ['EV Uptake'] },
-      { ...selectors.fuelType, visualisations: ['EV Uptake'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
+      { ...selectors.year, visualisations: ['EVCP Requirements'] },
+      { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
+      { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
     ],
   },
 };
