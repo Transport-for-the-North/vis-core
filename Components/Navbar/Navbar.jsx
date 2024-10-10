@@ -15,19 +15,6 @@ const StyledNavbar = styled.nav`
   background-color: #f8f9fa; // Example background color, adjust as needed
 `;
 
-const StyledLogout = styled.img`
-  cursor: pointer;
-
-  @media only screen and (min-width: 766px) {
-    position: absolute;
-    right: 1%;
-  }
-
-  @media only screen and (max-width: 765px) {
-    display: none;
-  }
-`;
-
 /**
  * Navbar component represents the navigation bar of the application.
  * It includes the logo, navigation links, and a button for opening/closing the side navigation menu.
@@ -73,7 +60,6 @@ export function Navbar() {
     <>
       <StyledNavbar className="navbar">
         <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick("/","img/tfn-logo-fullsize.png")} />
-
         <Link
           key='Home'
           className={
