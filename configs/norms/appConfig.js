@@ -77,6 +77,22 @@ const scenarioCodeValues = {
       displayValue: "UAF 2052",
       paramValue: "UAF_2052",
     },
+    {
+      displayValue: "TBG 2042",
+      paramValue: "TBG_2042",
+    },
+    {
+      displayValue: "UCS 2042",
+      paramValue: "UCS_2042",
+    },
+    {
+      displayValue: "TBH 2052",
+      paramValue: "TBH_2052",
+    },
+    {
+      displayValue: "UCT 2052",
+      paramValue: "UCT_2052",
+    },
   ],
 };
 
