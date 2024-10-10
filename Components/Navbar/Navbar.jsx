@@ -97,6 +97,7 @@ export function Navbar() {
                 activeLink={activeLink}
                 dropdownName={page.category}
                 onClick={onClick}
+                bgColor={bgColor}
               />
             );
           } else {
