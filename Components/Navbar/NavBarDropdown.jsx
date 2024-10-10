@@ -108,7 +108,7 @@ export function NavBarDropdown(props) {
             }
             to={page.url}
             onClick={(e) => {
-              props.onClick(page.url, page.customLogoPath);
+              props.onClick(page.url, page.customLogoPath, page.navbarLinkBgColour);
               handleClose(e);
             }}
             $activeLink={props.activeLink === page.url}
