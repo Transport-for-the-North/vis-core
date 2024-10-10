@@ -3,9 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { AppContext} from "contexts";
-import { useAuth } from "contexts/AuthProvider";
-import { Button } from "./Button";
-import { LateralNavbar } from "./LateralNavbar";
 import { Logo } from "./Logo";
 import { NavBarDropdown } from "./NavBarDropdown";
 import "./Navbar.styles.css";
@@ -44,7 +41,6 @@ export function Navbar() {
   const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
   const listCategories = [];
   const appContext = useContext(AppContext);
-  const { logOut } = useAuth();
   const [ logoImage, setLogoImage ] = useState("img/tfn-logo-fullsize.png");
   
   const navigate = useNavigate();
@@ -63,12 +59,6 @@ export function Navbar() {
     setIsClicked(!isClicked);
   };
 
-  const handleLogout = () => {
-      
-   logOut(); // Call logout function from AuthContext
-      
-  };
-
   useEffect(() => {
     setActiveLink(location.pathname);
     if (sideNavOpen === "sideNavbar-shown") updateMenu();
@@ -83,7 +73,7 @@ export function Navbar() {
     <>
       <StyledNavbar className="navbar">
         <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick("/","img/tfn-logo-fullsize.png")} />
-        <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
+
         <Link
           key='Home'
           className={
@@ -125,13 +115,7 @@ export function Navbar() {
             return null;
           }
          })}
-        <Button
-          className="navbarMobile"
-          src={appContext.logoutButtonImage}
-          alt="Burger Button Navbar"
-          onClick={updateMenu}
-        />
-        <StyledLogout src="/img/logout.png" onClick={ handleLogout} />
+
       </StyledNavbar>
       <div className="empty-blank-nav"></div>
     </>
