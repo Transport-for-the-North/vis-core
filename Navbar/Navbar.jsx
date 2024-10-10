@@ -45,10 +45,12 @@ export function Navbar() {
   const listCategories = [];
   const appContext = useContext(AppContext);
   const { logOut } = useAuth();
+  const [ logoImage, setLogoImage ] = useState("img/tfn-logo-fullsize.png");
   
   const navigate = useNavigate();
 
-  const onClick = (url) => {
+  const onClick = (url, newLogo) => {
+    setLogoImage(newLogo);
     navigate(url);
   };
 
@@ -80,8 +82,7 @@ export function Navbar() {
   return (
     <>
       <StyledNavbar className="navbar">
-        <Logo className="logoNav" onClick={() => onClick("/")} 
-              logoImage={appContext.logoImage} />
+        <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick("/","img/tfn-logo-fullsize.png")} />
         <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
         <Link
           key='Home'
@@ -89,6 +90,7 @@ export function Navbar() {
             activeLink === "/" ? "ActiveNavButton" : "NavButton"
           }
           to="/"
+          onClick={() => onClick("/","img/tfn-logo-fullsize.png")} 
         >
           Home
         </Link>
@@ -116,6 +118,7 @@ export function Navbar() {
                 dropdownItems={dropdownItems}
                 activeLink={activeLink}
                 dropdownName={page.category}
+                onClick={onClick}
               />
             );
           } else {
