@@ -1,0 +1,23 @@
+.footer{
+    min-height: 10vh;
+    background-color: #0d0f3d;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.credits-footer {
+    color: white;
+}
+
+.bottom-footer {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    text-align: center;
+}
+
+.footer-links {
+    color: white;
+    text-decoration: none;
+    font-size: larger;
+}
