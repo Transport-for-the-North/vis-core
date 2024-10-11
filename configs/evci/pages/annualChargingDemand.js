@@ -52,5 +52,10 @@ export const annualChargingDemand = {
       { ...selectors.chargingCategory, visualisations: ['Annual Charging Demand'] },
       { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };

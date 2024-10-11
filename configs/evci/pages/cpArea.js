@@ -49,5 +49,10 @@ export const cpArea = {
       { ...selectors.areaValueDisplay, visualisations: ['Chargers/Power by Area'] },
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Area'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };

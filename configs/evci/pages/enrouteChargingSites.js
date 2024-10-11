@@ -47,5 +47,10 @@ export const enrouteChargingSites = {
     filters: [
       { ...selectors.vehicleType, visualisations: ['Potential Charging Sites'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };

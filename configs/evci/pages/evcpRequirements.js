@@ -29,7 +29,7 @@ export const evcpRequirements = {
         labelNulls: false,
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: true,
-      }
+      },
     ],
     visualisations: [
       {
@@ -52,5 +52,10 @@ export const evcpRequirements = {
       { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
       { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };

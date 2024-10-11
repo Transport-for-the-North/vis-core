@@ -48,5 +48,10 @@ export const cpMajorRoad = {
       { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Major Road'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };
