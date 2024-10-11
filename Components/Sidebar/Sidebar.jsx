@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { TextSection } from "./Accordion";
+import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
-
+import { Glossary } from "Components/Glossary";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -88,7 +88,8 @@ export const Sidebar = ({
   filters,
   legalText,
   onFilterChange,
-  children, // Accept children props
+  additionalFeatures,
+  children
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -106,6 +107,11 @@ export const Sidebar = ({
         {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
       </ToggleButton>
         <TextSection title="About this visualisation" text={aboutVisualisationText} />
+        {additionalFeatures?.glossary && (
+          <AccordionSection title="Glossary">
+            <Glossary dataDictionary={additionalFeatures.glossary.dataDictionary} />
+          </AccordionSection>
+        )}
         {filters && (
           <SelectorSection
             filters={filters}
