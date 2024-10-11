@@ -106,22 +106,17 @@ class BaseService {
    *
    * @param {string} path - The path for the GET request.
    * @param {Object} [addOptions={}] - Additional options for the fetch request.
+   * @param {boolean} [skipAuth=false] - Flag to skip adding Authorization header.
    * @returns {Promise<Object>} The response data.
    */
-  async _get(path, addOptions = {}) {
+  async _get(path, addOptions = {}, skipAuth = false) {
     const url = this._buildUrl(path);
-    const jwtToken = Cookies.get("token");
-    // Ensure the JWT token is available before adding it to the headers
-    if (!jwtToken) {
-      throw new Error(
-        "JWT token is not available in the environment variables."
-      );
-    }
+    const jwtToken = skipAuth ? null : Cookies.get("token");
     const options = {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${jwtToken}`, // Add the JWT token to the Authorization header
-        ...addOptions.headers, // Spread any additional headers provided in addOptions
+        ...(jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {}),
+        ...addOptions.headers,
       },
       ...addOptions,
     };
@@ -132,7 +127,6 @@ class BaseService {
       throw new Error(`HTTP error! status: ${result.status}`);
     }
     const data = await result.json();
-
     return data;
   }
 
@@ -142,12 +136,13 @@ class BaseService {
    * @param {string} [subPath=""] - The sub-path for the GET request.
    * @param {Object} [options={}] - Additional options, including query parameters.
    * @property {Object} [options.queryParams={}] - The query parameters for the GET request.
+   * @param {boolean} [options.skipAuth=false] - Flag to skip adding Authorization header.
    * @returns {Promise<Object>} The response data.
    */
-  async get(subPath = "", options = { queryParams: {} }) {
+  async get(subPath = "", options = { queryParams: {}, skipAuth: false }) {
     const params = this._buildQuery(options?.queryParams);
     const path = params ? `${subPath}?${params}` : subPath;
-    const results = await this._get(path);
+    const results = await this._get(path, {}, options.skipAuth);
     return results;
   }
 

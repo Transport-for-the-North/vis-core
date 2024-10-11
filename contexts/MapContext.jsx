@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, sortValues, isValidCondition, applyCondition } from 'utils';
+import { hasRouteParameter, replaceRouteParameter, checkSecurityRequirements, sortValues, isValidCondition, applyCondition } from 'utils';
 import { AppContext, PageContext, FilterContext } from 'contexts';
 import { api } from 'services';
 
@@ -244,18 +244,23 @@ export const MapProvider = ({ children }) => {
         const queryParams = {};
         const apiRoute = visConfig.dataPath;
         const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+        const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
+      
         apiParameters.forEach((param) => {
           if (param.in === 'query') {
             queryParams[param.name] = null;
           }
         });
+      
         const visualisation = {
           ...visConfig,
           dataPath: apiRoute,
           queryParams,
           data: [],
           paintProperty: {},
+          requiresAuth,
         };
+      
         dispatch({
           type: actionTypes.ADD_VISUALISATION,
           payload: { [visConfig.name]: visualisation },
