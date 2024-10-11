@@ -28,7 +28,7 @@ export function Logo(props) {
     props.onClick();
   };
   return (
-    <LogoImage
+    props.logoImage && <LogoImage
       src={props.logoImage}
       alt="Logo"
       onClick={handleClick}
