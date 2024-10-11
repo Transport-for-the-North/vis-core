@@ -47,5 +47,10 @@ export const cpLocation = {
     filters: [
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Location'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };

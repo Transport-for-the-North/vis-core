@@ -53,5 +53,10 @@ export const evUptake = {
       { ...selectors.fuelType, visualisations: ['EV Uptake'] },
       { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+    },
   },
 };
