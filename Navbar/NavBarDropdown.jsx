@@ -23,8 +23,9 @@ const DropdownContainer = styled.div`
   height: 100%; /* Full height of navbar */
   display: flex;
   align-items: center; /* Vertically centre text */
-  justify-content: center; /* Centre text horizontally */
+  justify-content: space-between; /* Space between title and icon */
   border-bottom-right-radius: 20px;
+  transition: background-color 0.3s ease;
 
   @media only screen and (max-width: 1165px) {
     font-size: large;
@@ -65,15 +66,28 @@ const DropdownItem = styled(Link)`
   text-align: left;
   box-sizing: border-box; /* Ensure padding is inside the container */
   background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#f9f9f9")};
+  color: ${(props) => (props.$activeLink ? "#f9f9f9" : "#4b3e91")};
+  transition: background-color 0.3s ease, color 0.3s ease;
+
   &:hover {
     background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#7317de")};
+    color: #f9f9f9;
   }
+`;
+
+const Title = styled.span`
+  flex-grow: 1; /* Take up remaining space */
+  text-align: center; /* Center the title */
+`;
+
+const Icon = styled.span`
+  margin-left: 5px; /* Add some space between title and icon */
 `;
 
 export function NavBarDropdown(props) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
-  const appContext = useContext(AppContext)
+  const appContext = useContext(AppContext);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -107,9 +121,10 @@ export function NavBarDropdown(props) {
       onMouseOver={() => setOpen(true)}
       onMouseLeave={handleClose}
       $bgColor={props.dropdownItems.find(item => item.url === props.activeLink)?.navbarLinkBgColour || "#f9f9f9"}
-      $isActive={props.dropdownItems.find(item => item.url === props.activeLink)? true : false}
+      $isActive={props.dropdownItems.find(item => item.url === props.activeLink) ? true : false}
     >
-      {props.dropdownName} ▾
+      <Title>{props.dropdownName}</Title>
+      <Icon>▾</Icon>
       <DropdownMenu onMouseLeave={handleToggle} open={open}>
         {props.dropdownItems.map((page) => (
           <DropdownItem
