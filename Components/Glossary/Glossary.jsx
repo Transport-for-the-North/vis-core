@@ -87,11 +87,22 @@ const ClickableImage = styled.img`
   cursor: pointer;
 `;
 
+/**
+ * Glossary component that displays a searchable glossary of terms and definitions.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.dataDictionary - The dictionary containing glossary terms and their definitions.
+ * @param {string} [props.bgColor] - Optional background color for the definition box.
+ * @param {string} [props.fontColor] - Optional font color for the definition box.
+ * @param {string} [props.location] - Optional location to filter terms based on exclusion criteria.
+ * @returns {JSX.Element} The rendered Glossary component.
+ */
 export const Glossary = ({ dataDictionary, bgColor, fontColor, location }) => {
   const [selectedTerm, setSelectedTerm] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
 
+  // Memoize the options for the select component
   const options = useMemo(
     () => Object.keys(dataDictionary)
       .map((key) => ({
@@ -105,20 +116,39 @@ export const Glossary = ({ dataDictionary, bgColor, fontColor, location }) => {
     [dataDictionary, location]
   );
 
+  /**
+   * Handle the selection of a term from the dropdown.
+   *
+   * @param {Object} selected - The selected term object.
+   */
   const handleSelection = (selected) => {
     setSelectedTerm(selected);
   };
 
+  /**
+   * Handle the click event on an image to open it in a modal.
+   *
+   * @param {string} src - The source URL of the image.
+   */
   const handleImageClick = (src) => {
     setModalImageSrc(src);
     setModalIsOpen(true);
   };
 
+  /**
+   * Close the modal.
+   */
   const closeModal = () => {
     setModalIsOpen(false);
     setModalImageSrc('');
   };
 
+  /**
+   * Render the content of a term, extracting images for separate rendering.
+   *
+   * @param {string} content - The HTML content of the term.
+   * @returns {Object} An object containing the HTML content and extracted images.
+   */
   const renderContent = (content) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
@@ -137,6 +167,7 @@ export const Glossary = ({ dataDictionary, bgColor, fontColor, location }) => {
     };
   };
 
+  // Set the app element for the modal on component mount
   useEffect(() => {
     Modal.setAppElement('body');
   }, []);
