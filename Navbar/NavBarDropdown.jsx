@@ -64,7 +64,7 @@ const DropdownItem = styled(Link)`
   border-radius: 0px;
   text-align: left;
   box-sizing: border-box; /* Ensure padding is inside the container */
-  background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#7317de")};
+  background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#f9f9f9")};
   &:hover {
     background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#7317de")};
   }
