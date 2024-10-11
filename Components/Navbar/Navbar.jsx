@@ -13,9 +13,10 @@ import "./Navbar.styles.css";
 const StyledNavbar = styled.nav`
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between; /* Adjust to allow content to spread between start and end */
   padding: 0px;
-  background-color: #f8f9fa; // Example background color, adjust as needed
+  background-color: #f8f9fa;
+  width: 100%;
 `;
 
 const StyledLogout = styled.img`
@@ -81,58 +82,67 @@ export function Navbar() {
     return null; // Do not render the navbar
   }
 
+  const isLogoLeft = appContext.logoPosition !== "right"; // Default to left if not provided
+
   return (
     <>
       <StyledNavbar className="navbar">
-        <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
-        <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
-        <Link
-          key='Home'
-          className={activeLink === "/" ? "ActiveNavButton" : "NavButton"}
-          to="/"
-          onClick={() => onClick("/", appContext.logoImage)}
-        >
-          Home
-        </Link>
-        {appContext.appPages.map((page) => {
-          if (page.category === null) {
-            return (
-              <Link
-                key={page.pageName}
-                className={activeLink === page.url ? "ActiveNavButton" : "NavButton"}
-                to={page.url}
-                onClick={() => onClick(page.url, page.logoImage)}
-              >
-                {page.pageName}
-              </Link>
-            );
-          } else if (!listCategories.includes(page.category)) {
-            listCategories.push(page.category);
-            const dropdownItems = appContext.appPages.filter(
-              (pageToTest) => pageToTest.category === page.category
-            );
-            return (
-              <NavBarDropdown
-                key={page.category}
-                dropdownItems={dropdownItems}
-                activeLink={activeLink}
-                dropdownName={page.category}
-                onClick={onClick}
-                bgColor={bgColor}
-              />
-            );
-          } else {
-            return null;
-          }
-        })}
-        <Button
-          className="navbarMobile"
-          src={appContext.logoutButtonImage}
-          alt="Burger Button Navbar"
-          onClick={updateMenu}
-        />
-        {appContext.authenticationRequired && (
-          <StyledLogout src="/img/logout.png" onClick={handleLogout} />
+        {isLogoLeft && (
+          <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
+        )}
+        <div className="navbarContent">
+          <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
+          <Link
+            key='Home'
+            className={activeLink === "/" ? "ActiveNavButton" : "NavButton"}
+            to="/"
+            onClick={() => onClick("/", appContext.logoImage)}
+          >
+            Home
+          </Link>
+          {appContext.appPages.map((page) => {
+            if (page.category === null) {
+              return (
+                <Link
+                  key={page.pageName}
+                  className={activeLink === page.url ? "ActiveNavButton" : "NavButton"}
+                  to={page.url}
+                  onClick={() => onClick(page.url, page.logoImage)}
+                >
+                  {page.pageName}
+                </Link>
+              );
+            } else if (!listCategories.includes(page.category)) {
+              listCategories.push(page.category);
+              const dropdownItems = appContext.appPages.filter(
+                (pageToTest) => pageToTest.category === page.category
+              );
+              return (
+                <NavBarDropdown
+                  key={page.category}
+                  dropdownItems={dropdownItems}
+                  activeLink={activeLink}
+                  dropdownName={page.category}
+                  onClick={onClick}
+                  bgColor={bgColor}
+                />
+              );
+            } else {
+              return null;
+            }
+          })}
+          <Button
+            className="navbarMobile"
+            src={appContext.logoutButtonImage}
+            alt="Burger Button Navbar"
+            onClick={updateMenu}
+          />
+          {appContext.authenticationRequired && (
+            <StyledLogout src="/img/logout.png" onClick={handleLogout} />
+          )}
+        </div>
+        {!isLogoLeft && (
+          <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
         )}
       </StyledNavbar>
       <div className="empty-blank-nav"></div>

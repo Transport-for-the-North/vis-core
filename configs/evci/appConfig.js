@@ -14,6 +14,7 @@ export const appConfig = {
   contactText: "Please contact [Name] for any questions on this data tool.",
   contactEmail: "firstname.lastname@transportforthenorth.com",
   logoImage: null,
+  logoPosition: 'right',
   backgroundImage: "img/evci/placeholderTFN.png",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
