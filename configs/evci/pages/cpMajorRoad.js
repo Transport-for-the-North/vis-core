@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 
 export const cpMajorRoad = {
-  pageName: "cpMajorRoad",
+  pageName: "Chargers/Power by Major Road",
   url: "/@stbTag@/cp-major-road",
   type: "MapLayout",
   category: "@stbName@",
@@ -14,13 +14,13 @@ export const cpMajorRoad = {
   config: {
     layers: [
       {
-        name: "Administrative Boundaries",
+        name: "Roads",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-        sourceLayer: "zones",
-        geometryType: "polygon",
-        visualisationName: "Chargers/Power Road",
+        path: "/api/vectortiles/evci_links/{z}/{x}/{y}", // matches the path in swagger.json
+        sourceLayer: "geometry",
+        geometryType: "line",
+        visualisationName: "Chargers/Power by Major Road",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,10 +33,10 @@ export const cpMajorRoad = {
     ],
     visualisations: [
       {
-        name: "Chargers/Power Road",
+        name: "Chargers/Power by Major Road",
         type: "joinDataToMap",
-        joinLayer: "Administrative Boundaries",
-        style: "polygon-continuous",
+        joinLayer: "Roads",
+        style: "line-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -45,8 +45,8 @@ export const cpMajorRoad = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power Road'] },
-      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power Road'] },
+      { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power by Major Road'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Major Road'] },
     ],
   },
 };
