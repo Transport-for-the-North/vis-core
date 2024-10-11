@@ -8,10 +8,18 @@ export const enrouteChargingSites = {
   customLogoPath: "@logoPath@",
   navbarLinkBgColour: "@primaryBgColour@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>
-  <p>EV uptake gives the number of electric vehicles (EVs) that are expected across the region, 
-    split by powertrain type (battery electric or plug-in hybrid) and vehicle type (car, van, or heavy goods vehicle).</p>`,
+  <p>Shows the sites within a region with the most potential for the installation of en-route charging infrastructure. 
+  This ranking is not designed to provide users with specific parcels of land for development but is instead designed to show 
+  broader regions where rapid charging hub development looks promising.</p>
+  <p>These dots are designed to be used alongside "En-route charging demand by major road" data which can be used to identify regions with a need for public charging. Once a region has been identified the "Potential en-route charging sites" data provides the user with local information (greenbelt restriction, risk of flooding, local traffic flow, existing local charging hubs, a lack of local off street parking) which can be used to identify areas of interest.</p>
+
+<p>These sites are potential areas where rapid charging hubs (likely to be 5 or more chargers) could be installed, however a detailed analysis of the local area (including planning restrictions, currently installed chargers, nearby amenities, and electricity grid connection costs) would be required to determine if installation is feasible and how many chargers should be installed.</p>
+
+<p>Sites are expressed relative to the single best scored site in the TfN area. Only sites meeting a minimum threshold have been included. Each point represents a hexagonal cell of side length 620 metres, centred on the point shown.</p>
+  <div class="inset-text-area">
+    <p><b>Warning: </b>Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid 
+  charging hub development looks promising.</p>
+  </div>`,
   config: {
     layers: [
       {
