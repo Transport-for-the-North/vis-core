@@ -1,7 +1,7 @@
 import React from 'react';
 import { AccordionSection } from 'Components';
 import parse from 'html-react-parser';
-
+import './TextSection.styles.css'
 
 /**
  * Component representing a section for displaying text content within an accordion.
