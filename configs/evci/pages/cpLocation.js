@@ -1,8 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 
-export const actualArea = {
-  pageName: "Actual: Chargers/power by area",
-  url: "/@stbTag@/actual-area",
+export const cpLocation = {
+  pageName: "cpLocation",
+  url: "/@stbTag@/cp-location",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
@@ -14,13 +14,13 @@ export const actualArea = {
   config: {
     layers: [
       {
-        name: "Administrative Boundaries",
+        name: "Charging Sites",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-        sourceLayer: "zones",
-        geometryType: "polygon",
-        visualisationName: "Actual Area",
+        path: "/api/vectortiles/evci_actual_charging_sites/{z}/{x}/{y}", // matches the path in swagger.json
+        sourceLayer: "geometry",
+        geometryType: "point",
+        visualisationName: "Chargers/Power Location",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,21 +33,19 @@ export const actualArea = {
     ],
     visualisations: [
       {
-        name: "Actual Area",
+        name: "Chargers/Power Location",
         type: "joinDataToMap",
-        joinLayer: "Administrative Boundaries",
-        style: "polygon-continuous",
+        joinLayer: "Charging Location",
+        style: "point-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/actual-area",
+        dataPath: "/api/evci/cp-location",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.administrativeBoundary, visualisations: ['Actual Area'] },
-      { ...selectors.areaValueDisplay, visualisations: ['Actual Area'] },
-      { ...selectors.chargerSpeed, visualisations: ['Actual Area'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power Location'] },
     ],
   },
 };

@@ -1,8 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 
-export const actualRoad = {
-  pageName: "Actual: Chargers/power by major road",
-  url: "/@stbTag@/actual-road",
+export const cpMajorRoad = {
+  pageName: "cpMajorRoad",
+  url: "/@stbTag@/cp-major-road",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
@@ -20,7 +20,7 @@ export const actualRoad = {
         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
-        visualisationName: "Actual Road",
+        visualisationName: "Chargers/Power Road",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,20 +33,20 @@ export const actualRoad = {
     ],
     visualisations: [
       {
-        name: "Actual Road",
+        name: "Chargers/Power Road",
         type: "joinDataToMap",
         joinLayer: "Administrative Boundaries",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/actual-road",
+        dataPath: "/api/evci/cp-major-road",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.distanceValueDisplay, visualisations: ['Actual Road'] },
-      { ...selectors.chargerSpeed, visualisations: ['Actual Road'] },
+      { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power Road'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power Road'] },
     ],
   },
 };
