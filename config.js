@@ -91,7 +91,64 @@ export function replacePlaceholders(target, source) {
     return item;
   }
 
-  // Start recursive replacement on the target object
-  const adaptedTarget = recursiveReplace(target);
-  return adaptedTarget;
+  return recursiveReplace(target);
 }
+
+
+/**
+ * Filters a glossary data object by excluding entries that contain any items from a specified exclude list.
+ *
+ * @param {Object} glossaryData - The glossary data to be filtered. This should be an object where each key is a unique identifier
+ *                                and each value is an object representing a glossary entry. Each glossary entry object should have
+ *                                an `exclude` property, which is an array of items to be checked against the exclude list.
+ * @param {string|Array<string>} excludeList - A string or an array of strings representing items to be excluded. If any item in the
+ *                                             `exclude` array of a glossary entry matches an item in this list, that glossary entry
+ *                                             will be excluded from the result.
+ * @returns {Object} - A new object containing only the glossary entries that do not have any items in their `exclude` array
+ *                     matching any item in the exclude list.
+ *
+ * @example
+ * const glossaryData = {
+ *   term1: { definition: "Definition 1", exclude: ["item1", "item2"] },
+ *   term2: { definition: "Definition 2", exclude: ["item3"] },
+ *   term3: { definition: "Definition 3", exclude: [] }
+ * };
+ * const excludeList = ["item1", "item3"];
+ * const result = filterGlossaryData(glossaryData, excludeList);
+ * // result will be:
+ * // {
+ * //   term3: { definition: "Definition 3", exclude: [] }
+ * // }
+ *
+ * @example
+ * const glossaryData = {
+ *   term1: { definition: "Definition 1", exclude: ["item1", "item2"] },
+ *   term2: { definition: "Definition 2", exclude: ["item3"] },
+ *   term3: { definition: "Definition 3", exclude: [] }
+ * };
+ * const excludeList = "item1";
+ * const result = filterGlossaryData(glossaryData, excludeList);
+ * // result will be:
+ * // {
+ * //   term2: { definition: "Definition 2", exclude: ["item3"] },
+ * //   term3: { definition: "Definition 3", exclude: [] }
+ * // }
+ */
+export function filterGlossaryData(glossaryData, excludeList) {
+  const filteredGlossaryData = {};
+  const excludeArray = Array.isArray(excludeList) ? excludeList : [excludeList];
+
+  for (const key in glossaryData) {
+    if (glossaryData.hasOwnProperty(key)) {
+      const entry = glossaryData[key];
+      const entryExcludeArray = Array.isArray(entry.exclude) ? entry.exclude : [];
+
+      if (!entryExcludeArray.some(excludeItem => excludeArray.includes(excludeItem))) {
+        filteredGlossaryData[key] = entry;
+      }
+    }
+  }
+  
+  return filteredGlossaryData;
+}
+
