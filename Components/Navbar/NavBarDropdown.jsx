@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { AppContext } from "contexts";
 import "./Navbar.styles.css";
 
 const DropdownContainer = styled.div`
@@ -68,6 +69,7 @@ const DropdownItem = styled(Link)`
 export function NavBarDropdown(props) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
+  const appContext = useContext(AppContext)
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -112,7 +114,11 @@ export function NavBarDropdown(props) {
             }
             to={page.url}
             onClick={(e) => {
-              props.onClick(page.url, page.customLogoPath, page.navbarLinkBgColour);
+              props.onClick(
+                page.url, 
+                page.customLogoPath || appContext.logoImage, 
+                page.navbarLinkBgColour || "#7317de"
+              );
               handleClose(e);
             }}
             $activeLink={props.activeLink === page.url}
