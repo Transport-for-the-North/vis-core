@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 
 export const cpArea = {
-  pageName: "cpArea",
+  pageName: "Chargers/Power by Area",
   url: "/@stbTag@/cp-area",
   type: "MapLayout",
   category: "@stbName@",
@@ -20,7 +20,7 @@ export const cpArea = {
         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
-        visualisationName: "Chargers/Power Area",
+        visualisationName: "Chargers/Power by Area",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,7 +33,7 @@ export const cpArea = {
     ],
     visualisations: [
       {
-        name: "Chargers/Power Area",
+        name: "Chargers/Power by Area",
         type: "joinDataToMap",
         joinLayer: "Administrative Boundaries",
         style: "polygon-continuous",
@@ -45,9 +45,9 @@ export const cpArea = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.administrativeBoundary, visualisations: ['Chargers/Power Area'] },
-      { ...selectors.areaValueDisplay, visualisations: ['Chargers/Power Area'] },
-      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power Area'] },
+      { ...selectors.administrativeBoundary, visualisations: ['Chargers/Power by Area'] },
+      { ...selectors.areaValueDisplay, visualisations: ['Chargers/Power by Area'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Area'] },
     ],
   },
 };

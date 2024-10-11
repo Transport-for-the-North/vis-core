@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 
 export const cpLocation = {
-  pageName: "cpLocation",
+  pageName: "Chargers/Power by Location",
   url: "/@stbTag@/cp-location",
   type: "MapLayout",
   category: "@stbName@",
@@ -20,7 +20,7 @@ export const cpLocation = {
         path: "/api/vectortiles/evci_actual_charging_sites/{z}/{x}/{y}", // matches the path in swagger.json
         sourceLayer: "geometry",
         geometryType: "point",
-        visualisationName: "Chargers/Power Location",
+        visualisationName: "Chargers/Power by Location",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,7 +33,7 @@ export const cpLocation = {
     ],
     visualisations: [
       {
-        name: "Chargers/Power Location",
+        name: "Chargers/Power by Location",
         type: "joinDataToMap",
         joinLayer: "Charging Location",
         style: "point-continuous",
@@ -45,7 +45,7 @@ export const cpLocation = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power Location'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Location'] },
     ],
   },
 };
