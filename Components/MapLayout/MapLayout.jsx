@@ -129,6 +129,7 @@ export const MapLayout = () => {
         filters={state.filters}
         legalText={loremIpsum}
         onFilterChange={handleFilterChange}
+        additionalFeatures={pageContext.config.additionalFeatures} // Pass additionalFeatures prop
       >
         <MapLayerSection
           handleColorChange={handleColorChange}

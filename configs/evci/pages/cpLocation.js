@@ -1,8 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 
-export const evUptake = {
-  pageName: "EV Uptake",
-  url: "/@stbTag@/ev-uptake",
+export const cpLocation = {
+  pageName: "Chargers/Power by Location",
+  url: "/@stbTag@/cp-location",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
@@ -14,13 +14,13 @@ export const evUptake = {
   config: {
     layers: [
       {
-        name: "Administrative Boundaries",
+        name: "Charging Sites",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-        sourceLayer: "zones",
-        geometryType: "polygon",
-        visualisationName: "EV Uptake",
+        path: "/api/vectortiles/evci_actual_charging_sites/{z}/{x}/{y}", // matches the path in swagger.json
+        sourceLayer: "geometry",
+        geometryType: "point",
+        visualisationName: "Chargers/Power by Location",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,25 +33,19 @@ export const evUptake = {
     ],
     visualisations: [
       {
-        name: "EV Uptake",
+        name: "Chargers/Power by Location",
         type: "joinDataToMap",
-        joinLayer: "Administrative Boundaries",
-        style: "polygon-continuous",
+        joinLayer: "Charging Location",
+        style: "point-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/ev-uptake",
+        dataPath: "/api/evci/cp-location",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.year, visualisations: ['EV Uptake'] },
-      { ...selectors.administrativeBoundary, visualisations: ['EV Uptake'] },
-      { ...selectors.travelScenario, visualisations: ['EV Uptake'] },
-      { ...selectors.behaviouralScenario, visualisations: ['EV Uptake'] },
-      { ...selectors.vehicleType, visualisations: ['EV Uptake'] },
-      { ...selectors.fuelType, visualisations: ['EV Uptake'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Location'] },
     ],
     additionalFeatures: {
       glossary: { 

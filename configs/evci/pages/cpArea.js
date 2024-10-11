@@ -1,8 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 
-export const evUptake = {
-  pageName: "EV Uptake",
-  url: "/@stbTag@/ev-uptake",
+export const cpArea = {
+  pageName: "Chargers/Power by Area",
+  url: "/@stbTag@/cp-area",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
@@ -20,7 +20,7 @@ export const evUptake = {
         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
-        visualisationName: "EV Uptake",
+        visualisationName: "Chargers/Power by Area",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -33,25 +33,21 @@ export const evUptake = {
     ],
     visualisations: [
       {
-        name: "EV Uptake",
+        name: "Chargers/Power by Area",
         type: "joinDataToMap",
         joinLayer: "Administrative Boundaries",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/ev-uptake",
+        dataPath: "/api/evci/cp-area",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.year, visualisations: ['EV Uptake'] },
-      { ...selectors.administrativeBoundary, visualisations: ['EV Uptake'] },
-      { ...selectors.travelScenario, visualisations: ['EV Uptake'] },
-      { ...selectors.behaviouralScenario, visualisations: ['EV Uptake'] },
-      { ...selectors.vehicleType, visualisations: ['EV Uptake'] },
-      { ...selectors.fuelType, visualisations: ['EV Uptake'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
+      { ...selectors.administrativeBoundary, visualisations: ['Chargers/Power by Area'] },
+      { ...selectors.areaValueDisplay, visualisations: ['Chargers/Power by Area'] },
+      { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Area'] },
     ],
     additionalFeatures: {
       glossary: { 

@@ -1,6 +1,7 @@
 import { stbConfig } from "./stbConfig";
 import { pages } from "./pages";
-import { replacePlaceholders } from "utils";
+import { filterGlossaryData, replacePlaceholders } from "utils";
+import glossaryData from "./glossaryData";
 
 export const appConfig = {
   title: "STB Electric Vehicle Charging Infrastructure Framework",
@@ -29,6 +30,12 @@ async function loadAndAdaptPages() {
         const basePage = pages[page];
         if (basePage) {
           const adaptedPage = replacePlaceholders(basePage, stb);
+
+          // Check if adaptedPage has additionalFeatures and glossary
+          if (adaptedPage.config?.additionalFeatures?.glossary) {
+            adaptedPage.config.additionalFeatures.glossary.dataDictionary = filterGlossaryData(glossaryData, stb.stbTag);
+          }
+
           appPages.push(adaptedPage);
         }
       } catch (error) {
