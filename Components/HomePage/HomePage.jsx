@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import parse from "html-react-parser";
-import { Footer } from ".";
+import { Footer } from "./Footer";
 import "./HomePage.styles.css";
 import { AppContext } from "contexts";
 
@@ -14,6 +14,8 @@ import { AppContext } from "contexts";
  */
 export const HomePage = () => {
   const appContext = useContext(AppContext);
+
+  const { footer } = appContext;
 
   return (
     <>
@@ -47,7 +49,14 @@ export const HomePage = () => {
           </a>
         </div>
       </div>
-      <Footer />
+      {footer && (
+        <Footer
+          creditsText={footer.creditsText}
+          privacyPolicyLink={footer.privacyPolicyLink}
+          cookiesLink={footer.cookiesLink}
+          contactUsLink={footer.contactUsLink}
+        />
+      )}
     </>
   );
 };
