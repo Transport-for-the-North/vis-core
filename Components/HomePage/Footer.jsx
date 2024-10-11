@@ -1,18 +1,19 @@
 import { Link } from "react-router-dom";
-import './Footer.styles.css'
+import './Footer.styles.css';
 
-export function Footer() {
+export function Footer({ creditsText, privacyPolicyLink, cookiesLink, contactUsLink }) {
   return (
     <footer className="footer">
       <div className="bottom-footer">
         <p className="credits-footer">
-          © Transport for the North 2024. All rights reserved.
+          {creditsText}
         </p>
         <div className="empty"></div>
-        <Link to={"https://transportforthenorth.com/privacy-policy/"} className="footer-links">Privacy Policy</Link>
-        <Link to={"https://transportforthenorth.com/cookies/"} className="footer-links">Cookies</Link>
-        <Link to={"https://transportforthenorth.com/about-transport-for-the-north/contact-us/"} className="footer-links">Contact Us</Link>
+        <Link to={privacyPolicyLink} className="footer-links">Privacy Policy</Link>
+        <Link to={cookiesLink} className="footer-links">Cookies</Link>
+        <Link to={contactUsLink} className="footer-links">Contact Us</Link>
       </div>
     </footer>
   );
 }
+
