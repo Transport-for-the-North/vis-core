@@ -10,6 +10,10 @@ const DropdownContainer = styled.div`
   font-family: var(--standardFontFamily);
   font-size: larger;
   background-color: ${(props) => props.$bgColor || "#ff0000"};
+  &:hover {
+    background-color: ${(props) => (props.$isActive ? props.$bgColor : "#7317de")};
+  }
+  color: ${(props) => (props.$isActive ? "#f9f9f9" : "#7317de")};
   text-decoration: none;
   width: 12%;
   max-width: 270px;
@@ -103,6 +107,7 @@ export function NavBarDropdown(props) {
       onMouseOver={() => setOpen(true)}
       onMouseLeave={handleClose}
       $bgColor={props.dropdownItems.find(item => item.url === props.activeLink)?.navbarLinkBgColour || "#f9f9f9"}
+      $isActive={props.dropdownItems.find(item => item.url === props.activeLink)? true : false}
     >
       {props.dropdownName} ▾
       <DropdownMenu onMouseLeave={handleToggle} open={open}>
