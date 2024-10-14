@@ -48,14 +48,18 @@ export function Navbar() {
   const { logOut } = useAuth();
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
   const [bgColor, setBgColor] = useState("#7317de");
+  const [mapCentre, setMapCentre] = useState([-2.6394653, 54.075506])
 
   const navigate = useNavigate();
 
-  const onClick = (url, newLogo, navColor) => {
+  const onClick = (url, newLogo, navColor, newMapCentre) => {
     setLogoImage(newLogo || appContext.logoImage); // Default to appContext.logoImage if newLogo is not provided
     navigate(url);
     if (navColor !== bgColor) {
       setBgColor(navColor);
+    }
+    if (newMapCentre) {
+      setMapCentre(newMapCentre, [-2.6394653, 54.075506]);
     }
   };
 
