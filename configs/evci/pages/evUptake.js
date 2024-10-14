@@ -7,7 +7,6 @@ export const evUptake = {
   category: "@stbName@",
   customLogoPath: "@logoPath@",
   navbarLinkBgColour: "@primaryBgColour@",
-  mapCentre: "@mapCentre",
   about: `
   <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
     To get further help, type or select a topic in the glossary box.</p>
