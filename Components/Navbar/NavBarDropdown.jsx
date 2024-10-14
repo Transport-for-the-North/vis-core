@@ -137,7 +137,8 @@ export function NavBarDropdown(props) {
               props.onClick(
                 page.url, 
                 page.customLogoPath || appContext.logoImage, 
-                page.navbarLinkBgColour || "#7317de"
+                page.navbarLinkBgColour || "#7317de",
+                page.mapCentre 
               );
               handleClose(e);
             }}
