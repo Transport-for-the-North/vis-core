@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, checkSecurityRequirements, sortValues, isValidCondition, applyCondition } from 'utils';
+import { hasRouteParameter, replaceRouteParameter, checkSecurityRequirements, sortValues, isValidCondition, applyCondition, parseStringToArray } from 'utils';
 import { AppContext, PageContext, FilterContext } from 'contexts';
 import { api } from 'services';
 
