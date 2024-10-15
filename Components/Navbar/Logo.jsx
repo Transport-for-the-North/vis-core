@@ -20,7 +20,7 @@ const LogoContainer = styled.div`
 `;
 
 const LogoImage = styled.img`
-  width: auto;
+  min-width: 192px;
   max-width: 100%;
   max-height: 100%;
 `;
