@@ -30,10 +30,10 @@
 .ActiveNavButton {
   color: #4b3e91;
   font-family: var(--standardFontFamily);
-  font-size: larger;
+  font-size: large;
   text-decoration: none;
   width: 12%;
-  max-width: 270px;
+  max-width: 300px;
   text-align: center;
   height: 100%; /* Ensures NavButton takes the full height of the navbar */
   display: flex;
