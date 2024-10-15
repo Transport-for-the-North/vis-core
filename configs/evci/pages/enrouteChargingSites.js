@@ -60,6 +60,7 @@ export const enrouteChargingSites = {
       glossary: { 
         dataDictionary: {}
       },
+      warning: "Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid charging hub development looks promising."
     },
   },
 };
