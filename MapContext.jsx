@@ -9,6 +9,7 @@ import { api } from 'services';
 export const MapContext = createContext();
 
 const initialState = {
+  mapCentre: [-2.6394653, 54.075506],
   layers: {},
   visualisations: {},
   leftVisualisations: {},
@@ -51,6 +52,15 @@ export const MapProvider = ({ children }) => {
   const contextValue = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
+
+  useEffect(() => {
+    if (pageContext.customMapCentre) {
+      dispatch({
+        type: actionTypes.UPDATE_MAP_CENTRE,
+        payload: parseStringToArray(pageContext.customMapCentre),
+      });
+    }
+  }, [dispatch, pageContext]);
 
   useEffect(() => {
     dispatch({ type: actionTypes.SET_IS_LOADING });
