@@ -13,7 +13,7 @@ import "./Navbar.styles.css";
 const StyledNavbar = styled.nav`
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between; /* Space between logo, navbar content, and logout section */
   padding: 0px;
   background-color: #f8f9fa;
   width: 100%;
@@ -23,21 +23,21 @@ const NavbarContent = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
-  flex-grow: 0.75; /* Allow the content to grow */
-  justify-content: space-around; /* Distribute space around items */
+  flex-grow: 1; /* Allow the navbar content to grow within its limited space */
+  justify-content: flex-start; /* Align the items to the left */
+`;
+
+const LogoutSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Fixed width for the logout section */
 `;
 
 const StyledLogout = styled.img`
   cursor: pointer;
-
-  @media only screen and (min-width: 766px) {
-    position: absolute;
-    right: 1%;
-  }
-
-  @media only screen and (max-width: 765px) {
-    display: none;
-  }
+  width: 75%; /* Make sure the logout image fills the container */
+  height: auto;
 `;
 
 /**
@@ -101,7 +101,7 @@ export function Navbar() {
         <NavbarContent>
           <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
           <Link
-            key='Home'
+            key="Home"
             className={activeLink === "/" ? "ActiveNavButton" : "NavButton"}
             to="/"
             onClick={() => onClick("/", appContext.logoImage)}
@@ -145,12 +145,14 @@ export function Navbar() {
             alt="Burger Button Navbar"
             onClick={updateMenu}
           />
-          {appContext.authenticationRequired && (
-            <StyledLogout src="/img/logout.png" onClick={handleLogout} />
-          )}
         </NavbarContent>
         {!isLogoLeft && (
           <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
+        )}
+        {appContext.authenticationRequired && (
+          <LogoutSection>
+            <StyledLogout src="/img/logout.png" onClick={handleLogout} />
+          </LogoutSection>
         )}
       </StyledNavbar>
       <div className="empty-blank-nav"></div>
