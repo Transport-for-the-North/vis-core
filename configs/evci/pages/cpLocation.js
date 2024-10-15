@@ -6,6 +6,7 @@ export const cpLocation = {
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
+  customMapCentre: "@mapCentre@",
   navbarLinkBgColour: "@primaryBgColour@",
   about: `
   <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
