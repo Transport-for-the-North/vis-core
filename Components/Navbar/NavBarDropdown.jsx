@@ -8,15 +8,15 @@ const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
   font-family: var(--standardFontFamily);
-  font-size: larger;
+  font-size: large;
   background-color: ${(props) => props.$bgColor || "#ff0000"};
   &:hover {
     background-color: ${(props) => (props.$isActive ? props.$bgColor : "#7317de")};
   }
   color: ${(props) => (props.$isActive ? "#f9f9f9" : "#4b3e91")};
   text-decoration: none;
-  width: 12%;
-  max-width: 270px;
+  width: 15%;
+  max-width: 300px;
   text-align: center;
   cursor: pointer;
   padding: 0 5px 0 5px;
