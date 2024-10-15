@@ -11,7 +11,7 @@ export const stbConfig = [
     urlBase: "/transport-for-the-north",
     logoPath: "/img/evci/tfn-logo-fullsize.png",
     contact: "EVCI@transportforthenorth.com",
-    mapCentre: [54.2, -1.7],
+    mapCentre: [-1.7, 54.2],
     website:
       "https://transportforthenorth.com/major-roads-network/EV-charging-infrastructure",
     primaryBgColour: '#0d0f3d',
@@ -29,7 +29,7 @@ export const stbConfig = [
     urlBase: "/transport-for-the-south-east",
     logoPath: "/img/evci/tfse-logo.png",
     contact: "joshua.jiao@eastsussex.gov.uk",
-    mapCentre: [51.2, -0.3],
+    mapCentre: [-0.3, 51.2],
     website:
       "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
     primaryBgColour: '#0078be',
@@ -65,7 +65,7 @@ export const stbConfig = [
     urlBase: "/england-economic-heartland",
     logoPath: "/img/evci/eeh-logo.png",
     contact: "businessunit@englandseconomicheartland.com",
-    mapCentre: [52.1, -0.6],
+    mapCentre: [-0.6, 52.1],
     website:
       "https://www.englandseconomicheartland.com/our-work/cutting-emissions/",
     primaryBgColour: '#00099a',
@@ -83,7 +83,7 @@ export const stbConfig = [
     urlBase: "/peninsula-transport",
     logoPath: "/img/evci/peninsula-logo.png",
     contact: "info@peninsulatransport.org.uk",
-    mapCentre: [50.75, -4],
+    mapCentre: [-4, 50.75],
     website:
       "https://www.peninsulatransport.org.uk/going-electric/",
     primaryBgColour: '#0099ff',
@@ -101,7 +101,7 @@ export const stbConfig = [
     urlBase: "/transport-east",
     logoPath: "/img/evci/te-logo.png",
     contact: "info@transporteast.gov.uk",
-    mapCentre: [52.36, 0.95],
+    mapCentre: [0.95, 52.36],
     website:
       "https://www.transporteast.gov.uk/electric-vehicles/",
     primaryBgColour: '#2CA3DD',
@@ -119,7 +119,7 @@ export const stbConfig = [
     urlBase: "/western-gateway",
     logoPath: "/img/evci/wg-logo.png",
     contact: "westerngatewaystb@westofengland-ca.gov.uk",
-    mapCentre: [51.32, -2.8],
+    mapCentre: [-2.8, 51.32],
     website:
       "https://westerngatewaystb.org.uk/electric-vehicles/",
     primaryBgColour: '#4D8514',
