@@ -29,6 +29,19 @@ const Map = () => {
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
+  const mapCentre = state.mapCentre;
+
+  /**
+   * useEffect to update the map center when certain dependencies change
+   * Checks if the map is ready and mapCentre is a valid array with 2 elements (longitude and latitude)
+   * Set the map's center to the specified longitude and latitude
+   */
+  useEffect(() => {
+    if (isMapReady && Array.isArray(mapCentre) && mapCentre.length === 2) {
+      const [lng, lat] = mapCentre;
+      map.setCenter([lng, lat]);
+    }
+  }, [map, isMapReady, mapCentre]);
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
