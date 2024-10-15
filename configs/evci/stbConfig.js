@@ -47,7 +47,7 @@ export const stbConfig = [
     urlBase: "/midlands-connect",
     logoPath: "/img/evci/mc-logo.png",
     contact: "evc@midlandsconnect.uk",
-    mapCentre: [52.7, -1.4],
+    mapCentre: [-1.4, 52.7],
     website:
       "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
     primaryBgColour: '#017500',
