@@ -13,10 +13,18 @@ import "./Navbar.styles.css";
 const StyledNavbar = styled.nav`
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Adjust to allow content to spread between start and end */
+  justify-content: start;
   padding: 0px;
   background-color: #f8f9fa;
   width: 100%;
+`;
+
+const NavbarContent = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-grow: 0.75; /* Allow the content to grow */
+  justify-content: space-around; /* Distribute space around items */
 `;
 
 const StyledLogout = styled.img`
@@ -90,7 +98,7 @@ export function Navbar() {
         {isLogoLeft && (
           <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
         )}
-        <div className="navbarContent">
+        <NavbarContent>
           <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
           <Link
             key='Home'
@@ -140,7 +148,7 @@ export function Navbar() {
           {appContext.authenticationRequired && (
             <StyledLogout src="/img/logout.png" onClick={handleLogout} />
           )}
-        </div>
+        </NavbarContent>
         {!isLogoLeft && (
           <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
         )}
