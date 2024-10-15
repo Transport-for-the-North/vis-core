@@ -2,13 +2,13 @@ import styled from "styled-components"; // Ensure styled-components is imported
 
 const LogoContainer = styled.div`
   width: 192px;
-  height: 192px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   @media only screen and (min-width: 766px) {
-    padding: 1rem;
+    padding: 0rem 1rem;
     cursor: pointer;
     padding-right: 35px;
   }
