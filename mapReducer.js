@@ -2,6 +2,7 @@ import { replaceRouteParameter } from "utils";
 
 // TODO delineate actionTypes into separate namespaces
 export const actionTypes = {
+    UPDATE_MAP_CENTRE: 'UPDATE_MAP_CENTRE',
     INITIALISE_SIDEBAR: 'INITIALISE_SIDEBAR',
     SET_PAGE_INFO: 'SET_PAGE_INFO',
     SET_MAP: 'SET_MAP',
@@ -38,6 +39,8 @@ export const actionTypes = {
  */
 export const mapReducer = (state, action) => {
     switch (action.type) {
+        case actionTypes.UPDATE_MAP_CENTRE:
+            return { ...state, mapCentre: action.payload };
         case actionTypes.RESET_CONTEXT:
             return { ...state, layers: {}, visualisations: {}, filters: {}, leftVisualisations: {}, rightVisualisations: {}, isLoading: true, pageIsReady: false};
         case actionTypes.SET_PAGE_INFO:
