@@ -599,7 +599,7 @@ const Map = () => {
     if (isMapReady) {
       Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
     }
-
+  
     return () => {
       if (map) {
         Object.values(state.layers).forEach((layer) => {
@@ -621,7 +621,7 @@ const Map = () => {
         });
       }
     };
-  }, [state.layers, isMapReady, map, addLayerToMap]);
+  }, [isMapReady, map, addLayerToMap, JSON.stringify(state.layers)]); 
 
   return (
     <StyledMapContainer ref={mapContainerRef}>
