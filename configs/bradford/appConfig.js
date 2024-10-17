@@ -2,80 +2,20 @@ const scenarioCodeValues = {
   source: "local",
   values: [
     {
-      displayValue: "IGX 2018",
-      paramValue: "IGX_2018",
+      displayValue: "TBG 2042",
+      paramValue: "TBG_2042",
     },
     {
-      displayValue: "JPI 2042",
-      paramValue: "JPI_2042",
+      displayValue: "UCS 2042",
+      paramValue: "UCS_2042",
     },
     {
-      displayValue: "JRT 2042",
-      paramValue: "JRT_2042",
+      displayValue: "TBH 2052",
+      paramValue: "TBH_2052",
     },
     {
-      displayValue: "JRU 2052",
-      paramValue: "JRU_2052",
-    },
-    {
-      displayValue: "JRV 2042",
-      paramValue: "JRV_2042",
-    },
-    {
-      displayValue: "JRW 2052",
-      paramValue: "JRW_2052",
-    },
-    {
-      displayValue: "JRX 2042",
-      paramValue: "JRX_2042",
-    },
-    {
-      displayValue: "JRY 2052",
-      paramValue: "JRY_2052",
-    },
-    {
-      displayValue: "JRZ 2042",
-      paramValue: "JRZ_2042",
-    },
-    {
-      displayValue: "JSA 2052",
-      paramValue: "JSA_2052",
-    },
-    {
-      displayValue: "K9N 2042",
-      paramValue: "K9N_2042",
-    },
-    {
-      displayValue: "K9O 2052",
-      paramValue: "K9O_2052",
-    },
-    {
-      displayValue: "KZI 2042",
-      paramValue: "KZI_2042",
-    },
-    {
-      displayValue: "UAA 2042",
-      paramValue: "UAA_2042",
-    },
-    {
-      displayValue: "UAB 2052",
-      paramValue: "UAB_2052",
-    },
-    {
-      displayValue: "UAC 2042",
-      paramValue: "UAC_2042",
-    },
-    {
-      displayValue: "UAD 2052",
-      paramValue: "UAD_2052",
-    },
-    {
-      displayValue: "UAE 2042",
-      paramValue: "UAE_2042",
-    },
-    {
-      displayValue: "UAF 2052",
-      paramValue: "UAF_2052",
+      displayValue: "UCT 2052",
+      paramValue: "UCT_2052",
     },
   ],
 };
@@ -353,7 +293,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -1043,7 +1003,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -1940,7 +1920,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -2836,7 +2836,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -3697,7 +3717,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
         ]
@@ -4536,7 +4576,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
         ]
@@ -5686,7 +5746,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -6526,7 +6606,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -7213,7 +7313,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -8009,7 +8129,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -8826,7 +8966,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
@@ -9421,7 +9581,27 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: [
+                "IGX_2018",
+                "JPI_2042",
+                "JRT_2042",
+                "JRU_2052",
+                "JRV_2042",
+                "JRW_2052",
+                "JRX_2042",
+                "JRY_2052",
+                "JRZ_2042",
+                "JSA_2052",
+                "K9N_2042",
+                "K9O_2052",
+                "KZI_2042",
+                "UAA_2042",
+                "UAB_2052",
+                "UAC_2042",
+                "UAD_2052",
+                "UAE_2042",
+                "UAF_2052"
+              ]
             },
           },
           {
