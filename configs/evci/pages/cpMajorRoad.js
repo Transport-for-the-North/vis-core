@@ -55,8 +55,8 @@ export const cpMajorRoad = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Major Road'] },
+      { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Major Road'] },
     ],
     additionalFeatures: {
       glossary: { 

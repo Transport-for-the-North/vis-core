@@ -29,7 +29,7 @@ const administrativeBoundarySelector = {
 
 const yearSelector = {
   filterName: "Year",
-  paramName: "year",
+  paramName: "scenarioYear",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -39,7 +39,7 @@ const yearSelector = {
 
 const travelScenarioSelector = {
   filterName: "Travel Scenario",
-  paramName: "travelScenario",
+  paramName: "travelScenarioId",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -48,12 +48,32 @@ const travelScenarioSelector = {
     source: "local",
     values: [
       {
-        displayValue: "UK Gov. - Business as Usual",
-        paramValue: "BAU",
+        displayValue: "Unknown",
+        paramValue: 0,
       },
       {
-        displayValue: "UK Gov. - Accelerated EV",
-        paramValue: "AEV",
+        displayValue: "Business as Usual",
+        paramValue: 1,
+      },
+      {
+        displayValue: "Just About Managing",
+        paramValue: 2,
+      },
+      {
+        displayValue: "Accelerated EV",
+        paramValue: 3,
+      },
+      {
+        displayValue: "Digitally Distributed",
+        paramValue: 4,
+      },
+      {
+        displayValue: "Prioritised Places",
+        paramValue: 5,
+      },
+      {
+        displayValue: "Urban Zero Carbon",
+        paramValue: 6,
       },
     ],
   },
@@ -61,7 +81,7 @@ const travelScenarioSelector = {
 
 const behaviouralScenarioSelector = {
   filterName: "Behavioural Scenario",
-  paramName: "behaviouralScenario",
+  paramName: "behaviourScenarioId",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -70,12 +90,20 @@ const behaviouralScenarioSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Baseline",
-        paramValue: "base",
+        displayValue: "Unknown",
+        paramValue: 0,
       },
       {
-        displayValue: "Destination Focus",
-        paramValue: "destination",
+        displayValue: "Base",
+        paramValue: 1,
+      },
+      {
+        displayValue: "Destination",
+        paramValue: 2,
+      },
+      {
+        displayValue: "Not Applicable",
+        paramValue: 3,
       },
     ],
   },
@@ -83,7 +111,7 @@ const behaviouralScenarioSelector = {
 
 const vehicleTypeSelector = {
   filterName: "Vehicle Type",
-  paramName: "vehicleType",
+  paramName: "modeCode",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -109,7 +137,7 @@ const vehicleTypeSelector = {
 
 const fuelTypeSelector = {
   filterName: "Fuel Type",
-  paramName: "fuelType",
+  paramName: "fuelTypeCode",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -131,7 +159,7 @@ const fuelTypeSelector = {
 
 const chargingCategorySelector = {
   filterName: "Charging Category",
-  paramName: "chargingCategory",
+  paramName: "chargingCategoryId",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -141,31 +169,31 @@ const chargingCategorySelector = {
     values: [
       {
         displayValue: "Destination",
-        paramValue: "destination",
+        paramValue: 1,
       },
       {
         displayValue: "HGV Depot",
-        paramValue: "hgv_depot",
+        paramValue: 2,
       },
       {
         displayValue: "Home",
-        paramValue: "home",
+        paramValue: 3,
       },
       {
         displayValue: "Public Residential",
-        paramValue: "public_residential",
+        paramValue: 4,
       },
       {
         displayValue: "Workplace",
-        paramValue: "workplace",
+        paramValue: 5,
       },
       {
         displayValue: "HGV en route",
-        paramValue: "hgv_en-route",
+        paramValue: 6,
       },
       {
         displayValue: "En route",
-        paramValue: "en-route",
+        paramValue: 7,
       },
     ],
   },
@@ -221,7 +249,7 @@ const distanceValueDisplaySelector = {
 
 const chargerSpeedSelector = {
   filterName: "Charger Speed",
-  paramName: "chargerSpeed",
+  paramName: "name",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -231,35 +259,79 @@ const chargerSpeedSelector = {
     values: [
       {
         displayValue: "Slow",
-        paramValue: "slow",
+        paramValue: "Slow",
       },
       {
         displayValue: "Standard",
-        paramValue: "standard",
+        paramValue: "Standard",
       },
       {
         displayValue: "Rapid",
-        paramValue: "rapid",
+        paramValue: "Rapid",
       },
       {
         displayValue: "Ultra-rapid",
-        paramValue: "ultra-rapid",
+        paramValue: "Ultra-rapid",
       },
       {
         displayValue: "Any Speed",
-        paramValue: "any",
+        paramValue: "Any Speed",
       },
       {
         displayValue: "Any Non-rapid",
-        paramValue: "any_regular",
+        paramValue: "Any Non-rapid",
       },
       {
         displayValue: "Any Rapid or Faster",
-        paramValue: "any_rapid",
+        paramValue: "Any Rapid or Faster",
       },
       {
         displayValue: "Fast",
-        paramValue: "fast",
+        paramValue: "Fast",
+      },
+    ],
+  },
+};
+
+const columnNameCPSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Total Kilowatts",
+        paramValue: "kw_total",
+      },
+      {
+        displayValue: "Device Count",
+        paramValue: "device_count",
+      },
+    ],
+  },
+};
+
+const columnNameSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Total Kilowatts",
+        paramValue: "kw_total",
+      },
+      {
+        displayValue: "Stops Count",
+        paramValue: "stops_count",
       },
     ],
   },
@@ -276,4 +348,6 @@ export const selectors = {
   areaValueDisplay: areaValueDisplaySelector,
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,
+  columnNameCP: columnNameCPSelector,
+  columnName: columnNameSelector,
 };
