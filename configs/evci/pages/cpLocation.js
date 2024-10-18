@@ -56,6 +56,7 @@ export const cpLocation = {
     metadataTables: [],
     filters: [
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Location'] },
+      { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Location'] },
     ],
     additionalFeatures: {
       glossary: { 
