@@ -125,6 +125,46 @@ const userClassIdValues = {
       displayValue: "Other, all car availabilities",
       paramValue: "789",
     },
+    {
+      displayValue: "All",
+      paramValue: "0",
+    },
+    {
+      displayValue: "Business, car available from home",
+      paramValue: "1",
+    },
+    {
+      displayValue: "Business, car available to home",
+      paramValue: "2",
+    },
+    {
+      displayValue: "Business, car non available",
+      paramValue: "3",
+    },
+    {
+      displayValue: "Commuting, car available from home",
+      paramValue: "4",
+    },
+    {
+      displayValue: "Commuting, car available to home",
+      paramValue: "5",
+    },
+    {
+      displayValue: "Commuting, car non available",
+      paramValue: "6",
+    },
+    {
+      displayValue: "Other, car available from home",
+      paramValue: "7",
+    },
+    {
+      displayValue: "Other, car available to home",
+      paramValue: "8",
+    },
+    {
+      displayValue: "Other, car non available",
+      paramValue: "9",
+    }
   ]
 }
 
@@ -133,11 +173,11 @@ const originOrDestinationValues = {
   values: [
     {
       displayValue: "Origin",
-      paramValue: "origin",
+      paramValue: "1"
     },
     {
       displayValue: "Destination",
-      paramValue: "destination",
+      paramValue: "0",
     },
   ],
 }
@@ -1971,7 +2011,7 @@ export const appConfig = {
               displayColumn: "name",
               paramColumn: "id",
               sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+              exclude: [123, 456, 789]
             },
           },
           {
