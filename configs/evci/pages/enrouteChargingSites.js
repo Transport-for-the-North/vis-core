@@ -8,6 +8,7 @@ export const enrouteChargingSites = {
   customLogoPath: "@logoPath@",
   navbarLinkBgColour: "@primaryBgColour@",
   customMapCentre: "@mapCentre@",
+  customMapZoom: "@mapZoom@",
   about: `
   <p>Shows the sites within a region with the most potential for the installation of en-route charging infrastructure. 
   This ranking is not designed to provide users with specific parcels of land for development but is instead designed to show 
