@@ -1,27 +1,21 @@
-import React, { createContext, useEffect, useContext, useReducer } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, checkSecurityRequirements, sortValues, isValidCondition, applyCondition, parseStringToArray } from 'utils';
-import { AppContext, PageContext, FilterContext } from 'contexts';
-import { api } from 'services';
+import React, { createContext, useEffect, useContext, useReducer } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { actionTypes, mapReducer } from "reducers";
+import {
+  hasRouteParameter,
+  replaceRouteParameter,
+  checkSecurityRequirements,
+  sortValues,
+  isValidCondition,
+  applyCondition,
+  parseStringToArray,
+} from "utils";
+import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
+import { AppContext, PageContext, FilterContext } from "contexts";
+import { api } from "services";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
-
-const initialState = {
-  mapCentre: [-2.6394653, 54.075506],
-  layers: {},
-  visualisations: {},
-  leftVisualisations: {},
-  rightVisualisations: {},
-  metadataTables: {},
-  metadataFilters: [],
-  filters: [],
-  map: null,
-  isMapReady: false,
-  isLoading: true,
-  pageIsReady: false,
-};
 
 /**
  * Helper function to check for duplicate values in an array.
@@ -47,20 +41,35 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
+
+  // Initialize state within the provider function
+  const initialState = {
+    mapStyle: appContext.mapStyle || defaultMapStyle,
+    mapCentre: pageContext.customMapCentre
+      ? parseStringToArray(pageContext.customMapCentre)
+      : defaultMapCentre,
+    mapZoom: pageContext.customMapZoom
+      ? parseFloat(pageContext.customMapZoom)
+      : defaultMapZoom,
+    layers: {},
+    visualisations: {},
+    leftVisualisations: {},
+    rightVisualisations: {},
+    metadataTables: {},
+    metadataFilters: [],
+    filters: [],
+    map: null,
+    isMapReady: false,
+    isLoading: true,
+    pageIsReady: false,
+  };
+
+
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
   const contextValue = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
-
-  useEffect(() => {
-    if (pageContext.customMapCentre) {
-      dispatch({
-        type: actionTypes.UPDATE_MAP_CENTRE,
-        payload: parseStringToArray(pageContext.customMapCentre),
-      });
-    }
-  }, [dispatch, pageContext]);
 
   useEffect(() => {
     dispatch({ type: actionTypes.SET_IS_LOADING });
