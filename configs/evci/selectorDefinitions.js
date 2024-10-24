@@ -34,7 +34,39 @@ const yearSelector = {
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
   type: "slider",
-  values: [2023, 2025, 2030, 2035, 2040, 2045, 2050],
+  values: {
+    "source": "local",
+    "values": [
+      {
+        "displayValue": 2023,
+        "paramValue": 2023
+      },
+      {
+        "displayValue": 2025,
+        "paramValue": 2025
+      },
+      {
+        "displayValue": 2030,
+        "paramValue": 2030
+      },
+      {
+        "displayValue": 2035,
+        "paramValue": 2035
+      },
+      {
+        "displayValue": 2040,
+        "paramValue": 2040
+      },
+      {
+        "displayValue": 2045,
+        "paramValue": 2045
+      },
+      {
+        "displayValue": 2050,
+        "paramValue": 2050
+      }
+    ]
+  },
 };
 
 const travelScenarioSelector = {
