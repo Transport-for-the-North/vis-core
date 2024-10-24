@@ -226,9 +226,9 @@ const landuseExogValues = {
 
 export const appConfig = {
   title: "TAME React Vis Template",
-  introduction: `<p>The TfN’s Northern Rail Modelling System Visualiser (NoRMS) aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
-   NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise highway model data in an interactive, intuitive,
-   web-based format. This instance of the platform presents information from the {insert project name or study} project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
+  introduction: `<p>The TfN’s Northern Rail Modelling System (NoRMS) Vis Framework aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
+   NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise modelled rail data in an interactive, intuitive, and
+   web-based format. This instance of the platform presents information from the Network North project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
    based on scenario testing done using NoRMS.</p>`,
   background: "",
   legalText:
@@ -245,8 +245,8 @@ export const appConfig = {
       url: "/norms-station-totals",
       type: "MapLayout",
       about: `
-      <p>Visualise the daily number of passengers using the station by selecting a scenario, adjusting Time Period and choosing the Metric. </p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.</p>
+      <p>Visualise the number of passengers using the station by selecting a scenario, adjusting the Time Period and choosing the Metric. </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       `,
       category: "Station",
       config: {
@@ -420,8 +420,8 @@ export const appConfig = {
       url: "/norms-station-totals-difference",
       type: "MapLayout",
       about:`
-      <p>Visualise the difference in passenger movements at stations between two separate scenarios by selecting Do Minimum and Do Something variants respectively. The difference is calculated scenario 2 minus scenario 1 (i.e. 2–1). </p>
-      <p>Time period values are an hourly totals of a selected option, “All” option is a sum of those averaged periods.  </p>
+      <p>Visualise the difference in passenger movements at stations between two separate scenarios by selecting two scenarios. The difference is calculated scenario 2 vs scenario 1 (i.e. 2–1). </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>It is possible to show the total passengers that board, alight or interchange on a train at a station, or the total passengers that access (enter) or egress (exit) a station.  </p>
       `,
       category: "Station",
@@ -686,7 +686,7 @@ export const appConfig = {
       type: "DualMapLayout",
       about:`
       <p>Visualise both scenarios, and their respective absolute values, at the same time by selecting Left/Right Scenarios. This allows to see the absolute values of both scenarios in real time.  </p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.  </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p> It is possible to show the total passengers that board, alight or interchange on a train at a station, or the total passengers that access (enter) or egress (exit) a station.  </p>
       `,
       category: "Station",
@@ -950,11 +950,11 @@ export const appConfig = {
       url: "/norms-station-pair",
       type: "MapLayout",
       about: `
-      <p>Visualise the travelling patterns of a station by selecting it on the map. Further, adjust Time Period, User Class, Column Name (*change to “Metric”?) and Direction. </p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.  </p>
+      <p>Visualise the travelling patterns of a station by selecting it on the map. Further, adjust Time Period, User Class, Direction and Metric. </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
       <p>Direction toggle allows to switch between the selected station being a starting point or a destination.  </p>      
-      <p>Column Name refers to Demand (Passengers), Generalised Cost (*it doesn’t specify if it’s in pence/pounds* and Generalised Journey Time (in seconds). </p>
+      <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
       `, // TODO - Insert classification explanation or change the numbers to words??
       category: "Station",
       config: {
@@ -1177,10 +1177,10 @@ export const appConfig = {
       type: "MapLayout",
       about: `
       <p>Visualise difference of a selected station’s travelling patterns between two different scenarios by clicking on a preferred location. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction. </p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.</p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes</p>
       <p>Direction toggle allows to switch between the selected station being a starting point or a destination.</p>
-      <p>Column Name refers to Demand (Passengers), Generalised Cost (minutes) and Generalised Journey Time (Minutes). </p>
+      <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
       `, // TODO Double check final point units for GC and GJT
       category: "Station",
       config: {
@@ -1516,10 +1516,10 @@ export const appConfig = {
       type: "DualMapLayout",
       about:`
       <p>Visualise both scenarios at the same time by selecting a station. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction.</p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.  </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
       <p>Direction toggle allows to switch between the selected station being a starting point or a destination.  </p>
-      <p>Column Name refers to Demand (Passengers), Generalised Cost (*it doesn’t specify if it’s in pence/pounds* and Generalised Journey Time (Seconds). </p>
+      <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
       `, // TODO Find out what is to go here.
       category: "Station",
       config: {
@@ -1852,10 +1852,10 @@ export const appConfig = {
       url: "/norms-station-catchment",
       type: "MapLayout",
       about:`
-      <p>Visualise station catchments, the zones that passengers come from to use the station, by selecting a station on the map. Further, adjust the Scenario, Time Period, User Class, Direction and a Metric of choice. </p>
+      <p>Visualise station catchments by selecting a station on the map. Further, adjust the Scenario, Time Period, User Class, Direction and a Metric of choice. </p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
       <p>Direction is whether the passenger is boarding the train as an origin, or alighting the train as a destination, this map will then show which zones passengers come from or go to,</p>
-      <p>Metric allows to further aggregate the catchment by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit). Alternatively, a Total Demand, by mode, can also be displayed.  </p>
+      <p>Metric allows to further aggregate the catchment by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit. Alternatively, a Total Demand, by mode, can also be displayed.  </p>
       `,
       category: "Station",
       config: {
@@ -2088,10 +2088,10 @@ export const appConfig = {
       type: "MapLayout",
       about:`
       <p>Visualise the difference between two scenarios and a selected station catchment by selecting a station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.</p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
       <p>Direction is whether the passenger is boarding the train as an origin, or alighting the train as a destination, this map will then show which zones passengers come from or go to.</p>
-      <p>Metric allows to further aggregate the catchment in by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit). Alternatively, a Total Demand, by mode, can also be displayed.  </p>
+      <p>Metric allows to further aggregate the catchment in by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit. Alternatively, a Total Demand, by mode, can also be displayed.  </p>
       `,
       category: "Station",
       config: {
@@ -2437,10 +2437,10 @@ export const appConfig = {
       type: "DualMapLayout",
       about:`
       <p>Visualise station catchments for two scenarios simultaneously by selecting the station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.</p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
       <p>Direction is whether the passenger is boarding the train as an origin, or alighting the train as a destination, this map will then show which zones passengers come from or go to.</p>
-      <p>Metric allows to further aggregate the catchment in by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit). Alternatively, a Total Demand, by mode, can also be displayed.  </p>
+      <p>Metric allows to further aggregate the catchment in by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit. Alternatively, a Total Demand, by mode, can also be displayed.  </p>
       `,
       category: "Station",
       config: {
@@ -2786,7 +2786,7 @@ export const appConfig = {
       type: "MapLayout",
       about:`
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods.</p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour. </p>
       `,
       category: "Link",
@@ -2983,7 +2983,7 @@ export const appConfig = {
       type: "MapLayout",
       about: `
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics should match). 
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods. </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
       `, //to be added
       category: "Link",
@@ -3319,7 +3319,7 @@ export const appConfig = {
       type: "DualMapLayout",
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice.</p>  
-      <p>Time period values are an hourly average of a selected option, “All” option is a sum of those averaged periods. </p>
+      <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
       `, 
       category: "Link",
@@ -3608,7 +3608,7 @@ export const appConfig = {
       about: `
       <p>The NorTMS zones included in the model are displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
-      <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice</p>
+      <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice.</p>
       `,
       config: {
         layers: [
@@ -3802,7 +3802,7 @@ export const appConfig = {
       about: `
       <p>This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics selection should match). </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
-      <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice </p>
+      <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice. </p>
       `, //To be added.
       config: {
         layers: [
@@ -4108,7 +4108,7 @@ export const appConfig = {
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
-      <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice </p>
+      <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice. </p>
       `, //To be added.
       config: {
         layers: [
