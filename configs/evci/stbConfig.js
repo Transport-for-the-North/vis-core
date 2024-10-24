@@ -11,7 +11,8 @@ export const stbConfig = [
     urlBase: "/transport-for-the-north",
     logoPath: "/img/evci/tfn-logo-fullsize.png",
     contact: "EVCI@transportforthenorth.com",
-    mapCentre: [-1.7, 54.2],
+    mapCentre: [-2.2, 54.2],
+    mapZoom: 7.5,
     website:
       "https://transportforthenorth.com/major-roads-network/EV-charging-infrastructure",
     primaryBgColour: '#0d0f3d',
@@ -29,7 +30,8 @@ export const stbConfig = [
     urlBase: "/transport-for-the-south-east",
     logoPath: "/img/evci/tfse-logo.png",
     contact: "joshua.jiao@eastsussex.gov.uk",
-    mapCentre: [-0.3, 51.2],
+    mapCentre:  [-0.78624, 51.20819],
+    mapZoom: 8.21,
     website:
       "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
     primaryBgColour: '#0078be',
@@ -48,6 +50,7 @@ export const stbConfig = [
     logoPath: "/img/evci/mc-logo.png",
     contact: "evc@midlandsconnect.uk",
     mapCentre: [-1.4, 52.7],
+    mapZoom: 7.5,
     website:
       "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
     primaryBgColour: '#017500',
@@ -66,6 +69,7 @@ export const stbConfig = [
     logoPath: "/img/evci/eeh-logo.png",
     contact: "businessunit@englandseconomicheartland.com",
     mapCentre: [-0.6, 52.1],
+    mapZoom: 7.5,
     website:
       "https://www.englandseconomicheartland.com/our-work/cutting-emissions/",
     primaryBgColour: '#00099a',
@@ -84,6 +88,7 @@ export const stbConfig = [
     logoPath: "/img/evci/peninsula-logo.png",
     contact: "info@peninsulatransport.org.uk",
     mapCentre: [-4, 50.75],
+    mapZoom: 7.5,
     website:
       "https://www.peninsulatransport.org.uk/going-electric/",
     primaryBgColour: '#0099ff',
@@ -102,6 +107,7 @@ export const stbConfig = [
     logoPath: "/img/evci/te-logo.png",
     contact: "info@transporteast.gov.uk",
     mapCentre: [0.95, 52.36],
+    mapZoom: 7.5,
     website:
       "https://www.transporteast.gov.uk/electric-vehicles/",
     primaryBgColour: '#2CA3DD',
@@ -120,6 +126,7 @@ export const stbConfig = [
     logoPath: "/img/evci/wg-logo.png",
     contact: "westerngatewaystb@westofengland-ca.gov.uk",
     mapCentre: [-2.8, 51.32],
+    mapZoom: 7.5,
     website:
       "https://westerngatewaystb.org.uk/electric-vehicles/",
     primaryBgColour: '#4D8514',
