@@ -396,7 +396,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network Scenario",
+            filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
             info: "Network DM/DS",
             target: "api",
@@ -959,6 +959,7 @@ export const appConfig = {
           {
             filterName: "Metric",
             paramName: "columnName",
+            info: "Metric to display",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -972,6 +973,7 @@ export const appConfig = {
           {
             filterName: "Delivery Programme",
             paramName: "deliveryProgrammeName",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
@@ -1000,8 +1002,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network Scenario",
+            filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
+            info: "Network DM/DS",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
@@ -1017,6 +1020,7 @@ export const appConfig = {
           {
             filterName: "Demand Scenario",
             paramName: "demandScenarioName",
+            info: "Matrix demand scenario",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
@@ -1096,6 +1100,7 @@ export const appConfig = {
           {
             filterName: "Metric",
             paramName: "columnName",
+            info: "Metric to display",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -1109,6 +1114,7 @@ export const appConfig = {
           {
             filterName: "Scen. 1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoMinimum",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1139,6 +1145,7 @@ export const appConfig = {
           {
             filterName: "Scen. 1 Network Scenario Name",
             paramName: "networkScenarioNameDoMinimum",
+            info: "Network DM/DS",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1154,6 +1161,7 @@ export const appConfig = {
           {
             filterName: "Scen. 1 Demand Scenario",
             paramName: "demandScenarioNameDoMinimum",
+            info: "Matrix demand scenario",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1178,6 +1186,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1208,6 +1217,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Network Scenario Name",
             paramName: "networkScenarioNameDoSomething",
+            info: "Network DM/DS",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1223,6 +1233,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Demand Scenario",
             paramName: "demandScenarioNameDoSomething",
+            info: "Matrix demand scenario",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1300,6 +1311,7 @@ export const appConfig = {
           {
             filterName: "Metric",
             paramName: "columnName",
+            info: "Metric to display",
             target: "api",
             actions: [
               { action: "UPDATE_DUAL_QUERY_PARAMS" },
@@ -1311,8 +1323,9 @@ export const appConfig = {
             values: nodeMetricValues,
           },
           {
-            filterName: "Left Delivery Programme",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
+            info: "Assignment delivery programme for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1326,7 +1339,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Year",
+            filterName: "Year - Left",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1341,8 +1354,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Network Scenario",
+            filterName: "Network Scenario Name - Left",
             paramName: "networkScenarioName",
+            info: "Network DM/DS for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1356,8 +1370,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Demand Scenario",
+            filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
+            info: "Matrix demand scenario for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1371,7 +1386,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
+            filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1380,8 +1395,9 @@ export const appConfig = {
             values: timePeriodValues
           },
           {
-            filterName: "Right Delivery Programme",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
+            info: "Assignment delivery programme for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1395,7 +1411,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Year",
+            filterName: "Year - Right",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1410,8 +1426,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Network Scenario",
+            filterName: "Network Scenario Name - Right",
             paramName: "networkScenarioName",
+            info: "Network DM/DS for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1425,8 +1442,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Demand Scenario",
+            filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
+            info: "Matrix demand scenario for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1440,7 +1458,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
+            filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1819,7 +1837,7 @@ export const appConfig = {
             values: originOrDestTripValues,
           },
           {
-            filterName: "Left Delivery Programme",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the left map",
             target: "api",
@@ -1835,7 +1853,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Year",
+            filterName: "Year - Left",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1850,7 +1868,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Demand Scenario",
+            filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the left map",
             target: "api",
@@ -1866,7 +1884,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
+            filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1875,7 +1893,7 @@ export const appConfig = {
             values: timePeriodValues
           },
           {
-             filterName: "Left User Class",
+             filterName: "User Class - Left",
              paramName: "userClassCode",
              target: "api",
              actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1884,7 +1902,7 @@ export const appConfig = {
              values: userClassValues
           },
           {
-            filterName: "Right Delivery Programme",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the right map",
             target: "api",
@@ -1900,7 +1918,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Year",
+            filterName: "Year - Right",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1915,7 +1933,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Demand Scenario",
+            filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the right map",
             target: "api",
@@ -1931,7 +1949,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
+            filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1940,7 +1958,7 @@ export const appConfig = {
             values: timePeriodValues
           },
           {
-            filterName: "Right User Class",
+            filterName: "User Class - Right",
             paramName: "userClassCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2065,7 +2083,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network Scenario",
+            filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
             info: "Network DM/DS",
             target: "api",
@@ -2446,7 +2464,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Left Delivery Programme",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the left map",
             target: "api",
@@ -2462,7 +2480,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Year",
+            filterName: "Year - Left",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2477,7 +2495,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Network Scenario Name",
+            filterName: "Network Scenario Name - Left",
             paramName: "networkScenarioName",
             info: "Network DM/DS for the left map",
             target: "api",
@@ -2493,7 +2511,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Demand Scenario",
+            filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the left map",
             target: "api",
@@ -2509,7 +2527,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
+            filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2518,7 +2536,7 @@ export const appConfig = {
             values: timePeriodValues
           },
           {
-            filterName: "Left User Class",
+            filterName: "User Class - Left",
             paramName: "userClass",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2527,7 +2545,7 @@ export const appConfig = {
             values: userClassValues
           },
           {
-            filterName: "Right Delivery Programme",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the right map",
             target: "api",
@@ -2543,7 +2561,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Year",
+            filterName: "Year - Right",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2558,7 +2576,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Network Scenario Name",
+            filterName: "Network Scenario Name - Right",
             paramName: "networkScenarioName",
             info: "Network DM/DS for the right map",
             target: "api",
@@ -2574,7 +2592,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Demand Scenario",
+            filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the right map",
             target: "api",
@@ -2590,7 +2608,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
+            filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2599,7 +2617,7 @@ export const appConfig = {
             values: timePeriodValues
           },
           {
-            filterName: "Right User Class",
+            filterName: "User Class - Right",
             paramName: "userClass",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
