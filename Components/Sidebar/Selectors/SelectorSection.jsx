@@ -5,12 +5,16 @@ import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
+import { AppContext, AuthProvider} from 'contexts';
+import { useContext, useEffect, useState } from "react";
+import App from "App";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
 `;
 
 const NoDataParagraph = styled.p``;
+const DiffParagraph = styled.p``;
 
 /**
  * Checks if the geometry property is not null for each feature in the provided feature collection.
@@ -86,9 +90,17 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
 
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
+  
+  const appContext = useContext(AppContext);
+  const appName = process.env.REACT_APP_NAME;
+  const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
+  const DiffPage = currentPage.pageName.includes("Difference") && appName === "noham"
 
+  const DiffPageMessage = 
+    "The difference is calculated by Scenario 2 minus Scenario 1."
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
+      {DiffPage && <DiffParagraph>{DiffPageMessage}</DiffParagraph>}
       {Array.isArray(filters) && filters.length > 0 ? (
         filters.map((filter) => (
           <SelectorContainer key={filter.id}>
