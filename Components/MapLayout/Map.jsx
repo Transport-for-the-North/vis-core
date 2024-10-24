@@ -7,8 +7,13 @@ import { useMap, useMapContext, useFilterContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 import { Visualisation } from "./Visualisation";
-import { getHoverLayerStyle, getLayerStyle, getSourceLayer, numberWithCommas } from "utils";
-import './MapLayout.css'
+import {
+  getHoverLayerStyle,
+  getLayerStyle,
+  getSourceLayer,
+  numberWithCommas,
+} from "utils";
+import "./MapLayout.css";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -23,25 +28,13 @@ const StyledMapContainer = styled.div`
  */
 const Map = () => {
   const mapContainerRef = useRef(null);
-  const { map, isMapReady } = useMap(mapContainerRef);
   const { state, dispatch } = useMapContext();
+  const { mapStyle, mapCentre, mapZoom } = state;
+  const { map, isMapReady } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom);
   const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
-  const mapCentre = state.mapCentre;
-
-  /**
-   * useEffect to update the map center when certain dependencies change
-   * Checks if the map is ready and mapCentre is a valid array with 2 elements (longitude and latitude)
-   * Set the map's center to the specified longitude and latitude
-   */
-  useEffect(() => {
-    if (isMapReady && Array.isArray(mapCentre) && mapCentre.length === 2) {
-      const [lng, lat] = mapCentre;
-      map.setCenter([lng, lat]);
-    }
-  }, [map, isMapReady, mapCentre]);
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
