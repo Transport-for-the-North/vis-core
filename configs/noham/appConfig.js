@@ -14,12 +14,12 @@ const originOrDestTripValues = {
     {
       displayValue: 'Origin Trips',
       paramValue: 'origin_trips',
-      legendSubtitleText: "unit"
+      legendSubtitleText: "trip(s)"
     },
     {
       displayValue: 'Destination Trips',
       paramValue: 'destination_trips',
-      legendSubtitleText: "unit"
+      legendSubtitleText: "trip(s)"
     }
   ],
 }
@@ -165,9 +165,9 @@ const linkMetricValues = {
       legendSubtitleText: "secs"
     },
     {
-      displayValue: "Link queues (secs)",
+      displayValue: "Link queues (pcu's)",
       paramValue: "link_queues_secs",
-      legendSubtitleText: "secs"
+      legendSubtitleText: "pcu's"
     },
   ],
 }
@@ -198,23 +198,23 @@ const userClassValues = {
     },
     {
       displayValue: "Car: Business",
-      paramValue: "UC1-Car_Business",
+      paramValue: "car_eb_vh",
     },
     {
       displayValue: "Car: Commute",
-      paramValue: "UC2-Car_Commute",
+      paramValue: "car_com_vh",
     },
     {
       displayValue: "Car: Other",
-      paramValue: "UC3-Car_Other",
+      paramValue: "car_oth_vh",
     },
     {
       displayValue: "LGV",
-      paramValue: "UC4-LGV",
+      paramValue: "lgv_vh",
     },
     {
       displayValue: "HGV",
-      paramValue: "UC5-HGV",
+      paramValue: "hgv_vh",
     },
   ],
 }
@@ -281,14 +281,14 @@ export const appConfig = {
       type: "MapLayout",
       category: "Link",
       about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
-      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination
-      of road section attributes and comparisons of modelled traffic conditions in different scenarios.</p>
-      <p>Currently includes: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction</li>
+      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination of road section attributes and 
+      comparisons of modelled traffic conditions in different scenarios. </p>
+      <p>Metrics include: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction,</li>
       <li>Traffic flow – represents the flow, by vehicle type and journey purpose, in an average hour traversing the road section,</li>
-      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a v/c ration of 1.00/100% indicates the link is operating at 100% of it’s capacity,</li>
-      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Average speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
-      <li>Delays – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time.</li>
-      <li>Queues – the average queue length over the average hour, reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
+      <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a V/C ration of 100% indicates the link is operating at 100% of its capacity,</li>
+      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Net speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
+      <li>Link delay – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time,</li>
+      <li>Link queues – the average queue length over the average hour, in Passenger Car Units (PCU's), reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       config: {
         layers: [
           {
@@ -363,7 +363,7 @@ export const appConfig = {
             values: linkMetricValues,
           },
           {
-            filterName: "Delivery programme",
+            filterName: "Delivery Programme",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme",
             target: "api",
@@ -396,7 +396,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network scenario",
+            filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
             info: "Network DM/DS",
             target: "api",
@@ -413,7 +413,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand scenario",
+            filterName: "Demand Scenario",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario",
             target: "api",
@@ -430,7 +430,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time period",
+            filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -447,15 +447,14 @@ export const appConfig = {
       pageName: "Difference",
       url: "/link-result-difference",
       type: "MapLayout",
-      about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
-      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination
-      of road section attributes and comparisons of modelled traffic conditions in different scenarios.</p>
-      <p>Currently includes: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction</li>
+      about: `<p>This visual allows you to select two different scenarios and compare the difference between a chosen metric for the scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
+      Therefore, the user should be setting scenario 2 as the Do-Something and scenario 1 as the Do-Minimum when comparing DS-DM.</p>
+      <p>Metrics include: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction,</li>
       <li>Traffic flow – represents the flow, by vehicle type and journey purpose, in an average hour traversing the road section,</li>
-      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a v/c ration of 1.00/100% indicates the link is operating at 100% of it’s capacity,</li>
-      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Average speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
-      <li>Delays – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time.</li>
-      <li>Queues – the average queue length over the average hour, reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
+      <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a V/C ration of 100% indicates the link is operating at 100% of its capacity,</li>
+      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Net speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
+      <li>Link delay – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time,</li>
+      <li>Link queues – the average queue length over the average hour, in Passenger Car Units (PCU's), reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       category: "Link",
       config: {
         layers: [
@@ -683,15 +682,14 @@ export const appConfig = {
       pageName: "Side by Side",
       url: "/link-result-dual",
       type: "DualMapLayout",
-      about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
-      Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination
-      of road section attributes and comparisons of modelled traffic conditions in different scenarios.</p>
-      <p>Currently includes: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction</li>
+      about: `<p>This visual allows you to select two different scenarios and compare them side by side. Particularly useful for when you have new infrastructure in one scenario which is not in the other, since the difference 
+      dashboard doesn’t show a comparison where there are no common links.</p>
+      <p>Metrics include: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction,</li>
       <li>Traffic flow – represents the flow, by vehicle type and journey purpose, in an average hour traversing the road section,</li>
-      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a v/c ration of 1.00/100% indicates the link is operating at 100% of it’s capacity,</li>
-      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Average speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
-      <li>Delays – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time.</li>
-      <li>Queues – the average queue length over the average hour, reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
+      <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation of a road section. It compares traffic volumes with link capacity. For example, a V/C ration of 100% indicates the link is operating at 100% of its capacity,</li>
+      <li>Speed limit – the sign posted speed limit on the road section (kph),</li><li>Net speed – the average speed (kph) of vehicles traveling along the road section, considering traffic congestion,</li>
+      <li>Link delay – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time,</li>
+      <li>Link queues – the average queue length over the average hour, in Passenger Car Units (PCU's), reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       category: "Link",
       config: {
         layers: [
@@ -829,9 +827,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "Delivery Programme - Right",
@@ -903,9 +899,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
         ]
       },
@@ -917,15 +911,15 @@ export const appConfig = {
       url: "/node-results",
       type: "MapLayout",
       category: "Node",
-      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. 
-      Some junctions  are not represented because the model is a simplification. This visualistion allows for the examination
-      of junction attributes and the comparison of junction performance in different scenarios. </p><p>Currently includes: <ul>
-      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation and performance of the junction.
-      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a v/c of 1.00/100%
+      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. Some junctions are not represented because the model is a simplification. 
+      This visualisation allows for the examination of junction attributes and the comparison of junction performance in different scenarios.  </p><p>Metrics include: <ul>
+      <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation and performance of the junction.
+      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a V/C of 100%
       indicates the junction is operating at capacity.</li>
       <li>Junction delay – is the additional travel time experience by a vehicle beyond uncongested conditions.
-      It is a measured as the time difference between the congested travel time and free-flow travel time, at junctions
-      delay includes time being held at red lights, or waiting to turn right. </li></ul></p>`,
+      It is measured as the time difference between the congested travel time and free-flow travel time. Junction delay includes time being held at red lights or waiting to turn right. </li></ul></p>
+      <p>Node type key: <ul> <li>'pri' – Priority junction,</li> <li>'sig' – Signalised junction,</li> <li>'rnd' – Roundabout,</li> <li>'rnd_u' – Roundabout with U-turns allowed,</li> 
+      <li>'dum' – Dummy node,</li> <li>'ext' – External node.</li></ul></p>`,
       config: {
         layers: [
           {
@@ -965,6 +959,7 @@ export const appConfig = {
           {
             filterName: "Metric",
             paramName: "columnName",
+            info: "Metric to display",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -978,6 +973,7 @@ export const appConfig = {
           {
             filterName: "Delivery Programme",
             paramName: "deliveryProgrammeName",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
@@ -1006,8 +1002,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network Scenario",
+            filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
+            info: "Network DM/DS",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
@@ -1023,6 +1020,7 @@ export const appConfig = {
           {
             filterName: "Demand Scenario",
             paramName: "demandScenarioName",
+            info: "Matrix demand scenario",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
@@ -1042,9 +1040,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           }]
       },
     },
@@ -1055,15 +1051,15 @@ export const appConfig = {
       pageName: "Difference",
       url: "/node-result-difference",
       type: "MapLayout",
-      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. 
-      Some junctions  are not represented because the model is a simplification. This visualistion allows for the examination
-      of junction attributes and the comparison of junction performance in different scenarios. </p><p>Currently includes: <ul>
-      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation and performance of the junction.
-      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a v/c of 1.00/100%
+      about: `<p>This visual allows you to select two different scenarios and compare the difference at junctions between a chosen metric for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
+      Therefore, the user should be setting scenario 2 as the Do-Something and scenario 1 as the Do-Minimum when comparing DS-DM.  </p><p>Metrics include: <ul>
+      <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation and performance of the junction.
+      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a V/C of 100%
       indicates the junction is operating at capacity.</li>
       <li>Junction delay – is the additional travel time experience by a vehicle beyond uncongested conditions.
-      It is a measured as the time difference between the congested travel time and free-flow travel time, at junctions
-      delay includes time being held at red lights, or waiting to turn right. </li></ul></p>`,
+      It is measured as the time difference between the congested travel time and free-flow travel time. Junction delay includes time being held at red lights or waiting to turn right. </li></ul></p>
+      <p>Node type key: <ul> <li>'pri' – Priority junction,</li> <li>'sig' – Signalised junction,</li> <li>'rnd' – Roundabout,</li> <li>'rnd_u' – Roundabout with U-turns allowed,</li> 
+      <li>'dum' – Dummy node,</li> <li>'ext' – External node.</li></ul></p>`,
       category: "Node",
       config: {
         layers: [
@@ -1104,6 +1100,7 @@ export const appConfig = {
           {
             filterName: "Metric",
             paramName: "columnName",
+            info: "Metric to display",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -1117,6 +1114,7 @@ export const appConfig = {
           {
             filterName: "Scen. 1 Delivery Programme",
             paramName: "deliveryProgrammeNameDoMinimum",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1147,6 +1145,7 @@ export const appConfig = {
           {
             filterName: "Scen. 1 Network Scenario Name",
             paramName: "networkScenarioNameDoMinimum",
+            info: "Network DM/DS",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1162,6 +1161,7 @@ export const appConfig = {
           {
             filterName: "Scen. 1 Demand Scenario",
             paramName: "demandScenarioNameDoMinimum",
+            info: "Matrix demand scenario",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1181,13 +1181,12 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            }
+            values: timePeriodValues
           },
           {
             filterName: "Scen. 2 Delivery Programme",
             paramName: "deliveryProgrammeNameDoSomething",
+            info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1218,6 +1217,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Network Scenario Name",
             paramName: "networkScenarioNameDoSomething",
+            info: "Network DM/DS",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1233,6 +1233,7 @@ export const appConfig = {
           {
             filterName: "Scen. 2 Demand Scenario",
             paramName: "demandScenarioNameDoSomething",
+            info: "Matrix demand scenario",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
@@ -1252,9 +1253,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            }
+            values: timePeriodValues
           },
         ],
       },
@@ -1264,15 +1263,15 @@ export const appConfig = {
       url: "/node-results-dual",
       type: "DualMapLayout",
       category: "Node",
-      about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. 
-      Some junctions  are not represented because the model is a simplification. This visualistion allows for the examination
-      of junction attributes and the comparison of junction performance in different scenarios. </p><p>Currently includes: <ul>
-      <li>Volume to capacity ratio (v/c %) – is a measure that reflects the operation and performance of the junction.
-      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a v/c of 1.00/100%
+      about: `<p>This visual allows you to select two different scenarios and compare them side by side. Particularly useful for when you have new 
+      infrastructure in one scenario which is not in the other, since the difference dashboard doesn’t show a comparison where there are no common nodes.  </p><p>Metrics include: <ul>
+      <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation and performance of the junction.
+      It compares traffic volumes with junction capacity, averaged across all arms of the junction. For example, a V/C of 100%
       indicates the junction is operating at capacity.</li>
       <li>Junction delay – is the additional travel time experience by a vehicle beyond uncongested conditions.
-      It is a measured as the time difference between the congested travel time and free-flow travel time, at junctions
-      delay includes time being held at red lights, or waiting to turn right. </li></ul></p>`,
+      It is measured as the time difference between the congested travel time and free-flow travel time. Junction delay includes time being held at red lights or waiting to turn right. </li></ul></p>
+      <p>Node type key: <ul> <li>'pri' – Priority junction,</li> <li>'sig' – Signalised junction,</li> <li>'rnd' – Roundabout,</li> <li>'rnd_u' – Roundabout with U-turns allowed,</li> 
+      <li>'dum' – Dummy node,</li> <li>'ext' – External node.</li></ul></p>`,
       config: {
         layers: [
           {
@@ -1312,6 +1311,7 @@ export const appConfig = {
           {
             filterName: "Metric",
             paramName: "columnName",
+            info: "Metric to display",
             target: "api",
             actions: [
               { action: "UPDATE_DUAL_QUERY_PARAMS" },
@@ -1323,8 +1323,9 @@ export const appConfig = {
             values: nodeMetricValues,
           },
           {
-            filterName: "Left Delivery Programme",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
+            info: "Assignment delivery programme for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1338,7 +1339,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Year",
+            filterName: "Year - Left",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1353,8 +1354,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Network Scenario",
+            filterName: "Network Scenario Name - Left",
             paramName: "networkScenarioName",
+            info: "Network DM/DS for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1368,8 +1370,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Demand Scenario",
+            filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
+            info: "Matrix demand scenario for the left map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1383,19 +1386,18 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
+            filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
-            filterName: "Right Delivery Programme",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
+            info: "Assignment delivery programme for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1409,7 +1411,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Year",
+            filterName: "Year - Right",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1424,8 +1426,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Network Scenario",
+            filterName: "Network Scenario Name - Right",
             paramName: "networkScenarioName",
+            info: "Network DM/DS for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1439,8 +1442,9 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Demand Scenario",
+            filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
+            info: "Matrix demand scenario for the right map",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
@@ -1454,15 +1458,13 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
+            filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           }
         ]
       },
@@ -1475,10 +1477,8 @@ export const appConfig = {
       url: "/zone-results",
       type: "MapLayout",
       category: "Matrix Trip Ends",
-      about: `<p>NoHAM travel demand trip ends at an origin or destination. This visualisation 
-      shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle
-      type and journey purpose as a choropleth. Zones are generalised geographic areas they share
-       similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA).</p>`,
+      about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle type and journey purpose as a choropleth. 
+      NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA) within Northern England and are more aggregated externally.</p>`,
       config: {
         layers: [
           {
@@ -1579,9 +1579,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Results"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "User Class",
@@ -1591,10 +1589,7 @@ export const appConfig = {
             visualisations: ["Zone Results"],
             type: "dropdown",
             containsLegendInfo: true,
-            values: {
-              source: "api",
-              legendSubtitleText: "unit"
-            },
+            values: userClassValues
           },
         ]
       }
@@ -1606,10 +1601,8 @@ export const appConfig = {
       pageName: "Difference",
       url: "/zone-result-difference",
       type: "MapLayout",
-      about: `<p>NoHAM travel demand trip ends at an origin or destination. This visualisation 
-      shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle
-      type and journey purpose as a choropleth. Zones are generalised geographic areas they share
-       similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA).</p>`,
+      about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation allows you to select two different demand scenarios and compare the difference at NoHAM zonal level for origin or destination trips for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
+      It also allows you to choose the same demand scenario but different vehicle user classes per scenario, which are split by vehicle type and journey purpose. </p>`,
       category: "Matrix Trip Ends",
       config: {
         layers: [
@@ -1710,9 +1703,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "Scen. 1 User Class",
@@ -1722,10 +1713,7 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             containsLegendInfo: true,
-            values: {
-              source: "api",
-              legendSubtitleText: "unit"
-            },
+            values: userClassValues
           },
           {
             filterName: "Scen.2 Delivery Programme",
@@ -1781,9 +1769,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "Scen. 2 User Class",
@@ -1793,10 +1779,7 @@ export const appConfig = {
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
             containsLegendInfo: true,
-            values: {
-              source: "api",
-              legendSubtitleText: "unit"
-            },
+            values: userClassValues
           }, 
         ]
       },
@@ -1806,10 +1789,8 @@ export const appConfig = {
       url: "/zone-results-dual",
       type: "DualMapLayout",
       category: "Matrix Trip Ends",
-      about: `<p>NoHAM travel demand trip ends at an origin or destination. This visualisation 
-      shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle
-      type and journey purpose as a choropleth. Zones are generalised geographic areas they share
-       similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA).</p>`,
+      about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visual allows you to select two different demand scenarios and compare them side by side at NoHAM zoning level, for origin or destination trips. 
+      It also allows you to choose the same demand scenario but different vehicle user classes per scenario, which are split by vehicle type and journey purpose. </p>`,
       config: {
         layers: [
           {
@@ -1856,7 +1837,7 @@ export const appConfig = {
             values: originOrDestTripValues,
           },
           {
-            filterName: "Left Delivery Programme",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the left map",
             target: "api",
@@ -1872,7 +1853,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Year",
+            filterName: "Year - Left",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1887,7 +1868,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Demand Scenario",
+            filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the left map",
             target: "api",
@@ -1903,29 +1884,25 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
+            filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
-             filterName: "Left User Class",
+             filterName: "User Class - Left",
              paramName: "userClassCode",
              target: "api",
              actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
              visualisations: ["Zone Results Side-By-Side"],
              type: "dropdown",
-             values: {
-                 source: "api",
-             },
+             values: userClassValues
           },
           {
-            filterName: "Right Delivery Programme",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the right map",
             target: "api",
@@ -1941,7 +1918,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Year",
+            filterName: "Year - Right",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -1956,7 +1933,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Demand Scenario",
+            filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the right map",
             target: "api",
@@ -1972,26 +1949,22 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
+            filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
-            filterName: "Right User Class",
+            filterName: "User Class - Right",
             paramName: "userClassCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
-            values: {
-              source: "api",
-            },
+            values: userClassValues
           },
         ]
       }
@@ -2002,14 +1975,14 @@ export const appConfig = {
     {
       pageName: "Single Scenario",
       url: "/zonal-pair-results",
-      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone. 
-      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation
-       to other zones. So by seleclting origin and clicking a zone, the demand to all other zones is shown as a choropleth.</p>
-      <p>Currently includes: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone</li>
+      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone over an average hour across the time period. 
+      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation to other zones. 
+      So by selecting origin and clicking a zone, the demand to all other zones from that selected zone is shown as a choropleth. </p>
+      <p>Metrics include: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone over an average hour across the time period.</li>
       <li>Average time – the travel time at an origin or destination level with respect to the selected zone, selecting an origin zone will show
-      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth</li>
+      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth.</li>
       <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
-      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth</li></ul></p>`,
+      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "MapLayout",
       category: "O/D Analysis",
       config: {
@@ -2079,7 +2052,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Delivery programme",
+            filterName: "Delivery Programme",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme",
             target: "api",
@@ -2110,7 +2083,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Network scenario",
+            filterName: "Network Scenario Name",
             paramName: "networkScenarioName",
             info: "Network DM/DS",
             target: "api",
@@ -2126,7 +2099,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Demand scenario",
+            filterName: "Demand Scenario",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario",
             target: "api",
@@ -2142,15 +2115,13 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time period",
+            filterName: "Time Period",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "toggle",
-            values: {
-              source: "api",
-            }
+            values: timePeriodValues
           },
           {
             filterName: "User Class",
@@ -2170,14 +2141,14 @@ export const appConfig = {
     {
       pageName: "Difference",
       url: "/zonal-pair-difference",
-      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone. 
-      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation
-       to other zones. So by seleclting origin and clicking a zone, the demand to all other zones is shown as a choropleth.</p>
-      <p>Currently includes: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone</li>
+      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone over an average hour across the time period. 
+      This visual allows you to select two different scenarios and compare the difference between a chosen metric for the scenarios; calculating scenario 2 minus 
+      scenario 1 (Scen. 2 - Scen.1). Therefore, the user should be setting scenario 2 as the Do-Something and scenario 1 as the Do-Minimum when comparing DS-DM. </p>
+      <p>Metrics include: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone over an average hour across the time period.</li>
       <li>Average time – the travel time at an origin or destination level with respect to the selected zone, selecting an origin zone will show
-      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth</li>
+      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth.</li>
       <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
-      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth</li></ul></p>`,
+      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "MapLayout",
       category: "O/D Analysis",
       config: {
@@ -2316,9 +2287,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "Scen.1 User Class",
@@ -2327,9 +2296,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
-            values: {
-              source: "api",
-            },
+            values: userClassValues
           },
           {
             filterName: "Scen.2 Delivery Programme",
@@ -2401,9 +2368,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
             filterName: "Scen.2 User Class",
@@ -2412,9 +2377,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
-            values: {
-              source: "api",
-            }
+            values: userClassValues
           },
         ],
       },
@@ -2425,14 +2388,13 @@ export const appConfig = {
     {
       pageName: "Side by Side",
       url: "/zonal-pair-results-dual",
-      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone. 
-      By selecting a zone as the origin or destination, the travel demand and performance are shown to or from that zone in relation
-       to other zones. So by seleclting origin and clicking a zone, the demand to all other zones is shown as a choropleth.</p>
-      <p>Currently includes: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone</li>
+      about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone over an average hour across the time period. 
+      This visual allows you to select two different scenarios and compare the Origin-Destination choropleth’s side by side for each metric.  </p>
+      <p>Metrics include: <ul><li>Trips – the highway travel demand at an origin or destination level with respect to the selected zone over an average hour across the time period.</li>
       <li>Average time – the travel time at an origin or destination level with respect to the selected zone, selecting an origin zone will show
-      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth</li>
+      the modelled travel time (seconds) to all other zones as destinations, with the travel times shown as a choropleth.</li>
       <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
-      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth</li></ul></p>`,
+      will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "DualMapLayout",
       category: "O/D Analysis",
       config: {
@@ -2502,7 +2464,7 @@ export const appConfig = {
             values: pairMetricValues,
           },
           {
-            filterName: "Left Delivery Programme",
+            filterName: "Delivery Programme - Left",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the left map",
             target: "api",
@@ -2518,7 +2480,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Year",
+            filterName: "Year - Left",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2533,7 +2495,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Network Scenario Name",
+            filterName: "Network Scenario Name - Left",
             paramName: "networkScenarioName",
             info: "Network DM/DS for the left map",
             target: "api",
@@ -2549,7 +2511,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Demand Scenario",
+            filterName: "Demand Scenario - Left",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the left map",
             target: "api",
@@ -2565,29 +2527,25 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Left Time Period",
+            filterName: "Time Period - Left",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
-            filterName: "Left User Class",
+            filterName: "User Class - Left",
             paramName: "userClass",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
-            values: {
-              source: "api",
-            },
+            values: userClassValues
           },
           {
-            filterName: "Right Delivery Programme",
+            filterName: "Delivery Programme - Right",
             paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme for the right map",
             target: "api",
@@ -2603,7 +2561,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Year",
+            filterName: "Year - Right",
             paramName: "year",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
@@ -2618,7 +2576,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Network Scenario Name",
+            filterName: "Network Scenario Name - Right",
             paramName: "networkScenarioName",
             info: "Network DM/DS for the right map",
             target: "api",
@@ -2634,7 +2592,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Demand Scenario",
+            filterName: "Demand Scenario - Right",
             paramName: "demandScenarioName",
             info: "Matrix demand scenario for the right map",
             target: "api",
@@ -2650,26 +2608,22 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Right Time Period",
+            filterName: "Time Period - Right",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "toggle",
-            values: {
-              source: "api",
-            },
+            values: timePeriodValues
           },
           {
-            filterName: "Right User Class",
+            filterName: "User Class - Right",
             paramName: "userClass",
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
-            values: {
-              source: "api",
-            },
+            values: userClassValues
           },
         ],
       },
