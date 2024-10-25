@@ -499,7 +499,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -591,7 +591,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1281,7 +1281,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1393,7 +1393,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1948,7 +1948,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -3009,7 +3009,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3146,7 +3146,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
