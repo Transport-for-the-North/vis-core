@@ -122,7 +122,14 @@ const originOrDestinationValues = {
 
 const inputNormsScenarioMetadataTable = {
   name: "input_norms_scenario",
-  path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
+  path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario",
+  where: [
+    {
+      column: "business_case",
+      operand: "=",
+      value: "Bradford beta"
+    }
+  ]
 }
 
 const keyLocationTypeMetadataTable = {
@@ -1051,7 +1058,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1302,7 +1309,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1414,7 +1421,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1642,7 +1649,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1754,7 +1761,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2178,7 +2185,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2260,7 +2267,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -2290,7 +2297,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2555,7 +2562,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2667,7 +2674,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -3593,7 +3600,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -3834,7 +3841,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3855,7 +3862,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -3946,7 +3953,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3967,7 +3974,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4157,7 +4164,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4269,7 +4276,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4432,7 +4439,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4755,7 +4762,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4867,7 +4874,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -5694,7 +5701,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -5939,7 +5946,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6021,7 +6028,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -6051,7 +6058,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6255,7 +6262,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6367,7 +6374,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
