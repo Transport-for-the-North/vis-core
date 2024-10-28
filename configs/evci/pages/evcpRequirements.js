@@ -44,6 +44,12 @@ export const evcpRequirements = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/evci/evcp-requirements",
+        legendText: [
+          {
+            displayValue: "EVCP Requirements",
+            legendSubtitleText: "charging points" 
+          }
+        ]
       },
     ],
     metadataTables: [],

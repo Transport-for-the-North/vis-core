@@ -20,7 +20,7 @@ export const evUptake = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@",
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "EV Uptake",
@@ -44,6 +44,12 @@ export const evUptake = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/evci/ev-uptake",
+        legendText: [
+          {
+            displayValue: "Number of EVs",
+            legendSubtitleText: "vehicles" 
+          }
+        ]
       },
     ],
     metadataTables: [],

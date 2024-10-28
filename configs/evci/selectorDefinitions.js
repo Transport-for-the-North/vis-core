@@ -79,10 +79,10 @@ const travelScenarioSelector = {
   values: {
     source: "local",
     values: [
-      {
-        displayValue: "Unknown",
-        paramValue: 0,
-      },
+      // {
+      //   displayValue: "Unknown",
+      //   paramValue: 0,
+      // },
       {
         displayValue: "Business as Usual",
         paramValue: 1,
@@ -121,10 +121,10 @@ const behaviouralScenarioSelector = {
   values: {
     source: "local",
     values: [
-      {
-        displayValue: "Unknown",
-        paramValue: 0,
-      },
+      // {
+      //   displayValue: "Unknown",
+      //   paramValue: 0,
+      // },
       {
         displayValue: "Base",
         paramValue: 1,
@@ -329,19 +329,24 @@ const columnNameCPSelector = {
   filterName: "Metric",
   paramName: "columnName",
   target: "api",
-  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
   visualisations: null,
   type: "dropdown",
   values: {
     source: "local",
     values: [
       {
-        displayValue: "Total Kilowatts",
+        displayValue: "Installed charger power",
         paramValue: "kw_total",
+        legendSubtitleText: "kW"
       },
       {
-        displayValue: "Device Count",
+        displayValue: "Installed devices",
         paramValue: "device_count",
+        legendSubtitleText: "device count"
       },
     ],
   },
@@ -351,19 +356,24 @@ const columnNameSelector = {
   filterName: "Metric",
   paramName: "columnName",
   target: "api",
-  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
   visualisations: null,
   type: "dropdown",
   values: {
     source: "local",
     values: [
       {
-        displayValue: "Total Kilowatts",
+        displayValue: "Charger power",
         paramValue: "kw_total",
+        legendSubtitleText: "kW"
       },
       {
-        displayValue: "Stops Count",
+        displayValue: "Stops count",
         paramValue: "stops_count",
+        legendSubtitleText: "stops"
       },
     ],
   },

@@ -47,7 +47,7 @@ export const cpLocation = {
         name: "Chargers/Power by Location",
         type: "joinDataToMap",
         joinLayer: "Charging Location",
-        style: "point-continuous",
+        style: "circle-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",

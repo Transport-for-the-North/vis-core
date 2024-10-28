@@ -20,7 +20,7 @@ export const annualChargingDemand = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@",
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Annual Charging Demand",
@@ -44,6 +44,12 @@ export const annualChargingDemand = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/evci/annual-charging-demand",
+        legendText: [
+          {
+            displayValue: "Annual charging demand",
+            legendSubtitleText: "kWh" 
+          }
+        ]
       },
     ],
     metadataTables: [],

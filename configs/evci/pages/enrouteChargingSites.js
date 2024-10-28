@@ -47,20 +47,22 @@ export const enrouteChargingSites = {
         name: "Potential Charging Sites",
         type: "joinDataToMap",
         joinLayer: "Potential Charging Sites",
-        style: "point-continuous",
+        style: "circle-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/evci/potential-charging-sites",
+        legendText: [
+          {
+            displayValue: "Charging sites",
+            legendSubtitleText: "score /100" 
+          }
+        ]
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.year, visualisations: ['Potential Charging Sites'] },
       { ...selectors.vehicleType, visualisations: ['Potential Charging Sites'] },
-      { ...selectors.travelScenario, visualisations: ['Potential Charging Sites'] },
-      { ...selectors.behaviouralScenario, visualisations: ['Potential Charging Sites'] },
-      { ...selectors.columnName, visualisations: ['Potential Charging Sites'] },
     ],
     additionalFeatures: {
       glossary: { 

@@ -32,7 +32,7 @@ export const cpArea = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneTypeId=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Chargers/Power by Area",
@@ -56,6 +56,12 @@ export const cpArea = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/evci/cp-area",
+        legendText: [
+          {
+            displayValue: "Installed chargers",
+            legendSubtitleText: "" 
+          }
+        ]
       },
     ],
     metadataTables: [],

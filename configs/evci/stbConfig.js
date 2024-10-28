@@ -6,6 +6,7 @@ export const stbConfig = [
     stbName: "Transport for the North",
     stbTag: "tfn",
     stbTagDisplay: "TfN",
+    stbZoneId: 31390,
     termsOfUseLink:
       "https://transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/",
     urlBase: "/transport-for-the-north",
@@ -25,6 +26,7 @@ export const stbConfig = [
     stbName: "Transport for the South East",
     stbTag: "tfse",
     stbTagDisplay: "TfSE",
+    stbZoneId: 31391,
     termsOfUseLink:
       "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
     urlBase: "/transport-for-the-south-east",
@@ -44,6 +46,7 @@ export const stbConfig = [
     stbName: "Midlands Connect",
     stbTag: "mc",
     stbTagDisplay: "Midlands Connect",
+    stbZoneId: 31395,
     termsOfUseLink:
       "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
     urlBase: "/midlands-connect",
@@ -63,6 +66,7 @@ export const stbConfig = [
     stbName: "England's Economic Heartland",
     stbTag: "eeh",
     stbTagDisplay: "EEH",
+    stbZoneId: 31388,
     termsOfUseLink:
       "https://www.englandseconomicheartland.com/our-work/cutting-emissions/",
     urlBase: "/england-economic-heartland",
@@ -82,6 +86,7 @@ export const stbConfig = [
     stbName: "Peninsula Transport",
     stbTag: "peninsula",
     stbTagDisplay: "Peninsula",
+    stbZoneId: 31397,
     termsOfUseLink:
       "https://www.peninsulatransport.org.uk/going-electric/",
     urlBase: "/peninsula-transport",
@@ -101,6 +106,7 @@ export const stbConfig = [
     stbName: "Transport East",
     stbTag: "te",
     stbTagDisplay: "TE",
+    stbZoneId: 31389,
     termsOfUseLink:
       "https://www.transporteast.gov.uk/electric-vehicles/",
     urlBase: "/transport-east",
@@ -120,6 +126,7 @@ export const stbConfig = [
     stbName: "Western Gateway",
     stbTag: "wg",
     stbTagDisplay: "WG",
+    stbZoneId: 31396,
     termsOfUseLink:
       "https://westerngatewaystb.org.uk/electric-vehicles/",
     urlBase: "/western-gateway",
