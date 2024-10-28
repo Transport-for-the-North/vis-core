@@ -28,7 +28,7 @@ export const enrouteChargingSites = {
         name: "Potential Charging Sites",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/evci_potential_charging_sites/{z}/{x}/{y}", // matches the path in swagger.json
+        path: "/api/vectortiles/evci_potential_charging_sites/{z}/{x}/{y}?stb_zone_id=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "geometry",
         geometryType: "point",
         visualisationName: "Potential Charging Sites",
