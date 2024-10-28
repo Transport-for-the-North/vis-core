@@ -61,6 +61,12 @@ export const mapReducer = (state, action) => {
             const layerName = action.payload.filter.layer;
             const paramName = action.payload.filter.paramName;
             const newParamValue = action.payload.value;
+            
+            if (newParamValue == null) {
+                // Do not update the layer if value is null
+                return state; // Return the current state unmodified
+            }
+            
             // Update the path of the layer with the new parameters
             const updatedPath = replaceRouteParameter(state.layers[layerName].pathTemplate, paramName, newParamValue);
             // Update the layer in the state
