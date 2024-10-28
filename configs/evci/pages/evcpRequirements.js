@@ -59,6 +59,7 @@ export const evcpRequirements = {
       { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
       { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
       { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
+      { ...selectors.stbTag, visualisations: ['EV Uptake'] }
     ],
     additionalFeatures: {
       glossary: { 

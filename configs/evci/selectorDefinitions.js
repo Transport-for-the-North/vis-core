@@ -379,6 +379,26 @@ const columnNameSelector = {
   },
 };
 
+const stbTagSelector = {
+  filterName: "STB Name",
+  paramName: "stbName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "@stbTagDisplay@",
+        paramValue: "@stbTag@",
+      }
+    ],
+  },
+};
+
 export const selectors = {
   year: yearSelector,
   administrativeBoundary: administrativeBoundarySelector,
@@ -392,4 +412,5 @@ export const selectors = {
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
   columnName: columnNameSelector,
+  stbTag: stbTagSelector
 };
