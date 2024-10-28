@@ -63,6 +63,7 @@ export const enrouteChargingSites = {
     metadataTables: [],
     filters: [
       { ...selectors.vehicleType, visualisations: ['Potential Charging Sites'] },
+      { ...selectors.stbTag, visualisations: ['EV Uptake'] }
     ],
     additionalFeatures: {
       glossary: { 

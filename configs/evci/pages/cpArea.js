@@ -69,6 +69,7 @@ export const cpArea = {
       { ...selectors.administrativeBoundary, visualisations: ['Chargers/Power by Area'] },
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Area'] },
       { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Area'] },
+      { ...selectors.stbTag, visualisations: ['EV Uptake'] }
     ],
     additionalFeatures: {
       glossary: { 

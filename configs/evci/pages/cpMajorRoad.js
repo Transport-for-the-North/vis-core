@@ -58,6 +58,7 @@ export const cpMajorRoad = {
     filters: [
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Major Road'] },
+      { ...selectors.stbTag, visualisations: ['EV Uptake'] }
     ],
     additionalFeatures: {
       glossary: { 

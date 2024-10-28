@@ -87,48 +87,48 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
 
-  return (
-    <AccordionSection title="Filtering and data selection" defaultValue={true}>
-      {Array.isArray(filters) && filters.length > 0 ? (
-        filters.map((filter) => (
-          <SelectorContainer key={filter.id}>
-            <SelectorLabel
-              htmlFor={filter.paramName}
-              text={filter.filterName}
-              info={filter.info ?? null}
-            />
-            {filter.type === "dropdown" && (
-              <Dropdown
-                key={filter.id}
-                filter={filter}
-                value={filterState[filter.id]}
-                onChange={(filter, value) => handleFilterChange(filter, value)}
-              />
-            )}
-            {filter.type === "slider" && (
-              <Slider
-                key={filter.id}
-                filter={filter}
-                value={filterState[filter.id] || filter.min || filter.values[0]}
-                onChange={(filter, value) => handleFilterChange(filter, value)}
-              />
-            )}
-            {filter.type === "toggle" && (
-              <Toggle
-                key={filter.id}
-                filter={filter}
-                value={filterState[filter.id] || filter.values.values[0].paramValue}
-                onChange={(filter, value) => handleFilterChange(filter, value)}
-
-              />
-            )}
-          </SelectorContainer>
-        ))
-      ) : (
-        <NoDataParagraph>Loading filters...</NoDataParagraph>
-      )}
-      {/* Check if no data has been found and display a small message in the sidebar if so */}
-      {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
-    </AccordionSection>
-  );
-};
+    return (
+      <AccordionSection title="Filtering and data selection" defaultValue={true}>
+        {Array.isArray(filters) && filters.length > 0 ? (
+          filters
+            .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
+            .map((filter) => (
+              <SelectorContainer key={filter.id}>
+                <SelectorLabel
+                  htmlFor={filter.paramName}
+                  text={filter.filterName}
+                  info={filter.info ?? null}
+                />
+                {filter.type === "dropdown" && (
+                  <Dropdown
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                  />
+                )}
+                {filter.type === "slider" && (
+                  <Slider
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.min || filter.values[0]}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                  />
+                )}
+                {filter.type === "toggle" && (
+                  <Toggle
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                  />
+                )}
+              </SelectorContainer>
+            ))
+        ) : (
+          <NoDataParagraph>Loading filters...</NoDataParagraph>
+        )}
+        {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
+      </AccordionSection>
+    );
+  };
