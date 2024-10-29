@@ -194,7 +194,7 @@ const landuseExogValues = {
 }
 
 export const appConfig = {
-  title: "TAME NPR Visualisation Framwork: Bradford Business Case",
+  title: "TAME NPR Visualisation Framework: Bradford Business Case",
   introduction: `<p>The application focuses on the modelling outputs produced for Bradford Business Case. The TfN’s Northern Rail Modelling System (NoRMS) Vis Framework aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
    NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise modelled rail data in an interactive, intuitive, and
    web-based format. This instance of the platform presents information from the Network North project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
