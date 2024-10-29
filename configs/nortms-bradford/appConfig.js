@@ -15,7 +15,7 @@ const scenarioCodeValues = {
     },
     {
       displayValue: "UCT 2052",
-      paramValue: "UCT2052",
+      paramValue: "UCT_2052",
     },
     {
       displayValue: "TBK 2042",
@@ -33,26 +33,26 @@ const scenarioCodeValues = {
 }; // TODO What is this for? It is not used in rest of code? 
 
 const excludeCodes = [
-  "IGX_2018",
-  "JPI_2042",
-  "JRT_2042",
-  "JRU_2052",
-  "JRV_2042",
-  "JRW_2052",
-  "JRX_2042",
-  "JRY_2052",
-  "JRZ_2042",
-  "JSA_2052",
-  "K9N_2042",
-  "K9O_2052",
-  "KZI_2042",
-  "UAA_2042",
-  "UAB_2052",
-  "UAC_2042",
-  "UAD_2052",
-  "UAE_2042",
-  "UAF_2052",
-  "NA"
+  // "IGX_2018",
+  // "JPI_2042",
+  // "JRT_2042",
+  // "JRU_2052",
+  // "JRV_2042",
+  // "JRW_2052",
+  // "JRX_2042",
+  // "JRY_2052",
+  // "JRZ_2042",
+  // "JSA_2052",
+  // "K9N_2042",
+  // "K9O_2052",
+  // "KZI_2042",
+  // "UAA_2042",
+  // "UAB_2052",
+  // "UAC_2042",
+  // "UAD_2052",
+  // "UAE_2042",
+  // "UAF_2052",
+  // "NA"
 ];
 
 
