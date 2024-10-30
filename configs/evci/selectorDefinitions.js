@@ -247,11 +247,11 @@ const areaValueDisplaySelector = {
       },
       {
         displayValue: "Per sq km",
-        paramValue: "valuePerSqKm",
+        paramValue: "perSqKm",
       },
       {
         displayValue: "Per 000 vehs",
-        paramValue: "valuePerThousandVehicles",
+        paramValue: "perThousandVehicles",
       },
     ],
   },
@@ -273,7 +273,7 @@ const distanceValueDisplaySelector = {
       },
       {
         displayValue: "Per km",
-        paramValue: "valuePerKm",
+        paramValue: "perKm",
       },
     ],
   },
