@@ -233,7 +233,7 @@ const chargingCategorySelector = {
 
 const areaValueDisplaySelector = {
   filterName: "Display values as...",
-  paramName: "valueDisplay",
+  paramName: "showValuesAs",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -259,7 +259,7 @@ const areaValueDisplaySelector = {
 
 const distanceValueDisplaySelector = {
   filterName: "Display values as...",
-  paramName: "valueDisplay",
+  paramName: "showValuesAs",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
