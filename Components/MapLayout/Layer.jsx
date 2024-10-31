@@ -5,16 +5,34 @@ import { useMapContext } from "hooks";
 
 /**
  * Layer component that adds a layer to the map and handles its lifecycle.
+ * 
+ * This component is responsible for adding a specified layer to a map instance
+ * and managing its lifecycle, including cleanup when the component is unmounted.
+ * It supports both GeoJSON and tile-based layers and can optionally add hover
+ * effects to the layers.
+ * 
  * @param {Object} props - The properties of the layer.
  * @param {Object} props.layer - The layer configuration object.
+ * @param {string} props.layer.name - The unique name of the layer.
+ * @param {string} props.layer.type - The type of the layer, either "geojson" or "tile".
+ * @param {string} props.layer.geometryType - The geometry type of the layer (e.g., "line", "point").
+ * @param {boolean} [props.layer.hiddenByDefault] - Whether the layer should be hidden by default.
+ * @param {boolean} [props.layer.isStylable] - Whether the layer is stylable.
+ * @param {boolean} [props.layer.isHoverable] - Whether the layer should have a hover effect.
+ * @param {string} [props.layer.path] - The path or URL to the layer data.
+ * @param {string} [props.layer.source] - The source of the layer data, e.g., "api".
+ * @param {string} [props.layer.sourceLayer] - The source layer name for tile layers.
  */
 export const Layer = ({ layer }) => {
+  // Access the map context to get the current map instance
   const { state } = useMapContext();
   const { map } = state;
 
   useEffect(() => {
+    // If no map instance is available, exit early
     if (!map) return;
 
+    // Check if the layer source is already added to the map
     if (!map.getSource(layer.name)) {
       let sourceConfig = {};
       let layerConfig = getLayerStyle(layer.geometryType);
@@ -28,6 +46,7 @@ export const Layer = ({ layer }) => {
         path: layer.path ?? null,
       };
 
+      // Handle GeoJSON layer type
       if (layer.type === "geojson") {
         api.geodataService.getLayer(layer).then((geojson) => {
           sourceConfig.type = "geojson";
@@ -40,7 +59,9 @@ export const Layer = ({ layer }) => {
             map.addLayer({ ...hoverLayerConfig, source: layer.name });
           }
         });
-      } else if (layer.type === "tile") {
+      } 
+      // Handle tile layer type
+      else if (layer.type === "tile") {
         const url =
           layer.source === "api"
             ? api.geodataService.buildTileLayerUrl(layer.path)
@@ -73,6 +94,7 @@ export const Layer = ({ layer }) => {
       }
     }
 
+    // Cleanup function to remove layers and sources when the component unmounts
     return () => {
       if (map.getLayer(layer.name)) {
         map.removeLayer(layer.name);
@@ -92,5 +114,6 @@ export const Layer = ({ layer }) => {
     };
   }, [map, JSON.stringify(layer)]);
 
+  // This component does not render any visible elements
   return null;
 };
