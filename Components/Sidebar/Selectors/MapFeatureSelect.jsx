@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import styled from "styled-components";
 import { FaMousePointer, FaDrawPolygon } from "react-icons/fa";
@@ -76,6 +76,10 @@ const EnableSelectButton = styled.button`
  * MapFeatureSelect component allows users to select features from a map layer
  * and toggle between different selection modes (feature or rectangle).
  *
+ * If there are no options and the user hasn't entered any input, a placeholder
+ * message 'Start typing to search features' is displayed. If the user has started
+ * typing and there are no options found, a placeholder 'No features found' is displayed.
+ *
  * @component
  * @param {Object} props - The component props.
  * @param {string|number} props.key - Unique key for the component.
@@ -119,6 +123,28 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
   // Use custom hook to fetch feature options
   const { options, isLoading, handleInputChange } =
     useLayerFeatureMetadata(layerPath);
+
+  // State to manage the no options message
+  const [noOptionsMessage, setNoOptionsMessage] = useState("Start typing to search features");
+
+  // Effect to handle message transitions
+  useEffect(() => {
+    let timer;
+    if (isLoading) {
+      setNoOptionsMessage("Searching...");
+    } else {
+      timer = setTimeout(() => {
+        setNoOptionsMessage("No features found");
+      }, 300); // Adjust the delay as needed
+    }
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  // Reset the message when the dropdown is opened
+  const handleMenuOpen = () => {
+    setNoOptionsMessage("Start typing to search features");
+  };
 
   /**
    * Handles the change in selected options from the dropdown.
@@ -175,6 +201,8 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
     }
   };
 
+  
+
   return (
     <Container key={key}>
       <Select
@@ -185,6 +213,8 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
         onInputChange={handleInputChange}
         placeholder="Search and select map features..."
         isLoading={isLoading}
+        noOptionsMessage={() => noOptionsMessage}
+        onMenuOpen={handleMenuOpen}
         styles={{
           menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           control: (base) => ({ ...base, minHeight: "35px" }),
