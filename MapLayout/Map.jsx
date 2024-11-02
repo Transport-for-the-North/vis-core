@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
-import { useMap, useMapContext, useFilterContext } from "hooks";
+import { useMap, useMapContext, useFilterContext, useFeatureSelect } from "hooks";
 import maplibregl from "maplibre-gl";
 import { Visualisation } from "./Visualisation";
 import { Layer } from "./Layer";
@@ -500,6 +500,9 @@ const Map = () => {
       });
     }
   }, [isMapReady]);
+
+  const featureSelectConfig = state.filters.find((filter) => filter.type === 'mapFeatureSelect');
+  useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
 
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {

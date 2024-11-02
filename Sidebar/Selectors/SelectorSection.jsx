@@ -8,6 +8,7 @@ import { Toggle } from "./Toggle";
 import { AppContext, AuthProvider} from 'contexts';
 import { useContext, useEffect, useState } from "react";
 import App from "App";
+import { MapFeatureSelect } from "./MapFeatureSelect";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -133,7 +134,11 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
                     filter={filter}
                     value={filterState[filter.id] || filter.values.values[0].paramValue}
                     onChange={(filter, value) => handleFilterChange(filter, value)}
-                  />
+              />
+            )}
+            {filter.type === 'mapFeatureSelect' && (
+              <MapFeatureSelect
+                layer={mapState.layers[filter.layer]}                  />
                 )}
               </SelectorContainer>
             ))
