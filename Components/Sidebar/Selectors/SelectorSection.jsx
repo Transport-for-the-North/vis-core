@@ -138,14 +138,19 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
             )}
             {filter.type === 'mapFeatureSelect' && (
               <MapFeatureSelect
-                layer={mapState.layers[filter.layer]}                  />
-                )}
-              </SelectorContainer>
-            ))
-        ) : (
-          <NoDataParagraph>Loading filters...</NoDataParagraph>
-        )}
-        {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
-      </AccordionSection>
-    );
-  };
+                key={filter.id}
+                filter={filter}
+                value={filterState[filter.id]}
+                onChange={(filter, value) => handleFilterChange(filter, value)}
+            />
+            )}
+          </SelectorContainer>
+        ))
+      ) : (
+        <NoDataParagraph>Loading filters...</NoDataParagraph>
+      )}
+      {/* Check if no data has been found and display a small message in the sidebar if so */}
+      {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
+    </AccordionSection>
+  );
+};

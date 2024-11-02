@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import Select from "react-select";
 import styled from "styled-components";
-import { useMapContext } from "hooks";
 import { FaMousePointer, FaDrawPolygon } from "react-icons/fa";
+import { useMapContext } from "hooks";
 import { useLayerFeatureMetadata } from "hooks/useLayerFeatureMetadata";
 
 // Styled components
@@ -78,11 +78,32 @@ const EnableSelectButton = styled.button`
  *
  * @component
  * @param {Object} props - The component props.
- * @param {Object} props.layer - The layer object containing metadata for fetching features.
+ * @param {string|number} props.key - Unique key for the component.
+ * @param {Object} props.filter - The filter object containing filter details.
+ * @param {Array} props.value - The selected feature values.
+ * @param {Function} props.onChange - Function to call when the selected features change.
  * @returns {JSX.Element} The rendered MapFeatureSelect component.
  */
-export const MapFeatureSelect = ({ layer }) => {
+export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
   const { state: mapState, dispatch: mapDispatch } = useMapContext();
+
+  // Check if filter.layer is provided
+  if (!filter || !filter.layer) {
+    console.error(
+      `Error: attempting to instantiate a mapFeatureSelect filter without providing layer property in the filter definition. Filter name is "${filter.filterName}":`
+    );
+    console.log(filter);
+  }
+
+  // Get the layer using filter.layer from mapState
+  const layer = mapState.layers[filter.layer];
+
+  // Check if the specified layer exists in mapState
+  if (!layer) {
+    console.error(
+      `Error: Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
+    );
+  }
 
   // Extract values from mapState and set default values if necessary
   const selectedOptions = mapState.selectedFeatures?.value || [];
@@ -96,9 +117,8 @@ export const MapFeatureSelect = ({ layer }) => {
   const layerPath = layer?.metadata?.path ?? layer?.path;
 
   // Use custom hook to fetch feature options
-  const { options, isLoading, handleInputChange } = useLayerFeatureMetadata(
-    layerPath
-  );
+  const { options, isLoading, handleInputChange } =
+    useLayerFeatureMetadata(layerPath);
 
   /**
    * Handles the change in selected options from the dropdown.
@@ -110,6 +130,8 @@ export const MapFeatureSelect = ({ layer }) => {
       type: "SET_SELECTED_FEATURES",
       payload: { value: options || [] },
     });
+
+    onChange(filter, value);
   };
 
   /**
@@ -154,7 +176,7 @@ export const MapFeatureSelect = ({ layer }) => {
   };
 
   return (
-    <Container>
+    <Container key={key}>
       <Select
         isMulti
         options={options}
