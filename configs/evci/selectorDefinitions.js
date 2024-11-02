@@ -27,6 +27,36 @@ const administrativeBoundarySelector = {
   },
 };
 
+const zoneSelector = {
+  filterName: "Optional location filter",
+  type: "mapFeatureSelect",
+  paramName: "features",
+  target: "api",
+  actions: [
+    {
+    },
+  ],
+  visualisations: null,
+  layer: "Administrative Boundaries",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
+const siteSelector = {
+  filterName: "Optional location filter",
+  type: "mapFeatureSelect",
+  paramName: "features",
+  target: "api",
+  actions: [
+    {
+    },
+  ],
+  visualisations: null,
+  layer: "Potential Charging Sites",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
 const yearSelector = {
   filterName: "Year",
   paramName: "scenarioYear",
@@ -412,5 +442,7 @@ export const selectors = {
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
   columnName: columnNameSelector,
-  stbTag: stbTagSelector
+  stbTag: stbTagSelector,
+  zoneSelector: zoneSelector,
+  siteSelector: siteSelector
 };
