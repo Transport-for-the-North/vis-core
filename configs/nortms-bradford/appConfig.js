@@ -127,7 +127,7 @@ const inputNormsScenarioMetadataTable = {
     {
       column: "business_case",
       operand: "=",
-      value: "Bradford beta"
+      value: "Bradford SOBC 2024"
     }
   ]
 }
@@ -4423,6 +4423,11 @@ export const appConfig = {
                 column: "scenario_type",
                 operand: "=",
                 value: "DS"
+              },
+              {
+                column: "business_case",
+                operand: "=",
+                value: "Bradford SOBC 2024"
               }
             ]
           },
@@ -4660,6 +4665,11 @@ export const appConfig = {
                 column: "scenario_type",
                 operand: "=",
                 value: "DS"
+              },
+              {
+                column: "business_case",
+                operand: "=",
+                value: "Bradford SOBC 2024"
               }
             ]
           }, userClassMetadataTable],
