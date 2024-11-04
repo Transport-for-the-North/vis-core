@@ -35,6 +35,54 @@ export const useFeatureSelect = (map, filterConfig) => {
           draw_rectangle: RectangleMode,
         },
         controls: {},
+        styles: [
+          {
+            'id': 'gl-draw-polygon-fill-inactive',
+            'type': 'fill',
+            'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+            'paint': {
+              'fill-color': '#007bff',
+              'fill-outline-color': '#007bff',
+              'fill-opacity': 0.3
+            }
+          },
+          {
+            'id': 'gl-draw-polygon-fill-active',
+            'type': 'fill',
+            'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+            'paint': {
+              'fill-color': '#007bff',
+              'fill-outline-color': '#007bff',
+              'fill-opacity': 0.3
+            }
+          },
+          {
+            'id': 'gl-draw-polygon-stroke-inactive',
+            'type': 'line',
+            'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+            'layout': {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            'paint': {
+              'line-color': '#007bff',
+              'line-width': 2
+            }
+          },
+          {
+            'id': 'gl-draw-polygon-stroke-active',
+            'type': 'line',
+            'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
+            'layout': {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            'paint': {
+              'line-color': '#007bff',
+              'line-width': 2
+            }
+          }
+        ]
       });
       map.addControl(drawInstance);
 
