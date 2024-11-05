@@ -91,6 +91,26 @@ export const useFeatureSelect = (map, filterConfig) => {
     }
 
     /**
+     * Moves the draw layers to the top of the layer stack.
+     */
+    const moveDrawLayersToTop = () => {
+      // Get all Mapbox Draw layers by filtering layers with IDs starting with 'gl-draw'
+      const drawLayerIds = map.getStyle().layers
+        .filter(layer => layer.id.startsWith('gl-draw'))
+        .map(layer => layer.id);
+    
+      // Move each Draw layer to the top
+      drawLayerIds.forEach((layerId) => {
+        map.moveLayer(layerId);
+      });
+    };
+    
+
+    // Move draw layers to the top initially
+    moveDrawLayersToTop();
+
+
+    /**
      * Handles the selection of features and dispatches actions to update the filters and map state.
      *
      * @param {Array} features - The array of selected GeoJSON features.
@@ -134,6 +154,8 @@ export const useFeatureSelect = (map, filterConfig) => {
      */
     const handleFeatureClick = (e) => {
       if (selectionMode !== 'feature' || !isFeatureSelectActive) return;
+      
+      moveDrawLayersToTop();
 
       // Query features at the click point
       const featuresAtPoint = map.queryRenderedFeatures(e.point, {
@@ -183,6 +205,7 @@ export const useFeatureSelect = (map, filterConfig) => {
      */
     const handleDrawCreate = (e) => {
       if (selectionMode !== 'rectangle' || !isFeatureSelectActive) return;
+      moveDrawLayersToTop();
 
       const rectangleFeature = e.features[0];
       const bbox = turf.bbox(rectangleFeature);
