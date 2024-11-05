@@ -2,83 +2,61 @@ const scenarioCodeValues = {
   source: "local",
   values: [
     {
-      displayValue: "IGX 2018",
-      paramValue: "IGX_2018",
+      displayValue: "TBG 2042",
+      paramValue: "TBG_2042",
     },
     {
-      displayValue: "JPI 2042",
-      paramValue: "JPI_2042",
+      displayValue: "UCS 2042",
+      paramValue: "UCS_2042",
     },
     {
-      displayValue: "JRT 2042",
-      paramValue: "JRT_2042",
+      displayValue: "TBH 2052",
+      paramValue: "TBH_2052",
     },
     {
-      displayValue: "JRU 2052",
-      paramValue: "JRU_2052",
+      displayValue: "UCT 2052",
+      paramValue: "UCT_2052",
     },
     {
-      displayValue: "JRV 2042",
-      paramValue: "JRV_2042",
+      displayValue: "TBK 2042",
+      paramValue: "TBK_2042",
     },
     {
-      displayValue: "JRW 2052",
-      paramValue: "JRW_2052",
+      displayValue: "TBL 2052",
+      paramValue: "TBL_2052",
     },
     {
-      displayValue: "JRX 2042",
-      paramValue: "JRX_2042",
-    },
-    {
-      displayValue: "JRY 2052",
-      paramValue: "JRY_2052",
-    },
-    {
-      displayValue: "JRZ 2042",
-      paramValue: "JRZ_2042",
-    },
-    {
-      displayValue: "JSA 2052",
-      paramValue: "JSA_2052",
-    },
-    {
-      displayValue: "K9N 2042",
-      paramValue: "K9N_2042",
-    },
-    {
-      displayValue: "K9O 2052",
-      paramValue: "K9O_2052",
-    },
-    {
-      displayValue: "KZI 2042",
-      paramValue: "KZI_2042",
-    },
-    {
-      displayValue: "UAA 2042",
-      paramValue: "UAA_2042",
-    },
-    {
-      displayValue: "UAB 2052",
-      paramValue: "UAB_2052",
-    },
-    {
-      displayValue: "UAC 2042",
-      paramValue: "UAC_2042",
-    },
-    {
-      displayValue: "UAD 2052",
-      paramValue: "UAD_2052",
-    },
-    {
-      displayValue: "UAE 2042",
-      paramValue: "UAE_2042",
-    },
-    {
-      displayValue: "UAF 2052",
-      paramValue: "UAF_2052",
+      displayValue: "UDH 2042 ",
+      paramValue: "UDH_2042 ",
     },
   ],
-};
+}; // TODO What is this for? It is not used in rest of code? 
+
+const excludeCodes = [
+  // "IGX_2018",
+  // "JPI_2042",
+  // "JRT_2042",
+  // "JRU_2052",
+  // "JRV_2042",
+  // "JRW_2052",
+  // "JRX_2042",
+  // "JRY_2052",
+  // "JRZ_2042",
+  // "JSA_2052",
+  // "K9N_2042",
+  // "K9O_2052",
+  // "KZI_2042",
+  // "UAA_2042",
+  // "UAB_2052",
+  // "UAC_2042",
+  // "UAD_2052",
+  // "UAE_2042",
+  // "UAF_2052",
+  // "NA"
+];
+
+
+
 
 const timePeriodCodeValues = {
   source: "local",
@@ -125,46 +103,6 @@ const userClassIdValues = {
       displayValue: "Other, all car availabilities",
       paramValue: "789",
     },
-    {
-      displayValue: "All",
-      paramValue: "0",
-    },
-    {
-      displayValue: "Business, car available from home",
-      paramValue: "1",
-    },
-    {
-      displayValue: "Business, car available to home",
-      paramValue: "2",
-    },
-    {
-      displayValue: "Business, car non available",
-      paramValue: "3",
-    },
-    {
-      displayValue: "Commuting, car available from home",
-      paramValue: "4",
-    },
-    {
-      displayValue: "Commuting, car available to home",
-      paramValue: "5",
-    },
-    {
-      displayValue: "Commuting, car non available",
-      paramValue: "6",
-    },
-    {
-      displayValue: "Other, car available from home",
-      paramValue: "7",
-    },
-    {
-      displayValue: "Other, car available to home",
-      paramValue: "8",
-    },
-    {
-      displayValue: "Other, car non available",
-      paramValue: "9",
-    }
   ]
 }
 
@@ -173,18 +111,25 @@ const originOrDestinationValues = {
   values: [
     {
       displayValue: "Origin",
-      paramValue: "1"
+      paramValue: "origin",
     },
     {
       displayValue: "Destination",
-      paramValue: "0",
+      paramValue: "destination",
     },
   ],
 }
 
 const inputNormsScenarioMetadataTable = {
   name: "input_norms_scenario",
-  path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario"
+  path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario",
+  where: [
+    {
+      column: "business_case",
+      operand: "=",
+      value: "Bradford SOBC 2024"
+    }
+  ]
 }
 
 const keyLocationTypeMetadataTable = {
@@ -249,16 +194,16 @@ const landuseExogValues = {
 }
 
 export const appConfig = {
-  title: "TAME React Vis Template",
-  introduction: `<p>The TfN’s Northern Rail Modelling System (NoRMS) Vis Framework aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
+  title: "TAME NPR Visualisation Framework: Bradford Business Case",
+  introduction: `<p>The application focuses on the modelling outputs produced for Bradford Business Case. The TfN’s Northern Rail Modelling System (NoRMS) Vis Framework aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
    NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise modelled rail data in an interactive, intuitive, and
    web-based format. This instance of the platform presents information from the Network North project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
    based on scenario testing done using NoRMS.</p>`,
   background: "",
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
-  contactText: "Please contact Matteo Gravellu for any questions on this data tool.",
-  contactEmail: "matteo.gravellu@transportforthenorth.com",
+  contactText: "Please contact [Name] for any questions on this data tool.",
+  contactEmail: "firstname.lastname@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
   backgroundImage: "img/norms/hero.jpg",
   logoutButtonImage: "img/burgerIcon.png",
@@ -400,7 +345,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -573,7 +518,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -665,7 +610,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -838,7 +783,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -930,7 +875,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -979,7 +924,7 @@ export const appConfig = {
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
       <p>Direction toggle allows to switch between the selected station being a starting point or a destination.  </p>      
       <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
-      `, // TODO - Insert classification explanation or change the numbers to words??
+      `,
       category: "Station",
       config: {
         layers: [
@@ -1107,7 +1052,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1137,7 +1082,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1205,7 +1150,7 @@ export const appConfig = {
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes</p>
       <p>Direction toggle allows to switch between the selected station being a starting point or a destination.</p>
       <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
-      `, // TODO Double check final point units for GC and GJT
+      `,
       category: "Station",
       config: {
         layers: [
@@ -1374,7 +1319,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1395,7 +1340,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1486,7 +1431,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1507,7 +1452,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1544,7 +1489,7 @@ export const appConfig = {
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
       <p>Direction toggle allows to switch between the selected station being a starting point or a destination.  </p>
       <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
-      `, // TODO Find out what is to go here.
+      `,
       category: "Station",
       config: {
         layers: [
@@ -1712,7 +1657,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1742,7 +1687,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -1824,7 +1769,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -1854,7 +1799,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2024,7 +1969,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -2054,8 +1999,8 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
-              exclude: [123, 456, 789]
+              sort: "descending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -2291,7 +2236,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2373,7 +2318,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -2403,7 +2348,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2645,7 +2590,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -2675,7 +2620,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2757,7 +2702,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -2787,7 +2732,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -2939,7 +2884,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3009,7 +2954,7 @@ export const appConfig = {
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics should match). 
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
       <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
-      `, //to be added
+      `,
       category: "Link",
       config: {
         layers: [
@@ -3138,7 +3083,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3275,7 +3220,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3472,7 +3417,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3562,7 +3507,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3730,7 +3675,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -3812,7 +3757,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
         ]
@@ -3975,7 +3920,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -3996,7 +3941,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4087,7 +4032,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -4108,7 +4053,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4133,7 +4078,7 @@ export const appConfig = {
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
       <p>Metrics are aggregated by revenue, Demand (number of passengers), generlised cost, in-vehicle time, crowding, wait time, walk time, penalties, access/egress time and  value of choice. </p>
-      `, //To be added.
+      `,
       config: {
         layers: [
           {
@@ -4281,7 +4226,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -4302,7 +4247,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4393,7 +4338,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -4414,7 +4359,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4478,6 +4423,11 @@ export const appConfig = {
                 column: "scenario_type",
                 operand: "=",
                 value: "DS"
+              },
+              {
+                column: "business_case",
+                operand: "=",
+                value: "Bradford SOBC 2024"
               }
             ]
           },
@@ -4577,7 +4527,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -4659,7 +4609,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
         ]
@@ -4674,7 +4624,7 @@ export const appConfig = {
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
       <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time.</p>
-      `, //To be added.
+      `,
       config: {
         layers: [
           {
@@ -4715,6 +4665,11 @@ export const appConfig = {
                 column: "scenario_type",
                 operand: "=",
                 value: "DS"
+              },
+              {
+                column: "business_case",
+                operand: "=",
+                value: "Bradford SOBC 2024"
               }
             ]
           }, userClassMetadataTable],
@@ -4904,7 +4859,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -5016,7 +4971,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -5151,7 +5106,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: excludeCodes
             },
           },
           {
@@ -5702,10 +5657,6 @@ export const appConfig = {
       pageName: "Zone Pairs",
       url: "/norms-zones-pair",
       type: "MapLayout",
-      about: `
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
-      `,
       category: "Zone",
       config: {
         layers: [
@@ -5817,7 +5768,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -5847,7 +5798,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -5909,11 +5860,6 @@ export const appConfig = {
       pageName: "Zone Pairs Difference",
       url: "/norms-zones-pair-difference",
       type: "MapLayout",
-      about: `
-      <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
-      `,
       category: "Zone",
       config: {
         layers: [
@@ -6097,7 +6043,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6179,7 +6125,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -6209,7 +6155,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6230,11 +6176,6 @@ export const appConfig = {
       pageName: "Zone Pairs Side-by-Side",
       url: "/norms-zones-pair-dual",
       type: "DualMapLayout",
-      about: `
-      <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
-      `,
       category: "Zone",
       config: {
         layers: [
@@ -6388,7 +6329,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -6418,7 +6359,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6500,7 +6441,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: ["NA"]
+              exclude: excludeCodes
             },
           },
           {
@@ -6530,7 +6471,7 @@ export const appConfig = {
               metadataTableName: "norms_userclass_list",
               displayColumn: "name",
               paramColumn: "id",
-              sort: "ascending",
+              sort: "descending",
               exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
@@ -6667,7 +6608,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: excludeCodes
             },
           },
           {
@@ -7354,7 +7295,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: excludeCodes
             },
           },
           {
@@ -8150,7 +8091,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: excludeCodes
             },
           },
           {
@@ -8967,7 +8908,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: excludeCodes
             },
           },
           {
@@ -9562,7 +9503,7 @@ export const appConfig = {
               displayColumn: "scenario_code",
               paramColumn: "scenario_code",
               sort: "ascending",
-              exclude: [0]
+              exclude: excludeCodes
             },
           },
           {
