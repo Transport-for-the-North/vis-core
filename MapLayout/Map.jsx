@@ -519,7 +519,32 @@ const Map = () => {
         map.off("click", handleMapClick);
       }
     };
-  }, [isMapReady, map, handleMapClick]); 
+  }, [isMapReady, map, handleMapClick]);
+
+  // **Apply layer filters**
+  useEffect(() => {
+    if (!map) return;
+
+    Object.keys(state.layers).forEach((layerId) => {
+      if (map.getLayer(layerId)) {
+        const featureIdsForLayer = state.visualisedFeatureIds[layerId];
+        if (featureIdsForLayer && featureIdsForLayer.length > 0) {
+          // Extract the values from featureIdsForLayer
+          const featureIdValues = featureIdsForLayer.map(feature => feature.value);
+        
+          // Apply filter to show only features with IDs in featureIdValues
+          map.setFilter(layerId, [
+            "in",
+            ["get", "id"], // Assuming "id" is the property name
+            ["literal", featureIdValues],
+          ]);
+        } else {
+          // No filter applied for this layer
+          map.setFilter(layerId, null);
+        }
+      }
+    });
+  }, [map, state.visualisedFeatureIds]);
   
   return (
     <StyledMapContainer ref={mapContainerRef}>

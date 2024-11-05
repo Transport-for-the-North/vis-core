@@ -157,7 +157,7 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
       payload: { value: options || [] },
     });
 
-    onChange(filter, value);
+    onChange(filter, options);
   };
 
   /**
