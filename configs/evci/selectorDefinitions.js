@@ -34,6 +34,7 @@ const zoneSelector = {
   target: "api",
   actions: [
     {
+      action: 'UPDATE_VISUALISED_FEATURES'
     },
   ],
   visualisations: null,

@@ -30,6 +30,7 @@ export const actionTypes = {
   SET_SELECTION_MODE: "SET_SELECTION_MODE",
   SET_SELECTED_FEATURES: "SET_SELECTED_FEATURES",
   SET_IS_FEATURE_SELECT_ACTIVE: "SET_IS_FEATURE_SELECT_ACTIVE",
+  UPDATE_VISUALISED_FEATURES: "UPDATE_VISUALISED_FEATURES",
 };
 
 /**
@@ -43,6 +44,15 @@ export const actionTypes = {
  */
 export const mapReducer = (state, action) => {
   switch (action.type) {
+    case actionTypes.UPDATE_VISUALISED_FEATURES: {
+      const { filter, value } = action.payload;
+      const { layer } = filter;
+      const newVisualisedFeatureIds = {
+        ...state.visualisedFeatureIds,
+        [layer]: value,
+      };
+      return { ...state, visualisedFeatureIds: newVisualisedFeatureIds };
+    }
     case actionTypes.SET_SELECTION_MODE:
       return { ...state, selectionMode: action.payload };
     case actionTypes.SET_SELECTED_FEATURES:
@@ -69,6 +79,7 @@ export const mapReducer = (state, action) => {
         selectionLayer: null,
         selectedFeatures: [],
         isFeatureSelectActive: false,
+        visualisedFeatureIds: {},
       };
     case actionTypes.SET_PAGE_INFO:
       return { ...state, pageInfo: action.payload };

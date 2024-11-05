@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useMapContext, useFilterContext } from 'hooks';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { RectangleMode } from '@ookla/mapbox-gl-draw-rectangle';
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
-import * as turf from '@turf/turf';
-import { getSourceLayer } from 'utils';
+import { useEffect, useState } from "react";
+import { useMapContext, useFilterContext } from "hooks";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import * as turf from "@turf/turf";
+import { getSourceLayer } from "utils";
 
 /**
  * Custom hook that enables feature selection on the map based on the current selection mode.
@@ -37,52 +37,70 @@ export const useFeatureSelect = (map, filterConfig) => {
         controls: {},
         styles: [
           {
-            'id': 'gl-draw-polygon-fill-inactive',
-            'type': 'fill',
-            'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-            'paint': {
-              'fill-color': '#007bff',
-              'fill-outline-color': '#007bff',
-              'fill-opacity': 0.3
-            }
-          },
-          {
-            'id': 'gl-draw-polygon-fill-active',
-            'type': 'fill',
-            'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
-            'paint': {
-              'fill-color': '#007bff',
-              'fill-outline-color': '#007bff',
-              'fill-opacity': 0.3
-            }
-          },
-          {
-            'id': 'gl-draw-polygon-stroke-inactive',
-            'type': 'line',
-            'filter': ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-            'layout': {
-              'line-cap': 'round',
-              'line-join': 'round'
+            id: "gl-draw-polygon-fill-inactive",
+            type: "fill",
+            filter: [
+              "all",
+              ["==", "active", "false"],
+              ["==", "$type", "Polygon"],
+              ["!=", "mode", "static"],
+            ],
+            paint: {
+              "fill-color": "#007bff",
+              "fill-outline-color": "#007bff",
+              "fill-opacity": 0.3,
             },
-            'paint': {
-              'line-color': '#007bff',
-              'line-width': 2
-            }
           },
           {
-            'id': 'gl-draw-polygon-stroke-active',
-            'type': 'line',
-            'filter': ['all', ['==', 'active', 'true'], ['==', '$type', 'Polygon']],
-            'layout': {
-              'line-cap': 'round',
-              'line-join': 'round'
+            id: "gl-draw-polygon-fill-active",
+            type: "fill",
+            filter: [
+              "all",
+              ["==", "active", "true"],
+              ["==", "$type", "Polygon"],
+            ],
+            paint: {
+              "fill-color": "#007bff",
+              "fill-outline-color": "#007bff",
+              "fill-opacity": 0.3,
             },
-            'paint': {
-              'line-color': '#007bff',
-              'line-width': 2
-            }
-          }
-        ]
+          },
+          {
+            id: "gl-draw-polygon-stroke-inactive",
+            type: "line",
+            filter: [
+              "all",
+              ["==", "active", "false"],
+              ["==", "$type", "Polygon"],
+              ["!=", "mode", "static"],
+            ],
+            layout: {
+              "line-cap": "round",
+              "line-join": "round",
+            },
+            paint: {
+              "line-color": "#007bff",
+              "line-width": 2,
+            },
+          },
+          {
+            id: "gl-draw-polygon-stroke-active",
+            type: "line",
+            filter: [
+              "all",
+              ["==", "active", "true"],
+              ["==", "$type", "Polygon"],
+            ],
+            layout: {
+              "line-cap": "round",
+              "line-join": "round",
+            },
+            paint: {
+              "line-color": "#007bff",
+              "line-width": 2,
+            },
+          },
+        ],
       });
       map.addControl(drawInstance);
 
@@ -95,20 +113,19 @@ export const useFeatureSelect = (map, filterConfig) => {
      */
     const moveDrawLayersToTop = () => {
       // Get all Mapbox Draw layers by filtering layers with IDs starting with 'gl-draw'
-      const drawLayerIds = map.getStyle().layers
-        .filter(layer => layer.id.startsWith('gl-draw'))
-        .map(layer => layer.id);
-    
+      const drawLayerIds = map
+        .getStyle()
+        .layers.filter((layer) => layer.id.startsWith("gl-draw"))
+        .map((layer) => layer.id);
+
       // Move each Draw layer to the top
       drawLayerIds.forEach((layerId) => {
         map.moveLayer(layerId);
       });
     };
-    
 
     // Move draw layers to the top initially
     moveDrawLayersToTop();
-
 
     /**
      * Handles the selection of features and dispatches actions to update the filters and map state.
@@ -122,26 +139,17 @@ export const useFeatureSelect = (map, filterConfig) => {
         label: feature.properties.name, // Feature's name
       }));
 
-      // Extract feature IDs for the filter value
-      const filterValues = features.map((feature) => feature.properties.id);
-
-      // Dispatch the filter update
-      filterDispatch({
-        type: 'SET_FILTER_VALUE',
-        payload: { filterId: filterId, features: filterValues },
-      });
-
       // Dispatch the map update with transformed features
       actions.forEach((action) => {
         mapDispatch({
           type: action.action,
-          payload: { value: transformedFeatures },
+          payload: { filter: filterConfig, value: transformedFeatures },
         });
       });
 
       // Update the selected features in context
       mapDispatch({
-        type: 'SET_SELECTED_FEATURES',
+        type: "SET_SELECTED_FEATURES",
         payload: { value: transformedFeatures },
       });
     };
@@ -153,17 +161,31 @@ export const useFeatureSelect = (map, filterConfig) => {
      * @param {Object} e - The map click event object.
      */
     const handleFeatureClick = (e) => {
-      if (selectionMode !== 'feature' || !isFeatureSelectActive) return;
-      
+      if (selectionMode !== "feature" || !isFeatureSelectActive) return;
+
       moveDrawLayersToTop();
 
-      // Query features at the click point
-      const featuresAtPoint = map.queryRenderedFeatures(e.point, {
-        layers: [layer],
+      // Query all features from the source layer
+      const allFeatures = map.querySourceFeatures(layer, {
+        sourceLayer: getSourceLayer(map, layer) || "",
+        filter: ["all"],
       });
 
-      if (featuresAtPoint.length > 0) {
-        const clickedFeature = featuresAtPoint[0].toJSON();
+      if (allFeatures.length > 0) {
+        // Find the feature closest to the click point
+        const clickedFeature = allFeatures.reduce((closestFeature, feature) => {
+          const featurePoint = turf.pointOnFeature(feature.geometry);
+          const distance = turf.distance(
+            turf.point([e.lngLat.lng, e.lngLat.lat]),
+            featurePoint
+          );
+
+          if (!closestFeature || distance < closestFeature.distance) {
+            return { feature: feature.toJSON(), distance };
+          }
+
+          return closestFeature;
+        }, null).feature;
 
         // Check if the feature is already selected
         const isFeatureAlreadySelected = selectedFeatureValues.some(
@@ -173,14 +195,16 @@ export const useFeatureSelect = (map, filterConfig) => {
         let updatedFeatures;
 
         // Convert selectedFeatureValues back to GeoJSON features for consistency
-        const selectedGeoJSONFeatures = selectedFeatureValues.map((feature) => ({
-          type: 'Feature',
-          id: feature.value,
-          properties: {
-            name: feature.label,
-            id: feature.value, // Assuming the property 'id' holds feature id
-          },
-        }));
+        const selectedGeoJSONFeatures = selectedFeatureValues.map(
+          (feature) => ({
+            type: "Feature",
+            id: feature.value,
+            properties: {
+              name: feature.label,
+              id: feature.value, // Assuming the property 'id' holds feature id
+            },
+          })
+        );
 
         if (isFeatureAlreadySelected) {
           // Remove the feature from selected features
@@ -204,7 +228,7 @@ export const useFeatureSelect = (map, filterConfig) => {
      * @param {Object} e - The draw create event object.
      */
     const handleDrawCreate = (e) => {
-      if (selectionMode !== 'rectangle' || !isFeatureSelectActive) return;
+      if (selectionMode !== "rectangle" || !isFeatureSelectActive) return;
       moveDrawLayersToTop();
 
       const rectangleFeature = e.features[0];
@@ -213,8 +237,8 @@ export const useFeatureSelect = (map, filterConfig) => {
 
       // Get all features from the source layer
       const allFeatures = map.querySourceFeatures(layer, {
-        sourceLayer: getSourceLayer(map, layer) || '',
-        filter: ['all'],
+        sourceLayer: getSourceLayer(map, layer) || "",
+        filter: ["all"],
       });
 
       // Filter features that intersect with the rectangle
@@ -226,7 +250,7 @@ export const useFeatureSelect = (map, filterConfig) => {
 
       // Convert selectedFeatureValues back to GeoJSON features
       const selectedGeoJSONFeatures = selectedFeatureValues.map((feature) => ({
-        type: 'Feature',
+        type: "Feature",
         id: feature.value,
         properties: {
           name: feature.label,
@@ -258,34 +282,52 @@ export const useFeatureSelect = (map, filterConfig) => {
     };
 
     /**
-     * Sets up event listeners based on the current selection mode.
+     * Updates the cursor style based on the active state of the pointer selection mode.
+     *
+     * @param {boolean} isActive - Indicates whether the pointer selection mode is active.
+     *                             If true, the cursor is set to 'pointer'; otherwise, it is reset.
+     */
+    const updateCursorStyle = (isActive) => {
+      if (isActive) {
+        map.getCanvas().style.cursor = "pointer";
+      } else {
+        map.getCanvas().style.cursor = "";
+      }
+    };
+
+    /**
+     * Sets up event listeners for feature selection based on the current selection mode.
+     * It enables pointer or rectangle selection and updates the cursor style accordingly.
      */
     const setupEventListeners = () => {
       if (isFeatureSelectActive) {
-        if (selectionMode === 'feature') {
+        if (selectionMode === "feature") {
           // Enable pointer selection
-          map.on('click', handleFeatureClick);
+          map.on("click", handleFeatureClick);
+          updateCursorStyle(true); // Set cursor to pointer
           // Ensure draw is not active
           if (draw) {
-            draw.changeMode('simple_select');
+            draw.changeMode("simple_select");
           }
-        } else if (selectionMode === 'rectangle' && draw) {
+        } else if (selectionMode === "rectangle" && draw) {
           // Enable rectangle selection
-          draw.changeMode('draw_rectangle');
-          map.on('draw.create', handleDrawCreate);
+          draw.changeMode("draw_rectangle");
+          map.on("draw.create", handleDrawCreate);
         }
       }
     };
 
     /**
-     * Removes event listeners based on the current selection mode.
+     * Removes event listeners for feature selection based on the current selection mode.
+     * It also resets the cursor style to its default state.
      */
     const removeEventListeners = () => {
       if (isFeatureSelectActive) {
-        if (selectionMode === 'feature') {
-          map.off('click', handleFeatureClick);
-        } else if (selectionMode === 'rectangle' && draw) {
-          map.off('draw.create', handleDrawCreate);
+        if (selectionMode === "feature") {
+          map.off("click", handleFeatureClick);
+          updateCursorStyle(false); // Reset cursor style
+        } else if (selectionMode === "rectangle" && draw) {
+          map.off("draw.create", handleDrawCreate);
           draw.deleteAll();
         }
       }
