@@ -1,4 +1,5 @@
 import { selectors } from "../selectorDefinitions";
+import { termsOfUse } from "../TermsOfUse";
 
 export const cpMajorRoad = {
   pageName: "Chargers/Power by Major Road",
@@ -22,6 +23,7 @@ export const cpMajorRoad = {
   as it is the responsibility of the operator to add EVI to this database
   (although comparisons have shown reasonable agreement for application in this strategic toolkit).</p>
       </div>`,
+  termsOfUse: termsOfUse,
   config: {
     layers: [
       {

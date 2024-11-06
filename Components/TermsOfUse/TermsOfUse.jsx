@@ -1,73 +1,93 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Button, Modal } from "react-bootstrap";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Cookies from 'js-cookie';
 
-const Text = styled.a`
-  cursor: pointer;
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 9999; /* Ensure it's below the StyledBox but above other content */
+  pointer-events: auto; /* Allow interaction with nothing */
 `;
 
-export const TermsOfUse = ({ pageContext }) => {
-  const [showModal, setShowModal] = useState(true);
+const StyledBox = styled.div`
+  position: fixed;
+  top: 27%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f0f0f0; /* Light grey color */
+  color: rgb(13, 15, 61);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10000; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: auto; /* Ensure this component captures pointer events */
 
-  useEffect(() => {
-    setShowModal(true);
-  }, []);
+  .tou-header {
+    font-size: 24px; /* Larger font size for the header */
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    margin: 20px 0;
+  }
+
+  .tou-content {
+    width: 100%;
+    text-align: left; /* Align text to the left */
+    margin-bottom: 20px;
+  }
+
+  .accept-button {
+    background-color: #7317de; /* Button background color */
+    border: none;
+    color: white; /* Button text color */
+    padding: 10px 20px; /* Button padding */
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #5a0fb0; /* Darker shade on hover */
+    }
+  }
+`;
+
+export const TermsOfUse = ({ htmlText }) => {
+  const [isVisible, setIsVisible] = useState(true);
 
   const handleAccept = () => {
     Cookies.set('toc', true, { expires: 3, secure: true, sameSite: 'Lax' }); // Set the cookie to true when accepted
-    setShowModal(false);
+    setIsVisible(false);
   };
 
   return (
     <>
-      <Text onClick={() => setShowModal((showModal) => !showModal)}>
-        Show terms of use
-      </Text>
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        backdrop="static"
-      >
-        <Modal.Header>
-          <Modal.Title>
-            <p className="h5">{pageContext.TermsOfUseTitle} - Terms of Use</p>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            This data can be used by third parties as long as the source is
-            clearly attributed to {pageContext.TermsOfUsestbTag}, a logo is added to any
-            graphs and if online, a link is added back{" "}
-            <a href={pageContext.TermsOfUseLink} target="_blank" rel="noopener noreferrer">
-              to this {pageContext.TermsOfUsestbTag} webpage
-            </a>
-            . For our terms of use, please see the{" "}
-            <a
-              href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open Government Licence
-            </a>
-            . Use of the {pageContext.name} EV Charging Infrastructure regional requirements
-            tool also indicates your acceptance of{" "}
-            <a
-              href="https://transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-04062024.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              this Disclaimer and Appropriate Use Statement
-            </a>
-            .
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleAccept}>
-            Ok
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {isVisible && (
+        <>
+          <Overlay />
+          <StyledBox>
+            <div className="tou-header">Terms of Use</div>
+            <div className="divider"></div>
+            <div className="tou-content" dangerouslySetInnerHTML={{ __html: htmlText }} />
+            <button className="accept-button" onClick={handleAccept}>
+              Accept
+            </button>
+          </StyledBox>
+        </>
+      )}
     </>
   );
 }

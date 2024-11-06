@@ -1,4 +1,5 @@
 import { selectors } from "../selectorDefinitions";
+import { termsOfUse } from "../TermsOfUse";
 
 export const enrouteChargingSites = {
   pageName: "Potential Charging Sites",
@@ -22,6 +23,7 @@ export const enrouteChargingSites = {
     <p><b>Warning: </b>Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid 
   charging hub development looks promising.</p>
   </div>`,
+  termsOfUse: termsOfUse,
   config: {
     layers: [
       {

@@ -1,4 +1,6 @@
+
 import { selectors } from "../selectorDefinitions";
+import { termsOfUse } from "../TermsOfUse";
 
 export const cpArea = {
   pageName: "Chargers/Power by Area",
@@ -26,6 +28,7 @@ export const cpArea = {
   as it is the responsibility of the operator to add EVI to this database
   (although comparisons have shown reasonable agreement for application in this strategic toolkit).</p>
       </div>`,
+  termsOfUse: termsOfUse,
   config: {
     layers: [
       {

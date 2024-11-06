@@ -21,11 +21,11 @@ export const stbConfig = [
     primaryFontColour: '#000000',
     secondaryFontColour: '#00dec6',
     pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites','cpArea','cpLocation','cpMajorRoad'],
-    TermsOfUseText: "Welcome",
-    TermsOfUseLink:
+    termsOfUseText: "Welcome",
+    termsOfUseLink:
       "https://transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/",
-    TermsOfUseTitle: "TfN EV Charging Infrastructure Framework",
-    TermsOfUsestbTag: "TfN",
+    termsOfUseTitle: "TfN EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "TfN",
   },
   {
     stbName: "Transport for the South East",
@@ -46,10 +46,10 @@ export const stbConfig = [
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
     pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
-    TermsOfUseText: "Welcome",
-    TermsOfUseLink: "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
-    TermsOfUseTitle: "STB EV Charging Infrastructure Framework",
-    TermsOfUsestbTag: "TfSE"
+    termsOfUseText: "Welcome",
+    termsOfUseLink: "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
+    termsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "TfSE"
   },
   {
     stbName: "Midlands Connect",
@@ -70,10 +70,10 @@ export const stbConfig = [
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
     pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
-    TermsOfUseText: "Welcome",
-    TermsOfUseLink: "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
-    TermsOfUseTitle: "STB EV Charging Infrastructure Framework",
-    TermsOfUsestbTag: "Midlands Connect"
+    termsOfUseText: "Welcome",
+    termsOfUseLink: "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
+    termsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "Midlands Connect"
   },
   {
     stbName: "England's Economic Heartland",

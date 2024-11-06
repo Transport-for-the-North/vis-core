@@ -1,4 +1,5 @@
 import { selectors } from "../selectorDefinitions";
+import { termsOfUse } from "../TermsOfUse";
 
 export const evcpRequirements = {
   pageName: "EVCP Requirements",
@@ -14,6 +15,7 @@ export const evcpRequirements = {
     To get further help, type or select a topic in the glossary box.</p>
   <p>EV uptake gives the number of electric vehicles (EVs) that are expected across the region, 
     split by powertrain type (battery electric or plug-in hybrid) and vehicle type (car, van, or heavy goods vehicle).</p>`,
+  termsOfUse: termsOfUse,
   config: {
     layers: [
       {
