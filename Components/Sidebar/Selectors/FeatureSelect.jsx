@@ -58,6 +58,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
           control: (base) => ({ ...base, minHeight: '35px' }),
         }}
         menuPortalTarget={document.body}
+        menuPosition="fixed"
       />
     </Container>
   );
