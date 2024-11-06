@@ -5,7 +5,7 @@ import { PageSwitch, HomePage, Navbar, Login, Unauthorized } from "Components";
 import { Dashboard } from "layouts";
 import { AppContext, AuthProvider } from "contexts";
 import { api } from "services";
-import { withWarning, withRoleValidation, composeHOCs } from "hocs";
+import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
 
 /**
  * Main application component.
@@ -71,7 +71,7 @@ function App() {
                   ? withRoleValidation(PageSwitch)
                   : PageSwitch;
                 const WrappedPageComponent =
-                  composeHOCs(withWarning)(PageComponent);
+                  composeHOCs(withWarning, withTermsOfUse)(PageComponent);
                 return (
                   <Route
                     key={page.pageName}

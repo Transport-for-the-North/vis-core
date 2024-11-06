@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(Cookies.get('token') || '');
     const navigate = useNavigate();
-  
 
     const loginAction = async (username, password) => {
         try {
@@ -30,6 +29,7 @@ export const AuthProvider = ({ children }) => {
             setUser({ username, roles: userRoles });
             setToken(jwtToken);
             Cookies.set('token', jwtToken, { expires: 1 / 24, secure: true, sameSite: 'Lax' });
+            Cookies.set('toc', false);
             navigate('/');
         } catch (err) {
             console.error('Login failed:', err);
