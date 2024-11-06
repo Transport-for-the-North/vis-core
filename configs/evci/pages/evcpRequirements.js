@@ -54,6 +54,7 @@ export const evcpRequirements = {
     ],
     metadataTables: [],
     filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['EVCP Requirements'] },
       { ...selectors.year, visualisations: ['EVCP Requirements'] },
       { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
       { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },

@@ -54,6 +54,7 @@ export const annualChargingDemand = {
     ],
     metadataTables: [],
     filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['Annual Charging Demand'] },
       { ...selectors.year, visualisations: ['Annual Charging Demand'] },
       { ...selectors.administrativeBoundary, visualisations: ['Annual Charging Demand'] },
       { ...selectors.travelScenario, visualisations: ['Annual Charging Demand'] },

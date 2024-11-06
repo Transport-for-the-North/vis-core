@@ -54,7 +54,7 @@ export const co2Savings = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.runTypeCodeDynamic, visualisations: ['CO2 Savings'] },
+      { ...selectors.runTypeCodeFixed, visualisations: ['CO2 Savings'] },
       { ...selectors.year, visualisations: ['CO2 Savings'] },
       { ...selectors.administrativeBoundary, visualisations: ['CO2 Savings'] },
       { ...selectors.travelScenario, visualisations: ['CO2 Savings'] },

@@ -54,6 +54,7 @@ export const evUptake = {
     ],
     metadataTables: [],
     filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['EV Uptake'] },
       { ...selectors.year, visualisations: ['EV Uptake'] },
       { ...selectors.administrativeBoundary, visualisations: ['EV Uptake'] },
       { ...selectors.travelScenario, visualisations: ['EV Uptake'] },
