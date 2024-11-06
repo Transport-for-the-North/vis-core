@@ -62,7 +62,8 @@ export const evUptake = {
       { ...selectors.vehicleType, visualisations: ['EV Uptake'] },
       { ...selectors.fuelType, visualisations: ['EV Uptake'] },
       { ...selectors.stbTag, visualisations: ['EV Uptake'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] }
+      { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
+      { ...selectors.zoneSelector, visualisations: ['EV Uptake'] }
     ],
     additionalFeatures: {
       glossary: { 

@@ -20,7 +20,12 @@ export const stbConfig = [
     secondaryBgColour: '#00dec6',
     primaryFontColour: '#000000',
     secondaryFontColour: '#00dec6',
-    pages: ['tfnEvUptake','tfnAnnualChargingDemand','tfnEvcpRequirements', 'tfnCo2Savings', 'enrouteChargingSites','cpArea','cpLocation','cpMajorRoad']
+    pages: ['tfnEvUptake','tfnAnnualChargingDemand','tfnEvcpRequirements', 'tfnCo2Savings', 'enrouteChargingSites','cpArea','cpLocation','cpMajorRoad'],
+    TermsOfUseText: "Welcome",
+    TermsOfUseLink:
+      "https://transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/",
+    TermsOfUseTitle: "TfN EV Charging Infrastructure Framework",
+    TermsOfUsestbTag: "TfN",
   },
   {
     stbName: "Transport for the South East",
@@ -40,7 +45,11 @@ export const stbConfig = [
     secondaryBgColour: '#ec6c60',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    TermsOfUseText: "Welcome",
+    TermsOfUseLink: "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
+    TermsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    TermsOfUsestbTag: "TfSE"
   },
   {
     stbName: "Midlands Connect",
@@ -60,7 +69,11 @@ export const stbConfig = [
     secondaryBgColour: '#272b30',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    TermsOfUseText: "Welcome",
+    TermsOfUseLink: "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
+    TermsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    TermsOfUsestbTag: "Midlands Connect"
   },
   {
     stbName: "England's Economic Heartland",
