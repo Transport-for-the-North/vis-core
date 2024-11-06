@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import Select from "react-select";
-import styled from "styled-components";
-import { FaMousePointer, FaDrawPolygon } from "react-icons/fa";
-import { useMapContext } from "hooks";
-import { useLayerFeatureMetadata } from "hooks/useLayerFeatureMetadata";
+import React, { useEffect } from 'react';
+import styled from 'styled-components';
+import { FaMousePointer, FaDrawPolygon } from 'react-icons/fa';
+import { useMapContext } from 'hooks';
+import { FeatureSelect } from './FeatureSelect'; 
 
 // Styled components
 const Container = styled.div`
@@ -18,7 +17,7 @@ const SelectionModeContainer = styled.div`
 
 const StyledToggle = styled.div`
   display: flex;
-  border: 1px solid ${(props) => (props.enabled ? "black" : "#ccc")};
+  border: 1px solid ${(props) => (props.enabled ? 'black' : '#ccc')};
   border-radius: 5px;
   flex-grow: 1;
 `;
@@ -26,21 +25,21 @@ const StyledToggle = styled.div`
 const ModeButton = styled.button`
   cursor: pointer;
   padding: 5px 2px;
-  background-color: ${(props) => (props.selected ? "#7317DE" : "white")};
-  color: ${(props) => (props.selected ? "white" : "black")};
+  background-color: ${(props) => (props.selected ? '#7317DE' : 'white')};
+  color: ${(props) => (props.selected ? 'white' : 'black')};
   border: none;
   border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: 'Hanken Grotesk', sans-serif;
   width: 50%;
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
-  pointer-events: ${(props) => (props.disabled ? "none" : "auto")};
+  pointer-events: ${(props) => (props.disabled ? 'none' : 'auto')};
 
   &:hover {
-    background-color: ${(props) => (props.selected ? "#7317DE" : "white")};
-    color: ${(props) => (props.selected ? "white" : "black")};
+    background-color: ${(props) => (props.selected ? '#7317DE' : 'white')};
+    color: ${(props) => (props.selected ? 'white' : 'black')};
   }
 
   svg {
@@ -59,26 +58,22 @@ const ModeButton = styled.button`
 const EnableSelectButton = styled.button`
   cursor: pointer;
   padding: 5px 10px;
-  background-color: ${(props) => (props.enabled ? "#7317DE" : "white")};
-  color: ${(props) => (props.enabled ? "white" : "black")};
-  border: 1px solid ${(props) => (props.enabled ? "black" : "#ccc")};
+  background-color: ${(props) => (props.enabled ? '#7317DE' : 'white')};
+  color: ${(props) => (props.enabled ? 'white' : 'black')};
+  border: 1px solid ${(props) => (props.enabled ? 'black' : '#ccc')};
   border-radius: 4px;
   margin-right: 10px;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: 'Hanken Grotesk', sans-serif;
 
   &:hover {
-    background-color: ${(props) => (props.enabled ? "#7317DE" : "white")};
-    color: ${(props) => (props.enabled ? "white" : "black")};
+    background-color: ${(props) => (props.enabled ? '#7317DE' : 'white')};
+    color: ${(props) => (props.enabled ? 'white' : 'black')};
   }
 `;
 
 /**
  * MapFeatureSelect component allows users to select features from a map layer
  * and toggle between different selection modes (feature or rectangle).
- *
- * If there are no options and the user hasn't entered any input, a placeholder
- * message 'Start typing to search features' is displayed. If the user has started
- * typing and there are no options found, a placeholder 'No features found' is displayed.
  *
  * @component
  * @param {Object} props - The component props.
@@ -111,40 +106,14 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
 
   // Extract values from mapState and set default values if necessary
   const selectedOptions = mapState.selectedFeatures?.value || [];
-  const selectionMode = mapState.selectionMode || "feature";
+  const selectionMode = mapState.selectionMode || 'feature';
   const isSelectEnabled =
-    typeof mapState.isFeatureSelectActive === "boolean"
+    typeof mapState.isFeatureSelectActive === 'boolean'
       ? mapState.isFeatureSelectActive
       : false;
 
   // Ensure layer and its properties are defined
   const layerPath = layer?.metadata?.path ?? layer?.path;
-
-  // Use custom hook to fetch feature options
-  const { options, isLoading, handleInputChange } =
-    useLayerFeatureMetadata(layerPath);
-
-  // State to manage the no options message
-  const [noOptionsMessage, setNoOptionsMessage] = useState("Start typing to search features");
-
-  // Effect to handle message transitions
-  useEffect(() => {
-    let timer;
-    if (isLoading) {
-      setNoOptionsMessage("Searching...");
-    } else {
-      timer = setTimeout(() => {
-        setNoOptionsMessage("No features found");
-      }, 300); // Adjust the delay as needed
-    }
-
-    return () => clearTimeout(timer);
-  }, [isLoading]);
-
-  // Reset the message when the dropdown is opened
-  const handleMenuOpen = () => {
-    setNoOptionsMessage("Start typing to search features");
-  };
 
   /**
    * Handles the change in selected options from the dropdown.
@@ -153,7 +122,7 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
    */
   const handleSelectionChange = (options) => {
     mapDispatch({
-      type: "SET_SELECTED_FEATURES",
+      type: 'SET_SELECTED_FEATURES',
       payload: { value: options || [] },
     });
 
@@ -168,7 +137,7 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
   const handleSelectionModeChange = (mode) => {
     if (isSelectEnabled) {
       mapDispatch({
-        type: "SET_SELECTION_MODE",
+        type: 'SET_SELECTION_MODE',
         payload: mode,
       });
     }
@@ -177,7 +146,7 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
   // Disable selection when the layer changes
   useEffect(() => {
     mapDispatch({
-      type: "SET_IS_FEATURE_SELECT_ACTIVE",
+      type: 'SET_IS_FEATURE_SELECT_ACTIVE',
       payload: false,
     });
   }, [layer, mapDispatch]);
@@ -188,38 +157,27 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
   const toggleSelectEnabled = () => {
     const newState = !isSelectEnabled;
     mapDispatch({
-      type: "SET_IS_FEATURE_SELECT_ACTIVE",
+      type: 'SET_IS_FEATURE_SELECT_ACTIVE',
       payload: newState,
     });
 
     // Automatically set the selection mode when enabling the filter
     if (newState) {
       mapDispatch({
-        type: "SET_SELECTION_MODE",
-        payload: selectionMode, // Use current selectionMode
+        type: 'SET_SELECTION_MODE',
+        payload: selectionMode,
       });
     }
   };
 
-  
-
   return (
     <Container key={key}>
-      <Select
-        isMulti
-        options={options}
+      <FeatureSelect
+        layerPath={layerPath}
         value={selectedOptions}
         onChange={handleSelectionChange}
-        onInputChange={handleInputChange}
+        isMulti={true}
         placeholder="Search and select map features..."
-        isLoading={isLoading}
-        noOptionsMessage={() => noOptionsMessage}
-        onMenuOpen={handleMenuOpen}
-        styles={{
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-          control: (base) => ({ ...base, minHeight: "35px" }),
-        }}
-        menuPortalTarget={document.body}
       />
 
       <SelectionModeContainer>
@@ -227,21 +185,21 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
           enabled={isSelectEnabled}
           onClick={toggleSelectEnabled}
         >
-          {isSelectEnabled ? "Disable Filter" : "Enable Filter"}
+          {isSelectEnabled ? 'Disable Filter' : 'Enable Filter'}
         </EnableSelectButton>
 
         <StyledToggle enabled={isSelectEnabled}>
           <ModeButton
-            selected={selectionMode === "feature"}
-            onClick={() => handleSelectionModeChange("feature")}
+            selected={selectionMode === 'feature'}
+            onClick={() => handleSelectionModeChange('feature')}
             disabled={!isSelectEnabled}
           >
             <FaMousePointer />
             Pointer Selection
           </ModeButton>
           <ModeButton
-            selected={selectionMode === "rectangle"}
-            onClick={() => handleSelectionModeChange("rectangle")}
+            selected={selectionMode === 'rectangle'}
+            onClick={() => handleSelectionModeChange('rectangle')}
             disabled={!isSelectEnabled}
           >
             <FaDrawPolygon />
