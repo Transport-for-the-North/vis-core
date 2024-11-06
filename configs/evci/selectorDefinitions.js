@@ -137,6 +137,10 @@ const behaviouralScenarioSelector = {
         displayValue: "Not Applicable",
         paramValue: 3,
       },
+      {
+        displayValue: "Local",
+        paramValue: 4,
+      },
     ],
   },
 };
@@ -399,6 +403,50 @@ const stbTagSelector = {
   },
 };
 
+const runTypeCodeFixedSelector = {
+  filterName: "Run Type Code Fixed",
+  paramName: "runTypeCode",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Default",
+        paramValue: "D",
+      }
+    ],
+  },
+};
+
+const runTypeCodeDynamicSelector = {
+  filterName: "Run Type Code",
+  paramName: "runTypeCode",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "toggle",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Default",
+        paramValue: "D",
+      },
+      {
+        displayValue: "Income",
+        paramValue: "I",
+      }
+    ],
+  },
+};
+
 export const selectors = {
   year: yearSelector,
   administrativeBoundary: administrativeBoundarySelector,
@@ -412,5 +460,7 @@ export const selectors = {
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
   columnName: columnNameSelector,
-  stbTag: stbTagSelector
+  stbTag: stbTagSelector,
+  runTypeCodeFixed: runTypeCodeFixedSelector,
+  runTypeCodeDynamic: runTypeCodeDynamicSelector
 };

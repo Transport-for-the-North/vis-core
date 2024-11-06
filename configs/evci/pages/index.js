@@ -5,6 +5,7 @@ import { enrouteChargingSites } from "./enrouteChargingSites"
 import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
+import { co2Savings } from "./co2Savings"
 
 export const pages = {
     evUptake: evUptake,
@@ -13,5 +14,6 @@ export const pages = {
     enrouteChargingSites: enrouteChargingSites,
     cpArea: cpArea,
     cpLocation: cpLocation,
-    cpMajorRoad: cpMajorRoad
+    cpMajorRoad: cpMajorRoad,
+    co2Savings: co2Savings
 }
