@@ -1,14 +1,11 @@
-import { evUptake } from "./evUptake"
+import { evUptake, tfnEvUptake } from "./evUptake"
 import { annualChargingDemand, tfnAnnualChargingDemand } from "./annualChargingDemand"
-import { evcpRequirements } from "./evcpRequirements"
+import { evcpRequirements, tfnEvcpRequirements } from "./evcpRequirements"
 import { enrouteChargingSites } from "./enrouteChargingSites"
 import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
-import { co2Savings } from "./co2Savings"
-import { tfnCo2Savings } from "./tfnCo2Savings"
-import { tfnEvUptake } from "./tfnEvUptake"
-import { tfnEvcpRequirements } from "./tfnEvcpRequirements"
+import { co2Savings, tfnCo2Savings } from "./co2Savings"
 
 export const pages = {
     evUptake: evUptake,

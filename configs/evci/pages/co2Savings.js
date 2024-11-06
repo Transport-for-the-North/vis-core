@@ -70,3 +70,20 @@ export const co2Savings = {
     },
   },
 };
+
+export const tfnCo2Savings = {
+  ...co2Savings,
+  config: {
+    ...co2Savings.config,
+    filters: [
+      { ...selectors.runTypeCodeDynamic, visualisations: ['CO2 Savings'] },
+      { ...selectors.year, visualisations: ['CO2 Savings'] },
+      { ...selectors.administrativeBoundary, visualisations: ['CO2 Savings'] },
+      { ...selectors.travelScenario, visualisations: ['CO2 Savings'] },
+      { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
+      { ...selectors.vehicleType, visualisations: ['CO2 Savings'] },
+      { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
+      { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] }
+    ],
+  },
+};
