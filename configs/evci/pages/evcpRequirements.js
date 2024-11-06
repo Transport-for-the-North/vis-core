@@ -56,6 +56,7 @@ export const evcpRequirements = {
     ],
     metadataTables: [],
     filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['EVCP Requirements'] },
       { ...selectors.year, visualisations: ['EVCP Requirements'] },
       { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
       { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
@@ -69,5 +70,22 @@ export const evcpRequirements = {
         dataDictionary: {}
       },
     },
+  },
+};
+
+export const tfnEvcpRequirements = {
+  ...evcpRequirements,
+  config: {
+    ...evcpRequirements.config,
+    filters: [
+      { ...selectors.runTypeCodeDynamic, visualisations: ['EVCP Requirements'] },
+      { ...selectors.year, visualisations: ['EVCP Requirements'] },
+      { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
+      { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
+      { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] }
+    ],
   },
 };

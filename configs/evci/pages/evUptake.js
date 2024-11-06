@@ -56,6 +56,7 @@ export const evUptake = {
     ],
     metadataTables: [],
     filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['EV Uptake'] },
       { ...selectors.year, visualisations: ['EV Uptake'] },
       { ...selectors.administrativeBoundary, visualisations: ['EV Uptake'] },
       { ...selectors.travelScenario, visualisations: ['EV Uptake'] },
@@ -71,5 +72,23 @@ export const evUptake = {
         dataDictionary: {}
       },
     },
+  },
+};
+
+export const tfnEvUptake = {
+  ...evUptake,
+  config: {
+    ...evUptake.config,
+    filters: [
+      { ...selectors.runTypeCodeDynamic, visualisations: ['EV Uptake'] },
+      { ...selectors.year, visualisations: ['EV Uptake'] },
+      { ...selectors.administrativeBoundary, visualisations: ['EV Uptake'] },
+      { ...selectors.travelScenario, visualisations: ['EV Uptake'] },
+      { ...selectors.behaviouralScenario, visualisations: ['EV Uptake'] },
+      { ...selectors.vehicleType, visualisations: ['EV Uptake'] },
+      { ...selectors.fuelType, visualisations: ['EV Uptake'] },
+      { ...selectors.stbTag, visualisations: ['EV Uptake'] },
+      { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] }
+    ],
   },
 };

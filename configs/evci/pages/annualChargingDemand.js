@@ -56,11 +56,13 @@ export const annualChargingDemand = {
     ],
     metadataTables: [],
     filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['Annual Charging Demand'] },
       { ...selectors.year, visualisations: ['Annual Charging Demand'] },
       { ...selectors.administrativeBoundary, visualisations: ['Annual Charging Demand'] },
       { ...selectors.travelScenario, visualisations: ['Annual Charging Demand'] },
       { ...selectors.behaviouralScenario, visualisations: ['Annual Charging Demand'] },
       { ...selectors.chargingCategory, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.stbTag, visualisations: ['Annual Charging Demand'] },
       { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
     ],
     additionalFeatures: {
@@ -68,5 +70,23 @@ export const annualChargingDemand = {
         dataDictionary: {}
       },
     },
+  },
+};
+
+
+export const tfnAnnualChargingDemand = {
+  ...annualChargingDemand,
+  config: {
+    ...annualChargingDemand.config,
+    filters: [
+      { ...selectors.runTypeCodeDynamic, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.year, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.administrativeBoundary, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.travelScenario, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.behaviouralScenario, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.chargingCategory, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.stbTag, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
+    ],
   },
 };
