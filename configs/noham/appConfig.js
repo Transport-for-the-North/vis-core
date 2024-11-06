@@ -444,7 +444,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Node results definition
     {
-      pageName: "Difference",
+      pageName: "Difference (2-1)",
       url: "/link-result-difference",
       type: "MapLayout",
       about: `<p>This visual allows you to select two different scenarios and compare the difference between a chosen metric for the scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
@@ -1048,7 +1048,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     //Node results difference Definition
     {
-      pageName: "Difference",
+      pageName: "Difference (2-1)",
       url: "/node-result-difference",
       type: "MapLayout",
       about: `<p>This visual allows you to select two different scenarios and compare the difference at junctions between a chosen metric for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
@@ -1598,7 +1598,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     //Zone difference Definition
     {
-      pageName: "Difference",
+      pageName: "Difference (2-1)",
       url: "/zone-result-difference",
       type: "MapLayout",
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation allows you to select two different demand scenarios and compare the difference at NoHAM zonal level for origin or destination trips for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
@@ -2139,7 +2139,7 @@ export const appConfig = {
     // -----------------------------------------------------------
     // Zone Pair difference Definition
     {
-      pageName: "Difference",
+      pageName: "Difference (2-1)",
       url: "/zonal-pair-difference",
       about: `<p>NoHAM travel demand and performance analysis at the origin or destination level with respect to the selected zone over an average hour across the time period. 
       This visual allows you to select two different scenarios and compare the difference between a chosen metric for the scenarios; calculating scenario 2 minus 
