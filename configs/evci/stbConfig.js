@@ -20,7 +20,7 @@ export const stbConfig = [
     secondaryBgColour: '#00dec6',
     primaryFontColour: '#000000',
     secondaryFontColour: '#00dec6',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites','cpArea','cpLocation','cpMajorRoad', 'co2Savings']
+    pages: ['tfnEvUptake','tfnAnnualChargingDemand','tfnEvcpRequirements', 'tfnCo2Savings', 'enrouteChargingSites','cpArea','cpLocation','cpMajorRoad']
   },
   {
     stbName: "Transport for the South East",

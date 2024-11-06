@@ -6,6 +6,10 @@ import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
 import { co2Savings } from "./co2Savings"
+import { tfnAnnualChargingDemand } from "./tfnAnnualChargingDemand"
+import { tfnCo2Savings } from "./tfnCo2Savings"
+import { tfnEvUptake } from "./tfnEvUptake"
+import { tfnEvcpRequirements } from "./tfnEvcpRequirements"
 
 export const pages = {
     evUptake: evUptake,
@@ -15,5 +19,9 @@ export const pages = {
     cpArea: cpArea,
     cpLocation: cpLocation,
     cpMajorRoad: cpMajorRoad,
-    co2Savings: co2Savings
+    co2Savings: co2Savings,
+    tfnAnnualChargingDemand: tfnAnnualChargingDemand,
+    tfnCo2Savings: tfnCo2Savings,
+    tfnEvcpRequirements: tfnEvcpRequirements,
+    tfnEvUptake: tfnEvUptake
 }
