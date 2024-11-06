@@ -33,13 +33,19 @@ export const LayerSearch = ({ map, layer }) => {
       setSelectedOption(selectedOption);
       if (selectedOption) {
         try {
-          // Get the centroid coordinates of the selected feature
-          const centroid = await api.geodataService.getFeatureGeometry(
+          // Get the bounds and centroid of the selected feature
+          const { bounds, centroid } = await api.geodataService.getFeatureGeometry(
             layer.metadata.path,
             selectedOption.value
           );
-          // Fly to the feature on the map
-          map.flyTo({ center: centroid.coordinates, zoom: 12 });
+
+          // Fit the map to the bounds of the feature
+          map.fitBounds(bounds.coordinates[0], {
+            padding: 20,
+          });
+
+          // Center the map on the centroid of the feature
+          map.setCenter(centroid.coordinates);
 
           // Add a temporary label for the selected feature
           const labelLayerId = 'feature-label';
@@ -72,7 +78,7 @@ export const LayerSearch = ({ map, layer }) => {
             source: labelSourceId,
             layout: {
               'text-field': ['get', 'name'],
-              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+              'text-font': ['Noto Sans Bold'],
               'text-size': 14,
               'text-offset': [0, 1.5],
               'text-anchor': 'top',
@@ -96,7 +102,7 @@ export const LayerSearch = ({ map, layer }) => {
           map.on('move', removeLabel);
           map.on('click', removeLabel);
         } catch (error) {
-          console.error('Failed to fetch centroid:', error);
+          console.error('Failed to fetch bounds:', error);
         }
       }
     },
