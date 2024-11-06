@@ -3,6 +3,7 @@ export const mapStyles = {
 
   osMapsApiRaster: {
     version: 8,
+    glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
     sources: {
       "raster-tiles": {
         type: "raster",

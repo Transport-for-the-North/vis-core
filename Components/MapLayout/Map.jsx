@@ -284,6 +284,7 @@ const Map = () => {
             'source-layer': sourceLayerName,
             layout: {
               'text-field': ['get', 'name'],
+              'text-font': ['Noto Sans Bold'],
               'text-size': 14,
               'text-anchor': 'center',
               'text-offset': [0, 1.5],
