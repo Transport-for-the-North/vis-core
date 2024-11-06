@@ -8,6 +8,7 @@ import { Toggle } from "./Toggle";
 import { AppContext, AuthProvider} from 'contexts';
 import { useContext, useEffect, useState } from "react";
 import App from "App";
+import { MapFeatureSelect } from "./MapFeatureSelect";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -133,14 +134,23 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
                     filter={filter}
                     value={filterState[filter.id] || filter.values.values[0].paramValue}
                     onChange={(filter, value) => handleFilterChange(filter, value)}
-                  />
-                )}
-              </SelectorContainer>
-            ))
-        ) : (
-          <NoDataParagraph>Loading filters...</NoDataParagraph>
-        )}
-        {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
-      </AccordionSection>
-    );
-  };
+              />
+            )}
+            {filter.type === 'mapFeatureSelect' && (
+              <MapFeatureSelect
+                key={filter.id}
+                filter={filter}
+                value={filterState[filter.id]}
+                onChange={(filter, value) => handleFilterChange(filter, value)}
+            />
+            )}
+          </SelectorContainer>
+        ))
+      ) : (
+        <NoDataParagraph>Loading filters...</NoDataParagraph>
+      )}
+      {/* Check if no data has been found and display a small message in the sidebar if so */}
+      {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
+    </AccordionSection>
+  );
+};

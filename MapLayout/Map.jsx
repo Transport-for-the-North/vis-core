@@ -3,13 +3,11 @@ import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
-import { useMap, useMapContext, useFilterContext } from "hooks";
+import { useMap, useMapContext, useFilterContext, useFeatureSelect } from "hooks";
 import maplibregl from "maplibre-gl";
-import { api } from "services";
 import { Visualisation } from "./Visualisation";
+import { Layer } from "./Layer";
 import {
-  getHoverLayerStyle,
-  getLayerStyle,
   getSourceLayer,
   numberWithCommas,
 } from "utils";
@@ -35,81 +33,6 @@ const Map = () => {
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
-
-  /**
-   * Adds a new layer to the map based on the provided layer configuration.
-   * Handles both GeoJSON and tile layers and optionally adds a hover layer
-   * if the layer is marked as hoverable.
-   *
-   * @param {Object} layer - The layer configuration object containing information about the layer to be added to the map.
-   * @param {string} layer.name - The name of the layer.
-   * @param {string} layer.type - The type of layer (e.g., "geojson" or "tile").
-   * @param {string} layer.geometryType - The geometry type of the layer (e.g., "point", "line", "polygon").
-   * @param {boolean} [layer.isStylable=false] - Flag indicating whether the layer is stylable.
-   * @param {boolean} [layer.isHoverable=false] - Flag indicating whether the layer is hoverable.
-   */
-  const addLayerToMap = useCallback(
-    (layer) => {
-      if (!map.getSource(layer.name)) {
-        let sourceConfig = {};
-        let layerConfig = getLayerStyle(layer.geometryType);
-        const layerLayout = {}
-        layerConfig.id = layer.name;
-        layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible"
-        layerConfig.layout = layerLayout
-        layerConfig.metadata = {
-          ...layerConfig.metadata,
-          isStylable: layer.isStylable ?? false,
-          path: layer.path ?? null,
-        };
-
-        if (layer.type === "geojson") {
-          api.geodataService.getLayer(layer).then((geojson) => {
-            sourceConfig.type = "geojson";
-            sourceConfig.data = geojson;
-            map.addSource(layer.name, sourceConfig);
-            map.addLayer({ ...layerConfig, source: layer.name });
-            if (layer.isHoverable) {
-              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
-              hoverLayerConfig.id = `${layer.name}-hover`;
-              map.addLayer({ ...hoverLayerConfig, source: layer.name });
-            }
-          });
-        } else if (layer.type === "tile") {
-          const url =
-            layer.source === "api"
-              ? api.geodataService.buildTileLayerUrl(layer.path)
-              : layer.path;
-          sourceConfig.type = "vector";
-          sourceConfig.tiles = [url];
-          sourceConfig.promoteId = "id";
-          map.addSource(layer.name, sourceConfig);
-          map.addLayer({
-            ...layerConfig,
-            source: layer.name,
-            "source-layer": layer.sourceLayer,
-            metadata: {
-              ...layerConfig.metadata,
-              isStylable: layer.isStylable ?? false,
-              bufferSize: layer.geometryType === "line" ? 7 : null,
-            },
-          });
-          if (layer.isHoverable) {
-            const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
-            hoverLayerConfig.id = `${layer.name}-hover`;
-            hoverLayerConfig.source = layer.name;
-            hoverLayerConfig["source-layer"] = layer.sourceLayer;
-            hoverLayerConfig.metadata = {
-              ...hoverLayerConfig.metadata,
-              isStylable: false,
-            };
-            map.addLayer(hoverLayerConfig);
-          }
-        }
-      }
-    },
-    [map]
-  );
 
   /**
    * Handles hover events for a specific layer by setting the hover state
@@ -578,6 +501,9 @@ const Map = () => {
     }
   }, [isMapReady]);
 
+  const featureSelectConfig = state.filters.find((filter) => filter.type === 'mapFeatureSelect');
+  useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
+
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {
       const hasMapFilter = state.filters.some(
@@ -595,36 +521,37 @@ const Map = () => {
     };
   }, [isMapReady, map, handleMapClick]);
 
+  // **Apply layer filters**
   useEffect(() => {
-    if (isMapReady) {
-      Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
-    }
+    if (!map) return;
 
-    return () => {
-      if (map) {
-        Object.values(state.layers).forEach((layer) => {
-          if (map.getLayer(layer.name)) {
-            map.removeLayer(layer.name);
-          }
-          if (map.getLayer(`${layer.name}-hover`)) {
-            map.removeLayer(`${layer.name}-hover`);
-          }
-          if (map.getSource(layer.name)) {
-            map.removeSource(layer.name);
-          }
-          if (map.getLayer("selected-feature-layer")) {
-            map.removeLayer("selected-feature-layer");
-          }
-          if (map.getSource("selected-feature-source")) {
-            map.removeSource("selected-feature-source");
-          }
-        });
+    Object.keys(state.layers).forEach((layerId) => {
+      if (map.getLayer(layerId)) {
+        const featureIdsForLayer = state.visualisedFeatureIds[layerId];
+        if (featureIdsForLayer && featureIdsForLayer.length > 0) {
+          // Extract the values from featureIdsForLayer
+          const featureIdValues = featureIdsForLayer.map(feature => feature.value);
+        
+          // Apply filter to show only features with IDs in featureIdValues
+          map.setFilter(layerId, [
+            "in",
+            ["get", "id"], // Assuming "id" is the property name
+            ["literal", featureIdValues],
+          ]);
+        } else {
+          // No filter applied for this layer
+          map.setFilter(layerId, null);
+        }
       }
-    };
-  }, [state.layers, isMapReady, map, addLayerToMap]);
-
+    });
+  }, [map, state.visualisedFeatureIds]);
+  
   return (
     <StyledMapContainer ref={mapContainerRef}>
+      {Object.values(state.layers).map((layer) => (
+        <Layer key={layer.name} layer={layer} />
+      ))}
+
       {Object.values(state.visualisations).map((visConfig) => (
         <Visualisation
           key={visConfig.name}
@@ -633,6 +560,7 @@ const Map = () => {
           maps={null}
         />
       ))}
+
       {isMapReady && <DynamicLegend map={map} />}
     </StyledMapContainer>
   );
