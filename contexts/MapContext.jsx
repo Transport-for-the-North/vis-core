@@ -62,6 +62,10 @@ export const MapProvider = ({ children }) => {
     isMapReady: false,
     isLoading: true,
     pageIsReady: false,
+    selectionMode: null,
+    selectionLayer: null,
+    selectedFeatures: [],
+    isFeatureSelectActive: false
   };
 
 
@@ -119,6 +123,7 @@ export const MapProvider = ({ children }) => {
         switch (filter.type) {
           case 'map':
           case 'slider':
+          case 'mapFeatureSelect':
             filters.push(filterWithId);
             break;
           default:

@@ -1,14 +1,11 @@
 import { selectors } from "../selectorDefinitions";
 
-export const evcpRequirements = {
-  pageName: "EVCP Requirements",
-  url: "/@stbTag@/evcp-requirements",
+export const actualArea = {
+  pageName: "Actual: Chargers/power by area",
+  url: "/@stbTag@/actual-area",
   type: "MapLayout",
   category: "@stbName@",
   customLogoPath: "@logoPath@",
-  navbarLinkBgColour: "@primaryBgColour@",
-  customMapCentre: "@mapCentre@",
-  customMapZoom: "@mapZoom@",
   about: `
   <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
     To get further help, type or select a topic in the glossary box.</p>
@@ -20,10 +17,10 @@ export const evcpRequirements = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@",
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
-        visualisationName: "EVCP Requirements",
+        visualisationName: "Actual Area",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -32,40 +29,25 @@ export const evcpRequirements = {
         labelNulls: false,
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: true,
-      },
+      }
     ],
     visualisations: [
       {
-        name: "EVCP Requirements",
+        name: "Actual Area",
         type: "joinDataToMap",
         joinLayer: "Administrative Boundaries",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/evci/evcp-requirements",
-        legendText: [
-          {
-            displayValue: "EVCP Requirements",
-            legendSubtitleText: "charging points" 
-          }
-        ]
+        dataPath: "/api/evci/actual-area",
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.year, visualisations: ['EVCP Requirements'] },
-      { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
-      { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
-      { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
-      { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
-      { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] }
+      { ...selectors.administrativeBoundary, visualisations: ['Actual Area'] },
+      { ...selectors.areaValueDisplay, visualisations: ['Actual Area'] },
+      { ...selectors.chargerSpeed, visualisations: ['Actual Area'] },
     ],
-    additionalFeatures: {
-      glossary: { 
-        dataDictionary: {}
-      },
-    },
   },
 };

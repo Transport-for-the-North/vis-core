@@ -393,10 +393,31 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       state.class_method !== prevClassMethodRef.current;
     const needUpdate =
       dataHasChanged || colorHasChanged || classificationHasChanged;
-    if (!needUpdate) {
+    
+      if (!needUpdate) {
       setLoading(false);
       return;
     }
+
+    // **Filter data based on visualisedFeatureIds**
+    const visualisationData =
+      left === null
+        ? visualisation.data
+        : left
+        ? state.leftVisualisations[visualisationName].data
+        : state.rightVisualisations[visualisationName].data;
+
+    const layerName = visualisation.joinLayer; // Get the associated layer name
+
+    const featureIdsForLayer = state.visualisedFeatureIds[layerName];
+
+    const filteredData =
+      featureIdsForLayer && featureIdsForLayer.length > 0
+        ? visualisationData.filter((row) =>
+            featureIdsForLayer.some(feature => feature.value === Number(row["id"]))
+          )
+        : visualisationData;
+
     switch (visualisation.type) {
       case "geojson": {
         setLoading(true);
@@ -410,41 +431,22 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       }
 
       case "joinDataToMap": {
-        const dataValues = Object.groupBy(
-          visualisation.data,
-          ({ value }) => value
-        );
-        if (
-          visualisation.data.length === 0 ||
-          (Object.keys(dataValues).length === 1 &&
-            Object.keys(dataValues)[0] === 0)
-        ) {
-          const dataValues = Object.groupBy(
-            visualisation.data,
-            ({ value }) => value
-          );
-          if (
-            visualisation.data.length === 0 ||
-            (Object.keys(dataValues).length === 1 &&
-              Object.keys(dataValues)[0] === 0)
-          ) {
-            resetMapStyle(visualisation.style);
-          }
-        }
-        // Reclassify and update the map style
-        else {
+        // Use filteredData instead of visualisationData
+        if (filteredData.length === 0) {
+          resetMapStyle(visualisation.style);
+        } else {
           setLoading(true);
           if (left !== null) {
             reclassifyAndStyleMap(
               maps[0],
-              visualisationData,
+              filteredData,
               state.leftVisualisations[visualisationName].data,
               visualisation.style,
               state.class_method
             );
             reclassifyAndStyleMap(
               maps[1],
-              visualisationData,
+              filteredData,
               state.rightVisualisations[visualisationName].data,
               visualisation.style,
               state.class_method
@@ -452,8 +454,8 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
           } else {
             reclassifyAndStyleMap(
               map,
-              visualisationData,
-              visualisation.data,
+              filteredData,
+              filteredData,
               visualisation.style,
               state.class_method
             );
@@ -466,7 +468,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
     }
     setLoading(false);
     // Update the ref to the current data
-    prevDataRef.current = visualisation.data;
+    prevDataRef.current = filteredData;
     prevColorRef.current = state.color_scheme;
 
     return () => {
@@ -489,7 +491,8 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
     map,
     state.color_scheme,
     resetMapStyle,
-    state.class_method
+    state.class_method,
+    state.visualisedFeatureIds
   ]);
 
   return null;

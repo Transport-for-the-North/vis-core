@@ -1,14 +1,12 @@
-import React, { useState, useCallback } from "react";
-import styled from "styled-components";
-import Select from "react-select";
-import { FixedSizeList as List } from "react-window";
-import { api } from "services";
-import debounce from "lodash.debounce";
-import { SelectorLabel } from "../Selectors/SelectorLabel";
+import React, { useState, useCallback } from 'react';
+import styled from 'styled-components';
+import Select from 'react-select';
+import { FixedSizeList as List } from 'react-window';
+import { api } from 'services';
+import { useLayerFeatureMetadata } from 'hooks/useLayerFeatureMetadata';
+import { SelectorLabel } from '../Selectors/SelectorLabel';
 
-/**
- * Styled container for the search component.
- */
+// Styled components
 const SearchContainer = styled.div`
   margin-top: 10px;
   margin-bottom: 10px;
@@ -16,6 +14,7 @@ const SearchContainer = styled.div`
 
 /**
  * Custom MenuList component for react-select using react-window for virtualization.
+ * This improves performance with large lists by only rendering visible items.
  */
 const MenuList = (props) => {
   const { options, children, maxHeight, getValue } = props;
@@ -31,7 +30,7 @@ const MenuList = (props) => {
       itemSize={height}
       initialScrollOffset={initialOffset}
       width="100%"
-      style={{ overflowX: "hidden" }} // Ensure no horizontal scrollbar
+      style={{ overflowX: 'hidden' }} // Ensure no horizontal scrollbar
     >
       {({ index, style }) => <div style={style}>{children[index]}</div>}
     </List>
@@ -45,51 +44,18 @@ const MenuList = (props) => {
  * @component
  * @param {Object} props - The component props.
  * @param {Object} props.map - The MapLibre map instance.
- * @param {Object} props.layer - The layer object containing information about the map layer.
+ * @param {Object} props.layer - The layer object containing metadata for fetching features.
  * @returns {JSX.Element} The rendered LayerSearch component.
  */
 export const LayerSearch = ({ map, layer }) => {
-  const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  /**
-   * Fetches options based on the input value.
-   * @param {string} inputValue - The input value.
-   */
-  const fetchOptions = useCallback(
-    debounce(async (inputValue) => {
-      if (!inputValue) {
-        setOptions([]);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const features = await api.geodataService.fetchMetadataFromPath(layer.metadata.path);
-        const filteredOptions = features
-          .filter((feature) =>
-            String(feature.name)
-              .toLowerCase()
-              .startsWith(inputValue.toLowerCase())
-          )
-          .map((feature) => ({
-            value: feature.id,
-            label: feature.name || feature.id,
-          }));
-        setOptions(filteredOptions);
-      } catch (error) {
-        console.error("Failed to fetch features:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300),
-    [layer.metadata.path]
-  );
+  // Use custom hook to fetch feature options
+  const { options, isLoading, handleInputChange } = useLayerFeatureMetadata(layer.metadata.path);
 
   /**
    * Handles the change event when a feature is selected.
+   * Zooms to the selected feature on the map and adds a temporary label.
    * @param {Object} selectedOption - The selected option.
    */
   const handleChange = useCallback(
@@ -97,13 +63,15 @@ export const LayerSearch = ({ map, layer }) => {
       setSelectedOption(selectedOption);
       if (selectedOption) {
         try {
+          // Get the centroid coordinates of the selected feature
           const centroid = await api.geodataService.getFeatureGeometry(
             layer.metadata.path,
             selectedOption.value
           );
+          // Fly to the feature on the map
           map.flyTo({ center: centroid.coordinates, zoom: 12 });
 
-          // Add a label for the selected feature
+          // Add a temporary label for the selected feature
           const labelLayerId = 'feature-label';
           const labelSourceId = 'feature-label-source';
 
@@ -113,18 +81,19 @@ export const LayerSearch = ({ map, layer }) => {
             map.removeSource(labelSourceId);
           }
 
+          // Add new source and layer for the label
           map.addSource(labelSourceId, {
             type: 'geojson',
             data: {
               type: 'Feature',
               geometry: {
                 type: 'Point',
-                coordinates: centroid.coordinates
+                coordinates: centroid.coordinates,
               },
               properties: {
-                name: selectedOption.label
-              }
-            }
+                name: selectedOption.label,
+              },
+            },
           });
 
           map.addLayer({
@@ -136,13 +105,13 @@ export const LayerSearch = ({ map, layer }) => {
               'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], // Use the same fonts as the app
               'text-size': 14, // Adjust the text size as needed
               'text-offset': [0, 1.5],
-              'text-anchor': 'top'
+              'text-anchor': 'top',
             },
             paint: {
               'text-color': '#000000', // Set the text color
               'text-halo-color': '#ffffff', // Add a halo for better readability
-              'text-halo-width': 2
-            }
+              'text-halo-width': 2,
+            },
           });
 
           // Remove the label when the user interacts with the map
@@ -157,26 +126,17 @@ export const LayerSearch = ({ map, layer }) => {
 
           map.on('move', removeLabel);
           map.on('click', removeLabel);
-
         } catch (error) {
-          console.error("Failed to fetch centroid:", error);
+          console.error('Failed to fetch centroid:', error);
         }
       }
     },
     [layer.metadata.path, map]
   );
 
-  /**
-   * Handles the input change event.
-   * @param {string} inputValue - The input value.
-   */
-  const handleInputChange = (inputValue) => {
-    fetchOptions(inputValue);
-  };
-
   return (
     <SearchContainer>
-      <SelectorLabel text="Zoom to map feature" info={"Search for a feature to zoom to"} />
+      <SelectorLabel text="Zoom to map feature" info="Search for a feature to zoom to" />
       <Select
         value={selectedOption}
         onChange={handleChange}
@@ -189,7 +149,7 @@ export const LayerSearch = ({ map, layer }) => {
         maxMenuHeight={200} // Set a maximum height for the dropdown
         menuPortalTarget={document.body}
         styles={{
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }), 
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
         }}
       />
     </SearchContainer>
