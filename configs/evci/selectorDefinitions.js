@@ -424,7 +424,7 @@ const runTypeCodeFixedSelector = {
 };
 
 const runTypeCodeDynamicSelector = {
-  filterName: "Run Type Code",
+  filterName: "Vehicle Stock Projection",
   paramName: "runTypeCode",
   target: "api",
   actions: [
