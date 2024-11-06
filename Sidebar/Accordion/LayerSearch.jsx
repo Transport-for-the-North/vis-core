@@ -1,41 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import Select from 'react-select';
-import { FixedSizeList as List } from 'react-window';
 import { api } from 'services';
-import { useLayerFeatureMetadata } from 'hooks/useLayerFeatureMetadata';
 import { SelectorLabel } from '../Selectors/SelectorLabel';
+import { FeatureSelect } from '../Selectors/FeatureSelect';
 
 // Styled components
 const SearchContainer = styled.div`
   margin-top: 10px;
   margin-bottom: 10px;
 `;
-
-/**
- * Custom MenuList component for react-select using react-window for virtualization.
- * This improves performance with large lists by only rendering visible items.
- */
-const MenuList = (props) => {
-  const { options, children, maxHeight, getValue } = props;
-  const height = 35;
-  const [value] = getValue();
-  const initialOffset = options.indexOf(value) * height;
-  const listHeight = Math.min(options.length * height, maxHeight);
-
-  return (
-    <List
-      height={listHeight}
-      itemCount={children.length}
-      itemSize={height}
-      initialScrollOffset={initialOffset}
-      width="100%"
-      style={{ overflowX: 'hidden' }} // Ensure no horizontal scrollbar
-    >
-      {({ index, style }) => <div style={style}>{children[index]}</div>}
-    </List>
-  );
-};
 
 /**
  * LayerSearch component allows users to search for features within a specified layer
@@ -49,9 +22,6 @@ const MenuList = (props) => {
  */
 export const LayerSearch = ({ map, layer }) => {
   const [selectedOption, setSelectedOption] = useState(null);
-
-  // Use custom hook to fetch feature options
-  const { options, isLoading, handleInputChange } = useLayerFeatureMetadata(layer.metadata.path);
 
   /**
    * Handles the change event when a feature is selected.
@@ -102,19 +72,18 @@ export const LayerSearch = ({ map, layer }) => {
             source: labelSourceId,
             layout: {
               'text-field': ['get', 'name'],
-              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], // Use the same fonts as the app
-              'text-size': 14, // Adjust the text size as needed
+              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+              'text-size': 14,
               'text-offset': [0, 1.5],
               'text-anchor': 'top',
             },
             paint: {
-              'text-color': '#000000', // Set the text color
-              'text-halo-color': '#ffffff', // Add a halo for better readability
+              'text-color': '#000000',
+              'text-halo-color': '#ffffff',
               'text-halo-width': 2,
             },
           });
 
-          // Remove the label when the user interacts with the map
           const removeLabel = () => {
             if (map.getLayer(labelLayerId)) {
               map.removeLayer(labelLayerId);
@@ -137,20 +106,11 @@ export const LayerSearch = ({ map, layer }) => {
   return (
     <SearchContainer>
       <SelectorLabel text="Zoom to map feature" info="Search for a feature to zoom to" />
-      <Select
+      <FeatureSelect
+        layerPath={layer.metadata.path}
         value={selectedOption}
         onChange={handleChange}
-        onInputChange={handleInputChange}
-        options={options}
         placeholder={`Search features in ${layer.id}...`}
-        components={{ MenuList }}
-        isLoading={isLoading}
-        menuIsOpen={options.length > 0} // Only show the dropdown if there are options
-        maxMenuHeight={200} // Set a maximum height for the dropdown
-        menuPortalTarget={document.body}
-        styles={{
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-        }}
       />
     </SearchContainer>
   );
