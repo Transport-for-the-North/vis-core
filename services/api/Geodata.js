@@ -141,7 +141,7 @@ class GeodataService extends BaseService {
    * @param {string} featureId - The ID of the feature.
    * @returns {Promise<Object>} The geometry of the feature.
    */
-  async getFeatureGeometry(path, featureId) {
+  async getFeatureGeometryCentroid(path, featureId) {
     const parsedParams = parseVectorTilePath(path);
     const { tableName } = parsedParams;
 
@@ -149,6 +149,54 @@ class GeodataService extends BaseService {
       const responseObj = await this.get(`/api/spatialdatafeaturegeometry/centroid/${tableName}/${featureId}`);
       // Read the geojson from the responseData - note janky handling as a result of mapping of sql result to api model
       const data = JSON.parse(responseObj.centroid)
+      return data
+    } catch (error) {
+      console.error('Error fetching layer data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches the geometry (bounds, centroid, and feature) for a specific feature.
+   * @param {string} path - The vector tile path for the given table.
+   * @param {string} featureId - The ID of the feature.
+   * @returns {Promise<Object>} The geometry of the feature.
+   */
+  async getFeatureGeometry(path, featureId) {
+    const parsedParams = parseVectorTilePath(path);
+    const { tableName } = parsedParams;
+
+    try {
+      const responseObj = await this.get(`/api/spatialdatafeaturegeometry/feature/${tableName}/${featureId}`);
+      // Parse the response object to extract and parse the geojson strings
+      const { centroid, bounds, geometry } = responseObj;
+
+      // Parse the JSON strings into objects
+      const parsedCentroid = JSON.parse(centroid);
+      const parsedBounds = JSON.parse(bounds);
+      const parsedGeometry = JSON.parse(geometry);
+
+      return { centroid: parsedCentroid, bounds: parsedBounds, geometry: parsedGeometry };
+    } catch (error) {
+      console.error('Error fetching layer data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches the geometry (bounds) for a specific feature.
+   * @param {string} path - The vector tile path for the given table.
+   * @param {string} featureId - The ID of the feature.
+   * @returns {Promise<Object>} The geometry of the feature.
+   */
+  async getFeatureGeometryBounds(path, featureId) {
+    const parsedParams = parseVectorTilePath(path);
+    const { tableName } = parsedParams;
+
+    try {
+      const responseObj = await this.get(`/api/spatialdatafeaturegeometry/bounds/${tableName}/${featureId}`);
+      // Read the geojson from the responseData - note janky handling as a result of mapping of sql result to api model
+      const data = JSON.parse(responseObj.bounds)
       return data
     } catch (error) {
       console.error('Error fetching layer data:', error);
