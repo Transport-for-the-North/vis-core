@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
 import { useMap, useMapContext, useFilterContext, useFeatureSelect } from "hooks";
+import { actionTypes } from "reducers";
 import maplibregl from "maplibre-gl";
 import { Visualisation } from "./Visualisation";
 import { Layer } from "./Layer";
@@ -502,7 +503,7 @@ const Map = () => {
     }
   }, [isMapReady]);
 
-  const featureSelectConfig = state.filters.find((filter) => filter.type === 'mapFeatureSelect');
+  const featureSelectConfig = state.filters.find((filter) => filter.type.startsWith('mapFeatureSelect'));
   useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
 
   useEffect(() => {
@@ -546,6 +547,20 @@ const Map = () => {
       }
     });
   }, [map, state.visualisedFeatureIds]);
+
+  // **Pan and centre map**
+  useEffect(() => {
+    if (map && state.mapBoundsAndCentroid) {
+      const { centroid, bounds } = state.mapBoundsAndCentroid;
+      if (bounds) {
+        map.fitBounds(bounds.coordinates[0], { padding: 20 });
+      } else if (centroid) {
+        map.panTo(centroid);
+      }
+      // Clear the bounds and centroid after panning
+      dispatch({ type: actionTypes.CLEAR_BOUNDS_AND_CENTROID });
+    }
+  }, [map, state.mapBoundsAndCentroid, dispatch]);
   
   return (
     <StyledMapContainer ref={mapContainerRef}>
