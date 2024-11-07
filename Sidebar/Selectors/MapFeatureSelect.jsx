@@ -72,8 +72,8 @@ const EnableSelectButton = styled.button`
 `;
 
 /**
- * MapFeatureSelect component allows users to select features from a map layer
- * and toggle between different selection modes (feature or rectangle).
+ * BaseMapFeatureSelect component provides the core functionality for selecting map features.
+ * It can optionally render controls for selection mode and enabling/disabling selection.
  *
  * @component
  * @param {Object} props - The component props.
@@ -81,9 +81,10 @@ const EnableSelectButton = styled.button`
  * @param {Object} props.filter - The filter object containing filter details.
  * @param {Array} props.value - The selected feature values.
  * @param {Function} props.onChange - Function to call when the selected features change.
- * @returns {JSX.Element} The rendered MapFeatureSelect component.
+ * @param {boolean} props.showControls - Whether to show selection mode controls.
+ * @returns {JSX.Element} The rendered BaseMapFeatureSelect component.
  */
-export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
+export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControls, ...props }) => {
   const { state: mapState, dispatch: mapDispatch } = useMapContext();
 
   // Check if filter.layer is provided
@@ -176,37 +177,48 @@ export const MapFeatureSelect = ({ key, filter, value, onChange }) => {
         layerPath={layerPath}
         value={selectedOptions}
         onChange={handleSelectionChange}
-        isMulti={true}
-        placeholder="Search and select map features..."
+        isMulti={props.isMulti !== undefined ? props.isMulti : filter.multiSelect}
+        placeholder={props.placeholder || "Search and select map features..."}
+        isClearable
       />
 
-      <SelectionModeContainer>
-        <EnableSelectButton
-          enabled={isSelectEnabled}
-          onClick={toggleSelectEnabled}
-        >
-          {isSelectEnabled ? 'Disable Filter' : 'Enable Filter'}
-        </EnableSelectButton>
+      {showControls && (
+        <SelectionModeContainer>
+          <EnableSelectButton
+            enabled={isSelectEnabled}
+            onClick={toggleSelectEnabled}
+          >
+            {isSelectEnabled ? 'Disable Filter' : 'Enable Filter'}
+          </EnableSelectButton>
 
-        <StyledToggle enabled={isSelectEnabled}>
-          <ModeButton
-            selected={selectionMode === 'feature'}
-            onClick={() => handleSelectionModeChange('feature')}
-            disabled={!isSelectEnabled}
-          >
-            <FaMousePointer />
-            Pointer Selection
-          </ModeButton>
-          <ModeButton
-            selected={selectionMode === 'rectangle'}
-            onClick={() => handleSelectionModeChange('rectangle')}
-            disabled={!isSelectEnabled}
-          >
-            <FaDrawPolygon />
-            Rectangle Selection
-          </ModeButton>
-        </StyledToggle>
-      </SelectionModeContainer>
+          <StyledToggle enabled={isSelectEnabled}>
+            <ModeButton
+              selected={selectionMode === 'feature'}
+              onClick={() => handleSelectionModeChange('feature')}
+              disabled={!isSelectEnabled}
+            >
+              <FaMousePointer />
+              Pointer Selection
+            </ModeButton>
+            <ModeButton
+              selected={selectionMode === 'rectangle'}
+              onClick={() => handleSelectionModeChange('rectangle')}
+              disabled={!isSelectEnabled}
+            >
+              <FaDrawPolygon />
+              Rectangle Selection
+            </ModeButton>
+          </StyledToggle>
+        </SelectionModeContainer>
+      )}
     </Container>
   );
 };
+
+export const MapFeatureSelectWithControls = (props) => (
+  <BaseMapFeatureSelect {...props} showControls={true} isMulti />
+);  
+
+export const MapFeatureSelect = (props) => (
+  <BaseMapFeatureSelect {...props} showControls={false} />
+);
