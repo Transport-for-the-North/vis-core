@@ -7,9 +7,11 @@ export const withTermsOfUse = (WrappedComponent) => {
     const { pageConfig } = props;
     const userHasAcceptedTermsOfUse = Cookies.get('toc');
 
+    console.log(pageConfig);
+
     return (
       <>
-        {(!userHasAcceptedTermsOfUse || userHasAcceptedTermsOfUse === undefined) && (
+        {(!userHasAcceptedTermsOfUse && pageConfig.termsOfUse) && (
           <TermsOfUse htmlText={pageConfig.termsOfUse}/>
         )}
         <WrappedComponent {...props} />

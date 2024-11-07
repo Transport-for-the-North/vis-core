@@ -21,8 +21,8 @@ export const stbConfig = [
     primaryFontColour: '#000000',
     secondaryFontColour: '#00dec6',
     pages: ['tfnEvUptake','tfnAnnualChargingDemand','tfnEvcpRequirements', 'tfnCo2Savings', 'enrouteChargingSites','cpArea','cpLocation','cpMajorRoad'],
-    TermsOfUseText: "Welcome",
-    TermsOfUseLink:
+    termsOfUseText: "Welcome",
+    termsOfUseLink:
       "https://transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/",
     termsOfUseTitle: "TfN EV Charging Infrastructure Framework",
     termsOfUsestbTag: "TfN",
@@ -119,8 +119,8 @@ export const stbConfig = [
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
     pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
-    ermsOfUseText: "Welcome",
-    TermsOfUseLink:
+    termsOfUseText: "Welcome",
+    termsOfUseLink:
       "",
     termsOfUseTitle: "STB EV Charging Infrastructure Framework",
     termsOfUsestbTag: "Peninsula",
@@ -144,8 +144,8 @@ export const stbConfig = [
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
     pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
-    ermsOfUseText: "Welcome",
-    TermsOfUseLink:
+    termsOfUseText: "Welcome",
+    termsOfUseLink:
       "",
     termsOfUseTitle: "STB EV Charging Infrastructure Framework",
     termsOfUsestbTag: "TE",
@@ -169,8 +169,8 @@ export const stbConfig = [
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
     pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
-    ermsOfUseText: "Welcome",
-    TermsOfUseLink:
+    termsOfUseText: "Welcome",
+    termsOfUseLink:
       "",
     termsOfUseTitle: "STB EV Charging Infrastructure Framework",
     termsOfUsestbTag: "WG",
