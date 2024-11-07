@@ -31,6 +31,8 @@ export const actionTypes = {
   SET_SELECTED_FEATURES: "SET_SELECTED_FEATURES",
   SET_IS_FEATURE_SELECT_ACTIVE: "SET_IS_FEATURE_SELECT_ACTIVE",
   UPDATE_VISUALISED_FEATURES: "UPDATE_VISUALISED_FEATURES",
+  SET_BOUNDS_AND_CENTROID: 'SET_BOUNDS_AND_CENTROID',
+  CLEAR_BOUNDS_AND_CENTROID: 'CLEAR_BOUNDS_AND_CENTROID',
 };
 
 /**
@@ -44,6 +46,14 @@ export const actionTypes = {
  */
 export const mapReducer = (state, action) => {
   switch (action.type) {
+    case actionTypes.SET_BOUNDS_AND_CENTROID: {
+      const { centroid, bounds } = action.payload;
+      return { ...state, mapBoundsAndCentroid: { centroid, bounds } };
+    }
+
+    case actionTypes.CLEAR_BOUNDS_AND_CENTROID:
+      return { ...state, mapBoundsAndCentroid: null };
+
     case actionTypes.UPDATE_VISUALISED_FEATURES: {
       const { filter, value } = action.payload;
       const { layer } = filter;
