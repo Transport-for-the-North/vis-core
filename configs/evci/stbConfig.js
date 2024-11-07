@@ -93,7 +93,12 @@ export const stbConfig = [
     secondaryBgColour: '#6b004c',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    TermsOfUseText: "Welcome",
+    TermsOfUseLink:
+      "",
+    termsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "EEH",
   },
   {
     stbName: "Peninsula Transport",
@@ -113,7 +118,12 @@ export const stbConfig = [
     secondaryBgColour: '#80ff00',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    ermsOfUseText: "Welcome",
+    TermsOfUseLink:
+      "",
+    termsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "Peninsula",
   },
   {
     stbName: "Transport East",
@@ -133,7 +143,12 @@ export const stbConfig = [
     secondaryBgColour: '#0E9059',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    ermsOfUseText: "Welcome",
+    TermsOfUseLink:
+      "",
+    termsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "TE",
   },
   {
     stbName: "Western Gateway",
@@ -153,6 +168,11 @@ export const stbConfig = [
     secondaryBgColour: '#ffffff',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites']
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    ermsOfUseText: "Welcome",
+    TermsOfUseLink:
+      "",
+    termsOfUseTitle: "STB EV Charging Infrastructure Framework",
+    termsOfUsestbTag: "WG",
   }
 ];
