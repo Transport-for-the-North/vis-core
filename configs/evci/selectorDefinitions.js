@@ -29,7 +29,7 @@ const administrativeBoundarySelector = {
 
 const zoneSelector = {
   filterName: "Optional location filter",
-  type: "mapFeatureSelect",
+  type: "mapFeatureSelectWithControls",
   paramName: "features",
   target: "api",
   actions: [
@@ -45,11 +45,12 @@ const zoneSelector = {
 
 const siteSelector = {
   filterName: "Optional location filter",
-  type: "mapFeatureSelect",
+  type: "mapFeatureSelectWithControls",
   paramName: "features",
   target: "api",
   actions: [
     {
+      action: 'UPDATE_VISUALISED_FEATURES',
     },
   ],
   visualisations: null,

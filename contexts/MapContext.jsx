@@ -124,6 +124,8 @@ export const MapProvider = ({ children }) => {
           case 'map':
           case 'slider':
           case 'mapFeatureSelect':
+          case 'mapFeatureSelectWithControls':
+          case 'mapFeatureSelectAndPan':
             filters.push(filterWithId);
             break;
           default:
