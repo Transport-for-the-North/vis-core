@@ -318,7 +318,7 @@ const Map = () => {
   const handleLayerLeave = useCallback(
     (layerId) => {
       if (!map) return;
-      if (map.getLayer(`${layerId}-hover`)) {
+      if (map.getLayer(`${layerId}-hover`) && hoverIdRef.current[layerId]) {
         const sourceLayer = getSourceLayer(map, layerId);
         map.setFeatureState(
           { source: layerId, id: hoverIdRef.current[layerId], sourceLayer },
@@ -347,26 +347,43 @@ const Map = () => {
         }
       } else {
         if (!map.getLayer(`${layerId}-label`)) {
-          // Create the layer if it does not exist
-          map.addLayer({
-            id: `${layerId}-label`,
-            type: 'symbol',
-            source: layerId,
-            'source-layer': sourceLayerName,
-            layout: {
-              'text-field': ['get', 'name'],
-              'text-size': 14,
-              'text-anchor': 'center',
-              'text-offset': [0, 1.5],
-              'text-allow-overlap': false, 
-            },
-            paint: {
-              'text-color': '#000000',  // Black text
-              'text-halo-color': '#ffffff',  // White halo for readability
-              'text-halo-width': 2.5,
-              'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
-            }
+          // Query the source features to determine the geometry type
+          const features = map.querySourceFeatures(layerId, {
+            sourceLayer: sourceLayerName
           });
+  
+          if (features.length > 0) {
+            const geometryType = features[0].geometry.type;
+  
+            // Determine symbol placement based on geometry type
+            let symbolPlacement = 'point'; // Default to point
+            if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
+              symbolPlacement = 'line';
+            }
+  
+            // Create the layer if it does not exist
+            map.addLayer({
+              id: `${layerId}-label`,
+              type: 'symbol',
+              source: layerId,
+              'source-layer': sourceLayerName,
+              layout: {
+                'text-field': ['get', 'name'],
+                'text-size': 14,
+                'text-anchor': 'center', // Center the text
+                'text-offset': [0, 1.5], // No offset
+                'text-allow-overlap': false,
+                'symbol-placement': symbolPlacement, // Dynamic placement
+                'symbol-spacing': 250
+              },
+              paint: {
+                'text-color': '#000000',  // Black text
+                'text-halo-color': '#ffffff',  // White halo for readability
+                'text-halo-width': 2.5,
+                'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+              }
+            });
+          }
         } else {
           map.setLayoutProperty(`${layerId}-label`, 'visibility', 'visible');
         }
@@ -374,6 +391,7 @@ const Map = () => {
     },
     [map]
   );
+  
   
 
   useEffect(() => {
