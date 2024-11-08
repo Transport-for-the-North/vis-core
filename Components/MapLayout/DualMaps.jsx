@@ -52,12 +52,14 @@ const DualMaps = () => {
         if (!map.getSource(layer.name)) {
           let sourceConfig = {};
           let layerConfig = getLayerStyle(layer.geometryType);
+          const layerLayout = {}
           layerConfig.id = layer.name;
-          layerConfig.visibility = "visible";
+          layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible"
+          layerConfig.layout = layerLayout
           layerConfig.metadata = {
             ...layerConfig.metadata,
             isStylable: layer.isStylable ?? false,
-            path: layer.path ?? null
+            path: layer.path ?? null,
           };
 
           if (layer.type === "geojson") {
@@ -611,6 +613,10 @@ const DualMaps = () => {
       dispatch({
         type: "SET_MAP",
         payload: { map: leftMap }, //Not sure about this part, needs some update
+      });
+      dispatch({
+        type: "SET_DUAL_MAPS",
+        payload: { maps: [leftMap, rightMap] }, //Not sure about this part, needs some update
       });
     }
   }, [isMapReady]);
