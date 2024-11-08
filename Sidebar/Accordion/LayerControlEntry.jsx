@@ -68,13 +68,13 @@ const OpacitySlider = styled.input`
  * @component
  * @param {Object} props - The component props.
  * @param {Object} props.layer - The layer object containing information about the map layer.
- * @param {Object} props.map - The MapLibre map instance.
+ * @param {Array} props.maps - An array of MapLibre map instances.
  * @param {Function} props.handleColorChange - The function to handle color changes for the layer.
  * @param {Function} props.handleClassificationChange - The function to handle classification changes for the layer.
  * @returns {JSX.Element} The rendered LayerControlEntry component.
  */
 export const LayerControlEntry = memo(
-  ({ layer, map, handleColorChange, handleClassificationChange, state }) => {
+  ({ layer, maps, handleColorChange, handleClassificationChange, state }) => {
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
@@ -96,12 +96,11 @@ export const LayerControlEntry = memo(
     );
     let currentOpacity = null;
 
-    if (map.getLayer(layer.id)) {
+    if (maps.length > 0 && maps[0].getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
-      currentOpacity = map.getPaintProperty(layer.id, opacityProp);
+      currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
     }
 
-    // Determine if the current opacity is an expression that includes the feature state logic
     const isFeatureStateExpression =
       Array.isArray(currentOpacity) && currentOpacity[0] === "case";
     const initialOpacity = isFeatureStateExpression
@@ -112,7 +111,11 @@ export const LayerControlEntry = memo(
 
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
-      map.setLayoutProperty(layer.id, "visibility", newVisibility);
+      maps.forEach((map) => {
+        if (map.getLayer(layer.id)) {
+          map.setLayoutProperty(layer.id, "visibility", newVisibility);
+        }
+      });
       setVisibility(newVisibility);
     };
 
@@ -121,18 +124,22 @@ export const LayerControlEntry = memo(
       const opacityProp = getOpacityProperty(layer.type);
       let opacityExpression;
 
-      // Apply the logic to filter out nulls and zeroes only if it was originally present
       if (isFeatureStateExpression) {
         opacityExpression = [
           "case",
           ["in", ["feature-state", "value"], ["literal", [0, null]]],
-          0, // Set opacity to 0 for null or zero values
-          newOpacity, // Set opacity to the slider value otherwise
+          0,
+          newOpacity,
         ];
       } else {
         opacityExpression = newOpacity;
       }
-      map.setPaintProperty(layer.id, opacityProp, opacityExpression);
+
+      maps.forEach((map) => {
+        if (map.getLayer(layer.id)) {
+          map.setPaintProperty(layer.id, opacityProp, opacityExpression);
+        }
+      });
       setOpacity(newOpacity);
     };
 
@@ -144,7 +151,7 @@ export const LayerControlEntry = memo(
             {visibility === "visible" ? <EyeIcon /> : <EyeSlashIcon />}
           </VisibilityToggle>
         </LayerHeader>
-        {layer.metadata?.path && <LayerSearch map={map} layer={layer} />}
+        {layer.metadata?.path && <LayerSearch map={maps[0]} layer={layer} />}
         <SelectorLabel text="Opacity" />
         <OpacityControl>
           <OpacitySlider

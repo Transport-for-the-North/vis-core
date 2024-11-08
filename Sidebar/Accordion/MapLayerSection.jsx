@@ -14,29 +14,39 @@ import { LayerControlEntry } from './LayerControlEntry';
  */
 export const MapLayerSection = ({ handleColorChange, handleClassificationChange }) => {
   const { state } = useMapContext();
-  const { map } = state;
+  const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
   const [layers, setLayers] = useState([]);
 
   const updateLayers = useCallback(() => {
-    const newLayers = map.getStyle().layers;
-    const filteredLayers = newLayers.filter(
-      (layer) =>
-        (layer.type === 'fill' || layer.type === 'line' || layer.type === 'circle') &&
-        layer.source !== 'default' && !layer.id.endsWith("-hover") && layer.id !== "selected-feature-layer"
-    );
-    setLayers(filteredLayers);
-  }, [map]);
+    if (maps.length > 0) {
+      const newLayers = maps[0].getStyle().layers;
+      const filteredLayers = newLayers.filter(
+        (layer) =>
+          (layer.type === 'fill' || layer.type === 'line' || layer.type === 'circle') &&
+          layer.source !== 'default' && !layer.id.endsWith("-hover") && layer.id !== "selected-feature-layer"
+      );
+      setLayers(filteredLayers);
+    }
+  }, [maps]);
 
   useEffect(() => {
-    if (map) {
-      map.on('styledata', updateLayers);
+    if (maps.length > 0) {
+      maps.forEach((map) => {
+        if (map) {
+          map.on('styledata', updateLayers);
+        }
+      });
       return () => {
-        map.off('styledata', updateLayers);
+        maps.forEach((map) => {
+          if (map) {
+            map.off('styledata', updateLayers);
+          }
+        });
       };
     }
-  }, [map, updateLayers]);
+  }, [maps, updateLayers]);
 
-  if (!map) {
+  if (maps.length === 0) {
     return <div>Loading map layers...</div>;
   }
 
@@ -50,7 +60,7 @@ export const MapLayerSection = ({ handleColorChange, handleClassificationChange 
         <LayerControlEntry
           key={layer.id}
           layer={layer}
-          map={map}
+          maps={maps}
           handleColorChange={handleColorChange}
           handleClassificationChange={handleClassificationChange}
           state={state}
