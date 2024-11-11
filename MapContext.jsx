@@ -2,8 +2,10 @@ import React, { createContext, useEffect, useContext, useReducer } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { actionTypes, mapReducer } from "reducers";
 import {
-  hasRouteParameter,
-  replaceRouteParameter,
+  hasRouteParameterOrQuery,
+  updateUrlParameters,
+  extractParamsWithValues,
+  processParameters,
   checkSecurityRequirements,
   sortValues,
   isValidCondition,
@@ -233,7 +235,7 @@ export const MapProvider = ({ children }) => {
     const initializeContext = async () => {
       // Initialise non-parameterised layers
       const nonParameterisedLayers = pageContext.config.layers.filter(
-        (layer) => !hasRouteParameter(layer.path)
+        (layer) => !hasRouteParameterOrQuery(layer.path)
       );
       nonParameterisedLayers.forEach((layer) => {
         const bufferSize = layer.geometryType === 'line' ? 7 : 0;
@@ -241,27 +243,43 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise parameterised layers based on corresponding filters
-      const parameterisedLayers = pageContext.config.layers.filter(
-        (layer) => hasRouteParameter(layer.path)
+      const parameterisedLayers = pageContext.config.layers.filter((layer) =>
+        hasRouteParameterOrQuery(layer.path)
       );
+      
       parameterisedLayers.forEach((layer) => {
         const bufferSize = layer.geometryType === 'line' ? 7 : 0;
-        const paramName = layer.path.match(/\{(.+?)\}/)[1];
-        const filter = pageContext.config.filters.find((f) => f.paramName === paramName);
-        if (filter) {
-          const updatedPath = replaceRouteParameter(
-            layer.path,
-            paramName,
-            filter.values.values[0].paramValue
-          );
-          dispatch({
-            type: actionTypes.ADD_LAYER,
-            payload: {
-              [layer.name]: { ...layer, path: updatedPath, pathTemplate: layer.path, bufferSize },
+      
+        // Extract parameters and their values from the layer path
+        const allParamsWithValues = extractParamsWithValues(layer.path);
+      
+        const excludedParams = ['x', 'y', 'z'];
+      
+        // Process parameters to fill values and find missing ones
+        const { params, missingParams } = processParameters(
+          allParamsWithValues,
+          pageContext.config.filters,
+          excludedParams
+        );
+      
+        // Update the path using the extracted and found parameters
+        const updatedPath = updateUrlParameters(layer.path, params);
+      
+        // Dispatch the layer with the updated path and any missing parameters
+        dispatch({
+          type: actionTypes.ADD_LAYER,
+          payload: {
+            [layer.name]: {
+              ...layer,
+              path: updatedPath,
+              pathTemplate: layer.path,
+              bufferSize,
+              missingParams, // Include missing parameters for later use
             },
-          });
-        }
+          },
+        });
       });
+      
 
       // Initialise visualisations
       const visualisationConfig = pageContext.config.visualisations;
