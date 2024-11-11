@@ -225,7 +225,7 @@ export function processParameters(allParamsWithValues, filters, excludedParams) 
   const missingParams = [];
 
   Object.entries(allParamsWithValues).forEach(([paramName, paramValue]) => {
-    if (paramValue !== '') {
+    if (paramValue !== '' && paramValue !== undefined) {
       // Use the value specified in the layer.path
       params[paramName] = paramValue;
     } else {
