@@ -52,7 +52,7 @@ export const MapLayout = () => {
           else sides = "both";
           dispatch({
             type: actionObj.action,
-            payload: { filter, value: defaultValue, sides: sides },
+            payload: { filter, value: defaultValue, sides: sides, ...actionObj.payload },
           });
         });
       });
@@ -88,7 +88,7 @@ export const MapLayout = () => {
         filter.actions.forEach((action) => {
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id] },
+            payload: { filter, value: filterState[filter.id], ...action.payload },
           });
         });
       } else {
@@ -99,7 +99,7 @@ export const MapLayout = () => {
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], sides },
+            payload: { filter, value: filterState[filter.id], sides, ...action.payload },
           });
         });
       }
