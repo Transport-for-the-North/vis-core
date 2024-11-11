@@ -1,4 +1,4 @@
-import { replaceRouteParameter } from "utils";
+import { updateUrlParameters } from "utils";
 
 // TODO delineate actionTypes into separate namespaces
 export const actionTypes = {
@@ -100,21 +100,30 @@ export const mapReducer = (state, action) => {
       return { ...state, layers: { ...state.layers, ...action.payload } };
     case actionTypes.UPDATE_PARAMETERISED_LAYER: {
       // Get the layer name and new parameters from the payload
-      const layerName = action.payload.filter.layer;
+      const layerName = action.payload.targetLayer;
       const paramName = action.payload.filter.paramName;
       const newParamValue = action.payload.value;
-
+    
       if (newParamValue == null) {
         // Do not update the layer if value is null
         return state; // Return the current state unmodified
       }
-
+    
+      // Prepare the parameters object for replacement
+      const params = { [paramName]: newParamValue };
+    
       // Update the path of the layer with the new parameters
-      const updatedPath = replaceRouteParameter(
+      const updatedPath = updateUrlParameters(
         state.layers[layerName].pathTemplate,
-        paramName,
-        newParamValue
+        params
       );
+    
+      // Update the missingParams array if it exists
+      const currentMissingParams = state.layers[layerName].missingParams || [];
+      const updatedMissingParams = currentMissingParams.filter(
+        (param) => param !== paramName
+      );
+    
       // Update the layer in the state
       return {
         ...state,
@@ -123,6 +132,7 @@ export const mapReducer = (state, action) => {
           [layerName]: {
             ...state.layers[layerName],
             path: updatedPath,
+            missingParams: updatedMissingParams,
           },
         },
       };
