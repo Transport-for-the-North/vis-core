@@ -17,7 +17,7 @@ const administrativeBoundarySelector = {
     values: [
       {
         displayValue: "LAD",
-        paramValue: 8,
+        paramValue: 27,
       },
       {
         displayValue: "MSOA",
@@ -101,7 +101,7 @@ const yearSelector = {
   },
 };
 
-const travelScenarioSelector = {
+const travelScenarioSelectorBase = {
   filterName: "Travel Scenario",
   paramName: "travelScenarioId",
   target: "api",
@@ -111,21 +111,27 @@ const travelScenarioSelector = {
   values: {
     source: "local",
     values: [
-      // {
-      //   displayValue: "Unknown",
-      //   paramValue: 0,
-      // },
       {
         displayValue: "Business as Usual",
         paramValue: 1,
       },
       {
-        displayValue: "Just About Managing",
-        paramValue: 2,
-      },
-      {
         displayValue: "Accelerated EV",
         paramValue: 3,
+      },
+    ],
+  },
+};
+
+const travelScenarioSelectorAdditional = {
+  ...travelScenarioSelectorBase,
+  values: {
+    ...travelScenarioSelectorBase.values,
+    values: [
+      ...travelScenarioSelectorBase.values.values,
+      {
+        displayValue: "Just About Managing",
+        paramValue: 2,
       },
       {
         displayValue: "Digitally Distributed",
@@ -165,14 +171,14 @@ const behaviouralScenarioSelector = {
         displayValue: "Destination",
         paramValue: 2,
       },
-      {
-        displayValue: "Not Applicable",
-        paramValue: 3,
-      },
-      {
-        displayValue: "Local",
-        paramValue: 4,
-      },
+      // {
+      //   displayValue: "Not Applicable",
+      //   paramValue: 3,
+      // },
+      // {
+      //   displayValue: "Local",
+      //   paramValue: 4,
+      // },
     ],
   },
 };
@@ -317,7 +323,7 @@ const distanceValueDisplaySelector = {
 
 const chargerSpeedSelector = {
   filterName: "Charger Speed",
-  paramName: "name",
+  paramName: "deviceSpeedId",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
   visualisations: null,
@@ -327,35 +333,35 @@ const chargerSpeedSelector = {
     values: [
       {
         displayValue: "Slow",
-        paramValue: "Slow",
+        paramValue: 1,
       },
-      {
-        displayValue: "Standard",
-        paramValue: "Standard",
-      },
+      // {
+      //   displayValue: "Standard",
+      //   paramValue: 2,
+      // },
       {
         displayValue: "Rapid",
-        paramValue: "Rapid",
+        paramValue: 3,
       },
       {
         displayValue: "Ultra-rapid",
-        paramValue: "Ultra-rapid",
+        paramValue: 4,
       },
-      {
-        displayValue: "Any Speed",
-        paramValue: "Any Speed",
-      },
-      {
-        displayValue: "Any Non-rapid",
-        paramValue: "Any Non-rapid",
-      },
-      {
-        displayValue: "Any Rapid or Faster",
-        paramValue: "Any Rapid or Faster",
-      },
+      // {
+      //   displayValue: "Any Speed",
+      //   paramValue: 5,
+      // },
+      // {
+      //   displayValue: "Any Non-rapid",
+      //   paramValue: 6,
+      // },
+      // {
+      //   displayValue: "Any Rapid or Faster",
+      //   paramValue: 7,
+      // },
       {
         displayValue: "Fast",
-        paramValue: "Fast",
+        paramValue: 8,
       },
     ],
   },
@@ -417,7 +423,7 @@ const columnNameSelector = {
 
 const stbTagSelector = {
   filterName: "STB Name",
-  paramName: "stbName",
+  paramName: "stbTag",
   target: "api",
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
@@ -482,7 +488,8 @@ const runTypeCodeDynamicSelector = {
 export const selectors = {
   year: yearSelector,
   administrativeBoundary: administrativeBoundarySelector,
-  travelScenario: travelScenarioSelector,
+  travelScenarioBase: travelScenarioSelectorBase,
+  travelScenarioAdditional: travelScenarioSelectorAdditional,
   behaviouralScenario: behaviouralScenarioSelector,
   vehicleType: vehicleTypeSelector,
   fuelType: fuelTypeSelector,

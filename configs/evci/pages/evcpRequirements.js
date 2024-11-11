@@ -59,11 +59,12 @@ export const evcpRequirements = {
       { ...selectors.runTypeCodeFixed, visualisations: ['EVCP Requirements'] },
       { ...selectors.year, visualisations: ['EVCP Requirements'] },
       { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
-      { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.travelScenarioBase, visualisations: ['EVCP Requirements'] },
       { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
       { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
       { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] }
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
+      { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
     ],
     additionalFeatures: {
       glossary: { 
@@ -81,11 +82,12 @@ export const tfnEvcpRequirements = {
       { ...selectors.runTypeCodeDynamic, visualisations: ['EVCP Requirements'] },
       { ...selectors.year, visualisations: ['EVCP Requirements'] },
       { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
-      { ...selectors.travelScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.travelScenarioAdditional, visualisations: ['EVCP Requirements'] },
       { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
       { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
       { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] }
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
+      { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
     ],
   },
 };

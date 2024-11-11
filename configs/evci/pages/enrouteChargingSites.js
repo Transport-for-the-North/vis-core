@@ -57,7 +57,7 @@ export const enrouteChargingSites = {
         legendText: [
           {
             displayValue: "Charging sites",
-            legendSubtitleText: "score /100" 
+            legendSubtitleText: "/100" 
           }
         ]
       },
