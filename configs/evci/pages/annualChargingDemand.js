@@ -64,6 +64,7 @@ export const annualChargingDemand = {
       { ...selectors.chargingCategory, visualisations: ['Annual Charging Demand'] },
       { ...selectors.stbTag, visualisations: ['Annual Charging Demand'] },
       { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.zoneSelector, visualisations: ['Annual Charging Demand']}
     ],
     additionalFeatures: {
       glossary: { 
@@ -87,6 +88,7 @@ export const tfnAnnualChargingDemand = {
       { ...selectors.chargingCategory, visualisations: ['Annual Charging Demand'] },
       { ...selectors.stbTag, visualisations: ['Annual Charging Demand'] },
       { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.zoneSelector, visualisations: ['Annual Charging Demand']}
     ],
   },
 };

@@ -60,7 +60,8 @@ export const cpLocation = {
     filters: [
       { ...selectors.chargerSpeed, visualisations: ['Chargers/Power by Location'] },
       { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Location'] },
-      { ...selectors.stbTag, visualisations: ['Chargers/Power by Location'] }
+      { ...selectors.stbTag, visualisations: ['Chargers/Power by Location'] },
+      { ...selectors.siteSelector, visualisations: ['Chargers/Power by Location'], layer: "Charging Sites" }
     ],
     additionalFeatures: {
       glossary: { 

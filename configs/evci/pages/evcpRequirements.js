@@ -63,7 +63,8 @@ export const evcpRequirements = {
       { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
       { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
       { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] }
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
+      { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
     ],
     additionalFeatures: {
       glossary: { 
@@ -85,7 +86,8 @@ export const tfnEvcpRequirements = {
       { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
       { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
       { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
-      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] }
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
+      { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
     ],
   },
 };

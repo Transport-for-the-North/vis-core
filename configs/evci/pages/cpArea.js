@@ -74,6 +74,7 @@ export const cpArea = {
       { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Area'] },
       { ...selectors.stbTag, visualisations: ['Chargers/Power by Area'] },
       { ...selectors.areaValueDisplay, visualisations: ['Chargers/Power by Area'] },
+      { ...selectors.zoneSelector, visualisations: ['Chargers/Power by Area'] }
     ],
     additionalFeatures: {
       glossary: { 

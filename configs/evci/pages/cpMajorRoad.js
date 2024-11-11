@@ -62,6 +62,7 @@ export const cpMajorRoad = {
       { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.stbTag, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power by Major Road'] },
+      { ...selectors.zoneSelector, visualisations: ['Chargers/Power by Major Road'], layer: "Roads" }
     ],
     additionalFeatures: {
       glossary: { 

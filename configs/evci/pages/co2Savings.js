@@ -61,7 +61,8 @@ export const co2Savings = {
       { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
       { ...selectors.vehicleType, visualisations: ['CO2 Savings'] },
       { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
-      { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] }
+      { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] },
+      { ...selectors.zoneSelector, visualisations: ['CO2 Savings']}
     ],
     additionalFeatures: {
       glossary: { 
@@ -83,7 +84,8 @@ export const tfnCo2Savings = {
       { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
       { ...selectors.vehicleType, visualisations: ['CO2 Savings'] },
       { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
-      { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] }
+      { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] },
+      { ...selectors.zoneSelector, visualisations: ['CO2 Savings']}
     ],
   },
 };
