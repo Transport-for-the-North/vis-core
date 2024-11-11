@@ -32,7 +32,22 @@ export const Layer = ({ layer }) => {
     // If no map instance is available, exit early
     if (!map) return;
 
-    // Check if the layer source is already added to the map
+    // If missingParams are present, remove the layer if it exists
+    if (layer.missingParams?.length > 0) {
+      // Remove the layer and its sources if they exist
+      if (map.getLayer(layer.name)) {
+        map.removeLayer(layer.name);
+      }
+      if (map.getLayer(`${layer.name}-hover`)) {
+        map.removeLayer(`${layer.name}-hover`);
+      }
+      if (map.getSource(layer.name)) {
+        map.removeSource(layer.name);
+      }
+      return; // Exit the useEffect early
+    }
+
+    // Check if the layer is already added to avoid duplicates
     if (!map.getSource(layer.name)) {
       let sourceConfig = {};
       let layerConfig = getLayerStyle(layer.geometryType);
@@ -59,7 +74,7 @@ export const Layer = ({ layer }) => {
             map.addLayer({ ...hoverLayerConfig, source: layer.name });
           }
         });
-      } 
+      }
       // Handle tile layer type
       else if (layer.type === "tile") {
         const url =
