@@ -409,7 +409,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
 
     const layerName = visualisation.joinLayer; // Get the associated layer name
 
-    const featureIdsForLayer = state.visualisedFeatureIds[layerName];
+    const featureIdsForLayer = state.visualisedFeatureIds & layerName ? state.visualisedFeatureIds[layerName] : [];
 
     const filteredData =
       featureIdsForLayer && featureIdsForLayer.length > 0

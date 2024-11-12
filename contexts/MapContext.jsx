@@ -67,7 +67,8 @@ export const MapProvider = ({ children }) => {
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
-    isFeatureSelectActive: false
+    isFeatureSelectActive: false,
+    visualisedFeatureIds: null
   };
 
 
