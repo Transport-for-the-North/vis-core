@@ -89,7 +89,7 @@ export const mapReducer = (state, action) => {
         selectionLayer: null,
         selectedFeatures: [],
         isFeatureSelectActive: false,
-        visualisedFeatureIds: {},
+        visualisedFeatureIds: null,
       };
     case actionTypes.SET_PAGE_INFO:
       return { ...state, pageInfo: action.payload };
