@@ -6,7 +6,6 @@ import { DynamicLegend } from "Components";
 import { useDualMaps, useMapContext, useFilterContext } from "hooks";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
-import { Visualisation } from "./Visualisation";
 
 import {
   getHoverLayerStyle,
@@ -16,6 +15,7 @@ import {
 } from "utils";
 import { useAppContext } from "contexts";
 import "./MapLayout.css";
+import { VisualisationManager } from "./VisualisationManager";
 
 const StyledMapContainer = styled.div`
   width: 50%;
@@ -663,23 +663,23 @@ const DualMaps = () => {
     <>
       <StyledMapContainer ref={leftMapContainerRef}>
         {Object.values(state.leftVisualisations).map((visConfig) => (
-          <Visualisation
+          <VisualisationManager
             key={visConfig.name}
-            visualisationName={visConfig.name}
+            visualisationConfig={visConfig}
             map={leftMap}
-            left={true}
             maps={maps}
+            left={true}
           />
         ))}
       </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
         {Object.values(state.rightVisualisations).map((visConfig) => (
-          <Visualisation
+          <VisualisationManager
             key={visConfig.name}
-            visualisationName={visConfig.name}
-            map={rightMap}
-            left={false}
+            visualisationConfig={visConfig}
+            map={leftMap}
             maps={maps}
+            left={false}
           />
         ))}
         {/* This below will need changing for when we have > 1 entries in each visualisation side. */}

@@ -6,7 +6,7 @@ import { DynamicLegend } from "Components";
 import { useMap, useMapContext, useFilterContext, useFeatureSelect } from "hooks";
 import { actionTypes } from "reducers";
 import maplibregl from "maplibre-gl";
-import { Visualisation } from "./Visualisation";
+import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from "./Layer";
 import {
   getSourceLayer,
@@ -569,9 +569,9 @@ const Map = () => {
       ))}
 
       {Object.values(state.visualisations).map((visConfig) => (
-        <Visualisation
+        <VisualisationManager
           key={visConfig.name}
-          visualisationName={visConfig.name}
+          visualisationConfig={visConfig}
           map={map}
           maps={null}
         />

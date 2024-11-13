@@ -1,11 +1,8 @@
 import colorbrewer from "colorbrewer";
-import { debounce } from "lodash";
-import { useCallback, useEffect, useRef, useState, useContext } from "react";
-
+import { useCallback, useEffect, useRef, useContext } from "react";
 import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
-import { api } from "services";
 import {
   colorSchemes,
   createPaintProperty,
@@ -14,41 +11,7 @@ import {
   resetPaintProperty,
 } from "utils";
 import chroma from "chroma-js";
-
-/**
- * Debounced function to fetch data for a specific visualization.
- *
- * @property {Object} visualisation - The visualization object containing details like data path and query parameters.
- * @property {Function} dispatch - The dispatch function to update the state in the context.
- * @property {Function} setLoading - The function to update the loading state.
- * @returns {Promise<void>} This function returns a promise.
- */
-const fetchDataForVisualisation = debounce(
-  async (visualisation, dispatch, setLoading, left) => {
-    if (visualisation && visualisation.queryParams) {
-      setLoading(true);
-      const path = visualisation.dataPath;
-      const queryParams = visualisation.queryParams;
-      const requiresAuth = visualisation.requiresAuth;
-      const visualisationName = visualisation.name;
-      try {
-        const data = await api.baseService.get(path, { queryParams, skipAuth: !requiresAuth });
-        dispatch({
-          type: actionTypes.UPDATE_ALL_DATA,
-          payload: { visualisationName, data, left },
-        });
-        if (data.length === 0) {
-          console.warn("No data returned for visualisation:", visualisationName);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data for visualisation:", error);
-        setLoading(false); // Set loading to false in case of error
-      }
-    }
-  },
-  400
-);
+import { useFetchVisualisationData } from "hooks"; // Import the custom hook
 
 /**
  * A React component responsible for rendering visualizations on a map.
@@ -58,14 +21,12 @@ const fetchDataForVisualisation = debounce(
  * @property {boolean} props.left - A boolean indicating whether the visualisation is for the left or the right map. Null for a single map page
  * @returns {null} This component doesn't render anything directly.
  */
-export const Visualisation = ({ visualisationName, map, left = null, maps }) => {
+export const MapVisualisation = ({ visualisationName, map, left = null, maps }) => {
   const { state, dispatch } = useMapContext();
   const appContext = useContext(AppContext);
-  const [isLoading, setLoading] = useState(false); // State to track loading
   const prevDataRef = useRef();
   const prevColorRef = useRef();
   const prevClassMethodRef = useRef();
-  const prevQueryParamsRef = useRef();
   const visualisation =
     left === null
       ? state.visualisations[visualisationName]
@@ -73,14 +34,19 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
 
-  let visualisationData = [];
-  if (left != null) {
-    visualisationData = state.leftVisualisations[visualisationName].data.concat(
-      state.rightVisualisations[visualisationName].data
-    )
-  } else {
-    visualisationData = state.visualisations[visualisationName].data
-  }
+  // Use the custom hook to fetch data
+  const { isLoading, data: visualisationData } = useFetchVisualisationData(visualisation);
+  
+  // Effect to dispatch the UPDATE_ALL_DATA action when data is fetched
+  useEffect(() => {
+    if (!isLoading && visualisationData) {
+      dispatch({
+        type: actionTypes.UPDATE_ALL_DATA,
+        payload: { visualisationName, data: visualisationData, left },
+      });
+    }
+  }, [visualisationData, dispatch, visualisationName, isLoading]);
+
 
   /**
    * Reclassifies the provided data and updates the map style.
@@ -124,7 +90,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       );
       addFeaturesToMap(mapItem, paintProperty, state.layers, data, style);
 
-      // addFeaturesToMap(map, paintProperty, state.layers, data, style);
       dispatch({
         type: "UPDATE_MAP_STYLE",
         payload: { visualisationName, paintProperty },
@@ -298,47 +263,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
     return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
   };
 
-  // Effect to update the data if queryParams change
-  useEffect(() => {
-    // Stringify the current queryParams for comparison
-    const currentQueryParamsStr = JSON.stringify(visualisation.queryParams);
-
-    // Check if all required query parameters are present
-    const allParamsPresent = Object.values(visualisation.queryParams).every(
-      (param) => param !== null && param !== undefined
-    );
-    const queryParamsChanged =
-      prevQueryParamsRef.current !== currentQueryParamsStr;
-
-    if (allParamsPresent && queryParamsChanged) {
-      if (!left) {
-        // Debounce the function to update both sides of the map
-        setTimeout(() => {
-          fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
-        }, 400);
-      } else
-        fetchDataForVisualisation(visualisation, dispatch, setLoading, left);
-
-      // Update the ref to the current queryParams
-      prevQueryParamsRef.current = currentQueryParamsStr;
-    }
-  }, [
-    visualisation.queryParams,
-    visualisationName,
-    visualisation,
-    left,
-    dispatch,
-  ]);
-
-  // Log loading status to console
-  useEffect(() => {
-    if (isLoading) {
-      dispatch({ type: actionTypes.SET_IS_LOADING });
-    } else {
-      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
-    }
-  }, [isLoading]);
-
   function checkGeometryNotNull(featureCollection) {
     // Check if the feature collection is provided
     if (
@@ -383,7 +307,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
   // Effect to restyle the map if data has changed
   useEffect(() => {
     const dataHasChanged =
-      visualisation.data !== prevDataRef.current &&
+      visualisationData !== prevDataRef.current &&
       prevDataRef.current !== undefined;
     const colorHasChanged =
       state.color_scheme !== null &&
@@ -393,37 +317,28 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       state.class_method !== prevClassMethodRef.current;
     const needUpdate =
       dataHasChanged || colorHasChanged || classificationHasChanged;
-    
-      if (!needUpdate) {
-      setLoading(false);
+
+    if (!needUpdate) {
       return;
     }
 
     // **Filter data based on visualisedFeatureIds**
-    const visualisationData =
-      left === null
-        ? visualisation.data
-        : left
-        ? state.leftVisualisations[visualisationName].data
-        : state.rightVisualisations[visualisationName].data;
-
     const layerName = visualisation.joinLayer; // Get the associated layer name
 
     const featureIdsForLayer = state.visualisedFeatureIds & layerName ? state.visualisedFeatureIds[layerName] : [];
 
-    const filteredData =
-      featureIdsForLayer && featureIdsForLayer.length > 0
-        ? visualisationData.filter((row) =>
-            featureIdsForLayer.some(feature => feature.value === Number(row["id"]))
-          )
-        : visualisationData;
+    const filteredData = featureIdsForLayer && featureIdsForLayer.length > 0
+      ? visualisationData.filter((row) =>
+          featureIdsForLayer.some(feature => feature.value === Number(row["id"]))
+        )
+      : visualisationData || [];
+
 
     switch (visualisation.type) {
       case "geojson": {
-        setLoading(true);
-        visualisation.data[0]
+        visualisationData[0]
           ? reclassifyAndStyleGeoJSONMap(
-              JSON.parse(visualisation.data[0].feature_collection),
+              JSON.parse(visualisationData[0].feature_collection),
               visualisation.style
             )
           : resetMapStyle(visualisation.style);
@@ -432,10 +347,9 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
 
       case "joinDataToMap": {
         // Use filteredData instead of visualisationData
-        if (filteredData.length === 0) {
+        if (Array.isArray(filteredData) && filteredData.length === 0) {
           resetMapStyle(visualisation.style);
         } else {
-          setLoading(true);
           if (left !== null) {
             reclassifyAndStyleMap(
               maps[0],
@@ -466,7 +380,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       default:
         break;
     }
-    setLoading(false);
     // Update the ref to the current data
     prevDataRef.current = filteredData;
     prevColorRef.current = state.color_scheme;
@@ -484,8 +397,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
   }, [
     visualisation,
     reclassifyAndStyleGeoJSONMap,
-    setLoading,
-    visualisation.data,
+    visualisationData,
     reclassifyAndStyleMap,
     dispatch,
     map,
