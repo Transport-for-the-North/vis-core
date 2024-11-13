@@ -135,13 +135,7 @@ export const useDualMaps = (
     }
   }, [leftMap, rightMap, mapZoom]);
 
-  // Update map style if mapStyle changes
-  useEffect(() => {
-    if (leftMap && rightMap && mapStyle) {
-      leftMap.setStyle(mapStyle);
-      rightMap.setStyle(mapStyle);
-    }
-  }, [leftMap, rightMap, mapStyle]);
+
 
   return { leftMap, rightMap, isMapStyleLoaded, isMapLoaded, isMapReady };
 };
