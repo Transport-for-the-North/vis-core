@@ -1,7 +1,7 @@
 import { evUptake, tfnEvUptake } from "./evUptake"
 import { annualChargingDemand, tfnAnnualChargingDemand } from "./annualChargingDemand"
 import { evcpRequirements, tfnEvcpRequirements } from "./evcpRequirements"
-import { enrouteChargingSites } from "./enrouteChargingSites"
+import { potentialChargingSites } from "./potentialChargingSites"
 import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
@@ -11,7 +11,7 @@ export const pages = {
     evUptake: evUptake,
     annualChargingDemand: annualChargingDemand,
     evcpRequirements: evcpRequirements,
-    enrouteChargingSites: enrouteChargingSites,
+    potentialChargingSites: potentialChargingSites,
     cpArea: cpArea,
     cpLocation: cpLocation,
     cpMajorRoad: cpMajorRoad,

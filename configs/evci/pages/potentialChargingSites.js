@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
-export const enrouteChargingSites = {
+export const potentialChargingSites = {
   pageName: "Potential Charging Sites",
   url: "/@stbTag@/potential-charging-sites",
   type: "MapLayout",
