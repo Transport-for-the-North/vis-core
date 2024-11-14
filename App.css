@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100;400&display=swap');
 
-body, html {
-    font-family: 'Hanken Grotesk', sans-serif;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
+body, html, .maplibregl-map {
+    font-family: 'Hanken Grotesk', sans-serif !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    -webkit-font-smoothing: antialiased !important;
 }
 
 .App {
