@@ -530,7 +530,7 @@ const runTypeCodeDynamicSelector = {
         paramValue: "D",
       },
       {
-        displayValue: "Income",
+        displayValue: "Income-based",
         paramValue: "I",
       }
     ],

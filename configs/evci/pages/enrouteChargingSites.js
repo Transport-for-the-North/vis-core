@@ -32,7 +32,7 @@ export const enrouteChargingSites = {
         source: "api",
         path: "/api/vectortiles/evci_links/{z}/{x}/{y}?stb_zone_id=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "geometry",
-        geometryType: "point",
+        geometryType: "line",
         visualisationName: "Enroute Charging Sites",
         isHoverable: true,
         isStylable: true,
@@ -49,7 +49,7 @@ export const enrouteChargingSites = {
         name: "Enroute Charging Sites",
         type: "joinDataToMap",
         joinLayer: "Enroute Charging Sites",
-        style: "circle-continuous",
+        style: "line-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",

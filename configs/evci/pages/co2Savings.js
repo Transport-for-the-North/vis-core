@@ -59,7 +59,7 @@ export const co2Savings = {
       { ...selectors.administrativeBoundary, visualisations: ['CO2 Savings'] },
       { ...selectors.travelScenarioBase, visualisations: ['CO2 Savings'] },
       { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
-      { ...selectors.vehicleType, visualisations: ['CO2 Savings'] },
+      { ...selectors.vehicleTypeWithoutAll, visualisations: ['CO2 Savings'] },
       { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
       { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] },
       { ...selectors.zoneSelector, visualisations: ['CO2 Savings']}
@@ -82,7 +82,7 @@ export const tfnCo2Savings = {
       { ...selectors.administrativeBoundary, visualisations: ['CO2 Savings'] },
       { ...selectors.travelScenarioAdditional, visualisations: ['CO2 Savings'] },
       { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
-      { ...selectors.vehicleType, visualisations: ['CO2 Savings'] },
+      { ...selectors.vehicleTypeWithoutAll, visualisations: ['CO2 Savings'] },
       { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
       { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] },
       { ...selectors.zoneSelector, visualisations: ['CO2 Savings']}
