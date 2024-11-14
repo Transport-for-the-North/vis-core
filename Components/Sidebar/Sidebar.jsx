@@ -32,6 +32,7 @@ const SidebarContainer = styled.div`
   border-radius: 10px;
   scrollbar-width: none;
   transition: left 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const ToggleButton = styled.button`
