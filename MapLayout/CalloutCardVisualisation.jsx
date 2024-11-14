@@ -1,0 +1,166 @@
+import React, { useEffect, useState, useContext } from 'react';
+import styled from 'styled-components';
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { MapContext } from 'contexts'; 
+
+const CARD_WIDTH = 300;
+const TOGGLE_BUTTON_WIDTH = 40;
+const TOGGLE_BUTTON_HEIGHT = 30;
+const PADDING = 10;
+
+
+/**
+ * Styled component for the card container.
+ */
+const CardContainer = styled.div`
+  position: absolute;
+  top: ${PADDING}px;
+  right: ${PADDING}px;
+  width: ${CARD_WIDTH}px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: ${PADDING}px;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(${({ $isVisible }) => ($isVisible ? '0' : `${CARD_WIDTH + PADDING * 3}px`)});
+`;
+
+/**
+ * Styled component for the card title.
+ */
+const CardTitle = styled.h3`
+  font-size: 1.2em;
+  color: #4b3e91;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #333;
+  user-select: none;
+  background-color: rgba(255, 255, 255, 0);
+`;
+
+/**
+ * Styled component for the card content.
+ */
+const CardContent = styled.div`
+  margin-top: 8px;
+  font-size: 1em;
+  color: #666;
+  text-align: left;
+`;
+
+/**
+ * Styled component for the toggle button.
+ */
+const ToggleButton = styled.button`
+  position: absolute;
+  top: ${PADDING * 2}px; // Adjusted for better alignment
+  right: ${({ $isVisible }) =>
+    $isVisible
+      ? `${PADDING * 2 + CARD_WIDTH - TOGGLE_BUTTON_WIDTH}px`
+      : `${PADDING}px`};
+  width: ${TOGGLE_BUTTON_WIDTH}px;
+  height: ${TOGGLE_BUTTON_HEIGHT}px;
+  z-index: 1001;
+  background-color: #7317de;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: right 0.3s ease-in-out;
+  
+  &:hover::after {
+    content: ${({ $isVisible }) => ($isVisible ? "'Hide Card'" : "'Show Card'")};
+    position: absolute;
+    right: 100%;
+    transform: translateX(0);
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    white-space: nowrap;
+  }
+`;
+
+/**
+ * CalloutCardVisualisation component to display a card-like element within the map.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.visualisationName - The name of the visualisation.
+ * @returns {JSX.Element} The rendered CalloutCardVisualisation component.
+ */
+export const CalloutCardVisualisation = ({ visualisationName }) => {
+  const { state } = useContext(MapContext); // Use context to get the visualisation config
+  const visualisation = state.visualisations[visualisationName];
+
+  // Use the custom hook to fetch data
+  // const { isLoading, data } = useFetchVisualisationData(visualisation);
+
+  // Dummy data for demonstration
+  const data = {
+    title: "Example Title",
+    content: "Example content goes here."
+  };
+  const isLoading = false;
+
+  // State to hold the rendered HTML content
+  const [renderedContent, setRenderedContent] = useState('');
+  const [isVisible, setIsVisible] = useState(true);
+
+  // Effect to replace placeholders in the HTML pattern with actual data
+  useEffect(() => {
+    if (data) {
+      const { title, content } = data;
+      const html = visualisation.htmlPattern
+        .replace('{title}', title)
+        .replace('{content}', content);
+      setRenderedContent(html);
+    }
+  }, [data, visualisation.htmlPattern]);
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <CardContainer $isVisible={isVisible}>
+          Loading...
+        </CardContainer>
+        <ToggleButton $isVisible={isVisible} onClick={toggleVisibility}>
+          {isVisible ? (
+            <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+          ) : (
+            <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
+          )}
+        </ToggleButton>
+      </>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return null; // Don't render the card if there's no data
+  }
+
+  return (
+    <>
+      <CardContainer $isVisible={isVisible}>
+        <CardTitle>{visualisation.name}</CardTitle>
+        <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
+      </CardContainer>
+      <ToggleButton $isVisible={isVisible} onClick={toggleVisibility}>
+        {isVisible ? (
+          <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+        ) : (
+          <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
+        )}
+      </ToggleButton>
+    </>
+  );
+};
