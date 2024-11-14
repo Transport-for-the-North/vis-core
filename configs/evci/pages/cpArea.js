@@ -3,7 +3,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
 export const cpArea = {
-  pageName: "Chargers/Power by Area",
+  pageName: "Actual: Charger power by Area",
   url: "/@stbTag@/cp-area",
   type: "MapLayout",
   category: "@stbName@",
