@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
 export const cpLocation = {
-  pageName: "Actual: Charger power by Location",
+  pageName: "Actual: Chargers/Power by Location",
   url: "/@stbTag@/cp-location",
   type: "MapLayout",
   category: "@stbName@",

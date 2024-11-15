@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
 export const cpMajorRoad = {
-  pageName: "Actual: Charger power by Major Road",
+  pageName: "Actual: Chargers/Power by Major Road",
   url: "/@stbTag@/cp-major-road",
   type: "MapLayout",
   category: "@stbName@",
