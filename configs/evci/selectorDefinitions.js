@@ -194,11 +194,7 @@ const vehicleTypeSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Car",
-        paramValue: "car",
-      },
-      {
-        displayValue: "Van",
+        displayValue: "Car and Van",
         paramValue: "lgv",
       },
       {
