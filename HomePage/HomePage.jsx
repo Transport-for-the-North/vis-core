@@ -76,6 +76,9 @@ export const HomePage = () => {
             const alignmentClass = homePageFragments[title]?.alignment || 'center';
             const backgroundColor = homePageFragments[title]?.backgroundColor || '';
             const sectionTitle = homePageFragments[title]?.sectionTitle;
+            const image = homePageFragments[title]?.image;
+            const imagePosition = homePageFragments[title]?.imagePosition || 'right';
+
             return (
               <section
                 key={title}
@@ -87,7 +90,12 @@ export const HomePage = () => {
                 <h2 className={`title-${alignmentClass}`}>
                   {sectionTitle}
                 </h2>
-                <div className="container-section">{parse(content)}</div>
+                <div className={`section-content ${imagePosition === 'full-width' ? 'full-width' : ''}`}>
+                  {image && imagePosition === 'left' && <img src={image} alt={`${title} image`} />}
+                  <div className="container-section">{parse(content)}</div>
+                  {image && imagePosition === 'right' && <img src={image} alt={`${title} image`} />}
+                </div>
+                {image && imagePosition === 'full-width' && <img src={image} alt={`${title} image`} />}
               </section>
             );
           })
