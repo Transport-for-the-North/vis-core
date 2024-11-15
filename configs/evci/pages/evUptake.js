@@ -13,8 +13,7 @@ export const evUptake = {
   about: `
   <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
     To get further help, type or select a topic in the glossary box.</p>
-  <p>EV uptake gives the number of electric vehicles (EVs) that are expected across the region, 
-    split by powertrain type (battery electric or plug-in hybrid) and vehicle type (car, van, or heavy goods vehicle).</p>`,
+  `,
   termsOfUse: termsOfUse,
   config: {
     layers: [
