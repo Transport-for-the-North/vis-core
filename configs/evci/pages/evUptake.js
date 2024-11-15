@@ -71,6 +71,20 @@ export const evUptake = {
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+        ],
+        downloadPath: '/api/evci/ev-uptake/download'
+      },
     },
   },
 };
@@ -91,5 +105,24 @@ export const tfnEvUptake = {
       { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
       { ...selectors.zoneSelector, visualisations: ['EV Uptake'] }
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+        ],
+        downloadPath: '/api/evci/ev-uptake/download'
+      },
+    },
   },
 };
