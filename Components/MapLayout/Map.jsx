@@ -532,7 +532,7 @@ const Map = () => {
         const featureIdsForLayer = state.visualisedFeatureIds[layerId];
         if (featureIdsForLayer && featureIdsForLayer.length > 0) {
           // Extract the values from featureIdsForLayer
-          const featureIdValues = featureIdsForLayer.map(feature => feature.value);
+          const featureIdValues = featureIdsForLayer.map(feature => parseInt(feature.value));
         
           // Apply filter to show only features with IDs in featureIdValues
           map.setFilter(layerId, [
