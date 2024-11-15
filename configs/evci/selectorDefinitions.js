@@ -216,17 +216,17 @@ const vehicleTypeWithoutAllSelector = {
     source: "local",
     values: [
       {
-        displayValue: "lgv",
+        displayValue: "Car",
+        paramValue: "car",
+      },
+      {
+        displayValue: "LGV",
         paramValue: "lgv",
       },
       {
         displayValue: "HGV",
         paramValue: "hgv",
       },
-      {
-        displayValue: "Car",
-        paramValue: "car",
-      }
     ],
   },
 };
@@ -242,20 +242,20 @@ const vehicleTypeAllSelector = {
     source: "local",
     values: [
       {
-        displayValue: "lgv",
-        paramValue: "lgv",
-      },
-      {
-        displayValue: "HGV",
-        paramValue: "hgv",
+        displayValue: "All",
+        paramValue: "all",
       },
       {
         displayValue: "Car",
         paramValue: "car",
       },
       {
-        displayValue: "All",
-        paramValue: "all",
+        displayValue: "LGV",
+        paramValue: "lgv",
+      },
+      {
+        displayValue: "HGV",
+        paramValue: "hgv",
       },
     ],
   },
