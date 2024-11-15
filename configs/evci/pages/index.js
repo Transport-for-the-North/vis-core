@@ -6,14 +6,14 @@ import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
 import { co2Savings, tfnCo2Savings } from "./co2Savings"
-import { enrouteChargingSites } from "./enrouteChargingSites"
+import { enrouteChargingDemand } from "./enrouteChargingDemand"
 
 export const pages = {
     evUptake: evUptake,
     annualChargingDemand: annualChargingDemand,
     evcpRequirements: evcpRequirements,
     potentialChargingSites: potentialChargingSites,
-    enrouteChargingSites: enrouteChargingSites,
+    enrouteChargingDemand: enrouteChargingDemand,
     cpArea: cpArea,
     cpLocation: cpLocation,
     cpMajorRoad: cpMajorRoad,
