@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { MapContext } from 'contexts'; 
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import DOMPurify from 'dompurify';
 
+import { MapContext } from 'contexts';
+import { useFetchVisualisationData } from 'hooks';
+
+// Constants for dimensions and spacing
 const CARD_WIDTH = 300;
 const TOGGLE_BUTTON_WIDTH = 40;
 const TOGGLE_BUTTON_HEIGHT = 30;
 const PADDING = 10;
-
 
 /**
  * Styled component for the card container.
@@ -29,12 +32,11 @@ const CardContainer = styled.div`
 /**
  * Styled component for the card title.
  */
-const CardTitle = styled.h3`
+const CardTitle = styled.h2`
   font-size: 1.2em;
   color: #4b3e91;
   font-weight: bold;
   margin-top: 5px;
-  color: #333;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
 `;
@@ -54,7 +56,7 @@ const CardContent = styled.div`
  */
 const ToggleButton = styled.button`
   position: absolute;
-  top: ${PADDING * 2}px; // Adjusted for better alignment
+  top: ${PADDING * 2}px;
   right: ${({ $isVisible }) =>
     $isVisible
       ? `${PADDING * 2 + CARD_WIDTH - TOGGLE_BUTTON_WIDTH}px`
@@ -72,7 +74,7 @@ const ToggleButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: right 0.3s ease-in-out;
-  
+
   &:hover::after {
     content: ${({ $isVisible }) => ($isVisible ? "'Hide Card'" : "'Show Card'")};
     position: absolute;
@@ -89,44 +91,61 @@ const ToggleButton = styled.button`
 
 /**
  * CalloutCardVisualisation component to display a card-like element within the map.
+ * It fetches data using the useFetchVisualisationData hook, uses an htmlFragment with
+ * placeholders, sanitizes the HTML, and populates the placeholders with the fetched data.
  *
  * @param {Object} props - The component props.
  * @param {string} props.visualisationName - The name of the visualisation.
- * @returns {JSX.Element} The rendered CalloutCardVisualisation component.
+ * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
 export const CalloutCardVisualisation = ({ visualisationName }) => {
-  const { state } = useContext(MapContext); // Use context to get the visualisation config
+  const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
 
-  // Use the custom hook to fetch data
   // const { isLoading, data } = useFetchVisualisationData(visualisation);
-
-  // Dummy data for demonstration
+  const isLoading = false
   const data = {
-    title: "Example Title",
-    content: "Example content goes here."
-  };
-  const isLoading = false;
-
+    title: "Example Combined Authority",
+    content: "Some example content"
+  }
   // State to hold the rendered HTML content
   const [renderedContent, setRenderedContent] = useState('');
   const [isVisible, setIsVisible] = useState(true);
 
-  // Effect to replace placeholders in the HTML pattern with actual data
-  useEffect(() => {
-    if (data) {
-      const { title, content } = data;
-      const html = visualisation.htmlPattern
-        .replace('{title}', title)
-        .replace('{content}', content);
-      setRenderedContent(html);
-    }
-  }, [data, visualisation.htmlPattern]);
+  /**
+   * Replaces placeholders in the HTML fragment with actual data.
+   * Placeholders are denoted by {key}, where 'key' corresponds to a key in the data object.
+   *
+   * @param {string} htmlFragment - The HTML fragment containing placeholders.
+   * @param {Object} data - The data object containing key-value pairs.
+   * @returns {string} The HTML fragment with placeholders replaced.
+   */
+  const replacePlaceholders = (htmlFragment, data) => {
+    // Use a regular expression to find all placeholders in the format {key}
+    return htmlFragment.replace(/{(\w+)}/g, (match, key) => {
+      // Replace the placeholder with the corresponding value from data
+      return data[key] !== undefined ? data[key] : match;
+    });
+  };
 
+  // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
+  useEffect(() => {
+    if (data && visualisation.htmlFragment) {
+      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, data);
+      // Sanitize the HTML to prevent XSS attacks
+      const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
+      setRenderedContent(sanitizedHtml);
+    }
+  }, [data, visualisation.htmlFragment]);
+
+  /**
+   * Toggles the visibility of the card.
+   */
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
 
+  // Render loading state if data is still being fetched
   if (isLoading) {
     return (
       <>
@@ -144,10 +163,12 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
     );
   }
 
-  if (!data || data.length === 0) {
+  // If there is no data to display, don't render the card
+  if (!data || Object.keys(data).length === 0) {
     return null; // Don't render the card if there's no data
   }
 
+  // Render the card with dynamic content
   return (
     <>
       <CardContainer $isVisible={isVisible}>
