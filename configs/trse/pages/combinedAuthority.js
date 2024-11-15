@@ -4,6 +4,7 @@ import { termsOfUse } from "../termsOfUse";
 export const combinedAuthority = {
   pageName: "Combined Authority",
   url: "/combined-authority",
+  category: null,
   type: "MapLayout",
   about: `
   <p>View TRSE data by Combined Authority District.</p>
@@ -64,16 +65,16 @@ export const combinedAuthority = {
         ]
       },
       {
-        name: "CA Callout",
+        name: "Detailed Information",
         type: "calloutCard",
         dataSource: "api",
         dataPath: "/api/trse/ca-callout",
-        htmlPattern: `embedded HTML here`
+        htmlFragment: '<div><h2>{title}</h1><p>{content}</p></div>'
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.parentCombinedAuthority, visualisations: ['TRSE Rank', 'CA Callout'] },
+      { ...selectors.parentCombinedAuthority, visualisations: ['TRSE Rank', 'Detailed Information'] },
     ],
     additionalFeatures: {
       glossary: { 
