@@ -4,6 +4,8 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
+import { DownloadSection } from "./Selectors/DownloadSelection";
+import { FilterProvider } from "contexts";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -119,6 +121,14 @@ export const Sidebar = ({
           />
         )}
         {children} {/* Render additional AccordionSections passed as children */}
+        {filters && additionalFeatures.download && (
+          <FilterProvider>
+            <DownloadSection
+              filters={additionalFeatures.download.filters}
+              downloadPath={additionalFeatures.download.downloadPath}
+            />
+          </FilterProvider>
+        )}
         <TextSection title="Legal" text={legalText} />
       </SidebarContainer>
     </>

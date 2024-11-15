@@ -81,6 +81,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
   } else {
     visualisationData = state.visualisations[visualisationName].data
   }
+  
 
   /**
    * Reclassifies the provided data and updates the map style.
@@ -94,6 +95,7 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
    */
   const reclassifyAndStyleMap = useCallback(
     (mapItem, mapData, data, style, classificationMethod) => {
+      console.log(state);
       // Reclassify data if needed
       const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
       const reclassifiedData = reclassifyData(
@@ -112,7 +114,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
       const colourPalette = calculateColours(currentColor, reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
-
       const opacityValue = document.getElementById(
         "opacity-" + visualisation.joinLayer
       )?.value;
