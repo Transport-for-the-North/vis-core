@@ -52,5 +52,5 @@ export const replaceRouteParameter = (path, paramName, paramValue) =>
  */
 export const checkSecurityRequirements = (apiSchema, apiRoute) => {
   const pathDetails = apiSchema.paths[apiRoute]?.get;
-  return pathDetails && pathDetails.security && pathDetails.security.length > 0;
+  return pathDetails && pathDetails.security ? pathDetails.security.length > 0 : false;
 };

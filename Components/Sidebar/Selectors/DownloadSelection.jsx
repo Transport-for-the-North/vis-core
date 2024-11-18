@@ -61,7 +61,7 @@ export const DownloadSection = ({ filters, downloadPath }) => {
     try {
       await api.downloadService.downloadCsv(apiRoute, {
         queryParams: filterState,
-        skipAuth: false, //requiresAuth,
+        skipAuth: !requiresAuth,
       });
       console.log('CSV downloaded successfully');
     } catch (error) {
