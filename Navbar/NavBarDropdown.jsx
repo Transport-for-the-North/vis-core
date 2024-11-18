@@ -12,6 +12,7 @@ const DropdownContainer = styled.div`
   background-color: ${(props) => (props.$isActive ? props.$bgColor : "#f9f9f9")};
   &:hover {
     background-color: ${(props) => (props.$isActive ? props.$bgColor : "#7317de")};
+    cursor: default;
   }
   color: ${(props) => (props.$isActive ? "#f9f9f9" : "#4b3e91")};
   text-decoration: none;

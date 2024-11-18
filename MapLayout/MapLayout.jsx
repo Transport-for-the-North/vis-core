@@ -127,7 +127,7 @@ export const MapLayout = () => {
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
         filters={state.filters}
-        legalText={loremIpsum}
+        legalText={pageContext.legalText}
         onFilterChange={handleFilterChange}
         additionalFeatures={pageContext.config.additionalFeatures} // Pass additionalFeatures prop
       >
