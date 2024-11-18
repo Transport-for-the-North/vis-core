@@ -1,5 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { caSummaryCallout } from "../templates";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -16,7 +17,7 @@ export const combinedAuthority = {
         name: "Output Areas",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/17/{z}/{x}/{y}?parentZoneType=16&parentZoneId=", // specify query params empty if to be set
+        path: "/api/vectortiles/zones/28/{z}/{x}/{y}?parentZoneType=16&parentZoneId=", // specify query params empty if to be set
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "TRSE Rank",
@@ -36,7 +37,6 @@ export const combinedAuthority = {
         path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
-        visualisationName: "TRSE Rank",
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
@@ -68,13 +68,17 @@ export const combinedAuthority = {
         name: "Detailed Information",
         type: "calloutCard",
         dataSource: "api",
-        dataPath: "/api/trse/ca-callout",
-        htmlFragment: '<div><h2>{title}</h1><p>{content}</p></div>'
+        dataPath: "/api/trse/callout-data/authority",
+        htmlFragment: caSummaryCallout
       },
     ],
     metadataTables: [],
     filters: [
       { ...selectors.parentCombinedAuthority, visualisations: ['TRSE Rank', 'Detailed Information'] },
+      { ...selectors.zoneResolutionCAFixed, visualisations: ['TRSE Rank']},
+      { ...selectors.zoneTypeCAFixed, visualisations: ['TRSE Rank', 'Detailed Information']},
+      { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank']},
+      { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank']},
     ],
     additionalFeatures: {
       glossary: { 
