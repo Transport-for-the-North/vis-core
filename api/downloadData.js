@@ -2,26 +2,6 @@ import { create } from "lodash";
 import BaseService from "./Base";
 import Cookies from "js-cookie";
 
-function createQueryString(queryParams) {
-    let queryString = '';
-
-    for (const [key, value] of Object.entries(queryParams)) {
-        if (Array.isArray(value)) {
-            const joinedValues = value.join(`|${key}=`);
-            queryString += `${key}=${joinedValues}&`;
-        } else {
-            queryString += `${key}=${value}&`;
-        }
-    }
-
-    // Remove the trailing '&' if it exists
-    if (queryString.endsWith('&')) {
-        queryString = queryString.slice(0, -1);
-    }
-
-    return queryString;
-}
-
 export class DownloadService extends BaseService {
     /**
      * Constructs a new GeodataService instance.
@@ -51,8 +31,7 @@ export class DownloadService extends BaseService {
    * @returns {Promise<void>} Resolves when the download is initiated.
    */
   async downloadCsv(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {} }) {
-    // const params = this._buildQuery(options?.queryParams);
-    const params = createQueryString(options?.queryParams);
+    const params = this._buildQuery(options?.queryParams);
     console.log(params);
     const path = params ? `${subPath}?${params}` : subPath;
     const url = this._buildUrl(path);
