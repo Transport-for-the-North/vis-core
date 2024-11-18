@@ -16,7 +16,7 @@ const administrativeBoundarySelector = {
     source: "local",
     values: [
       {
-        displayValue: "LAD",
+        displayValue: "Local Authority",
         paramValue: 27,
       },
       {

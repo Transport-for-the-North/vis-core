@@ -31,9 +31,9 @@ export const evUptake = {
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        labelNulls: true,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
       }
     ],
     visualisations: [
