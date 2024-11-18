@@ -1,6 +1,6 @@
 import { stbConfig } from "./stbConfig";
 import { pages } from "./pages";
-import { filterGlossaryData, replacePlaceholders } from "utils";
+import { filterGlossaryData, replacePlaceholdersInObject } from "utils";
 import glossaryData from "./glossaryData";
 import { mapStyles } from "defaults";
 
@@ -67,7 +67,7 @@ async function loadAndAdaptPages() {
       try {
         const basePage = pages[page];
         if (basePage) {
-          const adaptedPage = replacePlaceholders(basePage, stb);
+          const adaptedPage = replacePlaceholdersInObject(basePage, stb);
 
           // Check if adaptedPage has additionalFeatures and glossary
           if (adaptedPage.config?.additionalFeatures?.glossary) {

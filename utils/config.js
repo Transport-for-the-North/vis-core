@@ -32,7 +32,7 @@
  * };
  *
  * try {
- *     const result = replacePlaceholders(target, source);
+ *     const result = replacePlaceholdersInObject(target, source);
  *     console.log(result);
  * } catch (error) {
  *     console.error(error.message);
@@ -48,7 +48,7 @@
  *    "items": ["Apple", "Banana"]
  *}
  */
-export function replacePlaceholders(target, source) {
+export function replacePlaceholdersInObject(target, source) {
   // Validate input
   if (typeof target !== "object" || target === null || Array.isArray(target)) {
     throw new TypeError("The `target` must be a non-null object.");
@@ -94,6 +94,21 @@ export function replacePlaceholders(target, source) {
   return recursiveReplace(target);
 }
 
+/**
+   * Replaces placeholders in the HTML fragment with actual data.
+   * Placeholders are denoted by {key}, where 'key' corresponds to a key in the data object.
+   *
+   * @param {string} htmlFragment - The HTML fragment containing placeholders.
+   * @param {Object} data - The data object containing key-value pairs.
+   * @returns {string} The HTML fragment with placeholders replaced.
+   */
+export const replacePlaceholders = (htmlFragment, data) => {
+  // Use a regular expression to find all placeholders in the format {key}
+  return htmlFragment.replace(/{(\w+)}/g, (match, key) => {
+    // Replace the placeholder with the corresponding value from data
+    return data[key] !== undefined ? data[key] : match;
+  });
+};
 
 /**
  * Filters a glossary data object by excluding entries that contain any items from a specified exclude list.
