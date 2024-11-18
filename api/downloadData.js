@@ -56,10 +56,8 @@ export class DownloadService extends BaseService {
    */
   async downloadCsv(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {} }) {
     const params = createQueryString(options?.queryParams);
-    console.log(params);
     const path = params ? `${subPath}?${params}` : subPath;
     const url = this._buildUrl(path);
-    console.log(url);
     const jwtToken = options.skipAuth ? null : Cookies.get("token");
     const fetchOptions = {
       method: "GET",
