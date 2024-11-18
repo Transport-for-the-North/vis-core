@@ -31,9 +31,6 @@ export const DownloadSection = ({ filters, downloadPath }) => {
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
 
   useEffect(() => {
-    // filters.forEach(filter => {
-    //     filter.id = filter.paramName;
-    // });
     filters.forEach(filter => {
         if (filter.paramName !== "showValuesAs" && filter.paramName !== "stbTag") {
           filter.id = filter.paramName + 's';
@@ -50,7 +47,7 @@ export const DownloadSection = ({ filters, downloadPath }) => {
   }, []);
 
   // Function to handle dropdown change
-  const handleDownloadSelection = (filter, value) => {//paramName, newValue) => {
+  const handleDownloadSelection = (filter, value) => {
     filterDispatch({
         type: 'SET_FILTER_VALUE',
         payload: { filterId: filter.id, value },
