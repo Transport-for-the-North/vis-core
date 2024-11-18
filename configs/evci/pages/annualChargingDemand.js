@@ -16,6 +16,7 @@ export const annualChargingDemand = {
   <p>EV uptake gives the number of electric vehicles (EVs) that are expected across the region, 
     split by powertrain type (battery electric or plug-in hybrid) and vehicle type (car, van, or heavy goods vehicle).</p>`,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {

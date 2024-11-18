@@ -24,6 +24,7 @@ export const enrouteChargingSites = {
   charging hub development looks promising.</p>
   </div>`,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {

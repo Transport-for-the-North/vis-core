@@ -29,6 +29,7 @@ export const cpArea = {
   (although comparisons have shown reasonable agreement for application in this strategic toolkit).</p>
       </div>`,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {
