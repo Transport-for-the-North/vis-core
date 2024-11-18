@@ -5,6 +5,7 @@ import DOMPurify from 'dompurify';
 
 import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
+import { formatNumber, formatOrdinal, replacePlaceholders } from 'utils';
 
 // Constants for dimensions and spacing
 const CARD_WIDTH = 300;
@@ -45,10 +46,23 @@ const CardTitle = styled.h2`
  * Styled component for the card content.
  */
 const CardContent = styled.div`
-  margin-top: 8px;
-  font-size: 1em;
-  color: #666;
   text-align: left;
+  h2 {
+    font-size: 1.5em;
+    color: #4b3e91;
+    margin-bottom: 0.5em;
+  }
+
+  p {
+    font-size: 1.2em;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  .highlight {
+    font-weight: bold;
+    color: #e74c3c;
+  }
 `;
 
 /**
@@ -102,36 +116,24 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
 
-  // const { isLoading, data } = useFetchVisualisationData(visualisation);
-  const isLoading = false
-  const data = {
-    title: "Example Combined Authority",
-    content: "Some example content"
-  }
+  const { isLoading, data } = useFetchVisualisationData(visualisation);
+  
   // State to hold the rendered HTML content
   const [renderedContent, setRenderedContent] = useState('');
   const [isVisible, setIsVisible] = useState(true);
 
-  /**
-   * Replaces placeholders in the HTML fragment with actual data.
-   * Placeholders are denoted by {key}, where 'key' corresponds to a key in the data object.
-   *
-   * @param {string} htmlFragment - The HTML fragment containing placeholders.
-   * @param {Object} data - The data object containing key-value pairs.
-   * @returns {string} The HTML fragment with placeholders replaced.
-   */
-  const replacePlaceholders = (htmlFragment, data) => {
-    // Use a regular expression to find all placeholders in the format {key}
-    return htmlFragment.replace(/{(\w+)}/g, (match, key) => {
-      // Replace the placeholder with the corresponding value from data
-      return data[key] !== undefined ? data[key] : match;
-    });
-  };
 
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
-      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, data);
+      const formattedData = {
+        ...data,
+        high_risk_pop: formatNumber(data.high_risk_pop),
+        high_risk_rank: formatOrdinal(data.high_risk_rank),
+        high_risk_perc: formatNumber(data.high_risk_perc),
+        zone_count: formatNumber(data.zone_count),
+      };
+      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, formattedData);
       // Sanitize the HTML to prevent XSS attacks
       const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
       setRenderedContent(sanitizedHtml);
@@ -150,7 +152,10 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
     return (
       <>
         <CardContainer $isVisible={isVisible}>
-          Loading...
+          <CardTitle>Detailed Information</CardTitle>
+          <CardContent>
+            <h3>Loading...</h3>
+          </CardContent>
         </CardContainer>
         <ToggleButton $isVisible={isVisible} onClick={toggleVisibility}>
           {isVisible ? (
