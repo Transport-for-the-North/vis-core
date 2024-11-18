@@ -63,6 +63,33 @@ const CardContent = styled.div`
     font-weight: bold;
     color: #e74c3c;
   }
+  details {
+    margin-top: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0.5em;
+    background-color: #f9f9f9;
+
+    &[open] summary::after {
+      
+    }
+
+    summary {
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+
+      &::after {
+        
+      }
+    }
+
+    p {
+      margin-left: 1em;
+      margin-top: 0.5em;
+    }
+  }
 `;
 
 /**
@@ -126,14 +153,7 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
-      const formattedData = {
-        ...data,
-        high_risk_pop: formatNumber(data.high_risk_pop),
-        high_risk_rank: formatOrdinal(data.high_risk_rank),
-        high_risk_perc: formatNumber(data.high_risk_perc),
-        zone_count: formatNumber(data.zone_count),
-      };
-      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, formattedData);
+      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, data);
       // Sanitize the HTML to prevent XSS attacks
       const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
       setRenderedContent(sanitizedHtml);
@@ -177,7 +197,7 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
   return (
     <>
       <CardContainer $isVisible={isVisible}>
-        <CardTitle>{visualisation.name}</CardTitle>
+        <CardTitle>Detailed Information</CardTitle>
         <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
       </CardContainer>
       <ToggleButton $isVisible={isVisible} onClick={toggleVisibility}>

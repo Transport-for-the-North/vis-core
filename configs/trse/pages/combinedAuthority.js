@@ -1,6 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { caSummaryCallout } from "../templates";
+import { caSummaryCallout, oaDetailedCallout } from "../templates";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -27,8 +27,8 @@ export const combinedAuthority = {
         shouldHaveLabel: false,
         labelZoomLevel: 12,
         labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
       },
       {
         name: "Combined Authorities",
@@ -44,7 +44,7 @@ export const combinedAuthority = {
         labelZoomLevel: 12,
         labelNulls: false,
         hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        hoverTipShouldIncludeMetadata: false,
       }
     ],
     visualisations: [
@@ -71,6 +71,13 @@ export const combinedAuthority = {
         dataPath: "/api/trse/callout-data/authority",
         htmlFragment: caSummaryCallout
       },
+      {
+        name: "Feature Callout",
+        type: "calloutCard",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/oa-or-pt-point",
+        htmlFragment: oaDetailedCallout
+      },
     ],
     metadataTables: [],
     filters: [
@@ -79,6 +86,8 @@ export const combinedAuthority = {
       { ...selectors.zoneTypeCAFixed, visualisations: ['TRSE Rank', 'Detailed Information']},
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank']},
+      selectors.oaFeature,
+      selectors.oaFeatureType
     ],
     additionalFeatures: {
       glossary: { 

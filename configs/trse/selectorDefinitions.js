@@ -224,6 +224,37 @@ const oaOrPtPercentileFilter = {
   },
 };
 
+const oaFeatureSelector = {
+  filterName: "",
+  paramName: "featureId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: ["Feature Callout"],
+  type: "map",
+  layer: "Output Areas",
+  field: "id",
+};
+
+const oaFeatureTypeFixedSelector = {
+  filterName: "OA Feature Type",
+  paramName: "featureType",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: ['Feature Callout'],
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "OA",
+        paramValue: 'oa',
+      }
+    ],
+  },
+};
+
 
 export const selectors = {
   parentCombinedAuthority: parentCombinedAuthoritySelector,
@@ -235,5 +266,7 @@ export const selectors = {
   featureTypeOAFixed: featureTypeOAFixedSelector,
   featureTypePTFixed: featureTypePTFixedSelector,
   oaOrPtvariable: oaOrPtvariableSelector,
-  oaOrPtPercentileFilter: oaOrPtPercentileFilter
+  oaOrPtPercentileFilter: oaOrPtPercentileFilter,
+  oaFeature: oaFeatureSelector,
+  oaFeatureType: oaFeatureTypeFixedSelector
 };
