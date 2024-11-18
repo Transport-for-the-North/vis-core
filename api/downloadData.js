@@ -3,6 +3,10 @@ import BaseService from "./Base";
 import Cookies from "js-cookie";
 
 function createQueryString(queryParams) {
+    /**
+     * Creates the query string from the query parameters, e.g. adding %2C for multiple choices for the
+     * same query parameters and adding & between new query parameter entries.
+     */
     let queryString = '';
 
     for (const [key, value] of Object.entries(queryParams)) {
@@ -52,8 +56,10 @@ export class DownloadService extends BaseService {
    */
   async downloadCsv(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {} }) {
     const params = createQueryString(options?.queryParams);
+    console.log(params);
     const path = params ? `${subPath}?${params}` : subPath;
     const url = this._buildUrl(path);
+    console.log(url);
     const jwtToken = options.skipAuth ? null : Cookies.get("token");
     const fetchOptions = {
       method: "GET",
