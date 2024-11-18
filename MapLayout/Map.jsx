@@ -554,8 +554,9 @@ const Map = () => {
       const { centroid, bounds } = state.mapBoundsAndCentroid;
       if (bounds) {
         map.fitBounds(bounds.coordinates[0], { padding: 20 });
-      } else if (centroid) {
-        map.panTo(centroid);
+      }
+      if (centroid) {
+        map.panTo(centroid.coordinates);
       }
       // Clear the bounds and centroid after panning
       dispatch({ type: actionTypes.CLEAR_BOUNDS_AND_CENTROID });
