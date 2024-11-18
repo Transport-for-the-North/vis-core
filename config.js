@@ -1,3 +1,5 @@
+import { formatNumber, formatOrdinal } from "./text";
+
 /**
  * Replace placeholders in the `target` object with values from the `source` object.
  *
@@ -103,10 +105,38 @@ export function replacePlaceholdersInObject(target, source) {
    * @returns {string} The HTML fragment with placeholders replaced.
    */
 export const replacePlaceholders = (htmlFragment, data) => {
-  // Use a regular expression to find all placeholders in the format {key}
-  return htmlFragment.replace(/{(\w+)}/g, (match, key) => {
-    // Replace the placeholder with the corresponding value from data
-    return data[key] !== undefined ? data[key] : match;
+  // Regular expression to match placeholders with optional function calls
+  return htmlFragment.replace(/{(\w+)(\(([\w\.]+)\))?}/g, (match, funcOrKey, funcArgs, argKey) => {
+    // If there is no function call, replace with data[key]
+    if (!funcArgs) {
+      const value = data[funcOrKey];
+      return value !== undefined ? value : match;
+    }
+
+    // If there is a function call, process it
+    const functionName = funcOrKey;
+    const arg = data[argKey];
+
+    // If arg is undefined, return the original placeholder
+    if (!arg) {
+      return match
+    }
+
+    // Define allowed functions
+    const allowedFunctions = {
+      formatNumber,
+      formatOrdinal,
+    };
+
+    // Check if the function is allowed
+    const func = allowedFunctions[functionName];
+    if (func) {
+      return func(arg);
+    }
+
+
+    // If function is not allowed, return the original placeholder
+    return match;
   });
 };
 
