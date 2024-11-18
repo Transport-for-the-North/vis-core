@@ -1,6 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { caSummaryCallout, oaDetailedCallout } from "../templates";
+import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -76,7 +76,7 @@ export const combinedAuthority = {
         type: "calloutCard",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
-        htmlFragment: oaDetailedCallout
+        htmlFragment: oaCaDetailedCallout
       },
     ],
     metadataTables: [],
