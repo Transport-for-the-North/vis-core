@@ -186,7 +186,7 @@ export const mapReducer = (state, action) => {
 
     case actionTypes.UPDATE_QUERY_PARAMS: {
       const visualisationNames = action.payload.filter.visualisations;
-      const paramName = action.payload.filter.paramName;
+      const paramName = action.payload.paramName || action.payload.filter.paramName;
       let newParamValue = action.payload.value;
 
       // If newParamValue is an array, convert it to a comma-delimited string
