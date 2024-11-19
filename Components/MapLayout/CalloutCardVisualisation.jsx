@@ -81,13 +81,13 @@ const CardContent = styled.div`
     flex: 1 0 100px;
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: left; /* Align text to the left */
+    text-align: left;
   }
 
   .card .label {
     font-size: 1em;
     color: #666;
-    margin-bottom: 0.5em; /* Add margin below the label */
+    margin-bottom: 0.5em;
     font-weight: bold;
   }
 
@@ -122,6 +122,7 @@ const CardContent = styled.div`
       cursor: pointer;
       position: relative;
       outline: none;
+      color: #333333;
     }
 
     .card-container {
