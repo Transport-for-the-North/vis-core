@@ -81,6 +81,17 @@ export const cpArea = {
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.chargerSpeed, multiSelect: true, type: 'dropdown' },
+          { ...selectors.columnNameCP, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
+          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+        ],
+        downloadPath: '/api/evci/cp-area/download'
+      },
     },
   },
 };

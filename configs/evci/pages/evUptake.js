@@ -75,11 +75,12 @@ export const evUptake = {
           { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
-          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
         ],
         downloadPath: '/api/evci/ev-uptake/download'
@@ -118,6 +119,7 @@ export const tfnEvUptake = {
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
         ],
         downloadPath: '/api/evci/ev-uptake/download'

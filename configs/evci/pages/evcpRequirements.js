@@ -69,6 +69,20 @@ export const evcpRequirements = {
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
+          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+        ],
+        downloadPath: '/api/evci/evcp-requirements/download'
+      },
     },
   },
 };
@@ -88,5 +102,24 @@ export const tfnEvcpRequirements = {
       { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
       { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
+          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+        ],
+        downloadPath: '/api/evci/evcp-requirements/download'
+      },
+    },
   },
 };

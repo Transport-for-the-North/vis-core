@@ -73,6 +73,13 @@ export const enrouteChargingSites = {
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+        ],
+        downloadPath: '/api/evci/potential-charging-sites/download'
+      },
       warning: "Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid charging hub development looks promising."
     },
   },
