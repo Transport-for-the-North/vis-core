@@ -47,6 +47,7 @@ const CardTitle = styled.h2`
  */
 const CardContent = styled.div`
   text-align: left;
+
   h2 {
     font-size: 1.5em;
     color: #4b3e91;
@@ -57,37 +58,81 @@ const CardContent = styled.div`
     font-size: 1.2em;
     color: #333;
     line-height: 1.6;
+    margin: 0.5em 0;
   }
 
   .highlight {
     font-weight: bold;
     color: #e74c3c;
   }
+
+  /* Card container for dynamic flex layout */
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -0.5em;
+    margin-right: -0.5em;
+  }
+
+  /* Individual cards */
+  .card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1em;
+    margin: 0.5em;
+    flex: 1 0 100px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .card .value {
+    font-size: 2em;
+    color: #4b3e91;
+    font-weight: bold;
+  }
+
+  .card .label {
+    font-size: 1em;
+    color: #666;
+    margin-top: 0.5em;
+    font-weight: bold;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 800px) {
+    .card {
+      flex: 1 0 45%; 
+    }
+  }
+
+  @media (max-width: 500px) {
+    .card {
+      flex: 1 0 90%;
+    }
+  }
+
+  /* Details and summary styling */
   details {
     margin-top: 1em;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 0.5em;
-    background-color: #f9f9f9;
-
-    &[open] summary::after {
-      
-    }
+    background-color: #f4f4f4;
 
     summary {
-      font-size: 1em;
+      font-size: 1.2em;
       font-weight: bold;
       cursor: pointer;
       position: relative;
-
-      &::after {
-        
-      }
+      outline: none;
     }
 
-    p {
-      margin-left: 1em;
-      margin-top: 0.5em;
+    /* Nested card container inside details */
+    .card-container {
+      margin-left: -0.5em;
+      margin-right: -0.5em;
+      margin-top: 1em;
     }
   }
 `;
