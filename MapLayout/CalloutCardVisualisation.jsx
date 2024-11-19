@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 
 import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
-import { formatNumber, formatOrdinal, replacePlaceholders } from 'utils';
+import { replacePlaceholders } from 'utils';
 
 // Constants for dimensions and spacing
 const CARD_WIDTH = 300;
@@ -66,7 +66,6 @@ const CardContent = styled.div`
     color: #e74c3c;
   }
 
-  /* Card container for dynamic flex layout */
   .card-container {
     display: flex;
     flex-wrap: wrap;
@@ -74,7 +73,6 @@ const CardContent = styled.div`
     margin-right: -0.5em;
   }
 
-  /* Individual cards */
   .card {
     background-color: #f9f9f9;
     border-radius: 8px;
@@ -83,7 +81,14 @@ const CardContent = styled.div`
     flex: 1 0 100px;
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    text-align: left; /* Align text to the left */
+  }
+
+  .card .label {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 0.5em; /* Add margin below the label */
+    font-weight: bold;
   }
 
   .card .value {
@@ -92,17 +97,9 @@ const CardContent = styled.div`
     font-weight: bold;
   }
 
-  .card .label {
-    font-size: 1em;
-    color: #666;
-    margin-top: 0.5em;
-    font-weight: bold;
-  }
-
-  /* Responsive adjustments */
   @media (max-width: 800px) {
     .card {
-      flex: 1 0 45%; 
+      flex: 1 0 45%;
     }
   }
 
@@ -112,7 +109,6 @@ const CardContent = styled.div`
     }
   }
 
-  /* Details and summary styling */
   details {
     margin-top: 1em;
     border: 1px solid #ddd;
@@ -128,7 +124,6 @@ const CardContent = styled.div`
       outline: none;
     }
 
-    /* Nested card container inside details */
     .card-container {
       margin-left: -0.5em;
       margin-right: -0.5em;
@@ -136,6 +131,7 @@ const CardContent = styled.div`
     }
   }
 `;
+
 
 /**
  * Styled component for the toggle button.
