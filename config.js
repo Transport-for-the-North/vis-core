@@ -118,7 +118,7 @@ export const replacePlaceholders = (htmlFragment, data) => {
     const arg = data[argKey];
 
     // If arg is undefined, return the original placeholder
-    if (!arg) {
+    if (arg === undefined) {
       return match
     }
 
