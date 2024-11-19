@@ -568,16 +568,9 @@ const Map = () => {
       {Object.values(state.layers).map((layer) => (
         <Layer key={layer.name} layer={layer} />
       ))}
-
-      {Object.values(state.visualisations).map((visConfig) => (
-        <VisualisationManager
-          key={visConfig.name}
-          visualisationConfig={visConfig}
-          map={map}
-          maps={null}
-        />
-      ))}
-
+      {state.visualisations && <VisualisationManager
+        visualisationConfigs={state.visualisations}
+      />}
       {isMapReady && <DynamicLegend map={map} />}
     </StyledMapContainer>
   );

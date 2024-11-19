@@ -7,19 +7,14 @@ import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
 import { replacePlaceholders } from 'utils';
 
-// Constants for dimensions and spacing
-const CARD_WIDTH = 300;
-const TOGGLE_BUTTON_WIDTH = 40;
-const TOGGLE_BUTTON_HEIGHT = 30;
-const PADDING = 10;
+import { CARD_CONSTANTS } from "defaults";
+const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
+  CARD_CONSTANTS;
 
 /**
  * Styled component for the card container.
  */
 const CardContainer = styled.div`
-  position: absolute;
-  top: ${PADDING}px;
-  right: ${PADDING}px;
   width: ${CARD_WIDTH}px;
   background-color: white;
   border-radius: 8px;

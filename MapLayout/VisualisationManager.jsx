@@ -1,25 +1,55 @@
 import React from 'react';
 import { CalloutCardVisualisation } from './CalloutCardVisualisation';
 import { MapVisualisation } from './MapVisualisation';
+import { ScrollableContainer } from 'Components';
 
 /**
- * VisualisationRenderer component that renders the appropriate visualisation
- * based on the type specified in the visualisation configuration.
+ * VisualisationManager component that renders the appropriate visualizations
+ * based on the types specified in the visualisation configurations.
  *
  * @param {Object} props - The component props.
- * @param {Object} props.visualisationConfig - The configuration object for the visualisation.
+ * @param {Object} props.visualisationConfigs - Object of configuration objects for the visualizations.
  * @param {Object} props.map - The Maplibre JS map instance.
  * @param {Object} props.maps - The Maplibre JS map instances for left and right maps.
- * @returns {JSX.Element|null} The rendered visualisation component or null if type is unknown.
+ * @returns {JSX.Element|null} The rendered visualization components.
  */
-export const VisualisationManager = ({ visualisationConfig, map, maps, ...props }) => {
-  switch (visualisationConfig.type) {
-    case 'calloutCard':
-      return <CalloutCardVisualisation visualisationName={visualisationConfig.name} {...props} />;
-    case 'joinDataToMap':
-      return <MapVisualisation visualisationName={visualisationConfig.name} map={map} maps={maps} left={props.left} {...props} />;
-    default:
-      console.warn(`Unknown visualisation type: ${visualisationConfig.type}`);
-      return null;
-  }
+export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props }) => {
+  // Convert visualisationConfigs object to an array of entries
+  const visualisationEntries = Object.entries(visualisationConfigs);
+
+  // Separate visualizations by type
+  const calloutCardVisualisations = visualisationEntries.filter(
+    ([name, config]) => config.type === 'calloutCard'
+  );
+
+  const mapVisualisations = visualisationEntries.filter(
+    ([name, config]) => config.type === 'joinDataToMap'
+  );
+
+  return (
+    <>
+      {/* Render all calloutCard visualiations inside ScrollableContainer */}
+      <ScrollableContainer>
+        {calloutCardVisualisations.map(([name]) => (
+          <CalloutCardVisualisation
+            key={name}
+            visualisationName={name}
+            {...props}
+          />
+        ))}
+      </ScrollableContainer>
+
+      {/* Render all MapVisualizations */}
+      {mapVisualisations.map(([name]) => (
+        <MapVisualisation
+          key={name}
+          visualisationName={name}
+          map={map}
+          maps={maps}
+          left={props.left}
+          {...props}
+        />
+      ))}
+    </>
+  );
 };
