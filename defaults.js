@@ -29,3 +29,10 @@ export const mapStyles = {
 export const defaultMapStyle = mapStyles.osMapsApiRaster;
 export const defaultMapCentre = [-2.2, 54.2];
 export const defaultMapZoom = 7.5;
+
+export const CARD_CONSTANTS = {
+  CARD_WIDTH: 300,
+  TOGGLE_BUTTON_WIDTH: 40,
+  TOGGLE_BUTTON_HEIGHT: 30,
+  PADDING: 10,
+}
