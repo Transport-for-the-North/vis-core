@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useFilterContext } from 'hooks';
+import { darken } from "polished";
 
 const Container = styled.div`
   display: flex;
@@ -18,7 +19,7 @@ const StyledToggle = styled.div`
 const StyledButton = styled.button`
   cursor: pointer;
   padding: 5px 2px;
-  background-color: ${(props) => (props.$isSelected ? "#7317DE" : "white")};
+  background-color: ${(props) => (props.$isSelected ? props.$bgColor : "white")};
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-top-left-radius: ${(props) => (props.index === 0 ? "4px" : "0px")};
   border-bottom-left-radius: ${(props) => (props.index === 0 ? "4px" : "0px")};
@@ -36,7 +37,7 @@ const StyledButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background-color: ${(props) => (props.$isSelected ? "#7317DE" : "white")};
+    background-color: ${(props) => (props.$isSelected ?  darken(0.1, props.$bgColor) : "white")};
     color: ${(props) => (props.$isSelected ? "white" : "black")};
   }
 `;
@@ -44,7 +45,7 @@ const StyledButton = styled.button`
 const ToggleAllButton = styled.button`
   cursor: pointer;
   padding: 5px 2px;
-  background-color: ${(props) => (props.$isSelected ? "#7317DE" : "white")};
+  background-color: ${(props) => (props.$isSelected ? props.$bgColor : "white")};
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-radius: 4px;
   border: 0.25px solid;
@@ -56,7 +57,7 @@ const ToggleAllButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background-color: ${(props) => (props.$isSelected ? "#7317DE" : "white")};
+    background-color: ${(props) => (props.$isSelected ?  darken(0.1, props.$bgColor) : "white")};
     color: ${(props) => (props.$isSelected ? "white" : "black")};
   }
 `;
@@ -75,7 +76,7 @@ const IconWrapper = styled.span`
  * @property {Function} onChange - The function called when a new toggle option is selected.
  * @returns {JSX.Element} The rendered Toggle component.
  */
-export const Toggle = ({ filter, onChange }) => {
+export const Toggle = ({ filter, onChange, bgColor }) => {
   const { state: filterState } = useFilterContext();
   const [selectedButtons, setSelectedButtons] = useState(
     filterState[filter.id] || (filter.multiSelect ? [] : filter.values.values[0].paramValue)
@@ -126,6 +127,7 @@ export const Toggle = ({ filter, onChange }) => {
             $isSelected={filter.multiSelect ? selectedButtons.includes(option.paramValue) : selectedButtons === option.paramValue}
             size={options.length}
             index={index}
+            $bgColor={bgColor}
           >
             {option.displayValue}
             {option.isValid !== undefined && (
@@ -140,6 +142,7 @@ export const Toggle = ({ filter, onChange }) => {
         <ToggleAllButton
           onClick={handleToggleAll}
           $isSelected={selectedButtons.length === filter.values.values.length}
+          $bgColor={bgColor}
         >
           Toggle All
         </ToggleAllButton>

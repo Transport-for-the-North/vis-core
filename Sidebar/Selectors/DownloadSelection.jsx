@@ -9,7 +9,7 @@ import { useFilterContext } from "hooks";
 import { api } from "services";
 import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
-import { update } from "lodash";
+import { darken } from "polished";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -20,7 +20,7 @@ const NoDataParagraph = styled.p``;
 const DownloadButton = styled.button`
   cursor: pointer;
   padding: 10px 5px; /* Increased padding for a larger button */
-  background-color: #7317DE;
+  background-color: ${(props) => props.$bgColor}; /* Access the $bgColor prop */
   color: white;
   border-radius: 4px;
   border: 0.25px solid;
@@ -32,7 +32,7 @@ const DownloadButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background-color: #5e13b0; /* Slightly darker color on hover */
+    background-color: ${(props) => darken(0.1, props.$bgColor)}; /* Darken the background color by 10% */
   }
 `;
 
@@ -51,7 +51,7 @@ const Spinner = styled.div`
   }
 `;
 
-export const DownloadSection = ({ filters, downloadPath }) => {
+export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
   const appContext = useContext(AppContext);
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -134,11 +134,12 @@ export const DownloadSection = ({ filters, downloadPath }) => {
                     filter={filter}
                     value={filterState[filter.id] || filter.values.values[0].paramValue}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
+                    bgColor={bgColor}
                   />
                 )}
               </SelectorContainer>
             ))}
-          <DownloadButton onClick={handleDownload}>
+          <DownloadButton onClick={handleDownload} $bgColor={bgColor}>
             Download
             {isDownloading && <Spinner />}
           </DownloadButton>

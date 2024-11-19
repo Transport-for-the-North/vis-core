@@ -120,6 +120,8 @@ export const MapLayout = () => {
     });
   };
 
+  console.log(pageContext);
+
   return (
     <LayoutContainer>
       <Dimmer dimmed={isLoading} showLoader={true} />
@@ -129,6 +131,7 @@ export const MapLayout = () => {
         filters={state.filters}
         legalText={pageContext.legalText}
         onFilterChange={handleFilterChange}
+        bgColor={pageContext.navbarLinkBgColour}
         additionalFeatures={pageContext.config.additionalFeatures} // Pass additionalFeatures prop
       >
         <MapLayerSection

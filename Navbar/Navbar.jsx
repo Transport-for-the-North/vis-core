@@ -115,7 +115,7 @@ export function Navbar() {
                   key={page.pageName}
                   className={activeLink === page.url ? "ActiveNavButton" : "NavButton"}
                   to={page.url}
-                  onClick={() => onClick(page.url, page.logoImage)}
+                  onClick={() => onClick(page.url, page.logoImage, page.navbarLinkBgColour)}
                 >
                   {page.pageName}
                 </Link>
@@ -132,7 +132,7 @@ export function Navbar() {
                   activeLink={activeLink}
                   dropdownName={page.category}
                   onClick={onClick}
-                  bgColor={bgColor}
+                  bgColor={page.navbarLinkBgColour}
                 />
               );
             } else {

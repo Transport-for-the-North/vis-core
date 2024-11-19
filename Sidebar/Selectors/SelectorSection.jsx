@@ -50,7 +50,7 @@ function checkGeometryNotNull(featureCollection) {
  * @property {Function} onFilterChange - The function called when a filter value changes.
  * @returns {JSX.Element} The rendered SelectorSection component.
  */
-export const SelectorSection = ({ filters, onFilterChange }) => {
+export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
   const { state: mapState } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
 
@@ -135,6 +135,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
                     filter={filter}
                     value={filterState[filter.id] || filter.values.values[0].paramValue}
                     onChange={(filter, value) => handleFilterChange(filter, value)}
+                    bgColor={bgColor}
               />
             )}
             {filter.type === 'mapFeatureSelect' && (
@@ -143,6 +144,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
                 filter={filter}
                 value={filterState[filter.id]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
+                bgColor={bgColor}
             />
             )}
             {filter.type === 'mapFeatureSelectWithControls' && (
@@ -151,6 +153,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
                 filter={filter}
                 value={filterState[filter.id]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
+                bgColor={bgColor}
             />
             )}
             {filter.type === 'mapFeatureSelectAndPan' && (
@@ -159,6 +162,7 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
                 filter={filter}
                 value={filterState[filter.id]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
+                bgColor={bgColor}
             />
             )}
           </SelectorContainer>

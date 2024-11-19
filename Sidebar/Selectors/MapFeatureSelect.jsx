@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FaMousePointer, FaDrawPolygon } from 'react-icons/fa';
 import { useMapContext } from 'hooks';
 import { FeatureSelect } from './FeatureSelect'; 
+import { darken } from "polished";
 
 // Styled components
 const Container = styled.div`
@@ -25,7 +26,7 @@ const StyledToggle = styled.div`
 const ModeButton = styled.button`
   cursor: pointer;
   padding: 5px 2px;
-  background-color: ${(props) => (props.selected ? '#7317DE' : 'white')};
+  background-color: ${(props) => (props.selected ? props.$bgColor : 'white')};
   color: ${(props) => (props.selected ? 'white' : 'black')};
   border: none;
   border-radius: 0;
@@ -38,7 +39,7 @@ const ModeButton = styled.button`
   pointer-events: ${(props) => (props.disabled ? 'none' : 'auto')};
 
   &:hover {
-    background-color: ${(props) => (props.selected ? '#7317DE' : 'white')};
+    background-color: ${(props) => (props.selected ? darken(0.1, props.$bgColor) : 'white')};
     color: ${(props) => (props.selected ? 'white' : 'black')};
   }
 
@@ -58,7 +59,7 @@ const ModeButton = styled.button`
 const EnableSelectButton = styled.button`
   cursor: pointer;
   padding: 5px 10px;
-  background-color: ${(props) => (props.enabled ? '#7317DE' : 'white')};
+  background-color: ${(props) => (props.enabled ? props.$bgColor : 'white')};
   color: ${(props) => (props.enabled ? 'white' : 'black')};
   border: 1px solid ${(props) => (props.enabled ? 'black' : '#ccc')};
   border-radius: 4px;
@@ -66,7 +67,7 @@ const EnableSelectButton = styled.button`
   font-family: 'Hanken Grotesk', sans-serif;
 
   &:hover {
-    background-color: ${(props) => (props.enabled ? '#7317DE' : 'white')};
+    background-color: ${(props) => (props.enabled ? darken(0.1, props.$bgColor) : 'white')};
     color: ${(props) => (props.enabled ? 'white' : 'black')};
   }
 `;
@@ -187,6 +188,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
           <EnableSelectButton
             enabled={isSelectEnabled}
             onClick={toggleSelectEnabled}
+            $bgColor={props.bgColor}
           >
             {isSelectEnabled ? 'Disable Filter' : 'Enable Filter'}
           </EnableSelectButton>
@@ -196,6 +198,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
               selected={selectionMode === 'feature'}
               onClick={() => handleSelectionModeChange('feature')}
               disabled={!isSelectEnabled}
+              $bgColor={props.bgColor}
             >
               <FaMousePointer />
               Pointer Selection
@@ -204,6 +207,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
               selected={selectionMode === 'rectangle'}
               onClick={() => handleSelectionModeChange('rectangle')}
               disabled={!isSelectEnabled}
+              $bgColor={props.bgColor}
             >
               <FaDrawPolygon />
               Rectangle Selection
