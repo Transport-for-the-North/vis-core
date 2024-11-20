@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import styled from 'styled-components'
 
 import { CARD_CONSTANTS } from 'defaults';
 const { CARD_WIDTH, PADDING } = CARD_CONSTANTS
@@ -17,28 +15,9 @@ const StyledScrollableContainer = styled.div`
   z-index: 1000;
   max-height: 60vh;
   overflow-y: auto;
-  overflow-x: show;
+  overflow-x: hidden;
   width: ${CARD_WIDTH + PADDING * 2}px;
   transition: transform 0.3s ease-in-out;
-  transform: translateX(
-    ${({ $isVisible }) => ($isVisible ? '0' : '100%')}
-  );
-`;
-
-const ToggleButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 0;
-  background-color: #7317de;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px;
-  cursor: pointer;
-  z-index: 1001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 /**
@@ -49,24 +28,11 @@ const ToggleButton = styled.button`
  * @returns {JSX.Element} The rendered ScrollableContainer component.
  */
 export const ScrollableContainer = ({ children }) => {
-  const [isVisible, setIsVisible] = useState(true);
-
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
-
   return (
     <div style={{ position: 'relative' }}>
-      <StyledScrollableContainer $isVisible={isVisible}>
+      <StyledScrollableContainer>
         {children}
       </StyledScrollableContainer>
-      <ToggleButton onClick={toggleVisibility}>
-        {isVisible ? (
-          <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
-        ) : (
-          <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
-        )}
-      </ToggleButton>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import DOMPurify from 'dompurify';
@@ -6,10 +6,18 @@ import DOMPurify from 'dompurify';
 import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
 import { replacePlaceholders } from 'utils';
+import { Hovertip } from 'Components';
 
 import { CARD_CONSTANTS } from "defaults";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
+
+/**
+ * Styled component for the parent container.
+ */
+const ParentContainer = styled.div`
+  position: relative;
+`;
 
 /**
  * Styled component for the card container.
@@ -128,17 +136,16 @@ const CardContent = styled.div`
   }
 `;
 
-
 /**
  * Styled component for the toggle button.
  */
 const ToggleButton = styled.button`
   position: absolute;
-  top: ${PADDING * 2}px;
+  top: ${PADDING}px;
   right: ${({ $isVisible }) =>
     $isVisible
-      ? `${PADDING * 2 + CARD_WIDTH - TOGGLE_BUTTON_WIDTH}px`
-      : `${PADDING}px`};
+      ? `${PADDING + CARD_WIDTH - TOGGLE_BUTTON_WIDTH}px`
+      : '0' };
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
@@ -152,20 +159,8 @@ const ToggleButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: right 0.3s ease-in-out;
-
-  &:hover::after {
-    content: ${({ $isVisible }) => ($isVisible ? "'Hide Card'" : "'Show Card'")};
-    position: absolute;
-    right: 100%;
-    transform: translateX(0);
-    background-color: black;
-    color: white;
-    padding: 5px;
-    border-radius: 6px;
-    font-size: 0.8em;
-    white-space: nowrap;
-  }
 `;
+
 
 /**
  * CalloutCardVisualisation component to display a card-like element within the map.
@@ -174,26 +169,30 @@ const ToggleButton = styled.button`
  *
  * @param {Object} props - The component props.
  * @param {string} props.visualisationName - The name of the visualisation.
+ * @param {string} [props.cardName] - Optional name for the card.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ visualisationName }) => {
+export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
+  const buttonRef = useRef(null);
 
   const { isLoading, data } = useFetchVisualisationData(visualisation);
-  
+
   // State to hold the rendered HTML content
   const [renderedContent, setRenderedContent] = useState('');
   const [isVisible, setIsVisible] = useState(true);
-
+  const [isHovered, setIsHovered] = useState(false);
 
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
+      setIsVisible(true);
       const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, data);
       // Sanitize the HTML to prevent XSS attacks
       const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
       setRenderedContent(sanitizedHtml);
+      
     }
   }, [data, visualisation.htmlFragment]);
 
@@ -202,25 +201,42 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
    */
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
+    setIsHovered(false);
   };
 
   // Render loading state if data is still being fetched
   if (isLoading) {
     return (
       <>
+        <ParentContainer>
         <CardContainer $isVisible={isVisible}>
-          <CardTitle>Detailed Information</CardTitle>
+          <CardTitle>Loading...</CardTitle>
           <CardContent>
             <h3>Loading...</h3>
           </CardContent>
         </CardContainer>
-        <ToggleButton $isVisible={isVisible} onClick={toggleVisibility}>
+        <ToggleButton
+          ref={buttonRef}
+          $isVisible={isVisible}
+          onClick={toggleVisibility}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          cardName={cardName}
+        >
           {isVisible ? (
             <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
           ) : (
             <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
           )}
         </ToggleButton>
+        <Hovertip
+          isVisible={isHovered}
+          displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
+          side="left"
+          refElement={buttonRef}
+          offset={5}
+        />
+        </ParentContainer>
       </>
     );
   }
@@ -233,17 +249,34 @@ export const CalloutCardVisualisation = ({ visualisationName }) => {
   // Render the card with dynamic content
   return (
     <>
+      <ParentContainer>
       <CardContainer $isVisible={isVisible}>
-        <CardTitle>Detailed Information</CardTitle>
+        <CardTitle>{cardName}</CardTitle>
         <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
       </CardContainer>
-      <ToggleButton $isVisible={isVisible} onClick={toggleVisibility}>
+      <ToggleButton
+          ref={buttonRef}
+          $isVisible={isVisible}
+          onClick={toggleVisibility}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          cardName={cardName}
+        >
         {isVisible ? (
           <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
         ) : (
           <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
         )}
       </ToggleButton>
+      <Hovertip
+        isVisible={isHovered}
+        displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
+        side="left"
+        refElement={buttonRef}
+        offset={5}
+        
+      />
+      </ParentContainer>
     </>
   );
 };
