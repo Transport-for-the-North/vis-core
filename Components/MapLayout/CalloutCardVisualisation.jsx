@@ -35,16 +35,15 @@ const CardContainer = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: ${PADDING}px;
   z-index: 1000;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
   transform: translateX(${({ $isVisible }) => ($isVisible ? '0' : `100%`)});
-  overflow: clipped; /* Prevent content overflow */
-  // white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Prevent content overflow */
   display: flex;
   flex-direction: column;
-  flex-shrink: 0; /* Prevent shrinking */
-  flex-grow: 0; /* Prevent growing */
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: ${({ $isVisible }) => ($isVisible ? 'auto' : `${PADDING * 2}px`)};
 `;
-
 
 /**
  * Styled component for the card title.
