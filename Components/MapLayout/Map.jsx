@@ -570,6 +570,8 @@ const Map = () => {
       ))}
       {state.visualisations && <VisualisationManager
         visualisationConfigs={state.visualisations}
+        map={map}
+        maps={null}
       />}
       {isMapReady && <DynamicLegend map={map} />}
     </StyledMapContainer>
