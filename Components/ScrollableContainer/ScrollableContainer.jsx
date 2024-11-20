@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 import { CARD_CONSTANTS } from 'defaults';
-const { CARD_WIDTH, PADDING } = CARD_CONSTANTS
+const { PADDING } = CARD_CONSTANTS
 
 const StyledScrollableContainer = styled.div`
   position: absolute;
@@ -16,7 +16,7 @@ const StyledScrollableContainer = styled.div`
   max-height: 60vh;
   overflow-y: auto;
   overflow-x: hidden;
-  width: ${CARD_WIDTH + PADDING * 2}px;
+  width: fit-content;
   transition: transform 0.3s ease-in-out;
 `;
 

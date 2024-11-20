@@ -14,13 +14,19 @@ const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
 
 /**
  * Styled component for the parent container.
+ * Adjusted to resize when the card is hidden.
  */
 const ParentContainer = styled.div`
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  width: ${({ $isVisible }) => ($isVisible ? `${CARD_WIDTH + PADDING * 2}px` : `${TOGGLE_BUTTON_WIDTH + PADDING}px`)};
+  transition: width 0.3s ease-in-out;
 `;
 
 /**
  * Styled component for the card container.
+ * Slides in/out by adjusting the transform property.
  */
 const CardContainer = styled.div`
   width: ${CARD_WIDTH}px;
@@ -30,8 +36,15 @@ const CardContainer = styled.div`
   padding: ${PADDING}px;
   z-index: 1000;
   transition: transform 0.3s ease-in-out;
-  transform: translateX(${({ $isVisible }) => ($isVisible ? '0' : `${CARD_WIDTH + PADDING * 3}px`)});
+  transform: translateX(${({ $isVisible }) => ($isVisible ? '0' : `100%`)});
+  overflow: clipped; /* Prevent content overflow */
+  // white-space: nowrap; /* Prevent text wrapping */
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevent shrinking */
+  flex-grow: 0; /* Prevent growing */
 `;
+
 
 /**
  * Styled component for the card title.
@@ -142,10 +155,7 @@ const CardContent = styled.div`
 const ToggleButton = styled.button`
   position: absolute;
   top: ${PADDING}px;
-  right: ${({ $isVisible }) =>
-    $isVisible
-      ? `${PADDING + CARD_WIDTH - TOGGLE_BUTTON_WIDTH}px`
-      : '0' };
+  left: ${PADDING}px;
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
@@ -208,7 +218,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
   if (isLoading) {
     return (
       <>
-        <ParentContainer>
+        <ParentContainer $isVisible={isVisible}>
         <CardContainer $isVisible={isVisible}>
           <CardTitle>Loading...</CardTitle>
           <CardContent>
@@ -249,7 +259,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
   // Render the card with dynamic content
   return (
     <>
-      <ParentContainer>
+      <ParentContainer $isVisible={isVisible}>
       <CardContainer $isVisible={isVisible}>
         <CardTitle>{cardName}</CardTitle>
         <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
