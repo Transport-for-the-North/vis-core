@@ -12,7 +12,7 @@ import { createPortal } from 'react-dom';
  * @param {boolean} props.alignVertical - Whether to align the hovertip vertically with the middle of the refElement.
  * @returns {JSX.Element|null} The rendered Hovertip component.
  */
-export const Hovertip = ({ isVisible, displayText, side, refElement, offset = 0, alignVertical = true }) => {
+export const Hovertip = ({ isVisible, displayText, side, refElement, offset = 5, alignVertical = true }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const hovertipRef = useRef(null);
 

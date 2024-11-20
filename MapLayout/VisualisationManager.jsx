@@ -19,27 +19,28 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
 
   // Separate visualizations by type
   const calloutCardVisualisations = visualisationEntries.filter(
-    ([name, config]) => config.type === 'calloutCard'
+    ([_, config]) => config.type === 'calloutCard'
   );
 
   const mapVisualisations = visualisationEntries.filter(
-    ([name, config]) => config.type === 'joinDataToMap'
+    ([_, config]) => config.type === 'joinDataToMap'
   );
 
   return (
     <>
       {/* Render all calloutCard visualiations inside ScrollableContainer */}
       <ScrollableContainer>
-        {calloutCardVisualisations.map(([name]) => (
+        {calloutCardVisualisations.map(([name, config]) => (
           <CalloutCardVisualisation
             key={name}
             visualisationName={name}
+            cardName={config.cardName || name}
             {...props}
           />
         ))}
       </ScrollableContainer>
 
-      {/* Render all MapVisualizations */}
+      {/* Render all MapVisualisations */}
       {mapVisualisations.map(([name]) => (
         <MapVisualisation
           key={name}
