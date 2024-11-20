@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
+import { Hovertip } from 'Components';
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -15,7 +16,7 @@ const SidebarHeader = styled.h2`
   color: #333;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
-  max-width: 270px
+  max-width: 270px;
 `;
 
 const SidebarContainer = styled.div`
@@ -56,19 +57,6 @@ const ToggleButton = styled.button`
     top: 108px;
     left: 10px;
   `}
-
-  &:hover::after {
-    content: ${({ $isVisible }) => ($isVisible ? "'Collapse Sidebar'" : "'Expand Sidebar'")};
-    position: absolute;
-    ${({ $isVisible }) => ($isVisible ? "right: 100%;" : "left: 100%;")}
-    transform: translateX(0); /* No horizontal translation */
-    background-color: black;
-    color: white;
-    padding: 5px;
-    border-radius: 6px;
-    font-size: 0.8em;
-    white-space: nowrap;
-  }
 `;
 
 /**
@@ -93,9 +81,12 @@ export const Sidebar = ({
   children
 }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const toggleButtonRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsVisible(!isVisible);
+    setIsHovered(false); // Reset hover state when toggling
   };
 
   return (
@@ -104,9 +95,22 @@ export const Sidebar = ({
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
         </SidebarHeader>
-      <ToggleButton $isVisible={isVisible} onClick={toggleSidebar}>
-        {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
-      </ToggleButton>
+        <ToggleButton
+          ref={toggleButtonRef}
+          $isVisible={isVisible}
+          onClick={toggleSidebar}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
+        </ToggleButton>
+        <Hovertip
+          isVisible={isHovered}
+          displayText={isVisible ? "Collapse Sidebar" : "Expand Sidebar"}
+          side="right"
+          refElement={toggleButtonRef}
+          alignVertical={true}
+        />
         <TextSection title="About this visualisation" text={aboutVisualisationText} />
         {additionalFeatures?.glossary && (
           <AccordionSection title="Glossary">
