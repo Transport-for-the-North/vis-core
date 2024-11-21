@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { AccordionSection } from 'Components';
-import { useMapContext } from 'hooks';
-import { LayerControlEntry } from './LayerControlEntry';
+import React, { useCallback, useEffect, useState } from "react";
+import { AccordionSection } from "Components";
+import { useMapContext } from "hooks";
+import { LayerControlEntry } from "./LayerControlEntry";
 
 /**
  * MapLayerSection component represents a section for controlling map layers.
@@ -12,7 +12,10 @@ import { LayerControlEntry } from './LayerControlEntry';
  * @param {Function} props.handleClassificationChange - The function to handle classification changes for the layers.
  * @returns {JSX.Element} The rendered MapLayerSection component.
  */
-export const MapLayerSection = ({ handleColorChange, handleClassificationChange }) => {
+export const MapLayerSection = ({
+  handleColorChange,
+  handleClassificationChange,
+}) => {
   const { state } = useMapContext();
   const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
   const [layers, setLayers] = useState([]);
@@ -22,8 +25,13 @@ export const MapLayerSection = ({ handleColorChange, handleClassificationChange 
       const newLayers = maps[0].getStyle().layers;
       const filteredLayers = newLayers.filter(
         (layer) =>
-          (layer.type === 'fill' || layer.type === 'line' || layer.type === 'circle') &&
-          layer.source !== 'default' && !layer.id.endsWith("-hover") && layer.id !== "selected-feature-layer"
+          (layer.type === "fill" ||
+            layer.type === "line" ||
+            layer.type === "circle") &&
+            layer.source !== "default" &&
+            !layer.id.endsWith("-hover") &&
+            layer.id !== "selected-feature-layer" &&
+            !layer.id.startsWith("gl-draw")
       );
       setLayers(filteredLayers);
     }
