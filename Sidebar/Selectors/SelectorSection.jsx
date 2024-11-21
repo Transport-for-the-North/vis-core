@@ -8,6 +8,8 @@ import { Toggle } from "./Toggle";
 import { AppContext, AuthProvider} from 'contexts';
 import { useContext, useEffect, useState } from "react";
 import App from "App";
+import { MapFeatureSelect, MapFeatureSelectWithControls } from './MapFeatureSelect';
+import { MapFeatureSelectAndPan } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -98,41 +100,66 @@ export const SelectorSection = ({ filters, onFilterChange }) => {
 
   const DiffPageMessage = 
     "The difference is calculated by Scenario 2 minus Scenario 1."
-  return (
-    <AccordionSection title="Filtering and data selection" defaultValue={true}>
+    return (
+      <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {DiffPage && <DiffParagraph>{DiffPageMessage}</DiffParagraph>}
-      {Array.isArray(filters) && filters.length > 0 ? (
-        filters.map((filter) => (
-          <SelectorContainer key={filter.id}>
-            <SelectorLabel
-              htmlFor={filter.paramName}
-              text={filter.filterName}
-              info={filter.info ?? null}
-            />
-            {filter.type === "dropdown" && (
-              <Dropdown
+        {Array.isArray(filters) && filters.length > 0 ? (
+          filters
+            .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
+            .map((filter) => (
+              <SelectorContainer key={filter.id}>
+                <SelectorLabel
+                  htmlFor={filter.paramName}
+                  text={filter.filterName}
+                  info={filter.info ?? null}
+                />
+                {filter.type === "dropdown" && (
+                  <Dropdown
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                  />
+                )}
+                {filter.type === "slider" && (
+                  <Slider
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.min || filter.values[0]}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                  />
+                )}
+                {filter.type === "toggle" && (
+                  <Toggle
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+              />
+            )}
+            {filter.type === 'mapFeatureSelect' && (
+              <MapFeatureSelect
                 key={filter.id}
                 filter={filter}
                 value={filterState[filter.id]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
-              />
+            />
             )}
-            {filter.type === "slider" && (
-              <Slider
+            {filter.type === 'mapFeatureSelectWithControls' && (
+              <MapFeatureSelectWithControls
                 key={filter.id}
                 filter={filter}
-                value={filterState[filter.id] || filter.min}
+                value={filterState[filter.id]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
-              />
+            />
             )}
-            {filter.type === "toggle" && (
-              <Toggle
+            {filter.type === 'mapFeatureSelectAndPan' && (
+              <MapFeatureSelectAndPan
                 key={filter.id}
                 filter={filter}
-                value={filterState[filter.id] || filter.values.values[0].paramValue}
+                value={filterState[filter.id]}
                 onChange={(filter, value) => handleFilterChange(filter, value)}
-
-              />
+            />
             )}
           </SelectorContainer>
         ))

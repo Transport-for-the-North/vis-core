@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { TextSection } from "./Accordion";
+import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
-
+import { Glossary } from "Components/Glossary";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -19,14 +19,14 @@ const SidebarHeader = styled.h2`
 `;
 
 const SidebarContainer = styled.div`
-  width: 300px;
+  width: 450px;
   max-height: calc(100vh - 235px);
   background-color: rgba(240, 240, 240, 0.65);
   padding: 10px;
   overflow-y: auto;
   text-align: left;
   position: fixed;
-  left: ${({ $isVisible }) => ($isVisible ? "10px" : "-320px")};
+  left: ${({ $isVisible }) => ($isVisible ? "10px" : "-470px")};
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
@@ -36,7 +36,7 @@ const SidebarContainer = styled.div`
 
 const ToggleButton = styled.button`
   position: absolute;
-  left: 270px;
+  left: 420px;
   top: 25px;
   z-index: 1001;
   background-color: #7317de;
@@ -88,7 +88,8 @@ export const Sidebar = ({
   filters,
   legalText,
   onFilterChange,
-  children, // Accept children props
+  additionalFeatures,
+  children
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -106,6 +107,11 @@ export const Sidebar = ({
         {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
       </ToggleButton>
         <TextSection title="About this visualisation" text={aboutVisualisationText} />
+        {additionalFeatures?.glossary && (
+          <AccordionSection title="Glossary">
+            <Glossary dataDictionary={additionalFeatures.glossary.dataDictionary} />
+          </AccordionSection>
+        )}
         {filters && (
           <SelectorSection
             filters={filters}

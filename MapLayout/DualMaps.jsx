@@ -1,13 +1,21 @@
+import "maplibre-gl/dist/maplibre-gl.css";
+import React, { useCallback, useEffect, useRef } from "react";
+import styled from "styled-components";
+
 import { DynamicLegend } from "Components";
 import { useDualMaps, useMapContext, useFilterContext } from "hooks";
 import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useRef } from "react";
 import { api } from "services";
-import styled from "styled-components";
-import { getHoverLayerStyle, getLayerStyle, getSourceLayer, numberWithCommas } from "utils";
 import { Visualisation } from "./Visualisation";
-import './MapLayout.css'
+
+import {
+  getHoverLayerStyle,
+  getLayerStyle,
+  getSourceLayer,
+  numberWithCommas,
+} from "utils";
+import { useAppContext } from "contexts";
+import "./MapLayout.css";
 
 const StyledMapContainer = styled.div`
   width: 50%;
@@ -15,7 +23,7 @@ const StyledMapContainer = styled.div`
 `;
 
 /**
- * DualMaps component that renders two maps side by side using MapLibre GL and handles layers,
+ * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
  *
  * @returns {JSX.Element} The rendered DualMaps component.
@@ -23,12 +31,17 @@ const StyledMapContainer = styled.div`
 const DualMaps = () => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
+  const { state, dispatch } = useMapContext();
+  const { mapStyle, mapCentre, mapZoom } = state;
   const { leftMap, rightMap, isMapReady } = useDualMaps(
     leftMapContainerRef,
-    rightMapContainerRef
+    rightMapContainerRef,
+    mapStyle,
+    mapCentre,
+    mapZoom
   );
   const { dispatch: filterDispatch } = useFilterContext();
-  const { state, dispatch } = useMapContext();
+
   const maps = [leftMap, rightMap];
   const popups = {};
   const listenerCallbackRef = useRef({});
