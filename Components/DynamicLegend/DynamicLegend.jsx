@@ -1,5 +1,5 @@
 import { forEach } from "lodash";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
@@ -90,6 +90,7 @@ const LegendDivider = styled.div`
  *
  * @param {Array} colorStops - An array of color stop objects, each with a `value` property.
  * @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
+ * @param {string} style - The style of the map, e.g., 'diverging'.
  * @returns {Array} An array of objects with `value` and `width` properties, where `width` is the interpolated diameter.
  * @throws Will throw an error if less than two color stops or width stops are provided.
  *
@@ -99,7 +100,7 @@ const LegendDivider = styled.div`
  * const result = interpolateWidths(colorStops, widthStops);
  * // result: [{ value: 1, width: 10 }, { value: 2, width: 20 }]
  */
-function interpolateWidths(colorStops, widthStops) {
+function interpolateWidths(colorStops, widthStops, style) {
   if (!colorStops || colorStops.length < 2) {
     throw new Error('At least two color stops are required.');
   }
@@ -109,13 +110,13 @@ function interpolateWidths(colorStops, widthStops) {
 
   const convertedWidthStops = widthStops.map(stop => ({
     radius: stop.width,
-    value: Number(stop.value)
+    value: Number(stop.value.replace(/,/g, ""))
   }));
 
   const widths = [];
   for (let i = 0; i < colorStops.length; i++) {
     const value = colorStops[i].value;
-    const radius = interpolateWidthAtValue(convertedWidthStops, value);
+    const radius = interpolateWidthAtValue(convertedWidthStops, Math.abs(Number(value.replace(/,/g, ""))));
     const diameter = radius * 2;
     widths.push({ value, width: diameter });
   }
@@ -314,8 +315,6 @@ const interpretWidthExpression = (expression) => {
  * @component
  * @property {Object} map - The map instance from Mapbox or MapLibre.
  * @returns {JSX.Element|null} The rendered legend component or null if there are no legend items.
- * @note The map instance is expected to be an object from MapLibre or Mapbox,
- * which follows a specific API for style manipulation and event handling.
  */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
@@ -380,7 +379,7 @@ export const DynamicLegend = ({ map }) => {
           );
 
           if (layer.type === "circle" && colorStops && widthStops?.length > 0 && colorStops.length !== widthStops.length) {
-            widthStops = interpolateWidths(colorStops, widthStops);
+            widthStops = interpolateWidths(colorStops, widthStops, layer.metadata.colorStyle);
           }
 
           return {
