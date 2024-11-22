@@ -95,7 +95,6 @@ export const Visualisation = ({ visualisationName, map, left = null, maps }) => 
    */
   const reclassifyAndStyleMap = useCallback(
     (mapItem, mapData, data, style, classificationMethod) => {
-      console.log(state);
       // Reclassify data if needed
       const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
       const reclassifiedData = reclassifyData(

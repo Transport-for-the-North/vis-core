@@ -80,8 +80,7 @@ export const evUptake = {
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
-          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.zoneSelector, multiSelect: true},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },
@@ -112,15 +111,14 @@ export const tfnEvUptake = {
       download: {
         filters: [
           { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
-          { ...selectors.year, multiSelect: true, type: 'dropdown' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
-          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },

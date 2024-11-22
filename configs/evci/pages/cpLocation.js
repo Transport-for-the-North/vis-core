@@ -73,8 +73,7 @@ export const cpLocation = {
           { ...selectors.chargerSpeed, multiSelect: true, type: 'dropdown' },
           { ...selectors.columnNameCP, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
-          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.siteSelector, multiselect: true },
         ],
         downloadPath: '/api/evci/cp-location/download'
       },

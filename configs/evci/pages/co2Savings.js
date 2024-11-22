@@ -80,8 +80,8 @@ export const co2Savings = {
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
           { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+           // { ...selectors.zoneSelector, multiselect: true },
         ],
         downloadPath: '/api/evci/co2-savings/download'
       },
@@ -117,8 +117,8 @@ export const tfnCo2Savings = {
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
           { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.zoneSelector, multiselect: true },
         ],
         downloadPath: '/api/evci/co2-savings/download'
       },

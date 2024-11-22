@@ -80,8 +80,8 @@ export const annualChargingDemand = {
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
           { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.zoneSelector, multiselect: true },
         ],
         downloadPath: '/api/evci/annual-charging-demand/download'
       },
@@ -118,8 +118,8 @@ export const tfnAnnualChargingDemand = {
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiselect: true, type: 'mapFeatureSelect' },
           { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.zoneSelector, multiselect: true },
         ],
         downloadPath: '/api/evci/annual-charging-demand/download'
       },

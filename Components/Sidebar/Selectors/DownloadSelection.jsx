@@ -10,6 +10,7 @@ import { api } from "services";
 import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
 import { darken } from "polished";
+import { MapFeatureSelect, MapFeatureSelectAndPan, MapFeatureSelectWithControls } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -63,19 +64,19 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
 
   useEffect(() => {
     filters.forEach(filter => {
-      if (filter.paramName !== "showValuesAs" && filter.paramName !== "stbTag") {
-        filter.id = filter.paramName + 's';
-      } else {
-        filter.id = filter.paramName;
-      }
+      filter.id = filter.paramName;
     });
     const updatedFilters = filters.reduce((acc, item) => {
-      const paramValues = item.values.values.map(value => value.paramValue);
-      acc[item.id] = paramValues.length === 1 ? paramValues[0] : paramValues;
+      if (item.type === 'mapFeatureSelectWithControls') {
+        acc[item.id] = null;
+      } else {
+        const paramValues = item.values.values.map(value => value.paramValue);
+        acc[item.id] = paramValues.length === 1 ? paramValues[0] : paramValues;
+      }
       return acc;
     }, {});
     filterDispatch({ type: 'INITIALIZE_FILTERS', payload: updatedFilters });
-  }, []);
+  }, [filters, filterDispatch]);
 
   const handleDownloadSelection = (filter, value) => {
     filterDispatch({
@@ -99,8 +100,12 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
     }
   };
 
+  if (!filterState || Object.keys(filterState).length === 0) {
+    return null; 
+  }
+
   return (
-    <AccordionSection title="Download data" defaultValue={true} key='DownloadData'>
+    <AccordionSection title="Download data" defaultValue={true}>
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
@@ -114,7 +119,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                 />
                 {filter.type === "dropdown" && (
                   <Dropdown
-                    key={filter.paramName}
+                    key={filter.id}
                     filter={filter}
                     value={filterState[filter.id]}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
@@ -136,6 +141,15 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
                   />
+                )}
+                {filter.type === 'mapFeatureSelectWithControls' && (
+                  <MapFeatureSelectWithControls
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value)}
+                    bgColor={bgColor}
+                />
                 )}
               </SelectorContainer>
             ))}
