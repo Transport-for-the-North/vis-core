@@ -8,6 +8,7 @@ export const actionTypes = {
   INITIALISE_SIDEBAR: "INITIALISE_SIDEBAR",
   SET_PAGE_INFO: "SET_PAGE_INFO",
   SET_MAP: "SET_MAP",
+  SET_DUAL_MAPS: "SET_DUAL_MAPS",
   ADD_LAYER: "ADD_LAYER",
   ADD_PARAMETERISED_LAYER: "ADD_PARAMETERISED_LAYER",
   UPDATE_PARAMETERISED_LAYER: "UPDATE_PARAMETERISED_LAYER",
@@ -321,6 +322,15 @@ export const mapReducer = (state, action) => {
       return {
         ...state,
         map: map, // Store the map instance directly in the state
+        color_scheme: { value: "GnBu", label: "GnBu" }, // Set up the default color scheme on startup only
+        class_method: "d",
+      };
+    }
+    case actionTypes.SET_DUAL_MAPS: {
+      const { maps } = action.payload;
+      return {
+        ...state,
+        maps: maps, // Store the map instance directly in the state
         color_scheme: { value: "YlGnBu", label: "YlGnBu" }, // Set up the default color scheme on startup only
         class_method: "d",
       };
