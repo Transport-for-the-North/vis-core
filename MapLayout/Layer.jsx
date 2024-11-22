@@ -36,6 +36,7 @@ export const Layer = ({ layer }) => {
     if (!map.getSource(layer.name)) {
       let sourceConfig = {};
       let layerConfig = getLayerStyle(layer.geometryType);
+      layerConfig.paint = layer.customPaint || layerConfig.paint;
       const layerLayout = {};
       layerConfig.id = layer.name;
       layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
@@ -44,6 +45,7 @@ export const Layer = ({ layer }) => {
         ...layerConfig.metadata,
         isStylable: layer.isStylable ?? false,
         path: layer.path ?? null,
+        shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false)
       };
 
       // Handle GeoJSON layer type
