@@ -2000,7 +2000,7 @@ export const appConfig = {
               displayColumn: "name",
               paramColumn: "id",
               sort: "descending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+              exclude: [123, 456, 789]
             },
           },
           {
@@ -2010,7 +2010,21 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
             type: "toggle",
-            values: originOrDestinationValues,
+            values: {
+              source: "local",
+              values: [
+              {
+                displayValue: "Origin",
+                paramValue: "0",
+                legendSubtitleText:"Origin"
+              },
+              {
+                displayValue: "Destination",
+                paramValue: "1",
+                legendSubtitleText:"Destination"
+              }
+            ]
+          },
           },
           {
             filterName: "Metric",
@@ -2030,6 +2044,7 @@ export const appConfig = {
                 { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_total", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" },
                 { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
                 { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
                 { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
@@ -2237,7 +2252,7 @@ export const appConfig = {
               displayColumn: "name",
               paramColumn: "id",
               sort: "descending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+              exclude: [123, 456, 789]
             },
           },
           {
@@ -2349,7 +2364,7 @@ export const appConfig = {
               displayColumn: "name",
               paramColumn: "id",
               sort: "descending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+              exclude: [123, 456, 789]
             },
           },
           {
@@ -2359,7 +2374,21 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
             type: "toggle",
-            values: originOrDestinationValues,
+            values: {
+              source: "local",
+              values: [
+              {
+                displayValue: "Origin",
+                paramValue: "0",
+                legendSubtitleText:"Origin"
+              },
+              {
+                displayValue: "Destination",
+                paramValue: "1",
+                legendSubtitleText:"Destination"
+              }
+            ]
+          },
           },
           {
             filterName: "Metric",
@@ -2379,6 +2408,7 @@ export const appConfig = {
                 { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_total", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" },
                 { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
                 { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
                 { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
@@ -2484,7 +2514,21 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
             type: "toggle",
-            values: originOrDestinationValues,
+            values: {
+              source: "local",
+              values: [
+              {
+                displayValue: "Origin",
+                paramValue: "0",
+                legendSubtitleText:"Origin"
+              },
+              {
+                displayValue: "Destination",
+                paramValue: "1",
+                legendSubtitleText:"Destination"
+              }
+            ]
+          },
           },
           {
             filterName: "Metric",
@@ -2504,6 +2548,7 @@ export const appConfig = {
                 { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
                 { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+                { paramValue: "gen_cost_total", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" },
                 { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
                 { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
                 { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
@@ -2621,7 +2666,7 @@ export const appConfig = {
               displayColumn: "name",
               paramColumn: "id",
               sort: "descending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+              exclude: [123, 456, 789]
             },
           },
           {
@@ -2733,7 +2778,7 @@ export const appConfig = {
               displayColumn: "name",
               paramColumn: "id",
               sort: "descending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+              exclude: [123, 456, 789]
             },
           },
           {
