@@ -1,4 +1,4 @@
-import { create } from "lodash";
+import { create, update } from "lodash";
 import BaseService from "./Base";
 import Cookies from "js-cookie";
 
@@ -24,6 +24,42 @@ function createQueryString(queryParams) {
     }
 
     return queryString;
+}
+
+function updateQueryParams(queryParams) {
+  /**
+   * Updates the query parameters appropriately, mainly with the zoneIds if they exist.
+   * Removes any undefined entries which might be an issue also.
+   */
+
+  // Check if queryParams is falsy and return it as is
+  if (!queryParams) {
+    return queryParams;
+  }
+
+  // Remove keys with values of 0 or null
+  for (const key in queryParams) {
+    if (queryParams[key] === 0 || queryParams[key] === null) {
+      delete queryParams[key];
+    }
+  }
+
+  // Remove the "undefined" key if it exists
+  if (queryParams.hasOwnProperty('undefined')) {
+    delete queryParams['undefined'];
+  }
+
+  // If zoneId is an array, update it with the 'value' from each dictionary
+  if (Array.isArray(queryParams.zoneId)) {
+    queryParams.zoneId = queryParams.zoneId.map(item => {
+      if (item && typeof item.value !== 'undefined') {
+        return parseInt(item.value, 10);
+      }
+      return null;
+    }).filter(value => value !== null); // Remove any null values
+  }
+
+  return queryParams;
 }
 
 export class DownloadService extends BaseService {
@@ -55,7 +91,9 @@ export class DownloadService extends BaseService {
    * @returns {Promise<void>} Resolves when the download is initiated.
    */
   async downloadCsv(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {} }) {
-    const params = createQueryString(options?.queryParams);
+    console.log(options?.queryParams);
+    const queryParams = updateQueryParams(options?.queryParams);
+    const params = createQueryString(queryParams);
     const path = params ? `${subPath}?${params}` : subPath;
     const url = this._buildUrl(path);
     const jwtToken = options.skipAuth ? null : Cookies.get("token");
