@@ -108,9 +108,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           Math.min(...bins),
-          1,
+          -1,
           Math.max(...bins),
-          5,
+          -5,
         ],
       };
     case "line-diverging":
@@ -140,9 +140,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           Math.min(...bins),
-          1,
+          -1,
           Math.max(...bins),
-          5,
+          -5,
         ],
       };
     case "circle-continuous":
@@ -456,13 +456,13 @@ export const getHoverLayerStyle = (geometryType) => {
             ["zoom"],
             // Specify zoom levels and corresponding line widths
             5,
-            1, // At zoom level 5, line width will be 1
+            -1, // At zoom level 5, line width will be 1
             10,
-            2, // At zoom level 10, line width will be 2
+            -2, // At zoom level 10, line width will be 2
             15,
-            6, // At zoom level 15, line width will be 4
+            -6, // At zoom level 15, line width will be 4
             20,
-            8, // At zoom level 20, line width will be 8
+            -8, // At zoom level 20, line width will be 8
           ],
         }
       };
