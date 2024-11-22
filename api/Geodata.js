@@ -3,16 +3,19 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import BaseService from "./Base";
 
 /**
- * Parses a vector tile path and extracts tableName and zoneTypeId parameters (where applicable).
+ * Parses a vector tile path and extracts tableName, zoneTypeId, and any additional query parameters.
  * @param {string} path - The path to be parsed.
- * @returns {Object} An object containing the tableName and optionally the zoneTypeId.
+ * @returns {Object} An object containing the tableName, optionally the zoneTypeId, and any query parameters.
  */
 function parseVectorTilePath(path) {
   if (!path.startsWith('/')) {
     throw new Error('Path must start with a slash.');
   }
 
-  const pathParts = path.split('/');
+  // Create a URL object to easily parse the path and query parameters
+  const url = new URL(`http://example.com${path}`);
+  const pathParts = url.pathname.split('/');
+
   if (pathParts[2] !== 'vectortiles') {
     throw new Error('Path must be for vectortiles.');
   }
@@ -20,12 +23,24 @@ function parseVectorTilePath(path) {
   const isZonePath = pathParts.includes('zones');
   const tableName = isZonePath ? 'zones' : pathParts[3];
 
+  const result = { tableName };
+
   if (isZonePath) {
     const zoneTypeId = pathParts[4];
-    return { tableName, zoneTypeId };
-  } else {
-    return { tableName };
+    result.zoneTypeId = zoneTypeId;
   }
+
+  // Extract query parameters
+  const queryParams = {};
+  for (const [key, value] of url.searchParams.entries()) {
+    queryParams[key] = value;
+  }
+
+  if (Object.keys(queryParams).length > 0) {
+    result.queryParams = queryParams;
+  }
+
+  return result;
 }
 
 /**
@@ -103,36 +118,36 @@ class GeodataService extends BaseService {
    * Fetches metadata for all features in the specified table.
    * @param {string} tableName - The name of the table.
    * @param {Object} [options] - Additional options for the request.
-   * @param {string} [options.zoneTypeId] - The zone type ID.
    * @returns {Promise<Array>} The metadata of the features.
    */
   async getFeaturesMetadata(tableName, options = {}) {
-    const { zoneTypeId } = options;
-    let url = `/api/spatialdatafeatures/features/${tableName}`;
+    const url = new URL(`/api/spatialdatafeatures/features/${tableName}`, this._apiBaseUrl);
 
-    if (zoneTypeId) {
-      url += `?zoneTypeId=${zoneTypeId}`;
-    }
+    // Append each option as a query parameter
+    Object.entries(options).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
+    });
 
-    return await this.get(url);
+    // Extract the path and query string from the URL
+    const pathWithQuery = `${url.pathname}${url.search}`;
+
+    return await this.get(pathWithQuery);
   }
 
   /**
- * Fetches metadata based on the parsed path.
- * @param {string} path - The path to be parsed.
- * @returns {Promise<Array>} The metadata of the features.
- */
+   * Fetches metadata based on the parsed path.
+   * @param {string} path - The path to be parsed.
+   * @returns {Promise<Array>} The metadata of the features.
+   */
   async fetchMetadataFromPath(path) {
     const parsedParams = parseVectorTilePath(path);
+    const { tableName, zoneTypeId, queryParams } = parsedParams;
+    const options = {
+      ...(zoneTypeId !== undefined && { zoneTypeId }),
+      ...queryParams
+    };
 
-    if (parsedParams.zoneTypeId) {
-      const { tableName, zoneTypeId } = parsedParams;
-      const options = { zoneTypeId };
-      return await this.getFeaturesMetadata(tableName, options);
-    } else {
-      const { tableName } = parsedParams;
-      return await this.getFeaturesMetadata(tableName);
-    }
+    return await this.getFeaturesMetadata(tableName, options);
   }
 
   /**
