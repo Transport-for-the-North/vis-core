@@ -1,3 +1,5 @@
+import { nodeCustomPaint } from "./customPaintDefinitions"
+
 const networkScenarioValues = {
   source: "local",
   values: [
@@ -292,24 +294,6 @@ export const appConfig = {
       config: {
         layers: [
           {
-            uniqueId: "NoHAMNodes",
-            name: "NoHAM Nodes",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "geometry",
-            geometryType: "point",
-            visualisationName: "Node Results",
-            isHoverable: true,
-            isStylable: false,
-            shouldHaveTooltipOnHover: true,
-            hoverTipShouldIncludeMetadata: true,
-            shouldHaveLabel: true,
-            labelZoomLevel: 12,
-            labelNulls: true,
-            hoverNulls: true,
-          },
-          {
             uniqueId: "NoHAMLinksVectorTile",
             name: "NoHAM Links",
             type: "tile",
@@ -350,6 +334,25 @@ export const appConfig = {
             labelNulls: true,
             hoverNulls: true,
             hiddenByDefault: true
+          },
+          {
+            uniqueId: "NoHAMNodes",
+            name: "NoHAM Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            customPaint: nodeCustomPaint,
+            isHoverable: true,
+            isStylable: false,
+            shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
+            hoverTipShouldIncludeMetadata: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
+            labelNulls: true,
+            hoverNulls: true,
           },
         ],
         visualisations: [
@@ -477,24 +480,6 @@ export const appConfig = {
       config: {
         layers: [
           {
-            uniqueId: "NoHAMNodes",
-            name: "NoHAM Nodes",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "geometry",
-            geometryType: "point",
-            visualisationName: "Node Results",
-            isHoverable: true,
-            isStylable: false,
-            shouldHaveTooltipOnHover: true,
-            hoverTipShouldIncludeMetadata: true,
-            shouldHaveLabel: true,
-            labelZoomLevel: 12,
-            labelNulls: true,
-            hoverNulls: true,
-          },
-          {
             uniqueId: "NoHAMLinkResultDifference",
             name: "LinkResultDifference",
             type: "tile",
@@ -527,6 +512,25 @@ export const appConfig = {
             labelNulls: true,
             hoverNulls: true,
             hiddenByDefault: true
+          },
+          {
+            uniqueId: "NoHAMNodes",
+            name: "NoHAM Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            customPaint: nodeCustomPaint,
+            isHoverable: true,
+            isStylable: false,
+            shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
+            hoverTipShouldIncludeMetadata: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
+            labelNulls: true,
+            hoverNulls: true,
           },
         ],
         visualisations: [
@@ -730,24 +734,6 @@ export const appConfig = {
       config: {
         layers: [
           {
-            uniqueId: "NoHAMNodes",
-            name: "NoHAM Nodes",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "geometry",
-            geometryType: "point",
-            visualisationName: "Node Results",
-            isHoverable: true,
-            isStylable: false,
-            shouldHaveTooltipOnHover: true,
-            hoverTipShouldIncludeMetadata: true,
-            shouldHaveLabel: true,
-            labelZoomLevel: 12,
-            labelNulls: true,
-            hoverNulls: true,
-          },
-          {
             uniqueId: "NoHAMLinkResultDual",
             name: "LinkResultDual",
             type: "tile",
@@ -780,6 +766,25 @@ export const appConfig = {
             labelNulls: true,
             hoverNulls: true,
             hiddenByDefault: true
+          },
+          {
+            uniqueId: "NoHAMNodes",
+            name: "NoHAM Nodes",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "point",
+            customPaint: nodeCustomPaint,
+            isHoverable: true,
+            isStylable: false,
+            shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
+            hoverTipShouldIncludeMetadata: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 12,
+            labelNulls: true,
+            hoverNulls: true,
           },
         ],
         visualisations: [
