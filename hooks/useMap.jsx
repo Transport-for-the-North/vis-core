@@ -30,10 +30,10 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom) => {
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         maxZoom: 15,
-        maxBounds: [
-          [ -10.76418, 49.528423 ],
-          [ 1.9134116, 61.331151 ]
-        ],
+        // maxBounds: [
+        //   [ -10.76418, 49.528423 ],
+        //   [ 1.9134116, 61.331151 ]
+        // ],
         attributionControl: false,
         transformRequest: (url, resourceType) => {
           if( resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
