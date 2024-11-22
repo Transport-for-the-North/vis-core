@@ -123,3 +123,30 @@ export const sortValues = (values, order) => {
     return 0;
   });
 };
+
+/**
+ * Converts a string representation of a number with commas into a Number.
+ * If the input is not a string, it returns the input as is.
+ *
+ * @param {string|number} value - The value to be converted. If it's a string,
+ * it should represent a number and may contain commas as thousand separators.
+ * If it's a number, it will be returned unchanged.
+ * 
+ * @returns {number} - The numeric value if the input was a string with commas,
+ * or the original value if it was not a string.
+ *
+ * @example
+ * // returns 12345
+ * convertStringToNumber("12,345");
+ *
+ * @example
+ * // returns 67890
+ * convertStringToNumber(67890);
+ *
+ * @example
+ * // returns "not a number"
+ * convertStringToNumber("not a number");
+ */
+export function convertStringToNumber(value) {
+  return typeof value === 'string' ? Number(value.replace(/,/g, "")) : value;
+}
