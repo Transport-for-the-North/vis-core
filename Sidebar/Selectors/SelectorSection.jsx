@@ -5,9 +5,8 @@ import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
-import { AppContext, AuthProvider} from 'contexts';
-import { useContext, useEffect, useState } from "react";
-import App from "App";
+import { AppContext } from 'contexts';
+import { useContext } from "react";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from './MapFeatureSelect';
 import { MapFeatureSelectAndPan } from ".";
 
@@ -52,13 +51,9 @@ function checkGeometryNotNull(featureCollection) {
  */
 export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
   const { state: mapState } = useMapContext();
-  const { state: filterState, dispatch: filterDispatch } = useFilterContext();
+  const { state: filterState } = useFilterContext();
 
   const handleFilterChange = (filter, value) => {
-    filterDispatch({
-      type: 'SET_FILTER_VALUE',
-      payload: { filterId: filter.id, value },
-    });
     onFilterChange(filter, value);
   };
 

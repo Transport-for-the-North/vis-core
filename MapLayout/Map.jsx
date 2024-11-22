@@ -13,6 +13,8 @@ import {
   numberWithCommas,
 } from "utils";
 import "./MapLayout.css";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -34,6 +36,91 @@ const Map = () => {
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
+
+  useEffect(() => {
+    if (!map) return ;
+
+    const drawInstance = new MapboxDraw({
+      displayControlsDefault: false,
+      modes: {
+        ...MapboxDraw.modes,
+        draw_rectangle: RectangleMode,
+      },
+      controls: {},
+      styles: [
+        {
+          id: "gl-draw-polygon-fill-inactive",
+          type: "fill",
+          filter: [
+            "all",
+            ["==", "active", "false"],
+            ["==", "$type", "Polygon"],
+            ["!=", "mode", "static"],
+          ],
+          paint: {
+            "fill-color": "#007bff",
+            "fill-outline-color": "#007bff",
+            "fill-opacity": 0.3,
+          },
+        },
+        {
+          id: "gl-draw-polygon-fill-active",
+          type: "fill",
+          filter: [
+            "all",
+            ["==", "active", "true"],
+            ["==", "$type", "Polygon"],
+          ],
+          paint: {
+            "fill-color": "#007bff",
+            "fill-outline-color": "#007bff",
+            "fill-opacity": 0.3,
+          },
+        },
+        {
+          id: "gl-draw-polygon-stroke-inactive",
+          type: "line",
+          filter: [
+            "all",
+            ["==", "active", "false"],
+            ["==", "$type", "Polygon"],
+            ["!=", "mode", "static"],
+          ],
+          layout: {
+            "line-cap": "round",
+            "line-join": "round",
+          },
+          paint: {
+            "line-color": "#007bff",
+            "line-width": 2,
+          },
+        },
+        {
+          id: "gl-draw-polygon-stroke-active",
+          type: "line",
+          filter: [
+            "all",
+            ["==", "active", "true"],
+            ["==", "$type", "Polygon"],
+          ],
+          layout: {
+            "line-cap": "round",
+            "line-join": "round",
+          },
+          paint: {
+            "line-color": "#007bff",
+            "line-width": 2,
+          },
+        },
+      ],
+    });
+
+    map.addControl(drawInstance);
+    dispatch(
+      { type: 'SET_DRAW_INSTANCE', payload: drawInstance }
+    );
+    
+  }, [map]); 
 
   /**
    * Handles hover events for a specific layer by setting the hover state
@@ -504,7 +591,7 @@ const Map = () => {
   }, [isMapReady]);
 
   const featureSelectConfig = state.filters.find((filter) => filter.type.startsWith('mapFeatureSelect'));
-  useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
+  // useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
 
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {
