@@ -33,7 +33,8 @@ export const actionTypes = {
   UPDATE_VISUALISED_FEATURES: "UPDATE_VISUALISED_FEATURES",
   SET_BOUNDS_AND_CENTROID: 'SET_BOUNDS_AND_CENTROID',
   CLEAR_BOUNDS_AND_CENTROID: 'CLEAR_BOUNDS_AND_CENTROID',
-  UPDATE_DOWNLOAD_QUERY_PARAMS: "UPDATE_DOWNLOAD_QUERY_PARAMS"
+  UPDATE_DOWNLOAD_QUERY_PARAMS: "UPDATE_DOWNLOAD_QUERY_PARAMS",
+  SET_DRAW_INSTANCE: "SET_DRAW_INSTANCE"
 };
 
 /**
@@ -55,6 +56,12 @@ export const mapReducer = (state, action) => {
     case actionTypes.CLEAR_BOUNDS_AND_CENTROID:
       return { ...state, mapBoundsAndCentroid: null };
 
+    case actionTypes.SET_DRAW_INSTANCE:
+      return {
+        ...state,
+        drawInstance: action.payload,
+      };
+      
     case actionTypes.UPDATE_VISUALISED_FEATURES: {
       const { filter, value } = action.payload;
       const { layer } = filter;

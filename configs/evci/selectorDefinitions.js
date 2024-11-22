@@ -53,6 +53,9 @@ const siteSelector = {
   target: "api",
   actions: [
     {
+      action: 'SET_SELECTED_FEATURES'
+    },
+    {
       action: 'UPDATE_VISUALISED_FEATURES',
     },
   ],

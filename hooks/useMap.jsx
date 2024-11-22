@@ -64,7 +64,6 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom) => {
         "bottom-right"
       );
 
-
       mapInstance.resize();
 
       setMap(mapInstance);

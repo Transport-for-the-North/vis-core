@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { FaMousePointer, FaDrawPolygon } from 'react-icons/fa';
-import { useMapContext } from 'hooks';
+import { useMapContext, useFeatureSelect } from 'hooks';
 import { FeatureSelect } from './FeatureSelect'; 
 import { darken } from "polished";
+import { isEqual } from 'lodash';
 
 // Styled components
 const Container = styled.div`
@@ -86,7 +87,12 @@ const EnableSelectButton = styled.button`
  * @returns {JSX.Element} The rendered BaseMapFeatureSelect component.
  */
 export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControls, ...props }) => {
-  const { state: mapState, dispatch: mapDispatch } = useMapContext();
+  const { state: mapState } = useMapContext();
+  const { map } = mapState;
+  const prevTransformedFeaturesRef = useRef();
+  const [isFeatureSelectActive, setFeatureSelectActive] = useState(false);
+  const [selectionMode, setSelectionMode] = useState("feature");
+  const transformedFeatures = useFeatureSelect(map, filter, isFeatureSelectActive, setFeatureSelectActive, selectionMode);
 
   // Check if filter.layer is provided
   if (!filter || !filter.layer) {
@@ -107,12 +113,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
   }
 
   // Extract values from mapState and set default values if necessary
-  const selectedOptions = mapState.selectedFeatures?.value || [];
-  const selectionMode = mapState.selectionMode || 'feature';
-  const isSelectEnabled =
-    typeof mapState.isFeatureSelectActive === 'boolean'
-      ? mapState.isFeatureSelectActive
-      : false;
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   // Ensure layer and its properties are defined
   const layerPath = layer?.metadata?.path ?? layer?.path;
@@ -122,14 +123,14 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
    *
    * @param {Array} options - The selected options from the dropdown.
    */
-  const handleSelectionChange = (options) => {
-    mapDispatch({
-      type: 'SET_SELECTED_FEATURES',
-      payload: { value: options || [] },
-    });
-
+  // const handleSelectionChange = (options) => {
+  //   setSelectedOptions(options);
+  //   onChange(filter, options);
+  // };
+  const handleSelectionChange = useCallback((options) => {
+    setSelectedOptions(options);
     onChange(filter, options);
-  };
+  }, [filter, onChange]);
 
   /**
    * Handles the change in selection mode (feature or rectangle).
@@ -137,40 +138,30 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
    * @param {string} mode - The new selection mode.
    */
   const handleSelectionModeChange = (mode) => {
-    if (isSelectEnabled) {
-      mapDispatch({
-        type: 'SET_SELECTION_MODE',
-        payload: mode,
-      });
+    if (isFeatureSelectActive) {
+      setSelectionMode(mode);
     }
   };
-
-  // Disable selection when the layer changes
-  useEffect(() => {
-    mapDispatch({
-      type: 'SET_IS_FEATURE_SELECT_ACTIVE',
-      payload: false,
-    });
-  }, [layer, mapDispatch]);
 
   /**
    * Toggles the feature selection enabled state and sets the selection mode.
    */
   const toggleSelectEnabled = () => {
-    const newState = !isSelectEnabled;
-    mapDispatch({
-      type: 'SET_IS_FEATURE_SELECT_ACTIVE',
-      payload: newState,
-    });
+    const newState = !isFeatureSelectActive;
+    setFeatureSelectActive(newState);
 
     // Automatically set the selection mode when enabling the filter
     if (newState) {
-      mapDispatch({
-        type: 'SET_SELECTION_MODE',
-        payload: selectionMode,
-      });
+      setSelectionMode(selectionMode);
     }
   };
+
+  useEffect(() => {
+    if (!isEqual(prevTransformedFeaturesRef.current, transformedFeatures)) {
+      prevTransformedFeaturesRef.current = transformedFeatures;
+      handleSelectionChange(transformedFeatures);
+    }
+  }, [transformedFeatures, handleSelectionChange]);
 
   return (
     <Container key={key}>
@@ -186,18 +177,18 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
       {showControls && (
         <SelectionModeContainer>
           <EnableSelectButton
-            enabled={isSelectEnabled}
+            enabled={isFeatureSelectActive}
             onClick={toggleSelectEnabled}
             $bgColor={props.bgColor}
           >
-            {isSelectEnabled ? 'Disable Filter' : 'Enable Filter'}
+            {isFeatureSelectActive ? 'Disable Filter' : 'Enable Filter'}
           </EnableSelectButton>
 
-          <StyledToggle enabled={isSelectEnabled}>
+          <StyledToggle enabled={isFeatureSelectActive}>
             <ModeButton
               selected={selectionMode === 'feature'}
               onClick={() => handleSelectionModeChange('feature')}
-              disabled={!isSelectEnabled}
+              disabled={!isFeatureSelectActive}
               $bgColor={props.bgColor}
             >
               <FaMousePointer />
@@ -206,7 +197,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
             <ModeButton
               selected={selectionMode === 'rectangle'}
               onClick={() => handleSelectionModeChange('rectangle')}
-              disabled={!isSelectEnabled}
+              disabled={!isFeatureSelectActive}
               $bgColor={props.bgColor}
             >
               <FaDrawPolygon />

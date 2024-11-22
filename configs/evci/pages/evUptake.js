@@ -80,7 +80,7 @@ export const evUptake = {
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, multiSelect: true},
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },
@@ -118,7 +118,7 @@ export const tfnEvUptake = {
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },

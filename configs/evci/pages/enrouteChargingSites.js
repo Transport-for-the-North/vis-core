@@ -77,7 +77,7 @@ export const enrouteChargingSites = {
         filters: [
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.siteSelector, multiSelect: true }
+          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] }
         ],
         downloadPath: '/api/evci/potential-charging-sites/download'
       },

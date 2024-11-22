@@ -10,7 +10,7 @@ import { api } from "services";
 import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
 import { darken } from "polished";
-import { MapFeatureSelect, MapFeatureSelectAndPan, MapFeatureSelectWithControls } from ".";
+import { MapFeatureSelectWithControls } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -59,13 +59,14 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
 
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
-  const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+  // const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
 
   useEffect(() => {
     filters.forEach(filter => {
       filter.id = filter.paramName;
     });
+    console.log(filters);
     const updatedFilters = filters.reduce((acc, item) => {
       if (item.type === 'mapFeatureSelectWithControls') {
         acc[item.id] = null;
