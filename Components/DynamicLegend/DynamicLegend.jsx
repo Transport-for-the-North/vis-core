@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { numberWithCommas } from "utils";
+import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 
 // Styled components for the legend UI
@@ -100,7 +100,7 @@ const LegendDivider = styled.div`
  * const result = interpolateWidths(colorStops, widthStops);
  * // result: [{ value: 1, width: 10 }, { value: 2, width: 20 }]
  */
-function interpolateWidths(colorStops, widthStops, style) {
+function interpolateWidths(colorStops, widthStops, type) {
   if (!colorStops || colorStops.length < 2) {
     throw new Error('At least two color stops are required.');
   }
@@ -109,40 +109,41 @@ function interpolateWidths(colorStops, widthStops, style) {
   }
 
   const convertedWidthStops = widthStops.map(stop => ({
-    radius: stop.width,
-    value: Number(stop.value.replace(/,/g, ""))
+    width: stop.width,
+    value: convertStringToNumber(stop.value)
   }));
 
   const widths = [];
   for (let i = 0; i < colorStops.length; i++) {
     const value = colorStops[i].value;
-    const radius = interpolateWidthAtValue(convertedWidthStops, Math.abs(Number(value.replace(/,/g, ""))));
-    const diameter = radius * 2;
-    widths.push({ value, width: diameter });
+    const convertedValue = convertStringToNumber(value);
+    const width = interpolateWidthAtValue(convertedWidthStops, Math.abs(convertedValue));
+    widths.push({ value, width: type === 'circle' ? width * 2 : width });
   }
 
   return widths;
 }
 
+
 /**
  * Interpolates the width at a given value based on width stops.
  *
- * @param {Array} widthStops - An array of width stop objects, each with a `value` and `radius` property.
+ * @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
  * @param {number} value - The value at which to interpolate the width.
- * @returns {number} The interpolated radius.
+ * @returns {number} The interpolated width.
  *
  * @example
- * const widthStops = [{ value: 1, radius: 5 }, { value: 2, radius: 10 }];
- * const radius = interpolateWidthAtValue(widthStops, 1.5);
- * // radius: 7.5
+ * const widthStops = [{ value: 1, radius: 5 }, { value: 2, width: 10 }];
+ * const width = interpolateWidthAtValue(widthStops, 1.5);
+ * // width: 7.5
  */
 function interpolateWidthAtValue(widthStops, value) {
   if (value <= widthStops[0].value) {
-    return widthStops[0].radius;
+    return widthStops[0].width;
   }
 
   if (value >= widthStops[widthStops.length - 1].value) {
-    return widthStops[widthStops.length - 1].radius;
+    return widthStops[widthStops.length - 1].width;
   }
 
   for (let i = 0; i < widthStops.length - 1; i++) {
@@ -152,13 +153,13 @@ function interpolateWidthAtValue(widthStops, value) {
     if (value >= startStop.value && value <= endStop.value) {
       const ratio =
         (value - startStop.value) / (endStop.value - startStop.value);
-      const radius =
-        startStop.radius + ratio * (endStop.radius - startStop.radius);
-      return radius;
+      const width =
+        startStop.width + ratio * (endStop.width - startStop.width);
+      return width;
     }
   }
 
-  return widthStops[widthStops.length - 1].radius;
+  return widthStops[widthStops.length - 1].width;
 }
 
 /**
@@ -369,19 +370,45 @@ export const DynamicLegend = ({ map }) => {
           }
 
           const paintProps = layer.paint;
-          const colorStops = interpretColorExpression(
+          let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
-              paintProps["circle-color"] ||
-              paintProps["fill-color"]
+            paintProps["circle-color"] ||
+            paintProps["fill-color"]
           );
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
           );
-
+          
           if (layer.type === "circle" && colorStops && widthStops?.length > 0 && colorStops.length !== widthStops.length) {
-            widthStops = interpolateWidths(colorStops, widthStops, layer.metadata.colorStyle);
+            widthStops = interpolateWidths(colorStops, widthStops, layer.type);
           }
-
+          
+          if (layer.type === "line" && layer.metadata.colorStyle === "diverging" && colorStops.length === 3) {
+            const negativeColor = colorStops.find(stop => stop.value === -1)?.color;
+            const positiveColor = colorStops.find(stop => stop.value === 1)?.color;
+          
+            const negativeWidthStops = widthStops
+              .filter(stop => convertStringToNumber(stop.value) > 0)
+              .map(stop => ({
+                ...stop,
+                value: `-${stop.value}` // Add a '-' to the start of the value
+              }))
+              .reverse();
+          
+            widthStops = [...negativeWidthStops, ...widthStops];
+            // Ensure there is a 0 value in widthStops
+            if (!widthStops.some(stop => convertStringToNumber(stop.value) === 0)) {
+              widthStops.push({ value: 0, width: 0 });
+              widthStops = widthStops.sort((a, b) => convertStringToNumber(a.value) - convertStringToNumber(b.value));
+            }
+          
+            // Assign colors based on the value sign
+            colorStops = widthStops.map(stop => ({
+              ...stop,
+              color: convertStringToNumber(stop.value) < 0 ? negativeColor : positiveColor
+            }));
+          }
+          
           return {
             title: displayValue,
             subtitle: legendSubtitleText,

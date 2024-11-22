@@ -42,7 +42,7 @@ export const appConfig = {
   },
   contactText: "Please contact [Name] for any questions on this data tool.",
   contactEmail: "firstname.lastname@transportforthenorth.com",
-  mapStyle: mapStyles.osMapsApiRaster,
+  mapStyle: mapStyles.geoapifyPositron,
   logoImage: null,
   logoPosition: 'right',
   backgroundImage: "img/evci/placeholderTFN.png",
