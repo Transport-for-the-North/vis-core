@@ -120,8 +120,6 @@ export const MapLayout = () => {
     });
   };
 
-  console.log(pageContext);
-
   return (
     <LayoutContainer>
       <Dimmer dimmed={isLoading} showLoader={true} />

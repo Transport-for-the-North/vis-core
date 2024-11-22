@@ -84,22 +84,21 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
 
   useEffect(() => {
     setSelectedButtons(filterState[filter.id] || (filter.multiSelect ? [] : filter.values.values[0].paramValue));
-  }, [filterState]);
+  }, [filter.id, filter.multiSelect, filter.values.values]);
 
-  const handleToggleChange = (e) => {
-    const selectedValue = e.target.value;
+  const handleToggleChange = (newSelectedValue) => {
     if (filter.multiSelect) {
       let newSelectedButtons;
-      if (selectedButtons.includes(selectedValue)) {
-        newSelectedButtons = selectedButtons.filter(value => value !== selectedValue);
+      if (selectedButtons.includes(newSelectedValue)) {
+        newSelectedButtons = selectedButtons.filter(value => value !== newSelectedValue);
       } else {
-        newSelectedButtons = [...selectedButtons, selectedValue];
+        newSelectedButtons = [...selectedButtons, newSelectedValue];
       }
       onChange(filter, newSelectedButtons);
       setSelectedButtons(newSelectedButtons);
     } else {
-      onChange(filter, selectedValue);
-      setSelectedButtons(selectedValue);
+      onChange(filter, newSelectedValue);
+      setSelectedButtons(newSelectedValue);
     }
   };
 
@@ -123,7 +122,7 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
           <StyledButton
             key={option.paramValue}
             value={option.paramValue}
-            onClick={handleToggleChange}
+            onClick={() => handleToggleChange(option.paramValue)}
             $isSelected={filter.multiSelect ? selectedButtons.includes(option.paramValue) : selectedButtons === option.paramValue}
             size={options.length}
             index={index}
