@@ -123,7 +123,7 @@ export const Sidebar = ({
           />
         )}
         {children} {/* Render additional AccordionSections passed as children */}
-        {additionalFeatures.download && (
+        {additionalFeatures?.download && (
           <FilterProvider>
             <DownloadSection
               filters={additionalFeatures.download.filters}
