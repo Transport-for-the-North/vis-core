@@ -33,6 +33,8 @@ const LegendTitle = styled.div`
   font-weight: bold;
   text-align: left;
   margin-bottom: 2px;
+  max-width: 150px;
+  font-size: 0.9em;
 `;
 
 const LegendSubtitle = styled.h2`
@@ -40,7 +42,7 @@ const LegendSubtitle = styled.h2`
   text-align: left;
   margin-top: 2px;
   margin-bottom: 2px;
-  font-size: x-small;
+  font-size: small;
   font-style: italic;
 `;
 
