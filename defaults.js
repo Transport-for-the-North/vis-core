@@ -29,3 +29,4 @@ export const mapStyles = {
 export const defaultMapStyle = mapStyles.geoapifyPositron;
 export const defaultMapCentre = [-2.2, 54.2];
 export const defaultMapZoom = 7.5;
+export const defaultBgColour = '#7317DE';

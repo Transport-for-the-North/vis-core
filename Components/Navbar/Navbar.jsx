@@ -132,7 +132,7 @@ export function Navbar() {
                   activeLink={activeLink}
                   dropdownName={page.category}
                   onClick={onClick}
-                  bgColor={page.navbarLinkBgColour}
+                  bgColor={page.navbarLinkBgColour || bgColor}
                 />
               );
             } else {
