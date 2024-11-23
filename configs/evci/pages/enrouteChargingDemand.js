@@ -14,6 +14,7 @@ export const enrouteChargingDemand = {
   <p>Shows the forecast demand for charging en-route by vehicle type and year.</p>
   `,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {
