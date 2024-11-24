@@ -1,15 +1,15 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
+import { oaEngDetailedCallout } from "../templates";
 
-export const combinedAuthority = {
-  pageName: "Combined Authority",
-  url: "/combined-authority",
+export const england = {
+  pageName: "England",
+  url: "/england",
   category: null,
   type: "MapLayout",
   about: `
-  <p>View TRSE data by Combined Authority District.</p>
-  <p>Search for a Combined Authority in the sidebar to view Output Area-level data. Click on OAs to read deeper insights.</p>`,
+  <p>View TRSE data nationally.</p>
+  <p>Click on OAs to read deeper insights.</p>`,
   termsOfUse: termsOfUse,
   config: {
     layers: [
@@ -17,7 +17,7 @@ export const combinedAuthority = {
         name: "Output Areas",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/28/{z}/{x}/{y}?parentZoneType=16&parentZoneId=", // specify query params empty if to be set
+        path: "/api/vectortiles/zones/28/{z}/{x}/{y}", // specify query params empty if to be set
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "TRSE Rank",
@@ -31,10 +31,10 @@ export const combinedAuthority = {
         hoverTipShouldIncludeMetadata: false,
       },
       {
-        name: "Combined Authorities",
+        name: "Local Authorities",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
+        path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
         isHoverable: true,
@@ -81,25 +81,17 @@ export const combinedAuthority = {
         ]
       },
       {
-        name: "Detailed Information",
-        type: "calloutCard",
-        dataSource: "api",
-        dataPath: "/api/trse/callout-data/authority",
-        htmlFragment: caSummaryCallout
-      },
-      {
         name: "Feature Callout",
         type: "calloutCard",
+        cardName: "OA Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
-        htmlFragment: oaCaDetailedCallout
+        htmlFragment: oaEngDetailedCallout
       },
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.parentCombinedAuthority, visualisations: ['TRSE Rank', 'Detailed Information'] },
-      { ...selectors.zoneResolutionCAFixed, visualisations: ['TRSE Rank']},
-      { ...selectors.zoneTypeCAFixed, visualisations: ['TRSE Rank', 'Detailed Information']},
+      { ...selectors.zoneResolutionEngFixed, visualisations: ['TRSE Rank']},
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank']},
       selectors.oaFeature,

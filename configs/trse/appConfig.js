@@ -19,7 +19,9 @@ export const appConfig = {
   logoutImage: "img/logout.png",
   authenticationRequired: false,
   appPages: [
-    pages.combinedAuthority
+    pages.combinedAuthority,
+    pages.localAuthority,
+    pages.england
   ],
   footer: {
     creditsText: "© Transport for the North 2024. All rights reserved.",

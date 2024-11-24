@@ -74,6 +74,10 @@ const zoneTypeLADFixedSelector = {
   target: "api",
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "parentZoneTypeId" }
+    },
   ],
   visualisations: null,
   type: "fixed",
@@ -81,7 +85,7 @@ const zoneTypeLADFixedSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Combined Authority",
+        displayValue: "Local Authority",
         paramValue: 29,
       }
     ],
@@ -108,6 +112,26 @@ const zoneResolutionCAFixedSelector = {
   },
 };
 
+const zoneResolutionEngFixedSelector = {
+  filterName: "Zone Resolution England Fixed",
+  paramName: "parentZoneResolution",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "England",
+        paramValue: "eng",
+      }
+    ],
+  },
+};
+
 const zoneResolutionLADFixedSelector = {
   filterName: "Zone Type LAD Fixed",
   paramName: "parentZoneResolution",
@@ -122,7 +146,7 @@ const zoneResolutionLADFixedSelector = {
     values: [
       {
         displayValue: "Local Authority",
-        paramValue: 'la',
+        paramValue: 'lad',
       }
     ],
   },
@@ -261,6 +285,7 @@ export const selectors = {
   parentLAD: parentLADSelector,
   zoneResolutionCAFixed: zoneResolutionCAFixedSelector,
   zoneResolutionLADFixed: zoneResolutionLADFixedSelector,
+  zoneResolutionEngFixed: zoneResolutionEngFixedSelector,
   zoneTypeCAFixed: zoneTypeCAFixedSelector,
   zoneTypeLADFixed: zoneTypeLADFixedSelector,
   featureTypeOAFixed: featureTypeOAFixedSelector,
