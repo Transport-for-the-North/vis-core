@@ -16,6 +16,8 @@ import {
 import { useAppContext } from "contexts";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
+import { Layer } from './Layer'
+import "./MapLayout.css";
 
 const StyledMapContainer = styled.div`
   width: 50%;
@@ -45,7 +47,7 @@ const DualMaps = () => {
   const maps = [leftMap, rightMap];
   const popups = {};
   const listenerCallbackRef = useRef({});
-  const hoverIdRef = useRef({ left: {}, right: {}});
+  const hoverIdRef = useRef({ left: {}, right: {} });
 
   /**
    * Adds a new layer to the map based on the provided layer configuration.
@@ -437,7 +439,7 @@ const DualMaps = () => {
           const zoomLevel = layerData.labelZoomLevel || 12;
           const sourceLayer = layerData.sourceLayer;
           const labelNulls = layerData.labelNulls;
-        
+
           const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
           map.on('zoomend', zoomHandler);
           if (!listenerCallbackRef.current[layerId]) {
@@ -446,9 +448,9 @@ const DualMaps = () => {
           listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
         }
         if (state.layers[layerId].isHoverable) {
-          const hoverNulls = state.layers[layerId].hoverNulls ?? true
+          const hoverNulls = state.layers[layerId].hoverNulls ?? true;
           const layerHover = (e) =>
-            handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0, hoverNulls);
+            handleLayerHover(e, layerId, map === leftMap ? "left" : "right", hoverNulls);
           map.on("mousemove", layerHover);
           map.on("mouseleave", layerId, () =>
             handleLayerLeave(layerId, map === leftMap ? "left" : "right")
@@ -459,13 +461,13 @@ const DualMaps = () => {
           map.on("mouseleave", layerId, () => {
             map.getCanvas().style.cursor = "grab";
           });
-          if(!listenerCallbackRef.current[layerId]) {
+          if (!listenerCallbackRef.current[layerId]) {
             listenerCallbackRef.current[layerId] = {};
           }
           listenerCallbackRef.current[layerId].layerHoverCallback = layerHover;
         }
         if (state.layers[layerId].shouldHaveTooltipOnHover) {
-          const hoverNulls = state.layers[layerId].hoverNulls ?? true
+          const hoverNulls = state.layers[layerId].hoverNulls ?? true;
           const hoverCallback = (e) =>
             handleLayerHoverTooltip(
               e,
@@ -483,8 +485,7 @@ const DualMaps = () => {
           if (!listenerCallbackRef.current[layerId]) {
             listenerCallbackRef.current[layerId] = {};
           }
-          listenerCallbackRef.current[layerId].hoverCallback =
-            handleLayerHoverTooltip;
+          listenerCallbackRef.current[layerId].hoverCallback = hoverCallback;
         }
         if (state.layers[layerId].shouldHaveTooltipOnClick) {
           const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -625,11 +626,11 @@ const DualMaps = () => {
     if (isMapReady) {
       dispatch({
         type: "SET_MAP",
-        payload: { map: leftMap }, //Not sure about this part, needs some update
+        payload: { map: leftMap },
       });
       dispatch({
         type: "SET_DUAL_MAPS",
-        payload: { maps: [leftMap, rightMap] }, //Not sure about this part, needs some update
+        payload: { maps: [leftMap, rightMap] },
       });
     }
   }, [isMapReady]);
@@ -651,39 +652,12 @@ const DualMaps = () => {
     };
   }, [isMapReady, leftMap, rightMap, handleMapClick]);
 
-  useEffect(() => {
-    if (isMapReady) {
-      Object.values(state.layers).forEach((layer) => addLayerToMap(layer));
-    }
-
-    return () => {
-      if (leftMap && rightMap) {
-        Object.values(state.layers).forEach((layer) => {
-          maps.forEach((map) => {
-            if (map.getLayer(layer.name)) {
-              map.removeLayer(layer.name);
-            }
-            if (map.getLayer(`${layer.name}-hover`)) {
-              map.removeLayer(`${layer.name}-hover`);
-            }
-            if (map.getSource(layer.name)) {
-              map.removeSource(layer.name);
-            }
-            if (map.getLayer("selected-feature-layer")) {
-              map.removeLayer("selected-feature-layer");
-            }
-            if (map.getSource("selected-feature-source")) {
-              map.removeSource("selected-feature-source");
-            }
-          });
-        });
-      }
-    };
-  }, [state.layers, isMapReady, leftMap, rightMap, addLayerToMap]);
-
   return (
     <>
       <StyledMapContainer ref={leftMapContainerRef}>
+        {Object.values(state.layers).map((layer) => (
+          <Layer key={layer.name} layer={layer} />
+        ))}
         {state.leftVisualisations && <VisualisationManager
             visualisationConfigs={state.leftVisualisations}
             map={leftMap}
@@ -692,13 +666,15 @@ const DualMaps = () => {
           />}
       </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
+        {Object.values(state.layers).map((layer) => (
+          <Layer key={layer.name} layer={layer} />
+        ))}
         {state.rightVisualisations && <VisualisationManager
           visualisationConfigs={state.rightVisualisations}
-          map={leftMap}
+          map={rightMap}
           maps={maps}
           left={false}
         />}
-        {/* This below will need changing for when we have > 1 entries in each visualisation side. */}
         {isMapReady &&
           (state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
             .data.length === 0 &&
