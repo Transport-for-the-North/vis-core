@@ -6,7 +6,7 @@
 function generateDetailedCallout(region) {
   const rankPrefix = {
     CA: "ca",
-    LA: "la",
+    LA: "lad",
     England: "eng",
   }[region];
 
