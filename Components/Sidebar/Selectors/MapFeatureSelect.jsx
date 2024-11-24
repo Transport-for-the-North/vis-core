@@ -185,7 +185,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
             onClick={toggleSelectEnabled}
             $bgColor={props.bgColor}
           >
-            {isFeatureSelectActive ? 'Disable Filter' : 'Enable Filter'}
+            {isFeatureSelectActive ? 'Disable Selection' : 'Enable Selector'}
           </EnableSelectButton>
 
           <StyledToggle enabled={isFeatureSelectActive}>
@@ -196,7 +196,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
               $bgColor={props.bgColor}
             >
               <FaMousePointer />
-              Pointer Selection
+              Pointer Select
             </ModeButton>
             <ModeButton
               selected={selectionMode === 'rectangle'}
@@ -205,7 +205,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
               $bgColor={props.bgColor}
             >
               <FaDrawPolygon />
-              Rectangle Selection
+              Rectangle Select
             </ModeButton>
           </StyledToggle>
         </SelectionModeContainer>
