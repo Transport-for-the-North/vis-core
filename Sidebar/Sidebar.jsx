@@ -5,6 +5,8 @@ import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
 import { Hovertip } from 'Components';
+import { DownloadSection } from "./Selectors/DownloadSelection";
+import { FilterProvider } from "contexts";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -77,7 +79,7 @@ const ToggleButton = styled.button`
   left: 400px;
   top: 25px;
   z-index: 1001;
-  background-color: #7317de;
+  background-color: ${(props) => props.$bgColor}; /* Access the $bgColor prop */
   color: white;
   border: none;
   border-radius: 5px;
@@ -113,6 +115,7 @@ export const Sidebar = ({
   filters,
   legalText,
   onFilterChange,
+  bgColor,
   additionalFeatures,
   children
 }) => {
@@ -137,6 +140,7 @@ export const Sidebar = ({
           onClick={toggleSidebar}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          $bgColor={bgColor}
         >
           {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
         </ToggleButton>
@@ -157,9 +161,19 @@ export const Sidebar = ({
           <SelectorSection
             filters={filters}
             onFilterChange={(filter, value) => onFilterChange(filter, value)}
+            bgColor={bgColor}
           />
         )}
         {children} {/* Render additional AccordionSections passed as children */}
+        {additionalFeatures?.download && (
+          <FilterProvider>
+            <DownloadSection
+              filters={additionalFeatures.download.filters}
+              downloadPath={additionalFeatures.download.downloadPath}
+              bgColor={bgColor}
+            />
+          </FilterProvider>
+        )}
         <TextSection title="Legal" text={legalText} />
       </SidebarContainer>
     </>

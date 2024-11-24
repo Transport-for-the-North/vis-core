@@ -78,7 +78,6 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
       const colourPalette = calculateColours(currentColor, reclassifiedData);
 
       // Update the map style based on the type of map, reclassified data, and color palette
-
       const opacityValue = document.getElementById(
         "opacity-" + visualisation.joinLayer
       )?.value;

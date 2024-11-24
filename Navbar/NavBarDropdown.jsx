@@ -8,12 +8,13 @@ const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
   font-family: var(--standardFontFamily);
-  font-size: large;
+  font-size: clamp(12px, 1.2vw, 18px); 
   background-color: ${(props) => (props.$isActive ? props.$bgColor : "#f9f9f9")};
-  &:hover {
-    background-color: ${(props) => (props.$isActive ? props.$bgColor : "#7317de")};
-  }
   color: ${(props) => (props.$isActive ? "#f9f9f9" : "#4b3e91")};
+  &:hover {
+    background-color: ${(props) => (props.$bgColor)};
+    cursor: default;
+  }
   text-decoration: none;
   width: 15%;
   max-width: 300px;
@@ -28,7 +29,7 @@ const DropdownContainer = styled.div`
   transition: background-color 0.3s ease;
 
   @media only screen and (max-width: 1165px) {
-    font-size: large;
+    font-size: clamp(12px, 1.2vw, 18px); 
     border-bottom-right-radius: 30px;
   }
 
@@ -71,7 +72,7 @@ const DropdownItem = styled(Link)`
   transition: background-color 0.3s ease, color 0.3s ease;
 
   &:hover {
-    background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#7317de")};
+    background-color: ${(props) => (props.$bgColor)};
     color: #f9f9f9;
   }
 `;
@@ -121,7 +122,7 @@ export function NavBarDropdown(props) {
       className="NavButton"
       onMouseOver={() => setOpen(true)}
       onMouseLeave={handleClose}
-      $bgColor={props.dropdownItems.find(item => item.url === props.activeLink)?.navbarLinkBgColour || "#7317de"}
+      $bgColor={props.bgColor}
       $isActive={props.dropdownItems.find(item => item.url === props.activeLink) ? true : false}
     >
       <Title>{props.dropdownName}</Title>
