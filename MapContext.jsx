@@ -293,9 +293,20 @@ export const MapProvider = ({ children }) => {
       
         apiParameters.forEach((param) => {
           if (param.in === 'query') {
-            queryParams[param.name] = null;
+            queryParams[param.name] = {
+              value: null,
+              required: param.required || false, // Use the 'required' property from the schema, default to false
+            };
           }
         });
+      
+        // If no parameters are marked as required, set all to required
+        const hasRequiredParams = apiParameters.some(param => param.required);
+        if (!hasRequiredParams) {
+          Object.keys(queryParams).forEach((key) => {
+            queryParams[key].required = true;
+          });
+        }
       
         const visualisation = {
           ...visConfig,
