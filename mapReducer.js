@@ -8,6 +8,7 @@ export const actionTypes = {
   INITIALISE_SIDEBAR: "INITIALISE_SIDEBAR",
   SET_PAGE_INFO: "SET_PAGE_INFO",
   SET_MAP: "SET_MAP",
+  SET_DUAL_MAPS: "SET_DUAL_MAPS",
   ADD_LAYER: "ADD_LAYER",
   ADD_PARAMETERISED_LAYER: "ADD_PARAMETERISED_LAYER",
   UPDATE_PARAMETERISED_LAYER: "UPDATE_PARAMETERISED_LAYER",
@@ -31,8 +32,8 @@ export const actionTypes = {
   SET_SELECTED_FEATURES: "SET_SELECTED_FEATURES",
   SET_IS_FEATURE_SELECT_ACTIVE: "SET_IS_FEATURE_SELECT_ACTIVE",
   UPDATE_VISUALISED_FEATURES: "UPDATE_VISUALISED_FEATURES",
-  SET_BOUNDS_AND_CENTROID: 'SET_BOUNDS_AND_CENTROID',
-  CLEAR_BOUNDS_AND_CENTROID: 'CLEAR_BOUNDS_AND_CENTROID',
+  SET_BOUNDS_AND_CENTROID: "SET_BOUNDS_AND_CENTROID",
+  CLEAR_BOUNDS_AND_CENTROID: "CLEAR_BOUNDS_AND_CENTROID",
 };
 
 /**
@@ -322,6 +323,15 @@ export const mapReducer = (state, action) => {
         ...state,
         map: map, // Store the map instance directly in the state
         color_scheme: { value: "GnBu", label: "GnBu" }, // Set up the default color scheme on startup only
+        class_method: "d",
+      };
+    }
+    case actionTypes.SET_DUAL_MAPS: {
+      const { maps } = action.payload;
+      return {
+        ...state,
+        maps: maps, // Store the map instance directly in the state
+        color_scheme: { value: "Reds", label: "Reds" }, // Set up the default color scheme on startup only
         class_method: "d",
       };
     }
