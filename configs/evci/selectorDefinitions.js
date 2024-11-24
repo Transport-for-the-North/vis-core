@@ -211,6 +211,62 @@ const vehicleTypeSelector = {
   },
 };
 
+const vehicleTypeWithoutAllSelector = {
+  filterName: "Vehicle Type",
+  paramName: "modeCode",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Car",
+        paramValue: "car",
+      },
+      {
+        displayValue: "LGV",
+        paramValue: "lgv",
+      },
+      {
+        displayValue: "HGV",
+        paramValue: "hgv",
+      },
+    ],
+  },
+};
+
+const vehicleTypeAllSelector = {
+  filterName: "Vehicle Type",
+  paramName: "modeCode",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "All",
+        paramValue: "all",
+      },
+      {
+        displayValue: "Car",
+        paramValue: "car",
+      },
+      {
+        displayValue: "LGV",
+        paramValue: "lgv",
+      },
+      {
+        displayValue: "HGV",
+        paramValue: "hgv",
+      },
+    ],
+  },
+};
+
 const fuelTypeSelector = {
   filterName: "Fuel Type",
   paramName: "fuelTypeCode",
@@ -480,7 +536,7 @@ const runTypeCodeDynamicSelector = {
         paramValue: "D",
       },
       {
-        displayValue: "Income",
+        displayValue: "Income-based",
         paramValue: "I",
       }
     ],
@@ -494,6 +550,8 @@ export const selectors = {
   travelScenarioAdditional: travelScenarioSelectorAdditional,
   behaviouralScenario: behaviouralScenarioSelector,
   vehicleType: vehicleTypeSelector,
+  vehicleTypeWithoutAll: vehicleTypeWithoutAllSelector,
+  vehicleTypeAll: vehicleTypeAllSelector,
   fuelType: fuelTypeSelector,
   chargingCategory: chargingCategorySelector,
   areaValueDisplay: areaValueDisplaySelector,

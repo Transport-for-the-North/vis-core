@@ -20,7 +20,7 @@ export const stbConfig = [
     secondaryBgColour: '#00dec6',
     primaryFontColour: '#000000',
     secondaryFontColour: '#00dec6',
-    pages: ['tfnEvUptake','tfnAnnualChargingDemand','tfnEvcpRequirements', 'tfnCo2Savings', 'enrouteChargingSites','cpArea','cpLocation','cpMajorRoad'],
+    pages: ['tfnEvUptake','tfnAnnualChargingDemand','tfnEvcpRequirements', 'tfnCo2Savings','enrouteChargingDemand','potentialChargingSites','cpArea','cpLocation','cpMajorRoad'],
     termsOfUseText: "Welcome",
     termsOfUseLink:
       "https://transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/",
@@ -45,7 +45,7 @@ export const stbConfig = [
     secondaryBgColour: '#ec6c60',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','potentialChargingSites'],
     termsOfUseText: "Welcome",
     termsOfUseLink: "https://transportforthesoutheast.org.uk/our-work/electric-vehicle-charging-infrastructure-strategy/",
     termsOfUseTitle: "STB EV Charging Infrastructure Framework",
@@ -69,7 +69,7 @@ export const stbConfig = [
     secondaryBgColour: '#272b30',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','potentialChargingSites'],
     termsOfUseText: "Welcome",
     termsOfUseLink: "https://www.midlandsconnect.uk/about-us/projects/electric-vehicle-infrastructure/",
     termsOfUseTitle: "STB EV Charging Infrastructure Framework",
@@ -93,7 +93,7 @@ export const stbConfig = [
     secondaryBgColour: '#6b004c',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','potentialChargingSites'],
     TermsOfUseText: "Welcome",
     TermsOfUseLink:
       "",
@@ -118,7 +118,7 @@ export const stbConfig = [
     secondaryBgColour: '#80ff00',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','potentialChargingSites'],
     termsOfUseText: "Welcome",
     termsOfUseLink:
       "",
@@ -143,7 +143,7 @@ export const stbConfig = [
     secondaryBgColour: '#0E9059',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','potentialChargingSites'],
     termsOfUseText: "Welcome",
     termsOfUseLink:
       "",
@@ -168,7 +168,7 @@ export const stbConfig = [
     secondaryBgColour: '#ffffff',
     primaryFontColour: '#ffffff',
     secondaryFontColour: '#000000',
-    pages: ['evUptake','annualChargingDemand','evcpRequirements','enrouteChargingSites'],
+    pages: ['evUptake','annualChargingDemand','evcpRequirements','potentialChargingSites'],
     termsOfUseText: "Welcome",
     termsOfUseLink:
       "",

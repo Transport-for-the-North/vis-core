@@ -123,7 +123,6 @@ export function NavBarDropdown(props) {
       onMouseOver={() => setOpen(true)}
       onMouseLeave={handleClose}
       $bgColor={props.bgColor}
-      //$bgColor={props.dropdownItems.find(item => item.url === props.activeLink)?.navbarLinkBgColour || "#7317de"}
       $isActive={props.dropdownItems.find(item => item.url === props.activeLink) ? true : false}
     >
       <Title>{props.dropdownName}</Title>
