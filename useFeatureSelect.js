@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useMapContext } from "hooks";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import * as turf from "@turf/turf";
@@ -11,18 +11,23 @@ import { getSourceLayer } from "utils";
  *
  * @param {Object} map - The Mapbox GL JS map instance.
  * @param {Object} filterConfig - The filter configuration containing the layer ID and actions.
+ * @param {boolean} isFeatureSelectActive - Whether feature selection is active.
+ * @param {Function} setFeatureSelectActive - Function to set the feature selection active state.
+ * @param {string} selectionMode - The selection mode ('feature' or 'rectangle').
+ * @param {Array} selectedFeatureValues - The current selected feature values.
  * @returns {Array} transformedFeatures - The array of transformed selected features.
  */
-export const useFeatureSelect = (map, filterConfig, isFeatureSelectActive, setFeatureSelectActive, selectionMode) => {
+export const useFeatureSelect = (
+  map,
+  filterConfig,
+  isFeatureSelectActive,
+  setFeatureSelectActive,
+  selectionMode,
+  selectedFeatureValues  // Accept selectedFeatureValues as an argument
+) => {
   const { state: mapState } = useMapContext();
-  const { selectedFeatures } = mapState;
-  const selectedFeatureValues = useMemo(
-    () => selectedFeatures.value || [],
-    [selectedFeatures.value]
-  );
   const [transformedFeaturesState, setTransformedFeaturesState] = useState([]);
   const draw = mapState.drawInstance;
-
   const { layer } = filterConfig;
 
   /**
