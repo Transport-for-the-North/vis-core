@@ -214,27 +214,6 @@ export const mapReducer = (state, action) => {
       };
     }
 
-    // case actionTypes.UPDATE_DOWNLOAD_QUERY_PARAMS : {
-    //   const paramName = action.payload.filter.paramName;
-    //   let newParamValue = action.payload.value;
-
-    //   // If newParamValue is an array, convert it to a comma-delimited string
-    //   if (Array.isArray(newParamValue)) {
-    //     newParamValue = newParamValue.join(",");
-    //   }
-
-    //   const downloadParams = {
-    //     ...state.downloadParams, [paramName]: newParamValue,
-    //   };
-
-    //   console.log(downloadParams);
-      
-    //   return {
-    //     ...state,
-    //     downloadParams: downloadParams,
-    //   };
-    // }
-
     case actionTypes.UPDATE_DUAL_QUERY_PARAMS: {
       const visualisationNames = action.payload.filter.visualisations;
       const paramName = action.payload.filter.paramName;
