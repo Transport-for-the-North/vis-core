@@ -25,11 +25,18 @@ export const useFetchVisualisationData = (visualisation) => {
     async (visualisation) => {
       if (visualisation && visualisation.queryParams) {
         setLoading(true);
-        const { dataPath: path, queryParams, requiresAuth, name: visualisationName } =
-          visualisation;
+        const { dataPath: path, queryParams, requiresAuth, name: visualisationName } = visualisation;
+
+        // Transform queryParams to a simple object of param: value, only including those with a set value
+        const queryParamsForApi = Object.fromEntries(
+          Object.entries(queryParams)
+            .filter(([, { value }]) => value !== null && value !== undefined)
+            .map(([key, { value }]) => [key, value])
+        );
+
         try {
           const responseData = await api.baseService.get(path, {
-            queryParams,
+            queryParams: queryParamsForApi,
             skipAuth: !requiresAuth,
           });
           setData(responseData);
@@ -50,12 +57,14 @@ export const useFetchVisualisationData = (visualisation) => {
   useEffect(() => {
     const currentQueryParamsStr = JSON.stringify(visualisation.queryParams);
 
-    const allParamsPresent = Object.values(visualisation.queryParams).every(
-      (param) => param !== null && param !== undefined
+    // Check if all required parameters are present
+    const allRequiredParamsPresent = Object.values(visualisation.queryParams).every(
+      (param) => !param.required || (param.required && param.value !== null && param.value !== undefined)
     );
+
     const queryParamsChanged = prevQueryParamsRef.current !== currentQueryParamsStr;
 
-    if (allParamsPresent && queryParamsChanged) {
+    if (allRequiredParamsPresent && queryParamsChanged) {
       fetchDataForVisualisation(visualisation);
       prevQueryParamsRef.current = currentQueryParamsStr;
     }
