@@ -20,25 +20,61 @@ const SidebarHeader = styled.h2`
 `;
 
 const SidebarContainer = styled.div`
+  --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
+  --firefox-scrollbar-width: 8px; /* Approximate scrollbar width for Firefox */
+
   width: 450px;
+  max-width: 95vw;
   max-height: calc(100vh - 235px);
-  background-color: rgba(240, 240, 240, 0.65);
   padding: 10px;
-  overflow-y: auto;
+  padding-right: calc(10px - var(--scrollbar-width)); /* Adjust padding for Webkit */
+  box-sizing: border-box; /* Include padding and border in width */
+  background-color: rgba(240, 240, 240, 0.65);
+  overflow-y: scroll;
+  overflow-x: hidden;
   text-align: left;
   position: fixed;
-  left: ${({ $isVisible }) => ($isVisible ? "10px" : "-470px")};
+  left: ${({ $isVisible }) => ($isVisible ? '10px' : '-470px')};
   top: 85px;
   z-index: 1000;
   border-radius: 10px;
-  scrollbar-width: none;
   transition: left 0.3s ease-in-out;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Webkit-based browsers (Chrome, Safari, Edge) */
+  /* Custom Scrollbar Styles */
+  &::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Default color */
+    border-radius: 10px;
+    background-clip: padding-box;
+    transition: background-color 0.3s ease-in-out;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: darkgrey; /* Color when hovered */
+  }
+
+  /* Firefox-specific styles */
+  @-moz-document url-prefix() {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent; /* Default color */
+    padding-right: calc(10px - var(--firefox-scrollbar-width)); /* Adjust padding for Firefox */
+    &:hover {
+      scrollbar-color: darkgrey transparent; /* Color when hovered */
+    }
+  }
 `;
+
 
 const ToggleButton = styled.button`
   position: absolute;
-  left: 420px;
+  left: 400px;
   top: 25px;
   z-index: 1001;
   background-color: #7317de;
