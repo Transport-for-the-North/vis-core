@@ -5,7 +5,7 @@ const administrativeBoundarySelector = {
   actions: [
     {
       action: "UPDATE_PARAMETERISED_LAYER",
-      payload: "Administrative Boundaries",
+      payload: { targetLayer: "Administrative Boundaries" },
     },
     { action: "UPDATE_QUERY_PARAMS" },
   ],
