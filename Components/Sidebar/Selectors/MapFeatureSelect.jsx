@@ -92,7 +92,16 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
   const prevTransformedFeaturesRef = useRef();
   const [isFeatureSelectActive, setFeatureSelectActive] = useState(false);
   const [selectionMode, setSelectionMode] = useState("feature");
-  const transformedFeatures = useFeatureSelect(map, filter, isFeatureSelectActive, setFeatureSelectActive, selectionMode);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const transformedFeatures = useFeatureSelect(
+    map,
+    filter,
+    isFeatureSelectActive,
+    setFeatureSelectActive,
+    selectionMode,
+    selectedOptions
+  );
+  
 
   // Check if filter.layer is provided
   if (!filter || !filter.layer) {
@@ -112,8 +121,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
     );
   }
 
-  // Extract values from mapState and set default values if necessary
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  
 
   // Ensure layer and its properties are defined
   const layerPath = layer?.metadata?.path ?? layer?.path;
@@ -123,10 +131,6 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
    *
    * @param {Array} options - The selected options from the dropdown.
    */
-  // const handleSelectionChange = (options) => {
-  //   setSelectedOptions(options);
-  //   onChange(filter, options);
-  // };
   const handleSelectionChange = useCallback((options) => {
     setSelectedOptions(options);
     onChange(filter, options);
