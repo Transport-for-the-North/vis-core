@@ -662,26 +662,20 @@ const DualMaps = () => {
   return (
     <>
       <StyledMapContainer ref={leftMapContainerRef}>
-        {Object.values(state.leftVisualisations).map((visConfig) => (
-          <VisualisationManager
-            key={visConfig.name}
-            visualisationConfig={visConfig}
+        {state.leftVisualisations && <VisualisationManager
+            visualisationConfigs={state.leftVisualisations}
             map={leftMap}
             maps={maps}
             left={true}
-          />
-        ))}
+          />}
       </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
-        {Object.values(state.rightVisualisations).map((visConfig) => (
-          <VisualisationManager
-            key={visConfig.name}
-            visualisationConfig={visConfig}
-            map={leftMap}
-            maps={maps}
-            left={false}
-          />
-        ))}
+        {state.rightVisualisations && <VisualisationManager
+          visualisationConfigs={state.rightVisualisations}
+          map={leftMap}
+          maps={maps}
+          left={false}
+        />}
         {/* This below will need changing for when we have > 1 entries in each visualisation side. */}
         {isMapReady &&
           (state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
