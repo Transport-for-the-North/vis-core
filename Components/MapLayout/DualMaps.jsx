@@ -65,12 +65,14 @@ const DualMaps = () => {
         if (!map.getSource(layer.name)) {
           let sourceConfig = {};
           let layerConfig = getLayerStyle(layer.geometryType);
+          const layerLayout = {}
           layerConfig.id = layer.name;
-          layerConfig.visibility = "visible";
+          layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible"
+          layerConfig.layout = layerLayout
           layerConfig.metadata = {
             ...layerConfig.metadata,
             isStylable: layer.isStylable ?? false,
-            path: layer.path ?? null
+            path: layer.path ?? null,
           };
 
           if (layer.type === "geojson") {
@@ -149,7 +151,7 @@ const DualMaps = () => {
 
       if (features.length < 1) {
         maps.forEach((map) => {
-          if (map.getLayer(hoverLayerId)) {
+          if (map.getLayer(hoverLayerId) && hoverId) {
             const sourceLayer = getSourceLayer(map, layerId);
             map.setFeatureState(
               { source: layerId, id: hoverId, sourceLayer },
@@ -170,7 +172,7 @@ const DualMaps = () => {
       }
 
       maps.forEach((map) => {
-        if (map.getLayer(hoverLayerId)) {
+        if (map.getLayer(hoverLayerId) && hoverId) {
           map.setFeatureState(
             { source, id: hoverId, sourceLayer },
             { hover: false }
@@ -348,7 +350,7 @@ const DualMaps = () => {
         mapType === "left" ? hoverIdRef.current.left[layerId] : hoverIdRef.current.right[layerId];
 
       maps.forEach((map) => {
-        if (map.getLayer(`${layerId}-hover`)) {
+        if (map.getLayer(`${layerId}-hover`) && hoverId) {
           const sourceLayer = getSourceLayer(map, layerId);
           map.setFeatureState(
             { source: layerId, id: hoverId, sourceLayer },
@@ -379,28 +381,44 @@ const DualMaps = () => {
           }
         } else {
           if (!map.getLayer(`${layerId}-label`)) {
-            // Create the layer if it does not exist
-            map.addLayer({
-              id: `${layerId}-label`,
-              type: 'symbol',
-              source: layerId,
-              'source-layer': sourceLayerName,
-              layout: {
-                'text-field': ['get', 'name'],
-                'text-size': 14,
-                'text-anchor': 'center',
-                'text-offset': [0, 1.5],
-                'text-allow-overlap': false, 
-              },
-              paint: {
-                'text-color': '#000000',  // Black text
-                'text-halo-color': '#ffffff',  // White halo for readability
-                'text-halo-width': 2.5,
-                'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
-              }
+            // Query the source features to determine the geometry type
+            const features = map.querySourceFeatures(layerId, {
+              sourceLayer: sourceLayerName
             });
-          }
-          else {
+    
+            if (features.length > 0) {
+              const geometryType = features[0].geometry.type;
+    
+              // Determine symbol placement based on geometry type
+              let symbolPlacement = 'point'; // Default to point
+              if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
+                symbolPlacement = 'line';
+              }
+    
+              // Create the layer if it does not exist
+              map.addLayer({
+                id: `${layerId}-label`,
+                type: 'symbol',
+                source: layerId,
+                'source-layer': sourceLayerName,
+                layout: {
+                  'text-field': ['get', 'name'],
+                  'text-size': 14,
+                  'text-anchor': 'center', // Center the text
+                  'text-offset': [0, 1.5], // No offset
+                  'text-allow-overlap': false,
+                  'symbol-placement': symbolPlacement, // Dynamic placement
+                  'symbol-spacing': 250
+                },
+                paint: {
+                  'text-color': '#000000',  // Black text
+                  'text-halo-color': '#ffffff',  // White halo for readability
+                  'text-halo-width': 2.5,
+                  'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                }
+              });
+            }
+          } else {
             map.setLayoutProperty(`${layerId}-label`, 'visibility', 'visible');
           }
         }
@@ -608,6 +626,10 @@ const DualMaps = () => {
       dispatch({
         type: "SET_MAP",
         payload: { map: leftMap }, //Not sure about this part, needs some update
+      });
+      dispatch({
+        type: "SET_DUAL_MAPS",
+        payload: { maps: [leftMap, rightMap] }, //Not sure about this part, needs some update
       });
     }
   }, [isMapReady]);

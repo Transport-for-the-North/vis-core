@@ -23,10 +23,10 @@ export const mapStyles = {
   },
 
   osVectorTileApiOpenGreyscale:
-    "https://raw.githubusercontent.com/Transport-for-the-North/OS-Vector-Tile-API-Stylesheets/refs/heads/main/OS_VTS_3857_Open_Greyscale.json",
+    "https://raw.githubusercontent.com/Transport-for-the-North/OS-Vector-Tile-API-Stylesheets/refs/heads/main/OS_VTS_3857_Open_Light.json",
 };
 
-export const defaultMapStyle = mapStyles.osMapsApiRaster;
+export const defaultMapStyle = mapStyles.geoapifyPositron;
 export const defaultMapCentre = [-2.2, 54.2];
 export const defaultMapZoom = 7.5;
 
