@@ -8,7 +8,7 @@ const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
   font-family: var(--standardFontFamily);
-  font-size: large;
+  font-size: clamp(12px, 1.2vw, 18px); 
   background-color: ${(props) => (props.$isActive ? props.$bgColor : "#f9f9f9")};
   color: ${(props) => (props.$isActive ? "#f9f9f9" : "#4b3e91")};
   &:hover {
@@ -29,7 +29,7 @@ const DropdownContainer = styled.div`
   transition: background-color 0.3s ease;
 
   @media only screen and (max-width: 1165px) {
-    font-size: large;
+    font-size: clamp(12px, 1.2vw, 18px); 
     border-bottom-right-radius: 30px;
   }
 
