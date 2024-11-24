@@ -36,13 +36,13 @@ export const useDualMaps = (
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         maxZoom: 16,
-        maxBounds: [
-          [ -10.76418, 49.528423 ],
-          [ 1.9134116, 61.331151 ]
-        ],
+        // maxBounds: [
+        //   [ -10.76418, 49.528423 ],
+        //   [ 1.9134116, 61.331151 ]
+        // ],
         attributionControl: false,
         transformRequest: (url, resourceType) => {
-          if (resourceType !== 'Style') {
+          if (resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
             url = new URL(url);
             if (!url.searchParams.has('key')) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
             if (!url.searchParams.has('srs')) url.searchParams.append('srs', 3857);

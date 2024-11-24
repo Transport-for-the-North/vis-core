@@ -4,9 +4,9 @@ import { getHoverLayerStyle, getLayerStyle } from "utils";
 import { useMapContext } from "hooks";
 
 /**
- * Layer component that adds a layer to the map and handles its lifecycle.
+ * Layer component that adds a layer to the map(s) and handles its lifecycle.
  * 
- * This component is responsible for adding a specified layer to a map instance
+ * This component is responsible for adding a specified layer to one or more map instances
  * and managing its lifecycle, including cleanup when the component is unmounted.
  * It supports both GeoJSON and tile-based layers and can optionally add hover
  * effects to the layers.
@@ -24,112 +24,120 @@ import { useMapContext } from "hooks";
  * @param {string} [props.layer.sourceLayer] - The source layer name for tile layers.
  */
 export const Layer = ({ layer }) => {
-  // Access the map context to get the current map instance
+  // Access the map context to get the current map instance(s)
   const { state } = useMapContext();
-  const { map } = state;
+  const { map, maps } = state;
 
   useEffect(() => {
-    // If no map instance is available, exit early
-    if (!map) return;
+    // Determine the maps to operate on
+    const targetMaps = maps || (map ? [map] : []);
+
+    // If no map instances are available, exit early
+    if (targetMaps.length === 0) return;
 
     // If missingParams are present, remove the layer if it exists
     if (layer.missingParams?.length > 0) {
-      // Remove the layer and its sources if they exist
-      if (map.getLayer(layer.name)) {
-        map.removeLayer(layer.name);
-      }
-      if (map.getLayer(`${layer.name}-hover`)) {
-        map.removeLayer(`${layer.name}-hover`);
-      }
-      if (map.getSource(layer.name)) {
-        map.removeSource(layer.name);
-      }
+      targetMaps.forEach((mapInstance) => {
+        if (mapInstance.getLayer(layer.name)) {
+          mapInstance.removeLayer(layer.name);
+        }
+        if (mapInstance.getLayer(`${layer.name}-hover`)) {
+          mapInstance.removeLayer(`${layer.name}-hover`);
+        }
+        if (mapInstance.getSource(layer.name)) {
+          mapInstance.removeSource(layer.name);
+        }
+      });
       return; // Exit the useEffect early
     }
 
     // Check if the layer is already added to avoid duplicates
-    if (!map.getSource(layer.name)) {
-      let sourceConfig = {};
-      let layerConfig = getLayerStyle(layer.geometryType);
-      layerConfig.paint = layer.customPaint || layerConfig.paint;
-      const layerLayout = {};
-      layerConfig.id = layer.name;
-      layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
-      layerConfig.layout = layerLayout;
-      layerConfig.metadata = {
-        ...layerConfig.metadata,
-        isStylable: layer.isStylable ?? false,
-        path: layer.path ?? null,
-        shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false)
-      };
+    targetMaps.forEach((mapInstance) => {
+      if (!mapInstance.getSource(layer.name)) {
+        let sourceConfig = {};
+        let layerConfig = getLayerStyle(layer.geometryType);
+        layerConfig.paint = layer.customPaint || layerConfig.paint;
+        const layerLayout = {};
+        layerConfig.id = layer.name;
+        layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
+        layerConfig.layout = layerLayout;
+        layerConfig.metadata = {
+          ...layerConfig.metadata,
+          isStylable: layer.isStylable ?? false,
+          path: layer.path ?? null,
+          shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false)
+        };
 
-      // Handle GeoJSON layer type
-      if (layer.type === "geojson") {
-        api.geodataService.getLayer(layer).then((geojson) => {
-          sourceConfig.type = "geojson";
-          sourceConfig.data = geojson;
-          map.addSource(layer.name, sourceConfig);
-          map.addLayer({ ...layerConfig, source: layer.name });
+        // Handle GeoJSON layer type
+        if (layer.type === "geojson") {
+          api.geodataService.getLayer(layer).then((geojson) => {
+            sourceConfig.type = "geojson";
+            sourceConfig.data = geojson;
+            mapInstance.addSource(layer.name, sourceConfig);
+            mapInstance.addLayer({ ...layerConfig, source: layer.name });
+            if (layer.isHoverable) {
+              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
+              hoverLayerConfig.id = `${layer.name}-hover`;
+              mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
+            }
+          });
+        }
+        // Handle tile layer type
+        else if (layer.type === "tile") {
+          const url =
+            layer.source === "api"
+              ? api.geodataService.buildTileLayerUrl(layer.path)
+              : layer.path;
+          sourceConfig.type = "vector";
+          sourceConfig.tiles = [url];
+          sourceConfig.promoteId = "id";
+          mapInstance.addSource(layer.name, sourceConfig);
+          mapInstance.addLayer({
+            ...layerConfig,
+            source: layer.name,
+            "source-layer": layer.sourceLayer,
+            metadata: {
+              ...layerConfig.metadata,
+              isStylable: layer.isStylable ?? false,
+              bufferSize: layer.geometryType === "line" ? 7 : null,
+            },
+          });
           if (layer.isHoverable) {
             const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
             hoverLayerConfig.id = `${layer.name}-hover`;
-            map.addLayer({ ...hoverLayerConfig, source: layer.name });
+            hoverLayerConfig.source = layer.name;
+            hoverLayerConfig["source-layer"] = layer.sourceLayer;
+            hoverLayerConfig.metadata = {
+              ...hoverLayerConfig.metadata,
+              isStylable: false,
+            };
+            mapInstance.addLayer(hoverLayerConfig);
           }
-        });
-      }
-      // Handle tile layer type
-      else if (layer.type === "tile") {
-        const url =
-          layer.source === "api"
-            ? api.geodataService.buildTileLayerUrl(layer.path)
-            : layer.path;
-        sourceConfig.type = "vector";
-        sourceConfig.tiles = [url];
-        sourceConfig.promoteId = "id";
-        map.addSource(layer.name, sourceConfig);
-        map.addLayer({
-          ...layerConfig,
-          source: layer.name,
-          "source-layer": layer.sourceLayer,
-          metadata: {
-            ...layerConfig.metadata,
-            isStylable: layer.isStylable ?? false,
-            bufferSize: layer.geometryType === "line" ? 7 : null,
-          },
-        });
-        if (layer.isHoverable) {
-          const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
-          hoverLayerConfig.id = `${layer.name}-hover`;
-          hoverLayerConfig.source = layer.name;
-          hoverLayerConfig["source-layer"] = layer.sourceLayer;
-          hoverLayerConfig.metadata = {
-            ...hoverLayerConfig.metadata,
-            isStylable: false,
-          };
-          map.addLayer(hoverLayerConfig);
         }
       }
-    }
+    });
 
     // Cleanup function to remove layers and sources when the component unmounts
     return () => {
-      if (map.getLayer(layer.name)) {
-        map.removeLayer(layer.name);
-      }
-      if (map.getLayer(`${layer.name}-hover`)) {
-        map.removeLayer(`${layer.name}-hover`);
-      }
-      if (map.getSource(layer.name)) {
-        map.removeSource(layer.name);
-      }
-      if (map.getLayer("selected-feature-layer")) {
-        map.removeLayer("selected-feature-layer");
-      }
-      if (map.getSource("selected-feature-source")) {
-        map.removeSource("selected-feature-source");
-      }
+      targetMaps.forEach((mapInstance) => {
+        if (mapInstance.getLayer(layer.name)) {
+          mapInstance.removeLayer(layer.name);
+        }
+        if (mapInstance.getLayer(`${layer.name}-hover`)) {
+          mapInstance.removeLayer(`${layer.name}-hover`);
+        }
+        if (mapInstance.getSource(layer.name)) {
+          mapInstance.removeSource(layer.name);
+        }
+        if (mapInstance.getLayer("selected-feature-layer")) {
+          mapInstance.removeLayer("selected-feature-layer");
+        }
+        if (mapInstance.getSource("selected-feature-source")) {
+          mapInstance.removeSource("selected-feature-source");
+        }
+      });
     };
-  }, [map, JSON.stringify(layer)]);
+  }, [map, maps, JSON.stringify(layer)]);
 
   // This component does not render any visible elements
   return null;
