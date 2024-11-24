@@ -188,27 +188,32 @@ export const mapReducer = (state, action) => {
       const visualisationNames = action.payload.filter.visualisations;
       const paramName = action.payload.paramName || action.payload.filter.paramName;
       let newParamValue = action.payload.value;
-
+    
       // If newParamValue is an array, convert it to a comma-delimited string
       if (Array.isArray(newParamValue)) {
         newParamValue = newParamValue.join(",");
       }
-
+    
       // Create a new visualisations object with updated query params for each visualisation
       const updatedVisualisations = { ...state.visualisations };
       visualisationNames.forEach((visName) => {
         if (updatedVisualisations[visName]) {
+          const currentQueryParams = updatedVisualisations[visName].queryParams;
+          const isRequired = currentQueryParams[paramName]?.required || false;
+    
           updatedVisualisations[visName] = {
             ...updatedVisualisations[visName],
             queryParams: {
-              ...updatedVisualisations[visName].queryParams,
-              [paramName]: newParamValue,
+              ...currentQueryParams,
+              [paramName]: {
+                value: newParamValue,
+                required: isRequired,
+              },
             },
           };
         }
       });
-
-      // Return the new state with updated visualisations
+    
       return {
         ...state,
         visualisations: updatedVisualisations,
@@ -219,7 +224,7 @@ export const mapReducer = (state, action) => {
       const visualisationNames = action.payload.filter.visualisations;
       const paramName = action.payload.filter.paramName;
       const newParamValue = action.payload.value;
-      const updatedVisualisations = (() => {
+          const updatedVisualisations = (() => {
         switch (action.payload.sides) {
           case "left":
             return [{ ...state.leftVisualisations }];
@@ -234,14 +239,21 @@ export const mapReducer = (state, action) => {
             return [{ ...state.leftVisualisations }];
         }
       })();
+    
       updatedVisualisations.forEach((updatedVisualisation) => {
         visualisationNames.forEach((visName) => {
           if (updatedVisualisation[visName]) {
+            const currentQueryParams = updatedVisualisation[visName].queryParams;
+            const isRequired = currentQueryParams[paramName]?.required || false;
+    
             updatedVisualisation[visName] = {
               ...updatedVisualisation[visName],
               queryParams: {
-                ...updatedVisualisation[visName].queryParams,
-                [paramName]: newParamValue,
+                ...currentQueryParams,
+                [paramName]: {
+                  value: newParamValue,
+                  required: isRequired,
+                },
               },
             };
           }
