@@ -11,8 +11,7 @@ export const evcpRequirements = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>`,
+  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -71,7 +70,7 @@ export const evcpRequirements = {
       },
       download: {
         filters: [
-          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
+          selectors.runTypeCodeFixed,
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },

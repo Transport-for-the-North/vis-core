@@ -16,18 +16,7 @@ export const cpArea = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>
-  <div class="inset-text-area">
-    <p><b>Warning:</b> Beta project to pilot application of the
-  <a href="https://chargepoints.dft.gov.uk/">National Chargepoint (NCR) registry</a> as a monitoring and evaluation capability against
-  TfN's forecasted requirements (for publicly available charge points).
-  All numbers by area, points on map, and applications on road network are based on NCR data downloads.
-  The user should verify this data when using beyond strategic planning purposes.
-  The user should also note the quality of this data may not be as full as other data sets,
-  as it is the responsibility of the operator to add EVI to this database
-  (although comparisons have shown reasonable agreement for application in this strategic toolkit).</p>
-      </div>`,
+  <p>This visualisation shows the actual chargers and power numbers by area.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {

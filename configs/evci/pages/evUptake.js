@@ -11,8 +11,8 @@ export const evUptake = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>`,
+  <p>This visualisation shows both actual (based on 2023 DVLA data) and forecast
+    EV uptake expected across the region (car, van or heavy goods vehicle). </p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -72,7 +72,7 @@ export const evUptake = {
       },
       download: {
         filters: [
-          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
+          selectors.runTypeCodeFixed,
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
