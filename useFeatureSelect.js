@@ -112,6 +112,8 @@ export const useFeatureSelect = (map, filterConfig) => {
      * Moves the draw layers to the top of the layer stack.
      */
     const moveDrawLayersToTop = () => {
+      if (!map.getStyle()) return;
+      
       // Get all Mapbox Draw layers by filtering layers with IDs starting with 'gl-draw'
       const drawLayerIds = map
         .getStyle()
