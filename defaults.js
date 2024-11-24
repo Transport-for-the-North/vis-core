@@ -36,3 +36,4 @@ export const CARD_CONSTANTS = {
   TOGGLE_BUTTON_HEIGHT: 30,
   PADDING: 10,
 }
+export const defaultBgColour = '#7317DE';

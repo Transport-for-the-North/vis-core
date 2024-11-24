@@ -4,6 +4,7 @@ import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
+import { defaultBgColour } from 'defaults';
 import DualMaps from "./DualMaps";
 import Map from "./Map";
 
@@ -127,8 +128,9 @@ export const MapLayout = () => {
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
         filters={state.filters}
-        legalText={loremIpsum}
+        legalText={pageContext.legalText ?? loremIpsum}
         onFilterChange={handleFilterChange}
+        bgColor={pageContext.navbarLinkBgColour || defaultBgColour}
         additionalFeatures={pageContext.config.additionalFeatures} // Pass additionalFeatures prop
       >
         <MapLayerSection

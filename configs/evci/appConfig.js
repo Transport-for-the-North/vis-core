@@ -10,7 +10,7 @@ const generateContactHTML = (stbConfig) => {
       <img src="${stb.logoPath}" alt="${stb.stbName} Logo" class="stb-logo" />
       <div class="icon-links">
         <a href="mailto:${stb.contact}">
-          <img src="img/at-symbol.svg" alt="Contact ${stb.stbName}" class="icon" />
+          <img src="img/envelope.svg" alt="Contact ${stb.stbName}" class="icon" />
         </a>
         <a href="${stb.website}" target="_blank">
           <img src="img/web-icon.svg" alt="Visit ${stb.stbName} website" class="icon" />

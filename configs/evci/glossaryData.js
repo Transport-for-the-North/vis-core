@@ -441,6 +441,12 @@ const glossaryData = {
       content:
         "<p>Highways Network - Regional highways network (MRN, SRN and key local roads) provided by National Highways Regional Traffic Models, covering car, van and HGVs.</p>",
     },
+    optionalLocationFilter: {
+      title: "Optional location filter",
+      content: `<p>Show only selected zones in the map. Filter using the search box, or using the interactive tool.</p>
+      <p>Pointer select: select the zone under the pointer and add it to the filter.</p>
+      <p>Rectangle select: click anywhere on the map to start drawing a rectangle; drag then click again to add the zones within the rectangle to the filter.</p>`
+    },
     commonAnalyticalScenarios: {
       title: "DfT Common Analytical Scenarios for EV uptake",
       content: `<p>Whilst TfN’s EVCI Framework provides outputs for 6 different scenarios (4 TfN Future Travel Scenarios and 2 national scenarios), 

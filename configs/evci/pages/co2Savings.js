@@ -1,4 +1,5 @@
 import { selectors } from "../selectorDefinitions";
+import { termsOfUse } from "../TermsOfUse";
 
 export const co2Savings = {
   pageName: "CO2 Savings",
@@ -10,10 +11,10 @@ export const co2Savings = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>
-  <p>EV uptake gives the number of electric vehicles (EVs) that are expected across the region, 
-    split by powertrain type (battery electric or plug-in hybrid) and vehicle type (car, van, or heavy goods vehicle).</p>`,
+  <p>This is a measure of the cumulative CO2 emissions saved over time 
+    between the Travel Scenario selected and an EV-free Baseline Scenario.</p>`,
+  termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {
@@ -29,9 +30,9 @@ export const co2Savings = {
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        labelNulls: true,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
       }
     ],
     visualisations: [
@@ -58,7 +59,6 @@ export const co2Savings = {
       { ...selectors.year, visualisations: ['CO2 Savings'] },
       { ...selectors.administrativeBoundary, visualisations: ['CO2 Savings'] },
       { ...selectors.travelScenarioBase, visualisations: ['CO2 Savings'] },
-      { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
       { ...selectors.vehicleTypeWithoutAll, visualisations: ['CO2 Savings'] },
       { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
       { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] },
@@ -67,6 +67,19 @@ export const co2Savings = {
     additionalFeatures: {
       glossary: { 
         dataDictionary: {}
+      },
+      download: {
+        filters: [
+          selectors.runTypeCodeFixed,
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+        ],
+        downloadPath: '/api/evci/co2-savings/download'
       },
     },
   },
@@ -81,11 +94,28 @@ export const tfnCo2Savings = {
       { ...selectors.year, visualisations: ['CO2 Savings'] },
       { ...selectors.administrativeBoundary, visualisations: ['CO2 Savings'] },
       { ...selectors.travelScenarioAdditional, visualisations: ['CO2 Savings'] },
-      { ...selectors.behaviouralScenario, visualisations: ['CO2 Savings'] },
       { ...selectors.vehicleTypeWithoutAll, visualisations: ['CO2 Savings'] },
       { ...selectors.stbTag, visualisations: ['CO2 Savings'] },
       { ...selectors.areaValueDisplay, visualisations: ['CO2 Savings'] },
       { ...selectors.zoneSelector, visualisations: ['CO2 Savings']}
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+        ],
+        downloadPath: '/api/evci/co2-savings/download'
+      },
+    },
   },
 };

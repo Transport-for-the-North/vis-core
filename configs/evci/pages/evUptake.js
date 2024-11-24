@@ -11,10 +11,10 @@ export const evUptake = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>
-  `,
+  <p>This visualisation shows both actual (based on 2023 DVLA data) and forecast
+    EV uptake expected across the region (car, van or heavy goods vehicle). </p>`,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {
@@ -30,9 +30,9 @@ export const evUptake = {
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        labelNulls: true,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
       }
     ],
     visualisations: [
@@ -70,6 +70,20 @@ export const evUptake = {
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          selectors.runTypeCodeFixed,
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
+          { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+        ],
+        downloadPath: '/api/evci/ev-uptake/download'
+      },
     },
   },
 };
@@ -90,5 +104,24 @@ export const tfnEvUptake = {
       { ...selectors.areaValueDisplay, visualisations: ['EV Uptake'] },
       { ...selectors.zoneSelector, visualisations: ['EV Uptake'] }
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
+          { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+        ],
+        downloadPath: '/api/evci/ev-uptake/download'
+      },
+    },
   },
 };

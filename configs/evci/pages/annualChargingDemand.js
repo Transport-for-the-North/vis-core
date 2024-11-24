@@ -11,11 +11,9 @@ export const annualChargingDemand = {
   customMapZoom: "@mapZoom@",
   navbarLinkBgColour: "@primaryBgColour@",
   about: `
-  <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.
-    To get further help, type or select a topic in the glossary box.</p>
-  <p>EV uptake gives the number of electric vehicles (EVs) that are expected across the region, 
-    split by powertrain type (battery electric or plug-in hybrid) and vehicle type (car, van, or heavy goods vehicle).</p>`,
+  <p>This visualisation shows the forecasted annual energy demand which EV uptake will require, for each charging category.</p>`,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {
@@ -31,9 +29,9 @@ export const annualChargingDemand = {
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        labelNulls: true,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
       }
     ],
     visualisations: [
@@ -70,6 +68,20 @@ export const annualChargingDemand = {
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          selectors.runTypeCodeFixed,
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+        ],
+        downloadPath: '/api/evci/annual-charging-demand/download'
+      },
     },
   },
 };
@@ -90,5 +102,24 @@ export const tfnAnnualChargingDemand = {
       { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
       { ...selectors.zoneSelector, visualisations: ['Annual Charging Demand']}
     ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+        ],
+        downloadPath: '/api/evci/annual-charging-demand/download'
+      },
+    },
   },
 };

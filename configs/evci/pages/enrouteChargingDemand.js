@@ -11,9 +11,11 @@ export const enrouteChargingDemand = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>Shows the forecast demand for charging en-route by vehicle type and year.</p>
+  <p>This shows the likelihood of vehicles stopping to charge during their journeys,
+     by Major Road Network (MRN) and Strategic Road Network (SRN) segment. </p>
   `,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {

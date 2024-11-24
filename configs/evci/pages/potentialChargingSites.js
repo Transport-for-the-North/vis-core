@@ -24,6 +24,7 @@ export const potentialChargingSites = {
   charging hub development looks promising.</p>
   </div>`,
   termsOfUse: termsOfUse,
+  legalText: termsOfUse,
   config: {
     layers: [
       {
@@ -39,9 +40,9 @@ export const potentialChargingSites = {
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: true,
+        labelNulls: true,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
       }
     ],
     visualisations: [
@@ -71,6 +72,14 @@ export const potentialChargingSites = {
     additionalFeatures: {
       glossary: { 
         dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] }
+        ],
+        downloadPath: '/api/evci/potential-charging-sites/download'
       },
       warning: "Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid charging hub development looks promising."
     },

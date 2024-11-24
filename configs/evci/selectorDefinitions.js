@@ -16,7 +16,7 @@ const administrativeBoundarySelector = {
     source: "local",
     values: [
       {
-        displayValue: "LAD",
+        displayValue: "Local Authority",
         paramValue: 27,
       },
       {
@@ -30,9 +30,12 @@ const administrativeBoundarySelector = {
 const zoneSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
-  paramName: "features",
+  paramName: "zoneId",
   target: "api",
   actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
     {
       action: 'UPDATE_VISUALISED_FEATURES'
     },
@@ -46,9 +49,12 @@ const zoneSelector = {
 const siteSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
-  paramName: "features",
+  paramName: "siteId",
   target: "api",
   actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
     {
       action: 'UPDATE_VISUALISED_FEATURES',
     },
