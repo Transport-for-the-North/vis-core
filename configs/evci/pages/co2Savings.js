@@ -74,9 +74,9 @@ export const co2Savings = {
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
-          { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
            { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/co2-savings/download'
@@ -109,9 +109,9 @@ export const tfnCo2Savings = {
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
-          { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/co2-savings/download'

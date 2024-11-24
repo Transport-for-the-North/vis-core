@@ -63,7 +63,7 @@ export const cpMajorRoad = {
           { ...selectors.chargerSpeed, multiSelect: true, type: 'dropdown' },
           { ...selectors.columnNameCP, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.distanceValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.distanceValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/cp-major-road/download'

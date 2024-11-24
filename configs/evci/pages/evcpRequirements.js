@@ -77,7 +77,7 @@ export const evcpRequirements = {
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/evcp-requirements/download'
@@ -114,7 +114,7 @@ export const tfnEvcpRequirements = {
           { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/evcp-requirements/download'
