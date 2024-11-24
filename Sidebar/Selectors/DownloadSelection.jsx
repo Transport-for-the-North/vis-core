@@ -23,10 +23,10 @@ const DownloadButton = styled.button`
   padding: 10px 5px; /* Increased padding for a larger button */
   background-color: ${(props) => props.$bgColor}; /* Access the $bgColor prop */
   color: white;
-  border-radius: 4px;
+  border-radius: 8px;
   border: 0.25px solid;
   margin-right: 10px; /* Changed to margin-right to position it on the left */
-  width: 100px; /* Increased width */
+  width: 50%;
   font-family: "Hanken Grotesk", sans-serif;
   display: flex;
   align-items: center; /* Center align items vertically */
@@ -59,14 +59,12 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
 
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
-  // const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
 
   useEffect(() => {
     filters.forEach(filter => {
       filter.id = filter.paramName;
     });
-    console.log(filters);
     const updatedFilters = filters.reduce((acc, item) => {
       if (item.type === 'mapFeatureSelectWithControls') {
         acc[item.id] = null;
