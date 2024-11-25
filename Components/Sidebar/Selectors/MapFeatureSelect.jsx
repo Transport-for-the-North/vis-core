@@ -116,8 +116,8 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
 
   // Check if the specified layer exists in mapState
   if (!layer) {
-    console.error(
-      `Error: Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
+    console.warn(
+      `Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
     );
   }
 

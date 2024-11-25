@@ -28,8 +28,8 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
 
   // Check if the specified layer exists in mapState
   if (!layer) {
-    console.error(
-      `Error: Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
+    console.warn(
+      `Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
     );
   }
   const layerPath = layer?.metadata?.path ?? layer?.path;
@@ -41,7 +41,7 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
    * @param {Object} option - The selected option from the dropdown.
    */
   const handleSelectionChange = async (filter, options) => {
-    if (options) {
+    if (options.value) {
       const { bounds, centroid } = await api.geodataService.getFeatureGeometry(layerPath, options.value);
   
       // Dispatch the updated action
