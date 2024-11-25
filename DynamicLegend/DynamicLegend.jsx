@@ -333,11 +333,12 @@ export const DynamicLegend = ({ map }) => {
       const layers = map.getStyle().layers;
 
       const items = layers
-        .filter(
-          (layer) =>
-            layer.metadata &&
-            (layer.metadata.isStylable || layer.metadata.shouldShowInLegend)
-        )
+        .filter((layer) => {
+          const isStylableOrShouldShow = layer.metadata && (layer.metadata.isStylable || layer.metadata.shouldShowInLegend);
+          const isWithinZoomRange = (layer.minzoom === undefined || state.currentZoom >= layer.minzoom) &&
+                                    (layer.maxzoom === undefined || state.currentZoom <= layer.maxzoom);
+          return isStylableOrShouldShow && isWithinZoomRange;
+        })
         .map((layer, index) => {
           const title = layer.id;
           let displayValue = title;
@@ -430,7 +431,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [state.filters, map, state.visualisations]);
+  }, [state.filters, map, state.visualisations, state.currentZoom]);
 
   if (legendItems.length === 0) {
     return null;
