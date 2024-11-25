@@ -68,7 +68,10 @@ export const MapProvider = ({ children }) => {
     selectionLayer: null,
     selectedFeatures: [],
     isFeatureSelectActive: false,
-    visualisedFeatureIds: null
+    visualisedFeatureIds: null,
+    currentZoom: pageContext.customMapZoom
+      ? parseFloat(pageContext.customMapZoom)
+      : defaultMapZoom,
   };
 
 
