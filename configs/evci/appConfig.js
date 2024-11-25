@@ -40,8 +40,6 @@ export const appConfig = {
       backgroundColor: 'white',
     },
   },
-  contactText: "Please contact [Name] for any questions on this data tool.",
-  contactEmail: "firstname.lastname@transportforthenorth.com",
   mapStyle: mapStyles.geoapifyPositron,
   logoImage: null,
   logoPosition: 'right',
