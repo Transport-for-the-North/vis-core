@@ -263,7 +263,7 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
       if (selectedPageBands && selectedMetricParamName) {
-        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
+        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]?.value);
         if(metrics.length > 1) return metrics.find((metric) => currentPage.pageName.includes(metric.pageName)).values;
         if(metrics.length === 1) return metrics[0].values;
       }
