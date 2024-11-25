@@ -301,6 +301,12 @@ const DualMaps = () => {
     (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       maps.forEach((map) => {
         const mapZoomLevel = map.getZoom();
+        
+        dispatch({
+          type: "STORE_CURRENT_ZOOM",
+          payload: mapZoomLevel,
+        });
+
         if (mapZoomLevel <= labelZoomLevel) {
           if (map.getLayer(`${layerId}-label`)) {
             map.setLayoutProperty(`${layerId}-label`, 'visibility', 'none');
