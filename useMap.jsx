@@ -35,6 +35,9 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom) => {
         //   [ 1.9134116, 61.331151 ]
         // ],
         attributionControl: false,
+        fadeDuration: 0,
+        refreshExpiredTiles: false,
+        maxTileCacheSize: 500,
         transformRequest: (url, resourceType) => {
           if( resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
               url = new URL(url);

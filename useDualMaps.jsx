@@ -40,6 +40,9 @@ export const useDualMaps = (
         //   [ -10.76418, 49.528423 ],
         //   [ 1.9134116, 61.331151 ]
         // ],
+        fadeDuration: 0,
+        refreshExpiredTiles: false,
+        maxTileCacheSize: 500,
         attributionControl: false,
         transformRequest: (url, resourceType) => {
           if (resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
