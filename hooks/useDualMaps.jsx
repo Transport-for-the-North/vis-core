@@ -35,7 +35,7 @@ export const useDualMaps = (
         style: mapStyle || defaultMapStyle,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
-        maxZoom: 16,
+        // maxZoom: 16,
         // maxBounds: [
         //   [ -10.76418, 49.528423 ],
         //   [ 1.9134116, 61.331151 ]
