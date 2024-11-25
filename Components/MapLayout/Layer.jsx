@@ -55,10 +55,15 @@ export const Layer = ({ layer }) => {
     targetMaps.forEach((mapInstance) => {
       if (!mapInstance.getSource(layer.name)) {
         let sourceConfig = {};
-        let layerConfig = getLayerStyle(layer.geometryType);
+        let layerConfig = {
+          ...getLayerStyle(layer.geometryType),
+          id: layer.name,
+          maxzoom: layer.maxZoom || 24,
+          minzoom: layer.minZoom || 0,
+        };
         layerConfig.paint = layer.customPaint || layerConfig.paint;
+
         const layerLayout = {};
-        layerConfig.id = layer.name;
         layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
         layerConfig.layout = layerLayout;
         layerConfig.metadata = {
