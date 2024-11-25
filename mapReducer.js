@@ -35,7 +35,8 @@ export const actionTypes = {
   SET_BOUNDS_AND_CENTROID: 'SET_BOUNDS_AND_CENTROID',
   CLEAR_BOUNDS_AND_CENTROID: 'CLEAR_BOUNDS_AND_CENTROID',
   UPDATE_DOWNLOAD_QUERY_PARAMS: "UPDATE_DOWNLOAD_QUERY_PARAMS",
-  SET_DRAW_INSTANCE: "SET_DRAW_INSTANCE"
+  SET_DRAW_INSTANCE: "SET_DRAW_INSTANCE",
+  STORE_CURRENT_ZOOM: "STORE_CURRENT_ZOOM"
 };
 
 /**
@@ -49,6 +50,10 @@ export const actionTypes = {
  */
 export const mapReducer = (state, action) => {
   switch (action.type) {
+    case actionTypes.STORE_CURRENT_ZOOM: {
+      return { ...state, currentZoom: action.payload }
+    }
+    
     case actionTypes.SET_BOUNDS_AND_CENTROID: {
       const { centroid, bounds } = action.payload;
       return { ...state, mapBoundsAndCentroid: { centroid, bounds } };
