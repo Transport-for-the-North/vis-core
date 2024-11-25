@@ -92,7 +92,7 @@ export const LayerControlEntry = memo(
     const hasDefaultBands = selectedPageBands?.metric.find(
       (metric) =>
         metric.name ===
-        visualisation.queryParams[selectedMetricParamName.paramName]
+        visualisation.queryParams[selectedMetricParamName.paramName]?.value
     );
     let currentOpacity = null;
 
