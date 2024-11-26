@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
-import { useMapContext, useFilterContext } from "hooks";
+import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
 import { defaultBgColour } from 'defaults';
 import DualMaps from "./DualMaps";
@@ -37,6 +37,8 @@ export const MapLayout = () => {
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
+
+  const layerZoomMessage = useLayerZoomMessage();
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -131,7 +133,8 @@ export const MapLayout = () => {
         legalText={pageContext.legalText ?? loremIpsum}
         onFilterChange={handleFilterChange}
         bgColor={pageContext.navbarLinkBgColour || defaultBgColour}
-        additionalFeatures={pageContext.config.additionalFeatures} // Pass additionalFeatures prop
+        additionalFeatures={pageContext.config.additionalFeatures}
+        infoBoxText={layerZoomMessage}
       >
         <MapLayerSection
           handleColorChange={handleColorChange}
