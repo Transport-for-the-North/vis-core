@@ -131,6 +131,9 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);
         }
+        if (mapInstance.getLayer(`${layer.name}-label`)) {
+          mapInstance.removeLayer(`${layer.name}-label`);
+        }
         if (mapInstance.getSource(layer.name)) {
           mapInstance.removeSource(layer.name);
         }
