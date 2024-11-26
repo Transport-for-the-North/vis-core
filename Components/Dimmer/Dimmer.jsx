@@ -1,4 +1,3 @@
-import { Spinner } from "react-bootstrap";
 import styled from "styled-components";
 
 const Dimmed = styled.div`
@@ -9,9 +8,25 @@ const Dimmed = styled.div`
   padding: 0;
   width: 100%;
   height: 100%;
-  position: absolute;
-  opacity: 50%;
+  position: fixed; /* Covers the entire viewport */
+  opacity: 0.5; /* Translucent background */
   background-color: #000;
+`;
+
+const CenteredSpinner = styled.div`
+  position: fixed; /* Fixed to ensure it stays centered */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999999;
+  .spinner {
+    border: 8px solid rgba(0, 0, 0, 0.1);
+    border-top: 8px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
 `;
 
 /**
@@ -30,11 +45,9 @@ export const Dimmer = ({ dimmed, showLoader }) => {
   return (
     <>
       {showLoader ? (
-        <Spinner
-          style={{ zIndex: 999999 }}
-          animation="grow"
-          className="position-center"
-        />
+        <CenteredSpinner>
+          <div className="spinner"></div>
+        </CenteredSpinner>
       ) : null}
       <Dimmed />
     </>
