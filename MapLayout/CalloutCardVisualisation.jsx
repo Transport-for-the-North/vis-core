@@ -268,7 +268,6 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
           onClick={toggleVisibility}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          cardName={cardName}
         >
         {isVisible ? (
           <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
