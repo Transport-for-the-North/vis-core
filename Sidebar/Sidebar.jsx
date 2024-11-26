@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
@@ -21,10 +21,29 @@ const SidebarHeader = styled.h2`
   max-width: 270px;
 `;
 
+// Styled component for the info box
+const InfoBox = styled.div`
+  background-color: rgba(0, 222, 198, 0.9);
+  color: rgb(13, 15, 61);
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+`;
+
+// Styled component for the icon
+const IconWrapper = styled.div`
+  margin-right: 8px; /* Space between icon and text */
+  display: flex;
+  align-items: center;
+`;
+
 const SidebarContainer = styled.div`
   --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
   --firefox-scrollbar-width: 8px; /* Approximate scrollbar width for Firefox */
-
   width: 450px;
   max-width: 95vw;
   max-height: calc(100vh - 235px);
@@ -106,6 +125,7 @@ const ToggleButton = styled.button`
  * @property {Array} filters - An array of filter objects used for selecting data options.
  * @property {string} legalText - The legal information text displayed in the sidebar.
  * @property {function} onFilterChange - A function to handle filter changes.
+ * @property {string} infoBoxText - Any text to appear at the top of the sidebar in an info box.
  * @property {React.ReactNode} children - Additional React components or elements to be rendered within the sidebar.
  * @returns {JSX.Element} The rendered Sidebar component.
  */
@@ -117,6 +137,7 @@ export const Sidebar = ({
   onFilterChange,
   bgColor,
   additionalFeatures,
+  infoBoxText,
   children
 }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -134,6 +155,14 @@ export const Sidebar = ({
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
         </SidebarHeader>
+        {infoBoxText && (
+          <InfoBox>
+            <IconWrapper>
+              <InformationCircleIcon style={{ width: '20px', height: '20px', color: 'rgb(13, 15, 61)'}} />
+            </IconWrapper>
+            {infoBoxText}
+          </InfoBox>
+        )}
         <ToggleButton
           ref={toggleButtonRef}
           $isVisible={isVisible}
