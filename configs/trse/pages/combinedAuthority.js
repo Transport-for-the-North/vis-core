@@ -46,22 +46,22 @@ export const combinedAuthority = {
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
       },
-      // {
-      //   name: "PT Points",
-      //   type: "tile",
-      //   source: "api",
-      //   path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}",
-      //   sourceLayer: "zones",
-      //   geometryType: "polygon",
-      //   isHoverable: true,
-      //   isStylable: true,
-      //   shouldHaveTooltipOnHover: true,
-      //   shouldHaveLabel: true,
-      //   labelZoomLevel: 12,
-      //   labelNulls: false,
-      //   hoverNulls: false,
-      //   hoverTipShouldIncludeMetadata: false,
-      // }
+      {
+        name: "PT Points",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=16&parentZoneId=",
+        sourceLayer: "geometry",
+        geometryType: "point",
+        isHoverable: true,
+        isStylable: false,
+        shouldHaveTooltipOnHover: true,
+        shouldHaveLabel: true,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: false,
+        hoverTipShouldIncludeMetadata: false,
+      }
     ],
     visualisations: [
       {

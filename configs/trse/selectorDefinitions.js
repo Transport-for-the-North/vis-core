@@ -7,6 +7,10 @@ const parentCombinedAuthoritySelector = {
       action: "UPDATE_PARAMETERISED_LAYER",
       payload: {targetLayer: "Output Areas"},
     },
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "PT Points"},
+    },
     { 
       action: "UPDATE_QUERY_PARAMS",
       payload: { paramName: "zoneId" }
@@ -29,6 +33,10 @@ const parentLADSelector = {
     {
       action: "UPDATE_PARAMETERISED_LAYER",
       payload: {targetLayer: "Output Areas"},
+    },
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "PT Points"},
     },
     { 
       action: "UPDATE_QUERY_PARAMS",
