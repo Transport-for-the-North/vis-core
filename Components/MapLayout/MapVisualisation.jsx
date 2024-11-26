@@ -38,6 +38,14 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
 
   // Use the custom hook to fetch data
   const { isLoading, data: visualisationData } = useFetchVisualisationData(visualisation);
+  // Effect to handle loading state
+  useEffect(() => {
+    if (isLoading) {
+      dispatch({ type: actionTypes.SET_IS_LOADING });
+    } else {
+      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
+    }
+  }, [isLoading, dispatch]);
 
   // Effect to dispatch the UPDATE_ALL_DATA action when data is fetched
   useEffect(() => {
