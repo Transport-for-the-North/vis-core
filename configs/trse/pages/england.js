@@ -54,6 +54,7 @@ export const england = {
         path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}",
         sourceLayer: "geometry",
         geometryType: "point",
+        minZoom: 11,
         isHoverable: true,
         isStylable: false,
         shouldHaveTooltipOnHover: true,

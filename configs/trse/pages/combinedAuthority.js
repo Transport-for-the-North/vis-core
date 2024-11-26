@@ -53,6 +53,7 @@ export const combinedAuthority = {
         path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=16&parentZoneId=",
         sourceLayer: "geometry",
         geometryType: "point",
+        minZoom: 11,
         isHoverable: true,
         isStylable: false,
         shouldHaveTooltipOnHover: true,

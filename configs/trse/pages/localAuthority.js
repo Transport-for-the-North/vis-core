@@ -53,6 +53,7 @@ export const localAuthority = {
         path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=29&parentZoneId=",
         sourceLayer: "geometry",
         geometryType: "point",
+        minZoom: 11,
         isHoverable: true,
         isStylable: false,
         shouldHaveTooltipOnHover: true,
