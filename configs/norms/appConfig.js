@@ -4827,7 +4827,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
-            type: "dropdown",
+            type: "toggle",
             values: originOrDestinationValues
           },
           {
@@ -4837,8 +4837,8 @@ export const appConfig = {
             visualisations: ["Zone Benefits Difference"],
             type: "dropdown",
             shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: true,
-            shouldFilterOthers: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
             isClearable: false,
             multiSelect: false,
             values: {
