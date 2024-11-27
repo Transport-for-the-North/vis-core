@@ -43,7 +43,7 @@ const IconWrapper = styled.div`
 
 const SidebarContainer = styled.div`
   --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
-  --firefox-scrollbar-width: 8px; /* Approximate scrollbar width for Firefox */
+  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */
   width: 450px;
   max-width: 95vw;
   max-height: calc(100vh - 235px);
