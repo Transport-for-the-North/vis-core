@@ -197,3 +197,14 @@ export function filterGlossaryData(glossaryData, excludeList) {
   return filteredGlossaryData;
 }
 
+/**
+ * Checks if a specified paramName in the filters array has forceRequired set to true.
+ *
+ * @param {Array} filters - The array of filter objects to search through.
+ * @param {string} targetParamName - The paramName to search for in the filters array.
+ * @returns {boolean} - Returns true if the specified paramName is found and forceRequired is true, otherwise returns false.
+ */
+export function isParamNameForceRequired(filters, targetParamName) {
+  const filter = filters.find(f => f.paramName === targetParamName);
+  return filter ? filter.forceRequired === true : false;
+}
