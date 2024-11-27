@@ -6,21 +6,56 @@ import { useMapContext } from "hooks";
 
 // Styled components for the legend UI
 const LegendContainer = styled.div`
+  --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
+  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */
+
   display: flex;
-  flex-direction: row; /* Changed to row-based flex */
+  flex-direction: row; /* Row-based flex layout */
   gap: 8px;
   position: absolute;
   bottom: 40px;
   right: 10px;
   background: rgba(255, 255, 255, 0.9);
   padding: 15px;
+  /* Adjust padding-right to account for scrollbar width */
+  padding-right: calc(15px - var(--scrollbar-width)); /* For WebKit browsers */
+  box-sizing: border-box; /* Include padding and border in width */
   border-radius: 10px;
   z-index: 10;
-  max-height: 350px; /* Increased max-height for larger size */
+  max-height: 25vh;
   overflow-y: auto;
+  overflow-x: hidden; /* Hide horizontal scrollbar if any */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
   font-size: medium;
+
+  /* WebKit-based browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Default color */
+    border-radius: 10px;
+    background-clip: padding-box;
+    transition: background-color 0.3s ease-in-out;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: darkgrey; /* Color when hovered */
+  }
+
+  /* Firefox-specific styles */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent; /* Default colors */
+  /* Adjust padding-right to account for scrollbar in Firefox */
+  padding-right: calc(15px - var(--firefox-scrollbar-width));
+
+  &:hover {
+    scrollbar-color: darkgrey transparent; /* Change thumb color on hover */
+  }
 `;
 
 const LegendItemContainer = styled.div`
