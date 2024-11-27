@@ -53,15 +53,16 @@ export const combinedAuthority = {
         path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=16&parentZoneId=",
         sourceLayer: "geometry",
         geometryType: "point",
+        visualisationName: "PT Points Visualisation",
         minZoom: 11,
         isHoverable: true,
-        isStylable: false,
+        isStylable: true,
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
-        labelZoomLevel: 12,
+        labelZoomLevel: 14,
         labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: true,
       }
     ],
     visualisations: [
@@ -82,6 +83,22 @@ export const combinedAuthority = {
         ]
       },
       {
+        name: "PT Points Visualisation",
+        type: "joinDataToMap",
+        joinLayer: "PT Points",
+        style: "point-continuous",
+        joinField: "id",
+        valueField: "value",
+        dataSource: "api",
+        dataPath: "/api/trse/pt-point-data",
+        legendText: [
+          {
+            displayValue: "PT Points",
+            legendSubtitleText: "%"
+          }
+        ]
+      },
+      {
         name: "Detailed Information",
         type: "calloutCard",
         dataSource: "api",
@@ -98,11 +115,11 @@ export const combinedAuthority = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.parentCombinedAuthority, visualisations: ['TRSE Rank', 'Detailed Information'] },
-      { ...selectors.zoneResolutionCAFixed, visualisations: ['TRSE Rank']},
-      { ...selectors.zoneTypeCAFixed, visualisations: ['TRSE Rank', 'Detailed Information']},
-      { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank']},
-      { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank']},
+      { ...selectors.parentCombinedAuthority, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information'] },
+      { ...selectors.zoneResolutionCAFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.zoneTypeCAFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information']},
+      { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
       selectors.oaFeatureType
     ],
