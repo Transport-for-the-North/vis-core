@@ -56,13 +56,13 @@ export const combinedAuthority = {
         visualisationName: "PT Points Visualisation",
         minZoom: 11,
         isHoverable: true,
-        isStylable: false,
+        isStylable: true,
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
-        labelZoomLevel: 12,
+        labelZoomLevel: 14,
         labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: true,
       }
     ],
     visualisations: [
@@ -86,7 +86,7 @@ export const combinedAuthority = {
         name: "PT Points Visualisation",
         type: "joinDataToMap",
         joinLayer: "PT Points",
-        style: "circle-continuous",
+        style: "point-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -94,7 +94,7 @@ export const combinedAuthority = {
         legendText: [
           {
             displayValue: "PT Points",
-            legendSubtitleText: "Points"
+            legendSubtitleText: "%"
           }
         ]
       },

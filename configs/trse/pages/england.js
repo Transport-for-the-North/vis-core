@@ -57,13 +57,13 @@ export const england = {
         visualisationName: "PT Points Visualisation",
         minZoom: 11,
         isHoverable: true,
-        isStylable: false,
+        isStylable: true,
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
-        labelZoomLevel: 12,
+        labelZoomLevel: 14,
         labelNulls: false,
         hoverNulls: true,
-        hoverTipShouldIncludeMetadata: false,
+        hoverTipShouldIncludeMetadata: true,
       }
     ],
     visualisations: [
@@ -87,7 +87,7 @@ export const england = {
         name: "PT Points Visualisation",
         type: "joinDataToMap",
         joinLayer: "PT Points",
-        style: "circle-continuous",
+        style: "point-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -95,7 +95,7 @@ export const england = {
         legendText: [
           {
             displayValue: "PT Points",
-            legendSubtitleText: "Points"
+            legendSubtitleText: "%"
           }
         ]
       },
