@@ -23,7 +23,7 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
   );
 
   const mapVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === 'joinDataToMap'
+    ([_, config]) => (config.type === 'joinDataToMap' || config.type === 'geojson')
   );
 
   return (
