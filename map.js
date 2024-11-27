@@ -31,13 +31,13 @@ export function getOpacityProperty(layerType) {
 
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
- * This function is designed to create paint properties for various map features such as polygons, lines, and circles.
+ * This function is designed to create paint properties for various map features such as polygons, lines, circles, and points.
  *
  * @function createPaintProperty
- * @param {Array.<(number|string)>} bins - The differents breaks used for the legend
- * @param {string} style - The type of geometries that we want to display on the map
+ * @param {Array.<(number|string)>} bins - The different breaks used for the legend
+ * @param {string} style - The type of geometries that we want to display on the map. Supported styles include 'polygon-continuous', 'polygon-diverging', 'line-continuous', 'line-diverging', 'circle-continuous', 'circle-diverging', 'point-continuous', and 'point-diverging'.
  * @param {Array.<string>} colours - The array of colours available for the styling. Usually an array of #FFFF
- * @param {float} opacityValue - the current opacity value, between 0 and 1
+ * @param {float} opacityValue - The current opacity value, between 0 and 1
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue) {
@@ -180,6 +180,41 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "circle-stroke-color": "#000000"
       };
     }
+    case "point-continuous":
+    case "point-diverging": {
+      return {
+        "circle-color": [
+          "interpolate", ["linear"], ["feature-state", "value"], ...colors
+        ],
+        "circle-stroke-width": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [0, null]]],
+          0.0,
+          1,
+        ],
+        "circle-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 1,
+        ],
+        "circle-stroke-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 0.2,
+        ],
+        "circle-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0, 2,  // Minimum radius at zoom level 0
+          12, 4, // Medium radius at zoom level 12
+          22, 8 // Maximum radius at zoom level 22
+        ],
+        "circle-stroke-color": "#666"
+      };
+    }
     default:
       return {};
   }
@@ -207,11 +242,21 @@ export const resetPaintProperty = (style) => {
     case "circle-continuous":
     case "circle-diverging":
     case "circle-categorical":
+    case "point-continuous":
+    case "point-diverging":
       return {
         "circle-color": "rgb(0, 0, 0)",
         "circle-stroke-width": 0.5,
         "circle-opacity": 0.65,
-        "circle-radius": 2,
+        "circle-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0, 2,  // Minimum radius at zoom level 0
+          12, 4, // Medium radius at zoom level 12
+          22, 8 // Maximum radius at zoom level 22
+        ],
+        "circle-stroke-color": "#666"
       };
     default:
       return {};
@@ -385,7 +430,7 @@ export const getLayerStyle = (geometryType) => {
               ["zoom"],
               0, 2,
               12, 8,
-              22, 22
+              22, 15
             ],
             "circle-color": "#1E90FF",
             "circle-stroke-color": "#FFFFFF",
