@@ -1,5 +1,5 @@
 import colorbrewer from "colorbrewer";
-import { useCallback, useEffect, useRef, useContext } from "react";
+import { useCallback, useEffect, useRef, useContext, useMemo } from "react";
 import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
@@ -9,6 +9,7 @@ import {
   reclassifyData,
   reclassifyGeoJSONData,
   resetPaintProperty,
+  checkGeometryNotNull
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData } from "hooks"; // Import the custom hook
@@ -23,12 +24,22 @@ import { useFetchVisualisationData } from "hooks"; // Import the custom hook
  * @param {Object[]} [props.maps] - An array containing the left and right map instances for side-by-side maps.
  * @returns {null} This component doesn't render anything directly.
  */
-export const MapVisualisation = ({ visualisationName, map, left = null, maps }) => {
+export const MapVisualisation = ({
+  visualisationName,
+  map,
+  left = null,
+  maps,
+}) => {
   const { state, dispatch } = useMapContext();
   const appContext = useContext(AppContext);
-  const prevDataRef = useRef();
+
+  // Refs to keep track of previous values
+  const prevCombinedDataRef = useRef();
+  const prevVisualisationDataRef = useRef();
   const prevColorRef = useRef();
   const prevClassMethodRef = useRef();
+
+  // Determine the visualisation based on side (left, right, or single)
   const visualisation =
     left === null
       ? state.visualisations[visualisationName]
@@ -36,18 +47,26 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
 
-  // Use the custom hook to fetch data
-  const { isLoading, data: visualisationData } = useFetchVisualisationData(visualisation);
-  // Effect to handle loading state
+  // Use the custom hook to fetch data for the visualisation
+  const {
+    isLoading,
+    data: visualisationData,
+    error,
+  } = useFetchVisualisationData(visualisation);
+
+  // Handle loading state
   useEffect(() => {
     if (isLoading) {
       dispatch({ type: actionTypes.SET_IS_LOADING });
+    } else if (error) {
+      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
+      // Optionally, handle the error (e.g., dispatch an error action)
     } else {
       dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
-  }, [isLoading, dispatch]);
+  }, [isLoading, error, dispatch]);
 
-  // Effect to dispatch the UPDATE_ALL_DATA action when data is fetched
+  // Update the visualisation data in the global state when fetched
   useEffect(() => {
     if (!isLoading && visualisationData) {
       dispatch({
@@ -57,65 +76,288 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     }
   }, [visualisationData, dispatch, visualisationName, isLoading, left]);
 
+  // Compute combined data from both left and right visualisations using useMemo (if DualMaps)
+  const combinedData = useMemo(() => {
+    if (left !== null) {
+      const leftData = state.leftVisualisations[visualisationName]?.data || [];
+      const rightData =
+        state.rightVisualisations[visualisationName]?.data || [];
+      return [...leftData, ...rightData];
+    } else {
+      return visualisationData || [];
+    }
+  }, [
+    left,
+    state.leftVisualisations[visualisationName]?.data,
+    state.rightVisualisations[visualisationName]?.data,
+    visualisationData,
+    visualisationName,
+  ]);
+
   /**
    * Reclassifies the provided data and updates the map style for a specified layer.
    *
-   * This function reclassifies the data based on the given style and updates the map style
-   * for a specified layer. It ensures that the color scheme is applied correctly and updates
-   * the paint properties of the map layer. It only proceeds if the relevant layer exists on the map.
-   *
    * @param {Object} mapItem - The map instance to which styles will be applied.
-   * @param {Array} mapData - The data to be reclassified and styled.
-   * @param {Array} data - The original data used for setting feature states.
+   * @param {Array} combinedDataForClassification - Data from both visualisations used for classification.
+   * @param {Array} visualisationDataForMap - Data specific to this visualisation for updating the map.
    * @param {string} style - The style to be applied for reclassification.
    * @param {string} classificationMethod - The method used for data classification.
-   * @param {Object} layer - The layer object specifying the layer to be styled.
+   * @param {string} layer - The layer name to be styled.
    */
   const reclassifyAndStyleMap = useCallback(
-    (mapItem, mapData, data, style, classificationMethod, layer) => {
+    (
+      mapItem,
+      combinedDataForClassification,
+      visualisationDataForMap,
+      style,
+      classificationMethod,
+      layer
+    ) => {
       // Check if the specified layer exists on the map
       if (!mapItem.getLayer(layer)) {
         return;
       }
 
-      // Reclassify data if needed
-      const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
+      // Reclassify data using combinedData
+      const currentPage = appContext.appPages.find(
+        (page) => page.url === window.location.pathname
+      );
       const reclassifiedData = reclassifyData(
-        mapData,
+        combinedDataForClassification,
         style,
         classificationMethod,
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams
       );
+
+      // Determine the current color scheme
       const currentColor = colorSchemes[style.split("-")[1]].some(
         (e) => e === state.color_scheme.value
       )
         ? state.color_scheme.value
         : colorSchemes[style.split("-")[1]][0];
+
+      // Calculate the color palette based on the classification
       const colourPalette = calculateColours(currentColor, reclassifiedData);
 
       // Update the map style
-      const opacityValue = document.getElementById("opacity-" + visualisation.joinLayer)?.value;
+      const opacityValue = document.getElementById(
+        "opacity-" + visualisation.joinLayer
+      )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
         visualisation.style,
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
-      addFeaturesToMap(mapItem, paintProperty, state.layers, data, style, layer);
+
+      // Use visualisationDataForMap to update the map features
+      addFeaturesToMap(
+        mapItem,
+        paintProperty,
+        state.layers,
+        visualisationDataForMap,
+        style,
+        layer
+      );
     },
     [
-      dispatch,
       state.color_scheme,
       state.layers,
       visualisation.style,
-      visualisationName,
       appContext,
       visualisation.queryParams,
-      state.class_method,
     ]
   );
+
+  /**
+   * Adds features to the map and updates their paint properties for a specified layer.
+   *
+   * @param {Object} map - The map object to which features will be added.
+   * @param {Object} paintProperty - The paint properties to apply to the layer.
+   * @param {Object} layers - The layers to which the features will be added.
+   * @param {Array} data - The data containing features to be added to the map.
+   * @param {string} style - The style string indicating the type of visualisation.
+   * @param {string} layerName - The name of the layer to which features will be added.
+   */
+  const addFeaturesToMap = useCallback(
+    (map, paintProperty, layers, data, style, layerName) => {
+      // Find the specified layer
+      const specifiedLayer = Object.values(layers).find(
+        (layer) => layer.name === layerName
+      );
+
+      if (specifiedLayer && map.getLayer(specifiedLayer.name)) {
+        if (data && data.length > 0 && specifiedLayer.isStylable) {
+          map.getLayer(specifiedLayer.name).metadata = {
+            ...map.getLayer(specifiedLayer.name).metadata,
+            colorStyle: style.split("-")[1],
+          };
+          map.removeFeatureState({
+            source: specifiedLayer.name,
+            sourceLayer: specifiedLayer.sourceLayer,
+          });
+          data.forEach((row) => {
+            map.setFeatureState(
+              {
+                source: specifiedLayer.name,
+                sourceLayer: specifiedLayer.sourceLayer,
+                id: Number(row["id"]),
+              },
+              {
+                value: row["value"],
+                valueAbs: Math.abs(row["value"]),
+              }
+            );
+          });
+          for (const [paintPropertyName, paintPropertyArray] of Object.entries(
+            paintProperty
+          )) {
+            map.setPaintProperty(
+              specifiedLayer.name,
+              paintPropertyName,
+              paintPropertyArray
+            );
+          }
+        }
+      }
+    },
+    []
+  );
+
+  /**
+   * Calculates the color palette based on the provided color scheme and number of bins.
+   *
+   * @param {string} colourScheme - The name of the color scheme to use.
+   * @param {Array} bins - The bins representing the data distribution.
+   * @returns {string[]} An array of color values representing the color palette.
+   */
+  const calculateColours = useCallback((colourScheme, bins) => {
+    if (bins.length > 9) return chroma.scale(colourScheme).colors(bins.length);
+    return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
+  }, []);
+
+  /**
+   * Reset the map style to the default style for a specified layer.
+   *
+   * @param {string} style - The type of geometries of the visualisation.
+   */
+  const resetMapStyle = useCallback(
+    (style) => {
+      if (map) {
+        const paintProperty = resetPaintProperty(style);
+        addFeaturesToMap(
+          map,
+          paintProperty,
+          state.layers,
+          visualisationData,
+          style,
+          visualisation.joinLayer
+        );
+      }
+    },
+    [
+      map,
+      state.layers,
+      visualisation.joinLayer,
+      addFeaturesToMap,
+      visualisationData,
+    ]
+  );
+
+  // Effect to reclassify and restyle the map when data or settings change
+  useEffect(() => {
+    // Determine if reclassification is needed
+    const dataHasChanged =
+      combinedData !== prevCombinedDataRef.current &&
+      prevCombinedDataRef.current !== undefined;
+    const visualisationDataHasChanged =
+      visualisationData !== prevVisualisationDataRef.current &&
+      prevVisualisationDataRef.current !== undefined;
+    const colorHasChanged =
+      state.color_scheme !== null &&
+      state.color_scheme !== prevColorRef.current;
+    const classificationHasChanged =
+      state.class_method != null &&
+      state.class_method !== prevClassMethodRef.current;
+    const needUpdate =
+      dataHasChanged ||
+      visualisationDataHasChanged ||
+      colorHasChanged ||
+      classificationHasChanged;
+
+    if (!needUpdate) {
+      return;
+    }
+
+    // Use visualisationData for setting feature states
+    const dataToVisualize = visualisationData || [];
+
+    // Use combinedData for reclassification
+    const dataToClassify = combinedData;
+
+    switch (visualisation.type) {
+      case "geojson": {
+        if (dataToVisualize && dataToVisualize[0]) {
+          reclassifyAndStyleGeoJSONMap(
+            JSON.parse(dataToVisualize[0].feature_collection),
+            visualisation.style
+          );
+        } else {
+          resetMapStyle(visualisation.style);
+        }
+        break;
+      }
+      case "joinDataToMap": {
+        if (Array.isArray(dataToVisualize) && dataToVisualize.length === 0) {
+          resetMapStyle(visualisation.style);
+        } else {
+          reclassifyAndStyleMap(
+            map,
+            dataToClassify,
+            dataToVisualize,
+            visualisation.style,
+            state.class_method,
+            visualisation.joinLayer
+          );
+        }
+        break;
+      }
+      default:
+        break;
+    }
+
+    // Update the refs to the current data
+    prevCombinedDataRef.current = combinedData;
+    prevVisualisationDataRef.current = visualisationData;
+    prevColorRef.current = state.color_scheme;
+    prevClassMethodRef.current = state.class_method;
+
+    // Cleanup if necessary
+    return () => {
+      if (map && visualisation.type === "geojson") {
+        if (map.getLayer(visualisationName)) {
+          map.removeLayer(visualisationName);
+        }
+        if (map.getSource(visualisationName)) {
+          map.removeSource(visualisationName);
+        }
+      }
+    };
+  }, [
+    combinedData,
+    visualisationData,
+    map,
+    state.color_scheme,
+    state.class_method,
+    reclassifyAndStyleMap,
+    resetMapStyle,
+    visualisation.joinLayer,
+    visualisation.style,
+    visualisation.type,
+    visualisationName,
+  ]);
 
   /**
    * Reclassifies GeoJSON data and styles the map accordingly.
@@ -123,7 +365,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
    * If the layer exists, it updates the paint properties of the layer.
    *
    * @param {Object} featureCollection - The GeoJSON feature collection to be added or updated on the map.
-   * @param {string} style - The style string indicating the type of visualisation (e.g., 'polygon-continuous').
+   * @param {string} style - The style string indicating the type of visualisation (e.g., 'polygon-categorical').
    */
   const reclassifyAndStyleGeoJSONMap = useCallback(
     (featureCollection, style) => {
@@ -143,17 +385,21 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
         // Update the existing source
         map.getSource(visualisationName).setData(featureCollection);
       }
-      // Reclassify data if needed
+
+      // Reclassify data
       const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
+
+      // Determine current color scheme
       const currentColor = colorSchemes[style.split("-")[1]].some(
         (e) => e === state.color_scheme.value
       )
         ? state.color_scheme.value
         : colorSchemes[style.split("-")[1]][0];
+
+      // Calculate color palette
       const colourPalette = calculateColours(currentColor, reclassifiedData);
 
-      // Update the map style based on the type of map, reclassified data, and color palette
-
+      // Create paint property
       const opacityValue = document.getElementById(
         "opacity-" + visualisation.joinLayer
       )?.value;
@@ -187,8 +433,9 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
             },
           },
           beforeLayerId
-        ); // Add the new layer below the identified layer
+        );
       } else {
+        // Update the paint properties
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(
           paintProperty
         )) {
@@ -202,238 +449,6 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     },
     [map, visualisationName, state.color_scheme, visualisation.joinLayer]
   );
-
-  /**
-   * Adds features to the map and updates their paint properties for a specified layer.
-   *
-   * This function updates the map with new features and their corresponding paint properties
-   * for a specified layer. It removes the previous feature states, sets new feature states,
-   * and updates the paint properties for the specified layer.
-   *
-   * @param {Object} map - The map object to which features will be added.
-   * @param {Object} paintProperty - The paint properties to apply to the layer.
-   * @param {Object} layers - The layers to which the features will be added.
-   * @param {Array} data - The data containing features to be added to the map.
-   * @param {string} style - The style string indicating the type of visualisation.
-   * @param {string} layerName - The name of the layer to which features will be added.
-   */
-  const addFeaturesToMap = (map, paintProperty, layers, data, style, layerName) => {
-    // Filter layers to only include the specified layer
-    const specifiedLayer = Object.values(layers).find((layer) => layer.name === layerName);
-
-    if (specifiedLayer && map.getLayer(specifiedLayer.name)) {
-      if (data && data.length > 0 && specifiedLayer.isStylable) {
-        map.getLayer(specifiedLayer.name).metadata = {
-          ...map.getLayer(specifiedLayer.name).metadata,
-          colorStyle: style.split("-")[1],
-        };
-        map.removeFeatureState({
-          source: specifiedLayer.name,
-          sourceLayer: specifiedLayer.sourceLayer,
-        });
-        data.forEach((row) => {
-          map.setFeatureState(
-            {
-              source: specifiedLayer.name,
-              sourceLayer: specifiedLayer.sourceLayer,
-              id: Number(row["id"]),
-            },
-            {
-              value: row["value"],
-              valueAbs: Math.abs(row["value"]),
-            }
-          );
-        });
-        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintProperty)) {
-          map.setPaintProperty(specifiedLayer.name, paintPropertyName, paintPropertyArray);
-        }
-      }
-    }
-  };
-
-  /**
-   * Calculates the color palette based on the provided color scheme and number of bins.
-   *
-   * This function calculates the color palette to be used for visualizing data based on the specified
-   * color scheme and the number of bins. It retrieves the color palette from the ColorBrewer library
-   * and ensures that the number of bins falls within a certain range (3 to 9) to avoid out-of-bounds errors.
-   *
-   * @param {string} colourScheme - The name of the color scheme to use.
-   * @param {Array} bins - The bins representing the data distribution.
-   * @returns {string[]} An array of color values representing the color palette.
-   */
-  const calculateColours = (colourScheme, bins) => {
-    if (bins.length > 9) return chroma.scale(colourScheme).colors(bins.length);
-    return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
-  };
-
-  /**
-   * Checks whether all the features in a GeoJSON feature collection have non-null geometries.
-   *
-   * @param {Object} featureCollection - The GeoJSON feature collection to check.
-   * @returns {boolean} True if all features have non-null geometries; otherwise, false.
-   */
-  function checkGeometryNotNull(featureCollection) {
-    // Check if the feature collection is provided
-    if (
-      !featureCollection ||
-      !featureCollection.features ||
-      featureCollection.features.length === 0
-    ) {
-      return false; // Return false if the feature collection is empty or undefined
-    }
-
-    // Iterate through each feature in the feature collection
-    for (let feature of featureCollection.features) {
-      // Check if the geometry property exists and is not null
-      if (!feature.geometry || feature.geometry === null) {
-        return false; // Return false if geometry is null for any feature
-      }
-    }
-
-    return true; // Return true if geometry is not null for all features
-  }
-
-  /**
-   * Reset the map style to the default style for a specified layer.
-   *
-   * @param {string} style - The type of geometries of the visualisation.
-   */
-  const resetMapStyle = useCallback(
-    (style) => {
-      if (map) {
-        const paintProperty = resetPaintProperty(style);
-        addFeaturesToMap(map, paintProperty, state.layers, prevDataRef.current, style, visualisation.joinLayer);
-      }
-    },
-    [map, state.layers, visualisation.joinLayer]
-  );
-
-  // Effect to restyle the map if data has changed
-  useEffect(() => {
-    const dataHasChanged =
-      visualisationData !== prevDataRef.current &&
-      prevDataRef.current !== undefined;
-    const colorHasChanged =
-      state.color_scheme !== null &&
-      state.color_scheme !== prevColorRef.current;
-    const classificationHasChanged =
-      state.class_method != null &&
-      state.class_method !== prevClassMethodRef.current;
-    const needUpdate =
-      dataHasChanged || colorHasChanged || classificationHasChanged;
-
-    if (!needUpdate) {
-      return;
-    }
-
-    // Check if layers exist before proceeding
-    const layersExist =
-      map &&
-      Object.values(state.layers).some((layer) => map.getLayer(layer.name));
-    if (!layersExist) {
-      // Do not proceed if layers are not present
-      return;
-    }
-
-    // **Filter data based on visualisedFeatureIds**
-    const layerName = visualisation.joinLayer; // Get the associated layer name
-
-    const featureIdsForLayer =
-      state.visualisedFeatureIds && state.visualisedFeatureIds[layerName]
-        ? state.visualisedFeatureIds[layerName]
-        : [];
-
-    const filteredData =
-      featureIdsForLayer && featureIdsForLayer.length > 0
-        ? visualisationData.filter((row) =>
-            featureIdsForLayer.some(
-              (feature) => feature.value === Number(row["id"])
-            )
-          )
-        : visualisationData || [];
-
-    switch (visualisation.type) {
-      case "geojson": {
-        visualisationData && visualisationData[0]
-          ? reclassifyAndStyleGeoJSONMap(
-              JSON.parse(visualisationData[0].feature_collection),
-              visualisation.style
-            )
-          : resetMapStyle(visualisation.style);
-        break;
-      }
-
-      case "joinDataToMap": {
-        // Use filteredData instead of visualisationData
-        if (Array.isArray(filteredData) && filteredData.length === 0) {
-          resetMapStyle(visualisation.style);
-        } else {
-          if (left !== null) {
-            reclassifyAndStyleMap(
-              maps[0],
-              filteredData,
-              state.leftVisualisations[visualisationName].data,
-              visualisation.style,
-              state.class_method, 
-              visualisation.joinLayer
-            );
-            reclassifyAndStyleMap(
-              maps[1],
-              filteredData,
-              state.rightVisualisations[visualisationName].data,
-              visualisation.style,
-              state.class_method,
-              visualisation.joinLayer
-            );
-          } else {
-            reclassifyAndStyleMap(
-              map,
-              filteredData,
-              filteredData,
-              visualisation.style,
-              state.class_method,
-              visualisation.joinLayer
-            );
-          }
-        }
-        break;
-      }
-      default:
-        break;
-    }
-    // Update the ref to the current data
-    prevDataRef.current = filteredData;
-    prevColorRef.current = state.color_scheme;
-    prevClassMethodRef.current = state.class_method;
-
-    return () => {
-      if (map && visualisation.type === "geojson") {
-        if (map.getLayer(visualisationName)) {
-          map.removeLayer(visualisationName);
-        }
-        if (map.getSource(visualisationName)) {
-          map.removeSource(visualisationName);
-        }
-      }
-    };
-  }, [
-    visualisation,
-    reclassifyAndStyleGeoJSONMap,
-    visualisationData,
-    reclassifyAndStyleMap,
-    dispatch,
-    map,
-    state.color_scheme,
-    resetMapStyle,
-    state.class_method,
-    state.visualisedFeatureIds,
-    state.layers, // Add state.layers to dependency array
-    left,
-    maps,
-    visualisation.joinLayer,
-    visualisationName,
-  ]);
 
   return null;
 };

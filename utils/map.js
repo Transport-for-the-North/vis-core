@@ -536,3 +536,31 @@ export const getSourceLayer = (map, layerId) => {
   const layer = map.getLayer(layerId);
   return layer ? layer['sourceLayer'] : null;
 };
+
+
+ /**
+   * Checks whether all the features in a GeoJSON feature collection have non-null geometries.
+   *
+   * @param {Object} featureCollection - The GeoJSON feature collection to check.
+   * @returns {boolean} True if all features have non-null geometries; otherwise, false.
+   */
+ export function checkGeometryNotNull(featureCollection) {
+  // Check if the feature collection is provided
+  if (
+    !featureCollection ||
+    !featureCollection.features ||
+    featureCollection.features.length === 0
+  ) {
+    return false; // Return false if the feature collection is empty or undefined
+  }
+
+  // Iterate through each feature in the feature collection
+  for (let feature of featureCollection.features) {
+    // Check if the geometry property exists and is not null
+    if (!feature.geometry || feature.geometry === null) {
+      return false; // Return false if geometry is null for any feature
+    }
+  }
+
+  return true; // Return true if geometry is not null for all features
+}
