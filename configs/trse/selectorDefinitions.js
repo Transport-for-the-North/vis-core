@@ -22,7 +22,8 @@ const parentCombinedAuthoritySelector = {
   ],
   visualisations: null,
   layer: "Combined Authorities",
-  type: "mapFeatureSelectAndPan"
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true
 };
 
 const parentLADSelector = {
@@ -49,7 +50,8 @@ const parentLADSelector = {
   ],
   visualisations: null,
   layer: "Local Authorities",
-  type: "mapFeatureSelectAndPan"
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true
 };
 
 const zoneTypeCAFixedSelector = {
