@@ -50,24 +50,23 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
   }, [visualisationData, dispatch, visualisationName, isLoading, left]);
 
   /**
-   * Reclassifies the provided data and updates the map style.
+   * Reclassifies the provided data and updates the map style for a specified layer.
    *
    * This function reclassifies the data based on the given style and updates the map style
-   * accordingly. It ensures that the color scheme is applied correctly and updates the paint
-   * properties of the map layers. It only proceeds if the relevant layers exist on the map.
+   * for a specified layer. It ensures that the color scheme is applied correctly and updates
+   * the paint properties of the map layer. It only proceeds if the relevant layer exists on the map.
    *
    * @param {Object} mapItem - The map instance to which styles will be applied.
    * @param {Array} mapData - The data to be reclassified and styled.
    * @param {Array} data - The original data used for setting feature states.
    * @param {string} style - The style to be applied for reclassification.
    * @param {string} classificationMethod - The method used for data classification.
+   * @param {Object} layer - The layer object specifying the layer to be styled.
    */
   const reclassifyAndStyleMap = useCallback(
-    (mapItem, mapData, data, style, classificationMethod) => {
-      // Check if any relevant layers exist on the map
-      const layersExist = Object.values(state.layers).some((layer) => mapItem.getLayer(layer.name));
-      if (!layersExist) {
-        // If no layers are present, do not proceed
+    (mapItem, mapData, data, style, classificationMethod, layer) => {
+      // Check if the specified layer exists on the map
+      if (!mapItem.getLayer(layer)) {
         return;
       }
 
@@ -96,12 +95,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65
       );
-      addFeaturesToMap(mapItem, paintProperty, state.layers, data, style);
-
-      dispatch({
-        type: "UPDATE_MAP_STYLE",
-        payload: { visualisationName, paintProperty },
-      });
+      addFeaturesToMap(mapItem, paintProperty, state.layers, data, style, layer);
     },
     [
       dispatch,
@@ -202,40 +196,38 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
   );
 
   /**
-   * Adds features to the map and updates their paint properties.
+   * Adds features to the map and updates their paint properties for a specified layer.
    *
-   * This function iterates over the provided layers and updates the map with the new features
-   * and their corresponding paint properties. It removes the previous feature states, sets new
-   * feature states, and updates the paint properties for each layer.
-   * Only layers that are present on the map will be processed.
+   * This function updates the map with new features and their corresponding paint properties
+   * for a specified layer. It removes the previous feature states, sets new feature states,
+   * and updates the paint properties for the specified layer.
    *
    * @param {Object} map - The map object to which features will be added.
-   * @param {Object} paintProperty - The paint properties to apply to the layers.
+   * @param {Object} paintProperty - The paint properties to apply to the layer.
    * @param {Object} layers - The layers to which the features will be added.
    * @param {Array} data - The data containing features to be added to the map.
    * @param {string} style - The style string indicating the type of visualisation.
+   * @param {string} layerName - The name of the layer to which features will be added.
    */
-  const addFeaturesToMap = (map, paintProperty, layers, data, style) => {
-    // Filter layers to only include those that are present on the map
-    const existingLayers = Object.values(layers).filter((layer) =>
-      map.getLayer(layer.name)
-    );
+  const addFeaturesToMap = (map, paintProperty, layers, data, style, layerName) => {
+    // Filter layers to only include the specified layer
+    const specifiedLayer = Object.values(layers).find((layer) => layer.name === layerName);
 
-    existingLayers.forEach((layer) => {
-      if (data && data.length > 0 && layer.isStylable) {
-        map.getLayer(layer.name).metadata = {
-          ...map.getLayer(layer.name).metadata,
+    if (specifiedLayer && map.getLayer(specifiedLayer.name)) {
+      if (data && data.length > 0 && specifiedLayer.isStylable) {
+        map.getLayer(specifiedLayer.name).metadata = {
+          ...map.getLayer(specifiedLayer.name).metadata,
           colorStyle: style.split("-")[1],
         };
         map.removeFeatureState({
-          source: layer.name,
-          sourceLayer: layer.sourceLayer,
+          source: specifiedLayer.name,
+          sourceLayer: specifiedLayer.sourceLayer,
         });
         data.forEach((row) => {
           map.setFeatureState(
             {
-              source: layer.name,
-              sourceLayer: layer.sourceLayer,
+              source: specifiedLayer.name,
+              sourceLayer: specifiedLayer.sourceLayer,
               id: Number(row["id"]),
             },
             {
@@ -244,13 +236,11 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
             }
           );
         });
-        for (const [paintPropertyName, paintPropertyArray] of Object.entries(
-          paintProperty
-        )) {
-          map.setPaintProperty(layer.name, paintPropertyName, paintPropertyArray);
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintProperty)) {
+          map.setPaintProperty(specifiedLayer.name, paintPropertyName, paintPropertyArray);
         }
       }
-    });
+    }
   };
 
   /**
@@ -297,7 +287,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
   }
 
   /**
-   * Reset the map style to the default style.
+   * Reset the map style to the default style for a specified layer.
    *
    * @param {string} style - The type of geometries of the visualisation.
    */
@@ -305,10 +295,10 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     (style) => {
       if (map) {
         const paintProperty = resetPaintProperty(style);
-        addFeaturesToMap(map, paintProperty, state.layers, prevDataRef.current, style);
+        addFeaturesToMap(map, paintProperty, state.layers, prevDataRef.current, style, visualisation.joinLayer);
       }
     },
-    [map, state.layers]
+    [map, state.layers, visualisation.joinLayer]
   );
 
   // Effect to restyle the map if data has changed
@@ -377,14 +367,16 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
               filteredData,
               state.leftVisualisations[visualisationName].data,
               visualisation.style,
-              state.class_method
+              state.class_method, 
+              visualisation.joinLayer
             );
             reclassifyAndStyleMap(
               maps[1],
               filteredData,
               state.rightVisualisations[visualisationName].data,
               visualisation.style,
-              state.class_method
+              state.class_method,
+              visualisation.joinLayer
             );
           } else {
             reclassifyAndStyleMap(
@@ -392,7 +384,8 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
               filteredData,
               filteredData,
               visualisation.style,
-              state.class_method
+              state.class_method,
+              visualisation.joinLayer
             );
           }
         }
