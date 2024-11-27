@@ -11,6 +11,7 @@ import {
   isValidCondition,
   applyCondition,
   parseStringToArray,
+  isParamNameForceRequired
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
@@ -298,7 +299,7 @@ export const MapProvider = ({ children }) => {
           if (param.in === 'query') {
             queryParams[param.name] = {
               value: null,
-              required: param.required || false, // Use the 'required' property from the schema, default to false
+              required: param.required || isParamNameForceRequired(pageContext.config.filters, param.name) || false, // Use the 'required' property from the schema, default to false
             };
           }
         });
