@@ -53,6 +53,7 @@ export const localAuthority = {
         path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=29&parentZoneId=",
         sourceLayer: "geometry",
         geometryType: "point",
+        visualisationName: "PT Points Visualisation",
         minZoom: 11,
         isHoverable: true,
         isStylable: false,
@@ -82,6 +83,22 @@ export const localAuthority = {
         ]
       },
       {
+        name: "PT Points Visualisation",
+        type: "joinDataToMap",
+        joinLayer: "PT Points",
+        style: "circle-continuous",
+        joinField: "id",
+        valueField: "value",
+        dataSource: "api",
+        dataPath: "/api/trse/pt-point-data",
+        legendText: [
+          {
+            displayValue: "PT Points",
+            legendSubtitleText: "Points"
+          }
+        ]
+      },
+      {
         name: "Detailed Information",
         type: "calloutCard",
         cardName: "LA Summary",
@@ -100,11 +117,11 @@ export const localAuthority = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.parentLAD, visualisations: ['TRSE Rank', 'Detailed Information'] },
-      { ...selectors.zoneResolutionLADFixed, visualisations: ['TRSE Rank']},
-      { ...selectors.zoneTypeLADFixed, visualisations: ['TRSE Rank', 'Detailed Information']},
-      { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank']},
-      { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank']},
+      { ...selectors.parentLAD, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information'] },
+      { ...selectors.zoneResolutionLADFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.zoneTypeLADFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information']},
+      { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
       selectors.oaFeatureType
     ],
