@@ -1,4 +1,5 @@
 export * from './api'
+export * from './config'
 export * from './map'
 export * from './math'
 export * from './state'

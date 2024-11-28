@@ -31,13 +31,13 @@ export function getOpacityProperty(layerType) {
 
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
- * This function is designed to create paint properties for various map features such as polygons, lines, and circles.
+ * This function is designed to create paint properties for various map features such as polygons, lines, circles, and points.
  *
  * @function createPaintProperty
- * @param {Array.<(number|string)>} bins - The differents breaks used for the legend
- * @param {string} style - The type of geometries that we want to display on the map
+ * @param {Array.<(number|string)>} bins - The different breaks used for the legend
+ * @param {string} style - The type of geometries that we want to display on the map. Supported styles include 'polygon-continuous', 'polygon-diverging', 'line-continuous', 'line-diverging', 'circle-continuous', 'circle-diverging', 'point-continuous', and 'point-diverging'.
  * @param {Array.<string>} colours - The array of colours available for the styling. Usually an array of #FFFF
- * @param {float} opacityValue - the current opacity value, between 0 and 1
+ * @param {float} opacityValue - The current opacity value, between 0 and 1
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue) {
@@ -108,9 +108,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           Math.min(...bins),
-          1,
+          -1,
           Math.max(...bins),
-          5,
+          -5,
         ],
       };
     case "line-diverging":
@@ -140,9 +140,9 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
           Math.min(...bins),
-          1,
+          -1,
           Math.max(...bins),
-          5,
+          -5,
         ],
       };
     case "circle-continuous":
@@ -180,6 +180,41 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "circle-stroke-color": "#000000"
       };
     }
+    case "point-continuous":
+    case "point-diverging": {
+      return {
+        "circle-color": [
+          "interpolate", ["linear"], ["feature-state", "value"], ...colors
+        ],
+        "circle-stroke-width": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [0, null]]],
+          0.0,
+          1,
+        ],
+        "circle-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 1,
+        ],
+        "circle-stroke-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 0.2,
+        ],
+        "circle-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0, 2,  // Minimum radius at zoom level 0
+          12, 4, // Medium radius at zoom level 12
+          22, 8 // Maximum radius at zoom level 22
+        ],
+        "circle-stroke-color": "#666"
+      };
+    }
     default:
       return {};
   }
@@ -207,11 +242,21 @@ export const resetPaintProperty = (style) => {
     case "circle-continuous":
     case "circle-diverging":
     case "circle-categorical":
+    case "point-continuous":
+    case "point-diverging":
       return {
         "circle-color": "rgb(0, 0, 0)",
         "circle-stroke-width": 0.5,
         "circle-opacity": 0.65,
-        "circle-radius": 2,
+        "circle-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0, 2,  // Minimum radius at zoom level 0
+          12, 4, // Medium radius at zoom level 12
+          22, 8 // Maximum radius at zoom level 22
+        ],
+        "circle-stroke-color": "#666"
       };
     default:
       return {};
@@ -263,7 +308,7 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
       if (selectedPageBands && selectedMetricParamName) {
-        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
+        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]?.value);
         if(metrics.length > 1) return metrics.find((metric) => currentPage.pageName.includes(metric.pageName)).values;
         if(metrics.length === 1) return metrics[0].values;
       }
@@ -385,7 +430,7 @@ export const getLayerStyle = (geometryType) => {
               ["zoom"],
               0, 2,
               12, 8,
-              22, 22
+              22, 15
             ],
             "circle-color": "#1E90FF",
             "circle-stroke-color": "#FFFFFF",
@@ -456,13 +501,13 @@ export const getHoverLayerStyle = (geometryType) => {
             ["zoom"],
             // Specify zoom levels and corresponding line widths
             5,
-            1, // At zoom level 5, line width will be 1
+            -1, // At zoom level 5, line width will be 1
             10,
-            2, // At zoom level 10, line width will be 2
+            -2, // At zoom level 10, line width will be 2
             15,
-            6, // At zoom level 15, line width will be 4
+            -6, // At zoom level 15, line width will be 4
             20,
-            8, // At zoom level 20, line width will be 8
+            -8, // At zoom level 20, line width will be 8
           ],
         }
       };
@@ -491,3 +536,31 @@ export const getSourceLayer = (map, layerId) => {
   const layer = map.getLayer(layerId);
   return layer ? layer['sourceLayer'] : null;
 };
+
+
+ /**
+   * Checks whether all the features in a GeoJSON feature collection have non-null geometries.
+   *
+   * @param {Object} featureCollection - The GeoJSON feature collection to check.
+   * @returns {boolean} True if all features have non-null geometries; otherwise, false.
+   */
+ export function checkGeometryNotNull(featureCollection) {
+  // Check if the feature collection is provided
+  if (
+    !featureCollection ||
+    !featureCollection.features ||
+    featureCollection.features.length === 0
+  ) {
+    return false; // Return false if the feature collection is empty or undefined
+  }
+
+  // Iterate through each feature in the feature collection
+  for (let feature of featureCollection.features) {
+    // Check if the geometry property exists and is not null
+    if (!feature.geometry || feature.geometry === null) {
+      return false; // Return false if geometry is null for any feature
+    }
+  }
+
+  return true; // Return true if geometry is not null for all features
+}

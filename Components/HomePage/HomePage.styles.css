@@ -1,157 +1,213 @@
 .landing {
-    background-color: white;
-    width: 100vw;
-  
-    h2 {
-      color: #0d0f3d;
-      text-align: center;
-      margin-bottom: 10vh;
-    }
+  background-color: white;
+}
+
+.header-landing {
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.header-landing::before {
+  content: "";
+  display: block;
+  position: absolute;
+  background-image: linear-gradient(to top, rgba(115, 23, 222, 0.6), transparent);
+  width: 100%;
+  height: 50vh;
+}
+
+.header-title {
+  color: white;
+  font-weight: 1000;
+}
+
+.title-left {
+  text-align: left;
+}
+
+.title-center {
+  text-align: center;
+}
+
+.title-right {
+  text-align: right;
+}
+
+.container {
+  position: relative;
+  text-align: center;
+}
+
+.introduction {
+  padding: 3vh 10vw;
+  font-size: larger;
+  background-color: #f5f5f5;
+  text-align: start;
+}
+
+.introduction h2 {
+  color: #0d0f3d;
+  text-align: start;
+  margin-bottom: 2vh;
+}
+
+.container-intro {
+  color: #0d0f3d;
+  text-indent: 0em;
+}
+
+.background,
+.additional-section,
+.even-section,
+.odd-section {
+  padding: 3vh 10vw;
+  font-size: medium; /* Slightly smaller font size */
+  text-align: start;
+}
+
+.background {
+  background-color: #7317de;
+  color: white;
+}
+
+.background h2,
+.additional-section h2 {
+  margin-bottom: 2vh;
+}
+
+.container-bg,
+.container-section {
+  text-indent: 0em;
+}
+
+.even-section {
+  background-color: #7317de;
+  color: white;
+}
+
+.odd-section {
+  background-color: #f5f5f5;
+  color: #0d0f3d;
+}
+
+.contacts {
+  text-align: center;
+  font-size: larger;
+  color: #0d0f3d;
+  margin: 10vh 0 5vh;
+}
+
+.contacts p {
+  padding-bottom: 2vh;
+}
+
+.contact {
+  font-size: large;
+  color: #0d0f3d;
+  text-decoration: none;
+  border-width: thin;
+  border-style: solid;
+  border-radius: 25px;
+  padding: 10px;
+}
+
+.contact:hover {
+  color: #0d0f3d;
+}
+
+.contactsList {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%; /* Ensure it occupies the full width of the parent */
+}
+
+.contactItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+  flex: 1 1 25%;
+  box-sizing: border-box;
+  min-width: 200px;
+}
+
+.contactsList .stb-logo {
+  max-width: 235px;
+  max-height: 66px; /* Adjust the size of the STB logo */
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.stb-logo {
+  max-width: 200px;
+  max-height: 70px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.icon-links {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-links .icon {
+  height: 30px;
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .contactItem {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
-  
-  .paragraph {
-    color: white;
-    font-size: large;
-    text-align: justify;
-    margin-bottom: 5vh;
-    width: 70vw;
+
+  .stb-logo {
+    max-width: 120px;
   }
-  
-  .company-list {
-    list-style-type: none;
-    text-align: center;
-    margin-bottom: 5vh;
+}
+
+.section-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.section-content img {
+  max-width: 45%;
+  height: auto;
+  margin: 10px;
+}
+
+.section-content.full-width img {
+  max-width: 100%;
+  margin: 10px 0;
+}
+
+@media (max-width: 1100px) and (min-width: 769px) {
+  .contactItem {
+    flex: 1 1 45%;
+    max-width: 45%;
   }
-  
-  .company {
-    padding: 1.5vh;
-    height: 100px;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-column-gap: 10px;
-  
-    p {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: left;
-      text-decoration: none;
-      font-size: x-large;
-      color: #0d0f3d;
-      grid-column-start: 2;
-      margin-bottom: 0;
-    }
+
+  .stb-logo {
+    max-width: 150px; /* Adjust the logo size for this range */
   }
-  
-  .company-logo {
-    cursor: pointer;
-    grid-column-start: 4;
+}
+
+@media (max-width: 768px) {
+  .section-content {
+    flex-direction: column;
   }
-  
-  .introduction {
-    margin-top: 5vh;
-  
-    h2 {
-      color: #0d0f3d;
-      text-align: start;
-      padding-left: 12vw;
-      margin-bottom: 2vh;
-    }
-  
-    .container-intro {
-      margin-left: 10vw;
-      margin-right: 20vw;
-      padding: 3vh;
-      border-radius: 10px;
-      background-color: #7317de;
-      color: white;
-      font-size: large;
-      text-align: start;
-      text-indent: 2em;
-    }
+
+  .section-content img {
+    max-width: 100%;
   }
-  
-  .background {
-    h2 {
-      color: #0d0f3d;
-      text-align: end;
-      padding-left: 12vw;
-      margin-bottom: 4vh;
-    }
-  
-    .container-bg {
-      margin-right: 10vw;
-      margin-left: 20vw;
-      padding: 3vh;
-      border-radius: 10px;
-      background-color: #7317de;
-      color: white;
-      font-size: large;
-      text-indent: 2em;
-    }
-  }
-  
-  .header-landing {
-    height: 50vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-size: 100vw;
-    background-position: center;
-    position: relative;
-  }
-  
-  .header-landing::before {
-    content: "";
-    display: block;
-    position: absolute;
-    background-image: linear-gradient(
-      to top,
-      rgba(115, 23, 222, 0.6),
-      transparent
-    );
-    width: 100%;
-    height: 50vh;
-  }
-  
-  .header-title {
-    color: white;
-    font-weight: 1000;
-  }
-  
-  .container {
-    position: relative;
-    text-align: center;
-  }
-  
-  .contacts {
-    text-align: center;
-    font-size: larger;
-    color: #0d0f3d;
-    margin-top: 10vh;
-    margin-bottom: 5vh;
-  
-    p{
-      padding-bottom: 2vh;
-    }
-  }
-  
-  .contact {
-    font-size: large;
-    color: #0d0f3d;
-    text-decoration: none;
-    border-width: thin;
-    border-style: solid;
-    border-radius: 25px;
-    padding: 10px;
-  }
-  
-  .contact:hover{
-    color: #0d0f3d;
-  }
-  
-  .contactsList {
-    display: flex;
-    justify-content: space-evenly;
-  }
-  
+}

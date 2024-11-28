@@ -21,6 +21,31 @@ export const loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing el
   return parseFloat(cleanedStr);
 }
 
+/**
+ * Parses a string into an array if it looks like a comma-separated list, or returns the input if it's already an array.
+ * Throws an error if the input is neither an array nor a valid comma-separated string.
+ *
+ * @param {string|Array} input - The input to be parsed or returned.
+ * @returns {Array} - The parsed array or the original array.
+ * @throws {Error} - Throws an error if the input is neither an array nor a valid comma-separated string.
+ */
+export function parseStringToArray(input) {
+  if (Array.isArray(input)) {
+      // Input is already an array
+      return input;
+  } else if (typeof input === 'string' && input.includes(',')) {
+      // Input is a string that looks like a comma-separated list
+      try {
+          const parsedArray = input.split(',').map(item => item.trim());
+          return parsedArray;
+      } catch (e) {
+          throw new Error('Invalid comma-separated string format');
+      }
+  } else {
+      throw new Error('Input is neither an array nor a valid comma-separated string');
+  }
+}
+
 function removeRecurringDecimals(number) {
   // Convert the number to a string
   let numStr = number.toString();
@@ -48,3 +73,24 @@ export function numberWithCommas(x) {
   x = x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
     return x
   }
+
+const numberFormatter = new Intl.NumberFormat('en-GB', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+export const formatNumber = (value) => {
+  if (typeof value === 'number') {
+    return numberFormatter.format(value);
+  }
+  return value;
+};
+
+export const formatOrdinal = (n) => {
+  if (typeof n === 'number') {
+    const s = ['th', 'st', 'nd', 'rd'],
+      v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+  return n;
+};

@@ -2872,8 +2872,10 @@ export const appConfig = {
             visualisationName: "Station Nodes",
             isHoverable: false,
             isStylable: false,
-            shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelNulls: true,
+            labelZoomLevel: 9,
           },
           {
             uniqueId: "NoRMSLinksVectorTile",
@@ -3069,8 +3071,10 @@ export const appConfig = {
             visualisationName: "Station Nodes",
             isHoverable: false,
             isStylable: false,
-            shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelNulls: true,
+            labelZoomLevel: 9,
           },
           {
             uniqueId: "NoRMSLinksResultDifference",
@@ -3405,8 +3409,10 @@ export const appConfig = {
             visualisationName: "Station Nodes",
             isHoverable: false,
             isStylable: false,
-            shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 9,
+            labelNulls: true
           },
           {
             uniqueId: "NoRMSLinksResultDual",

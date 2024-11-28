@@ -61,8 +61,8 @@ export const ClassificationDropdown = ({
   return (
     <div style={{ marginTop: "10px" }}>
       <SelectorLabel
-        text="Symbology mode"
-        info={"Select symbology banding mode"}
+        text="Classification method"
+        info={"Select classification method for map data"}
       />
       <Select
         components={animatedComponents}

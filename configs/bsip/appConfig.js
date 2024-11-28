@@ -69,7 +69,10 @@ export const appConfig = {
             paramName: "zoneTypeId",
             target: "api",
             actions: [
-              { action: "UPDATE_PARAMETERISED_LAYER", payload: "Origin Zones" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER", 
+                payload: { targetLayer: "Origin Zones" } 
+              },
               { action: "UPDATE_QUERY_PARAMS" },
             ],
             visualisations: ["Bus Reliability"],
@@ -199,9 +202,9 @@ export const appConfig = {
             paramName: "zoneTypeId",
             target: "api",
             actions: [
-              {
-                action: "UPDATE_PARAMETERISED_LAYER",
-                payload: "Accessibility",
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER", 
+                payload: { targetLayer: "Accessibility" } 
               },
               { action: "UPDATE_QUERY_PARAMS" },
             ],

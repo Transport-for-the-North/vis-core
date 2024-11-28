@@ -1,6 +1,7 @@
 import BaseService from "./Base";
 import { GeodataService } from "./Geodata";
 import { MetadataService } from "./Metadata";
+import { DownloadService } from "./downloadData";
 
 /**
  * Object containing instances of various services.
@@ -11,7 +12,8 @@ import { MetadataService } from "./Metadata";
 const api ={
   baseService: new BaseService(),
   metadataService: new MetadataService(),
-  geodataService: new GeodataService()
+  geodataService: new GeodataService(),
+  downloadService: new DownloadService()
 };
 
 export default api;
