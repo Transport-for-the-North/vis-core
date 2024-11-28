@@ -506,6 +506,53 @@ const columnNameCPSelector = {
   },
 };
 
+const columnNameOSPASelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Demand Park Access",
+        paramValue: "demand_park_access_lsoa",
+        legendSubtitleText: "LSOA"
+      },
+      {
+        displayValue: "Car Park Access",
+        paramValue: "car_park_access_perc",
+        legendSubtitleText: "Percentage %"
+      },
+      {
+        displayValue: "Non Driveway Count",
+        paramValue: "non_driveway_count",
+        legendSubtitleText: "Count"
+      },
+      {
+        displayValue: "Driveway Count",
+        paramValue: "driveway_count",
+        legendSubtitleText: "Count"
+      },
+      {
+        displayValue: "Total Count",
+        paramValue: "total_count",
+        legendSubtitleText: "Count"
+      },
+      {
+        displayValue: "Driveway",
+        paramValue: "driveway_perc",
+        legendSubtitleText: "Percentage %"
+      },
+    ],
+  },
+};
+
 const columnNameCVFixedSelector = {
   filterName: "Metric",
   paramName: "columnName",
@@ -658,6 +705,7 @@ export const selectors = {
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
+  columnNameOSPA: columnNameOSPASelector,
   columnNameCVFixed: columnNameCVFixedSelector,
   columnNameMMHFixed: columnNameMMHFixedSelector,
   columnName: columnNameSelector,

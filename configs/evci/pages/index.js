@@ -9,6 +9,7 @@ import { co2Savings, tfnCo2Savings } from "./co2Savings"
 import { enrouteChargingDemand } from "./enrouteChargingDemand"
 import { commercialViability } from "./commercialViability"
 import { multiModalHubs } from "./multiModalHubs"
+import { offStreetParkingAccess } from "./offStreetParkingAccess"
 
 export const pages = {
     evUptake: evUptake,
@@ -22,6 +23,7 @@ export const pages = {
     co2Savings: co2Savings,
     commercialViability: commercialViability,
     multiModalHubs: multiModalHubs,
+    offStreetParkingAccess: offStreetParkingAccess,
     tfnAnnualChargingDemand: tfnAnnualChargingDemand,
     tfnCo2Savings: tfnCo2Savings,
     tfnEvcpRequirements: tfnEvcpRequirements,

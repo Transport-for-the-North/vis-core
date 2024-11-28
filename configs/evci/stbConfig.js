@@ -31,7 +31,8 @@ export const stbConfig = [
       "tfnCo2Savings",
       "enrouteChargingDemand",
       "commercialViability",
-      "multiModalHubs"
+      "multiModalHubs",
+      "offStreetParkingAccess"
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:
