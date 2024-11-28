@@ -61,7 +61,7 @@ export const commercialViability = {
       { ...selectors.administrativeBoundaryFixed, visualisations: ['Commercial Viability'] },
       { ...selectors.columnNameCVFixed, visualisations: ['Commercial Viability'] },
       { ...selectors.stbTag, visualisations: ['Commercial Viability'] },
-      { ...selectors.areaValueDisplay, visualisations: ['Commercial Viability'] },
+      //{ ...selectors.areaValueDisplay, visualisations: ['Commercial Viability'] },
       { ...selectors.zoneSelector, visualisations: ['Commercial Viability'] }
     ],
     additionalFeatures: {

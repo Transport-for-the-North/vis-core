@@ -61,7 +61,7 @@ export const offStreetParkingAccess = {
       { ...selectors.administrativeBoundary, visualisations: ['Off Street Parking Access'] },
       { ...selectors.columnNameOSPA, visualisations: ['Off Street Parking Access'] },
       { ...selectors.stbTag, visualisations: ['Off Street Parking Access'] },
-      { ...selectors.areaValueDisplay, visualisations: ['Off Street Parking Access'] },
+      //{ ...selectors.areaValueDisplay, visualisations: ['Off Street Parking Access'] },
       { ...selectors.zoneSelector, visualisations: ['Off Street Parking Access'] }
     ],
     additionalFeatures: {

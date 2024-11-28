@@ -61,7 +61,7 @@ export const multiModalHubs = {
       { ...selectors.administrativeBoundaryFixed, visualisations: ['Multi-Modal Hubs'] },
       { ...selectors.columnNameMMHFixed, visualisations: ['Multi-Modal Hubs'] },
       { ...selectors.stbTag, visualisations: ['Multi-Modal Hubs'] },
-      { ...selectors.areaValueDisplay, visualisations: ['Multi-Modal Hubs'] },
+      //{ ...selectors.areaValueDisplay, visualisations: ['Multi-Modal Hubs'] },
       { ...selectors.zoneSelector, visualisations: ['Multi-Modal Hubs'] }
     ],
     additionalFeatures: {
