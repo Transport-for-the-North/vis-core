@@ -7,6 +7,7 @@ import { Glossary } from "Components/Glossary";
 import { Hovertip } from 'Components';
 import { DownloadSection } from "./Selectors/DownloadSelection";
 import { FilterProvider } from "contexts";
+import { isWindows10OrLower } from "utils";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -43,7 +44,7 @@ const IconWrapper = styled.div`
 
 const SidebarContainer = styled.div`
   --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
-  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */
+  --firefox-scrollbar-width: 8px; /* Approximate scrollbar width for Firefox */
   width: 450px;
   max-width: 95vw;
   max-height: calc(100vh - 235px);
@@ -81,15 +82,19 @@ const SidebarContainer = styled.div`
     background-color: darkgrey; /* Color when hovered */
   }
 
-  /* Firefox-specific styles */
-  @-moz-document url-prefix() {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent; /* Default color */
-    padding-right: calc(10px - var(--firefox-scrollbar-width)); /* Adjust padding for Firefox */
-    &:hover {
-      scrollbar-color: darkgrey transparent; /* Color when hovered */
+  /* Conditionally apply Firefox-specific styles */
+  ${({ $isWindows10OrLower }) =>
+    $isWindows10OrLower &&
+    `
+    @-moz-document url-prefix() {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent; /* Default color */
+      padding-right: calc(10px - var(--firefox-scrollbar-width)); /* Adjust padding for Firefox */
+      &:hover {
+        scrollbar-color: darkgrey transparent; /* Color when hovered */
+      }
     }
-  }
+  `}
 `;
 
 
@@ -151,7 +156,7 @@ export const Sidebar = ({
 
   return (
     <>
-      <SidebarContainer $isVisible={isVisible}>
+      <SidebarContainer $isVisible={isVisible} $isWindows10OrLower={isWindows10OrLower}>
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
         </SidebarHeader>
