@@ -22,14 +22,15 @@ const LegendContainer = styled.div`
   box-sizing: border-box; /* Include padding and border in width */
   border-radius: 10px;
   z-index: 10;
-  max-height: 25vh;
+  max-height: 30vh;
   overflow-y: auto;
   overflow-x: hidden; /* Hide horizontal scrollbar if any */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
   font-size: medium;
 
-  /* WebKit-based browsers (Chrome, Safari, Edge) */
+  /* Webkit-based browsers (Chrome, Safari, Edge) */
+  /* Custom Scrollbar Styles */
   &::-webkit-scrollbar {
     width: var(--scrollbar-width);
   }
@@ -48,14 +49,13 @@ const LegendContainer = styled.div`
   }
 
   /* Firefox-specific styles */
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent; /* Default colors */
-  /* Adjust padding-right to account for scrollbar in Firefox */
-  padding-right: calc(15px - var(--firefox-scrollbar-width));
-
-  &:hover {
-    scrollbar-color: darkgrey transparent; /* Change thumb color on hover */
-  }
+  @-moz-document url-prefix() {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent; /* Default color */
+    padding-right: calc(15px - var(--firefox-scrollbar-width)); /* Adjust padding for Firefox */
+    &:hover {
+      scrollbar-color: darkgrey transparent; /* Color when hovered */
+    }
 `;
 
 const LegendItemContainer = styled.div`
@@ -105,8 +105,8 @@ const LineSwatch = styled.div`
 `;
 
 const PolygonSwatch = styled.div`
-  width: 50px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   background-color: ${(props) => props.color};
   border: 1px solid #333;
   margin-right: 5px;
