@@ -663,7 +663,7 @@ const Map = () => {
     if (map && state.mapBoundsAndCentroid) {
       const { centroid, bounds } = state.mapBoundsAndCentroid;
       if (bounds) {
-        map.fitBounds(bounds.coordinates[0], { padding: 20 });
+        map.fitBounds(bounds.coordinates[0], { padding: 0 });
       }
       if (centroid) {
         map.panTo(centroid.coordinates);
