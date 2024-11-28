@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
 export const offStreetParkingAccess = {
-  pageName: "Off-street parking (Access)",
+  pageName: "Off-Street Parking Accessibility",
   url: "/@stbTag@/off-street-parking-access",
   type: "MapLayout",
   category: "@stbName@",
@@ -15,7 +15,7 @@ export const offStreetParkingAccess = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows the Off-street parking ('Access').</p>`,
+  <p>This visualisation shows the Off-Street Parking Accessibility.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
