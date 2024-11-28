@@ -221,3 +221,25 @@ export function isWindows10OrLower() {
   }
   return false;
 }
+
+
+export const getScrollbarWidth = () => {
+  // Create a temporary div container
+  const outer = document.createElement('div');
+  outer.style.visibility = 'hidden';
+  outer.style.overflow = 'scroll'; // Force scrollbars
+  outer.style.msOverflowStyle = 'scrollbar'; // Needed for WinJS apps
+  document.body.appendChild(outer);
+
+  // Create a temporary inner div
+  const inner = document.createElement('div');
+  outer.appendChild(inner);
+
+  // Calculate the scrollbar width
+  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+
+  // Clean up
+  outer.parentNode.removeChild(outer);
+
+  return scrollbarWidth;
+};
