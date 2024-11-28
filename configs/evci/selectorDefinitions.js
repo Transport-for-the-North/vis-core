@@ -528,6 +528,28 @@ const columnNameCVFixedSelector = {
   },
 };
 
+const columnNameMMHFixedSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Multi-Modal Hubs",
+        paramValue: "multi_modal_hub",
+        legendSubtitleText: "Hubs"
+      }
+    ],
+  },
+};
+
 const columnNameSelector = {
   filterName: "Metric",
   paramName: "columnName",
@@ -637,6 +659,7 @@ export const selectors = {
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
   columnNameCVFixed: columnNameCVFixedSelector,
+  columnNameMMHFixed: columnNameMMHFixedSelector,
   columnName: columnNameSelector,
   stbTag: stbTagSelector,
   runTypeCodeFixed: runTypeCodeFixedSelector,
