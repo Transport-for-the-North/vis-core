@@ -57,15 +57,6 @@ export const cpLocation = {
       glossary: { 
         dataDictionary: {}
       },
-      download: {
-        filters: [
-          { ...selectors.chargerSpeed, multiSelect: true, type: 'dropdown' },
-          { ...selectors.columnNameCP, multiSelect: true, type: 'dropdown' },
-          { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
-        ],
-        downloadPath: '/api/evci/cp-location/download'
-      },
     },
   },
 };
