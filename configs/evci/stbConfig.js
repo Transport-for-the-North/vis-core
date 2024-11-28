@@ -30,6 +30,7 @@ export const stbConfig = [
       "potentialChargingSites",
       "tfnCo2Savings",
       "enrouteChargingDemand",
+      "commercialViability"
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:
@@ -59,7 +60,7 @@ export const stbConfig = [
       "evUptake",
       "evcpRequirements",
       "annualChargingDemand",
-      "potentialChargingSites",
+      "potentialChargingSites"
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:

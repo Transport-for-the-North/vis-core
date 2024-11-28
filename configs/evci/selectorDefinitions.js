@@ -27,6 +27,26 @@ const administrativeBoundarySelector = {
   },
 };
 
+const administrativeBoundaryFixedSelector = {
+  filterName: "Administrative Boundaries Fixed",
+  paramName: "zoneTypeId",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "MSOA",
+        paramValue: "14",
+      }
+    ],
+  },
+};
+
 const zoneSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
@@ -102,6 +122,32 @@ const yearSelector = {
       {
         "displayValue": 2050,
         "paramValue": 2050
+      }
+    ]
+  },
+};
+
+const yearTripletSelector = {
+  filterName: "Year",
+  paramName: "scenarioYear",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "slider",
+  values: {
+    "source": "local",
+    "values": [
+      {
+        "displayValue": 2025,
+        "paramValue": 2025
+      },
+      {
+        "displayValue": 2030,
+        "paramValue": 2030
+      },
+      {
+        "displayValue": 2035,
+        "paramValue": 2035
       }
     ]
   },
@@ -185,6 +231,10 @@ const behaviouralScenarioSelector = {
       //   displayValue: "Local",
       //   paramValue: 4,
       // },
+      {
+        displayValue: "Queuing acceptance",
+        paramValue: 5,
+      },
     ],
   },
 };
@@ -312,7 +362,7 @@ const chargingCategorySelector = {
         paramValue: 3,
       },
       {
-        displayValue: "Public Residential",
+        displayValue: "On-street residential charging",
         paramValue: 4,
       },
       {
@@ -326,6 +376,10 @@ const chargingCategorySelector = {
       {
         displayValue: "En route",
         paramValue: 7,
+      },
+      {
+        displayValue: "Local Public Charging Hub focus",
+        paramValue: 8,
       },
     ],
   },
@@ -452,6 +506,28 @@ const columnNameCPSelector = {
   },
 };
 
+const columnNameCVFixedSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Commercial Viability",
+        paramValue: "commercial",
+        legendSubtitleText: "viability"
+      }
+    ],
+  },
+};
+
 const columnNameSelector = {
   filterName: "Metric",
   paramName: "columnName",
@@ -545,7 +621,9 @@ const runTypeCodeDynamicSelector = {
 
 export const selectors = {
   year: yearSelector,
+  yearTriplet: yearTripletSelector,
   administrativeBoundary: administrativeBoundarySelector,
+  administrativeBoundaryFixed: administrativeBoundaryFixedSelector,
   travelScenarioBase: travelScenarioSelectorBase,
   travelScenarioAdditional: travelScenarioSelectorAdditional,
   behaviouralScenario: behaviouralScenarioSelector,
@@ -558,6 +636,7 @@ export const selectors = {
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
+  columnNameCVFixed: columnNameCVFixedSelector,
   columnName: columnNameSelector,
   stbTag: stbTagSelector,
   runTypeCodeFixed: runTypeCodeFixedSelector,
