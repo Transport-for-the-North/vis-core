@@ -170,43 +170,51 @@ export const bands = [
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500],
             },
             {
-                name: "Total Generalised Cost",
+                name: "total_gen_cost",
                 pageName: "Zone Benefits Total",
+                values: [-20000, -5000, -1000, -500, 0, 500, 1000, 5000, 20000],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
-                name: "IVT",
+                name: "ivt",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
-                name: "Crowding",
+                name: "crowding",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
-                name: "Wait Time",
+                name: "wait_time",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
-                name: "Walk Time",
+                name: "walk_time",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
-                name: "Penalty",
+                name: "penalty",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500],
             },
             {
-                name: "Access Egress",
+                name: "access_egress",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500],
             },
             {
-                name: "Value of Choice",
+                name: "value_of_choice",
                 pageName: "Zone Benefits Total",
+                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
