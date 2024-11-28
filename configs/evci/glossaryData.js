@@ -1,3 +1,5 @@
+import { commercialViability } from "./pages/commercialViability";
+
 const glossaryData = {
     /*
     Add new Info (mini-manual) entries within infoFragments, eg:
@@ -91,6 +93,30 @@ const glossaryData = {
       title: "Annual Charging Demand",
       content: `<p>Gives the expected annual energy demand in kWh that vehicles are expected to require from each charging category.</p>
       <p>Note that every kWh of energy demand corresponds to roughly 6 km driven by a car, 3 km by a van, or 1 km driven by a heavy goods vehicle.</p>`,
+      exclude: [],
+    },
+    commercialViability: {
+      title: "Commercial Viability Assessment",
+      content: `<p>Assesses EVCI commercial investment viability, to inform LA strategic decisions and business and commercial deployment activities.​</p>
+      <p>Identifies key characteristics of areas with likely strong potential return on investment suitable for commercial CPO interest.​</p>
+      <p>Presents a methodology that can highlight areas where a single issue is causing challenge (for example energy supply or rurality).​</p>
+      <p>Identifies characteristics of areas which are strategically important for social equality and inclusivity and require public sector support due to lower commercial viability but high societal value.​</p>
+      <p>Supports TfN's objective of a whole network solution across the region.​</p>`,
+      exclude: [],
+    },
+    multiModalHub: {
+      title: "Multi model hub potential scoring",
+      content: `
+      <p>Multi-modal hub suitability and demand scoring based on publicly available data sources and from TfN. This includes grid capacity, existing EV network, EV and EVCI forecast, Rail and bus station locations and OD demand, proximity to highway network and enviro considerations.​</p>
+      <p>Further specific site investigation and development work is advised for any locations of interest.​</p>`,
+      exclude: [],
+    },
+    offStreetParkingAccess: {
+      title: "Off-street parking accessibility",
+      content: `<p>Identifies which households within areas may be reliant on public charging or an on-street solution. This function maps on/off street parking access across 6.4m households (public and more detailed private sharing).​</p>
+      <p>By using a combination of Bluesky's 12.5cm resolution aerial photography, new OS National Geographic Database (NDG) data and a cutting-edge object detection algorithm, a process has been devised that will identify driveways from aerial photography.​</p>
+      <p>This new methodology outperforms previous approaches used by TfN and others, which is to use of house type (i.e. terraced, semi-detached, detached ) to infer driveway presence. TfN has integrated the driveway findings into its EVCI Framework to better inform projections of charge point requirements, and will be applying this function across the wider TfN Anlytical Framework to shape other areas of TfN work.​</p>
+      <p>Additional data is available to TfN’s local authority or statutory partners with Ordnance Survey Public Sector Geospatial Agreements. This includes household level information and geometries. TfN partners can receive this data free of charge (via TfN) to inform future decisions around public EVCI.</p>`,
       exclude: [],
     },
     digitallyDistributed: {
