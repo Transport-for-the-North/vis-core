@@ -220,6 +220,11 @@ export const MapVisualisation = ({
               paintPropertyArray
             );
           }
+        } else if (data && data.length === 0 && specifiedLayer.isStylable) {
+          map.removeFeatureState({
+            source: specifiedLayer.name,
+            sourceLayer: specifiedLayer.sourceLayer,
+          });
         }
       }
     },
