@@ -15,7 +15,6 @@ export const commercialViability = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request.</p>
   <p>This visualisation shows the Commercial Viability.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
@@ -79,6 +78,7 @@ export const commercialViability = {
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },
+      warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request."
     },
   },
 };
