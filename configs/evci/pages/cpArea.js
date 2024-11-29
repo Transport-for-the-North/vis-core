@@ -25,7 +25,7 @@ export const cpArea = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneTypeId=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Chargers/Power by Area",
@@ -67,6 +67,7 @@ export const cpArea = {
       { ...selectors.zoneSelector, visualisations: ['Chargers/Power by Area'] }
     ],
     additionalFeatures: {
+      warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request.",
       glossary: { 
         dataDictionary: {}
       },

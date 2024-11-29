@@ -24,7 +24,7 @@ export const commercialViability = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneTypeId=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/14/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Commercial Viability",
@@ -61,7 +61,6 @@ export const commercialViability = {
       { ...selectors.administrativeBoundaryFixed, visualisations: ['Commercial Viability'] },
       { ...selectors.columnNameCVFixed, visualisations: ['Commercial Viability'] },
       { ...selectors.stbTag, visualisations: ['Commercial Viability'] },
-      //{ ...selectors.areaValueDisplay, visualisations: ['Commercial Viability'] },
       { ...selectors.zoneSelector, visualisations: ['Commercial Viability'] }
     ],
     additionalFeatures: {
@@ -73,12 +72,11 @@ export const commercialViability = {
           { ...selectors.administrativeBoundaryFixed, type: 'fixed' },
           { ...selectors.columnNameCVFixed, type: 'fixed' },
           { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },
-      warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request."
+      warning: "Rationale goes here or in about box???"
     },
   },
 };

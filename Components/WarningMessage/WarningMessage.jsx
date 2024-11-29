@@ -17,6 +17,7 @@ export const WarningMessage = styled.div`
   flex-direction: row; /* Change to row to align items in columns */
   align-items: flex-start;
   text-align: left;
+  font-size: 0.9em;
 
   .close-button {
     background: none;

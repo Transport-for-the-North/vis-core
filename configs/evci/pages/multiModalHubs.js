@@ -24,7 +24,7 @@ export const multiModalHubs = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneTypeId=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Multi-Modal Hubs",
@@ -78,7 +78,9 @@ export const multiModalHubs = {
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },
-      warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request."
+      warning: `Multi-modal hub suitability and demand scoring based on publicly available data sources and from TfN. This includes grid capacity, existing EV network, EV and EVCI forecast, Rail and bus station locations and OD demand, proximity to highway network and enviro considerations.
+
+      Further specific site investigation and development work is advised for any locations of interest.`,
     },
   },
 };

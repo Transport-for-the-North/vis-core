@@ -54,6 +54,7 @@ export const cpLocation = {
       { ...selectors.siteSelector, visualisations: ['Chargers/Power by Location'], layer: "Charging Sites" }
     ],
     additionalFeatures: {
+      warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request.",
       glossary: { 
         dataDictionary: {}
       },

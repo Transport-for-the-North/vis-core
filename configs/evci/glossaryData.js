@@ -1,5 +1,3 @@
-import { commercialViability } from "./pages/commercialViability";
-
 const glossaryData = {
     /*
     Add new Info (mini-manual) entries within infoFragments, eg:
@@ -96,7 +94,7 @@ const glossaryData = {
       exclude: [],
     },
     commercialViability: {
-      title: "Commercial Viability Assessment",
+      title: "Commercial viability assessment",
       content: `<p>Assesses EVCI commercial investment viability, to inform LA strategic decisions and business and commercial deployment activities.​</p>
       <p>Identifies key characteristics of areas with likely strong potential return on investment suitable for commercial CPO interest.​</p>
       <p>Presents a methodology that can highlight areas where a single issue is causing challenge (for example energy supply or rurality).​</p>
@@ -105,7 +103,7 @@ const glossaryData = {
       exclude: [],
     },
     multiModalHub: {
-      title: "Multi model hub potential scoring",
+      title: "Multi-modal hub potential scoring",
       content: `
       <p>Multi-modal hub suitability and demand scoring based on publicly available data sources and from TfN. This includes grid capacity, existing EV network, EV and EVCI forecast, Rail and bus station locations and OD demand, proximity to highway network and enviro considerations.​</p>
       <p>Further specific site investigation and development work is advised for any locations of interest.​</p>`,
@@ -267,6 +265,8 @@ const glossaryData = {
       <li>Baseline: charging behaviour follows current observed trends: 
       most charging is done at or near home, with some taking place at destinations or en-route.</li>
       <li>Destination focus: charging behaviour changes from current behaviour to be more prevalent at destinations away from the driver's home location.</li>
+      <li>Local public charging hub focus: charging behaviour changes from current behaviour to be more prevalent at local charging hub destinations away from the drivers home location.</li>
+      <li>Queuing acceptance: charging behaviour follows current observed trends (baseline) but with an user acceptance to queue at times of peak demand for a charge, rather than a requirement for a charger being available during peak at all times.</li>
       </ul>`,
       exclude: [],
     },

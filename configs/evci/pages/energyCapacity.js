@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
 export const energyCapacity = {
-  pageName: "Forecasted charging demand vrs electricity headroom",
+  pageName: "Forecast charging demand vs electricity headroom",
   url: "/@stbTag@/energy-capacity",
   type: "MapLayout",
   category: "@stbName@",
@@ -15,7 +15,7 @@ export const energyCapacity = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows the Forecasted charging demand vrs electricity headroom.</p>`,
+  <p>This visualisation shows the forecast charging demand vs. electricity headroom.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -24,7 +24,7 @@ export const energyCapacity = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneTypeId=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Energy Capacity",
@@ -43,7 +43,7 @@ export const energyCapacity = {
         name: "Energy Capacity",
         type: "joinDataToMap",
         joinLayer: "Administrative Boundaries",
-        style: "polygon-continuous",
+        style: "polygon-diverging",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -70,7 +70,7 @@ export const energyCapacity = {
       download: {
         filters: [
           { ...selectors.administrativeBoundaryFixed, type: 'fixed' },
-          { ...selectors.yearTriplet, type: 'dropdown' },
+          { ...selectors.yearTriplet, type: 'dropdown', multiSelect: true },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },

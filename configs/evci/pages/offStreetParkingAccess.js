@@ -24,7 +24,7 @@ export const offStreetParkingAccess = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneTypeId=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Off Street Parking Access",
@@ -58,7 +58,7 @@ export const offStreetParkingAccess = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.administrativeBoundary, visualisations: ['Off Street Parking Access'] },
+      { ...selectors.administrativeBoundaryFixed, visualisations: ['Off Street Parking Access'] },
       { ...selectors.columnNameOSPA, visualisations: ['Off Street Parking Access'] },
       { ...selectors.stbTag, visualisations: ['Off Street Parking Access'] },
       //{ ...selectors.areaValueDisplay, visualisations: ['Off Street Parking Access'] },
@@ -70,7 +70,7 @@ export const offStreetParkingAccess = {
       },
       download: {
         filters: [
-          { ...selectors.administrativeBoundary, type: 'toggle' },
+          { ...selectors.administrativeBoundaryFixed },
           { ...selectors.columnNameOSPA, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
@@ -78,7 +78,7 @@ export const offStreetParkingAccess = {
         ],
         downloadPath: '/api/evci/zonal-access/download'
       },
-      warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request."
+      warning: "Key zonal outputs of this assessment are provided in this public EVCI Framework tool. Further data outputs are available to TfN’s local authority partners and statutory partners and should be requested directly. This includes household level information and geometries, sharable under Ordnance Survey’s Public Sector Geospatial Agreements."
     },
   },
 };

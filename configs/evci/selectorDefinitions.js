@@ -164,7 +164,7 @@ const travelScenarioSelectorBase = {
     source: "local",
     values: [
       {
-        displayValue: "Business as Usual",
+        displayValue: "Business as usual",
         paramValue: 1,
       },
       {
@@ -216,7 +216,7 @@ const behaviouralScenarioSelector = {
       //   paramValue: 0,
       // },
       {
-        displayValue: "Base",
+        displayValue: "Baseline",
         paramValue: 1,
       },
       {
@@ -227,10 +227,10 @@ const behaviouralScenarioSelector = {
       //   displayValue: "Not Applicable",
       //   paramValue: 3,
       // },
-      // {
-      //   displayValue: "Local",
-      //   paramValue: 4,
-      // },
+      {
+        displayValue: "Local public charging hub",
+        paramValue: 4,
+      },
       {
         displayValue: "Queuing acceptance",
         paramValue: 5,
@@ -369,14 +369,14 @@ const chargingCategorySelector = {
         displayValue: "Workplace",
         paramValue: 5,
       },
-      {
-        displayValue: "HGV en route",
-        paramValue: 6,
-      },
-      {
-        displayValue: "En route",
-        paramValue: 7,
-      },
+      // {
+      //   displayValue: "HGV en route",
+      //   paramValue: 6,
+      // },
+      // {
+      //   displayValue: "En route",
+      //   paramValue: 7,
+      // },
       {
         displayValue: "Local Public Charging Hub focus",
         paramValue: 8,
@@ -519,35 +519,35 @@ const columnNameOSPASelector = {
   values: {
     source: "local",
     values: [
+      // {
+      //   displayValue: "Demand Park Access",
+      //   paramValue: "demand_park_access_lsoa",
+      //   legendSubtitleText: "LSOA"
+      // },
       {
-        displayValue: "Demand Park Access",
-        paramValue: "demand_park_access_lsoa",
-        legendSubtitleText: "LSOA"
-      },
-      {
-        displayValue: "Car Park Access",
+        displayValue: "Car park access",
         paramValue: "car_park_access_perc",
-        legendSubtitleText: "Percentage %"
+        legendSubtitleText: "% households with access"
       },
+      // {
+      //   displayValue: "Non Driveway Count",
+      //   paramValue: "non_driveway_count",
+      //   legendSubtitleText: "Count"
+      // },
+      // {
+      //   displayValue: "Driveway Count",
+      //   paramValue: "driveway_count",
+      //   legendSubtitleText: "Count"
+      // },
+      // {
+      //   displayValue: "Total Count",
+      //   paramValue: "total_count",
+      //   legendSubtitleText: "Count"
+      // },
       {
-        displayValue: "Non Driveway Count",
-        paramValue: "non_driveway_count",
-        legendSubtitleText: "Count"
-      },
-      {
-        displayValue: "Driveway Count",
-        paramValue: "driveway_count",
-        legendSubtitleText: "Count"
-      },
-      {
-        displayValue: "Total Count",
-        paramValue: "total_count",
-        legendSubtitleText: "Count"
-      },
-      {
-        displayValue: "Driveway",
+        displayValue: "Driveway access",
         paramValue: "driveway_perc",
-        legendSubtitleText: "Percentage %"
+        legendSubtitleText: "% homes with access"
       },
     ],
   },
