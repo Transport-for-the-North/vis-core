@@ -13,15 +13,14 @@ const colourStyles = {
     ...base,
     zIndex: 9999, // Adjust zIndex to be higher than everything else
   }),
-  option: (styles, { data }) => {
+  option: (styles, { isFocused }) => {
     return {
       ...styles,
       display: "flex",
-      justifyContent: "space-between",
       alignItems: "center",
       borderBottom: "1px solid #eee",
-      padding: "10px",
-      backgroundColor: data.isFocused ? "lightgray" : "white",
+      padding: "5px 10px",
+      backgroundColor: isFocused ? "lightgray" : "white",
       color: "black",
       ":active": {
         ...styles[":active"],
@@ -29,6 +28,11 @@ const colourStyles = {
       },
     };
   },
+  singleValue: (styles) => ({
+    ...styles,
+    display: "flex",
+    alignItems: "center",
+  }),
 };
 
 /**
@@ -47,27 +51,31 @@ export const ColourSchemeDropdown = ({
 
   /**
    * Custom formatting for option label to include color swatches.
+   * The label occupies 30% and the swatches occupy 70%.
    * @property {string} value - The value of the option.
    * @property {string} label - The label of the option.
    * @returns {JSX.Element} The formatted option label.
    */
-  const formatOptionLabel = ({ value, label }) => (
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <div>{label}</div>
-      <div style={{ marginLeft: "10px", display: "flex" }}>
-        {chroma.brewer[value].map((color) => (
-          <div
-            key={color}
-            style={{
-              backgroundColor: color,
-              width: "17px",
-              height: "20px"
-            }}
-          />
-        ))}
+  const formatOptionLabel = ({ value, label }) => {
+    const colors = chroma.brewer[value];
+    return (
+      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+        <div style={{ width: "30%", paddingRight: "10px" }}>{label}</div>
+        <div style={{ width: "70%", display: "flex" }}>
+          {colors.map((color) => (
+            <div
+              key={color}
+              style={{
+                backgroundColor: color,
+                width: `${100 / colors.length}%`,
+                height: "20px",
+              }}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const { state } = useMapContext();
   const options = useMemo(
