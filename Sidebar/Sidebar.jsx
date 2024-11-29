@@ -150,7 +150,7 @@ export const Sidebar = ({
     setIsFirefox(isFirefoxBrowser);
     if (isFirefoxBrowser) {
       // Set the scrollbar width in state
-      const width = getScrollbarWidth();
+      const width = getScrollbarWidth('thin');
       setScrollbarWidth(width);
     }
   }, []);
@@ -158,7 +158,7 @@ export const Sidebar = ({
   useEffect(() => {
     const handleResize = () => {
       if (isFirefox) {
-        const width = getScrollbarWidth();
+        const width = getScrollbarWidth('thin');
         setScrollbarWidth(width);
       }
     };
