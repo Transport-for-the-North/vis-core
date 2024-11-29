@@ -393,7 +393,7 @@ const Map = () => {
               layout: {
                 'text-field': ['get', 'name'],
                 'text-size': 14,
-                'text-anchor': 'center', // Center the text
+                'text-anchor': 'centre', // centre the text
                 'text-offset': [0, 1.5], // No offset
                 'text-allow-overlap': false,
                 'symbol-placement': symbolPlacement, // Dynamic placement
@@ -662,10 +662,47 @@ const Map = () => {
   useEffect(() => {
     if (map && state.mapBoundsAndCentroid) {
       const { centroid, bounds } = state.mapBoundsAndCentroid;
-      if (bounds) {
-        map.fitBounds(bounds.coordinates[0], { padding: 20 });
+      if (bounds && centroid) {
+        // Initialize a new LngLatBounds object
+        const mapBounds = new maplibregl.LngLatBounds();
+  
+        // Extend bounds with the coordinates from your bounds data
+        bounds.coordinates[0].forEach(coord => mapBounds.extend(coord));
+  
+        // Calculate the northeast and southwest points of the bounds
+        const ne = mapBounds.getNorthEast();
+        const sw = mapBounds.getSouthWest();
+  
+        // Get the centre coordinates
+        const centre = centroid.coordinates; // [lng, lat]
+  
+        // Calculate offsets based on the difference between the centre and the bounds
+        const offset = {
+          ne: [
+            centre[0] - ne.lng,
+            centre[1] - ne.lat,
+          ],
+          sw: [
+            centre[0] - sw.lng,
+            centre[1] - sw.lat,
+          ],
+        };
+  
+        // Adjust the bounds by extending them with the offset points
+        mapBounds.extend([centre[0] + offset.ne[0], centre[1] + offset.ne[1]]);
+        mapBounds.extend([centre[0] + offset.sw[0], centre[1] + offset.sw[1]]);
+  
+        // Define the fitBounds options
+        const options = {
+          padding: 80,
+          duration: 0,
+        };
+  
+        // Fit the map to the adjusted bounds and pan
+        map.fitBounds(mapBounds, options);
+        map.panTo(centre)
       }
-      if (centroid) {
+      if (centroid && !bounds) {
         map.panTo(centroid.coordinates);
       }
       // Clear the bounds and centroid after panning

@@ -208,3 +208,38 @@ export function isParamNameForceRequired(filters, targetParamName) {
   const filter = filters.find(f => f.paramName === targetParamName);
   return filter ? filter.forceRequired === true : false;
 }
+
+// Function to detect if the OS is Windows 10 or lower
+export function isWindows10OrLower() {
+  const { userAgent } = navigator;
+  const windowsVersionMatch = userAgent.match(/Windows NT (\d+\.\d+)/);
+  if (windowsVersionMatch) {
+    const version = parseFloat(windowsVersionMatch[1]);
+    // Windows NT versions: 10.0 (Windows 10), 6.3 (Windows 8.1), 6.2 (Windows 8), etc.
+    // Windows 10 is version 10.0, so include it and any lower versions
+    return version <= 10.0;
+  }
+  return false;
+}
+
+
+export const getScrollbarWidth = () => {
+  // Create a temporary div container
+  const outer = document.createElement('div');
+  outer.style.visibility = 'hidden';
+  outer.style.overflow = 'scroll'; // Force scrollbars
+  outer.style.msOverflowStyle = 'scrollbar'; // Needed for WinJS apps
+  document.body.appendChild(outer);
+
+  // Create a temporary inner div
+  const inner = document.createElement('div');
+  outer.appendChild(inner);
+
+  // Calculate the scrollbar width
+  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+
+  // Clean up
+  outer.parentNode.removeChild(outer);
+
+  return scrollbarWidth;
+};

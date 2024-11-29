@@ -5042,7 +5042,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals)",
       url: "/accessibility-key-location-totals",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -5295,7 +5295,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals) Difference",
       url: "/accessibility-key-location-totals-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -6544,7 +6544,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair)",
       url: "/accessibility-key-location-pair",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -6807,7 +6807,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair) Difference",
       url: "/accessibility-key-location-pair-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -7230,7 +7230,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals)",
       url: "/accessibility-landuse-totals",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -7547,7 +7547,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals) Difference",
       url: "/accessibility-landuse-totals-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -8026,7 +8026,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair)",
       url: "/accessibility-landuse-pair",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -8353,7 +8353,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair) Difference",
       url: "/accessibility-landuse-pair-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -8835,7 +8835,7 @@ export const appConfig = {
         ]
       }
     },
-    {
+    /*{
       pageName: "Journey Time Accessibility (Zone Totals)",
       url: "/accessibility-journey-time-totals",
       type: "MapLayout",
@@ -9051,8 +9051,8 @@ export const appConfig = {
           },
         ]
       }
-    },
-    {
+    },*/
+    /*{
       pageName: "Journey Time Accessibility (Zone Totals) Difference",
       url: "/accessibility-journey-time-totals-difference",
       type: "MapLayout",
@@ -9428,13 +9428,13 @@ export const appConfig = {
           }
         ]
       }
-    },
+    },*/
 
     {
       pageName: "Journey Time Accessibility (Zone Pair)",
       url: "/accessibility-journey-time-pair",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Journey Time)",
       about: "", //To be added.
       config: {
         layers: [
@@ -9661,7 +9661,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Pair) Difference",
       url: "/accessibility-journey-time-pair-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Journey Time)",
       about: "", //To be added.
       config: {
         layers: [
