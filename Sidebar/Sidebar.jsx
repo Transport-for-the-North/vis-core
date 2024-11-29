@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { AccordionSection, TextSection } from "./Accordion";
@@ -7,6 +7,7 @@ import { Glossary } from "Components/Glossary";
 import { Hovertip } from 'Components';
 import { DownloadSection } from "./Selectors/DownloadSelection";
 import { FilterProvider } from "contexts";
+import { getScrollbarWidth } from "utils";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -42,14 +43,12 @@ const IconWrapper = styled.div`
 `;
 
 const SidebarContainer = styled.div`
-  --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
-  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */
   width: 450px;
   max-width: 95vw;
   max-height: calc(100vh - 235px);
   padding: 10px;
-  padding-right: calc(10px - var(--scrollbar-width)); /* Adjust padding for Webkit */
-  box-sizing: border-box; /* Include padding and border in width */
+  padding-right: ${({ $isFirefox, $scrollbarWidth }) => $isFirefox ? `calc(10px - ${$scrollbarWidth}px)` : `6px`};
+  box-sizing: border-box;
   background-color: rgba(240, 240, 240, 0.65);
   overflow-y: scroll;
   overflow-x: hidden;
@@ -62,36 +61,35 @@ const SidebarContainer = styled.div`
   transition: left 0.3s ease-in-out;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-  /* Webkit-based browsers (Chrome, Safari, Edge) */
-  /* Custom Scrollbar Styles */
-  &::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: transparent; /* Default color */
-    border-radius: 10px;
-    background-clip: padding-box;
-    transition: background-color 0.3s ease-in-out;
-  }
-  &:hover::-webkit-scrollbar-thumb {
-    background-color: darkgrey; /* Color when hovered */
-  }
+  /* Custom Scrollbar Styles for non-Firefox browsers */
+  ${({ $isFirefox }) => !$isFirefox && `
+    /* Webkit-based browsers (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+      width: 4px; /* Custom scrollbar width */
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: transparent;
+      border-radius: 10px;
+      background-clip: padding-box;
+      transition: background-color 0.3s ease-in-out;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+      background-color: darkgrey; /* Color when hovered */
+    }
+  `}
 
   /* Firefox-specific styles */
-  @-moz-document url-prefix() {
+  ${({ $isFirefox }) => $isFirefox && `
     scrollbar-width: thin;
     scrollbar-color: transparent transparent; /* Default color */
-    padding-right: calc(10px - var(--firefox-scrollbar-width)); /* Adjust padding for Firefox */
     &:hover {
       scrollbar-color: darkgrey transparent; /* Color when hovered */
     }
-  }
-`;
-
+  `}`;
 
 const ToggleButton = styled.button`
   position: absolute;
@@ -110,7 +108,7 @@ const ToggleButton = styled.button`
   justify-content: center;
 
   ${({ $isVisible }) => !$isVisible && `
-    position: fixed;
+    position: fixed;  
     top: 108px;
     left: 10px;
   `}
@@ -142,7 +140,37 @@ export const Sidebar = ({
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [scrollbarWidth, setScrollbarWidth] = useState(0);
+  const [isFirefox, setIsFirefox] = useState(false);
   const toggleButtonRef = useRef(null);
+
+  useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase();
+    const isFirefoxBrowser = ua.indexOf('firefox') > -1;
+    setIsFirefox(isFirefoxBrowser);
+    if (isFirefoxBrowser) {
+      // Set the scrollbar width in state
+      const width = getScrollbarWidth();
+      setScrollbarWidth(width);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (isFirefox) {
+        const width = getScrollbarWidth();
+        setScrollbarWidth(width);
+      }
+    };
+  
+    window.addEventListener('resize', handleResize);
+  
+    // Initial calculation
+    handleResize();
+  
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsVisible(!isVisible);
@@ -151,7 +179,7 @@ export const Sidebar = ({
 
   return (
     <>
-      <SidebarContainer $isVisible={isVisible}>
+      <SidebarContainer $isVisible={isVisible} $scrollbarWidth={scrollbarWidth} $isFirefox={isFirefox}>
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
         </SidebarHeader>
