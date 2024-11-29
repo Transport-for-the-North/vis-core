@@ -32,7 +32,8 @@ export const stbConfig = [
       "enrouteChargingDemand",
       "commercialViability",
       "multiModalHubs",
-      "offStreetParkingAccess"
+      "offStreetParkingAccess",
+      "energyCapacity"
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:
