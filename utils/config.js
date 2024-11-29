@@ -223,10 +223,11 @@ export function isWindows10OrLower() {
 }
 
 
-export const getScrollbarWidth = () => {
+export const getScrollbarWidth = (scrollbarWidthProp) => {
   // Create a temporary div container
   const outer = document.createElement('div');
   outer.style.visibility = 'hidden';
+  outer.style.scrollbarWidth = scrollbarWidthProp;
   outer.style.overflow = 'scroll'; // Force scrollbars
   outer.style.msOverflowStyle = 'scrollbar'; // Needed for WinJS apps
   document.body.appendChild(outer);
