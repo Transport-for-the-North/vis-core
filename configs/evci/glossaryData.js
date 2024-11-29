@@ -119,6 +119,24 @@ const glossaryData = {
       <p>Additional data is available to TfN’s local authority or statutory partners with Ordnance Survey Public Sector Geospatial Agreements. This includes household level information and geometries. TfN partners can receive this data free of charge (via TfN) to inform future decisions around public EVCI.</p>`,
       exclude: [],
     },
+    forecastedChargingDemand: {
+      title: "Forecasted charging demand vrs electricity headroom",
+      content: `<p>An assessment of electricity grid capacity (for all the Primary Substations within the TfN region) against TfN’s projected EV demand and EVCI requirements.  This estimates the potential impact of EV charging on the future headroom capacity for each primary substation for the forecasted years of 2025, 2030 and 2035.​</p>
+      <p>A RAG classification, based on primary substation’s existing capacity, was applied to identify and categorise which primary substations could handle increasing demand for EV charging without needing additional reinforcement.​</p>
+      <p>This assessment is for electricity demand to power the projected EV demand, and does not include assessments for other uses such as heating.​</p>`,
+      exclude: [],
+    },
+    headroom: {
+      title: "Headroom",
+      content: `<p>Demand headroom is the gap between the rating of the electricity network to supply electrical demand, and the actual demand in that part of the network.​</p>`,
+      exclude: [],
+    },
+    electricitySubStation: {
+      title: "Electricity sub-station",
+      content: `<p>Substations are integral features within that grid and enable electricity to be transmitted at different voltages, securely and reliably. Substations contain the specialist equipment that allows the voltage of electricity to be transformed (or ‘switched’). The voltage is stepped up or down through pieces of equipment called transformers, which sit within a substation’s site.​</p>
+      <p>Primary substations are the interconnection between high voltage and medium voltage. Secondary substations are the interconnection between medium and low voltage.</p>`,
+      exclude: [],
+    },
     digitallyDistributed: {
       title: "Future Travel Scenario: Digitally Distributed",
       content: `<p>This scenario sees a future where digital and technological advances accelerate, transforming how we work, travel and live. 
