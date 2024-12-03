@@ -9,7 +9,7 @@ export const combinedAuthority = {
   type: "MapLayout",
   about: `
   <p>View TRSE data by Combined Authority District.</p>
-  <p>Search for a Combined Authority in the sidebar to view Output Area-level data. Click on OAs to read deeper insights.</p>`,
+  <p>This map compares the risk of TRSE in each neighbourhood to the average for the relevant combined authority area. Search for a combined authority in the side bar to view output-area data. Click on areas to see more information.</p>`,
   termsOfUse: termsOfUse,
   config: {
     layers: [
