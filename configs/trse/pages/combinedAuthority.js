@@ -29,6 +29,7 @@ export const combinedAuthority = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
+        invertedColorScheme: true,
       },
       {
         name: "Combined Authorities",
@@ -63,6 +64,7 @@ export const combinedAuthority = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: true,
+        invertedColorScheme: true,
       }
     ],
     visualisations: [

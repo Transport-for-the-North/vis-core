@@ -406,8 +406,10 @@ export const DynamicLegend = ({ map }) => {
                 legendTexts[index]?.legendSubtitleText || "";
             }
           }
-
+          
+          const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;
           const paintProps = layer.paint;
+          // Interpret expressions
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
             paintProps["circle-color"] ||
@@ -416,6 +418,14 @@ export const DynamicLegend = ({ map }) => {
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
           );
+          
+          // Invert color and width stops if necessary
+          if (invertColorScheme) {
+            colorStops = colorStops.slice().reverse();
+            if (widthStops) {
+              widthStops = widthStops.slice().reverse();
+            }
+          }
           
           if (layer.type === "circle" && colorStops && widthStops?.length > 0 && colorStops.length !== widthStops.length) {
             widthStops = interpolateWidths(colorStops, widthStops, layer.type);
