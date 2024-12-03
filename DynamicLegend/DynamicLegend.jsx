@@ -127,15 +127,9 @@ const LegendDivider = styled.div`
  *
  * @param {Array} colorStops - An array of color stop objects, each with a `value` property.
  * @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
- * @param {string} style - The style of the map, e.g., 'diverging'.
+ * @param {string} type - The type of the layer (e.g., 'circle', 'line').
  * @returns {Array} An array of objects with `value` and `width` properties, where `width` is the interpolated diameter.
  * @throws Will throw an error if less than two color stops or width stops are provided.
- *
- * @example
- * const colorStops = [{ value: 1 }, { value: 2 }];
- * const widthStops = [{ value: 1, width: 5 }, { value: 2, width: 10 }];
- * const result = interpolateWidths(colorStops, widthStops);
- * // result: [{ value: 1, width: 10 }, { value: 2, width: 20 }]
  */
 function interpolateWidths(colorStops, widthStops, type) {
   if (!colorStops || colorStops.length < 2) {
@@ -161,18 +155,12 @@ function interpolateWidths(colorStops, widthStops, type) {
   return widths;
 }
 
-
 /**
  * Interpolates the width at a given value based on width stops.
  *
  * @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
  * @param {number} value - The value at which to interpolate the width.
  * @returns {number} The interpolated width.
- *
- * @example
- * const widthStops = [{ value: 1, radius: 5 }, { value: 2, width: 10 }];
- * const width = interpolateWidthAtValue(widthStops, 1.5);
- * // width: 7.5
  */
 function interpolateWidthAtValue(widthStops, value) {
   if (value <= widthStops[0].value) {
@@ -209,38 +197,7 @@ function interpolateWidthAtValue(widthStops, value) {
  *                                    'step', or 'match' expression.
  * @returns {array|null} An array of objects with 'value' and 'color' properties representing
  *                       the color stops, or null if the expression cannot be interpreted.
- *
- * @example
- * // Simple color string
- * const colorString = '#FF5733';
- * const result = interpretColorExpression(colorString);
- * // result: [{ color: '#FF5733' }]
- * 
- * @example
- * // Interpolate expression
- * const interpolateExpression = ['interpolate', ['linear'], ['zoom'], 5, '#F00', 10, '#0F0'];
- * const result = interpretColorExpression(interpolateExpression);
- * // result: [{ value: 5, color: '#F00' }, { value: 10, color: '#0F0' }]
- *
- * @example
- * // Interpolate expression
- * const interpolateExpression = ['interpolate', ['linear'], ['zoom'], 5, '#F00', 10, '#0F0'];
- * const result = interpretColorExpression(interpolateExpression);
- * // result: [{ value: 5, color: '#F00' }, { value: 10, color: '#0F0' }]
- * 
- * @example
- * // Step expression
- * const stepExpression = ['step', ['zoom'], '#F00', 5, '#0F0'];
- * const result = interpretColorExpression(stepExpression);
- * // result: [{ value: 5, color: '#0F0' }]
- * 
- *  @example
- * // Match expression
- * const matchExpression = ['match', ['get', 'property'], 'value1', '#F00', 'value2', '#0F0', '#FFF'];
- * const result = interpretColorExpression(matchExpression);
- * // result: [{ value: 'value1', color: '#F00' }, { value: 'value2', color: '#0F0' }, { value: null, color: '#FFF' }]
  */
-
 const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "string") {
@@ -297,26 +254,7 @@ const interpretColorExpression = (expression) => {
  * The number of intermediate stops is dynamic and can be specified.
  *
  * @param {Array|number} expression - The width expression from the map style.
- * @param {number} [numInterpolatedStops=4] - The number of intermediate stops to calculate.
  * @returns {Array|null} - An array of width stops or null if the expression is invalid.
- *
- * @example
- * // Simple width value
- * const widthValue = 2;
- * const result = interpretWidthExpression(widthValue);
- * // result: [{ width: 2 }]
- * 
- * @example
- * // Interpolate expression
- * const interpolateExpression = ['interpolate', ['linear'], ['zoom'], 5, 1, 10, 5];
- * const result = interpretWidthExpression(interpolateExpression, 6);
- * // result: [{ value: 5, width: 1 }, { value: 6.8, width: 3.4 }, { value: 8.6, width: 5 }]
- * 
- * @example
- * // Step expression
- * const stepExpression = ['step', ['zoom'], 1, 5, 3];
- * const result = interpretWidthExpression(stepExpression);
- * // result: [{ value: 1, width: 5 }]
  */
 const interpretWidthExpression = (expression) => {
   if (!expression) return null;
@@ -362,9 +300,6 @@ export const DynamicLegend = ({ map }) => {
     if (!map) return;
 
     const updateLegend = () => {
-      const visualisationKey = Object.keys(state.visualisations)[0];
-      const visualisation = state.visualisations[visualisationKey];
-      const legendTexts = visualisation?.legendText || [];
       const layers = map.getStyle().layers;
 
       const items = layers
@@ -375,6 +310,14 @@ export const DynamicLegend = ({ map }) => {
           return isStylableOrShouldShow && isWithinZoomRange;
         })
         .map((layer, index) => {
+          // Get the visualisation associated with this layer via joinLayer
+          const visualisationKey = Object.keys(state.visualisations).find(key => {
+            return state.visualisations[key].joinLayer === layer.id;
+          });
+          const visualisation = state.visualisations[visualisationKey];
+          // Get legendText from visualisation
+          const legendText = visualisation?.legendText || [];
+
           const title = layer.id;
           let displayValue = title;
           let legendSubtitleText = "";
@@ -396,18 +339,19 @@ export const DynamicLegend = ({ map }) => {
                 filterValues[0]?.legendSubtitleText || "";
 
               displayValue =
-                legendTexts[index]?.displayValue || defaultDisplayValue;
+                legendText[0]?.displayValue || defaultDisplayValue;
               legendSubtitleText =
-                legendTexts[index]?.legendSubtitleText ||
+                legendText[0]?.legendSubtitleText ||
                 defaultLegendSubtitleText;
             } else {
-              displayValue = legendTexts[index]?.displayValue || title;
+              displayValue = legendText[0]?.displayValue || title;
               legendSubtitleText =
-                legendTexts[index]?.legendSubtitleText || "";
+                legendText[0]?.legendSubtitleText || "";
             }
           }
-          
+
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;
+          const trseLabel = state.layers[layer.id]?.trseLabel === true;
           const paintProps = layer.paint;
           // Interpret expressions
           let colorStops = interpretColorExpression(
@@ -418,7 +362,7 @@ export const DynamicLegend = ({ map }) => {
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
           );
-          
+
           // Invert color and width stops if necessary
           if (invertColorScheme) {
             colorStops = colorStops.slice().reverse();
@@ -426,15 +370,15 @@ export const DynamicLegend = ({ map }) => {
               widthStops = widthStops.slice().reverse();
             }
           }
-          
+
           if (layer.type === "circle" && colorStops && widthStops?.length > 0 && colorStops.length !== widthStops.length) {
             widthStops = interpolateWidths(colorStops, widthStops, layer.type);
           }
-          
+
           if (layer.type === "line" && layer.metadata.colorStyle === "diverging" && colorStops.length === 3) {
             const negativeColor = colorStops.find(stop => stop.value === -1)?.color;
             const positiveColor = colorStops.find(stop => stop.value === 1)?.color;
-          
+
             const negativeWidthStops = widthStops
               .filter(stop => convertStringToNumber(stop.value) > 0)
               .map(stop => ({
@@ -442,28 +386,30 @@ export const DynamicLegend = ({ map }) => {
                 value: `-${stop.value}` // Add a '-' to the start of the value
               }))
               .reverse();
-          
+
             widthStops = [...negativeWidthStops, ...widthStops];
             // Ensure there is a 0 value in widthStops
             if (!widthStops.some(stop => convertStringToNumber(stop.value) === 0)) {
               widthStops.push({ value: 0, width: 0 });
               widthStops = widthStops.sort((a, b) => convertStringToNumber(a.value) - convertStringToNumber(b.value));
             }
-          
+
             // Assign colors based on the value sign
             colorStops = widthStops.map(stop => ({
               ...stop,
               color: convertStringToNumber(stop.value) < 0 ? negativeColor : positiveColor
             }));
           }
-          
+            
           return {
+            layerId: layer.id,
             title: displayValue,
             subtitle: legendSubtitleText,
             colorStops: colorStops || [],
             widthStops: widthStops || [],
             type: layer.type,
             style: layer.metadata.colorStyle,
+            trseLabel, // Add trseLabel to item
           };
         });
       setLegendItems(items);
@@ -478,6 +424,26 @@ export const DynamicLegend = ({ map }) => {
     };
   }, [state.filters, map, state.visualisations, state.currentZoom]);
 
+  /**
+   * Generates custom labels for TRSE based on the bin value.
+   * Adjusted to handle the case when the value is 100 to prevent the "100-110" label.
+   *
+   * @param {string|number} value - The bin value to generate the label for.
+   * @returns {string|null} The custom label for the bin, or null if the bin should not be displayed.
+   */
+  const getTRSELabel = (value) => {
+    const numValue = parseInt(value, 10);
+    if (numValue === 0) {
+      return "0-10 (Highest Risk of TRSE)";
+    } else if (numValue === 90) {
+      return "90-100 (Lowest Risk of TRSE)";
+    } else if (numValue < 90) {
+      return `${numValue}-${numValue + 10}`;
+    } else {
+      return null; // Do not create a label for value 100
+    }
+  };
+
   if (legendItems.length === 0) {
     return null;
   }
@@ -489,28 +455,40 @@ export const DynamicLegend = ({ map }) => {
           <LegendSubtitle>{item.subtitle}</LegendSubtitle>
           {item.colorStops &&
             item.widthStops &&
-            item.colorStops.map((stop, idx) => (
-              <LegendItem key={idx}>
-                {item.type === "circle" ? (
-                  <CircleSwatch
-                    diameter={item.widthStops[idx]?.width || 10}
-                    color={stop.color}
-                  />
-                ) : item.type === "line" ? (
-                  <LineSwatch
-                    height={item.widthStops[idx]?.width || 2}
-                    color={stop.color}
-                  />
-                ) : item.type === "fill" ? (
-                  <PolygonSwatch
-                    color={stop.color}
-                  />
-                ) : null}
-                <LegendLabel>
-                  {stop.value !== undefined ? `${stop.value}` : "Value"}
-                </LegendLabel>
-              </LegendItem>
-            ))}
+            item.colorStops.map((stop, idx) => {
+              // Generate label
+              const label = item.trseLabel
+                ? getTRSELabel(stop.value)
+                : stop.value !== undefined
+                ? `${stop.value}`
+                : "Value";
+
+              // Skip rendering if label is null (e.g., when value is 100 for trseLabel)
+              if (label === null) {
+                return null;
+              }
+
+              return (
+                <LegendItem key={idx}>
+                  {item.type === "circle" ? (
+                    <CircleSwatch
+                      diameter={item.widthStops[idx]?.width || 10}
+                      color={stop.color}
+                    />
+                  ) : item.type === "line" ? (
+                    <LineSwatch
+                      height={item.widthStops[idx]?.width || 2}
+                      color={stop.color}
+                    />
+                  ) : item.type === "fill" ? (
+                    <PolygonSwatch
+                      color={stop.color}
+                    />
+                  ) : null}
+                  <LegendLabel>{label}</LegendLabel>
+                </LegendItem>
+              );
+            })}
           {index < legendItems.length - 1 && <LegendDivider />}
         </LegendItemContainer>
       ))}
