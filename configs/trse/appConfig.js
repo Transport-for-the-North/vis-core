@@ -26,13 +26,14 @@ export const appConfig = {
     `<p>This tool measures transport-related social exclusion by examining two things: (1) Access to everyday places 
     with the transport options available. (2) The vulnerability of the population to social exclusion. We do this at 
     the Output Area level for all of England, as well as grouping our data by local and combined authorities.</p>
-    <p>This tool measures transport-related social exclusion by examining two things: (1) Access to everyday places with 
-    the transport options available. (2) The vulnerability of the population to social exclusion. We do this at the Output 
-    Area level for all of England, as well as grouping our data by local and combined authorities.</p>
+    <p>Our analysis of access to everyday places considers the following destinations: Work, primary schools, secondary schools, 
+    further education colleges, hospitals, GP surgeries, pharmacies, dentists, banks, supermarkets, and town centres. We do this 
+    for all available modes of public transport and for car travel. We measure access and journey times for a weekday morning peak 
+    time, and weekday evening post-peak time, and a weekend afternoon.</p>
     <p>Our analysis of vulnerability to social exclusion considers poverty, disability, caring responsibilities, poor health, 
     and a range of other factors that our research has shown makes populations more vulnerable to social exclusion. We use 
     statistics produced by the Department for Work and Pensions, the Office for National Statistics, and the 2021 Census to measure 
-    each of these factors, and used a factor analysis process to group and weight these. Out approach is inspired by and broadly 
+    each of these factors, and used a factor analysis process to group and weight these. Our approach is inspired by and broadly 
     similar to the English Indices of Deprivation, but has been tailored to reflect the outcomes of our research into TRSE.</p>`,
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
