@@ -393,7 +393,7 @@ const Map = () => {
               layout: {
                 'text-field': ['get', 'name'],
                 'text-size': 14,
-                'text-anchor': 'centre', // centre the text
+                'text-anchor': 'center', // centre the text
                 'text-offset': [0, 1.5], // No offset
                 'text-allow-overlap': false,
                 'symbol-placement': symbolPlacement, // Dynamic placement
