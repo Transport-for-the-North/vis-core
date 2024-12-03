@@ -73,9 +73,23 @@ export const MapLayout = () => {
 
   const handleFilterChange = (filter, value) => {
     filterDispatch({
-      type: "SET_FILTER_VALUE",
+      type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value },
     });
+    
+    // Only proceed if the filter has selectable values
+    if (filter.values?.values && Array.isArray(filter.values.values)) {
+      const selectedOption = filter.values.values.find(
+        (option) => option.paramValue === value
+      );
+  
+      if (selectedOption && selectedOption.colourValue) {
+        dispatch({
+          type: 'UPDATE_COLOR_SCHEME',
+          payload: { color_scheme: selectedOption.colourValue },
+        });
+      } 
+    }
   };
 
   useEffect(() => {
@@ -87,6 +101,7 @@ export const MapLayout = () => {
     });
 
     state.filters.forEach((filter) => {
+      
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
           dispatch({
