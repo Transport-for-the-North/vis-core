@@ -30,6 +30,7 @@ export const england = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
+        invertedColorScheme: true,
       },
       {
         name: "Local Authorities",
@@ -64,6 +65,7 @@ export const england = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: true,
+        invertedColorScheme: true,
       }
     ],
     visualisations: [
