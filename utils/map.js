@@ -102,7 +102,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           0,
           opacityValue ?? 1,
         ],
-        
+
         "line-offset": [
           "interpolate",
           ["linear"],
@@ -269,9 +269,14 @@ export const resetPaintProperty = (style) => {
  * @function reclassifyData
  * @param {Array.<{id: number, value: string}>} data - The different features that we have.
  * @param {string} style - The type of geometry we have.
+ * @param {string} classificationMethod - The method used for data classification.
+ * @param {Array} defaultBands - Default bands for classification.
+ * @param {Object} currentPage - The current page configuration.
+ * @param {Object} queryParams - Query parameters from the visualisation.
+ * @param {Object} options - Additional options, e.g., { trseLabel: true }
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
-export const reclassifyData = (data, style, classificationMethod, defaultBands, currentPage, queryParams) => {
+export const reclassifyData = (data, style, classificationMethod, defaultBands, currentPage, queryParams, options = {}) => {
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -300,6 +305,12 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     else {
       return num
     }
+  }
+
+  // Check if trseLabel is true in options
+  if (options.trseLabel) {
+    // Return fixed bins from 0 to 100 in steps of 10
+    return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   }
 
   if (style.includes("continuous")) {
