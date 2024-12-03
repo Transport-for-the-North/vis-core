@@ -1,5 +1,20 @@
 import { updateUrlParameters } from "utils";
 
+// This function finds the first colourValue present in the state.filters in order to deduce the
+// starting map colour.
+const findFirstColourValue = (filters) => {
+  for (const filter of filters) {
+    if (filter.values && filter.values.values) {
+      for (const valueItem of filter.values.values) {
+        if (valueItem.colourValue) {
+          return valueItem.colourValue;
+        }
+      }
+    }
+  }
+  return null;
+};
+
 // TODO delineate actionTypes into separate namespaces
 export const actionTypes = {
   UPDATE_MAP_CENTRE: "UPDATE_MAP_CENTRE",
@@ -331,20 +346,37 @@ export const mapReducer = (state, action) => {
     }
 
     case actionTypes.SET_MAP: {
-      const { map } = action.payload;
+      const { map } = action.payload;    
+      // Attempt to find a colourValue
+      let colourValue = findFirstColourValue(state.filters);
+    
+      // If colourValue is null, default to { value: "YlGnBu", label: "YlGnBu" }
+      if (!colourValue) {
+        colourValue = { value: "YlGnBu", label: "YlGnBu" };
+      }
+    
       return {
         ...state,
         map: map, // Store the map instance directly in the state
-        color_scheme: { value: "YlGnBu", label: "YLGnBu" }, // Set up the default color scheme on startup only
+        color_scheme: colourValue, // Use either the found or default colourValue
         class_method: "d",
       };
     }
+    
     case actionTypes.SET_DUAL_MAPS: {
       const { maps } = action.payload;
+      // Attempt to find a colourValue
+      let colourValue = findFirstColourValue(state.filters);
+    
+      // If colourValue is null, default to { value: "YlGnBu", label: "YlGnBu" }
+      if (!colourValue) {
+        colourValue = { value: "YlGnBu", label: "YlGnBu" };
+      }
+    
       return {
         ...state,
-        maps: maps, // Store the map instance directly in the state
-        color_scheme: { value: "YlGnBu", label: "YlGnBu" }, // Set up the default color scheme on startup only
+        maps: maps, // Store the map instances directly in the state
+        color_scheme: colourValue, // Use either the found or default colourValue
         class_method: "d",
       };
     }
