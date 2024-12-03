@@ -101,13 +101,23 @@ export const combinedAuthority = {
       {
         name: "Detailed Information",
         type: "calloutCard",
+        cardName: "CA Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/authority",
         htmlFragment: caSummaryCallout
       },
       {
-        name: "Feature Callout",
+        name: "OA Callout",
         type: "calloutCard",
+        cardName: "OA Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/oa-or-pt-point",
+        htmlFragment: oaCaDetailedCallout
+      },
+      {
+        name: "PT Callout",
+        type: "calloutCard",
+        cardName: "PT Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaCaDetailedCallout
@@ -121,7 +131,9 @@ export const combinedAuthority = {
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
-      selectors.oaFeatureType
+      selectors.oaFeatureType,
+      selectors.ptFeature,
+      selectors.ptFeatureType,
     ],
     additionalFeatures: {
       glossary: { 
