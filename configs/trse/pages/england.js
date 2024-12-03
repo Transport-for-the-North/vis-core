@@ -9,7 +9,7 @@ export const england = {
   type: "MapLayout",
   about: `
   <p>View TRSE data nationally.</p>
-  <p>Click on OAs to read deeper insights.</p>`,
+  <p>This map compares the risk of TRSE in each neighbourhood to the average for England. Click on areas to see more information.</p>`,
   termsOfUse: termsOfUse,
   config: {
     layers: [

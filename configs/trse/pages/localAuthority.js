@@ -9,7 +9,7 @@ export const localAuthority = {
   type: "MapLayout",
   about: `
   <p>View TRSE data by Local Authority District.</p>
-  <p>Search for a Local Authority in the sidebar to view Output Area-level data. Click on OAs to read deeper insights.</p>`,
+  <p>This map compares the risk of TRSE in each neighbourhood to the average for the relevant local authority area. Search for a local authority in the side bar to view output-area data. Click on areas to see more information.</p>`,
   termsOfUse: termsOfUse,
   config: {
     layers: [
