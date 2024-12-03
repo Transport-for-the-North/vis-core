@@ -31,6 +31,7 @@ export const england = {
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: true,
+        trseLabel: true,
       },
       {
         name: "Local Authorities",
@@ -66,6 +67,7 @@ export const england = {
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: true,
         invertedColorScheme: true,
+        trseLabel: true,
       }
     ],
     visualisations: [
@@ -80,7 +82,7 @@ export const england = {
         dataPath: "/api/trse/output-area-data",
         legendText: [
           {
-            displayValue: "Value",
+            displayValue: "Risk of TRSE",
             legendSubtitleText: "%" 
           }
         ]
@@ -96,7 +98,7 @@ export const england = {
         dataPath: "/api/trse/pt-point-data",
         legendText: [
           {
-            displayValue: "PT Points",
+            displayValue: "Public Transport Stops",
             legendSubtitleText: "%"
           }
         ]
