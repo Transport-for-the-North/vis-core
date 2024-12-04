@@ -101,7 +101,7 @@ export const combinedAuthority = {
       {
         name: "Detailed Information",
         type: "calloutCard",
-        cardName: "CA Summary",
+        cardName: "Combined Authority Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/authority",
         htmlFragment: caSummaryCallout
@@ -109,7 +109,7 @@ export const combinedAuthority = {
       {
         name: "OA Callout",
         type: "calloutCard",
-        cardName: "OA Summary",
+        cardName: "Output Area Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaCaDetailedCallout
@@ -117,7 +117,7 @@ export const combinedAuthority = {
       {
         name: "PT Callout",
         type: "calloutCard",
-        cardName: "PT Summary",
+        cardName: "Public Transport Points Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaCaDetailedCallout

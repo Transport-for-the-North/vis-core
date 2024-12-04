@@ -102,7 +102,7 @@ export const england = {
       {
         name: "OA Callout",
         type: "calloutCard",
-        cardName: "OA Summary",
+        cardName: "Output Area Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaEngDetailedCallout
@@ -110,7 +110,7 @@ export const england = {
       {
         name: "PT Callout",
         type: "calloutCard",
-        cardName: "PT Summary",
+        cardName: "Public Transport Points Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaEngDetailedCallout
