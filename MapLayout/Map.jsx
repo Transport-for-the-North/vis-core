@@ -530,14 +530,14 @@ const Map = () => {
   const handleMapClick = useCallback(
     (event) => {
       if (!isMapReady || !map) return;
-
+  
       const point = event.point;
-
+  
       // Get all map filters
       const mapFilters = state.filters.filter(
         (filter) => filter.type === "map"
       );
-
+  
       // For each map filter, check if the clicked point has a feature from the layer
       mapFilters.forEach((filter) => {
         const features = map.queryRenderedFeatures(point, {
@@ -547,18 +547,18 @@ const Map = () => {
           // Assuming the first feature is the one we're interested in
           const feature = features[0];
           const value = feature.properties[filter.field];
-
+  
           // Remove the previous selection layer if it exists
           if (map.getLayer("selected-feature-layer")) {
             map.removeLayer("selected-feature-layer");
             map.removeSource("selected-feature-source");
           }
-
+  
           let paintProp = {};
+          let layerType = feature.layer.type;
 
-          // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
-          // for the circle paintProp, however we currently dont have full functionality.
-
+          const outlineOnPolygonSelect = state.layers[feature.layer.id]?.outlineOnPolygonSelect;
+  
           if (feature.layer.type == "circle") {
             paintProp = {
               "circle-radius": 6,
@@ -567,25 +567,43 @@ const Map = () => {
               "circle-stroke-width": 2,
               "circle-stroke-color": "black",
             };
+            layerType = "circle";
           } else if (feature.layer.type == "fill") {
+            // If layer has outlineOnPolygonSelect as true, it will do the line to draw otherwise
+            // it will fit the polygon.
+            if (outlineOnPolygonSelect) {
+              paintProp = {
+                "line-color": "#f00",
+                "line-width": 2,
+              };
+              layerType = "line"; // Change layer type to 'line' to draw the outline
+            } else {
+              paintProp = {
+                "fill-color": "#f00",
+                "fill-opacity": 0.5,
+              };
+              layerType = "fill";
+            }
+          } else {
+            // Handle other layer types if necessary
             paintProp = {
-              "fill-color": "#f00",
-              "fill-opacity": 0.5,
+              // Default paint properties
             };
           }
-
+  
           // Add a new source and layer for the selected feature
           map.addSource("selected-feature-source", {
             type: "geojson",
             data: feature.toJSON(),
           });
-
+  
           map.addLayer({
             id: "selected-feature-layer",
-            type: feature.layer.type,
+            type: layerType,
             source: "selected-feature-source",
             paint: paintProp,
           });
+  
           // Dispatch the action with the value from the clicked feature
           filterDispatch({
             type: 'SET_FILTER_VALUE',

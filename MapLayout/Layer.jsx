@@ -70,7 +70,7 @@ export const Layer = ({ layer }) => {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
           path: layer.path ?? null,
-          shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false)
+          shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false),
         };
 
         // Handle GeoJSON layer type

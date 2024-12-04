@@ -1,3 +1,4 @@
+
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo } from "react";
 import { useMapContext } from "hooks";
@@ -122,13 +123,18 @@ export const MapVisualisation = ({
       const currentPage = appContext.appPages.find(
         (page) => page.url === window.location.pathname
       );
+
+      // Get trseLabel from state.layers
+      const trseLabel = state.layers[visualisation.joinLayer]?.trseLabel === true;
+
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
         style,
         classificationMethod,
         appContext.defaultBands,
         currentPage,
-        visualisation.queryParams
+        visualisation.queryParams,
+        { trseLabel } // Pass trseLabel in options
       );
 
       // Determine the current color scheme
@@ -139,7 +145,8 @@ export const MapVisualisation = ({
         : colorSchemes[style.split("-")[1]][0];
 
       // Calculate the color palette based on the classification
-      const colourPalette = calculateColours(currentColor, reclassifiedData);
+      const invertColorScheme = state.layers[visualisation.joinLayer]?.invertedColorScheme === true;
+      const colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
 
       // Update the map style
       const opacityValue = document.getElementById(
@@ -236,11 +243,20 @@ export const MapVisualisation = ({
    *
    * @param {string} colourScheme - The name of the color scheme to use.
    * @param {Array} bins - The bins representing the data distribution.
+   * @param {boolean} invert - Whether to invert the color scheme.
    * @returns {string[]} An array of color values representing the color palette.
    */
-  const calculateColours = useCallback((colourScheme, bins) => {
-    if (bins.length > 9) return chroma.scale(colourScheme).colors(bins.length);
-    return colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
+  const calculateColours = useCallback((colourScheme, bins, invert=false) => {
+    let colors;
+    if (bins.length > 9) {
+      colors = chroma.scale(colourScheme).colors(bins.length);
+    } else {
+      colors = colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
+    }
+    if (invert) {
+      colors = colors.slice().reverse();
+    }
+    return colors;
   }, []);
 
   /**
