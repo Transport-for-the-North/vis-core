@@ -62,6 +62,12 @@
   text-indent: 0em;
 }
 
+.legalText {
+  padding: 3vh 10vw;
+  font-size: medium; /* Slightly smaller font size */
+  text-align: center;
+}
+
 .methodology,
 .background,
 .additional-section,

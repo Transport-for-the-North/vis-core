@@ -77,6 +77,12 @@ export const HomePage = () => {
             <p className="container-methodology">{parse(appContext.methodology)}</p>
           </section>
         )}
+        {appContext.legalText !== "" && (
+          <section className="legalText">
+            <h2>Legal</h2>
+            <p className="container-bg">{parse(appContext.legalText)}</p>
+          </section>
+        )}
         {homePageFragments && Object.keys(fragmentsContent).length > 0 && (
           Object.entries(fragmentsContent).map(([title, content], index) => {
             const alignmentClass = homePageFragments[title]?.alignment || 'center';
