@@ -29,6 +29,9 @@ export const combinedAuthority = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
+        invertedColorScheme: true,
+        trseLabel: true,
+        outlineOnPolygonSelect: true,
       },
       {
         name: "Combined Authorities",
@@ -63,6 +66,8 @@ export const combinedAuthority = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: true,
+        invertedColorScheme: true,
+        trseLabel: true,
       }
     ],
     visualisations: [
@@ -77,7 +82,7 @@ export const combinedAuthority = {
         dataPath: "/api/trse/output-area-data",
         legendText: [
           {
-            displayValue: "Value",
+            displayValue: "Risk of TRSE",
             legendSubtitleText: "%" 
           }
         ]
@@ -93,7 +98,7 @@ export const combinedAuthority = {
         dataPath: "/api/trse/pt-point-data",
         legendText: [
           {
-            displayValue: "PT Points",
+            displayValue: "Public Transport Stops",
             legendSubtitleText: "%"
           }
         ]

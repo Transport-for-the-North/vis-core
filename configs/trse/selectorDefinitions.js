@@ -217,14 +217,17 @@ const oaOrPtvariableSelector = {
       {
         displayValue: "TRSE",
         paramValue: "trse",
+        colourValue: { value: "PuRd", label: "PuRd" },
       },
       {
         displayValue: "Access only",
         paramValue: "acc",
+        colourValue: { value: "OrRd", label: "OrRd" },
       },
       {
         displayValue: "Vulnerability only",
         paramValue: "vul",
+        colourValue: { value: "Purples", label: "Purples" },
       }
     ],
   },
