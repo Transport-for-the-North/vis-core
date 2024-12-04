@@ -80,7 +80,7 @@ export const HomePage = () => {
         {appContext.legalText !== "" && (
           <section className="legalText">
             <h2>Legal</h2>
-            <p className="container-bg">{parse(appContext.legalText)}</p>
+            <p className="container-legalText">{parse(appContext.legalText)}</p>
           </section>
         )}
         {homePageFragments && Object.keys(fragmentsContent).length > 0 && (
