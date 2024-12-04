@@ -260,7 +260,7 @@ const glossaryData = {
     behaviouralScenario: {
       title: "Behavioural scenario",
       content: `<p>Defines the assumptions around how and where drivers will use electric vehicle charging.</p>
-      <p>Currently 2 scenarios are available:</p>
+      <p>Currently 4 scenarios are available:</p>
       <ul>
       <li>Baseline: charging behaviour follows current observed trends: 
       most charging is done at or near home, with some taking place at destinations or en-route.</li>
@@ -273,7 +273,7 @@ const glossaryData = {
     chargingCategories: {
       title: "Charging categories",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
-      <p>There are 5 charging categories defined for cars and vans, and 2 for heavy goods vehicles:</p>
+      <p>There are 6 charging categories defined for cars and vans, and 2 for heavy goods vehicles:</p>
       <p><strong>Cars and vans</strong></p>
       <ul>
       <li>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
@@ -288,6 +288,12 @@ const glossaryData = {
       We assume the use of a 7 kW charger.</li>
       <li>Workplace: Charging which occurs at or near a driver's place of work. 
       Only accessible to drivers who use their vehicle for commuting. We assume the use of a 7 kW charger.</li>
+      <li>Local charging hub: 
+      TfN defines a local charging hub as a grouped hub of charge points, typically providing a mixture of slow to fast AC chargers, 
+      and a number of rapid chargers. This would support scheduled slots for overnight charging and an app to book a shorter slot for a top up if needed. 
+      Example locations include private car parks and local authority / community car parks, such as schools and libraries. 
+      <br> Although well-used, the popularity of local charging hubs is still to be proven in terms of preference over residential charging. 
+      However, TfN feel it important to provide our partnership with a view of what this approach may mean for areas across the region. </li>
       </ul>
       <p><strong>Heavy goods vehicles</strong></p>
       <ul>
@@ -508,6 +514,17 @@ const glossaryData = {
          hybrid vehicle in TfN’s framework. To translate between the two approaches, TfN uses the mileage splits of hybrid and PHEV vehicles from its CAFCarb model.</p>`,
       exclude: [],
     },
+    download: {
+      title: "Download",
+      content: `<p>1. How do I view and download the results?</p>
+      <li>You can either hover over a given LA, MSOA or location (depending on selection) or use the download data section. When wishing to download data, 
+      click the arrow and then customise the selections as required before pressing ‘download’. Doing this will create a downloadable excel document in the top right. 
+      Once downloaded, you can use the excel functions such as ‘filter and ‘autosum’ to support your calculations.  </li>
+      <p>2. How do i combine Local Authorities (LAs) or Middle Super Output Areas when making calculations?</p>
+      <li>In the ‘filtering and data selection’ section, click either LA or MSOA below ‘administrative boundaries’. Then, under ‘optional location filter’ click on ‘enable selector’. 
+      Then simply click on the map and combine the LAs or MSOAs you desire. You can see them compile in the box. Simply re-click on the LA or MSOA on the map to remove or 
+      click on the ‘x’ next to the name in the box. To remove them all, click on the larger ‘X’ to the right of the box.   </li>`
+    }
   };
   
   function getInfo(key) {

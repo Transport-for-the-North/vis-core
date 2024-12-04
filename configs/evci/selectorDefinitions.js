@@ -228,7 +228,7 @@ const behaviouralScenarioSelector = {
       //   paramValue: 3,
       // },
       {
-        displayValue: "Local public charging hub",
+        displayValue: "Local Charging Hub focus",
         paramValue: 4,
       },
       {
@@ -378,7 +378,7 @@ const chargingCategorySelector = {
       //   paramValue: 7,
       // },
       {
-        displayValue: "Local Public Charging Hub focus",
+        displayValue: "Local Charging Hubs",
         paramValue: 8,
       },
     ],

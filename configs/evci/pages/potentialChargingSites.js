@@ -22,7 +22,16 @@ export const potentialChargingSites = {
   <div class="inset-text-area">
     <p><b>Warning: </b>Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid 
   charging hub development looks promising.</p>
-  </div>`,
+  </div>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {

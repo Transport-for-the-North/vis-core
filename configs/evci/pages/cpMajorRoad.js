@@ -1,5 +1,5 @@
 import { selectors } from "../selectorDefinitions";
-import { termsOfUse } from "../TermsOfUse";
+import { termsOfUse, termsOfUseCP } from "../TermsOfUse";
 
 export const cpMajorRoad = {
   pageName: "Actual: Chargers/Power by Major Road",
@@ -11,9 +11,18 @@ export const cpMajorRoad = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows the actual chargers and power numbers across the region’s major roads.</p>`,
+  <p>This visualisation shows the actual chargers and power numbers across the region’s major roads.</p>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   termsOfUse: termsOfUse,
-  legalText: termsOfUse,
+  legalText: termsOfUseCP,
   config: {
     layers: [
       {

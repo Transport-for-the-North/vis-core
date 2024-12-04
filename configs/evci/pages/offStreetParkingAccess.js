@@ -15,7 +15,17 @@ export const offStreetParkingAccess = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows the Off-Street Parking Accessibility.</p>`,
+  <p>This visualisation shows off-street parking accessibility for the region, i.e. which of the regions 6.4 million residences have a driveway. 
+  More detailed intelligence is available to TfN’s partner authorities. </p>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -78,7 +88,7 @@ export const offStreetParkingAccess = {
         ],
         downloadPath: '/api/evci/zonal-access/download'
       },
-      warning: "Key zonal outputs of this assessment are provided in this public EVCI Framework tool. Further data outputs are available to TfN’s local authority partners and statutory partners and should be requested directly. This includes household level information and geometries, sharable under Ordnance Survey’s Public Sector Geospatial Agreements."
+      warning: "Key zonal outputs of this assessment are provided in this public EVCI Framework tool. Further data outputs are available to TfN’s local authority partners and statutory partners and should be requested directly. This includes household level information and geometries, sharable under Ordnance Survey’s Public Sector Geospatial Agreement."
     },
   },
 };
