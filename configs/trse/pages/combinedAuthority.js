@@ -31,6 +31,7 @@ export const combinedAuthority = {
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: true,
         trseLabel: true,
+        outlineOnPolygonSelect: true,
       },
       {
         name: "Combined Authorities",

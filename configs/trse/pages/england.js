@@ -32,6 +32,7 @@ export const england = {
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: true,
         trseLabel: true,
+        outlineOnPolygonSelect: true,
       },
       {
         name: "Local Authorities",
