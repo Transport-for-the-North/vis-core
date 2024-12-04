@@ -56,10 +56,17 @@
   margin-bottom: 2vh;
 }
 
+.container-legalText,
 .container-methodology,
 .container-intro {
   color: #0d0f3d;
   text-indent: 0em;
+}
+
+.legalText {
+  padding: 3vh 10vw 0vh 10vw;
+  font-size: medium; /* Slightly smaller font size */
+  text-align: center;
 }
 
 .methodology,

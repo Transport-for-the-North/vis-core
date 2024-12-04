@@ -36,7 +36,9 @@ export const appConfig = {
     each of these factors, and used a factor analysis process to group and weight these. Our approach is inspired by and broadly 
     similar to the English Indices of Deprivation, but has been tailored to reflect the outcomes of our research into TRSE.</p>`,
   legalText:
-    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+    `<p>This data can be used by third parties as long as the source is clearly attributed to TfN, a logo is added to any maps and, 
+    if online, a link is added back to this webpage. For our terms of use, please see the Open Government Licence. Use of the TRSE 
+    tool also indicates your acceptance of this Disclaimer and Appropriate Use Statement.</p>`,
   contactText: "Please contact research@transportforthenorth.com for any questions on this data tool.",
   contactEmail: "research@transportforthenorth.com",
   mapStyle: mapStyles.geoapifyPositron,
