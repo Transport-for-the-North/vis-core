@@ -520,7 +520,7 @@ const glossaryData = {
       <li>You can either hover over a given LA, MSOA or location (depending on selection) or use the download data section. When wishing to download data, 
       click the arrow and then customise the selections as required before pressing ‘download’. Doing this will create a downloadable excel document in the top right. 
       Once downloaded, you can use the excel functions such as ‘filter and ‘autosum’ to support your calculations.  </li>
-      <p>2. How do i combine Local Authorities (LAs) or Middle Super Output Areas when making calculations?</p>
+      <p>2. How do I combine Local Authorities (LAs) or Middle Super Output Areas when making calculations?</p>
       <li>In the ‘filtering and data selection’ section, click either LA or MSOA below ‘administrative boundaries’. Then, under ‘optional location filter’ click on ‘enable selector’. 
       Then simply click on the map and combine the LAs or MSOAs you desire. You can see them compile in the box. Simply re-click on the LA or MSOA on the map to remove or 
       click on the ‘x’ next to the name in the box. To remove them all, click on the larger ‘X’ to the right of the box.   </li>`
