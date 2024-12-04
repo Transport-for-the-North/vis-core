@@ -99,14 +99,6 @@ export const localAuthority = {
         ]
       },
       {
-        name: "Detailed Information",
-        type: "calloutCard",
-        cardName: "Local Authority Summary",
-        dataSource: "api",
-        dataPath: "/api/trse/callout-data/authority",
-        htmlFragment: ladSummaryCallout
-      },
-      {
         name: "OA Callout",
         type: "calloutCard",
         cardName: "Output Area Summary",
@@ -121,6 +113,14 @@ export const localAuthority = {
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaLaDetailedCallout
+      },
+      {
+        name: "Detailed Information",
+        type: "calloutCard",
+        cardName: "Local Authority Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/authority",
+        htmlFragment: ladSummaryCallout
       },
     ],
     metadataTables: [],

@@ -99,14 +99,6 @@ export const combinedAuthority = {
         ]
       },
       {
-        name: "Detailed Information",
-        type: "calloutCard",
-        cardName: "Combined Authority Summary",
-        dataSource: "api",
-        dataPath: "/api/trse/callout-data/authority",
-        htmlFragment: caSummaryCallout
-      },
-      {
         name: "OA Callout",
         type: "calloutCard",
         cardName: "Output Area Summary",
@@ -121,6 +113,14 @@ export const combinedAuthority = {
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaCaDetailedCallout
+      },
+      {
+        name: "Detailed Information",
+        type: "calloutCard",
+        cardName: "Combined Authority Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/authority",
+        htmlFragment: caSummaryCallout
       },
     ],
     metadataTables: [],
