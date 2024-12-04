@@ -219,7 +219,7 @@ const oaOrPtvariableSelector = {
         paramValue: "trse",
       },
       {
-        displayValue: "Accessibility only",
+        displayValue: "Access only",
         paramValue: "acc",
       },
       {
