@@ -270,7 +270,7 @@ export const appConfig = {
   background: "",
   methodology: "",
   legalText:
-    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the NoHAM Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
   contactText: "Please contact Luke Monaghan for any questions on this data tool.",
   contactEmail: "luke.monaghan@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
