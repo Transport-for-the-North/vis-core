@@ -105,6 +105,8 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
 
   return (
     <AccordionSection title="Download data" defaultValue={true}>
+      <p><strong>How do I view and download the results?</strong></p>
+      <p>You can either hover over a given LA, MSOA or location (depending on selection) or use the download data section. When wishing to download data, click the arrow and then customise the selections as required before pressing ‘download’. Doing this will create a downloadable excel document in the top right. Once downloaded, you can use the excel functions such as ‘filter and ‘autosum’ to support your calculations.</p>
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
