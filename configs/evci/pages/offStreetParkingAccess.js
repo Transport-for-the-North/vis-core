@@ -14,10 +14,11 @@ export const offStreetParkingAccess = {
   secondaryFontColour:"@secondaryFontColour@",
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
+  extraCopyrightText: "Copyright BlueSky International Ltd.",
   about: `
   <p>This visualisation shows the Off-Street Parking Accessibility.</p>`,
   termsOfUse: termsOfUse,
-  legalText: termsOfUse,
+  legalText: termsOfUse + `<p>Driveway Data: Copyright BlueSky International Ltd.</p>`,
   config: {
     layers: [
       {

@@ -30,7 +30,7 @@ const StyledMapContainer = styled.div`
  *
  * @returns {JSX.Element} The rendered DualMaps component.
  */
-const DualMaps = () => {
+const DualMaps = (props) => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
   const { state, dispatch } = useMapContext();
@@ -40,7 +40,8 @@ const DualMaps = () => {
     rightMapContainerRef,
     mapStyle,
     mapCentre,
-    mapZoom
+    mapZoom,
+    props.extraCopyrightText
   );
   const { dispatch: filterDispatch } = useFilterContext();
 

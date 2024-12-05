@@ -11,9 +11,10 @@ import { defaultMapZoom } from "defaults";
  * @param {string} mapStyle - A custom map style.
  * @param {Array<number>} mapCentre - The initial map center coordinates [longitude, latitude].
  * @param {number} mapZoom - The initial map zoom level.
+ * @param {string} extraCopyrightText - Extra copyright text that needs to go in the bottom right bar.
  * @returns {Object} An object containing the map instance, map style loaded state, map loaded state, and map ready state.
  */
-export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom) => {
+export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyrightText) => {
   const [map, setMap] = useState(null);
   const [isMapStyleLoaded, setIsMapStyleLoaded] = useState(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -59,10 +60,11 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom) => {
         "bottom-left"
       );
       
+      console.log(extraCopyrightText);
       mapInstance.addControl(
         new maplibregl.AttributionControl({
           compact: true,
-          customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}`
+          customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}${extraCopyrightText ? ` | ${extraCopyrightText}` : ''}`
         }),
         "bottom-right"
       );
