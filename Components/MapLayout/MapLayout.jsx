@@ -2,8 +2,9 @@ import { useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
-import { useMapContext, useFilterContext } from "hooks";
+import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
+import { defaultBgColour } from 'defaults';
 import DualMaps from "./DualMaps";
 import Map from "./Map";
 
@@ -37,6 +38,8 @@ export const MapLayout = () => {
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
 
+  const layerZoomMessage = useLayerZoomMessage();
+
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
       state.filters.forEach((filter) => {
@@ -52,7 +55,7 @@ export const MapLayout = () => {
           else sides = "both";
           dispatch({
             type: actionObj.action,
-            payload: { filter, value: defaultValue, sides: sides },
+            payload: { filter, value: defaultValue, sides: sides, ...actionObj.payload },
           });
         });
       });
@@ -70,9 +73,23 @@ export const MapLayout = () => {
 
   const handleFilterChange = (filter, value) => {
     filterDispatch({
-      type: "SET_FILTER_VALUE",
+      type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value },
     });
+    
+    // Only proceed if the filter has selectable values
+    if (filter.values?.values && Array.isArray(filter.values.values)) {
+      const selectedOption = filter.values.values.find(
+        (option) => option.paramValue === value
+      );
+  
+      if (selectedOption && selectedOption.colourValue) {
+        dispatch({
+          type: 'UPDATE_COLOR_SCHEME',
+          payload: { color_scheme: selectedOption.colourValue },
+        });
+      } 
+    }
   };
 
   useEffect(() => {
@@ -84,11 +101,12 @@ export const MapLayout = () => {
     });
 
     state.filters.forEach((filter) => {
+      
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id] },
+            payload: { filter, value: filterState[filter.id], ...action.payload },
           });
         });
       } else {
@@ -99,7 +117,7 @@ export const MapLayout = () => {
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], sides },
+            payload: { filter, value: filterState[filter.id], sides, ...action.payload },
           });
         });
       }
@@ -127,8 +145,11 @@ export const MapLayout = () => {
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
         filters={state.filters}
-        legalText={loremIpsum}
+        legalText={pageContext.legalText ?? loremIpsum}
         onFilterChange={handleFilterChange}
+        bgColor={pageContext.navbarLinkBgColour || defaultBgColour}
+        additionalFeatures={pageContext.config.additionalFeatures}
+        infoBoxText={layerZoomMessage}
       >
         <MapLayerSection
           handleColorChange={handleColorChange}

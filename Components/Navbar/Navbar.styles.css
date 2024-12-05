@@ -1,32 +1,47 @@
 @import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100;400&display=swap");
 
 .navbar {
-  height: 75px;
+  height: 75px; /* Fixed height to ensure full height alignment */
+  display: flex; /* Make sure the navbar is a flex container */
+  align-items: center; /* Centre items vertically */
+  justify-content: space-between; /* Space elements between the logo and content */
   z-index: 1001;
   box-shadow: 0px 3px 5px 0px gray;
   position: fixed;
   top: 0px;
   width: 100%;
+  background-color: #f8f9fa;
   --tfnPurple: #7317de;
   --standardFontFamily: "Hanken Grotesk", sans-serif;
+}
+
+.navbarContent {
+  display: flex;
+  align-items: center;
+  height: 100%; /* Make sure the flex container is full height */
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
 }
 
 .NavButton,
 .ActiveNavButton {
   color: #4b3e91;
   font-family: var(--standardFontFamily);
-  font-size: larger;
+  font-size: clamp(12px, 1.2vw, 18px);
   text-decoration: none;
   width: 12%;
-  max-width: 270px;
+  max-width: 300px;
   text-align: center;
-  position: relative; /* Added to allow dropdown alignment */
-  height: 100%; /* Full height of navbar */
+  height: 100%; /* Ensures NavButton takes the full height of the navbar */
   display: flex;
-  align-items: center; /* Vertically centre text */
+  align-items: center; /* Centre text vertically */
   justify-content: center; /* Centre text horizontally */
   border-bottom-right-radius: 20px;
   transition: background-color 0.3s;
+  position: relative; /* For positioning adjustments if needed */
 }
 
 .NavButton:hover,

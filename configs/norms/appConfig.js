@@ -255,6 +255,7 @@ export const appConfig = {
    web-based format. This instance of the platform presents information from the Network North project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
    based on scenario testing done using NoRMS.</p>`,
   background: "",
+  methodology: "",
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
   contactText: "Please contact Matteo Gravellu for any questions on this data tool.",
@@ -2872,8 +2873,10 @@ export const appConfig = {
             visualisationName: "Station Nodes",
             isHoverable: false,
             isStylable: false,
-            shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelNulls: true,
+            labelZoomLevel: 9,
           },
           {
             uniqueId: "NoRMSLinksVectorTile",
@@ -3069,8 +3072,10 @@ export const appConfig = {
             visualisationName: "Station Nodes",
             isHoverable: false,
             isStylable: false,
-            shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelNulls: true,
+            labelZoomLevel: 9,
           },
           {
             uniqueId: "NoRMSLinksResultDifference",
@@ -3405,8 +3410,10 @@ export const appConfig = {
             visualisationName: "Station Nodes",
             isHoverable: false,
             isStylable: false,
-            shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: true,
+            labelZoomLevel: 9,
+            labelNulls: true
           },
           {
             uniqueId: "NoRMSLinksResultDual",
@@ -5081,7 +5088,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals)",
       url: "/accessibility-key-location-totals",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -5334,7 +5341,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals) Difference",
       url: "/accessibility-key-location-totals-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -6597,7 +6604,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair)",
       url: "/accessibility-key-location-pair",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -6860,7 +6867,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair) Difference",
       url: "/accessibility-key-location-pair-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
         layers: [
@@ -7283,7 +7290,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals)",
       url: "/accessibility-landuse-totals",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -7600,7 +7607,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals) Difference",
       url: "/accessibility-landuse-totals-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -8079,7 +8086,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair)",
       url: "/accessibility-landuse-pair",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -8406,7 +8413,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair) Difference",
       url: "/accessibility-landuse-pair-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
         layers: [
@@ -8888,7 +8895,7 @@ export const appConfig = {
         ]
       }
     },
-    {
+    /*{
       pageName: "Journey Time Accessibility (Zone Totals)",
       url: "/accessibility-journey-time-totals",
       type: "MapLayout",
@@ -9104,8 +9111,8 @@ export const appConfig = {
           },
         ]
       }
-    },
-    {
+    },*/
+    /*{
       pageName: "Journey Time Accessibility (Zone Totals) Difference",
       url: "/accessibility-journey-time-totals-difference",
       type: "MapLayout",
@@ -9481,13 +9488,13 @@ export const appConfig = {
           }
         ]
       }
-    },
+    },*/
 
     {
       pageName: "Journey Time Accessibility (Zone Pair)",
       url: "/accessibility-journey-time-pair",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Journey Time)",
       about: "", //To be added.
       config: {
         layers: [
@@ -9714,7 +9721,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Pair) Difference",
       url: "/accessibility-journey-time-pair-difference",
       type: "MapLayout",
-      category: "Accessibility",
+      category: "Accessibility (Journey Time)",
       about: "", //To be added.
       config: {
         layers: [

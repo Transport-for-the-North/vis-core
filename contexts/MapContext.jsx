@@ -1,26 +1,24 @@
-import React, { createContext, useEffect, useContext, useReducer } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { actionTypes, mapReducer } from 'reducers';
-import { hasRouteParameter, replaceRouteParameter, sortValues, isValidCondition, applyCondition } from 'utils';
-import { AppContext, PageContext, FilterContext } from 'contexts';
-import { api } from 'services';
+import React, { createContext, useEffect, useContext, useReducer } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { actionTypes, mapReducer } from "reducers";
+import {
+  hasRouteParameterOrQuery,
+  updateUrlParameters,
+  extractParamsWithValues,
+  processParameters,
+  checkSecurityRequirements,
+  sortValues,
+  isValidCondition,
+  applyCondition,
+  parseStringToArray,
+  isParamNameForceRequired
+} from "utils";
+import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
+import { AppContext, PageContext, FilterContext } from "contexts";
+import { api } from "services";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
-
-const initialState = {
-  layers: {},
-  visualisations: {},
-  leftVisualisations: {},
-  rightVisualisations: {},
-  metadataTables: {},
-  metadataFilters: [],
-  filters: [],
-  map: null,
-  isMapReady: false,
-  isLoading: true,
-  pageIsReady: false,
-};
 
 /**
  * Helper function to check for duplicate values in an array.
@@ -46,6 +44,38 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
+
+  // Initialize state within the provider function
+  const initialState = {
+    mapStyle: appContext.mapStyle || defaultMapStyle,
+    mapCentre: pageContext.customMapCentre
+      ? parseStringToArray(pageContext.customMapCentre)
+      : defaultMapCentre,
+    mapZoom: pageContext.customMapZoom
+      ? parseFloat(pageContext.customMapZoom)
+      : defaultMapZoom,
+    layers: {},
+    visualisations: {},
+    leftVisualisations: {},
+    rightVisualisations: {},
+    metadataTables: {},
+    metadataFilters: [],
+    filters: [],
+    map: null,
+    isMapReady: false,
+    isLoading: true,
+    pageIsReady: false,
+    selectionMode: null,
+    selectionLayer: null,
+    selectedFeatures: [],
+    isFeatureSelectActive: false,
+    visualisedFeatureIds: null,
+    currentZoom: pageContext.customMapZoom
+      ? parseFloat(pageContext.customMapZoom)
+      : defaultMapZoom,
+  };
+
+
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
   const contextValue = React.useMemo(() => {
@@ -100,6 +130,9 @@ export const MapProvider = ({ children }) => {
         switch (filter.type) {
           case 'map':
           case 'slider':
+          case 'mapFeatureSelect':
+          case 'mapFeatureSelectWithControls':
+          case 'mapFeatureSelectAndPan':
             filters.push(filterWithId);
             break;
           default:
@@ -207,7 +240,7 @@ export const MapProvider = ({ children }) => {
     const initializeContext = async () => {
       // Initialise non-parameterised layers
       const nonParameterisedLayers = pageContext.config.layers.filter(
-        (layer) => !hasRouteParameter(layer.path)
+        (layer) => !hasRouteParameterOrQuery(layer.path)
       );
       nonParameterisedLayers.forEach((layer) => {
         const bufferSize = layer.geometryType === 'line' ? 7 : 0;
@@ -215,27 +248,43 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise parameterised layers based on corresponding filters
-      const parameterisedLayers = pageContext.config.layers.filter(
-        (layer) => hasRouteParameter(layer.path)
+      const parameterisedLayers = pageContext.config.layers.filter((layer) =>
+        hasRouteParameterOrQuery(layer.path)
       );
+      
       parameterisedLayers.forEach((layer) => {
         const bufferSize = layer.geometryType === 'line' ? 7 : 0;
-        const paramName = layer.path.match(/\{(.+?)\}/)[1];
-        const filter = pageContext.config.filters.find((f) => f.paramName === paramName);
-        if (filter) {
-          const updatedPath = replaceRouteParameter(
-            layer.path,
-            paramName,
-            filter.values.values[0].paramValue
-          );
-          dispatch({
-            type: actionTypes.ADD_LAYER,
-            payload: {
-              [layer.name]: { ...layer, path: updatedPath, pathTemplate: layer.path, bufferSize },
+      
+        // Extract parameters and their values from the layer path
+        const allParamsWithValues = extractParamsWithValues(layer.path);
+      
+        const excludedParams = ['x', 'y', 'z'];
+      
+        // Process parameters to fill values and find missing ones
+        const { params, missingParams } = processParameters(
+          allParamsWithValues,
+          pageContext.config.filters,
+          excludedParams
+        );
+      
+        // Update the path using the extracted and found parameters
+        const updatedPath = updateUrlParameters(layer.path, params);
+      
+        // Dispatch the layer with the updated path and any missing parameters
+        dispatch({
+          type: actionTypes.ADD_LAYER,
+          payload: {
+            [layer.name]: {
+              ...layer,
+              path: updatedPath,
+              pathTemplate: layer.path,
+              bufferSize,
+              missingParams, // Include missing parameters for later use
             },
-          });
-        }
+          },
+        });
       });
+      
 
       // Initialise visualisations
       const visualisationConfig = pageContext.config.visualisations;
@@ -244,18 +293,34 @@ export const MapProvider = ({ children }) => {
         const queryParams = {};
         const apiRoute = visConfig.dataPath;
         const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+        const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
+      
         apiParameters.forEach((param) => {
           if (param.in === 'query') {
-            queryParams[param.name] = null;
+            queryParams[param.name] = {
+              value: null,
+              required: param.required || isParamNameForceRequired(pageContext.config.filters, param.name) || false, // Use the 'required' property from the schema, default to false
+            };
           }
         });
+      
+        // If no parameters are marked as required, set all to required
+        const hasRequiredParams = apiParameters.some(param => param.required);
+        if (!hasRequiredParams) {
+          Object.keys(queryParams).forEach((key) => {
+            queryParams[key].required = true;
+          });
+        }
+      
         const visualisation = {
           ...visConfig,
           dataPath: apiRoute,
           queryParams,
           data: [],
           paintProperty: {},
+          requiresAuth,
         };
+      
         dispatch({
           type: actionTypes.ADD_VISUALISATION,
           payload: { [visConfig.name]: visualisation },
