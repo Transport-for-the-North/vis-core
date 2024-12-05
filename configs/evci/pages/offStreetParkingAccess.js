@@ -14,6 +14,7 @@ export const offStreetParkingAccess = {
   secondaryFontColour:"@secondaryFontColour@",
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
+  extraCopyrightText: "Copyright BlueSky International Ltd.",
   about: `
   <p>This visualisation shows off-street parking accessibility for the region, i.e. which of the regions 6.4 million residences have a driveway. 
   More detailed intelligence is available to TfN’s partner authorities. </p>
@@ -28,7 +29,7 @@ export const offStreetParkingAccess = {
             >
              here</a>.</p>`,
   termsOfUse: termsOfUse,
-  legalText: termsOfUse,
+  legalText: termsOfUse + `<p>Driveway Data: Copyright BlueSky International Ltd.</p>`,
   config: {
     layers: [
       {
