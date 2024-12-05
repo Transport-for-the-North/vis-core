@@ -11,7 +11,13 @@ export const annualChargingDemand = {
   customMapZoom: "@mapZoom@",
   navbarLinkBgColour: "@primaryBgColour@",
   about: `
-  <p>This visualisation shows the forecasted annual energy demand which EV uptake will require, for each charging category.</p>`,
+  <p>This visualisation shows the forecasted annual energy demand which EV uptake will require, for each charging category.</p>
+  <p>TfN’s methodology for the EVCI Framework can be found <a
+      href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      here</a>.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
