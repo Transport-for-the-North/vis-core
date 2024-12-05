@@ -27,11 +27,11 @@ const StyledMapContainer = styled.div`
  *
  * @returns {JSX.Element} The rendered Map component.
  */
-const Map = () => {
+const Map = (props) => {
   const mapContainerRef = useRef(null);
   const { state, dispatch } = useMapContext();
   const { mapStyle, mapCentre, mapZoom } = state;
-  const { map, isMapReady } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom);
+  const { map, isMapReady } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom, props.extraCopyrightText);
   const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
   const listenerCallbackRef = useRef({});
