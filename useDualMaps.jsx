@@ -18,7 +18,8 @@ export const useDualMaps = (
   rightMapContainerRef,
   mapStyle,
   mapCentre,
-  mapZoom
+  mapZoom,
+  extraCopyrightText
 ) => {
   const [leftMap, setLeftMap] = useState(null);
   const [rightMap, setRightMap] = useState(null);
@@ -85,7 +86,7 @@ export const useDualMaps = (
       rightMapInstance.addControl(
         new maplibregl.AttributionControl({
           compact: true,
-          customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}`
+          customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}${extraCopyrightText ? ` | ${extraCopyrightText}` : ''}`
         }),
         "bottom-right"
       );
