@@ -30,10 +30,10 @@ export const stbConfig = [
       "potentialChargingSites",
       "tfnCo2Savings",
       "enrouteChargingDemand",
-      "commercialViability",
-      "multiModalHubs",
       "offStreetParkingAccess",
-      "energyCapacity"
+      "energyCapacity",
+      "commercialViability",
+      "multiModalHubs" 
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:
