@@ -22,16 +22,7 @@ export const potentialChargingSites = {
   <div class="inset-text-area">
     <p><b>Warning: </b>Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid 
   charging hub development looks promising.</p>
-  </div>
-  <p>TfN can support our local authority partners with further information behind these outputs, 
-  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
-  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
-  can be found <a
-              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-             here</a>.</p>`,
+  </div>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -93,4 +84,30 @@ export const potentialChargingSites = {
       warning: "Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid charging hub development looks promising."
     },
   },
+};
+
+export const tfnPotentialChargingSites = {
+  ...potentialChargingSites,
+  about: `
+  <p>Shows the sites within a region with the most potential for the installation of en-route charging infrastructure. 
+  This ranking is not designed to provide users with specific parcels of land for development but is instead designed to show 
+  broader regions where rapid charging hub development looks promising.</p>
+  <p>These dots are designed to be used alongside "En-route charging demand by major road" data which can be used to identify regions with a need for public charging. Once a region has been identified the "Potential en-route charging sites" data provides the user with local information (greenbelt restriction, risk of flooding, local traffic flow, existing local charging hubs, a lack of local off street parking) which can be used to identify areas of interest.</p>
+
+<p>These sites are potential areas where rapid charging hubs (likely to be 5 or more chargers) could be installed, however a detailed analysis of the local area (including planning restrictions, currently installed chargers, nearby amenities, and electricity grid connection costs) would be required to determine if installation is feasible and how many chargers should be installed.</p>
+
+<p>Sites are expressed relative to the single best scored site in the TfN area. Only sites meeting a minimum threshold have been included. Each point represents a hexagonal cell of side length 620 metres, centred on the point shown.</p>
+  <div class="inset-text-area">
+    <p><b>Warning: </b>Locations shown are not specific parcels of land for development, but intended to show broader regions where rapid 
+  charging hub development looks promising.</p>
+  </div>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
 };

@@ -12,16 +12,7 @@ export const evUptake = {
   customMapZoom: "@mapZoom@",
   about: `
   <p>This visualisation shows both actual (based on 2023 DVLA data) and forecast
-    EV uptake expected across the region (car, van or heavy goods vehicle). </p>
-    <p>TfN can support our local authority partners with further information behind these outputs, 
-  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
-  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
-  can be found <a
-              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-             here</a>.</p>`,
+    EV uptake expected across the region (car, van or heavy goods vehicle). </p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -99,6 +90,18 @@ export const evUptake = {
 
 export const tfnEvUptake = {
   ...evUptake,
+  about: `
+  <p>This visualisation shows both actual (based on 2023 DVLA data) and forecast
+    EV uptake expected across the region (car, van or heavy goods vehicle). </p>
+    <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   config: {
     ...evUptake.config,
     filters: [
