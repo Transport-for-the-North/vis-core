@@ -105,6 +105,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
 
   return (
     <AccordionSection title="Download data" defaultValue={true}>
+      <p>Use the selections to toggle items on and off. See Glossary "Download" for more information.</p>
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
