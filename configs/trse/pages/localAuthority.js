@@ -82,7 +82,7 @@ export const localAuthority = {
         dataPath: "/api/trse/output-area-data",
         legendText: [
           {
-            displayValue: "Risk of TRSE",
+            displayValue: "Output Areas",
             legendSubtitleText: "%" 
           }
         ]
