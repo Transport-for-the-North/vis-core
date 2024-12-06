@@ -231,10 +231,10 @@ const behaviouralScenarioSelector = {
       //  displayValue: "Local Charging Hub focus",
       //  paramValue: 4,
       //},
-      {
-        displayValue: "Queuing acceptance",
-        paramValue: 5,
-      },
+      // {
+        // displayValue: "Queuing acceptance",
+        // paramValue: 5,
+      // },
     ],
   },
 };
