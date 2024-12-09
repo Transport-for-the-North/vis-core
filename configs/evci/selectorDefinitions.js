@@ -531,6 +531,10 @@ const chargerSpeedSelector = {
         displayValue: "Slow",
         paramValue: 1,
       },
+      {
+        displayValue: "Fast",
+        paramValue: 8,
+      },
       // {
       //   displayValue: "Standard",
       //   paramValue: 2,
@@ -543,21 +547,17 @@ const chargerSpeedSelector = {
         displayValue: "Ultra-rapid",
         paramValue: 4,
       },
-      // {
-      //   displayValue: "Any Speed",
-      //   paramValue: 5,
-      // },
-      // {
-      //   displayValue: "Any Non-rapid",
-      //   paramValue: 6,
-      // },
-      // {
-      //   displayValue: "Any Rapid or Faster",
-      //   paramValue: 7,
-      // },
       {
-        displayValue: "Fast",
-        paramValue: 8,
+        displayValue: "Any Speed",
+        paramValue: 5,
+      },
+      {
+        displayValue: "Any Non-rapid",
+        paramValue: 6,
+      },
+      {
+        displayValue: "Any Rapid or Faster",
+        paramValue: 7,
       },
     ],
   },
