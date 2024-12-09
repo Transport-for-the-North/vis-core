@@ -223,14 +223,14 @@ const Map = () => {
   
         features.forEach((feature, index) => {
           const featureName = feature.properties.name || '';
-          const featureValue = feature.state.value || '';
+          const featureValue = feature.state.value;
   
-          if (!hoverNulls && featureValue === '') {
+          if (!hoverNulls && (featureValue === null || featureValue === undefined)) {
             return;
           }
   
           let description = '';
-          if (featureName && featureValue) {
+          if (featureName && (featureValue !== undefined && featureValue !== null)) {
             description = `
               <div class="popup-content">
                 <p class="feature-name">${featureName}</p>
