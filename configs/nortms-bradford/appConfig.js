@@ -106,6 +106,21 @@ const userClassIdValues = {
   ]
 }
 
+const landuseValues = {
+  source: "local",
+  legendSubtitleTextColumn: "landuse",
+  values: [
+    {
+      displayValue: "Employment",
+      paramValue: "emp"
+    },
+    {
+      displayValue: "Population",
+      paramValue: "pop"
+    }
+  ]
+}
+
 const originOrDestinationValues = {
   source: "local",
   values: [
@@ -7445,14 +7460,7 @@ export const appConfig = {
             shouldFilterOthers: false,
             multiSelect: false,
             isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
+            values: landuseValues
           },
           {
             filterName: "Landuse Segment 1",
@@ -7924,14 +7932,7 @@ export const appConfig = {
             shouldFilterOthers: false,
             multiSelect: false,
             isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
+            values: landuseValues
           },
           {
             filterName: "Landuse Segment 1",
@@ -8241,14 +8242,7 @@ export const appConfig = {
             shouldFilterOthers: false,
             multiSelect: false,
             isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
+            values: landuseValues,
           },
           {
             filterName: "Landuse Segment 1",
@@ -8728,14 +8722,7 @@ export const appConfig = {
             shouldFilterOthers: false,
             multiSelect: false,
             isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
+            values: landuseValues,
           },
           {
             filterName: "Landuse Segment 1",
