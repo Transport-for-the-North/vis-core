@@ -1,4 +1,3 @@
-
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo } from "react";
 import { useMapContext } from "hooks";
@@ -10,18 +9,18 @@ import {
   reclassifyData,
   reclassifyGeoJSONData,
   resetPaintProperty,
-  checkGeometryNotNull
+  checkGeometryNotNull,
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData } from "hooks"; // Import the custom hook
 
 /**
- * A React component responsible for rendering visualizations on a map.
+ * MapVisualisation component responsible for rendering visualizations on a map.
  *
  * @param {Object} props - The properties passed to the component.
  * @param {string} props.visualisationName - The name of the visualization.
  * @param {Object} props.map - The Maplibre JS map instance.
- * @param {boolean|null} props.left - A boolean indicating whether the visualisation is for the left or the right map. Null for a single map page.
+ * @param {boolean|null} props.left - A boolean indicating whether the visualization is for the left or the right map. Null for a single map page.
  * @param {Object[]} [props.maps] - An array containing the left and right map instances for side-by-side maps.
  * @returns {null} This component doesn't render anything directly.
  */
@@ -37,8 +36,8 @@ export const MapVisualisation = ({
   // Refs to keep track of previous values
   const prevCombinedDataRef = useRef();
   const prevVisualisationDataRef = useRef();
-  const prevColorRef = useRef();
-  const prevClassMethodRef = useRef();
+  const prevColorRef = useRef({});
+  const prevClassMethodRef = useRef({});
 
   // Determine the visualisation based on side (left, right, or single)
   const visualisation =
@@ -47,6 +46,10 @@ export const MapVisualisation = ({
       : left
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
+
+  // Retrieve classificationMethod and color_scheme per layer
+  const classificationMethod =
+    state.layers[visualisation.joinLayer]?.class_method ?? "d";
 
   // Use the custom hook to fetch data for the visualisation
   const {
@@ -125,7 +128,8 @@ export const MapVisualisation = ({
       );
 
       // Get trseLabel from state.layers
-      const trseLabel = state.layers[visualisation.joinLayer]?.trseLabel === true;
+      const trseLabel =
+        state.layers[visualisation.joinLayer]?.trseLabel === true;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -145,8 +149,13 @@ export const MapVisualisation = ({
         : colorSchemes[style.split("-")[1]][0];
 
       // Calculate the color palette based on the classification
-      const invertColorScheme = state.layers[visualisation.joinLayer]?.invertedColorScheme === true;
-      const colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
+      const invertColorScheme =
+        state.layers[visualisation.joinLayer]?.invertedColorScheme === true;
+      const colourPalette = calculateColours(
+        currentColor,
+        reclassifiedData,
+        invertColorScheme
+      );
 
       // Update the map style
       const opacityValue = document.getElementById(
@@ -218,9 +227,10 @@ export const MapVisualisation = ({
               }
             );
           });
-          for (const [paintPropertyName, paintPropertyArray] of Object.entries(
-            paintProperty
-          )) {
+          for (const [
+            paintPropertyName,
+            paintPropertyArray,
+          ] of Object.entries(paintProperty)) {
             map.setPaintProperty(
               specifiedLayer.name,
               paintPropertyName,
@@ -246,12 +256,13 @@ export const MapVisualisation = ({
    * @param {boolean} invert - Whether to invert the color scheme.
    * @returns {string[]} An array of color values representing the color palette.
    */
-  const calculateColours = useCallback((colourScheme, bins, invert=false) => {
+  const calculateColours = useCallback((colourScheme, bins, invert = false) => {
     let colors;
     if (bins.length > 9) {
       colors = chroma.scale(colourScheme).colors(bins.length);
     } else {
-      colors = colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
+      colors =
+        colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
     }
     if (invert) {
       colors = colors.slice().reverse();
@@ -299,9 +310,13 @@ export const MapVisualisation = ({
     const colorHasChanged =
       state.color_scheme !== null &&
       state.color_scheme !== prevColorRef.current;
+
+    const prevClassificationMethod =
+      prevClassMethodRef.current[visualisation.joinLayer];
+
     const classificationHasChanged =
-      state.class_method != null &&
-      state.class_method !== prevClassMethodRef.current;
+      classificationMethod !== prevClassificationMethod;
+
     const needUpdate =
       dataHasChanged ||
       visualisationDataHasChanged ||
@@ -339,7 +354,7 @@ export const MapVisualisation = ({
             dataToClassify,
             dataToVisualize,
             visualisation.style,
-            state.class_method,
+            classificationMethod,
             visualisation.joinLayer
           );
         }
@@ -352,8 +367,10 @@ export const MapVisualisation = ({
     // Update the refs to the current data
     prevCombinedDataRef.current = combinedData;
     prevVisualisationDataRef.current = visualisationData;
+    // Update prevColorRef for the current layer
     prevColorRef.current = state.color_scheme;
-    prevClassMethodRef.current = state.class_method;
+    // Update prevClassMethodRef for the current layer
+    prevClassMethodRef.current[visualisation.joinLayer] = classificationMethod;
 
     // Cleanup if necessary
     return () => {
@@ -371,7 +388,7 @@ export const MapVisualisation = ({
     visualisationData,
     map,
     state.color_scheme,
-    state.class_method,
+    classificationMethod,
     reclassifyAndStyleMap,
     resetMapStyle,
     visualisation.joinLayer,
@@ -457,9 +474,10 @@ export const MapVisualisation = ({
         );
       } else {
         // Update the paint properties
-        for (const [paintPropertyName, paintPropertyArray] of Object.entries(
-          paintProperty
-        )) {
+        for (const [
+          paintPropertyName,
+          paintPropertyArray,
+        ] of Object.entries(paintProperty)) {
           map.setPaintProperty(
             visualisationName,
             paintPropertyName,
@@ -468,7 +486,12 @@ export const MapVisualisation = ({
         }
       }
     },
-    [map, visualisationName, state.color_scheme, visualisation.joinLayer]
+    [
+      map,
+      visualisationName,
+      state.color_scheme,
+      visualisation.joinLayer,
+    ]
   );
 
   return null;

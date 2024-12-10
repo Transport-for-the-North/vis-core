@@ -4,7 +4,7 @@ import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
-import { defaultBgColour } from 'defaults';
+import { defaultBgColour } from "defaults";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
 
@@ -76,19 +76,21 @@ export const MapLayout = () => {
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value },
     });
-    
+
     // Only proceed if the filter has selectable values
     if (filter.values?.values && Array.isArray(filter.values.values)) {
       const selectedOption = filter.values.values.find(
         (option) => option.paramValue === value
       );
-  
+      
       if (selectedOption && selectedOption.colourValue) {
+        // Need to determine which layer this color change applies to
+        // For simplicity, assume it applies to all layers for now
         dispatch({
           type: 'UPDATE_COLOR_SCHEME',
           payload: { color_scheme: selectedOption.colourValue },
         });
-      } 
+      }
     }
   };
 
@@ -101,7 +103,7 @@ export const MapLayout = () => {
     });
 
     state.filters.forEach((filter) => {
-      
+
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
           dispatch({
@@ -131,10 +133,10 @@ export const MapLayout = () => {
     });
   };
 
-  const handleClassificationChange = (classType) => {
+  const handleClassificationChange = (classType, layerName) => {
     dispatch({
       type: "UPDATE_CLASSIFICATION_METHOD",
-      payload: { class_method: classType },
+      payload: { class_method: classType, layerName },
     });
   };
 
@@ -158,12 +160,12 @@ export const MapLayout = () => {
       </Sidebar>
       {pageContext.type === "MapLayout" && (
         <MapContainer>
-          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
+          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} />
         </MapContainer>
       )}
       {pageContext.type === "DualMapLayout" && (
         <MapContainer>
-          <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
+          <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? ""} />
         </MapContainer>
       )}
     </LayoutContainer>
