@@ -95,8 +95,6 @@ export const offStreetParkingAccess = {
 
 export const offStreetParkingDrivewayOnly = {
   ...offStreetParkingAccess,
-  pageName: "Off-Street Parking",
-  url: "/@stbTag@/off-street-parking",
   config: {
     ...offStreetParkingAccess.config,
     filters: offStreetParkingAccess.config.filters.map(filter => {
