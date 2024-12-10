@@ -92,3 +92,31 @@ export const offStreetParkingAccess = {
     },
   },
 };
+
+export const offStreetParkingDrivewayOnly = {
+  ...offStreetParkingAccess,
+  pageName: "Off-Street Parking",
+  url: "/@stbTag@/off-street-parking",
+  config: {
+    ...offStreetParkingAccess.config,
+    filters: offStreetParkingAccess.config.filters.map(filter => {
+      if (filter.filterName === 'Metric') {
+        return { ...selectors.columnNameOSPADrivewayOnly, visualisations: ['Off Street Parking Access'] };
+      }
+      return filter;
+    }),
+    additionalFeatures: {
+      ...offStreetParkingAccess.config.additionalFeatures,
+      download: {
+        ...offStreetParkingAccess.config.additionalFeatures.download,
+        filters: offStreetParkingAccess.config.additionalFeatures.download.filters.map(filter => {
+          if (filter.filterName === 'Metric') {
+            return { ...selectors.columnNameOSPADrivewayOnly };
+          }
+          return filter;
+        }),
+      },
+    },
+  },
+};
+

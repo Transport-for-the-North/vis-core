@@ -553,6 +553,28 @@ const columnNameOSPASelector = {
   },
 };
 
+const columnNameOSPASelectorDrivewayOnly = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Driveway access",
+        paramValue: "driveway_perc",
+        legendSubtitleText: "% homes with access"
+      },
+    ],
+  },
+};
+
 const columnNameCVFixedSelector = {
   filterName: "Metric",
   paramName: "columnName",
@@ -706,6 +728,7 @@ export const selectors = {
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
   columnNameOSPA: columnNameOSPASelector,
+  columnNameOSPADrivewayOnly: columnNameOSPASelectorDrivewayOnly,
   columnNameCVFixed: columnNameCVFixedSelector,
   columnNameMMHFixed: columnNameMMHFixedSelector,
   columnName: columnNameSelector,
