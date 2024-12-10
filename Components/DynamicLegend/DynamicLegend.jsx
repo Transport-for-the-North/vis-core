@@ -400,16 +400,46 @@ export const DynamicLegend = ({ map }) => {
               color: convertStringToNumber(stop.value) < 0 ? negativeColor : positiveColor
             }));
           }
-            
+
+          // Process legend entries
+          let legendEntries = [];
+          if (colorStops && colorStops.length > 0) {
+            const length = trseLabel ? colorStops.length - 1 : colorStops.length;
+            for (let idx = 0; idx < length; idx++) {
+              const stop = colorStops[idx];
+              const nextStop = colorStops[idx + 1];
+              const widthStop = widthStops ? widthStops[idx] : null;
+              let label;
+              if (trseLabel && nextStop) {
+                const startValue = stop.value;
+                const endValue = nextStop.value;
+                if (idx === 0) {
+                  label = `${startValue}-${endValue} (Lowest Risk of TRSE)`;
+                } else if (idx === length - 1) {
+                  label = `${startValue}-${endValue} (Highest Risk of TRSE)`;
+                } else {
+                  label = `${startValue}-${endValue}`;
+                }
+              } else {
+                label = stop.value;
+              }
+              legendEntries.push({
+                color: stop.color,
+                width: widthStop ? widthStop.width : null,
+                label,
+                type: layer.type,
+              });
+            }
+          }
+
           return {
             layerId: layer.id,
             title: displayValue,
             subtitle: legendSubtitleText,
-            colorStops: colorStops || [],
-            widthStops: widthStops || [],
+            legendEntries: legendEntries,
+            trseLabel,
             type: layer.type,
             style: layer.metadata.colorStyle,
-            trseLabel, // Add trseLabel to item
           };
         });
       setLegendItems(items);
@@ -424,26 +454,6 @@ export const DynamicLegend = ({ map }) => {
     };
   }, [state.filters, map, state.visualisations, state.currentZoom]);
 
-  /**
-   * Generates custom labels for TRSE based on the bin value.
-   * Adjusted to handle the case when the value is 100 to prevent the "100-110" label.
-   *
-   * @param {string|number} value - The bin value to generate the label for.
-   * @returns {string|null} The custom label for the bin, or null if the bin should not be displayed.
-   */
-  const getTRSELabel = (value) => {
-    const numValue = parseInt(value, 10);
-    if (numValue === 0) {
-      return "0-10 (Highest Risk of TRSE)";
-    } else if (numValue === 90) {
-      return "90-100 (Lowest Risk of TRSE)";
-    } else if (numValue < 90) {
-      return `${numValue}-${numValue + 10}`;
-    } else {
-      return null; // Do not create a label for value 100
-    }
-  };
-
   if (legendItems.length === 0) {
     return null;
   }
@@ -453,42 +463,26 @@ export const DynamicLegend = ({ map }) => {
         <LegendItemContainer key={index}>
           <LegendTitle>{item.title}</LegendTitle>
           <LegendSubtitle>{item.subtitle}</LegendSubtitle>
-          {item.colorStops &&
-            item.widthStops &&
-            item.colorStops.map((stop, idx) => {
-              // Generate label
-              const label = item.trseLabel
-                ? getTRSELabel(stop.value)
-                : stop.value !== undefined
-                ? `${stop.value}`
-                : "Value";
-
-              // Skip rendering if label is null (e.g., when value is 100 for trseLabel)
-              if (label === null) {
-                return null;
-              }
-
-              return (
-                <LegendItem key={idx}>
-                  {item.type === "circle" ? (
-                    <CircleSwatch
-                      diameter={item.widthStops[idx]?.width || 10}
-                      color={stop.color}
-                    />
-                  ) : item.type === "line" ? (
-                    <LineSwatch
-                      height={item.widthStops[idx]?.width || 2}
-                      color={stop.color}
-                    />
-                  ) : item.type === "fill" ? (
-                    <PolygonSwatch
-                      color={stop.color}
-                    />
-                  ) : null}
-                  <LegendLabel>{label}</LegendLabel>
-                </LegendItem>
-              );
-            })}
+          {item.legendEntries.map((entry, idx) => (
+            <LegendItem key={idx}>
+              {entry.type === "circle" ? (
+                <CircleSwatch
+                  diameter={entry.width || 10}
+                  color={entry.color}
+                />
+              ) : entry.type === "line" ? (
+                <LineSwatch
+                  height={entry.width || 2}
+                  color={entry.color}
+                />
+              ) : entry.type === "fill" ? (
+                <PolygonSwatch
+                  color={entry.color}
+                />
+              ) : null}
+              <LegendLabel>{entry.label}</LegendLabel>
+            </LegendItem>
+          ))}
           {index < legendItems.length - 1 && <LegendDivider />}
         </LegendItemContainer>
       ))}

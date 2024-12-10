@@ -74,7 +74,13 @@ const OpacitySlider = styled.input`
  * @returns {JSX.Element} The rendered LayerControlEntry component.
  */
 export const LayerControlEntry = memo(
-  ({ layer, maps, handleColorChange, handleClassificationChange, state }) => {
+  ({
+    layer,
+    maps,
+    handleColorChange,
+    handleClassificationChange,
+    state,
+  }) => {
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
@@ -86,9 +92,11 @@ export const LayerControlEntry = memo(
     const selectedPageBands = appConfig.defaultBands.find(
       (band) => band.name === currentPage.category
     );
-    const visualisation = currentPage.pageName.includes("Side-by-Side") || currentPage.pageName.includes("Side by Side")
-      ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
-      : state.visualisations[Object.keys(state.visualisations)[0]];
+    const visualisation =
+      currentPage.pageName.includes("Side-by-Side") ||
+      currentPage.pageName.includes("Side by Side")
+        ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
+        : state.visualisations[Object.keys(state.visualisations)[0]];
     const hasDefaultBands = selectedPageBands?.metric.find(
       (metric) =>
         metric.name ===
@@ -137,7 +145,7 @@ export const LayerControlEntry = memo(
 
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
-          map.setPaintProperty(layer.id, opacityProp, opacityExpression);
+          map.setPaintProperty(layer.id, opacityExpression);
         }
       });
       setOpacity(newOpacity);
@@ -179,8 +187,8 @@ export const LayerControlEntry = memo(
                 Logarithmic: "l",
                 "K-Means": "k",
               }}
-              classification={state.class_method ?? "d"}
-              onChange={handleClassificationChange}
+              classification={state.layers[layer.id]?.class_method ?? "d"}
+              onChange={(value) => handleClassificationChange(value, layer.id)}
             />
           </>
         )}

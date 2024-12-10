@@ -68,7 +68,7 @@ export const mapReducer = (state, action) => {
     case actionTypes.STORE_CURRENT_ZOOM: {
       return { ...state, currentZoom: action.payload }
     }
-    
+
     case actionTypes.SET_BOUNDS_AND_CENTROID: {
       const { centroid, bounds } = action.payload;
       return { ...state, mapBoundsAndCentroid: { centroid, bounds } };
@@ -82,7 +82,7 @@ export const mapReducer = (state, action) => {
         ...state,
         drawInstance: action.payload,
       };
-      
+
     case actionTypes.UPDATE_VISUALISED_FEATURES: {
       const { filter, value } = action.payload;
       const { layer } = filter;
@@ -124,35 +124,36 @@ export const mapReducer = (state, action) => {
       return { ...state, pageInfo: action.payload };
     case actionTypes.INITIALISE_SIDEBAR:
       return { ...state, filters: action.payload };
-    case actionTypes.ADD_LAYER:
-      // Logic to add a non-parameterised layer
-      return { ...state, layers: { ...state.layers, ...action.payload } };
+    case actionTypes.ADD_LAYER: {
+     // Logic to add a non-parameterised layer
+     return { ...state, layers: { ...state.layers, ...action.payload } };
+    }
     case actionTypes.UPDATE_PARAMETERISED_LAYER: {
       // Get the layer name and new parameters from the payload
       const layerName = action.payload.targetLayer;
       const paramName = action.payload.filter.paramName;
       const newParamValue = action.payload.value;
-    
+
       if (newParamValue == null) {
         // Do not update the layer if value is null
         return state; // Return the current state unmodified
       }
-    
+
       // Prepare the parameters object for replacement
       const params = { [paramName]: newParamValue };
-    
+
       // Update the path of the layer with the new parameters
       const updatedPath = updateUrlParameters(
         state.layers[layerName].pathTemplate,
         params
       );
-    
+
       // Update the missingParams array if it exists
       const currentMissingParams = state.layers[layerName].missingParams || [];
       const updatedMissingParams = currentMissingParams.filter(
         (param) => param !== paramName
       );
-    
+
       // Update the layer in the state
       return {
         ...state,
@@ -192,10 +193,16 @@ export const mapReducer = (state, action) => {
     }
 
     case actionTypes.UPDATE_CLASSIFICATION_METHOD: {
-      const { class_method } = action.payload;
+      const { class_method, layerName } = action.payload;
       return {
         ...state,
-        class_method: class_method,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            class_method,
+          },
+        },
       };
     }
 
@@ -217,19 +224,19 @@ export const mapReducer = (state, action) => {
       const visualisationNames = action.payload.filter.visualisations;
       const paramName = action.payload.paramName || action.payload.filter.paramName;
       let newParamValue = action.payload.value;
-    
+
       // If newParamValue is an array, convert it to a comma-delimited string
       if (Array.isArray(newParamValue)) {
         newParamValue = newParamValue.join(",");
       }
-    
+
       // Create a new visualisations object with updated query params for each visualisation
       const updatedVisualisations = { ...state.visualisations };
       visualisationNames.forEach((visName) => {
         if (updatedVisualisations[visName]) {
           const currentQueryParams = updatedVisualisations[visName].queryParams;
           const isRequired = currentQueryParams[paramName]?.required || false;
-    
+
           updatedVisualisations[visName] = {
             ...updatedVisualisations[visName],
             queryParams: {
@@ -242,7 +249,7 @@ export const mapReducer = (state, action) => {
           };
         }
       });
-    
+
       return {
         ...state,
         visualisations: updatedVisualisations,
@@ -268,13 +275,13 @@ export const mapReducer = (state, action) => {
             return [{ ...state.leftVisualisations }];
         }
       })();
-    
+
       updatedVisualisations.forEach((updatedVisualisation) => {
         visualisationNames.forEach((visName) => {
           if (updatedVisualisation[visName]) {
             const currentQueryParams = updatedVisualisation[visName].queryParams;
             const isRequired = currentQueryParams[paramName]?.required || false;
-    
+
             updatedVisualisation[visName] = {
               ...updatedVisualisation[visName],
               queryParams: {
@@ -346,15 +353,15 @@ export const mapReducer = (state, action) => {
     }
 
     case actionTypes.SET_MAP: {
-      const { map } = action.payload;    
+      const { map } = action.payload;
       // Attempt to find a colourValue
       let colourValue = findFirstColourValue(state.filters);
     
       // If colourValue is null, default to { value: "YlGnBu", label: "YlGnBu" }
       if (!colourValue) {
         colourValue = { value: "YlGnBu", label: "YlGnBu" };
-      }
-    
+      }  
+
       return {
         ...state,
         map: map, // Store the map instance directly in the state
@@ -362,7 +369,7 @@ export const mapReducer = (state, action) => {
         class_method: "d",
       };
     }
-    
+
     case actionTypes.SET_DUAL_MAPS: {
       const { maps } = action.payload;
       // Attempt to find a colourValue
@@ -372,7 +379,7 @@ export const mapReducer = (state, action) => {
       if (!colourValue) {
         colourValue = { value: "YlGnBu", label: "YlGnBu" };
       }
-    
+
       return {
         ...state,
         maps: maps, // Store the map instances directly in the state
