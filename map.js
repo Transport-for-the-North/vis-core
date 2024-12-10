@@ -307,21 +307,24 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     }
   }
 
-  // Check if trseLabel is true in options
-  if (options.trseLabel) {
-    // Return fixed bins from 0 to 100 in steps of 10
-    return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-  }
-
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
     if (classificationMethod === 'd') {
-      const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
-      const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      if (selectedPageBands && selectedMetricParamName) {
-        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]?.value);
-        if(metrics.length > 1) return metrics.find((metric) => currentPage.pageName.includes(metric.pageName)).values;
-        if(metrics.length === 1) return metrics[0].values;
+      const pageCategory = currentPage.category || 'England';
+      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
+      let metricName = null;
+      if (options.trseLabel) {
+        metricName = 'trse';
+      } else {
+        const selectedMetricFilter = currentPage.config.filters.find(filter => filter.containsLegendInfo === true);
+        const selectedMetricParamName = selectedMetricFilter?.paramName;
+        metricName = queryParams[selectedMetricParamName]?.value;
+      }
+      if (selectedPageBands && metricName) {
+        const metric = selectedPageBands.metric.find(m => m.name === metricName);
+        if (metric) {
+          return metric.values;
+        }
       }
       classificationMethod = 'q';
     }
@@ -339,15 +342,21 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
     if (classificationMethod === 'd') {
-      const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
-      const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      if (selectedPageBands) {
-        const listMetrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
-        if (listMetrics.length > 1) {
-          const metric = listMetrics.find((metric) => currentPage.pageName.includes(metric.pageName));
-           return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2)
+      const pageCategory = currentPage.category || 'England';
+      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
+      let metricName = null;
+      if (options.trseLabel) {
+        metricName = 'trse';
+      } else {
+        const selectedMetricFilter = currentPage.config.filters.find(filter => filter.containsLegendInfo === true);
+        const selectedMetricParamName = selectedMetricFilter?.paramName;
+        metricName = queryParams[selectedMetricParamName]?.value;
+      }
+      if (selectedPageBands && metricName) {
+        const metric = selectedPageBands.metric.find(m => m.name === metricName);
+        if (metric) {
+          return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2);
         }
-        if(listMetrics.length === 1) return !style.includes("line") ? listMetrics[0].differenceValues : listMetrics[0].differenceValues.slice(listMetrics[0].differenceValues.length / 2);
       }
       classificationMethod = 'q';
     }
