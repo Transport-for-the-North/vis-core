@@ -55,8 +55,27 @@ const DropdownMenu = styled.div`
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   border-radius: 0 0 5px 5px;
-  overflow: hidden;
-`;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: calc(100vh - 80px); /* Set a maximum height for the dropdown */
+  /* Custom Scrollbar Styles for non-Firefox browsers */
+   /* Webkit-based browsers (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+      width: 4px; /* Custom scrollbar width */
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: transparent;
+      border-radius: 10px;
+      background-clip: padding-box;
+      transition: background-color 0.3s ease-in-out;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+      background-color: darkgrey; /* Color when hovered */
+    }
+  `;
 
 const DropdownItem = styled(Link)`
   width: 100%;
