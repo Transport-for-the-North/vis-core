@@ -60,7 +60,6 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         "bottom-left"
       );
       
-      console.log(extraCopyrightText);
       mapInstance.addControl(
         new maplibregl.AttributionControl({
           compact: true,
