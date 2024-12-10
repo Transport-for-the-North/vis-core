@@ -5,6 +5,7 @@ export const WarningMessage = styled.div`
   top: 85px;
   right: 10px;
   max-width: 20vw;
+  max-height: calc(35vh);
   min-width: 200px;
   background-color: rgba(0, 222, 198, 0.9);
   color: rgb(13, 15, 61);
@@ -14,6 +15,7 @@ export const WarningMessage = styled.div`
   z-index: 10000; 
   transition: right 0.3s ease-in-out;
   display: flex;
+  overflow: auto;
   flex-direction: row; /* Change to row to align items in columns */
   align-items: flex-start;
   text-align: left;
@@ -61,4 +63,23 @@ export const WarningMessage = styled.div`
   .text-container {
     flex-grow: 1;
   }
-`;
+
+  /* Custom Scrollbar Styles for non-Firefox browsers */
+   /* Webkit-based browsers (Chrome, Safari, Edge) */
+    &::-webkit-scrollbar {
+      width: 4px; /* Custom scrollbar width */
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: darkgrey;
+      border-radius: 10px;
+      background-clip: padding-box;
+      transition: background-color 0.3s ease-in-out;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+      background-color: darkgrey; /* Color when hovered */
+    }
+  `;
