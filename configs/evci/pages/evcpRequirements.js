@@ -12,9 +12,7 @@ export const evcpRequirements = {
   customMapZoom: "@mapZoom@",
   about: `
   <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>
-  <p>TfN can support our local authority partners with further information behind these outputs, 
-  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
-  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  <p>TfN’s methodology for the EVCI Framework 
   can be found <a
               href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
               target="_blank"
@@ -97,6 +95,17 @@ export const evcpRequirements = {
 
 export const tfnEvcpRequirements = {
   ...evcpRequirements,
+  about: `
+  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   config: {
     ...evcpRequirements.config,
     filters: [
@@ -104,8 +113,8 @@ export const tfnEvcpRequirements = {
       { ...selectors.year, visualisations: ['EVCP Requirements'] },
       { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
       { ...selectors.travelScenarioAdditional, visualisations: ['EVCP Requirements'] },
-      { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
-      { ...selectors.chargingCategory, visualisations: ['EVCP Requirements'] },
+      { ...selectors.tfnBehaviouralScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.tfnChargingCategory, visualisations: ['EVCP Requirements'] },
       { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
       { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
       { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
@@ -120,8 +129,8 @@ export const tfnEvcpRequirements = {
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
-          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
-          { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.tfnBehaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.tfnChargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },

@@ -249,7 +249,7 @@ const landuseExogValues = {
 }
 
 export const appConfig = {
-  title: "TAME React Vis Template",
+  title: "TfN's Northern Rail Modelling System (NoRMS) Visualiser",
   introduction: `<p>The TfN’s Northern Rail Modelling System (NoRMS) Vis Framework aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
    NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise modelled rail data in an interactive, intuitive, and
    web-based format. This instance of the platform presents information from the Network North project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
@@ -257,7 +257,7 @@ export const appConfig = {
   background: "",
   methodology: "",
   legalText:
-    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
   contactText: "Please contact Matteo Gravellu for any questions on this data tool.",
   contactEmail: "matteo.gravellu@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",

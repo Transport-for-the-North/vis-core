@@ -63,10 +63,11 @@ export const energyCapacity = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/evci/energy-capacity",
+        colorValue: { value: "RdYlGn", label: "RdYlGn" },
         legendText: [
           {
             displayValue: "Energy Capacity",
-            legendSubtitleText: "MW" 
+            legendSubtitleText: "MW",
           }
         ]
       },

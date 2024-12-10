@@ -27,7 +27,7 @@ export const stbConfig = [
       "tfnEvUptake",
       "tfnEvcpRequirements",
       "tfnAnnualChargingDemand",
-      "potentialChargingSites",
+      "tfnPotentialChargingSites",
       "tfnCo2Savings",
       "enrouteChargingDemand",
       "offStreetParkingDrivewayOnly"

@@ -89,7 +89,7 @@ export const offStreetParkingAccess = {
         ],
         downloadPath: '/api/evci/zonal-access/download'
       },
-      warning: "Key zonal outputs of this assessment are provided in this public EVCI Framework tool. Further data outputs are available to TfN’s local authority partners and statutory partners and should be requested directly. This includes household level information and geometries, sharable under Ordnance Survey’s Public Sector Geospatial Agreement."
+      warning: "An MSOA's car park access is an average of its contained LSOAs score. LSOA access is dependent on whether the LSOA's centroid, its geographic middle of population density, is located with ten minutes walking distance to a car park. Although some residencies in an MSOA may have ten minute walking access to a car park, only an LSOA's centroid contributes to the score. Because of this, some MSOAs may appear with a zero score, even when they contain a small number of residencies with access."
     },
   },
 };
