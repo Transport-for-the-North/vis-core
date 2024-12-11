@@ -30,7 +30,8 @@ export const stbConfig = [
       "tfnPotentialChargingSites",
       "tfnCo2Savings",
       "enrouteChargingDemand",
-      "offStreetParkingDrivewayOnly"
+      "offStreetParkingDrivewayOnly",
+      "energyCapacity",
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:

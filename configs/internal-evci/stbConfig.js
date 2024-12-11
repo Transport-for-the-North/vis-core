@@ -13,10 +13,10 @@ const pagesMap = {
     "potentialChargingSites",
     "tfnCo2Savings",
     "enrouteChargingDemand",
+    "offStreetParkingAccess",
+    "energyCapacity",
     "commercialViability",
     "multiModalHubs",
-    "offStreetParkingAccess",
-    "energyCapacity"
   ]
 };
 
