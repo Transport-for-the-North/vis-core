@@ -255,12 +255,12 @@ const landuseExogValues = {
   source: "local",
   values: [
     {
-      displayValue: "Dynamic",
-      paramValue: "dynamic",
-    },
-    {
       displayValue: "Static",
       paramValue: "static",
+    },
+    {
+      displayValue: "Dynamic",
+      paramValue: "dynamic",
     },
   ],
 }
@@ -286,6 +286,7 @@ export const appConfig = {
       pageName: "Station Totals",
       url: "/norms-station-totals",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about: `
       <p>Visualise the number of passengers using the station by selecting a scenario, adjusting the Time Period and choosing the Metric. </p>
@@ -462,6 +463,7 @@ export const appConfig = {
       pageName: "Station Totals Difference",
       url: "/norms-station-totals-difference",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference in passenger movements at stations between two separate scenarios by selecting two scenarios. The difference is calculated scenario 2 vs scenario 1 (i.e. 2–1). </p>
@@ -597,17 +599,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period DS",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Totals Difference"],
-            type: "toggle",
-            values: {
-              source: "api"
-            },
-          },
-          {
             filterName: "Filter Scenario DM by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -689,8 +680,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period DM",
-            paramName: "timePeriodCodeDoMinimum",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals Difference"],
@@ -700,7 +691,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Metric",
+            filterName: "Metric (DM and DS)",
             paramName: "propertyName",
             target: "api",
             actions: [
@@ -728,6 +719,7 @@ export const appConfig = {
       pageName: "Station Totals Side-by-Side",
       url: "/norms-station-totals-difference-dual",
       type: "DualMapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios, and their respective absolute values, at the same time by selecting Left/Right Scenarios. This allows to see the absolute values of both scenarios in real time.  </p>
@@ -994,6 +986,7 @@ export const appConfig = {
       pageName: "Station Pairs",
       url: "/norms-station-pair",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about: `
       <p>Visualise the travelling patterns of a station by selecting it on the map. Further, adjust Time Period, User Class, Direction and Metric. </p>
@@ -1221,6 +1214,7 @@ export const appConfig = {
       pageName: "Station Pairs Difference",
       url: "/norms-station-pair-difference",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about: `
       <p>Visualise difference of a selected station’s travelling patterns between two different scenarios by clicking on a preferred location. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction. </p>
@@ -1278,47 +1272,6 @@ export const appConfig = {
         ],
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "toggle",
-            values: originOrDestinationValues,
-          },
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Demand",
-                  paramValue: "demand",
-                  legendSubtitleText: "Demand",
-                },
-                {
-                  displayValue: "Generalised Cost",
-                  paramValue: "gen_cost",
-                  legendSubtitleText: "Cost",
-                },
-                {
-                  displayValue: "Generalised Journey Time",
-                  paramValue: "gen_jt",
-                  legendSubtitleText: "Seconds",
-                }
-              ]
-            }
-          },
           {
             filterName: "Filter DM Scenario by Network",
             target: "validate",
@@ -1399,37 +1352,6 @@ export const appConfig = {
               sort: "ascending",
               exclude: ["NA"]
             },
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter DS Scenario by Network",
@@ -1513,8 +1435,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "Origin or Destination (DM and DS)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "toggle",
+            values: originOrDestinationValues,
+          },
+          {
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
@@ -1535,13 +1466,45 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Difference"],
             type: "toggle",
             values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (DM and DS)",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
+                }
+              ]
+            }
           },
           {
             filterName: "Please select a station in the map",
@@ -1561,6 +1524,7 @@ export const appConfig = {
       pageName: "Station Pairs Side-by-Side",
       url: "/norms-station-pair-dual",
       type: "DualMapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios at the same time by selecting a station. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction.</p>
@@ -1899,6 +1863,7 @@ export const appConfig = {
       pageName: "Station Catchment",
       url: "/norms-station-catchment",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments by selecting a station on the map. Further, adjust the Scenario, Time Period, User Class, Direction and a Metric of choice. </p>
@@ -2150,6 +2115,7 @@ export const appConfig = {
       pageName: "Station Catchment Difference",
       url: "/norms-station-catchment/difference",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference between two scenarios and a selected station catchment by selecting a station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
@@ -2306,37 +2272,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [123, 456, 789]
-            },
-          },
-          {
             filterName: "Filter DS Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -2418,38 +2353,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [123, 456, 789]
-            },
-          },
-          {
-            filterName: "Origin or Destination",
+            filterName: "Origin or Destination (DM and DS)",
             paramName: "directionId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2472,7 +2376,38 @@ export const appConfig = {
           },
           },
           {
-            filterName: "Metric",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [123, 456, 789]
+            },
+          },
+          {
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (DM and DS)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -2515,6 +2450,7 @@ export const appConfig = {
       pageName: "Station Catchment Side-by-Side",
       url: "/norms-station-catchment-dual",
       type: "DualMapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments for two scenarios simultaneously by selecting the station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
@@ -2880,6 +2816,7 @@ export const appConfig = {
       pageName: "Link Totals",
       url: "/norms-link",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about:`
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
@@ -3080,6 +3017,7 @@ export const appConfig = {
       pageName: "Link Totals Difference",
       url: "/norms-link-result-difference",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about: `
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics should match). 
@@ -3220,62 +3158,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Link Totals Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "Metric DM",
-            paramName: "propertyNameDoMinimum",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Link Totals Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "No. Passengers",
-                  paramValue: "No. Passengers",
-                  legendSubtitleText: "Passengers",
-                },
-                {
-                  displayValue: "Total Crush Capacity",
-                  paramValue: "Total Crush Capacity",
-                  legendSubtitleText: "Capacity",
-                },
-                {
-                  displayValue: "Total Crush Load Factor",
-                  paramValue: "Total Crush Load Factor",
-                  legendSubtitleText: "Factor",
-                },
-                {
-                  displayValue: "Total Seat Capacity",
-                  paramValue: "Total Seat Capacity",
-                  legendSubtitleText: "Capacity",
-                },
-                {
-                  displayValue: "Total Seat Load Factor",
-                  paramValue: "Total Seat Load Factor",
-                  legendSubtitleText: "Factor",
-                },
-                {
-                  displayValue: "Trains per hour",
-                  paramValue: "Trains per hour",
-                  legendSubtitleText: "units",
-                },
-              ]
-            },
-          },
-          {
             filterName: "Filter DS Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -3357,8 +3239,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals Difference"],
@@ -3366,8 +3248,8 @@ export const appConfig = {
             values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric DS",
-            paramName: "propertyNameDoSomething",
+            filterName: "Metric (DM and DS)",
+            paramName: "propertyName",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -3419,6 +3301,7 @@ export const appConfig = {
       pageName: "Link Totals Side-by-Side",
       url: "/norms-link-result-dual",
       type: "DualMapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice.</p>  
@@ -3711,6 +3594,7 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Zone",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       about: `
       <p>The NorTMS zones included in the model are displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -3906,6 +3790,7 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Zone",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       about: `
       <p>This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics selection should match). </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -3944,42 +3829,6 @@ export const appConfig = {
         ],
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Revenue',
-                  paramValue: 'revenue',
-                  legendSubtitleText: "£",
-                },
-                {
-                  displayValue: 'Demand',
-                  paramValue: 'demand',
-                  legendSubtitleText: "Passengers",
-                }
-              ],
-            },
-          },
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            values: originOrDestinationValues
-          },
           {
             filterName: "Filter DM Scenario by Network",
             target: "validate",
@@ -4060,37 +3909,6 @@ export const appConfig = {
               sort: "ascending",
               exclude: ["NA"]
             },
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter DS Scenario by Network",
@@ -4174,8 +3992,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "Origin or Destination (DM and DS)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Difference"],
@@ -4196,13 +4023,40 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Difference"],
             type: "toggle",
             values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (DM and DS)",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Revenue',
+                  paramValue: 'revenue',
+                  legendSubtitleText: "£",
+                },
+                {
+                  displayValue: 'Demand',
+                  paramValue: 'demand',
+                  legendSubtitleText: "Passengers",
+                }
+              ],
+            },
           },
         ]
       }
@@ -4213,6 +4067,7 @@ export const appConfig = {
       type: "DualMapLayout",
       termsOfUse: termsOfUse,
       category: "Zone",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -4522,6 +4377,7 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Zone",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       about: "Shows the zonal benefits (summed to origin or destination for the selected scenario compared with its DM.",
       config: {
         layers: [
@@ -4756,6 +4612,7 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Zone",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
@@ -4805,72 +4662,6 @@ export const appConfig = {
             ]
           }, userClassMetadataTable],
         filters: [
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Zone Benefits Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Total Generalised Cost',
-                  paramValue: 'total_gen_cost',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'IVT',
-                  paramValue: 'ivt',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Crowding',
-                  paramValue: 'crowding',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Wait Time',
-                  paramValue: 'wait_time',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Walk Time',
-                  paramValue: 'walk_time',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Penalty',
-                  paramValue: 'penalty',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Access Egress',
-                  paramValue: 'access_egress',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Value of choice',
-                  paramValue: 'value_of_choice',
-                  legendSubtitleText: "Pass. Mins",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Benefits Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
           {
             filterName: "Scenario 1/Scenario 2 Do Minimum",
             target: "validate",
@@ -4973,37 +4764,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario 1 User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Benefits Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "Scenario 1 Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Benefits Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
             filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -5085,8 +4845,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario 2 User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "Origin or Destination (Scenario 1 and 2)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Benefits Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "User Class (Scenario 1 and 2)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
@@ -5107,13 +4876,70 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario 2 Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Time Period (Scenario 1 and 2)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
             type: "toggle",
             values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (Scenario 1 and 2)",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Benefits Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "Pass. Mins",
+                },
+              ],
+            },
           },
         ]
       }
@@ -5124,7 +4950,26 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination,<br> 
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X number of key locations are accessed from the zone as origin within Y minutes”. If destination is selected, 
+      the narrative changes to “X number of key locations can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on 
+      the combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -5378,7 +5223,26 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows <b><u>the difference in</u></b> the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination,<br> 
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X number of key locations are accessed from the zone as origin within Y minutes”. If destination is selected, 
+      the narrative changes to “X number of key locations can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on 
+      the combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -5496,85 +5360,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
             filterName: "Filter Scenario DS by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -5656,20 +5441,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Origin Or Destination (DM and DS)",
+            paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Segment (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5690,8 +5472,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5712,8 +5494,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5734,16 +5516,19 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
             type: "toggle",
-            values: originOrDestinationValues
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
           },
           {
-            filterName: "Key Location Type",
+            filterName: "Key Location Type (DM and DS)",
             paramName: "keyLocationTypeId",
             target: "api",
             actions: [
@@ -5769,7 +5554,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (DM and DS)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5791,9 +5576,12 @@ export const appConfig = {
       url: "/norms-zones-pair",
       type: "MapLayout",
       termsOfUse: termsOfUse,
-      about: `
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      aabout:`
+      <p>Visualise the distribution patterns of Demand, Generalised Cost and Generalised Journey Time of a zone by selecting it on the map. Further, adjust time period, direction and desired metric. </p>
+      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
+      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
+      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
       config: {
@@ -5998,11 +5786,14 @@ export const appConfig = {
       pageName: "Zone Pairs Difference",
       url: "/norms-zones-pair-difference",
       type: "MapLayout",
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
       termsOfUse: termsOfUse,
       about: `
-      <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
+      <p>Visualise the change in the distribution patterns of a given metric between two difference scenarios by selecting the desired zone on the map. Metrics included in the functionality are: Demand, 
+      Generalised Cost and Generalised Journey Time. Further, adjust time period, direction and desired metric.  </p>
+      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
+      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
+      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
       config: {
@@ -6038,47 +5829,6 @@ export const appConfig = {
         ],
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
-          {
-            filterName: "Zone as Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "toggle",
-            values: originOrDestinationValues,
-          },
-          {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Demand",
-                  paramValue: "demand",
-                  legendSubtitleText: "Demand",
-                },
-                {
-                  displayValue: "Generalised Cost",
-                  paramValue: "gen_cost",
-                  legendSubtitleText: "Cost",
-                },
-                {
-                  displayValue: "Generalised Journey Time",
-                  paramValue: "gen_jt",
-                  legendSubtitleText: "Seconds",
-                }
-              ]
-            }
-          },
           {
             filterName: "Filter DM Scenario by Network",
             target: "validate",
@@ -6158,37 +5908,6 @@ export const appConfig = {
               paramColumn: "scenario_code",
               sort: "ascending",
               exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
             },
           },
           {
@@ -6273,17 +5992,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Origin or Destination (DM and DS)",
+            paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
             type: "toggle",
-            values: timePeriodCodeValues
+            values: originOrDestinationValues,
           },
           {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoMinimum",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Difference"],
@@ -6304,6 +6023,47 @@ export const appConfig = {
             },
           },
           {
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Metric (DM and DS)",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: "Demand",
+                  paramValue: "demand",
+                  legendSubtitleText: "Demand",
+                },
+                {
+                  displayValue: "Generalised Cost",
+                  paramValue: "gen_cost",
+                  legendSubtitleText: "Cost",
+                },
+                {
+                  displayValue: "Generalised Journey Time",
+                  paramValue: "gen_jt",
+                  legendSubtitleText: "Seconds",
+                }
+              ]
+            }
+          },
+          {
             filterName: "Select a zone in the map",
             paramName: "zoneId",
             target: "api",
@@ -6312,7 +6072,7 @@ export const appConfig = {
             type: "map",
             layer: "NoRMS Zones Pair Result Difference",
             field: "id",
-          }
+          },
         ]
       },
     },
@@ -6321,10 +6081,12 @@ export const appConfig = {
       url: "/norms-zones-pair-dual",
       type: "DualMapLayout",
       termsOfUse: termsOfUse,
-      about: `
-      <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about:`
+      <p>Visualise the distribution patterns of Demand, Generalised Cost and Generalised Journey Time of a zone by selecting it on the map. Further, adjust time period, direction and desired metric. </p>
+      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
+      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
+      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
       config: {
@@ -6645,7 +6407,27 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold, <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X businesses are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X businesses can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the 
+      combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -6909,7 +6691,27 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold, <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X businesses are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X businesses can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the 
+      combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -7027,84 +6829,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
             filterName: "Filter Scenario DS by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -7184,22 +6908,19 @@ export const appConfig = {
               sort: "ascending",
               exclude: [0]
             },
-          },
+          },      
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Origin Or Destination (DM and DS)",
+            paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Segment (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7220,8 +6941,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7242,8 +6963,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7264,7 +6985,19 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Key Location Type",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          }, 
+          {
+            filterName: "Key Location Type (DM and DS)",
             paramName: "keyLocationTypeId",
             target: "api",
             actions: [
@@ -7290,26 +7023,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Select a zone in the map",
-            paramName: "zoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "map",
-            layer: "NoRMS Zone Accessibility Pair Difference",
-            field: "id",
-          },
-          {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (DM and DS)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7323,6 +7037,16 @@ export const appConfig = {
               unit: "mins",
             },
           },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "map",
+            layer: "NoRMS Zone Accessibility Pair Difference",
+            field: "id",
+          },
         ]
       }
     },
@@ -7333,7 +7057,33 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -7555,7 +7305,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -7577,7 +7327,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -7644,7 +7394,33 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows <b><u>the difference in</u></b> the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -7761,86 +7537,7 @@ export const appConfig = {
               sort: "ascending",
               exclude: [0]
             },
-          },
-          {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
+          },         
           {
             filterName: "Filter Scenario DS by Network",
             target: "validate",
@@ -7924,20 +7621,98 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Landuse (DM and DS)",
+            paramName: "landuse",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: landuseValues,
+          },
+          {
+            filterName: "Landuse Segment 1 (DM and DS)",
+            paramName: "landuseSegment1",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment1",
+              paramColumn: "segment1",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Segment 2 (DM and DS)",
+            paramName: "landuseSegment2",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment2",
+              paramColumn: "segment2",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Reference (DM and DS)",
+            paramName: "landuseReference",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            values: landuseReferenceValues
+          },
+          {
+            filterName: "Landuse Exog (DM and DS)",
+            paramName: "landuseExog",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: landuseExogValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Origin or Destination (DM and DS)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Filter User Class by Segment (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7959,8 +7734,8 @@ export const appConfig = {
           },
           
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7981,8 +7756,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -8003,97 +7778,19 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse",
-            paramName: "landuse",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
+            type: "toggle",
             shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: landuseValues,
-          },
-          {
-            filterName: "Landuse Segment 1",
-            paramName: "landuseSegment1",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
+            multiSelect: true,
             isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment1",
-              paramColumn: "segment1",
-              sort: "ascending",
-              exclude: []
-            },
+            values: timePeriodCodesValues
           },
           {
-            filterName: "Landuse Segment 2",
-            paramName: "landuseSegment2",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment2",
-              paramColumn: "segment2",
-              sort: "ascending",
-              exclude: []
-            },
-          },
-          {
-            filterName: "Landuse Reference",
-            paramName: "landuseReference",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            values: landuseReferenceValues
-          },
-          {
-            filterName: "Landuse Exog",
-            paramName: "landuseExog",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            values: landuseExogValues
-          },
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (DM and DS)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8117,7 +7814,34 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about:`
+      <p>This functionality shows the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -8339,7 +8063,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -8361,7 +8085,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -8438,7 +8162,34 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -8557,84 +8308,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
             filterName: "Filter Scenario DS by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -8717,20 +8390,98 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Landuse (DM and DS)",
+            paramName: "landuse",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: landuseValues,
+          },
+          {
+            filterName: "Landuse Segment 1 (DM and DS)",
+            paramName: "landuseSegment1",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment1",
+              paramColumn: "segment1",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Segment 2 (DM and DS)",
+            paramName: "landuseSegment2",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment2",
+              paramColumn: "segment2",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Reference (DM and DS)",
+            paramName: "landuseReference",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            values: landuseReferenceValues
+          },
+          {
+            filterName: "Landuse Exog (DM and DS)",
+            paramName: "landuseExog",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: landuseExogValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Origin Or Destination (DM and DS)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Filter User Class by Segment (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8751,8 +8502,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8773,8 +8524,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8795,107 +8546,19 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse",
-            paramName: "landuse",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
+            type: "toggle",
             shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: landuseValues,
-          },
-          {
-            filterName: "Landuse Segment 1",
-            paramName: "landuseSegment1",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
+            multiSelect: true,
             isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment1",
-              paramColumn: "segment1",
-              sort: "ascending",
-              exclude: []
-            },
+            values: timePeriodCodesValues
           },
           {
-            filterName: "Landuse Segment 2",
-            paramName: "landuseSegment2",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment2",
-              paramColumn: "segment2",
-              sort: "ascending",
-              exclude: []
-            },
-          },
-          {
-            filterName: "Landuse Reference",
-            paramName: "landuseReference",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            values: landuseReferenceValues
-          },
-          {
-            filterName: "Landuse Exog",
-            paramName: "landuseExog",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            values: landuseExogValues
-          },
-          {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Select a zone in the map",
-            paramName: "zoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "map",
-            layer: "NoRMS Landuse Accessibility Pair Difference",
-            field: "id",
-          },
-          {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (DM and DS)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8908,6 +8571,16 @@ export const appConfig = {
             displayAs: {
               unit: "mins",
             },
+          },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "map",
+            layer: "NoRMS Landuse Accessibility Pair Difference",
+            field: "id",
           },
         ]
       }
@@ -9515,7 +9188,26 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows the distribution (catchment) of the modelled journey time for the selected OD. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).
+      <ul><li>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </ul></ul></p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -9743,7 +9435,26 @@ export const appConfig = {
       type: "MapLayout",
       termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
-      about: "", //To be added.
+      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      about: `
+      <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the modelled journey time for the selected OD. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).
+      <ul><li>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </ul></ul></p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -9866,84 +9577,6 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
             filterName: "Filter Scenario DS by Network",
             target: "validate",
             actions: [{ action: "none" }],
@@ -10025,20 +9658,17 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Origin Or Destination (DM and DS)",
+            paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Segment (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -10059,8 +9689,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (DM and DS)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -10081,8 +9711,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (DM and DS)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -10103,13 +9733,16 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
+            filterName: "Time Period (DM and DS)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
             type: "toggle",
-            values: originOrDestinationValues
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
           },
           {
             filterName: "Select a zone in the map",
