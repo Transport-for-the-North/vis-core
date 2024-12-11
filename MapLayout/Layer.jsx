@@ -5,12 +5,12 @@ import { useMapContext } from "hooks";
 
 /**
  * Layer component that adds a layer to the map(s) and handles its lifecycle.
- * 
+ *
  * This component is responsible for adding a specified layer to one or more map instances
  * and managing its lifecycle, including cleanup when the component is unmounted.
  * It supports both GeoJSON and tile-based layers and can optionally add hover
  * effects to the layers.
- * 
+ *
  * @param {Object} props - The properties of the layer.
  * @param {Object} props.layer - The layer configuration object.
  * @param {string} props.layer.name - The unique name of the layer.
@@ -145,7 +145,7 @@ export const Layer = ({ layer }) => {
         }
       });
     };
-  }, [map, maps, JSON.stringify(layer)]);
+  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType]);
 
   // This component does not render any visible elements
   return null;
