@@ -22,7 +22,7 @@ const LegendContainer = styled.div`
   box-sizing: border-box; /* Include padding and border in width */
   border-radius: 10px;
   z-index: 10;
-  max-height: 30vh;
+  max-height: 35vh;
   overflow-y: auto;
   overflow-x: hidden; /* Hide horizontal scrollbar if any */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
