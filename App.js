@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import { PageSwitch, HomePage, Navbar, Login, Unauthorized } from "Components";
+import { PageSwitch, HomePage, Navbar, Login, Unauthorized, TermsOfUse } from "Components";
 import { Dashboard } from "layouts";
 import { AppContext, AuthProvider } from "contexts";
 import { api } from "services";

@@ -1,3 +1,5 @@
+import { termsOfUse } from "./termsOfUse";
+
 const scenarioCodeValues = {
   source: "local",
   values: [
@@ -216,6 +218,7 @@ export const appConfig = {
    based on scenario testing done using NoRMS.</p>`,
   background: "",
   methodology: "",
+  termsOfUse: termsOfUse,
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
   contactText: "Please contact [Name] for any questions on this data tool.",
@@ -229,6 +232,7 @@ export const appConfig = {
       pageName: "Station Totals",
       url: "/norms-station-totals",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about: `
       <p>Visualise the number of passengers using the station by selecting a scenario, adjusting the Time Period and choosing the Metric. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -404,6 +408,7 @@ export const appConfig = {
       pageName: "Station Totals Difference",
       url: "/norms-station-totals-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference in passenger movements at stations between two separate scenarios by selecting two scenarios. The difference is calculated scenario 2 vs scenario 1 (i.e. 2–1). </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -669,6 +674,7 @@ export const appConfig = {
       pageName: "Station Totals Side-by-Side",
       url: "/norms-station-totals-difference-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios, and their respective absolute values, at the same time by selecting Left/Right Scenarios. This allows to see the absolute values of both scenarios in real time.  </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -934,6 +940,7 @@ export const appConfig = {
       pageName: "Station Pairs",
       url: "/norms-station-pair",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about: `
       <p>Visualise the travelling patterns of a station by selecting it on the map. Further, adjust Time Period, User Class, Direction and Metric. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -1160,6 +1167,7 @@ export const appConfig = {
       pageName: "Station Pairs Difference",
       url: "/norms-station-pair-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about: `
       <p>Visualise difference of a selected station’s travelling patterns between two different scenarios by clicking on a preferred location. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -1499,6 +1507,7 @@ export const appConfig = {
       pageName: "Station Pairs Side-by-Side",
       url: "/norms-station-pair-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios at the same time by selecting a station. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction.</p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -1836,6 +1845,7 @@ export const appConfig = {
       pageName: "Station Catchment",
       url: "/norms-station-catchment",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments by selecting a station on the map. Further, adjust the Scenario, Time Period, User Class, Direction and a Metric of choice. </p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
@@ -2086,6 +2096,7 @@ export const appConfig = {
       pageName: "Station Catchment Difference",
       url: "/norms-station-catchment/difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference between two scenarios and a selected station catchment by selecting a station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -2450,6 +2461,7 @@ export const appConfig = {
       pageName: "Station Catchment Side-by-Side",
       url: "/norms-station-catchment-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments for two scenarios simultaneously by selecting the station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -2814,6 +2826,7 @@ export const appConfig = {
       pageName: "Link Totals",
       url: "/norms-link",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about:`
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -3013,6 +3026,7 @@ export const appConfig = {
       pageName: "Link Totals Difference",
       url: "/norms-link-result-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       about: `
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics should match). 
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -3351,6 +3365,7 @@ export const appConfig = {
       pageName: "Link Totals Side-by-Side",
       url: "/norms-link-result-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice.</p>  
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -3640,6 +3655,7 @@ export const appConfig = {
       pageName: "Zone Totals",
       url: "/zone-totals",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       about: `
       <p>The NorTMS zones included in the model are displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
@@ -3834,6 +3850,7 @@ export const appConfig = {
       pageName: "Zone Totals Difference",
       url: "/zone-totals-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       about: `
       <p>This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics selection should match). </p>
@@ -4140,6 +4157,7 @@ export const appConfig = {
       pageName: "Zone Totals Side-by-Side",
       url: "/zone-totals-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
@@ -4448,6 +4466,7 @@ export const appConfig = {
       pageName: "Zone Benefits",
       url: "/zone-benefits",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       about: "Shows the zonal benefits (summed to origin or destination for the selected scenario compared with its DM.",
       config: {
@@ -4686,6 +4705,7 @@ export const appConfig = {
       pageName: "Zone Benefits Difference",
       url: "/zone-benefits-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
@@ -5058,6 +5078,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals)",
       url: "/accessibility-key-location-totals",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
@@ -5311,6 +5332,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals) Difference",
       url: "/accessibility-key-location-totals-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
@@ -5724,6 +5746,7 @@ export const appConfig = {
       pageName: "Zone Pairs",
       url: "/norms-zones-pair",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       config: {
         layers: [
@@ -5927,6 +5950,7 @@ export const appConfig = {
       pageName: "Zone Pairs Difference",
       url: "/norms-zones-pair-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       config: {
         layers: [
@@ -6243,6 +6267,7 @@ export const appConfig = {
       pageName: "Zone Pairs Side-by-Side",
       url: "/norms-zones-pair-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
       category: "Zone",
       config: {
         layers: [
@@ -6560,6 +6585,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair)",
       url: "/accessibility-key-location-pair",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
@@ -6823,6 +6849,7 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair) Difference",
       url: "/accessibility-key-location-pair-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
       about: "", //To be added.
       config: {
@@ -7246,6 +7273,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals)",
       url: "/accessibility-landuse-totals",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
@@ -7556,6 +7584,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals) Difference",
       url: "/accessibility-landuse-totals-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
@@ -8028,6 +8057,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair)",
       url: "/accessibility-landuse-pair",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
@@ -8348,6 +8378,7 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair) Difference",
       url: "/accessibility-landuse-pair-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
       about: "", //To be added.
       config: {
@@ -8827,6 +8858,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Totals)",
       url: "/accessibility-journey-time-totals",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility",
       about: "", //To be added.
       config: {
@@ -9422,6 +9454,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Pair)",
       url: "/accessibility-journey-time-pair",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
       about: "", //To be added.
       config: {
@@ -9649,6 +9682,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Pair) Difference",
       url: "/accessibility-journey-time-pair-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
       about: "", //To be added.
       config: {
