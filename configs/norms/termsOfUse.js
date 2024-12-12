@@ -11,7 +11,7 @@ export const termsOfUse = `
             >
               Open Government Licence
             </a>
-            . Use of the TRSE data tool also indicates your acceptance of
+            . Use of the Rail Visualiser Tool also indicates your acceptance of
             <a
               href="https://transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-04062024.pdf"
               target="_blank"

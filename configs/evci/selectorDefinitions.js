@@ -227,6 +227,44 @@ const behaviouralScenarioSelector = {
       //   displayValue: "Not Applicable",
       //   paramValue: 3,
       // },
+      //{
+      //  displayValue: "Local Charging Hub focus",
+      //  paramValue: 4,
+      //},
+      // {
+        // displayValue: "Queuing acceptance",
+        // paramValue: 5,
+      // },
+    ],
+  },
+};
+
+const tfnBehaviouralScenarioSelector = {
+  filterName: "Behavioural Scenario",
+  paramName: "behaviourScenarioId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      // {
+      //   displayValue: "Unknown",
+      //   paramValue: 0,
+      // },
+      {
+        displayValue: "Baseline",
+        paramValue: 1,
+      },
+      {
+        displayValue: "Destination",
+        paramValue: 2,
+      },
+      // {
+      //   displayValue: "Not Applicable",
+      //   paramValue: 3,
+      // },
       {
         displayValue: "Local Charging Hub focus",
         paramValue: 4,
@@ -377,6 +415,52 @@ const chargingCategorySelector = {
       //   displayValue: "En route",
       //   paramValue: 7,
       // },
+      //{
+      //  displayValue: "Local Charging Hubs",
+      //  paramValue: 8,
+      //},
+    ],
+  },
+};
+
+const tfnChargingCategorySelector = {
+  filterName: "Charging Category",
+  paramName: "chargingCategoryId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Destination",
+        paramValue: 1,
+      },
+      {
+        displayValue: "HGV Depot",
+        paramValue: 2,
+      },
+      {
+        displayValue: "Home",
+        paramValue: 3,
+      },
+      {
+        displayValue: "On-street residential charging",
+        paramValue: 4,
+      },
+      {
+        displayValue: "Workplace",
+        paramValue: 5,
+      },
+      // {
+      //   displayValue: "HGV en route",
+      //   paramValue: 6,
+      // },
+      // {
+      //   displayValue: "En route",
+      //   paramValue: 7,
+      // },
       {
         displayValue: "Local Charging Hubs",
         paramValue: 8,
@@ -447,6 +531,10 @@ const chargerSpeedSelector = {
         displayValue: "Slow",
         paramValue: 1,
       },
+      {
+        displayValue: "Fast",
+        paramValue: 8,
+      },
       // {
       //   displayValue: "Standard",
       //   paramValue: 2,
@@ -459,21 +547,17 @@ const chargerSpeedSelector = {
         displayValue: "Ultra-rapid",
         paramValue: 4,
       },
-      // {
-      //   displayValue: "Any Speed",
-      //   paramValue: 5,
-      // },
-      // {
-      //   displayValue: "Any Non-rapid",
-      //   paramValue: 6,
-      // },
-      // {
-      //   displayValue: "Any Rapid or Faster",
-      //   paramValue: 7,
-      // },
       {
-        displayValue: "Fast",
-        paramValue: 8,
+        displayValue: "Any Speed",
+        paramValue: 5,
+      },
+      {
+        displayValue: "Any Non-rapid",
+        paramValue: 6,
+      },
+      {
+        displayValue: "Any Rapid or Faster",
+        paramValue: 7,
       },
     ],
   },
@@ -544,6 +628,28 @@ const columnNameOSPASelector = {
       //   paramValue: "total_count",
       //   legendSubtitleText: "Count"
       // },
+      {
+        displayValue: "Driveway access",
+        paramValue: "driveway_perc",
+        legendSubtitleText: "% homes with access"
+      },
+    ],
+  },
+};
+
+const columnNameOSPASelectorDrivewayOnly = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
       {
         displayValue: "Driveway access",
         paramValue: "driveway_perc",
@@ -696,16 +802,19 @@ export const selectors = {
   travelScenarioBase: travelScenarioSelectorBase,
   travelScenarioAdditional: travelScenarioSelectorAdditional,
   behaviouralScenario: behaviouralScenarioSelector,
+  tfnBehaviouralScenario: tfnBehaviouralScenarioSelector,
   vehicleType: vehicleTypeSelector,
   vehicleTypeWithoutAll: vehicleTypeWithoutAllSelector,
   vehicleTypeAll: vehicleTypeAllSelector,
   fuelType: fuelTypeSelector,
   chargingCategory: chargingCategorySelector,
+  tfnChargingCategory: tfnChargingCategorySelector,
   areaValueDisplay: areaValueDisplaySelector,
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,
   columnNameCP: columnNameCPSelector,
   columnNameOSPA: columnNameOSPASelector,
+  columnNameOSPADrivewayOnly: columnNameOSPASelectorDrivewayOnly,
   columnNameCVFixed: columnNameCVFixedSelector,
   columnNameMMHFixed: columnNameMMHFixedSelector,
   columnName: columnNameSelector,

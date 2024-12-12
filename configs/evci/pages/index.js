@@ -1,7 +1,7 @@
-import { evUptake, tfnEvUptake } from "./evUptake"
-import { annualChargingDemand, tfnAnnualChargingDemand } from "./annualChargingDemand"
-import { evcpRequirements, tfnEvcpRequirements } from "./evcpRequirements"
-import { potentialChargingSites } from "./potentialChargingSites"
+import { eehEvUptake, evUptake, tfnEvUptake } from "./evUptake"
+import { annualChargingDemand, eehAnnualChargingDemand, tfnAnnualChargingDemand } from "./annualChargingDemand"
+import { eehEvcpRequirements, evcpRequirements, tfnEvcpRequirements } from "./evcpRequirements"
+import { eehPotentialChargingSites, potentialChargingSites, tfnPotentialChargingSites } from "./potentialChargingSites"
 import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
@@ -9,7 +9,7 @@ import { co2Savings, tfnCo2Savings } from "./co2Savings"
 import { enrouteChargingDemand } from "./enrouteChargingDemand"
 import { commercialViability } from "./commercialViability"
 import { multiModalHubs } from "./multiModalHubs"
-import { offStreetParkingAccess } from "./offStreetParkingAccess"
+import { offStreetParkingAccess, offStreetParkingDrivewayOnly } from "./offStreetParkingAccess"
 import { energyCapacity } from "./energyCapacity"
 
 export const pages = {
@@ -25,9 +25,15 @@ export const pages = {
     commercialViability: commercialViability,
     multiModalHubs: multiModalHubs,
     offStreetParkingAccess: offStreetParkingAccess,
+    offStreetParkingDrivewayOnly: offStreetParkingDrivewayOnly,
     energyCapacity: energyCapacity,
     tfnAnnualChargingDemand: tfnAnnualChargingDemand,
     tfnCo2Savings: tfnCo2Savings,
     tfnEvcpRequirements: tfnEvcpRequirements,
-    tfnEvUptake: tfnEvUptake
+    tfnEvUptake: tfnEvUptake,
+    tfnPotentialChargingSites: tfnPotentialChargingSites,
+    eehEvUptake: eehEvUptake,
+    eehAnnualChargingDemand: eehAnnualChargingDemand,
+    eehEvcpRequirements: eehEvcpRequirements,
+    eehPotentialChargingSites: eehPotentialChargingSites
 }

@@ -10,6 +10,7 @@ export const combinedAuthority = {
   about: `
   <p>View TRSE data by Combined Authority District.</p>
   <p>This map compares the risk of TRSE in each neighbourhood to the average for the relevant combined authority area. Search for a combined authority in the side bar to view output-area data. Click on areas to see more information.</p>`,
+  legalText: termsOfUse,
   termsOfUse: termsOfUse,
   config: {
     layers: [
