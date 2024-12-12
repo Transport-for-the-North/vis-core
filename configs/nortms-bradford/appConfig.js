@@ -240,8 +240,7 @@ export const appConfig = {
   background: "",
   methodology: "",
   ////termsOfUse: termsOfUse,
-  legalText:
-    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+  legalText: termsOfUse,
   contactText: "Please contact Magda Smith for any questions on this data tool.",
   contactEmail: "magda.smith@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
@@ -253,7 +252,7 @@ export const appConfig = {
       pageName: "Station Totals",
       url: "/norms-station-totals",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       ////termsOfUse: termsOfUse,
       about: `
       <p>Visualise the number of passengers using the station by selecting a scenario, adjusting the Time Period and choosing the Metric. </p>
@@ -430,7 +429,7 @@ export const appConfig = {
       pageName: "Station Totals Difference",
       url: "/norms-station-totals-difference",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       ////termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference in passenger movements at stations between two separate scenarios by selecting two scenarios. The difference is calculated scenario 2 vs scenario 1 (i.e. 2–1). </p>
@@ -686,7 +685,7 @@ export const appConfig = {
       pageName: "Station Totals Side-by-Side",
       url: "/norms-station-totals-difference-dual",
       type: "DualMapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       ////termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios, and their respective absolute values, at the same time by selecting Left/Right Scenarios. This allows to see the absolute values of both scenarios in real time.  </p>
@@ -953,7 +952,7 @@ export const appConfig = {
       pageName: "Station Pairs",
       url: "/norms-station-pair",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       ////termsOfUse: termsOfUse,
       about: `
       <p>Visualise the travelling patterns of a station by selecting it on the map. Further, adjust Time Period, User Class, Direction and Metric. </p>
@@ -1181,7 +1180,7 @@ export const appConfig = {
       pageName: "Station Pairs Difference",
       url: "/norms-station-pair-difference",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about: `
       <p>Visualise difference of a selected station’s travelling patterns between two different scenarios by clicking on a preferred location. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction. </p>
@@ -1491,7 +1490,7 @@ export const appConfig = {
       pageName: "Station Pairs Side-by-Side",
       url: "/norms-station-pair-dual",
       type: "DualMapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios at the same time by selecting a station. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction.</p>
@@ -1830,7 +1829,7 @@ export const appConfig = {
       pageName: "Station Catchment",
       url: "/norms-station-catchment",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments by selecting a station on the map. Further, adjust the Scenario, Time Period, User Class, Direction and a Metric of choice. </p>
@@ -2082,7 +2081,7 @@ export const appConfig = {
       pageName: "Station Catchment Difference",
       url: "/norms-station-catchment/difference",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference between two scenarios and a selected station catchment by selecting a station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
@@ -2417,7 +2416,7 @@ export const appConfig = {
       pageName: "Station Catchment Side-by-Side",
       url: "/norms-station-catchment-dual",
       type: "DualMapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments for two scenarios simultaneously by selecting the station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
@@ -2783,7 +2782,7 @@ export const appConfig = {
       pageName: "Link Totals",
       url: "/norms-link",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about:`
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
@@ -2984,7 +2983,7 @@ export const appConfig = {
       pageName: "Link Totals Difference",
       url: "/norms-link-result-difference",
       type: "MapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about: `
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics should match). 
@@ -3268,7 +3267,7 @@ export const appConfig = {
       pageName: "Link Totals Side-by-Side",
       url: "/norms-link-result-dual",
       type: "DualMapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       //termsOfUse: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice.</p>  
@@ -3561,7 +3560,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Zone",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>The NorTMS zones included in the model are displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -3757,7 +3756,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Zone",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics selection should match). </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -4034,7 +4033,7 @@ export const appConfig = {
       type: "DualMapLayout",
       //termsOfUse: termsOfUse,
       category: "Zone",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -4344,7 +4343,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Zone",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: "Shows the zonal benefits (summed to origin or destination for the selected scenario compared with its DM.",
       config: {
         layers: [
@@ -4584,7 +4583,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Zone",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
@@ -4927,7 +4926,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
       <p>To use the functionality, please select in order: </p>
@@ -5200,7 +5199,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</u></b> the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
       <p>To use the functionality, please select in order: </p>
@@ -5560,7 +5559,7 @@ export const appConfig = {
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
       <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -5772,7 +5771,7 @@ export const appConfig = {
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
       <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -6057,7 +6056,7 @@ export const appConfig = {
       pageName: "Zone Pairs Side-by-Side",
       url: "/norms-zones-pair-dual",
       type: "DualMapLayout",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about:`
       <p>Visualise the distribution patterns of Demand, Generalised Cost and Generalised Journey Time of a zone by selecting it on the map. Further, adjust time period, direction and desired metric. </p>
       <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
@@ -6384,7 +6383,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
       <p>To use the functionality, please select in order: </p>
@@ -6668,7 +6667,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
       <p>To use the functionality, please select in order: </p>
@@ -7034,7 +7033,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
       <p>To use the functionality, please select in order: </p>
@@ -7371,7 +7370,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</u></b> the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
       <p>To use the functionality, please select in order: </p>
@@ -7791,7 +7790,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
       <p>To use the functionality, please select in order: </p>
@@ -8139,7 +8138,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
       <p>To use the functionality, please select in order: </p>
@@ -9164,7 +9163,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText: termsOfUse,
       about: `
       <p>This functionality shows the distribution (catchment) of the modelled journey time for the selected OD. </p>
       <p>To use the functionality, please select in order: </p>
@@ -9411,7 +9410,7 @@ export const appConfig = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
-      legalText:'<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Rail Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+      legalText:termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the modelled journey time for the selected OD. </p>
       <p>To use the functionality, please select in order: </p>
