@@ -13,7 +13,7 @@ export const termsOfUse = `
             </a>
             . Use of the TRSE data tool also indicates your acceptance of
             <a
-              href="https://transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-04062024.pdf"
+              href="https://www.transportforthenorth.com/wp-content/uploads/Disclaimer-and-Appropriate-Use-TRSE.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >
