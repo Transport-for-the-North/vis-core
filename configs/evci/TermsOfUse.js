@@ -17,7 +17,7 @@ export const termsOfUse = `
             . Use of the STB EV Charging Infrastructure regional requirements
             tool also indicates your acceptance of
             <a
-              href="https://transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-04062024.pdf"
+              href="https://www.transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-13082024-1.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -45,7 +45,7 @@ export const termsOfUseCP = `
             . Use of the STB EV Charging Infrastructure regional requirements
             tool also indicates your acceptance of
             <a
-              href="https://transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-04062024.pdf"
+              href="https://www.transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-13082024-1.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >
