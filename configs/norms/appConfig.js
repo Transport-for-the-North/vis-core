@@ -463,7 +463,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Station Totals Difference",
+      pageName: "Station Totals Difference (2-1)",
       url: "/norms-station-totals-difference",
       type: "MapLayout",
       legalText: termsOfUse,
@@ -521,7 +521,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -541,7 +541,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -561,7 +561,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -581,7 +581,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -603,7 +603,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -623,7 +623,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -643,7 +643,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -663,7 +663,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -685,7 +685,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -697,7 +697,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Metric (DM and DS)",
+            filterName: "Metric (1 and 2)",
             paramName: "propertyName",
             target: "api",
             actions: [
@@ -1227,7 +1227,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Station Pairs Difference",
+      pageName: "Station Pairs Difference (2-1)",
       url: "/norms-station-pair-difference",
       type: "MapLayout",
       legalText: termsOfUse,
@@ -1289,7 +1289,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Pairs Difference"],
@@ -1309,7 +1309,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Pairs Difference"],
@@ -1329,7 +1329,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Pairs Difference"],
@@ -1349,7 +1349,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1371,7 +1371,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Pairs Difference"],
@@ -1391,7 +1391,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Pairs Difference"],
@@ -1411,7 +1411,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Pairs Difference"],
@@ -1431,7 +1431,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1453,7 +1453,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin or Destination (DM and DS)",
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1462,7 +1462,7 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1485,7 +1485,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1495,7 +1495,7 @@ export const appConfig = {
             values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric (DM and DS)",
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -2144,7 +2144,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Station Catchment Difference",
+      pageName: "Station Catchment Difference (2-1)",
       url: "/norms-station-catchment/difference",
       type: "MapLayout",
       legalText: termsOfUse,
@@ -2223,7 +2223,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2243,7 +2243,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2263,7 +2263,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2283,7 +2283,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2305,7 +2305,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2325,7 +2325,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2345,7 +2345,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2365,7 +2365,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2387,7 +2387,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin or Destination (DM and DS)",
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "directionId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2410,7 +2410,7 @@ export const appConfig = {
           },
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2433,7 +2433,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2443,7 +2443,7 @@ export const appConfig = {
             values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric (DM and DS)",
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -3061,7 +3061,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Link Totals Difference",
+      pageName: "Link Totals Difference (2-1)",
       url: "/norms-link-result-difference",
       type: "MapLayout",
       legalText: termsOfUse,
@@ -3124,7 +3124,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3144,7 +3144,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3164,7 +3164,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3184,7 +3184,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -3206,7 +3206,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3226,7 +3226,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3246,7 +3246,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3266,7 +3266,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -3288,7 +3288,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -3298,7 +3298,7 @@ export const appConfig = {
             values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric (DM and DS)",
+            filterName: "Metric (1 and 2)",
             paramName: "propertyName",
             target: "api",
             actions: [
@@ -3846,7 +3846,7 @@ export const appConfig = {
       }
     },
     {
-      pageName: "Zone Totals Difference",
+      pageName: "Zone Totals Difference (2-1)",
       url: "/zone-totals-difference",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
@@ -3891,7 +3891,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
@@ -3911,7 +3911,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
@@ -3931,7 +3931,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
@@ -3951,7 +3951,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -3973,7 +3973,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
@@ -3993,7 +3993,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
@@ -4013,7 +4013,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Totals Difference"],
@@ -4033,7 +4033,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -4055,7 +4055,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin or Destination (DM and DS)",
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -4064,7 +4064,7 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -4087,7 +4087,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -4097,7 +4097,7 @@ export const appConfig = {
             values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric (DM and DS)",
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -4684,7 +4684,7 @@ export const appConfig = {
       }
     },
     {
-      pageName: "Zone Benefits Difference",
+      pageName: "Zone Benefits Difference (2-1)",
       url: "/zone-benefits-difference",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
@@ -4744,7 +4744,7 @@ export const appConfig = {
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Benefits Difference"],
-            info:"Select a DM scenario for both scenario 1 and scenario 2.",
+            info:"Select a 1 scenario for both scenario 1 and scenario 2.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5366,7 +5366,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5386,7 +5386,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5406,7 +5406,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5426,7 +5426,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5448,7 +5448,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5468,7 +5468,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5488,7 +5488,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5508,7 +5508,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5530,7 +5530,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination (DM and DS)",
+            filterName: "Origin Or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5539,7 +5539,7 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment (DM and DS)",
+            filterName: "Filter User Class by Segment (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -5561,7 +5561,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability (DM and DS)",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -5583,7 +5583,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5606,7 +5606,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5619,7 +5619,7 @@ export const appConfig = {
             values: timePeriodCodesValues
           },
           {
-            filterName: "Key Location Type (DM and DS)",
+            filterName: "Key Location Type (1 and 2)",
             paramName: "keyLocationTypeId",
             target: "api",
             actions: [
@@ -5646,7 +5646,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Threshold Value (DM and DS)",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5879,7 +5879,7 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Zone Pairs Difference",
+      pageName: "Zone Pairs Difference (2-1)",
       url: "/norms-zones-pair-difference",
       type: "MapLayout",
       legalText: termsOfUse,
@@ -5926,7 +5926,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Pairs Difference"],
@@ -5946,7 +5946,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Pairs Difference"],
@@ -5966,7 +5966,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Pairs Difference"],
@@ -5986,7 +5986,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6008,7 +6008,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Pairs Difference"],
@@ -6028,7 +6028,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Pairs Difference"],
@@ -6048,7 +6048,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Pairs Difference"],
@@ -6068,7 +6068,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6090,7 +6090,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin or Destination (DM and DS)",
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6099,7 +6099,7 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6122,7 +6122,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6132,7 +6132,7 @@ export const appConfig = {
             values: timePeriodCodeValues
           },
           {
-            filterName: "Metric (DM and DS)",
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -6860,7 +6860,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6880,7 +6880,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6900,7 +6900,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6920,7 +6920,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6942,7 +6942,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6962,7 +6962,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6982,7 +6982,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7002,7 +7002,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7024,7 +7024,7 @@ export const appConfig = {
             },
           },      
           {
-            filterName: "Origin Or Destination (DM and DS)",
+            filterName: "Origin Or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7033,7 +7033,7 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment (DM and DS)",
+            filterName: "Filter User Class by Segment (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -7055,7 +7055,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability (DM and DS)",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -7077,7 +7077,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7100,7 +7100,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7113,7 +7113,7 @@ export const appConfig = {
             values: timePeriodCodesValues
           }, 
           {
-            filterName: "Key Location Type (DM and DS)",
+            filterName: "Key Location Type (1 and 2)",
             paramName: "keyLocationTypeId",
             target: "api",
             actions: [
@@ -7140,7 +7140,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Threshold Value (DM and DS)",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7578,7 +7578,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7598,7 +7598,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7618,7 +7618,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             paramName: "scenarioYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7639,7 +7639,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7661,7 +7661,7 @@ export const appConfig = {
             },
           },         
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7681,7 +7681,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7701,7 +7701,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             paramName: "scenarioYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7722,7 +7722,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7744,7 +7744,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse (DM and DS)",
+            filterName: "Landuse (1 and 2)",
             paramName: "landuse",
             target: "api",
             actions: [
@@ -7764,7 +7764,7 @@ export const appConfig = {
             values: landuseValues,
           },
           {
-            filterName: "Landuse Segment 1 (DM and DS)",
+            filterName: "Landuse Segment 1 (1 and 2)",
             paramName: "landuseSegment1",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7786,7 +7786,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse Segment 2 (DM and DS)",
+            filterName: "Landuse Segment 2 (1 and 2)",
             paramName: "landuseSegment2",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7808,7 +7808,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse Reference (DM and DS)",
+            filterName: "Landuse Reference (1 and 2)",
             paramName: "landuseReference",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7817,7 +7817,7 @@ export const appConfig = {
             values: landuseReferenceValues
           },
           {
-            filterName: "Landuse Exog (DM and DS)",
+            filterName: "Landuse Exog (1 and 2)",
             paramName: "landuseExog",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7826,7 +7826,7 @@ export const appConfig = {
             values: landuseExogValues
           },
           {
-            filterName: "Origin or Destination (DM and DS)",
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7835,7 +7835,7 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment (DM and DS)",
+            filterName: "Filter User Class by Segment (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -7858,7 +7858,7 @@ export const appConfig = {
           },
           
           {
-            filterName: "Filter User Class by Car Availability (DM and DS)",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -7880,7 +7880,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7903,7 +7903,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7916,7 +7916,7 @@ export const appConfig = {
             values: timePeriodCodesValues
           },
           {
-            filterName: "Threshold Value (DM and DS)",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8356,7 +8356,7 @@ export const appConfig = {
         ],
         filters: [ 
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8376,7 +8376,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8396,7 +8396,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             paramName: "scenarioYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8417,7 +8417,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8439,7 +8439,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8459,7 +8459,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8479,7 +8479,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             paramName: "scenarioYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8500,7 +8500,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8522,7 +8522,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse (DM and DS)",
+            filterName: "Landuse (1 and 2)",
             paramName: "landuse",
             target: "api",
             actions: [
@@ -8542,7 +8542,7 @@ export const appConfig = {
             values: landuseValues,
           },
           {
-            filterName: "Landuse Segment 1 (DM and DS)",
+            filterName: "Landuse Segment 1 (1 and 2)",
             paramName: "landuseSegment1",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8564,7 +8564,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse Segment 2 (DM and DS)",
+            filterName: "Landuse Segment 2 (1 and 2)",
             paramName: "landuseSegment2",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8586,7 +8586,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse Reference (DM and DS)",
+            filterName: "Landuse Reference (1 and 2)",
             paramName: "landuseReference",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8595,7 +8595,7 @@ export const appConfig = {
             values: landuseReferenceValues
           },
           {
-            filterName: "Landuse Exog (DM and DS)",
+            filterName: "Landuse Exog (1 and 2)",
             paramName: "landuseExog",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8604,7 +8604,7 @@ export const appConfig = {
             values: landuseExogValues
           },
           {
-            filterName: "Origin Or Destination (DM and DS)",
+            filterName: "Origin Or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8613,7 +8613,7 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment (DM and DS)",
+            filterName: "Filter User Class by Segment (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -8635,7 +8635,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability (DM and DS)",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -8657,7 +8657,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8680,7 +8680,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8692,7 +8692,7 @@ export const appConfig = {
             values: timePeriodCodesValues
           },
           {
-            filterName: "Threshold Value (DM and DS)",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8985,7 +8985,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9005,7 +9005,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9025,7 +9025,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9045,7 +9045,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9145,7 +9145,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9165,7 +9165,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9185,7 +9185,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9205,7 +9205,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9658,7 +9658,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9678,7 +9678,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9698,7 +9698,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9718,7 +9718,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9740,7 +9740,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9760,7 +9760,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9780,7 +9780,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9800,7 +9800,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9822,7 +9822,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination (DM and DS)",
+            filterName: "Origin Or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9831,7 +9831,7 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment (DM and DS)",
+            filterName: "Filter User Class by Segment (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -9853,7 +9853,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability (DM and DS)",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
             paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
@@ -9875,7 +9875,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class (DM and DS)",
+            filterName: "User Class (1 and 2)",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9898,7 +9898,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period (DM and DS)",
+            filterName: "Time Period (1 and 2)",
             paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
