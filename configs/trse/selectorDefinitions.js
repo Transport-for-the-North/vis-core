@@ -211,6 +211,7 @@ const oaOrPtvariableSelector = {
   ],
   visualisations: null,
   type: "toggle",
+  containsLegendInfo: true,
   values: {
     source: "local",
     values: [
