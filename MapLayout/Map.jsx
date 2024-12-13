@@ -43,7 +43,7 @@ const Map = (props) => {
   const hoverInfoRef = useRef({});
   const prevHoveredFeaturesRef = useRef([]);
 
-  // ** Draw control logic
+  // **Draw control logic
   useEffect(() => {
     if (!map) return ;
 
@@ -129,71 +129,6 @@ const Map = (props) => {
     
   }, [map]); 
 
-  /**
-   * Handles hover events for a specific layer by setting the hover state
-   * for features under the mouse pointer. If hoverNulls is false, only sets
-   * the hover state for features where feature-state value is not null or undefined.
-   *
-   * @property {Object} e - The event object containing information about the hover event.
-   * @property {string} layerId - The ID of the layer being hovered over.
-   * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
-   * @property {boolean} hoverNulls - Flag indicating whether to set hover state for features with null feature-state values.
-   */
-  const handleLayerHover = useCallback(
-    (e, layerId, bufferSize, hoverNulls) => {
-      if (!map || !e.point) return;
-
-      const hoverLayerId = `${layerId}-hover`;
-      const bufferdPoint = [
-        [e.point.x - bufferSize, e.point.y - bufferSize],
-        [e.point.x + bufferSize, e.point.y + bufferSize],
-      ];
-      let features = [];
-      if (layerId in map.style._layers) {
-        features = map.queryRenderedFeatures(bufferdPoint, {
-          layers: [layerId],
-        });
-      }
-      if (features.length === 0) {
-        if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
-          const sourceLayer = getSourceLayer(map, layerId);
-          map.setFeatureState(
-            { source: layerId, id: hoverIdRef.current[layerId], sourceLayer },
-            { hover: false }
-          );
-        }
-        return;
-      }
-      const feature = features[0];
-      const source = feature.layer.source;
-      const sourceLayer = feature.layer["source-layer"];
-
-      // Check hoverNulls and feature-state value
-      if (!hoverNulls && (feature.state.value === null || feature.state.value === undefined)) {
-        return; // Skip setting hover state if hoverNulls is false and feature-state value is null or undefined
-      }
-
-      if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
-        map.setFeatureState(
-          { source, id: hoverIdRef.current[layerId], sourceLayer },
-          { hover: false }
-        );
-        hoverIdRef.current[layerId] = feature.id;
-        map.setFeatureState(
-          { source, id: hoverIdRef.current[layerId], sourceLayer },
-          { hover: true }
-        );
-        return;
-      }
-
-      hoverIdRef.current[layerId] = feature.id;
-      map.setFeatureState(
-        { source, id: hoverIdRef.current[layerId], sourceLayer },
-        { hover: true }
-      );
-    },
-    [map]
-  );
 
   /**
    * Handles hover events on the map and displays a single popup with information about all hovered features.
@@ -378,8 +313,7 @@ const Map = (props) => {
         const layerVisualisationName =
           state.layers[layerId]?.visualisationName;
         const legendText =
-          state.visualisations[layerVisualisationName]?.legendText[0]
-            ?.legendSubtitleText ?? "";
+          state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
 
         let description = "";
 
@@ -628,7 +562,7 @@ const Map = (props) => {
   );
   
   
-
+  // **Set up click and zoom handlers**
   useEffect(() => {
     if (!map) return;
 
@@ -672,9 +606,8 @@ const Map = (props) => {
         if (
           state.layers[layerId].shouldHaveTooltipOnClick
         ) {
-          const { clickCallback, layerHoverCallback, zoomHandler } =
+          const { clickCallback, zoomHandler } =
             listenerCallbackRef.current[layerId];
-          map.off("mousemove", layerHoverCallback);
           if (clickCallback) {map.off("click", clickCallback)};
           map.off('zoomend', zoomHandler);
 
@@ -688,19 +621,13 @@ const Map = (props) => {
             hoverInfoRef.current[layerId] = null;
           }
         }
-        if (state.layers[layerId].isHoverable) {
-          map.off("mousemove", layerId, (e) =>
-            handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
-          );
-          map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
-        }
         if (state.layers[layerId].shouldHaveLabel) {
           const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
           map.off('zoomend', zoomHandler);
         }
       });
     };
-  }, [map, handleLayerHover, handleLayerLeave, state.layers, state.visualisations]);
+  }, [map, handleLayerLeave, state.layers, state.visualisations]);
 
   /**
    * Handles map click events and dispatches actions based on the clicked feature.
@@ -801,6 +728,7 @@ const Map = (props) => {
     [isMapReady, map, state.filters, dispatch]
   );
 
+  // **Create map hover handler**
   useEffect(() => {
     if (!map) return;
 
@@ -857,9 +785,7 @@ const Map = (props) => {
     }
   }, [isMapReady]);
 
-  const featureSelectConfig = state.filters.find((filter) => filter.type.startsWith('mapFeatureSelect'));
-  // useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
-
+  // **Handle map clicks (for map filters)**
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {
       const hasMapFilter = state.filters.some(
