@@ -1,6 +1,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
+import { debounce } from "lodash";
 
 import { DynamicLegend } from "Components";
 import { useMap, useMapContext, useFilterContext } from "hooks";
@@ -42,6 +43,8 @@ const Map = (props) => {
   const abortControllerRef = useRef({});
   // Use a ref to store hover event IDs keyed by layerId
   const hoverEventIdsRef = useRef({});
+  // Ref to store debounced hover tooltip handlers per layer
+  const debouncedHoverTooltipRefs = useRef({});
 
   useEffect(() => {
     if (!map) return ;
@@ -547,15 +550,25 @@ const Map = (props) => {
           layerHover;
       }
       if (state.layers[layerId].shouldHaveTooltipOnHover) {
-        const hoverNulls = state.layers[layerId].hoverNulls ?? true
-        const hoverCallback = (e) =>
-          handleLayerHoverTooltip(
-            e,
-            layerId,
-            state.layers[layerId].bufferSize ?? 0,
-            hoverNulls
+        const hoverNulls = state.layers[layerId].hoverNulls ?? true;
+
+        // Create a debounced version of the hover tooltip handler for this layer
+        if (!debouncedHoverTooltipRefs.current[layerId]) {
+          debouncedHoverTooltipRefs.current[layerId] = debounce(
+            (e) =>
+              handleLayerHoverTooltip(
+                e,
+                layerId,
+                state.layers[layerId].bufferSize ?? 0,
+                hoverNulls
+              ),
+            100
           );
-        map.on("mousemove", hoverCallback);
+        }
+
+        const debouncedHoverCallback = debouncedHoverTooltipRefs.current[layerId];
+
+        map.on("mousemove", debouncedHoverCallback);
         map.on("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
         });
@@ -565,8 +578,7 @@ const Map = (props) => {
         if (!listenerCallbackRef.current[layerId]) {
           listenerCallbackRef.current[layerId] = {};
         }
-        listenerCallbackRef.current[layerId].hoverCallback =
-          hoverCallback;
+        listenerCallbackRef.current[layerId].hoverCallback = debouncedHoverCallback;
       }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -595,9 +607,9 @@ const Map = (props) => {
           state.layers[layerId].shouldHaveTooltipOnClick ||
           state.layers[layerId].shouldHaveTooltipOnHover
         ) {
-          const { clickCallback, hoverCallback, layerHoverCallback, zoomHandler } =
+          const { clickCallback, debouncedHoverCallback , layerHoverCallback, zoomHandler } =
             listenerCallbackRef.current[layerId];
-          map.off("mousemove", hoverCallback);
+          map.off("mousemove", debouncedHoverCallback );
           map.off("mousemove", layerHoverCallback);
           map.off("click", clickCallback);
           map.off('zoomend', zoomHandler);
