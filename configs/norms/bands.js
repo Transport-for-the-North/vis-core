@@ -178,43 +178,43 @@ export const bands = [
             {
                 name: "ivt",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
                 name: "crowding",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
                 name: "wait_time",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
                 name: "walk_time",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
                 name: "penalty",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500],
             },
             {
                 name: "access_egress",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500],
             },
             {
                 name: "value_of_choice",
                 pageName: "Zone Benefits Total",
-                values: [-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
+                values:[-1500, -500, -100, -50, 0, 50, 100, 500, 1500],
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
             {
@@ -257,6 +257,82 @@ export const bands = [
                 pageName: "Zone Benefits Pair",
                 differenceValues: [-500, -200, -100, -50, -10, 0, 10, 50, 100, 200, 500]
             },
+        ]
+    },
+    {   name: "Accessibility (Key Location)",
+        metric: [
+            {   name: 1,
+                values: [0, 1, 2, 3, 4, 5, 10],
+                differenceValues: [-10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10]
+            },
+            {   name: 2,
+                values: [0, 10, 25, 50, 100, 200, 500, 1000],
+                differenceValues: [-100, -50, -25, -10, -5, 0, 5, 10, 25, 50, 100]
+            },
+            {   name: 3,
+                values: [0, 5, 10, 20, 30, 50, 100],
+                differenceValues: [-100, -50, -25, -10, -5, 0, 5, 10, 25, 50, 100]
+            },
+            {   name: 4,
+                values: [0, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000000000],
+                differenceValues: [-100000, -50000, -25000, -10000, -5000, 0, 5000, 10000, 25000, 50000, 100000]
+            },
+            {
+                values: [0, 1, 2, 3, 4, 5, 10],
+                differenceValues: [-10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10]
+            },
+            {   name: 6,
+                values: [0, 1, 2, 3, 4, 5, 10],
+                differenceValues: [-10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10]
+            },
+            {   name: 7,
+                values: [0, 1, 2, 5, 10, 15, 20, 100],
+                differenceValues: [-100, -50, -25, -10, -5, 0, 5, 10, 25, 50, 100]
+            },
+            {   name: 8,
+                values: [0, 1, 2, 3, 4, 5, 10],
+                differenceValues: [-10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10]
+            },
+            {   name: 9,
+                values: [0, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000000000],
+                differenceValues: [-100000, -50000, -25000, -10000, -5000, 0, 5000, 10000, 25000, 50000, 100000]
+            },
+            {   name: 10,
+                values: [0, 5, 10, 20, 30, 50, 100, 250, 500],
+                differenceValues: [-100, -50, -25, -10, -5, 0, 5, 10, 25, 50, 100]
+            },
+        ]
+    },
+    {name: "Accessibility (Land Use)",
+        metric: [
+            {   name: "emp",
+                pageName: "Pop/Emp Accessibility (Zone Totals)",
+                values: [0, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 10000000],
+                differenceValues: [-5000000, 100000, -50000, -10000, -5000, 0 , 5000, 10000, 50000, 100000, 5000000]
+            },
+            {   name: "pop",
+                pageName: "Pop/Emp Accessibility (Zone Totals)",
+                values: [0, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 10000000],
+                differenceValues: [-5000000, 100000, -50000, -10000, -5000, 0 , 5000, 10000, 50000, 100000, 5000000]
+            },
+            {   name: "emp",
+                pageName: "Pop/Emp Accessibility (Zone Pair)",
+                values: [0, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 1000000],
+                differenceValues: [-500000, -100000, -50000, -25000, -10000, 0 , 10000, 25000, 50000, 100000, 500000]
+            },
+            {   name: "pop",
+                pageName: "Pop/Emp Accessibility (Zone Pair)",
+                values: [0, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 1000000],
+                differenceValues: [-500000, -100000, -50000, -25000, -10000, 0 , 10000, 25000, 50000, 100000, 500000]
+            }
+        ]
+    },
+    {   name: "Accessibility (Journey Time)",
+        metric: [
+            {   name: "journey_time",
+                pageName: "Journey Time Accessibility (Zone Pair)",
+                values: [0, 15, 30, 45, 60, 90, 120, 150, 180]
+            }
         ]
     }
 ]
