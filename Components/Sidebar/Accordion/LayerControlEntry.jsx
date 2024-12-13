@@ -89,9 +89,11 @@ export const LayerControlEntry = memo(
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
-    const selectedPageBands = appConfig.defaultBands.find(
-      (band) => band.name === currentPage.category
-    );
+    const selectedPageBands = appConfig.defaultBands.find((band) => {
+      if (!currentPage) return false;
+      const categoryOrName = currentPage.category || currentPage.pageName;
+      return band.name === categoryOrName;
+    });
     const visualisation =
       currentPage.pageName.includes("Side-by-Side") ||
       currentPage.pageName.includes("Side by Side")
