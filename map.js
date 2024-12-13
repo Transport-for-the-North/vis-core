@@ -342,7 +342,7 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
       const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
       const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
       if (selectedPageBands) {
-        const listMetrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]);
+        const listMetrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]?.value);
         if (listMetrics.length > 1) {
           const metric = listMetrics.find((metric) => currentPage.pageName.includes(metric.pageName));
            return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2)
