@@ -331,7 +331,8 @@ export const bands = [
         metric: [
             {   name: "journey_time",
                 pageName: "Journey Time Accessibility (Zone Pair)",
-                values: [0, 15, 30, 45, 60, 90, 120, 150, 180]
+                values: [0, 15, 30, 45, 60, 90, 120, 150, 180],
+                differenceValues: [-30, -20, -10 , -5, 0, 5, 10, 20, 30]
             }
         ]
     }
