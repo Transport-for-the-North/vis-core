@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { oaEngDetailedCallout } from "../templates";
+import { engPopupContent } from "../templates/popup";
 
 export const england = {
   pageName: "England",
@@ -34,6 +35,10 @@ export const england = {
         invertedColorScheme: true,
         trseLabel: true,
         outlineOnPolygonSelect: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
+          htmlTemplate: engPopupContent
+        }
       },
       {
         name: "Local Authorities",
@@ -42,9 +47,9 @@ export const england = {
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
-        isHoverable: true,
+        isHoverable: false,
         isStylable: false,
-        shouldHaveTooltipOnHover: true,
+        shouldHaveTooltipOnHover: false,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
         labelNulls: false,
@@ -70,6 +75,10 @@ export const england = {
         hoverTipShouldIncludeMetadata: true,
         invertedColorScheme: true,
         trseLabel: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
+          htmlTemplate: engPopupContent
+        }
       }
     ],
     visualisations: [
