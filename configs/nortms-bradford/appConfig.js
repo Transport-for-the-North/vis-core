@@ -221,7 +221,7 @@ export const appConfig = {
    <p>Each functionality found in the NPR Visualisation Framework presents itself with a selection of scenarios that can be combined with the following filters: modelling network, demand sensitivity and year. </p>
    <p><b>Filter Scenario by Network</b></p>
    <ul><li>DM8_04: Do minimum 8.04 (Jan24 Covid medium), <li>NPR10_06: Network North 10.06 Bradford Mill Lane, <li>NPR10_07: Network North 10.07 Bradford Interchange, 
-   <li>NPR10_08: Network North 10.08 Counterfactual Network, <li>NPR10_06ah1: Network North 10.06ah1 Bradford, <li>NPR10_06ah2: Network North 10.06ah2 Bradford St James' Market. </ul>
+   <li>NPR10_08: Network North 10.08 Counterfactual Network, <li>NPR10_06ah1: Network North 10.06ah1 Bradford Gateway, <li>NPR10_06ah2: Network North 10.06ah2 Bradford St James' Market. </ul>
    <p><b>Filter Scenario by Demand</b>, as of now exclusively including d096: Jan24 Covid medium. </p>
    <p><b>Filter Scenario by Year</b>, including 2042 and 2052. </p>
    <p>The framework works with the selection of the desired modelled scenario. <br>
