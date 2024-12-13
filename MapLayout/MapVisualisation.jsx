@@ -372,17 +372,6 @@ export const MapVisualisation = ({
     // Update prevClassMethodRef for the current layer
     prevClassMethodRef.current[visualisation.joinLayer] = classificationMethod;
 
-    // Cleanup if necessary
-    return () => {
-      if (map && visualisation.type === "geojson") {
-        if (map.getLayer(visualisationName)) {
-          map.removeLayer(visualisationName);
-        }
-        if (map.getSource(visualisationName)) {
-          map.removeSource(visualisationName);
-        }
-      }
-    };
   }, [
     combinedData,
     visualisationData,
@@ -396,6 +385,20 @@ export const MapVisualisation = ({
     visualisation.type,
     visualisationName,
   ]);
+
+  // **Run-once cleanup
+  useEffect(() => {
+    return () => {
+      if (map && visualisation.type === 'geojson') {
+        if (map.getLayer(visualisationName)) {
+          map.removeLayer(visualisationName);
+        }
+        if (map.getSource(visualisationName)) {
+          map.removeSource(visualisationName);
+        }
+      }
+    };
+  }, []);
 
   /**
    * Reclassifies GeoJSON data and styles the map accordingly.
