@@ -170,7 +170,7 @@ const DualMaps = (props) => {
                   <hr class="divider">
                   <div class="metadata-item">
                     <span class="metadata-key">Value:</span>
-                    <span class="metadata-value">${numberWithCommas(featureValue)} (${state.visualisations[state.layers[layerId].visualisationName].legendText[0].legendSubtitleText})</span>
+                    <span class="metadata-value">${numberWithCommas(featureValue)} (${state.visualisations[state.layers[layerId].visualisationName].legendText?.[0]?.legendSubtitleText || ""})</span>
                   </div>
                 </div>`;
             } else if (featureName) {
