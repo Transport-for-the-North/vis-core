@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
+import { caPopupContent } from "../templates/popup";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -33,6 +34,10 @@ export const combinedAuthority = {
         invertedColorScheme: true,
         trseLabel: true,
         outlineOnPolygonSelect: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
+          htmlTemplate: caPopupContent
+        }
       },
       {
         name: "Combined Authorities",
@@ -41,9 +46,9 @@ export const combinedAuthority = {
         path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
-        isHoverable: true,
+        isHoverable: false,
         isStylable: false,
-        shouldHaveTooltipOnHover: true,
+        shouldHaveTooltipOnHover: false,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
         labelNulls: false,
@@ -69,6 +74,10 @@ export const combinedAuthority = {
         hoverTipShouldIncludeMetadata: true,
         invertedColorScheme: true,
         trseLabel: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
+          htmlTemplate: caPopupContent
+        }
       }
     ],
     visualisations: [
