@@ -172,15 +172,16 @@ const userClassIdValues = {
 
 const landuseValues = {
   source: "local",
-  legendSubtitleTextColumn: "landuse",
   values: [
     {
       displayValue: "Employment",
-      paramValue: "emp"
+      paramValue: "emp",
+      legendSubtitleText: "employment"
     },
     {
       displayValue: "Population",
-      paramValue: "pop"
+      paramValue: "pop",
+      legendSubtitleText: "population"
     }
   ]
 }
@@ -9918,7 +9919,7 @@ export const appConfig = {
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" }
             ],
-            visualisations: ["Journey Time Accessibility Pair"],
+            visualisations: ["Journey Time Accessibility Pair Difference"],
             info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,

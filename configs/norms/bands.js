@@ -303,27 +303,15 @@ export const bands = [
             },
         ]
     },
-    {name: "Accessibility (Land Use)",
+    {   name: "Accessibility (Land Use)",
         metric: [
             {   name: "emp",
-                pageName: "Pop/Emp Accessibility (Zone Totals)",
-                values: [0, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 10000000],
-                differenceValues: [-5000000, 100000, -50000, -10000, -5000, 0 , 5000, 10000, 50000, 100000, 5000000]
+                values: [0, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 1000000],
+                differenceValues: [-5000000, -100000, -50000, -25000, -10000, 0 , 10000, 25000, 50000, 100000, 5000000]
             },
             {   name: "pop",
-                pageName: "Pop/Emp Accessibility (Zone Totals)",
-                values: [0, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 10000000],
-                differenceValues: [-5000000, 100000, -50000, -10000, -5000, 0 , 5000, 10000, 50000, 100000, 5000000]
-            },
-            {   name: "emp",
-                pageName: "Pop/Emp Accessibility (Zone Pair)",
                 values: [0, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 1000000],
-                differenceValues: [-500000, -100000, -50000, -25000, -10000, 0 , 10000, 25000, 50000, 100000, 500000]
-            },
-            {   name: "pop",
-                pageName: "Pop/Emp Accessibility (Zone Pair)",
-                values: [0, 2500, 5000, 10000, 25000, 50000, 75000, 100000, 1000000],
-                differenceValues: [-500000, -100000, -50000, -25000, -10000, 0 , 10000, 25000, 50000, 100000, 500000]
+                differenceValues: [-5000000, -100000, -50000, -25000, -10000, 0 , 10000, 25000, 50000, 100000, 5000000]
             }
         ]
     },
