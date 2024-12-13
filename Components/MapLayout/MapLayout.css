@@ -55,6 +55,7 @@
   .metadata-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     padding: 2px 0;
   }
@@ -62,6 +63,7 @@
   .metadata-key {
     font-weight: bold;
     margin-right: 10px;
+    text-align: left;
   }
   
   .metadata-value {
