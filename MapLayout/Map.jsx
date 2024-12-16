@@ -3,8 +3,9 @@ import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
-import { useMap, useMapContext, useFilterContext, useFeatureSelect } from "hooks";
+import { useMap, useMapContext, useFilterContext } from "hooks";
 import { actionTypes } from "reducers";
+import { api } from "services";
 import maplibregl from "maplibre-gl";
 import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from "./Layer";
@@ -36,7 +37,13 @@ const Map = (props) => {
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
+  
+  // Refs to manage hover state
+  const hoverEventIdRef = useRef(0);
+  const hoverInfoRef = useRef({});
+  const prevHoveredFeaturesRef = useRef([]);
 
+  // **Draw control logic
   useEffect(() => {
     if (!map) return ;
 
@@ -122,176 +129,315 @@ const Map = (props) => {
     
   }, [map]); 
 
+
   /**
-   * Handles hover events for a specific layer by setting the hover state
-   * for features under the mouse pointer. If hoverNulls is false, only sets
-   * the hover state for features where feature-state value is not null or undefined.
+   * Handles hover events on the map and displays a single popup with information about all hovered features.
+   * The API requests are delayed by 100ms. If the user moves the mouse away before 100ms, the API calls are canceled.
+   * Uses hoverEventId to ensure consistency and prevent outdated data from updating the tooltip.
    *
-   * @property {Object} e - The event object containing information about the hover event.
-   * @property {string} layerId - The ID of the layer being hovered over.
-   * @property {number} bufferSize - The size of the buffer around the hover point for querying features.
-   * @property {boolean} hoverNulls - Flag indicating whether to set hover state for features with null feature-state values.
+   * @param {Object} e - The event object containing information about the hover event.
    */
-  const handleLayerHover = useCallback(
-    (e, layerId, bufferSize, hoverNulls) => {
+  const handleMapHover = useCallback(
+    (e) => {
       if (!map || !e.point) return;
 
-      const hoverLayerId = `${layerId}-hover`;
-      const bufferdPoint = [
-        [e.point.x - bufferSize, e.point.y - bufferSize],
-        [e.point.x + bufferSize, e.point.y + bufferSize],
-      ];
-      let features = [];
-      if (layerId in map.style._layers) {
-        features = map.queryRenderedFeatures(bufferdPoint, {
-          layers: [layerId],
+      // Get layers that have shouldHaveTooltipOnHover set to true and are available on the map
+      const hoverableLayers = Object.keys(state.layers).filter(
+        (layerId) =>
+          state.layers[layerId].shouldHaveTooltipOnHover && map.getLayer(layerId)
+      );
+
+      if (hoverableLayers.length === 0) {
+        // Clean up if no hoverable layers
+        if (hoverInfoRef.current.popup) {
+          hoverInfoRef.current.popup.remove();
+          hoverInfoRef.current.popup = null;
+        }
+        // Clear hover state for previously hovered features
+        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
         });
+        prevHoveredFeaturesRef.current = [];
+        return;
       }
+
+      // Determine the maximum bufferSize among the layers
+      const maxBufferSize = Math.max(
+        ...hoverableLayers.map(
+          (layerId) => state.layers[layerId].bufferSize ?? 0
+        )
+      );
+
+      const bufferedPoint = [
+        [e.point.x - maxBufferSize, e.point.y - maxBufferSize],
+        [e.point.x + maxBufferSize, e.point.y + maxBufferSize],
+      ];
+
+      let features = map.queryRenderedFeatures(bufferedPoint, {
+        layers: hoverableLayers,
+      });
+
       if (features.length === 0) {
-        if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
-          const sourceLayer = getSourceLayer(map, layerId);
+        // No features under mouse, cleanup and return
+        if (hoverInfoRef.current.popup) {
+          hoverInfoRef.current.popup.remove();
+          hoverInfoRef.current.popup = null;
+        }
+        // Clear hover state for previously hovered features
+        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+        });
+        prevHoveredFeaturesRef.current = [];
+        return;
+      }
+
+      // Collect current hovered features
+      const currentHoveredFeatures = features.map((feature) => ({
+        layerId: feature.layer.id,
+        featureId: feature.id,
+        source: feature.layer.source,
+        sourceLayer: feature.layer["source-layer"],
+      }));
+
+      // Update hover states
+      // First, unset hover state for previous features that are no longer hovered
+      prevHoveredFeaturesRef.current.forEach((prevFeature) => {
+        const stillHovered = currentHoveredFeatures.find(
+          (currFeature) =>
+            currFeature.layerId === prevFeature.layerId &&
+            currFeature.featureId === prevFeature.featureId
+        );
+        if (!stillHovered) {
           map.setFeatureState(
-            { source: layerId, id: hoverIdRef.current[layerId], sourceLayer },
+            {
+              source: prevFeature.source,
+              id: prevFeature.featureId,
+              sourceLayer: prevFeature.sourceLayer,
+            },
             { hover: false }
           );
         }
-        return;
-      }
-      const feature = features[0];
-      const source = feature.layer.source;
-      const sourceLayer = feature.layer["source-layer"];
+      });
 
-      // Check hoverNulls and feature-state value
-      if (!hoverNulls && (feature.state.value === null || feature.state.value === undefined)) {
-        return; // Skip setting hover state if hoverNulls is false and feature-state value is null or undefined
-      }
-
-      if (map.getLayer(hoverLayerId) && hoverIdRef.current[layerId]) {
-        map.setFeatureState(
-          { source, id: hoverIdRef.current[layerId], sourceLayer },
-          { hover: false }
+      // Then, set hover state for newly hovered features
+      currentHoveredFeatures.forEach((currFeature) => {
+        const wasHovered = prevHoveredFeaturesRef.current.find(
+          (prevFeature) =>
+            prevFeature.layerId === currFeature.layerId &&
+            prevFeature.featureId === currFeature.featureId
         );
-        hoverIdRef.current[layerId] = feature.id;
-        map.setFeatureState(
-          { source, id: hoverIdRef.current[layerId], sourceLayer },
-          { hover: true }
-        );
-        return;
-      }
+        if (!wasHovered) {
+          map.setFeatureState(
+            {
+              source: currFeature.source,
+              id: currFeature.featureId,
+              sourceLayer: currFeature.sourceLayer,
+            },
+            { hover: true }
+          );
+        }
+      });
 
-      hoverIdRef.current[layerId] = feature.id;
-      map.setFeatureState(
-        { source, id: hoverIdRef.current[layerId], sourceLayer },
-        { hover: true }
-      );
-    },
-    [map]
-  );
+      // Now proceed to update the popup position
+      const coordinates = e.lngLat;
 
-  /**
- * Handles hover events on a layer and displays a popup with information about the hovered feature.
- * If hoverNulls is false, the hover tooltip does not render for features where the feature-state value is null.
- *
- * @param {Object} e - The event object containing information about the hover event.
- * @param {string} layerId - The ID of the layer being hovered.
- * @param {number} bufferSize - The size of the buffer around the hover point for querying features.
- * @param {boolean} hoverNulls - Flag indicating whether to show tooltips for features with null feature-state values.
- */
-  const handleLayerHoverTooltip = useCallback(
-    (e, layerId, bufferSize, hoverNulls) => {
-      if (popups[layerId]?.length) {
-        popups[layerId].forEach((popup) => popup.remove());
-        popups[layerId] = [];
-      }
-      const shouldIncludeMetadata = state.layers[layerId]?.hoverTipShouldIncludeMetadata ?? false;
-  
-      const bufferdPoint = [
-        [e.point.x - bufferSize, e.point.y - bufferSize],
-        [e.point.x + bufferSize, e.point.y + bufferSize],
-      ];
-  
-      let features = [];
-      if (layerId in map.style._layers) {
-        features = map.queryRenderedFeatures(bufferdPoint, {
-          layers: [layerId],
+      // Check if the features are the same as before
+      const prevHoveredFeatures = prevHoveredFeaturesRef.current || [];
+
+      const isSameFeatures =
+        prevHoveredFeatures.length === currentHoveredFeatures.length &&
+        prevHoveredFeatures.every((prevFeature, index) => {
+          const currFeature = currentHoveredFeatures[index];
+          return (
+            prevFeature.layerId === currFeature.layerId &&
+            prevFeature.featureId === currFeature.featureId
+          );
         });
+
+      if (isSameFeatures) {
+        // Same features, update popup position
+        if (hoverInfoRef.current.popup) {
+          hoverInfoRef.current.popup.setLngLat(coordinates);
+        }
+        // No need to re-fetch data or update descriptions
+        return;
       }
-  
-      if (features.length !== 0) {
-        const coordinates = e.lngLat;
-        let descriptions = '';
-  
-        features.forEach((feature, index) => {
-          const featureName = feature.properties.name || '';
-          const featureValue = feature.state.value || '';
-  
-          if (!hoverNulls && featureValue === '') {
-            return;
-          }
-  
-          let description = '';
-          if (featureName && featureValue) {
+
+      // Update previous hovered features
+      prevHoveredFeaturesRef.current = currentHoveredFeatures;
+
+      // Increment hoverEventId
+      hoverEventIdRef.current += 1;
+      const currentHoverEventId = hoverEventIdRef.current;
+
+      // Remove existing popup if any
+      if (hoverInfoRef.current.popup) {
+        hoverInfoRef.current.popup.remove();
+        hoverInfoRef.current.popup = null;
+      }
+
+      // Cancel any ongoing API requests
+      if (hoverInfoRef.current.abortController) {
+        hoverInfoRef.current.abortController.abort();
+        hoverInfoRef.current.abortController = null;
+      }
+
+      // Clear any pending timeout
+      if (hoverInfoRef.current.timeoutId) {
+        clearTimeout(hoverInfoRef.current.timeoutId);
+        hoverInfoRef.current.timeoutId = null;
+      }
+
+      let descriptions = [];
+      const apiRequests = [];
+
+      features.forEach((feature) => {
+        const layerId = feature.layer.id;
+        const layerConfig = state.layers[layerId];
+        const customTooltip = layerConfig?.customTooltip;
+        const hoverNulls = layerConfig.hoverNulls ?? true;
+
+        const featureValue = feature.state.value;
+        if (
+          !hoverNulls &&
+          (featureValue === null || featureValue === undefined)
+        ) {
+          return; // Skip this feature
+        }
+
+        const featureName = feature.properties.name || "";
+        const featureValueDisplay =
+          featureValue !== undefined && featureValue !== null
+            ? numberWithCommas(featureValue)
+            : "";
+        const layerVisualisationName =
+          state.layers[layerId]?.visualisationName;
+        const legendText =
+          state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
+
+        let description = "";
+
+        if (!customTooltip) {
+          // Immediate data
+          if (
+            featureName &&
+            featureValue !== undefined &&
+            featureValue !== null
+          ) {
             description = `
-              <div class="popup-content">
-                <p class="feature-name">${featureName}</p>
-                <hr class="divider">
-                <div class="metadata-item">
-                  <span class="metadata-key">Value:</span>
-                  <span class="metadata-value">${numberWithCommas(featureValue)} ${state.visualisations[state.layers[layerId].visualisationName].legendText[0].legendSubtitleText}</span>
-                </div>
-              </div>`;
+                  <div class="popup-content">
+                    <p class="feature-name">${featureName}</p>
+                    <hr class="divider">
+                    <div class="metadata-item">
+                      <span class="metadata-key">Value:</span>
+                      <span class="metadata-value">${featureValueDisplay} ${legendText}</span>
+                    </div>
+                  </div>`;
           } else if (featureName) {
             description = `
+                  <div class="popup-content">
+                    <p class="feature-name">${featureName}</p>
+                  </div>`;
+          }
+          if (description) {
+            descriptions.push(description);
+          }
+        } else {
+          // Custom tooltip requiring API call
+          // Add a placeholder
+          description = `
               <div class="popup-content">
                 <p class="feature-name">${featureName}</p>
+                <p>Loading data...</p>
               </div>`;
-          }
-  
-          // Extract additional metadata columns
-          const metadataKeys = Object.keys(feature.properties).filter(
-            key => !['id', 'name', 'value'].includes(key)
-          );
-  
-          if (metadataKeys.length > 0 && shouldIncludeMetadata) {
-            let metadataDescription = '<div class="metadata-section">';
-            metadataKeys.forEach(key => {
-              metadataDescription += `
-                <div class="metadata-item">
-                  <span class="metadata-key">${key}:</span>
-                  <span class="metadata-value">${feature.properties[key]}</span>
-                </div>`;
-            });
-            metadataDescription += '</div>';
-            description += metadataDescription;
-          }
-  
-          if (description) {
-            descriptions += description;
-            if (index < features.length - 1) {
-              descriptions += '<hr class="thick-divider">';
-            }
-          }
-        });
-  
-        if (descriptions) {
-          const newPopup = new maplibregl.Popup({
-            className: 'custom-popup',
-            closeButton: false,
-            closeOnClick: false,
-          })
-            .setLngLat(coordinates)
-            .setHTML(descriptions)
-            .addTo(map);
-          if (!popups[layerId]) {
-            popups[layerId] = [];
-          }
-          popups[layerId].push(newPopup);
+          descriptions.push(description);
+
+          // Prepare the API request
+          apiRequests.push({ feature, layerId, featureName });
         }
+      });
+
+      // Show the popup with initial descriptions
+      if (descriptions.length > 0) {
+        const aggregatedHtml = descriptions.join('<hr class="thick-divider">');
+        const popup = new maplibregl.Popup({
+          className: "custom-popup",
+          closeButton: false,
+          closeOnClick: false,
+        })
+          .setLngLat(coordinates)
+          .setHTML(aggregatedHtml)
+          .addTo(map);
+        hoverInfoRef.current.popup = popup;
+      } else {
+        // No descriptions, do not show popup
+        return;
+      }
+
+      if (apiRequests.length > 0) {
+        // Delay the API calls
+        const fetchData = () => {
+          const controller = new AbortController();
+          hoverInfoRef.current.abortController = controller;
+
+          const fetchPromises = apiRequests.map(
+            ({ feature, layerId, featureName }) => {
+              const layerConfig = state.layers[layerId];
+              const customTooltip = layerConfig?.customTooltip;
+              const { url, htmlTemplate } = customTooltip;
+              const featureId = feature.id;
+              const requestUrl = url.replace("{id}", featureId);
+
+              return api.baseService
+                .get(requestUrl, { signal: controller.signal })
+                .then((responseData) => {
+                  let tooltipHtml = htmlTemplate;
+                  for (const key in responseData) {
+                    tooltipHtml = tooltipHtml.replace(
+                      new RegExp(`\\{${key}\\}`, "g"),
+                      responseData[key]
+                    );
+                  }
+                  return tooltipHtml;
+                })
+                .catch((error) => {
+                  if (error.name !== "AbortError") {
+                    console.error("Failed to fetch tooltip data:", error);
+                  }
+                  // Return placeholder or null
+                  return `
+                        <div class="popup-content">
+                          <p class="feature-name">${featureName}</p>
+                          <p>Data unavailable.</p>
+                        </div>`;
+                });
+            }
+          );
+
+          Promise.all(fetchPromises).then((results) => {
+            if (
+              hoverEventIdRef.current === currentHoverEventId &&
+              hoverInfoRef.current.popup
+            ) {
+              // Update popup content
+              const existingDescriptions = descriptions.filter(
+                (desc) => !desc.includes("Loading data...")
+              );
+              const newDescriptions = existingDescriptions.concat(results);
+              const aggregatedHtml = newDescriptions.join(
+                '<hr class="thick-divider">'
+              );
+              hoverInfoRef.current.popup.setHTML(aggregatedHtml);
+            }
+          });
+        };
+
+        const timeoutId = setTimeout(fetchData, 100);
+        hoverInfoRef.current.timeoutId = timeoutId;
       }
     },
-    [map, popups, state.visualisations]
+    [map, state.layers, state.visualisations]
   );
-  
 
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
@@ -393,7 +539,7 @@ const Map = (props) => {
               layout: {
                 'text-field': ['get', 'name'],
                 'text-size': 14,
-                'text-anchor': 'centre', // centre the text
+                'text-anchor': 'center', // centre the text
                 'text-offset': [0, 1.5], // No offset
                 'text-allow-overlap': false,
                 'symbol-placement': symbolPlacement, // Dynamic placement
@@ -416,7 +562,7 @@ const Map = (props) => {
   );
   
   
-
+  // **Set up click and zoom handlers**
   useEffect(() => {
     if (!map) return;
 
@@ -433,46 +579,6 @@ const Map = (props) => {
           listenerCallbackRef.current[layerId] = {};
         }
         listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
-      }
-      if (state.layers[layerId].isHoverable) {
-        const hoverNulls = state.layers[layerId].hoverNulls ?? true
-        const layerHover = (e) =>
-          handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0, hoverNulls)
-        map.on("mousemove", layerHover);
-        map.on("mouseleave", layerId, () => handleLayerLeave(layerId));
-        map.on("mouseenter", layerId, () => {
-          map.getCanvas().style.cursor = "pointer";
-        });
-        map.on("mouseleave", layerId, () => {
-          map.getCanvas().style.cursor = "grab";
-        });
-        if (!listenerCallbackRef.current[layerId]) {
-          listenerCallbackRef.current[layerId] = {};
-        }
-        listenerCallbackRef.current[layerId].layerHoverCallback =
-          layerHover;
-      }
-      if (state.layers[layerId].shouldHaveTooltipOnHover) {
-        const hoverNulls = state.layers[layerId].hoverNulls ?? true
-        const hoverCallback = (e) =>
-          handleLayerHoverTooltip(
-            e,
-            layerId,
-            state.layers[layerId].bufferSize ?? 0,
-            hoverNulls
-          );
-        map.on("mousemove", hoverCallback);
-        map.on("mouseenter", layerId, () => {
-          map.getCanvas().style.cursor = "pointer";
-        });
-        map.on("mouseleave", layerId, () => {
-          map.getCanvas().style.cursor = "grab";
-        });
-        if (!listenerCallbackRef.current[layerId]) {
-          listenerCallbackRef.current[layerId] = {};
-        }
-        listenerCallbackRef.current[layerId].hoverCallback =
-          hoverCallback;
       }
       if (state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
@@ -498,21 +604,22 @@ const Map = (props) => {
           popups[layerId] = [];
         }
         if (
-          state.layers[layerId].shouldHaveTooltipOnClick ||
-          state.layers[layerId].shouldHaveTooltipOnHover
+          state.layers[layerId].shouldHaveTooltipOnClick
         ) {
-          const { clickCallback, hoverCallback, layerHoverCallback, zoomHandler } =
+          const { clickCallback, zoomHandler } =
             listenerCallbackRef.current[layerId];
-          map.off("mousemove", hoverCallback);
-          map.off("mousemove", layerHoverCallback);
-          map.off("click", clickCallback);
+          if (clickCallback) {map.off("click", clickCallback)};
           map.off('zoomend', zoomHandler);
-        }
-        if (state.layers[layerId].isHoverable) {
-          map.off("mousemove", layerId, (e) =>
-            handleLayerHover(e, layerId, state.layers[layerId].bufferSize ?? 0)
-          );
-          map.off("mouseleave", layerId, () => handleLayerLeave(layerId));
+
+          // Clean up hover info
+          if (hoverInfoRef.current[layerId]) {
+            const { timeoutId, abortController, popup } =
+              hoverInfoRef.current[layerId];
+            if (timeoutId) clearTimeout(timeoutId);
+            if (abortController) abortController.abort();
+            if (popup) popup.remove();
+            hoverInfoRef.current[layerId] = null;
+          }
         }
         if (state.layers[layerId].shouldHaveLabel) {
           const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
@@ -520,7 +627,7 @@ const Map = (props) => {
         }
       });
     };
-  }, [map, handleLayerHover, handleLayerLeave, state.layers, state.visualisations]);
+  }, [map, handleLayerLeave, state.layers, state.visualisations]);
 
   /**
    * Handles map click events and dispatches actions based on the clicked feature.
@@ -621,6 +728,53 @@ const Map = (props) => {
     [isMapReady, map, state.filters, dispatch]
   );
 
+  // **Create map hover handler**
+  useEffect(() => {
+    if (!map) return;
+
+    // Set up the hover event listener
+    const hoverCallback = (e) => handleMapHover(e);
+    map.on("mousemove", hoverCallback);
+
+    // Set up the mouseleave event listener to clean up
+    const mouseLeaveCallback = () => {
+      if (hoverInfoRef.current.popup) {
+        hoverInfoRef.current.popup.remove();
+        hoverInfoRef.current.popup = null;
+      }
+      if (hoverInfoRef.current.abortController) {
+        hoverInfoRef.current.abortController.abort();
+        hoverInfoRef.current.abortController = null;
+      }
+      if (hoverInfoRef.current.timeoutId) {
+        clearTimeout(hoverInfoRef.current.timeoutId);
+        hoverInfoRef.current.timeoutId = null;
+      }
+      // Reset previous hovered features and clear hover state
+      prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+        map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+      });
+      prevHoveredFeaturesRef.current = [];
+    };
+    map.getCanvas().addEventListener("mouseleave", mouseLeaveCallback);
+
+    // Store the callbacks to clean up later
+    listenerCallbackRef.current.hoverCallback = hoverCallback;
+    listenerCallbackRef.current.mouseLeaveCallback = mouseLeaveCallback;
+
+    return () => {
+      if (listenerCallbackRef.current.hoverCallback) {
+        map.off("mousemove", listenerCallbackRef.current.hoverCallback);
+      }
+      if (listenerCallbackRef.current.mouseLeaveCallback) {
+        map.getCanvas().removeEventListener(
+          "mouseleave",
+          listenerCallbackRef.current.mouseLeaveCallback
+        );
+      }
+    };
+  }, [map, handleMapHover]);
+
   // Run once to set the state of the map
   useEffect(() => {
     if (isMapReady) {
@@ -631,9 +785,7 @@ const Map = (props) => {
     }
   }, [isMapReady]);
 
-  const featureSelectConfig = state.filters.find((filter) => filter.type.startsWith('mapFeatureSelect'));
-  // useFeatureSelect(map, featureSelectConfig, featureSelectConfig?.defaultMode ?? null);
-
+  // **Handle map clicks (for map filters)**
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {
       const hasMapFilter = state.filters.some(

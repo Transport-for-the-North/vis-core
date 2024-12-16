@@ -15,6 +15,9 @@ const SelectorContainer = styled.div`
 `;
 
 const NoDataParagraph = styled.p``;
+const NoDataParagraphMessage = styled.p`
+  color: red;
+  `;
 const DiffParagraph = styled.p``;
 
 /**
@@ -166,7 +169,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
         <NoDataParagraph>Loading filters...</NoDataParagraph>
       )}
       {/* Check if no data has been found and display a small message in the sidebar if so */}
-      {noDataAvailable && <NoDataParagraph>{noDataMessage}</NoDataParagraph>}
+      {noDataAvailable && <NoDataParagraphMessage>{noDataMessage}</NoDataParagraphMessage>}
     </AccordionSection>
   );
 };
