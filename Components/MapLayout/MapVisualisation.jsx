@@ -151,7 +151,7 @@ export const MapVisualisation = ({
         (e) => e === layerColorScheme.value
       )
         ? layerColorScheme.value
-        : defaultMapColourMapper[colorStyle];
+        : defaultMapColourMapper[colorStyle].value;
 
       // Calculate the color palette based on the classification
       const invertColorScheme =
@@ -457,7 +457,7 @@ export const MapVisualisation = ({
         (e) => e === layerColorScheme.value
       )
         ? layerColorScheme.value
-        : defaultMapColourMapper[colorStyle];
+        : defaultMapColourMapper[colorStyle].value;
 
       // Calculate color palette
       const colourPalette = calculateColours(currentColor, reclassifiedData);
