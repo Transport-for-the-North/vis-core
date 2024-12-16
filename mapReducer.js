@@ -371,8 +371,9 @@ export const mapReducer = (state, action) => {
     case actionTypes.SET_MAP: {
       const { map } = action.payload;
       // Attempt to find a colourValue
-      let colourValue = findFirstColourValue(state.filters);
-    
+      const visualisationName = Object.keys(state.visualisations)[0];
+      let colourValue = findFirstColourValue(state.filters) || state.visualisations[visualisationName].colorValue;
+
       // If colourValue is null, default to { value: "YlGnBu", label: "YlGnBu" }
       if (!colourValue) {
         colourValue = { value: "YlGnBu", label: "YlGnBu" };
@@ -389,7 +390,8 @@ export const mapReducer = (state, action) => {
     case actionTypes.SET_DUAL_MAPS: {
       const { maps } = action.payload;
       // Attempt to find a colourValue
-      let colourValue = findFirstColourValue(state.filters);
+      const visualisationName = Object.keys(state.visualisations)[0];
+      let colourValue = findFirstColourValue(state.filters) || state.visualisations[visualisationName].colorValue;
     
       // If colourValue is null, default to { value: "YlGnBu", label: "YlGnBu" }
       if (!colourValue) {
