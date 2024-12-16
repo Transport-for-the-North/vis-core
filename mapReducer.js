@@ -108,6 +108,7 @@ export const mapReducer = (state, action) => {
       return {
         ...state,
         layers: {},
+        colorSchemesByLayer: {},
         visualisations: {},
         filters: {},
         leftVisualisations: {},
@@ -125,8 +126,20 @@ export const mapReducer = (state, action) => {
     case actionTypes.INITIALISE_SIDEBAR:
       return { ...state, filters: action.payload };
     case actionTypes.ADD_LAYER: {
-     // Logic to add a non-parameterised layer
-     return { ...state, layers: { ...state.layers, ...action.payload } };
+      const newLayers = { ...state.layers, ...action.payload };
+      const newColorSchemes = { ...state.colorSchemesByLayer };
+    
+      Object.keys(action.payload).forEach(layerName => {
+        if (!newColorSchemes[layerName]) {
+          newColorSchemes[layerName] = { value: "YlGnBu", label: "YlGnBu" }; // Default color scheme
+        }
+      });
+    
+      return {
+        ...state,
+        layers: newLayers,
+        colorSchemesByLayer: newColorSchemes,
+      };
     }
     case actionTypes.UPDATE_PARAMETERISED_LAYER: {
       // Get the layer name and new parameters from the payload
@@ -185,10 +198,13 @@ export const mapReducer = (state, action) => {
     }
 
     case actionTypes.UPDATE_COLOR_SCHEME: {
-      const { color_scheme } = action.payload;
+      const { layerName, color_scheme } = action.payload;
       return {
         ...state,
-        color_scheme: color_scheme,
+        colorSchemesByLayer: {
+          ...state.colorSchemesByLayer,
+          [layerName]: color_scheme,
+        },
       };
     }
 
@@ -365,8 +381,8 @@ export const mapReducer = (state, action) => {
       return {
         ...state,
         map: map, // Store the map instance directly in the state
-        color_scheme: colourValue, // Use either the found or default colourValue
-        class_method: "d",
+        // color_scheme: colourValue, // Use either the found or default colourValue
+        // class_method: "d",
       };
     }
 
