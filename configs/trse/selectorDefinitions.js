@@ -208,6 +208,8 @@ const oaOrPtvariableSelector = {
   target: "api",
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_COLOR_SCHEME", payload: { layerName: "Output Areas" } },
+    { action: "UPDATE_COLOR_SCHEME", payload: { layerName: "PT Points" } }
   ],
   visualisations: null,
   type: "toggle",
