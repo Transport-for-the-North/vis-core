@@ -99,6 +99,9 @@ export const LayerControlEntry = memo(
       currentPage.pageName.includes("Side by Side")
         ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
         : state.visualisations[Object.keys(state.visualisations)[0]];
+
+    const colorStyle = visualisation?.style?.split("-")[1] || "continuous";
+
     const hasDefaultBands = selectedPageBands?.metric.find(
       (metric) =>
         metric.name ===
@@ -147,7 +150,7 @@ export const LayerControlEntry = memo(
 
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
-          map.setPaintProperty(layer.id, opacityExpression);
+          map.setPaintProperty(layer.id, opacityProp, opacityExpression);
         }
       });
       setOpacity(newOpacity);
@@ -177,7 +180,7 @@ export const LayerControlEntry = memo(
         {layer.metadata?.isStylable && (
           <>
             <ColourSchemeDropdown
-              colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
+              colorStyle={colorStyle}
               handleColorChange={handleColorChange}
               layerName={layer.id}
             />

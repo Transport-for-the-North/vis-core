@@ -1,7 +1,7 @@
+import React, { useEffect, useState } from 'react';
 import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
-
 import { useMapContext } from "hooks";
 import { useMemo } from "react";
 import { colorSchemes } from "utils";
@@ -48,6 +48,10 @@ export const ColourSchemeDropdown = ({
   layerName,
 }) => {
   const animatedComponents = makeAnimated();
+  const { state } = useMapContext();
+
+  // Retrieve the color scheme for the specific layer
+  const layerColorScheme = state.colorSchemesByLayer[layerName];
 
   /**
    * Custom formatting for option label to include color swatches.
@@ -77,7 +81,6 @@ export const ColourSchemeDropdown = ({
     );
   };
 
-  const { state } = useMapContext();
   const options = useMemo(
     () =>
       colorSchemes[colorStyle].map((scheme) => ({
@@ -87,6 +90,19 @@ export const ColourSchemeDropdown = ({
     [colorStyle]
   );
 
+  // State to keep track of the selected option
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  // Update selected option when layerColorScheme changes
+  useEffect(() => {
+    if (layerColorScheme) {
+      const matchingOption = options.find(
+        (option) => option.value === layerColorScheme.value
+      );
+      setSelectedOption(matchingOption || options[0]);
+    }
+  }, [layerColorScheme, options]);
+
   return (
     <>
       <SelectorLabel text="Colour scheme" />
@@ -94,16 +110,12 @@ export const ColourSchemeDropdown = ({
         id={"colors-" + layerName}
         components={animatedComponents}
         options={options}
-        defaultValue={
-          options.some((e) => e.value === state.color_scheme.value)
-            ? state.color_scheme
-            : options[0]
-        }
+        value={selectedOption}
         formatOptionLabel={formatOptionLabel}
         styles={colourStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body} // Use a portal to render the menu
-        onChange={(color) => handleColorChange(color)}
+        onChange={(selectedOption) => handleColorChange(selectedOption, layerName)}
       />
     </>
   );
