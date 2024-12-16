@@ -1,5 +1,5 @@
 import { selectors } from "../selectorDefinitions";
-import { termsOfUse } from "../TermsOfUse";
+import { termsOfUse, termsOfUseCP } from "../TermsOfUse";
 
 export const cpLocation = {
   pageName: "Actual: Chargers/Power by Location",
@@ -11,9 +11,18 @@ export const cpLocation = {
   customMapZoom: "@mapZoom@",
   navbarLinkBgColour: "@primaryBgColour@",
   about: `
-  <p>This visualisation shows the actual chargers and power numbers by location.</p>`,
+  <p>This visualisation shows the actual chargers and power numbers by location.</p>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   termsOfUse: termsOfUse,
-  legalText: termsOfUse,
+  legalText: termsOfUseCP,
   config: {
     layers: [
       {
@@ -38,7 +47,7 @@ export const cpLocation = {
       {
         name: "Chargers/Power by Location",
         type: "joinDataToMap",
-        joinLayer: "Charging Location",
+        joinLayer: "Charging Sites",
         style: "circle-continuous",
         joinField: "id",
         valueField: "value",

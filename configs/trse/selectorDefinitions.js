@@ -223,7 +223,7 @@ const oaOrPtvariableSelector = {
         colourValue: { value: "PuRd", label: "PuRd" },
       },
       {
-        displayValue: "Accessibility only",
+        displayValue: "Access only",
         paramValue: "acc",
         colourValue: { value: "OrRd", label: "OrRd" },
       },
@@ -269,7 +269,7 @@ const oaFeatureSelector = {
   paramName: "featureId",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-  visualisations: ["Feature Callout"],
+  visualisations: ["OA Callout"],
   type: "map",
   layer: "Output Areas",
   field: "id",
@@ -282,7 +282,7 @@ const oaFeatureTypeFixedSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
-  visualisations: ['Feature Callout'],
+  visualisations: ['OA Callout'],
   type: "fixed",
   values: {
     source: "local",
@@ -290,6 +290,37 @@ const oaFeatureTypeFixedSelector = {
       {
         displayValue: "OA",
         paramValue: 'oa',
+      }
+    ],
+  },
+};
+
+const ptFeatureSelector = {
+  filterName: "",
+  paramName: "featureId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: ["PT Callout"],
+  type: "map",
+  layer: "PT Points",
+  field: "id",
+};
+
+const ptFeatureTypeFixedSelector = {
+  filterName: "OA Feature Type",
+  paramName: "featureType",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: ['PT Callout'],
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "PT",
+        paramValue: 'pt',
       }
     ],
   },
@@ -309,5 +340,7 @@ export const selectors = {
   oaOrPtvariable: oaOrPtvariableSelector,
   oaOrPtPercentileFilter: oaOrPtPercentileFilter,
   oaFeature: oaFeatureSelector,
-  oaFeatureType: oaFeatureTypeFixedSelector
+  oaFeatureType: oaFeatureTypeFixedSelector,
+  ptFeature: ptFeatureSelector,
+  ptFeatureType: ptFeatureTypeFixedSelector
 };

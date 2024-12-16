@@ -1,3 +1,5 @@
+import { termsOfUse } from "./termsOfUse";
+
 const scenarioCodeValues = {
   source: "local",
   values: [
@@ -168,6 +170,22 @@ const userClassIdValues = {
   ]
 }
 
+const landuseValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Employment",
+      paramValue: "emp",
+      legendSubtitleText: "employment"
+    },
+    {
+      displayValue: "Population",
+      paramValue: "pop",
+      legendSubtitleText: "population"
+    }
+  ]
+}
+
 const originOrDestinationValues = {
   source: "local",
   values: [
@@ -238,25 +256,26 @@ const landuseExogValues = {
   source: "local",
   values: [
     {
-      displayValue: "Dynamic",
-      paramValue: "dynamic",
-    },
-    {
       displayValue: "Static",
       paramValue: "static",
+    },
+    {
+      displayValue: "Dynamic",
+      paramValue: "dynamic",
     },
   ],
 }
 
 export const appConfig = {
-  title: "TAME React Vis Template",
+  title: "TfN's Northern Rail Modelling System (NoRMS) Visualiser",
   introduction: `<p>The TfN’s Northern Rail Modelling System (NoRMS) Vis Framework aims to collate and visualise outputs from the Transport for the North Northern Rail Model (NoRMS), that is part of the Northern Transport Modelling System (NorTMS).
    NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise modelled rail data in an interactive, intuitive, and
    web-based format. This instance of the platform presents information from the Network North project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
    based on scenario testing done using NoRMS.</p>`,
   background: "",
+  methodology: "",
   legalText:
-    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+     termsOfUse,
   contactText: "Please contact Matteo Gravellu for any questions on this data tool.",
   contactEmail: "matteo.gravellu@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
@@ -268,6 +287,8 @@ export const appConfig = {
       pageName: "Station Totals",
       url: "/norms-station-totals",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about: `
       <p>Visualise the number of passengers using the station by selecting a scenario, adjusting the Time Period and choosing the Metric. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -388,6 +409,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -409,6 +431,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: {
               source: "api"
@@ -423,6 +446,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Totals"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -440,9 +464,11 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Station Totals Difference",
+      pageName: "Station Totals Difference (2-1)",
       url: "/norms-station-totals-difference",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference in passenger movements at stations between two separate scenarios by selecting two scenarios. The difference is calculated scenario 2 vs scenario 1 (i.e. 2–1). </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -496,7 +522,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -516,7 +542,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -536,7 +562,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -556,11 +582,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -577,18 +604,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period DS",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Totals Difference"],
-            type: "toggle",
-            values: {
-              source: "api"
-            },
-          },
-          {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -608,7 +624,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -628,7 +644,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Totals Difference"],
@@ -648,11 +664,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -669,18 +686,19 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period DM",
-            paramName: "timePeriodCodeDoMinimum",
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Totals Difference"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: {
               source: "api"
             },
           },
           {
-            filterName: "Metric",
+            filterName: "Metric (1 and 2)",
             paramName: "propertyName",
             target: "api",
             actions: [
@@ -688,6 +706,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Totals Difference"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -708,6 +727,8 @@ export const appConfig = {
       pageName: "Station Totals Side-by-Side",
       url: "/norms-station-totals-difference-dual",
       type: "DualMapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios, and their respective absolute values, at the same time by selecting Left/Right Scenarios. This allows to see the absolute values of both scenarios in real time.  </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -826,6 +847,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Totals Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the left scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -847,6 +869,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Totals Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: {
               source: "api"
@@ -918,6 +941,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Totals Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the right scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -939,6 +963,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Totals Side-by-Side"],
+            info: "Select the desired time period. ",
             type: "toggle",
             values: {
               source: "api"
@@ -953,6 +978,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Totals Side-by-Side"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -973,6 +999,8 @@ export const appConfig = {
       pageName: "Station Pairs",
       url: "/norms-station-pair",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about: `
       <p>Visualise the travelling patterns of a station by selecting it on the map. Further, adjust Time Period, User Class, Direction and Metric. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -1095,6 +1123,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -1116,15 +1145,17 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs"],
+            info:"Select the desired time period. ",
             type: "toggle",
             values: timePeriodCodeValues,
           },
           {
-            filterName: "User",
+            filterName: "User Class",
             paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Pairs"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -1159,6 +1190,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Pairs"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1196,9 +1228,11 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Station Pairs Difference",
+      pageName: "Station Pairs Difference (2-1)",
       url: "/norms-station-pair-difference",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about: `
       <p>Visualise difference of a selected station’s travelling patterns between two different scenarios by clicking on a preferred location. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -1256,7 +1290,171 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Origin or Destination",
+            filterName: "Filter 1 Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 1 Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 1 Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Scenario 1",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Station Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Scenario 2",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1265,7 +1463,40 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "Metric",
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            info:"Select the desired user class.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
+          },
+          {
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Pairs Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -1273,6 +1504,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Pairs Difference"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1297,230 +1529,6 @@ export const appConfig = {
             }
           },
           {
-            filterName: "Filter DM Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DM Scenario",
-            paramName: "scenarioCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "Filter DS Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DS Scenario",
-            paramName: "scenarioCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Pairs Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
             filterName: "Please select a station in the map",
             paramName: "nodeId",
             target: "api",
@@ -1538,6 +1546,8 @@ export const appConfig = {
       pageName: "Station Pairs Side-by-Side",
       url: "/norms-station-pair-dual",
       type: "DualMapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>Visualise both scenarios at the same time by selecting a station. Further, adjust the Column Name to a desired metric, both Time Periods, both User Classes and a Direction.</p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -1611,6 +1621,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -1700,6 +1711,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the left scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -1721,6 +1733,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -1730,6 +1743,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -1812,6 +1826,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the right scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -1833,6 +1848,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -1842,6 +1858,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Pairs Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -1875,6 +1892,8 @@ export const appConfig = {
       pageName: "Station Catchment",
       url: "/norms-station-catchment",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments by selecting a station on the map. Further, adjust the Scenario, Time Period, User Class, Direction and a Metric of choice. </p>
       <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes.</p>
@@ -2012,6 +2031,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2033,6 +2053,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -2042,6 +2063,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2090,6 +2112,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Catchment"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -2122,9 +2145,11 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Station Catchment Difference",
+      pageName: "Station Catchment Difference (2-1)",
       url: "/norms-station-catchment/difference",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>Visualise the difference between two scenarios and a selected station catchment by selecting a station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -2199,7 +2224,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2219,7 +2244,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2239,7 +2264,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2259,11 +2284,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2280,38 +2306,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [123, 456, 789]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2331,7 +2326,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2351,7 +2346,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Station Catchment Difference"],
@@ -2371,11 +2366,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2392,38 +2388,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Station Catchment Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [123, 456, 789]
-            },
-          },
-          {
-            filterName: "Origin or Destination",
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "directionId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -2446,7 +2411,40 @@ export const appConfig = {
           },
           },
           {
-            filterName: "Metric",
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            info:"Select the desired user class.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [123, 456, 789]
+            },
+          },
+          {
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Station Catchment Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -2454,6 +2452,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Catchment Difference"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -2489,6 +2488,8 @@ export const appConfig = {
       pageName: "Station Catchment Side-by-Side",
       url: "/norms-station-catchment-dual",
       type: "DualMapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>Visualise station catchments for two scenarios simultaneously by selecting the station of interest. Further, adjust both Scenarios, both Time Periods, both User Classes, Metric of choice and Direction</p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -2594,6 +2595,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -2678,6 +2680,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the left scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2699,6 +2702,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -2708,6 +2712,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2790,6 +2795,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the right scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2811,6 +2817,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -2820,6 +2827,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Station Catchment Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2853,6 +2861,8 @@ export const appConfig = {
       pageName: "Link Totals",
       url: "/norms-link",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about:`
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -2974,6 +2984,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -2995,6 +3006,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -3007,6 +3019,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Link Totals"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3049,9 +3062,11 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Link Totals Difference",
+      pageName: "Link Totals Difference (2-1)",
       url: "/norms-link-result-difference",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about: `
       <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics should match). 
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -3110,7 +3125,7 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable ],
         filters: [
           {
-            filterName: "Filter DM Scenario by Network",
+            filterName: "Filter 1 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3130,7 +3145,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Demand Scenario",
+            filterName: "Filter 1 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3150,7 +3165,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DM Scenario by Year",
+            filterName: "Filter 1 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3170,11 +3185,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Scenario",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -3191,63 +3207,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Link Totals Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "Metric DM",
-            paramName: "propertyNameDoMinimum",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Link Totals Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "No. Passengers",
-                  paramValue: "No. Passengers",
-                  legendSubtitleText: "Passengers",
-                },
-                {
-                  displayValue: "Total Crush Capacity",
-                  paramValue: "Total Crush Capacity",
-                  legendSubtitleText: "Capacity",
-                },
-                {
-                  displayValue: "Total Crush Load Factor",
-                  paramValue: "Total Crush Load Factor",
-                  legendSubtitleText: "Factor",
-                },
-                {
-                  displayValue: "Total Seat Capacity",
-                  paramValue: "Total Seat Capacity",
-                  legendSubtitleText: "Capacity",
-                },
-                {
-                  displayValue: "Total Seat Load Factor",
-                  paramValue: "Total Seat Load Factor",
-                  legendSubtitleText: "Factor",
-                },
-                {
-                  displayValue: "Trains per hour",
-                  paramValue: "Trains per hour",
-                  legendSubtitleText: "units",
-                },
-              ]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Network",
+            filterName: "Filter 2 Scenario by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3267,7 +3227,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Demand Scenario",
+            filterName: "Filter 2 Scenario by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3287,7 +3247,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter DS Scenario by Year",
+            filterName: "Filter 2 Scenario by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Link Totals Difference"],
@@ -3307,11 +3267,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Scenario",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -3328,23 +3289,25 @@ export const appConfig = {
             },
           },
           {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Link Totals Difference"],
+            info:"Select the desired time period. ",
             type: "toggle",
             values: timePeriodCodeValues,
           },
           {
-            filterName: "Metric DS",
-            paramName: "propertyNameDoSomething",
+            filterName: "Metric (1 and 2)",
+            paramName: "propertyName",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Link Totals Difference"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3390,6 +3353,8 @@ export const appConfig = {
       pageName: "Link Totals Side-by-Side",
       url: "/norms-link-result-dual",
       type: "DualMapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice.</p>  
       <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
@@ -3411,6 +3376,7 @@ export const appConfig = {
             isStylable: false,
             shouldHaveTooltipOnHover: true,
             shouldHaveLabel: true,
+            labelNulls: true,
             labelZoomLevel: 9,
             labelNulls: true
           },
@@ -3511,6 +3477,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Totals Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the left scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -3532,6 +3499,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Totals Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -3601,6 +3569,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Totals Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the right scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -3622,6 +3591,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Totals Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -3634,6 +3604,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Link Totals Side-by-Side"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3679,7 +3650,9 @@ export const appConfig = {
       pageName: "Zone Totals",
       url: "/zone-totals",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Zone",
+      legalText: termsOfUse,
       about: `
       <p>The NorTMS zones included in the model are displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -3727,6 +3700,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Totals"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3760,6 +3734,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -3769,6 +3744,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -3851,6 +3827,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Totals"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -3870,10 +3847,12 @@ export const appConfig = {
       }
     },
     {
-      pageName: "Zone Totals Difference",
+      pageName: "Zone Totals Difference (2-1)",
       url: "/zone-totals-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Zone",
+      legalText: termsOfUse,
       about: `
       <p>This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics selection should match). </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -3913,7 +3892,213 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Metric",
+            filterName: "Filter 1 Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 1 Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 1 Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Scenario 1",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Scenario 2",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Origin or Destination (1 and 2)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            info:"Select the desired user class.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
+          },
+          {
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Totals Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -3921,6 +4106,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Totals Difference"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -3939,239 +4125,6 @@ export const appConfig = {
               ],
             },
           },
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Filter DM Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DM Scenario",
-            paramName: "scenarioCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "Filter DS Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DS Scenario",
-            paramName: "scenarioCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Totals Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
         ]
       }
     },
@@ -4179,7 +4132,9 @@ export const appConfig = {
       pageName: "Zone Totals Side-by-Side",
       url: "/zone-totals-dual",
       type: "DualMapLayout",
+      //termsOfUse: termsOfUse,
       category: "Zone",
+      legalText: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>Rail travel demand trip ends at an origin or destination. This visualisation shows the total rail travel demand coming from or going to a NorTMS zone for each user class as a choropleth. Zones are generalised geographic areas that share similar land uses, NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA). </p>
@@ -4227,6 +4182,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -4320,6 +4276,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the left scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4341,6 +4298,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4363,6 +4321,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -4432,6 +4391,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the right scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4453,6 +4413,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4475,6 +4436,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Totals Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: {
               source: "api"
@@ -4487,7 +4449,9 @@ export const appConfig = {
       pageName: "Zone Benefits",
       url: "/zone-benefits",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Zone",
+      legalText: termsOfUse,
       about: "Shows the zonal benefits (summed to origin or destination for the selected scenario compared with its DM.",
       config: {
         layers: [
@@ -4544,6 +4508,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Benefits"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -4607,6 +4572,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -4616,6 +4582,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4698,6 +4665,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4717,10 +4685,12 @@ export const appConfig = {
       }
     },
     {
-      pageName: "Zone Benefits Difference",
+      pageName: "Zone Benefits Difference (2-1)",
       url: "/zone-benefits-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Zone",
+      legalText: termsOfUse,
       about: `
       <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
       <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
@@ -4771,76 +4741,11 @@ export const appConfig = {
           }, userClassMetadataTable],
         filters: [
           {
-            filterName: "Metric",
-            paramName: "columnName",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Zone Benefits Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 'Total Generalised Cost',
-                  paramValue: 'total_gen_cost',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'IVT',
-                  paramValue: 'ivt',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Crowding',
-                  paramValue: 'crowding',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Wait Time',
-                  paramValue: 'wait_time',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Walk Time',
-                  paramValue: 'walk_time',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Penalty',
-                  paramValue: 'penalty',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Access Egress',
-                  paramValue: 'access_egress',
-                  legendSubtitleText: "Pass. Mins",
-                },
-                {
-                  displayValue: 'Value of choice',
-                  paramValue: 'value_of_choice',
-                  legendSubtitleText: "Pass. Mins",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Benefits Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
             filterName: "Scenario 1/Scenario 2 Do Minimum",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Benefits Difference"],
+            info:"Select a 1 scenario for both scenario 1 and scenario 2.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4922,6 +4827,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -4936,37 +4842,6 @@ export const appConfig = {
               sort: "ascending",
               exclude: ["NA"]
             },
-          },
-          {
-            filterName: "Scenario 1 User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Benefits Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "Scenario 1 Time Period",
-            paramName: "timePeriodCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Benefits Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter Scenario 2 by Network",
@@ -5034,6 +4909,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5050,11 +4926,21 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario 2 User Class",
-            paramName: "userClassIdDoSomething",
+            filterName: "Origin or Destination (Scenario 1 and 2)",
+            paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "User Class (Scenario 1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Benefits Difference"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5072,13 +4958,72 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario 2 Time Period",
-            paramName: "timePeriodCodeDoSomething",
+            filterName: "Time Period (Scenario 1 and 2)",
+            paramName: "timePeriodCode",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Benefits Difference"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
+          },
+          {
+            filterName: "Metric (Scenario 1 and 2)",
+            paramName: "columnName",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Zone Benefits Difference"],
+            info:"Select the desired metric.",
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: {
+              source: "local",
+              values: [
+                {
+                  displayValue: 'Total Generalised Cost',
+                  paramValue: 'total_gen_cost',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'IVT',
+                  paramValue: 'ivt',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Crowding',
+                  paramValue: 'crowding',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Wait Time',
+                  paramValue: 'wait_time',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Walk Time',
+                  paramValue: 'walk_time',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Penalty',
+                  paramValue: 'penalty',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Access Egress',
+                  paramValue: 'access_egress',
+                  legendSubtitleText: "Pass. Mins",
+                },
+                {
+                  displayValue: 'Value of choice',
+                  paramValue: 'value_of_choice',
+                  legendSubtitleText: "Pass. Mins",
+                },
+              ],
+            },
           },
         ]
       }
@@ -5087,8 +5032,28 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals)",
       url: "/accessibility-key-location-totals",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination,<br> 
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X number of key locations are accessed from the zone as origin within Y minutes”. If destination is selected, 
+      the narrative changes to “X number of key locations can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on 
+      the combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -5190,6 +5155,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5211,6 +5177,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
+            info:"Select the desired time period.",
             type: "toggle",
             shouldBeBlankOnInit: false,
             multiSelect: true,
@@ -5267,6 +5234,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -5292,6 +5260,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Accessibility Totals"],
+            info:"Select the desired key location.",
             type: "dropdown",
             containsLegendInfo: true,
             shouldBeBlankOnInit: false,
@@ -5340,8 +5309,28 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Totals) Difference",
       url: "/accessibility-key-location-totals-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows <b><u>the difference in</u></b> the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination,<br> 
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X number of key locations are accessed from the zone as origin within Y minutes”. If destination is selected, 
+      the narrative changes to “X number of key locations can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on 
+      the combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -5378,7 +5367,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5398,7 +5387,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5418,7 +5407,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5438,11 +5427,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5459,86 +5449,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5558,7 +5469,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5578,7 +5489,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Totals Difference"],
@@ -5598,11 +5509,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5619,85 +5531,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Origin Or Destination",
+            filterName: "Origin Or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5706,7 +5540,87 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
-            filterName: "Key Location Type",
+            filterName: "Filter User Class by Segment (1 and 2)",
+            paramName: "userClassId",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "Filter User Class by Car Availability (1 and 2)",
+            paramName: "userClassId",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Totals Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Key Location Type (1 and 2)",
             paramName: "keyLocationTypeId",
             target: "api",
             actions: [
@@ -5714,6 +5628,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Accessibility Totals Difference"],
+            info:"Select the desired key location.",
             type: "dropdown",
             containsLegendInfo: true,
             shouldBeBlankOnInit: false,
@@ -5732,7 +5647,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -5753,9 +5668,13 @@ export const appConfig = {
       pageName: "Zone Pairs",
       url: "/norms-zones-pair",
       type: "MapLayout",
-      about: `
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
+      //termsOfUse: termsOfUse,
+      legalText: termsOfUse,
+      aabout:`
+      <p>Visualise the distribution patterns of Demand, Generalised Cost and Generalised Journey Time of a zone by selecting it on the map. Further, adjust time period, direction and desired metric. </p>
+      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
+      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
+      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
       config: {
@@ -5856,6 +5775,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5877,6 +5797,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -5886,6 +5807,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -5920,6 +5842,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Pairs"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -5957,13 +5880,17 @@ export const appConfig = {
       },
     },
     {
-      pageName: "Zone Pairs Difference",
+      pageName: "Zone Pairs Difference (2-1)",
       url: "/norms-zones-pair-difference",
       type: "MapLayout",
+      legalText: termsOfUse,
+      //termsOfUse: termsOfUse,
       about: `
-      <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
+      <p>Visualise the change in the distribution patterns of a given metric between two difference scenarios by selecting the desired zone on the map. Metrics included in the functionality are: Demand, 
+      Generalised Cost and Generalised Journey Time. Further, adjust time period, direction and desired metric.  </p>
+      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
+      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
+      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
       config: {
@@ -6000,7 +5927,171 @@ export const appConfig = {
         metadataTables: [ inputNormsScenarioMetadataTable, userClassMetadataTable ],
         filters: [
           {
-            filterName: "Zone as Origin or Destination",
+            filterName: "Filter 1 Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 1 Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 1 Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Scenario 1",
+            paramName: "scenarioCodeDoMinimum",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Network",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "network_spec",
+              paramColumn: "network_spec",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Demand Scenario",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "demand_code",
+              paramColumn: "demand_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Filter 2 Scenario by Year",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Zone Pairs Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: true,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_year",
+              paramColumn: "scenario_year",
+              sort: "ascending",
+              exclude: [0]
+            },
+          },
+          {
+            filterName: "Scenario 2",
+            paramName: "scenarioCodeDoSomething",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldFilterOthers: false,
+            isClearable: true,
+            multiSelect: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "input_norms_scenario",
+              displayColumn: "scenario_code",
+              paramColumn: "scenario_code",
+              sort: "ascending",
+              exclude: ["NA"]
+            },
+          },
+          {
+            filterName: "Origin or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -6009,7 +6100,40 @@ export const appConfig = {
             values: originOrDestinationValues,
           },
           {
-            filterName: "Metric",
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            info:"Select the desired user class.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            },
+          },
+          {
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Pairs Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            values: timePeriodCodeValues
+          },
+          {
+            filterName: "Metric (1 and 2)",
             paramName: "columnName",
             target: "api",
             actions: [
@@ -6017,6 +6141,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Pairs Difference"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -6041,230 +6166,6 @@ export const appConfig = {
             }
           },
           {
-            filterName: "Filter DM Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DM Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DM Scenario",
-            paramName: "scenarioCodeDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DM Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues,
-          },
-          {
-            filterName: "DM User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Network",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "network_spec",
-              paramColumn: "network_spec",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Demand Scenario",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "demand_code",
-              paramColumn: "demand_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "Filter DS Scenario by Year",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: true,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_year",
-              paramColumn: "scenario_year",
-              sort: "ascending",
-              exclude: [0]
-            },
-          },
-          {
-            filterName: "DS Scenario",
-            paramName: "scenarioCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldFilterOthers: false,
-            isClearable: true,
-            multiSelect: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "input_norms_scenario",
-              displayColumn: "scenario_code",
-              paramColumn: "scenario_code",
-              sort: "ascending",
-              exclude: ["NA"]
-            },
-          },
-          {
-            filterName: "DS Time Period",
-            paramName: "timePeriodCodeDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "toggle",
-            values: timePeriodCodeValues
-          },
-          {
-            filterName: "DS User Class",
-            paramName: "userClassIdDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Pairs Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-            },
-          },
-          {
             filterName: "Select a zone in the map",
             paramName: "zoneId",
             target: "api",
@@ -6273,7 +6174,7 @@ export const appConfig = {
             type: "map",
             layer: "NoRMS Zones Pair Result Difference",
             field: "id",
-          }
+          },
         ]
       },
     },
@@ -6281,10 +6182,13 @@ export const appConfig = {
       pageName: "Zone Pairs Side-by-Side",
       url: "/norms-zones-pair-dual",
       type: "DualMapLayout",
-      about: `
-      <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>
-      <p>This visual can be used to display the travel movements between NorTMS zones, selecting a zone as the origin or destination will show the metric with respect to other zones in the model. Selecting an origin zone, and the demand metric, the visual will display the destinations that demand goes to as a choropleth. </p>
-      <p>Metrics are aggregated by Demand (number of passengers), generlised cost and generalized journey time. </p>
+      //termsOfUse: termsOfUse,
+      legalText: termsOfUse,
+      about:`
+      <p>Visualise the distribution patterns of Demand, Generalised Cost and Generalised Journey Time of a zone by selecting it on the map. Further, adjust time period, direction and desired metric. </p>
+      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
+      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
+      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
       config: {
@@ -6338,6 +6242,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Select the desired metric.",
             type: "dropdown",
             containsLegendInfo: true,
             values: {
@@ -6427,6 +6332,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the left scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -6448,6 +6354,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -6457,6 +6364,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -6539,6 +6447,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Use the Network, Demand, and Year filters to select the right scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -6560,6 +6469,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Select the desired time period.",
             type: "toggle",
             values: timePeriodCodeValues,
           },
@@ -6569,6 +6479,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Pairs Side-by-Side"],
+            info:"Select the desired user class.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -6603,8 +6514,29 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair)",
       url: "/accessibility-key-location-pair",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold, <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X businesses are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X businesses can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the 
+      combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -6706,6 +6638,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -6727,6 +6660,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair"],
+            info:"Select the desired time period.",
             type: "toggle",
             shouldBeBlankOnInit: false,
             multiSelect: true,
@@ -6783,6 +6717,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -6808,6 +6743,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Accessibility Pair"],
+            info:"Select the desired key location.",
             type: "dropdown",
             containsLegendInfo: true,
             shouldBeBlankOnInit: false,
@@ -6866,8 +6802,29 @@ export const appConfig = {
       pageName: "Key Location Accessibility (Zone Pair) Difference",
       url: "/accessibility-key-location-pair-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Key Location)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold, <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p><b>Key Location Type</b> is a list of the attractions included in the accessibility tool: air routes, airport zones, beach zones, businesses, city and major city zones, 
+      national park zones, port zones, university buildings, and visitor attractions. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. 
+      If origin is selected, the narrative is “X businesses are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X businesses can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the 
+      combination of the user-class and time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -6904,7 +6861,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6924,7 +6881,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6944,7 +6901,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -6964,11 +6921,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -6985,85 +6943,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7083,7 +6963,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7103,7 +6983,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7123,11 +7003,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -7142,22 +7023,19 @@ export const appConfig = {
               sort: "ascending",
               exclude: [0]
             },
-          },
+          },      
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Origin Or Destination (1 and 2)",
+            paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: originOrDestinationValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Segment (1 and 2)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7178,8 +7056,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Zone Accessibility Pair Difference"],
@@ -7200,11 +7078,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -7222,7 +7101,20 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Key Location Type",
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          }, 
+          {
+            filterName: "Key Location Type (1 and 2)",
             paramName: "keyLocationTypeId",
             target: "api",
             actions: [
@@ -7230,6 +7122,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Zone Accessibility Pair Difference"],
+            info:"Select the desired key location.",
             type: "dropdown",
             containsLegendInfo: true,
             shouldBeBlankOnInit: false,
@@ -7248,26 +7141,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Select a zone in the map",
-            paramName: "zoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Zone Accessibility Pair Difference"],
-            type: "map",
-            layer: "NoRMS Zone Accessibility Pair Difference",
-            field: "id",
-          },
-          {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7281,6 +7155,16 @@ export const appConfig = {
               unit: "mins",
             },
           },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Accessibility Pair Difference"],
+            type: "map",
+            layer: "NoRMS Zone Accessibility Pair Difference",
+            field: "id",
+          },
         ]
       }
     },
@@ -7289,8 +7173,35 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals)",
       url: "/accessibility-landuse-totals",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -7393,6 +7304,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
+            info: "Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -7414,6 +7326,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
+            info: "Select the desired time period.",
             type: "toggle",
             shouldBeBlankOnInit: false,
             multiSelect: true,
@@ -7470,6 +7383,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
+            info: "Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -7495,6 +7409,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Landuse Accessibility Totals"],
+            info:"Select the Land Use metric to show. Choose between population and employment and desired segmentation (please refer to the “about this visualisation” to know more). ",
             type: "dropdown",
             containsLegendInfo: true,
             shouldBeBlankOnInit: false,
@@ -7503,14 +7418,7 @@ export const appConfig = {
             shouldFilterOthers: false,
             multiSelect: false,
             isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
+            values: landuseValues
           },
           {
             filterName: "Landuse Segment 1",
@@ -7519,7 +7427,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -7541,7 +7449,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -7606,8 +7514,35 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Totals) Difference",
       url: "/accessibility-landuse-totals-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows <b><u>the difference in</u></b> the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. and the journey time threshold. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -7644,7 +7579,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7664,7 +7599,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7684,7 +7619,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             paramName: "scenarioYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7705,11 +7640,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -7724,88 +7660,9 @@ export const appConfig = {
               sort: "ascending",
               exclude: [0]
             },
-          },
+          },         
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7825,7 +7682,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7845,7 +7702,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             paramName: "scenarioYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -7866,11 +7723,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -7887,20 +7745,99 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Landuse (1 and 2)",
+            paramName: "landuse",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            info:"Select the Land Use metric to show. Choose between population and employment and desired segmentation (please refer to the “about this visualisation” to know more).",
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: landuseValues,
+          },
+          {
+            filterName: "Landuse Segment 1 (1 and 2)",
+            paramName: "landuseSegment1",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment1",
+              paramColumn: "segment1",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Segment 2 (1 and 2)",
+            paramName: "landuseSegment2",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment2",
+              paramColumn: "segment2",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Reference (1 and 2)",
+            paramName: "landuseReference",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "dropdown",
+            values: landuseReferenceValues
+          },
+          {
+            filterName: "Landuse Exog (1 and 2)",
+            paramName: "landuseExog",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: landuseExogValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Origin or Destination (1 and 2)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Totals Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Filter User Class by Segment (1 and 2)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7922,8 +7859,8 @@ export const appConfig = {
           },
           
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
@@ -7944,11 +7881,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -7966,104 +7904,20 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse",
-            paramName: "landuse",
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
             target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
+            info:"Select the desired time period.",
+            type: "toggle",
             shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
-          },
-          {
-            filterName: "Landuse Segment 1",
-            paramName: "landuseSegment1",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
+            multiSelect: true,
             isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment1",
-              paramColumn: "segment1",
-              sort: "ascending",
-              exclude: []
-            },
+            values: timePeriodCodesValues
           },
           {
-            filterName: "Landuse Segment 2",
-            paramName: "landuseSegment2",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment2",
-              paramColumn: "segment2",
-              sort: "ascending",
-              exclude: []
-            },
-          },
-          {
-            filterName: "Landuse Reference",
-            paramName: "landuseReference",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "dropdown",
-            values: landuseReferenceValues
-          },
-          {
-            filterName: "Landuse Exog",
-            paramName: "landuseExog",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            values: landuseExogValues
-          },
-          {
-            filterName: "Origin or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8085,8 +7939,36 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair)",
       url: "/accessibility-landuse-pair",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about:`
+      <p>This functionality shows the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -8189,6 +8071,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -8210,6 +8093,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
+            info:"Select the desired time period.",
             type: "toggle",
             shouldBeBlankOnInit: false,
             multiSelect: true,
@@ -8266,6 +8150,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -8291,6 +8176,7 @@ export const appConfig = {
               { action: "UPDATE_LEGEND_TEXT" }
             ],
             visualisations: ["Landuse Accessibility Pair"],
+            info:"Select the Land Use metric to show. Choose between population and employment and desired segmentation (please refer to the “about this visualisation” to know more).",
             type: "dropdown",
             containsLegendInfo: true,
             shouldBeBlankOnInit: false,
@@ -8299,14 +8185,7 @@ export const appConfig = {
             shouldFilterOthers: false,
             multiSelect: false,
             isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
+            values: landuseValues,
           },
           {
             filterName: "Landuse Segment 1",
@@ -8315,7 +8194,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -8337,7 +8216,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
@@ -8412,8 +8291,36 @@ export const appConfig = {
       pageName: "Pop/Emp Accessibility (Zone Pair) Difference",
       url: "/accessibility-landuse-pair-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Land Use)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).</ul></p>
+      <p>The Land Use metrics to be showcased can be toggled with the following filters: </p>
+      <p><ul><li><b>Landuse</b>: refers to population and employment. 
+      <li> <b>Landuse Segment 1</b> and <b>Segment 2</b> refer to the segmentation of the land use metric to be showcased in the visualisation: 
+      <ul><li>For population:<p>P0, total population </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), C3 as SOC3 (non-skilled workers), 
+      C4 as SOC4 (non-working age), </p><p>P2, population segmented by car availability: C1 (no car), C2 (car available). </p>
+      <li>For employment:<p>P0, total employment </p><p>P1, population segmented by occupation: C1 as SOC1 (high-skilled workers), C2 as SOC2 (skilled workers), 
+      C3 as SOC3 (non-skilled workers). </p><p>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </p></p></ul></ul>
+      <p><b>Landuse Exog</b> refers to Static if the figures come from exogenous assumptions (e.g., NTEM) or to Dynamic if the figures come from the NELUM model (currently not uploaded in the back end). 
+      The framework has been set-up to accommodate different sources of population and employment. </p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -8450,7 +8357,7 @@ export const appConfig = {
         ],
         filters: [ 
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8470,7 +8377,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8490,7 +8397,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             paramName: "scenarioYearDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8511,11 +8418,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down. ",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -8532,85 +8440,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8630,7 +8460,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8650,7 +8480,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             paramName: "scenarioYearDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8671,11 +8501,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -8692,20 +8523,99 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
+            filterName: "Landuse (1 and 2)",
+            paramName: "landuse",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            info:"Select the Land Use metric to show. Choose between population and employment and desired segmentation (please refer to the “about this visualisation” to know more).",
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: landuseValues,
+          },
+          {
+            filterName: "Landuse Segment 1 (1 and 2)",
+            paramName: "landuseSegment1",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment1",
+              paramColumn: "segment1",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Segment 2 (1 and 2)",
+            paramName: "landuseSegment2",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "landuse_segment_list",
+              displayColumn: "segment2",
+              paramColumn: "segment2",
+              sort: "ascending",
+              exclude: []
+            },
+          },
+          {
+            filterName: "Landuse Reference (1 and 2)",
+            paramName: "landuseReference",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "dropdown",
+            values: landuseReferenceValues
+          },
+          {
+            filterName: "Landuse Exog (1 and 2)",
+            paramName: "landuseExog",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
             type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
+            values: landuseExogValues
           },
           {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Origin Or Destination (1 and 2)",
+            paramName: "originOrDestination",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "toggle",
+            values: originOrDestinationValues
+          },
+          {
+            filterName: "Filter User Class by Segment (1 and 2)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8726,8 +8636,8 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "Filter User Class by Car Availability (1 and 2)",
+            paramName: "userClassId",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
@@ -8748,11 +8658,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -8770,114 +8681,19 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Landuse",
-            paramName: "landuse",
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
             target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            containsLegendInfo: true,
+            type: "toggle",
             shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: false,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "landuse",
-              paramColumn: "landuse",
-              sort: "ascending",
-              legendSubtitleTextColumn: "landuse"
-            },
-          },
-          {
-            filterName: "Landuse Segment 1",
-            paramName: "landuseSegment1",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
+            multiSelect: true,
             isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment1",
-              paramColumn: "segment1",
-              sort: "ascending",
-              exclude: []
-            },
+            values: timePeriodCodesValues
           },
           {
-            filterName: "Landuse Segment 2",
-            paramName: "landuseSegment2",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: false,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "landuse_segment_list",
-              displayColumn: "segment2",
-              paramColumn: "segment2",
-              sort: "ascending",
-              exclude: []
-            },
-          },
-          {
-            filterName: "Landuse Reference",
-            paramName: "landuseReference",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "dropdown",
-            values: landuseReferenceValues
-          },
-          {
-            filterName: "Landuse Exog",
-            paramName: "landuseExog",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            values: landuseExogValues
-          },
-          {
-            filterName: "Origin Or Destination",
-            paramName: "originOrDestination",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "toggle",
-            values: originOrDestinationValues
-          },
-          {
-            filterName: "Select a zone in the map",
-            paramName: "zoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "map",
-            layer: "NoRMS Landuse Accessibility Pair Difference",
-            field: "id",
-          },
-          {
-            filterName: "Threshold Value",
+            filterName: "Threshold Value (1 and 2)",
             paramName: "thresholdValue",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -8891,6 +8707,16 @@ export const appConfig = {
               unit: "mins",
             },
           },
+          {
+            filterName: "Select a zone in the map",
+            paramName: "zoneId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Landuse Accessibility Pair Difference"],
+            type: "map",
+            layer: "NoRMS Landuse Accessibility Pair Difference",
+            field: "id",
+          },
         ]
       }
     },
@@ -8898,6 +8724,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Totals)",
       url: "/accessibility-journey-time-totals",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility",
       about: "", //To be added.
       config: {
@@ -9115,6 +8942,7 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Totals) Difference",
       url: "/accessibility-journey-time-totals-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility",
       about: "", //To be added.
       config: {
@@ -9158,7 +8986,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9178,7 +9006,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9198,7 +9026,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9218,7 +9046,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9318,7 +9146,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9338,7 +9166,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9358,7 +9186,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Totals Difference"],
@@ -9378,7 +9206,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -9493,8 +9321,28 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Pair)",
       url: "/accessibility-journey-time-pair",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows the distribution (catchment) of the modelled journey time for the selected OD. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).
+      <ul><li>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </ul></ul></p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -9601,6 +9449,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair"],
+            info:"Use the Network, Demand, and Year filters to select the scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -9622,6 +9471,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair"],
+            info:"Select the desired time period.",
             type: "toggle",
             shouldBeBlankOnInit: false,
             multiSelect: true,
@@ -9678,6 +9528,7 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: true,
@@ -9704,6 +9555,31 @@ export const appConfig = {
             values: originOrDestinationValues
           },
           {
+            filterName: "Metric",
+            paramName: "journey_time",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Journey Time Accessibility Pair"],
+            info:"Select the desired metric.",
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "journey_time", displayValue: "Journey Time", legendSubtitleText: "mins" },
+              ]
+            },
+          },
+          {
             filterName: "Select a zone in the map",
             paramName: "zoneId",
             target: "api",
@@ -9720,8 +9596,28 @@ export const appConfig = {
       pageName: "Journey Time Accessibility (Zone Pair) Difference",
       url: "/accessibility-journey-time-pair-difference",
       type: "MapLayout",
+      //termsOfUse: termsOfUse,
       category: "Accessibility (Journey Time)",
-      about: "", //To be added.
+      legalText: termsOfUse,
+      about: `
+      <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the modelled journey time for the selected OD. </p>
+      <p>To use the functionality, please select in order: </p>
+      1. the desired scenario, <br>
+      2. the desired time-period, <br>
+      3. the desired user-class, <br>
+      4. the desired direction: origin or destination, <br>
+      5. the journey time threshold. <br>
+      6. and finally select the desired zone from the map. </p>
+      <p>To understand how the Scenario filter works, please refer to the description in the home page. </p>
+      <p>Modelling <b>Time Periods</b> are including as: AM, IP, PM, with the option of selecting all of them at the same time. </p>
+      <p>User Class is a combination of passenger demand by: </p>
+      <p><ul><li><b>Segment</b>: Business, Commuting, Other. <li> <b>Car Availability</b>: car available from home (CAF), car available to home (CAT), non-car available (NCA).
+      <ul><li>P2, population segmented by macro industry: C1 (Services), C2 (Industry), C3 (Agriculture), C4 (Other). </ul></ul></p>
+      <p>The <b>Direction</b> filter allows the functionality to aggregate the metric by selecting the accessibility feature either as origin or destination. If origin is selected, the narrative is “X jobs 
+      are accessed from the zone as origin within Y minutes”. If destination is selected, the narrative changes to 
+      “X people can access the zone as destination within Y minutes”. </p>
+      <p><b>Disclaimer</b>: the journey time is including i) access/egress time, ii) in-vehicle time, and iii) transfer waiting time and is evaluated depending on the combination of the user-class and 
+      time-period. The proxy journey time used in the functionality is demand weighted. </p>`,
       config: {
         layers: [
           {
@@ -9763,7 +9659,7 @@ export const appConfig = {
         ],
         filters: [
           {
-            filterName: "Filter Scenario DM by Network",
+            filterName: "Filter Scenario 1 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9783,7 +9679,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Demand Scenario",
+            filterName: "Filter Scenario 1 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9803,7 +9699,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DM by Year",
+            filterName: "Filter Scenario 1 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9823,11 +9719,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DM",
+            filterName: "Scenario 1",
             paramName: "scenarioCodeDoMinimum",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
+            info:"Use the Network, Demand, and Year filters to select the first scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -9844,85 +9741,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DM",
-            paramName: "timePeriodCodesDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DM",
-            paramName: "userClassIdsDoMinimum",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Filter Scenario DS by Network",
+            filterName: "Filter Scenario 2 by Network",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9942,7 +9761,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Demand Scenario",
+            filterName: "Filter Scenario 2 by Demand Scenario",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9962,7 +9781,7 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Filter Scenario DS by Year",
+            filterName: "Filter Scenario 2 by Year",
             target: "validate",
             actions: [{ action: "none" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
@@ -9982,11 +9801,12 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Scenario DS",
+            filterName: "Scenario 2",
             paramName: "scenarioCodeDoSomething",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
+            info:"Use the Network, Demand, and Year filters to select the second scenario. If scenario specifics are already known, you can directly use the Scenario drop-down.",
             type: "dropdown",
             shouldBeBlankOnInit: false,
             shouldFilterOnValidation: false,
@@ -10003,91 +9823,118 @@ export const appConfig = {
             },
           },
           {
-            filterName: "Time Period - DS",
-            paramName: "timePeriodCodesDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "toggle",
-            shouldBeBlankOnInit: false,
-            multiSelect: true,
-            isClearable: true,
-            values: timePeriodCodesValues
-          },
-          {
-            filterName: "Filter User Class by Segment - DS",
-            paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: false,
-            shouldBeValidated: false,
-            shouldFilterOthers: true,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "user_segment",
-              paramColumn: "user_segment",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "Filter User Class by Car Availability - DS",
-            paramName: "userClassIdsDoSomething",
-            target: "validate",
-            actions: [{ action: "none" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: true,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: false,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "car_availability",
-              paramColumn: "car_availability",
-              sort: "ascending",
-              exclude: ['All']
-            },
-          },
-          {
-            filterName: "User Class - DS",
-            paramName: "userClassIdsDoSomething",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Journey Time Accessibility Pair Difference"],
-            type: "dropdown",
-            shouldBeBlankOnInit: false,
-            shouldFilterOnValidation: true,
-            shouldBeValidated: true,
-            shouldFilterOthers: false,
-            multiSelect: true,
-            isClearable: true,
-            values: {
-              source: "metadataTable",
-              metadataTableName: "norms_userclass_list",
-              displayColumn: "name",
-              paramColumn: "id",
-              sort: "ascending",
-              exclude: [0, 123, 456, 789]
-            },
-          },
-          {
-            filterName: "Origin Or Destination",
+            filterName: "Origin Or Destination (1 and 2)",
             paramName: "originOrDestination",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Journey Time Accessibility Pair Difference"],
             type: "toggle",
             values: originOrDestinationValues
+          },
+          {
+            filterName: "Filter User Class by Segment (1 and 2)",
+            paramName: "userClassId",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Journey Time Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "user_segment",
+              paramColumn: "user_segment",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "Filter User Class by Car Availability (1 and 2)",
+            paramName: "userClassId",
+            target: "validate",
+            actions: [{ action: "none" }],
+            visualisations: ["Journey Time Accessibility Pair Difference"],
+            type: "dropdown",
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "car_availability",
+              paramColumn: "car_availability",
+              sort: "ascending",
+              exclude: ['All']
+            },
+          },
+          {
+            filterName: "User Class (1 and 2)",
+            paramName: "userClassId",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Journey Time Accessibility Pair Difference"],
+            info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
+            type: "dropdown",
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
+            values: {
+              source: "metadataTable",
+              metadataTableName: "norms_userclass_list",
+              displayColumn: "name",
+              paramColumn: "id",
+              sort: "ascending",
+              exclude: [0, 123, 456, 789]
+            },
+          },
+          {
+            filterName: "Time Period (1 and 2)",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Journey Time Accessibility Pair Difference"],
+            info:"Select the desired time period.",
+            type: "toggle",
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+            values: timePeriodCodesValues
+          },
+          {
+            filterName: "Metric",
+            paramName: "journey_time",
+            target: "api",
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { action: "UPDATE_LEGEND_TEXT" }
+            ],
+            visualisations: ["Journey Time Accessibility Pair Difference"],
+            info:"Select the desired metric.",
+            type: "dropdown",
+            containsLegendInfo: true,
+            shouldBeBlankOnInit: false,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: false,
+            isClearable: false,
+            values: {
+              source: "local",
+              values: [
+                { paramValue: "journey_time", displayValue: "Journey Time", legendSubtitleText: "mins" },
+              ]
+            },
           },
           {
             filterName: "Select a zone in the map",

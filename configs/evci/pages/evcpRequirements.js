@@ -11,7 +11,14 @@ export const evcpRequirements = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>`,
+  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>
+  <p>TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -88,6 +95,63 @@ export const evcpRequirements = {
 
 export const tfnEvcpRequirements = {
   ...evcpRequirements,
+  about: `
+  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>
+  <p>TfN can support our local authority partners with further information behind these outputs, 
+  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
+  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
+  config: {
+    ...evcpRequirements.config,
+    filters: [
+      { ...selectors.runTypeCodeDynamic, visualisations: ['EVCP Requirements'] },
+      { ...selectors.year, visualisations: ['EVCP Requirements'] },
+      { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
+      { ...selectors.travelScenarioAdditional, visualisations: ['EVCP Requirements'] },
+      { ...selectors.tfnBehaviouralScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.tfnChargingCategory, visualisations: ['EVCP Requirements'] },
+      { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
+      { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
+    ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioAdditional, multiSelect: true, type: 'dropdown' },
+          { ...selectors.tfnBehaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.tfnChargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+        ],
+        downloadPath: '/api/evci/evcp-requirements/download'
+      },
+    },
+  },
+};
+
+export const eehEvcpRequirements = {
+  ...evcpRequirements,
+  about: `
+  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>
+  <p>TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
   config: {
     ...evcpRequirements.config,
     filters: [
@@ -119,6 +183,7 @@ export const tfnEvcpRequirements = {
         ],
         downloadPath: '/api/evci/evcp-requirements/download'
       },
+      warning: "To note- the STB EVCI Framework for the England's Economic Heartland is being updated to reflect the new unitary authority boundaries for Buckinghamshire and Northamptonshire. This will be available early in 2025. Multiple local authority zones can be selected on the tool to create a total output for these areas.",
     },
   },
 };

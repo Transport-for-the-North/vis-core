@@ -23,7 +23,7 @@ function generateDetailedCallout(region) {
       </div>
     </div>
 
-    <details>
+    <details open>
       <summary><strong>Vulnerability</strong></summary>
       <div class="card-container">
         <div class="card">
@@ -45,7 +45,7 @@ function generateDetailedCallout(region) {
       </div>
     </details>
 
-    <details>
+    <details open>
       <summary><strong>Access</strong></summary>
       <div class="card-container">
         <div class="card">

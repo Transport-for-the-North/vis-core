@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { ladSummaryCallout, oaLaDetailedCallout } from "../templates";
+import { laPopupContent } from "../templates/popup";
 
 export const localAuthority = {
   pageName: "Local Authority",
@@ -9,7 +10,8 @@ export const localAuthority = {
   type: "MapLayout",
   about: `
   <p>View TRSE data by Local Authority District.</p>
-  <p>Search for a Local Authority in the sidebar to view Output Area-level data. Click on OAs to read deeper insights.</p>`,
+  <p>This map compares the risk of TRSE in each neighbourhood to the average for the relevant local authority area. Search for a local authority in the side bar to view output-area data. Click on areas to see more information.</p>`,
+  legalText: termsOfUse,
   termsOfUse: termsOfUse,
   config: {
     layers: [
@@ -32,6 +34,10 @@ export const localAuthority = {
         invertedColorScheme: true,
         trseLabel: true,
         outlineOnPolygonSelect: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
+          htmlTemplate: laPopupContent
+        }
       },
       {
         name: "Local Authorities",
@@ -40,10 +46,10 @@ export const localAuthority = {
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
-        isHoverable: true,
+        isHoverable: false,
         isStylable: false,
-        shouldHaveTooltipOnHover: true,
-        shouldHaveLabel: true,
+        shouldHaveTooltipOnHover: false,
+        shouldHaveLabel: false,
         labelZoomLevel: 12,
         labelNulls: false,
         hoverNulls: false,
@@ -68,6 +74,10 @@ export const localAuthority = {
         hoverTipShouldIncludeMetadata: true,
         invertedColorScheme: true,
         trseLabel: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
+          htmlTemplate: laPopupContent
+        }
       }
     ],
     visualisations: [
@@ -82,7 +92,7 @@ export const localAuthority = {
         dataPath: "/api/trse/output-area-data",
         legendText: [
           {
-            displayValue: "Risk of TRSE",
+            displayValue: "Output Areas",
             legendSubtitleText: "%" 
           }
         ]
@@ -104,20 +114,28 @@ export const localAuthority = {
         ]
       },
       {
-        name: "Detailed Information",
+        name: "OA Callout",
         type: "calloutCard",
-        cardName: "LA Summary",
-        dataSource: "api",
-        dataPath: "/api/trse/callout-data/authority",
-        htmlFragment: ladSummaryCallout
-      },
-      {
-        name: "Feature Callout",
-        type: "calloutCard",
-        cardName: "OA Summary",
+        cardName: "Output Area Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaLaDetailedCallout
+      },
+      {
+        name: "PT Callout",
+        type: "calloutCard",
+        cardName: "Public Transport Points Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/oa-or-pt-point",
+        htmlFragment: oaLaDetailedCallout
+      },
+      {
+        name: "Detailed Information",
+        type: "calloutCard",
+        cardName: "Local Authority Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/authority",
+        htmlFragment: ladSummaryCallout
       },
     ],
     metadataTables: [],
@@ -128,7 +146,9 @@ export const localAuthority = {
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
-      selectors.oaFeatureType
+      selectors.oaFeatureType,
+      selectors.ptFeature,
+      selectors.ptFeatureType,
     ],
     additionalFeatures: {
       glossary: { 

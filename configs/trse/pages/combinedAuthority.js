@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
+import { caPopupContent } from "../templates/popup";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -9,7 +10,8 @@ export const combinedAuthority = {
   type: "MapLayout",
   about: `
   <p>View TRSE data by Combined Authority District.</p>
-  <p>Search for a Combined Authority in the sidebar to view Output Area-level data. Click on OAs to read deeper insights.</p>`,
+  <p>This map compares the risk of TRSE in each neighbourhood to the average for the relevant combined authority area. Search for a combined authority in the side bar to view output-area data. Click on areas to see more information.</p>`,
+  legalText: termsOfUse,
   termsOfUse: termsOfUse,
   config: {
     layers: [
@@ -32,6 +34,10 @@ export const combinedAuthority = {
         invertedColorScheme: true,
         trseLabel: true,
         outlineOnPolygonSelect: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
+          htmlTemplate: caPopupContent
+        }
       },
       {
         name: "Combined Authorities",
@@ -40,9 +46,9 @@ export const combinedAuthority = {
         path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
-        isHoverable: true,
+        isHoverable: false,
         isStylable: false,
-        shouldHaveTooltipOnHover: true,
+        shouldHaveTooltipOnHover: false,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
         labelNulls: false,
@@ -68,6 +74,10 @@ export const combinedAuthority = {
         hoverTipShouldIncludeMetadata: true,
         invertedColorScheme: true,
         trseLabel: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
+          htmlTemplate: caPopupContent
+        }
       }
     ],
     visualisations: [
@@ -82,7 +92,7 @@ export const combinedAuthority = {
         dataPath: "/api/trse/output-area-data",
         legendText: [
           {
-            displayValue: "Risk of TRSE",
+            displayValue: "Output Areas",
             legendSubtitleText: "%" 
           }
         ]
@@ -104,18 +114,28 @@ export const combinedAuthority = {
         ]
       },
       {
-        name: "Detailed Information",
+        name: "OA Callout",
         type: "calloutCard",
-        dataSource: "api",
-        dataPath: "/api/trse/callout-data/authority",
-        htmlFragment: caSummaryCallout
-      },
-      {
-        name: "Feature Callout",
-        type: "calloutCard",
+        cardName: "Output Area Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaCaDetailedCallout
+      },
+      {
+        name: "PT Callout",
+        type: "calloutCard",
+        cardName: "Public Transport Points Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/oa-or-pt-point",
+        htmlFragment: oaCaDetailedCallout
+      },
+      {
+        name: "Detailed Information",
+        type: "calloutCard",
+        cardName: "Combined Authority Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/authority",
+        htmlFragment: caSummaryCallout
       },
     ],
     metadataTables: [],
@@ -126,7 +146,9 @@ export const combinedAuthority = {
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
-      selectors.oaFeatureType
+      selectors.oaFeatureType,
+      selectors.ptFeature,
+      selectors.ptFeatureType,
     ],
     additionalFeatures: {
       glossary: { 

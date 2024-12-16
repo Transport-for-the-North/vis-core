@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { oaEngDetailedCallout } from "../templates";
+import { engPopupContent } from "../templates/popup";
 
 export const england = {
   pageName: "England",
@@ -9,7 +10,8 @@ export const england = {
   type: "MapLayout",
   about: `
   <p>View TRSE data nationally.</p>
-  <p>Click on OAs to read deeper insights.</p>`,
+  <p>This map compares the risk of TRSE in each neighbourhood to the average for England. Click on areas to see more information.</p>`,
+  legalText: termsOfUse,
   termsOfUse: termsOfUse,
   config: {
     layers: [
@@ -33,6 +35,10 @@ export const england = {
         invertedColorScheme: true,
         trseLabel: true,
         outlineOnPolygonSelect: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
+          htmlTemplate: engPopupContent
+        }
       },
       {
         name: "Local Authorities",
@@ -41,9 +47,9 @@ export const england = {
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
-        isHoverable: true,
+        isHoverable: false,
         isStylable: false,
-        shouldHaveTooltipOnHover: true,
+        shouldHaveTooltipOnHover: false,
         shouldHaveLabel: true,
         labelZoomLevel: 12,
         labelNulls: false,
@@ -69,6 +75,10 @@ export const england = {
         hoverTipShouldIncludeMetadata: true,
         invertedColorScheme: true,
         trseLabel: true,
+        customTooltip: {
+          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
+          htmlTemplate: engPopupContent
+        }
       }
     ],
     visualisations: [
@@ -83,7 +93,7 @@ export const england = {
         dataPath: "/api/trse/output-area-data",
         legendText: [
           {
-            displayValue: "Risk of TRSE",
+            displayValue: "Output Areas",
             legendSubtitleText: "%" 
           }
         ]
@@ -105,9 +115,17 @@ export const england = {
         ]
       },
       {
-        name: "Feature Callout",
+        name: "OA Callout",
         type: "calloutCard",
-        cardName: "OA Summary",
+        cardName: "Output Area Summary",
+        dataSource: "api",
+        dataPath: "/api/trse/callout-data/oa-or-pt-point",
+        htmlFragment: oaEngDetailedCallout
+      },
+      {
+        name: "PT Callout",
+        type: "calloutCard",
+        cardName: "Public Transport Points Summary",
         dataSource: "api",
         dataPath: "/api/trse/callout-data/oa-or-pt-point",
         htmlFragment: oaEngDetailedCallout
@@ -119,7 +137,9 @@ export const england = {
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
-      selectors.oaFeatureType
+      selectors.oaFeatureType,
+      selectors.ptFeature,
+      selectors.ptFeatureType,
     ],
     additionalFeatures: {
       glossary: { 

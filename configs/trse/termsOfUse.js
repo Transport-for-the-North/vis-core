@@ -2,10 +2,7 @@ export const termsOfUse = `
  <p>
             This data can be used by third parties as long as the source is
             clearly attributed to TfN, a logo is added to any
-            graphs and if online, a link is added back
-            <a href=@TODO@ target="_blank" rel="noopener noreferrer">
-              to this @TODO@ webpage
-            </a>
+            graphs and if online, a link is added back to this webpage
             . For our terms of use, please see the
             <a
               href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
@@ -16,7 +13,7 @@ export const termsOfUse = `
             </a>
             . Use of the TRSE data tool also indicates your acceptance of
             <a
-              href="https://transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-04062024.pdf"
+              href="https://www.transportforthenorth.com/wp-content/uploads/Disclaimer-and-Appropriate-Use-TRSE.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -63,7 +63,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         ],
         "fill-opacity": [
           "case",
-          ["in", ["feature-state", "value"], ["literal", [0, null]]],
+          ["==", ["feature-state", "value"], null],
           0,
           opacityValue ?? 0.65,
         ],

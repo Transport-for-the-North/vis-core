@@ -35,6 +35,16 @@ export const Layer = ({ layer }) => {
     // If no map instances are available, exit early
     if (targetMaps.length === 0) return;
 
+    // Check for missing customTooltip parameters
+    if (layer.customTooltip) {
+      const { url, htmlTemplate } = layer.customTooltip;
+      if (!url || !htmlTemplate) {
+        console.error("Both url and htmlTemplate must be provided for customTooltip.");
+        return;
+      }
+    }
+
+
     // If missingParams are present, remove the layer if it exists
     if (layer.missingParams?.length > 0) {
       targetMaps.forEach((mapInstance) => {
