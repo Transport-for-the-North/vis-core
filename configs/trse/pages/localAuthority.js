@@ -1,8 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { ladSummaryCallout, oaLaDetailedCallout } from "../templates";
-import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions"
-import { nodeCustomPaint } from "configs/noham/customPaintDefinitions";
+import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions";
 import { laPopupContent, laPtPopupContent } from "../templates/popup";
 import glossaryData from "../glossaryData";
 
