@@ -32,6 +32,8 @@ export const actionTypes = {
   UPDATE_QUERY_PARAMS: "UPDATE_QUERY_PARAMS",
   UPDATE_DUAL_QUERY_PARAMS: "UPDATE_DUAL_QUERY_PARAMS",
   UPDATE_ALL_DATA: "UPDATE_ALL_DATA",
+  SET_DATA_REQUESTED: "SET_DATA_REQUESTED",
+  SET_NO_DATA_RETURNED: "SET_NO_DATA_RETURNED",
   UPDATE_COLOR_SCHEME: "UPDATE_COLOR_SCHEME",
   JOIN_DATA: "JOIN_DATA",
   SET_IS_LOADING: "SET_IS_LOADING",
@@ -367,6 +369,12 @@ export const mapReducer = (state, action) => {
           };
       }
     }
+
+    case actionTypes.SET_DATA_REQUESTED:
+      return { ...state, dataRequested: action.payload };
+
+      case actionTypes.SET_NO_DATA_RETURNED:
+        return { ...state, noDataReturned: action.payload };
 
     case actionTypes.SET_MAP: {
       const { map } = action.payload;
