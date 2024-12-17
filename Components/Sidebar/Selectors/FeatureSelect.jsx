@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import styled from 'styled-components';
 import { useLayerFeatureMetadata } from 'hooks/useLayerFeatureMetadata';
 
@@ -7,6 +7,25 @@ import { useLayerFeatureMetadata } from 'hooks/useLayerFeatureMetadata';
 const Container = styled.div`
   margin-bottom: 10px;
 `;
+
+// Custom ValueContainer to display count of selected features
+const CustomValueContainer = ({ children, ...props }) => {
+  const MAX_DISPLAY_COUNT = 100;
+  const { getValue } = props;
+  const selectedValues = getValue();
+
+  let displayValue = children;
+
+  if (selectedValues.length > MAX_DISPLAY_COUNT) {
+    displayValue = `${selectedValues.length} features selected`;
+  }
+
+  return (
+    <components.ValueContainer {...props}>
+      {displayValue}
+    </components.ValueContainer>
+  );
+};
 
 /**
  * FeatureSelect component provides a dropdown to select features from a map layer.
@@ -53,6 +72,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
         isLoading={isLoading}
         noOptionsMessage={() => noOptionsMessage}
         onMenuOpen={handleMenuOpen}
+        components={{ ValueContainer: CustomValueContainer }}
         styles={{
           control: (base) => ({
             ...base,
