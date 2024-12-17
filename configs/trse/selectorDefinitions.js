@@ -326,6 +326,44 @@ const ptFeatureTypeFixedSelector = {
   },
 };
 
+const zoneSelector = {
+  filterName: "Select output areas",
+  type: "mapFeatureSelectWithControls",
+  paramName: "zoneId",
+  target: "api",
+  actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
+  ],
+  visualisations: null,
+  layer: "Output Areas",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
+const includePtPointsCheckboxSelector = {
+  filterName: "",
+  type: "checkbox",
+  paramName: "includePtPoints",
+  target: "api",
+  actions: [
+    { 
+      action: 'UPDATE_QUERY_PARAMS'
+    }
+  ],
+  visualisations: null,
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Include public transport stops",
+        paramValue: true
+      }
+    ],
+  },
+};
+
 
 export const selectors = {
   parentCombinedAuthority: parentCombinedAuthoritySelector,
@@ -342,5 +380,7 @@ export const selectors = {
   oaFeature: oaFeatureSelector,
   oaFeatureType: oaFeatureTypeFixedSelector,
   ptFeature: ptFeatureSelector,
-  ptFeatureType: ptFeatureTypeFixedSelector
+  ptFeatureType: ptFeatureTypeFixedSelector,
+  zoneSelector: zoneSelector,
+  includePtPointsCheckbox: includePtPointsCheckboxSelector
 };

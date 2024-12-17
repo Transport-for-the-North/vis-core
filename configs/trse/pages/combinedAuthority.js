@@ -155,6 +155,16 @@ export const combinedAuthority = {
       glossary: { 
         dataDictionary: glossaryData
       },
+      download: {
+        filters: [
+          { ...selectors.parentCombinedAuthority, type: 'mapFeatureSelect' },
+          { ...selectors.zoneTypeCAFixed, paramName: 'parentZoneTypeId' },
+          selectors.zoneResolutionCAFixed,
+          selectors.zoneSelector,
+          selectors.includePtPointsCheckbox
+        ],
+        downloadPath: '/api/trse/output-area-data/download'
+      },
     },
   },
 };
