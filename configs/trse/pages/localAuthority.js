@@ -2,6 +2,8 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { ladSummaryCallout, oaLaDetailedCallout } from "../templates";
 import { laPopupContent } from "../templates/popup";
+import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions"
+import { nodeCustomPaint } from "configs/noham/customPaintDefinitions";
 
 export const localAuthority = {
   pageName: "Local Authority",
@@ -45,7 +47,8 @@ export const localAuthority = {
         source: "api",
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
         sourceLayer: "zones",
-        geometryType: "polygon",
+        geometryType: "line",
+        customPaint: parentAuthorityBoundaryCustomPaint,
         isHoverable: false,
         isStylable: false,
         shouldHaveTooltipOnHover: false,

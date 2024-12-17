@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
 import { caPopupContent } from "../templates/popup";
-import { nodeCustomPaint } from "../customPaintDefinitions"
+import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions"
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -46,8 +46,8 @@ export const combinedAuthority = {
         source: "api",
         path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
         sourceLayer: "zones",
-        geometryType: "polygon",
-        CustomPaint: nodeCustomPaint,
+        geometryType: "line",
+        customPaint: parentAuthorityBoundaryCustomPaint,
         isHoverable: false,
         isStylable: false,
         shouldHaveTooltipOnHover: false,
