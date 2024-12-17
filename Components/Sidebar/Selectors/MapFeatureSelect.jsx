@@ -185,7 +185,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
             onClick={toggleSelectEnabled}
             $bgColor={props.bgColor}
           >
-            {isFeatureSelectActive ? 'Disable Selection' : 'Enable Selector'}
+            {isFeatureSelectActive ? 'Disable Selector' : 'Enable Selector'}
           </EnableSelectButton>
 
           <StyledToggle enabled={isFeatureSelectActive}>
