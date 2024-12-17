@@ -50,11 +50,21 @@ export const MapVisualisation = ({
 
   const colorStyle = visualisation?.style?.split("-")[1];
 
-  // Retrieve classificationMethod and color_scheme per layer
+  // Determine the layer key based on the visualisation type
+  const layerKey =
+    visualisation.type === "joinDataToMap" ? visualisation.joinLayer : visualisationName;
+
+  // Retrieve classificationMethod per layer
   const classificationMethod =
-    state.layers[visualisation.joinLayer]?.class_method ?? "d";
-  const layerColorScheme =
-    state.colorSchemesByLayer[visualisation?.joinLayer];
+    state.layers[layerKey]?.class_method ?? "d";
+
+  // Determine the layerColorScheme based on visualisation type
+  const layerColorScheme = useMemo(() => {
+    return (
+      state.colorSchemesByLayer[layerKey] ??
+      defaultMapColourMapper[colorStyle]
+    );
+  }, [layerKey, state.colorSchemesByLayer, colorStyle]);
 
   // Use the custom hook to fetch data for the visualisation
   const {
@@ -134,7 +144,7 @@ export const MapVisualisation = ({
 
       // Get trseLabel from state.layers
       const trseLabel =
-        state.layers[visualisation.joinLayer]?.trseLabel === true;
+        state.layers[layerKey]?.trseLabel === true;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -155,7 +165,7 @@ export const MapVisualisation = ({
 
       // Calculate the color palette based on the classification
       const invertColorScheme =
-        state.layers[visualisation.joinLayer]?.invertedColorScheme === true;
+        state.layers[layerKey]?.invertedColorScheme === true;
       const colourPalette = calculateColours(
         currentColor,
         reclassifiedData,
@@ -164,7 +174,7 @@ export const MapVisualisation = ({
 
       // Update the map style
       const opacityValue = document.getElementById(
-        "opacity-" + visualisation.joinLayer
+        "opacity-" + layerKey
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
@@ -189,6 +199,9 @@ export const MapVisualisation = ({
       appContext,
       visualisation.queryParams,
       layerColorScheme,
+      layerKey,
+      // calculateColours,
+      colorStyle,
     ]
   );
 
@@ -290,22 +303,21 @@ export const MapVisualisation = ({
           state.layers,
           visualisationData,
           style,
-          visualisation.joinLayer
+          layerKey
         );
       }
     },
     [
       map,
       state.layers,
-      visualisation.joinLayer,
       addFeaturesToMap,
       visualisationData,
+      layerKey,
     ]
   );
 
-  // Effect to reclassify and restyle the map when data or settings change
   useEffect(() => {
-    if (!map) {return};
+    if (!map) return;
 
     // Determine if reclassification is needed
     const dataHasChanged =
@@ -316,36 +328,37 @@ export const MapVisualisation = ({
       prevVisualisationDataRef.current !== undefined;
     const colorHasChanged =
       layerColorScheme !== null &&
-      prevColorRef.current[visualisation.joinLayer];
-  
+      prevColorRef.current[layerKey];
     const prevClassificationMethod =
-      prevClassMethodRef.current[visualisation.joinLayer];
-  
+      prevClassMethodRef.current[layerKey];
     const classificationHasChanged =
       classificationMethod !== prevClassificationMethod;
-  
+
     const needUpdate =
       dataHasChanged ||
       visualisationDataHasChanged ||
       colorHasChanged ||
       classificationHasChanged;
-  
-    if (!needUpdate) {
-      return;
-    }
-  
-    const layerName = visualisation.joinLayer;
-  
-    // Define a function to proceed with reclassification and styling
-    const proceedWithReclassification = () => {
-      // Use visualisationData for setting feature states
-      const dataToVisualize = visualisationData || [];
-      // Use combinedData for reclassification
-      const dataToClassify = combinedData;
-  
+
+    if (!needUpdate) return;
+
+    // Update the refs to the current data
+    prevCombinedDataRef.current = combinedData;
+    prevVisualisationDataRef.current = visualisationData;
+    prevColorRef.current[layerKey] = layerColorScheme;
+    prevClassMethodRef.current[layerKey] = classificationMethod;
+
+    const layerName = layerKey;
+    const dataToVisualize = visualisationData || [];
+    const dataToClassify = combinedData;
+
+    const performReclassification = () => {
       switch (visualisation.type) {
         case "joinDataToMap": {
-          if (Array.isArray(dataToVisualize) && dataToVisualize.length === 0) {
+          if (
+            Array.isArray(dataToVisualize) &&
+            dataToVisualize.length === 0
+          ) {
             resetMapStyle(visualisation.style);
           } else {
             reclassifyAndStyleMap(
@@ -360,7 +373,7 @@ export const MapVisualisation = ({
           break;
         }
         case "geojson": {
-          if (dataToVisualize && dataToVisualize[0]) {
+          if (dataToVisualize[0]) {
             reclassifyAndStyleGeoJSONMap(
               JSON.parse(dataToVisualize[0].feature_collection),
               visualisation.style
@@ -373,27 +386,22 @@ export const MapVisualisation = ({
         default:
           break;
       }
-  
-      // Update the refs to the current data
-      prevCombinedDataRef.current = combinedData;
-      prevVisualisationDataRef.current = visualisationData;
-      prevColorRef.current[visualisation.joinLayer] = layerColorScheme;
-      prevClassMethodRef.current[visualisation.joinLayer] = classificationMethod;
     };
-  
-    if (map.getLayer(layerName)) {
-      // Layer is present, proceed immediately
-      proceedWithReclassification();
+
+    if (visualisation.type === "joinDataToMap") {
+      if (map.getLayer(layerName)) {
+        performReclassification();
+      } else {
+        const onStyleData = () => {
+          if (map.getLayer(layerName)) {
+            map.off("styledata", onStyleData);
+            performReclassification();
+          }
+        };
+        map.on("styledata", onStyleData);
+      }
     } else {
-      // Layer is not present, wait until it's added
-      const onStyleData = () => {
-        if (map.getLayer(layerName)) {
-          // Layer is now present, proceed
-          map.off('styledata', onStyleData);
-          proceedWithReclassification();
-        }
-      };
-      map.on('styledata', onStyleData);
+      performReclassification();
     }
   }, [
     combinedData,
@@ -402,10 +410,11 @@ export const MapVisualisation = ({
     layerColorScheme,
     classificationMethod,
     resetMapStyle,
-    visualisation.joinLayer,
     visualisation.style,
     visualisation.type,
     visualisationName,
+    // reclassifyAndStyleMap,
+    layerKey,
   ]);
 
   // **Run-once cleanup
@@ -420,7 +429,7 @@ export const MapVisualisation = ({
         }
       }
     };
-  }, []);
+  }, [map, visualisation.type, visualisationName]);
 
   /**
    * Reclassifies GeoJSON data and styles the map accordingly.
@@ -464,7 +473,7 @@ export const MapVisualisation = ({
 
       // Create paint property
       const opacityValue = document.getElementById(
-        "opacity-" + visualisation.joinLayer
+        "opacity-" + layerKey
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
@@ -497,6 +506,14 @@ export const MapVisualisation = ({
           },
           beforeLayerId
         );
+
+        dispatch({
+          type: "UPDATE_COLOR_SCHEME",
+          payload: {
+            layerName: visualisationName,
+            color_scheme: layerColorScheme,
+          },
+        });
       } else {
         // Update the paint properties
         for (const [
@@ -514,8 +531,11 @@ export const MapVisualisation = ({
     [
       map,
       visualisationName,
-      visualisation.joinLayer,
       layerColorScheme,
+      // calculateColours,
+      colorStyle,
+      dispatch,
+      layerKey,
     ]
   );
 
