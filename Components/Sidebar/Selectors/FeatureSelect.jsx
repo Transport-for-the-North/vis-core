@@ -85,6 +85,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
             maxHeight: '100px',
             overflowY: 'auto', // Enable scrolling for dropdown menu
           }),
+          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           menuList: (base) => ({
             ...base,
             maxHeight: '100px',
