@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
-import { caPopupContent } from "../templates/popup";
+import { caPopupContent, caPtPopupContent } from "../templates/popup";
 import glossaryData from "../glossaryData";
 
 export const combinedAuthority = {
@@ -77,7 +77,7 @@ export const combinedAuthority = {
         trseLabel: true,
         customTooltip: {
           url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
-          htmlTemplate: caPopupContent
+          htmlTemplate: caPtPopupContent
         }
       }
     ],
