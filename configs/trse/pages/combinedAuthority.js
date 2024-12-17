@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
 import { caPopupContent } from "../templates/popup";
+import glossaryData from "../glossaryData";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -152,7 +153,7 @@ export const combinedAuthority = {
     ],
     additionalFeatures: {
       glossary: { 
-        dataDictionary: {}
+        dataDictionary: glossaryData
       },
     },
   },

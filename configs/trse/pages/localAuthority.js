@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { ladSummaryCallout, oaLaDetailedCallout } from "../templates";
 import { laPopupContent } from "../templates/popup";
+import glossaryData from "../glossaryData";
 
 export const localAuthority = {
   pageName: "Local Authority",
@@ -152,7 +153,7 @@ export const localAuthority = {
     ],
     additionalFeatures: {
       glossary: { 
-        dataDictionary: {}
+        dataDictionary: glossaryData
       },
     },
   },
