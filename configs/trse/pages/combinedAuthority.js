@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
 import { caPopupContent } from "../templates/popup";
+import { nodeCustomPaint } from "../customPaintDefinitions"
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -9,7 +10,7 @@ export const combinedAuthority = {
   category: null,
   type: "MapLayout",
   about: `
-  <p>View TRSE data by Combined Authority District.</p>
+  <p>View TRSE data by Combined Authority.</p>
   <p>This map compares the risk of TRSE in each neighbourhood to the average for the relevant combined authority area. Search for a combined authority in the side bar to view output-area data. Click on areas to see more information.</p>`,
   legalText: termsOfUse,
   termsOfUse: termsOfUse,
@@ -46,6 +47,7 @@ export const combinedAuthority = {
         path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
+        CustomPaint: nodeCustomPaint,
         isHoverable: false,
         isStylable: false,
         shouldHaveTooltipOnHover: false,

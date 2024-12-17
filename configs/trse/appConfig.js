@@ -7,8 +7,7 @@ export const appConfig = {
     `<p>This tool shows how the risk of transport-related social exclusion (TRSE) varies across England. 
     It does so by measuring access to a wide range of everyday places with the transport options available, 
     and measuring the vulnerability of populations to social exclusion, through factors such as 
-    poverty, disability, caring responsibilities, and poor health.</p>
-    <p>You can view data comparing each neighbourhood to the relevant combined authority, local authority, 
+    poverty, disability, caring responsibilities, and poor health. You can view data comparing each neighbourhood to the relevant combined authority, local authority, 
     or to all of England by selecting the relevant tab above. </p>`,
   background:
     `<p>TRSE means that transport issues have a fundamental impact on everyday life, and limit the ability 
