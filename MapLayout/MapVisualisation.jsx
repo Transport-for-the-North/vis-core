@@ -77,13 +77,27 @@ export const MapVisualisation = ({
   useEffect(() => {
     if (isLoading) {
       dispatch({ type: actionTypes.SET_IS_LOADING });
-    } else if (error) {
-      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
-      // Optionally, handle the error (e.g., dispatch an error action)
+      dispatch({ type: actionTypes.SET_DATA_REQUESTED, payload: true });
     } else {
       dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
-  }, [isLoading, error, dispatch]);
+  }, [isLoading, dispatch]);
+
+  // Handle no data returned state
+  useEffect(() => {
+    if (!isLoading) {
+      if (visualisationData && visualisationData.length === 0) {
+        // No data returned from the API
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+      } else if (visualisationData) {
+        // Data was returned
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
+      } else if (error) {
+        // An error occurred
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+      }
+    }
+  }, [isLoading, visualisationData, error, dispatch]);
 
   // Update the visualisation data in the global state when fetched
   useEffect(() => {
