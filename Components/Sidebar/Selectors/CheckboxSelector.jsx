@@ -15,7 +15,7 @@ const CheckboxContainer = styled.div`
   margin-bottom: 5px;
 `;
 
-const StyledCheckbox = styled.input`
+const StyledCheckbox = styled.input.attrs({ type: 'checkbox' })`
   margin-right: 10px;
 `;
 
@@ -104,15 +104,16 @@ export const CheckboxSelector = ({ filter, onChange, bgColor }) => {
   return (
     <Container>
       {options.map((option) => (
-        <CheckboxContainer key={option.paramValue}>
+        <CheckboxContainer key={option.displayValue}>
+        <label htmlFor={option.displayValue} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
           <StyledCheckbox
-            type="checkbox"
-            id={option.paramValue}
+            id={option.displayValue}
             checked={!!selectedCheckboxes[option.displayValue]} // Ensure boolean value
             onChange={() => handleCheckboxChange(option.displayValue, option.paramValue)}
           />
-          <label htmlFor={option.paramValue}>{option.displayValue}</label>
-        </CheckboxContainer>
+          {option.displayValue}
+        </label>
+      </CheckboxContainer>
       ))}
       {filter.multiSelect && (
         <SelectAllButton
