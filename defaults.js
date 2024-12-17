@@ -37,3 +37,9 @@ export const CARD_CONSTANTS = {
   PADDING: 10,
 }
 export const defaultBgColour = '#7317DE';
+
+export const defaultMapColourMapper = {
+  'diverging': { value: 'BrBG', label: 'BrBG' },
+  'continuous': { value: 'YlGnBu', label: 'YlGnBu' },
+  'categorical': { value: 'Accent', lable: 'Accent'}
+}

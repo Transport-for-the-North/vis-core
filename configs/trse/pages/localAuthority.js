@@ -1,9 +1,10 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { ladSummaryCallout, oaLaDetailedCallout } from "../templates";
-import { laPopupContent } from "../templates/popup";
 import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions"
 import { nodeCustomPaint } from "configs/noham/customPaintDefinitions";
+import { laPopupContent, laPtPopupContent } from "../templates/popup";
+import glossaryData from "../glossaryData";
 
 export const localAuthority = {
   pageName: "Local Authority",
@@ -79,7 +80,7 @@ export const localAuthority = {
         trseLabel: true,
         customTooltip: {
           url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
-          htmlTemplate: laPopupContent
+          htmlTemplate: laPtPopupContent
         }
       }
     ],
@@ -155,7 +156,7 @@ export const localAuthority = {
     ],
     additionalFeatures: {
       glossary: { 
-        dataDictionary: {}
+        dataDictionary: glossaryData
       },
     },
   },

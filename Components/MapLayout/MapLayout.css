@@ -27,6 +27,12 @@
     font-weight: bold;
     margin: 0;
   }
+
+  .summary-text {
+    font-size: 0.9em;
+    margin-bottom: 2px;
+    color: rgb(88, 88, 88);
+  }
   
   .divider {
     width: 100%;

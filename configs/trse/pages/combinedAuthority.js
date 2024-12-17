@@ -1,8 +1,9 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { caSummaryCallout, oaCaDetailedCallout } from "../templates";
-import { caPopupContent } from "../templates/popup";
 import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions"
+import { caPopupContent, caPtPopupContent } from "../templates/popup";
+import glossaryData from "../glossaryData";
 
 export const combinedAuthority = {
   pageName: "Combined Authority",
@@ -78,7 +79,7 @@ export const combinedAuthority = {
         trseLabel: true,
         customTooltip: {
           url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
-          htmlTemplate: caPopupContent
+          htmlTemplate: caPtPopupContent
         }
       }
     ],
@@ -154,7 +155,7 @@ export const combinedAuthority = {
     ],
     additionalFeatures: {
       glossary: { 
-        dataDictionary: {}
+        dataDictionary: glossaryData
       },
     },
   },

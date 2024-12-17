@@ -60,34 +60,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
     onFilterChange(filter, value);
   };
 
-  const noDataAvailable = mapState.visualisations[
-    Object.keys(mapState.visualisations)[0]
-  ]?.data[0]?.feature_collection
-    ? !checkGeometryNotNull(
-        JSON.parse(
-          mapState.visualisations[Object.keys(mapState.visualisations)[0]].data[0]
-            .feature_collection
-        )
-      )
-    : mapState.visualisations[Object.keys(mapState.visualisations)[0]]?.data // If it's not a GeoJSON feature collection, check if it's an array and if it's empty for each visualisation
-        .length === 0 &&
-      mapState.leftVisualisations[Object.keys(mapState.leftVisualisations)[0]]?.data
-        .length === 0 &&
-      mapState.rightVisualisations[Object.keys(mapState.rightVisualisations)[0]]?.data
-        .length === 0 &&
-      Object.values(
-        mapState.leftVisualisations[Object.keys(mapState.leftVisualisations)[0]] // Finally verify that all query params are defined for each visualisation
-          ?.queryParams ?? {}
-      ).every((el) => el !== undefined) &&
-      Object.values(
-        mapState.rightVisualisations[Object.keys(mapState.rightVisualisations)[0]]
-          ?.queryParams ?? {}
-      ).every((el) => el !== undefined) &&
-      Object.values(
-        mapState.visualisations[Object.keys(mapState.visualisations)[0]]
-          ?.queryParams ?? {}
-      ).every((el) => el !== undefined);
-
+  const noDataAvailable = mapState.noDataReturned;
+  const dataRequested = mapState.dataRequested;
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
   
@@ -169,7 +143,9 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
         <NoDataParagraph>Loading filters...</NoDataParagraph>
       )}
       {/* Check if no data has been found and display a small message in the sidebar if so */}
-      {noDataAvailable && <NoDataParagraphMessage>{noDataMessage}</NoDataParagraphMessage>}
+      {dataRequested && noDataAvailable && (
+        <NoDataParagraphMessage>{noDataMessage}</NoDataParagraphMessage>
+      )}
     </AccordionSection>
   );
 };

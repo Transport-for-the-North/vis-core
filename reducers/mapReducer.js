@@ -32,6 +32,8 @@ export const actionTypes = {
   UPDATE_QUERY_PARAMS: "UPDATE_QUERY_PARAMS",
   UPDATE_DUAL_QUERY_PARAMS: "UPDATE_DUAL_QUERY_PARAMS",
   UPDATE_ALL_DATA: "UPDATE_ALL_DATA",
+  SET_DATA_REQUESTED: "SET_DATA_REQUESTED",
+  SET_NO_DATA_RETURNED: "SET_NO_DATA_RETURNED",
   UPDATE_COLOR_SCHEME: "UPDATE_COLOR_SCHEME",
   JOIN_DATA: "JOIN_DATA",
   SET_IS_LOADING: "SET_IS_LOADING",
@@ -68,7 +70,7 @@ export const mapReducer = (state, action) => {
     case actionTypes.STORE_CURRENT_ZOOM: {
       return { ...state, currentZoom: action.payload }
     }
-    
+
     case actionTypes.SET_BOUNDS_AND_CENTROID: {
       const { centroid, bounds } = action.payload;
       return { ...state, mapBoundsAndCentroid: { centroid, bounds } };
@@ -82,7 +84,7 @@ export const mapReducer = (state, action) => {
         ...state,
         drawInstance: action.payload,
       };
-      
+
     case actionTypes.UPDATE_VISUALISED_FEATURES: {
       const { filter, value } = action.payload;
       const { layer } = filter;
@@ -108,6 +110,7 @@ export const mapReducer = (state, action) => {
       return {
         ...state,
         layers: {},
+        colorSchemesByLayer: {},
         visualisations: {},
         filters: {},
         leftVisualisations: {},
@@ -124,35 +127,48 @@ export const mapReducer = (state, action) => {
       return { ...state, pageInfo: action.payload };
     case actionTypes.INITIALISE_SIDEBAR:
       return { ...state, filters: action.payload };
-    case actionTypes.ADD_LAYER:
-      // Logic to add a non-parameterised layer
-      return { ...state, layers: { ...state.layers, ...action.payload } };
+    case actionTypes.ADD_LAYER: {
+      const newLayers = { ...state.layers, ...action.payload };
+      const newColorSchemes = { ...state.colorSchemesByLayer };
+    
+      Object.keys(action.payload).forEach(layerName => {
+        if (!newColorSchemes[layerName]) {
+          newColorSchemes[layerName] = { value: "YlGnBu", label: "YlGnBu" }; // Default color scheme
+        }
+      });
+    
+      return {
+        ...state,
+        layers: newLayers,
+        colorSchemesByLayer: newColorSchemes,
+      };
+    }
     case actionTypes.UPDATE_PARAMETERISED_LAYER: {
       // Get the layer name and new parameters from the payload
       const layerName = action.payload.targetLayer;
       const paramName = action.payload.filter.paramName;
       const newParamValue = action.payload.value;
-    
+
       if (newParamValue == null) {
         // Do not update the layer if value is null
         return state; // Return the current state unmodified
       }
-    
+
       // Prepare the parameters object for replacement
       const params = { [paramName]: newParamValue };
-    
+
       // Update the path of the layer with the new parameters
       const updatedPath = updateUrlParameters(
         state.layers[layerName].pathTemplate,
         params
       );
-    
+
       // Update the missingParams array if it exists
       const currentMissingParams = state.layers[layerName].missingParams || [];
       const updatedMissingParams = currentMissingParams.filter(
         (param) => param !== paramName
       );
-    
+
       // Update the layer in the state
       return {
         ...state,
@@ -184,18 +200,27 @@ export const mapReducer = (state, action) => {
     }
 
     case actionTypes.UPDATE_COLOR_SCHEME: {
-      const { color_scheme } = action.payload;
+      const { layerName, color_scheme } = action.payload;
       return {
         ...state,
-        color_scheme: color_scheme,
+        colorSchemesByLayer: {
+          ...state.colorSchemesByLayer,
+          [layerName]: color_scheme,
+        },
       };
     }
 
     case actionTypes.UPDATE_CLASSIFICATION_METHOD: {
-      const { class_method } = action.payload;
+      const { class_method, layerName } = action.payload;
       return {
         ...state,
-        class_method: class_method,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            class_method,
+          },
+        },
       };
     }
 
@@ -217,19 +242,19 @@ export const mapReducer = (state, action) => {
       const visualisationNames = action.payload.filter.visualisations;
       const paramName = action.payload.paramName || action.payload.filter.paramName;
       let newParamValue = action.payload.value;
-    
+
       // If newParamValue is an array, convert it to a comma-delimited string
       if (Array.isArray(newParamValue)) {
         newParamValue = newParamValue.join(",");
       }
-    
+
       // Create a new visualisations object with updated query params for each visualisation
       const updatedVisualisations = { ...state.visualisations };
       visualisationNames.forEach((visName) => {
         if (updatedVisualisations[visName]) {
           const currentQueryParams = updatedVisualisations[visName].queryParams;
           const isRequired = currentQueryParams[paramName]?.required || false;
-    
+
           updatedVisualisations[visName] = {
             ...updatedVisualisations[visName],
             queryParams: {
@@ -242,7 +267,7 @@ export const mapReducer = (state, action) => {
           };
         }
       });
-    
+
       return {
         ...state,
         visualisations: updatedVisualisations,
@@ -268,13 +293,13 @@ export const mapReducer = (state, action) => {
             return [{ ...state.leftVisualisations }];
         }
       })();
-    
+
       updatedVisualisations.forEach((updatedVisualisation) => {
         visualisationNames.forEach((visName) => {
           if (updatedVisualisation[visName]) {
             const currentQueryParams = updatedVisualisation[visName].queryParams;
             const isRequired = currentQueryParams[paramName]?.required || false;
-    
+
             updatedVisualisation[visName] = {
               ...updatedVisualisation[visName],
               queryParams: {
@@ -345,8 +370,14 @@ export const mapReducer = (state, action) => {
       }
     }
 
+    case actionTypes.SET_DATA_REQUESTED:
+      return { ...state, dataRequested: action.payload };
+
+      case actionTypes.SET_NO_DATA_RETURNED:
+        return { ...state, noDataReturned: action.payload };
+
     case actionTypes.SET_MAP: {
-      const { map } = action.payload;    
+      const { map } = action.payload;
       // Attempt to find a colourValue
       const visualisationName = Object.keys(state.visualisations)[0];
       let colourValue = findFirstColourValue(state.filters) || state.visualisations[visualisationName].colorValue;
@@ -354,16 +385,16 @@ export const mapReducer = (state, action) => {
       // If colourValue is null, default to { value: "YlGnBu", label: "YlGnBu" }
       if (!colourValue) {
         colourValue = { value: "YlGnBu", label: "YlGnBu" };
-      }
-    
+      }  
+
       return {
         ...state,
         map: map, // Store the map instance directly in the state
-        color_scheme: colourValue, // Use either the found or default colourValue
-        class_method: "d",
+        // color_scheme: colourValue, // Use either the found or default colourValue
+        // class_method: "d",
       };
     }
-    
+
     case actionTypes.SET_DUAL_MAPS: {
       const { maps } = action.payload;
       // Attempt to find a colourValue
@@ -374,7 +405,7 @@ export const mapReducer = (state, action) => {
       if (!colourValue) {
         colourValue = { value: "YlGnBu", label: "YlGnBu" };
       }
-    
+
       return {
         ...state,
         maps: maps, // Store the map instances directly in the state
