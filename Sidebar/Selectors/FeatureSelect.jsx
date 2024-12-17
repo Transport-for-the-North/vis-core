@@ -54,8 +54,26 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
         noOptionsMessage={() => noOptionsMessage}
         onMenuOpen={handleMenuOpen}
         styles={{
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-          control: (base) => ({ ...base, minHeight: '35px' }),
+          control: (base) => ({
+            ...base,
+            minHeight: '35px',
+            maxHeight: '100px',
+            overflowY: 'auto', // Ensure control itself can scroll if needed
+          }),
+          menu: (base) => ({
+            ...base,
+            maxHeight: '100px',
+            overflowY: 'auto', // Enable scrolling for dropdown menu
+          }),
+          menuList: (base) => ({
+            ...base,
+            maxHeight: '100px',
+            overflowY: 'auto', // Ensure menu list is scrollable
+          }),
+          clearIndicator: (base) => ({
+            ...base,
+            alignSelf: 'flex-start', // Position clear control at top
+          }),
         }}
         menuPortalTarget={document.body}
         menuPosition="fixed"
