@@ -176,7 +176,7 @@ export const combinedAuthority = {
       },
       download: {
         filters: [
-          { ...selectors.parentCombinedAuthority, type: 'mapFeatureSelect' },
+          { ...selectors.downloadParentCombinedAuthority, type: 'mapFeatureSelect' },
           { ...selectors.zoneTypeCAFixed, paramName: 'parentZoneTypeId' },
           selectors.zoneResolutionCAFixed,
           selectors.zoneSelector,

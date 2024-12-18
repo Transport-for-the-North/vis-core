@@ -26,8 +26,64 @@ const parentCombinedAuthoritySelector = {
   forceRequired: true
 };
 
+const downloadParentCombinedAuthoritySelector = {
+  filterName: "Download an entire authority area...",
+  paramName: "parentZoneId",
+  target: "api",
+  actions: [
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "Output Areas"},
+    },
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "PT Points"},
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "zoneId" }
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "parentZoneId" }
+    },
+  ],
+  visualisations: null,
+  layer: "Combined Authorities",
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true
+};
+
 const parentLADSelector = {
   filterName: "Select a Local Authority...",
+  paramName: "parentZoneId",
+  target: "api",
+  actions: [
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "Output Areas"},
+    },
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "PT Points"},
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "zoneId" }
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "parentZoneId" }
+    }
+  ],
+  visualisations: null,
+  layer: "Local Authorities",
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true
+};
+
+const downloadParentLADSelector = {
+  filterName: "Download an entire authority area...",
   paramName: "parentZoneId",
   target: "api",
   actions: [
@@ -367,6 +423,8 @@ const includePtPointsCheckboxSelector = {
 
 export const selectors = {
   parentCombinedAuthority: parentCombinedAuthoritySelector,
+  downloadParentCombinedAuthority: downloadParentCombinedAuthoritySelector,
+  downloadParentLAD: downloadParentLADSelector,
   parentLAD: parentLADSelector,
   zoneResolutionCAFixed: zoneResolutionCAFixedSelector,
   zoneResolutionLADFixed: zoneResolutionLADFixedSelector,
