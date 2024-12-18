@@ -10,7 +10,7 @@ import { api } from "services";
 import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
 import { darken } from "polished";
-import { MapFeatureSelectWithControls } from ".";
+import { MapFeatureSelectWithControls, MapFeatureSelectAndPan, MapFeatureSelect, CheckboxSelector } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -66,7 +66,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
       filter.id = filter.paramName;
     });
     const updatedFilters = filters.reduce((acc, item) => {
-      if (item.type === 'mapFeatureSelectWithControls') {
+      if (item.type.startsWith('mapFeatureSelect')) {
         acc[item.id] = null;
       } else {
         const paramValues = item.values.values.map(value => value.paramValue);
@@ -104,7 +104,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
   }
 
   return (
-    <AccordionSection title="Download data" defaultValue={true}>
+    <AccordionSection title="Download data" defaultValue={false}>
       <p>Use the selections to toggle items on and off. See Glossary "Download" for more information.</p>
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
@@ -142,6 +142,15 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     bgColor={bgColor}
                   />
                 )}
+                {filter.type === "checkbox" && (
+                  <CheckboxSelector
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value)}
+                    bgColor={bgColor}
+              />
+            )}
                 {filter.type === 'mapFeatureSelectWithControls' && (
                   <MapFeatureSelectWithControls
                     key={filter.id}
@@ -150,6 +159,24 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
                 />
+                )}
+                {filter.type === 'mapFeatureSelectAndPan' && (
+                  <MapFeatureSelectAndPan
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value)}
+                    bgColor={bgColor}
+                  />
+                )}
+                {filter.type === 'mapFeatureSelect' && (
+                  <MapFeatureSelect
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value.value)}
+                    bgColor={bgColor}
+                  />
                 )}
               </SelectorContainer>
             ))}

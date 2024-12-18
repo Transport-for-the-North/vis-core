@@ -157,6 +157,16 @@ export const localAuthority = {
       glossary: { 
         dataDictionary: glossaryData
       },
+      download: {
+        filters: [
+          { ...selectors.parentLAD, type: 'mapFeatureSelect' },
+          { ...selectors.zoneTypeLADFixed, paramName: 'parentZoneTypeId' },
+          selectors.zoneResolutionLADFixed,
+          selectors.zoneSelector,
+          selectors.includePtPointsCheckbox
+        ],
+        downloadPath: '/api/trse/output-area-data/download'
+      },
     },
   },
 };

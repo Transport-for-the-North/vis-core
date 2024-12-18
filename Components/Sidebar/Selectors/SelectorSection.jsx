@@ -8,7 +8,7 @@ import { Toggle } from "./Toggle";
 import { AppContext } from 'contexts';
 import { useContext } from "react";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from './MapFeatureSelect';
-import { MapFeatureSelectAndPan } from ".";
+import { CheckboxSelector, MapFeatureSelectAndPan } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -103,6 +103,15 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
                 )}
                 {filter.type === "toggle" && (
                   <Toggle
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                    bgColor={bgColor}
+              />
+            )}
+            {filter.type === "checkbox" && (
+                  <CheckboxSelector
                     key={filter.id}
                     filter={filter}
                     value={filterState[filter.id] || filter.values.values[0].paramValue}

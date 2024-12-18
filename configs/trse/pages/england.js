@@ -146,6 +146,14 @@ export const england = {
       glossary: { 
         dataDictionary: glossaryData
       },
+      download: {
+        filters: [
+          selectors.zoneResolutionEngFixed,
+          selectors.zoneSelector,
+          selectors.includePtPointsCheckbox
+        ],
+        downloadPath: '/api/trse/output-area-data/download'
+      },
     },
   },
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useMapContext } from "hooks";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import * as turf from "@turf/turf";
@@ -23,12 +23,13 @@ export const useFeatureSelect = (
   isFeatureSelectActive,
   setFeatureSelectActive,
   selectionMode,
-  selectedFeatureValues  // Accept selectedFeatureValues as an argument
+  selectedFeatureValues
 ) => {
   const { state: mapState } = useMapContext();
   const [transformedFeaturesState, setTransformedFeaturesState] = useState([]);
   const draw = mapState.drawInstance;
   const { layer } = filterConfig;
+  const existingClickHandlersRef = useRef([]);
 
   /**
    * Moves the draw layers to the top of the layer stack.
@@ -46,6 +47,12 @@ export const useFeatureSelect = (
     });
   }, [map]);
 
+  /**
+   * Transforms features into a format suitable for selection display.
+   *
+   * @param {Array} features - The features to transform.
+   * @returns {Array} The transformed features.
+   */
   const transformFeatures = useCallback((features) => {
     return features.map((feature) => ({
       value: feature.id,
@@ -53,6 +60,11 @@ export const useFeatureSelect = (
     }));
   }, []);
 
+  /**
+   * Handles the selection of transformed features.
+   *
+   * @param {Array} transformedFeatures - The transformed features to handle.
+   */
   const handleSelection = useCallback(
     (transformedFeatures) => {
       setTransformedFeaturesState(transformedFeatures);
@@ -199,7 +211,6 @@ export const useFeatureSelect = (
       const transformedFeatures = transformFeatures(updatedFeatures);
       handleSelection(transformedFeatures);
 
-      // const draw = drawRef.current;
       if (draw) {
         draw.deleteAll();
       }
@@ -223,7 +234,10 @@ export const useFeatureSelect = (
   useEffect(() => {
     if (!map || !filterConfig) return;
 
-    const draw = mapState.drawInstance;
+    // Store existing click handlers only when activating feature select
+    if (isFeatureSelectActive && existingClickHandlersRef.current.length === 0 && map._listeners && map._listeners.click) {
+      existingClickHandlersRef.current = [...map._listeners.click];
+    }
 
     /**
      * Sets up event listeners for feature selection based on the current selection mode.
@@ -231,12 +245,17 @@ export const useFeatureSelect = (
      * Also removes event listeners when required.
      */
     const setupEventListeners = () => {
+      // Remove existing click handlers
+      existingClickHandlersRef.current.forEach(handler => map.off("click", handler));
+
       // Always remove existing listeners before adding new ones
       map.off("click", handleFeatureClick);
       map.off("draw.create", handleDrawCreate);
+
       if (draw) {
         draw.deleteAll();
       }
+
       updateCursorStyle(false);
 
       if (isFeatureSelectActive) {
@@ -259,9 +278,11 @@ export const useFeatureSelect = (
     return () => {
       map.off("click", handleFeatureClick);
       map.off("draw.create", handleDrawCreate);
+      
       if (draw) {
         draw.deleteAll();
       }
+
       updateCursorStyle(false);
     };
   }, [
@@ -274,6 +295,14 @@ export const useFeatureSelect = (
     updateCursorStyle,
     mapState.drawInstance
   ]);
+
+  // **Effect to restore handlers
+  useEffect(() => {
+    if (!isFeatureSelectActive && existingClickHandlersRef.current.length > 0) {
+      existingClickHandlersRef.current.forEach(handler => map.on("click", handler));
+      existingClickHandlersRef.current = [];
+    }
+  }, [isFeatureSelectActive, map]);
 
   return transformedFeaturesState;
 };
