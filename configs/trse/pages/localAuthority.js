@@ -176,7 +176,7 @@ export const localAuthority = {
       },
       download: {
         filters: [
-          { ...selectors.parentLAD, type: 'mapFeatureSelect' },
+          { ...selectors.downloadParentLAD, type: 'mapFeatureSelect' },
           { ...selectors.zoneTypeLADFixed, paramName: 'parentZoneTypeId' },
           selectors.zoneResolutionLADFixed,
           selectors.zoneSelector,
