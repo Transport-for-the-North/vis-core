@@ -41,23 +41,7 @@ export const localAuthority = {
           htmlTemplate: laPopupContent
         }
       },
-      {
-        name: "Local Authorities",
-        type: "tile",
-        source: "api",
-        path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
-        sourceLayer: "zones",
-        geometryType: "line",
-        customPaint: parentAuthorityBoundaryCustomPaint,
-        isHoverable: false,
-        isStylable: false,
-        shouldHaveTooltipOnHover: false,
-        shouldHaveLabel: false,
-        labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: false,
-        hoverTipShouldIncludeMetadata: false,
-      },
+      
       {
         name: "Local Authorities2",
         type: "tile",
@@ -73,6 +57,23 @@ export const localAuthority = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: true,
+      },
+      {
+        name: "Local Authorities",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+        sourceLayer: "zones",
+        geometryType: "line",
+        customPaint: parentAuthorityBoundaryCustomPaint,
+        isHoverable: true,
+        isStylable: false,
+        shouldHaveTooltipOnHover: false,
+        shouldHaveLabel: false,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: false,
+        hoverTipShouldIncludeMetadata: false,
       },
       {
         name: "PT Points",
