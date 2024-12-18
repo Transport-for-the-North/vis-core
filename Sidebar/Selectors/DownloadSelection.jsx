@@ -65,15 +65,22 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
     filters.forEach(filter => {
       filter.id = filter.paramName;
     });
+
     const updatedFilters = filters.reduce((acc, item) => {
       if (item.type.startsWith('mapFeatureSelect')) {
         acc[item.id] = null;
       } else {
-        const paramValues = item.values.values.map(value => value.paramValue);
+        const paramValues = item.values.values.map(value => {
+          if (typeof value.paramValue === 'boolean') {
+            return false; // Default to false if paramValue is a boolean
+          }
+          return value.paramValue;
+        });
         acc[item.id] = paramValues.length === 1 ? paramValues[0] : paramValues;
       }
       return acc;
     }, {});
+    
     filterDispatch({ type: 'INITIALIZE_FILTERS', payload: updatedFilters });
   }, [filters, filterDispatch]);
 
