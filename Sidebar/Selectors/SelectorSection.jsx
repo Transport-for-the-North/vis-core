@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useMapContext, useFilterContext } from "hooks";
+import { InfoBox } from "Components";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
@@ -18,6 +19,7 @@ const NoDataParagraph = styled.p``;
 const NoDataParagraphMessage = styled.p`
   color: red;
   `;
+
 const DiffParagraph = styled.p``;
 const TrseParagraph = styled.p`
   color: red;`;
@@ -70,16 +72,16 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
   const appContext = useContext(AppContext);
   const appName = process.env.REACT_APP_NAME;
   const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
-  const DiffPage = currentPage.pageName.includes("Difference") && appName === "noham"
-  const trsePage = currentPage.pageName.includes("Authority") && appName == "trse"
+  const isDiffPage = currentPage.pageName.includes("Difference") && appName === "noham"
+  const isTrsePage = currentPage.pageName.includes("Authority") && appName == "trse"
 
-  const DiffPageMessage = 
+  const diffPageMessage = 
     "The difference is calculated by Scenario 2 minus Scenario 1."
   const trsePageMessage = "Type an area in the box below to view data."
     return (
       <AccordionSection title="Filtering and data selection" defaultValue={true}>
-      {DiffPage && <DiffParagraph>{DiffPageMessage}</DiffParagraph>}
-      {trsePage && (<TrseParagraph><b>{trsePageMessage}</b></TrseParagraph>)}
+      {isDiffPage && <InfoBox text={diffPageMessage} />}
+      {isTrsePage && <InfoBox text={trsePageMessage}/>}
         {Array.isArray(filters) && filters.length > 0 ? (
           filters
             .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
