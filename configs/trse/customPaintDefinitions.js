@@ -1,5 +1,6 @@
 export const parentAuthorityBoundaryCustomPaint = {
-  "line-width": 2,
+  "line-color": "#000000",
+  "line-width": 3,
   "line-opacity": 1.0
 };
  

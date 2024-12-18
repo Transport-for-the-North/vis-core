@@ -41,6 +41,23 @@ export const combinedAuthority = {
           htmlTemplate: caPopupContent
         }
       },
+      
+      {
+        name: "Combined Authorities2",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
+        sourceLayer: "zones",
+        geometryType: "polygon",
+        isHoverable: true,
+        isStylable: false,
+        shouldHaveTooltipOnHover: true,
+        shouldHaveLabel: false,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: true,
+      },
       {
         name: "Combined Authorities",
         type: "tile",
@@ -57,22 +74,6 @@ export const combinedAuthority = {
         labelNulls: false,
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
-      },
-      {
-        name: "Combined Authorities2",
-        type: "tile",
-        source: "api",
-        path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
-        sourceLayer: "zones",
-        geometryType: "polygon",
-        isHoverable: true,
-        isStylable: false,
-        shouldHaveTooltipOnHover: true,
-        shouldHaveLabel: false,
-        labelZoomLevel: 12,
-        labelNulls: false,
-        hoverNulls: true,
-        hoverTipShouldIncludeMetadata: true,
       },
       {
         name: "PT Points",
