@@ -19,6 +19,8 @@ const NoDataParagraphMessage = styled.p`
   color: red;
   `;
 const DiffParagraph = styled.p``;
+const TrseParagraph = styled.p`
+  color: red;`;
 
 /**
  * Checks if the geometry property is not null for each feature in the provided feature collection.
@@ -69,12 +71,15 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
   const appName = process.env.REACT_APP_NAME;
   const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
   const DiffPage = currentPage.pageName.includes("Difference") && appName === "noham"
+  const trsePage = currentPage.pageName.includes("Authority") && appName == "trse"
 
   const DiffPageMessage = 
     "The difference is calculated by Scenario 2 minus Scenario 1."
+  const trsePageMessage = "Type an area in the box below to view data."
     return (
       <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {DiffPage && <DiffParagraph>{DiffPageMessage}</DiffParagraph>}
+      {trsePage && (<TrseParagraph><b>{trsePageMessage}</b></TrseParagraph>)}
         {Array.isArray(filters) && filters.length > 0 ? (
           filters
             .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
