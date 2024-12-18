@@ -6,6 +6,7 @@ import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 import { useEffect, useContext, useState } from "react";
 import { useFilterContext } from "hooks";
+import { InfoBox } from "Components";
 import { api } from "services";
 import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
@@ -112,7 +113,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
 
   return (
     <AccordionSection title="Download data" defaultValue={false}>
-      <p>Use the selections to toggle items on and off. See Glossary "Download" for more information.</p>
+      <InfoBox text={'Use the selections to toggle items on and off. See Glossary "Download" for more information.'} />
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
