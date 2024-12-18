@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useMapContext, useFilterContext } from "hooks";
-import { InfoBox } from "Components";
+import { InfoBox, WarningBox } from "Components";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
@@ -16,13 +16,6 @@ const SelectorContainer = styled.div`
 `;
 
 const NoDataParagraph = styled.p``;
-const NoDataParagraphMessage = styled.p`
-  color: red;
-  `;
-
-const DiffParagraph = styled.p``;
-const TrseParagraph = styled.p`
-  color: red;`;
 
 /**
  * Checks if the geometry property is not null for each feature in the provided feature collection.
@@ -82,6 +75,10 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
       <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {isDiffPage && <InfoBox text={diffPageMessage} />}
       {isTrsePage && <InfoBox text={trsePageMessage}/>}
+      {/* Check if no data has been found and display a small message in the sidebar if so */}
+      {dataRequested && noDataAvailable && (
+        <WarningBox text={noDataMessage}/>
+      )}
         {Array.isArray(filters) && filters.length > 0 ? (
           filters
             .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
@@ -157,10 +154,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
         ))
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
-      )}
-      {/* Check if no data has been found and display a small message in the sidebar if so */}
-      {dataRequested && noDataAvailable && (
-        <NoDataParagraphMessage>{noDataMessage}</NoDataParagraphMessage>
       )}
     </AccordionSection>
   );
