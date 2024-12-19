@@ -35,7 +35,7 @@ export const useFeatureSelect = (
    * Moves the draw layers to the top of the layer stack.
    */
   const moveDrawLayersToTop = useCallback(() => {
-    if (!map.getStyle()) return;
+    if (!map || !map.getStyle() || !map.getStyle().layers) return;
 
     const drawLayerIds = map
       .getStyle()
@@ -43,7 +43,11 @@ export const useFeatureSelect = (
       .map((layer) => layer.id);
 
     drawLayerIds.forEach((layerId) => {
-      map.moveLayer(layerId);
+      try {
+        map.moveLayer(layerId);
+      } catch (e) {
+        console.warn(`Failed to move layer ${layerId} to top: ${e.message}`);
+      }
     });
   }, [map]);
 
@@ -168,8 +172,6 @@ export const useFeatureSelect = (
   const handleDrawCreate = useCallback(
     (e) => {
       if (selectionMode !== "rectangle" || !isFeatureSelectActive) return;
-      moveDrawLayersToTop();
-
       const rectangleFeature = e.features[0];
       const bbox = turf.bbox(rectangleFeature);
       const bboxPolygon = turf.bboxPolygon(bbox);
@@ -277,6 +279,7 @@ export const useFeatureSelect = (
           }
         } else if (selectionMode === "rectangle" && draw) {
           draw.changeMode("draw_rectangle");
+          moveDrawLayersToTop();
           map.on("draw.create", handleDrawCreate);
         }
       }
@@ -305,6 +308,31 @@ export const useFeatureSelect = (
     updateCursorStyle,
     mapState.drawInstance
   ]);
+
+  // useEffect(() => {
+  //   if (!map) return;
+  
+  //   const onStyleData = () => {
+  //     moveDrawLayersToTop();
+  //   };
+  
+  //   // Listen only to 'styledata' events
+  //   map.on('styledata', onStyleData);
+  
+  //   // Ensure draw layers are on top after initial load
+  //   if (map.isStyleLoaded()) {
+  //     moveDrawLayersToTop();
+  //   } else {
+  //     map.once('style.load', () => {
+  //       moveDrawLayersToTop();
+  //     });
+  //   }
+  
+  //   // Cleanup on unmount
+  //   return () => {
+  //     map.off('styledata', onStyleData);
+  //   };
+  // }, [map, moveDrawLayersToTop]);
 
   return transformedFeaturesState;
 };
