@@ -208,7 +208,7 @@ export const MapVisualisation = ({
       );
     },
     [
-      state.layers,
+      JSON.stringify(state.layers),
       visualisation.style,
       appContext,
       visualisation.queryParams,
@@ -323,7 +323,7 @@ export const MapVisualisation = ({
     },
     [
       map,
-      state.layers,
+      JSON.stringify(state.layers),
       addFeaturesToMap,
       visualisationData,
       layerKey,
