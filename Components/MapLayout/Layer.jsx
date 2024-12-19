@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { api } from "services";
-import { getHoverLayerStyle, getLayerStyle } from "utils";
+import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle } from "utils";
 import { useMapContext } from "hooks";
 
 /**
@@ -9,7 +9,7 @@ import { useMapContext } from "hooks";
  * This component is responsible for adding a specified layer to one or more map instances
  * and managing its lifecycle, including cleanup when the component is unmounted.
  * It supports both GeoJSON and tile-based layers and can optionally add hover
- * effects to the layers.
+ * and select effects to the layers.
  *
  * @param {Object} props - The properties of the layer.
  * @param {Object} props.layer - The layer configuration object.
@@ -44,7 +44,6 @@ export const Layer = ({ layer }) => {
       }
     }
 
-
     // If missingParams are present, remove the layer if it exists
     if (layer.missingParams?.length > 0) {
       targetMaps.forEach((mapInstance) => {
@@ -53,6 +52,9 @@ export const Layer = ({ layer }) => {
         }
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);
+        }
+        if (mapInstance.getLayer(`${layer.name}-select`)) {
+          mapInstance.removeLayer(`${layer.name}-select`);
         }
         if (mapInstance.getSource(layer.name)) {
           mapInstance.removeSource(layer.name);
@@ -90,11 +92,18 @@ export const Layer = ({ layer }) => {
             sourceConfig.data = geojson;
             mapInstance.addSource(layer.name, sourceConfig);
             mapInstance.addLayer({ ...layerConfig, source: layer.name });
+
+            // Add the hover layer if the layer is hoverable
             if (layer.isHoverable) {
               const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
               hoverLayerConfig.id = `${layer.name}-hover`;
               mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
             }
+
+            // Add the select layer
+            const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
+            selectLayerConfig.id = `${layer.name}-select`;
+            mapInstance.addLayer({ ...selectLayerConfig, source: layer.name });
           });
         }
         // Handle tile layer type
@@ -117,6 +126,8 @@ export const Layer = ({ layer }) => {
               bufferSize: layer.geometryType === "line" ? 7 : null,
             },
           });
+
+          // Add the hover layer if the layer is hoverable
           if (layer.isHoverable) {
             const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
             hoverLayerConfig.id = `${layer.name}-hover`;
@@ -128,6 +139,17 @@ export const Layer = ({ layer }) => {
             };
             mapInstance.addLayer(hoverLayerConfig);
           }
+
+          // Add the select layer
+          const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
+          selectLayerConfig.id = `${layer.name}-select`;
+          selectLayerConfig.source = layer.name;
+          selectLayerConfig["source-layer"] = layer.sourceLayer;
+          selectLayerConfig.metadata = {
+            ...selectLayerConfig.metadata,
+            isStylable: false,
+          };
+          mapInstance.addLayer(selectLayerConfig);
         }
       }
     });
@@ -140,6 +162,9 @@ export const Layer = ({ layer }) => {
         }
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);
+        }
+        if (mapInstance.getLayer(`${layer.name}-select`)) {
+          mapInstance.removeLayer(`${layer.name}-select`);
         }
         if (mapInstance.getLayer(`${layer.name}-label`)) {
           mapInstance.removeLayer(`${layer.name}-label`);
