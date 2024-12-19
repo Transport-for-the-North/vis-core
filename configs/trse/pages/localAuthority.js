@@ -43,7 +43,7 @@ export const localAuthority = {
       },
       
       {
-        name: "Local Authorities2",
+        name: "hide_Local Authorities2",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
