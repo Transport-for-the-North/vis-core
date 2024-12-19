@@ -43,7 +43,7 @@ export const combinedAuthority = {
       },
       
       {
-        name: "Combined Authorities2",
+        name: "hide_Combined Authorities2",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
