@@ -216,6 +216,16 @@ export const useFeatureSelect = (
       }
 
       setFeatureSelectActive(false);
+
+      // Zero timeout to ensure handlers restored after draw created
+      setTimeout(() => {
+        if (existingClickHandlersRef.current.length > 0) {
+          existingClickHandlersRef.current.forEach((handler) =>
+            map.on("click", handler)
+          );
+          existingClickHandlersRef.current = [];
+        }
+      }, 0);
     },
     [
       selectionMode,
@@ -295,14 +305,6 @@ export const useFeatureSelect = (
     updateCursorStyle,
     mapState.drawInstance
   ]);
-
-  // **Effect to restore handlers
-  useEffect(() => {
-    if (!isFeatureSelectActive && existingClickHandlersRef.current.length > 0) {
-      existingClickHandlersRef.current.forEach(handler => map.on("click", handler));
-      existingClickHandlersRef.current = [];
-    }
-  }, [isFeatureSelectActive, map]);
 
   return transformedFeaturesState;
 };
