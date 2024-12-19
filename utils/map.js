@@ -546,6 +546,106 @@ export const getHoverLayerStyle = (geometryType) => {
 };
 
 /**
+ * Generates the style configuration for a selected layer based on the layer
+ * type (e.g., "fill", "line", "circle", "symbol", "polygon", or "point"). 
+ * For polygon layers ("fill" type), this function will always return an outline style.
+ * @component
+ * @property {string} layerType - The type of layer. Possible values are "fill", "line", "circle", "symbol", "polygon", "point", etc.
+ * @returns {Object} The style configuration object for the selected layer.
+ */
+export const getSelectedLayerStyle = (layerType) => {
+  switch (layerType) {
+    case "fill":
+    case "polygon":
+      // Handle fill layers (polygons) by drawing an outline
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": [
+            "case",
+            ["==", ["feature-state", "selected"], true],
+            "#f00",
+            "transparent",
+          ],
+          "line-width": 2,
+        },
+      };
+    case "line":
+      // Handle line layers
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#f00",
+            "transparent",
+          ],
+          "line-width": 4,
+        },
+      };
+    case "symbol":
+      // Handle symbol layers (e.g., icons or labels)
+      return {
+        id: "",
+        type: "symbol",
+        paint: {
+          // Adjust text or icon properties as needed
+          "text-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#f00",
+            "#000",
+          ],
+          "icon-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#f00",
+            "#000",
+          ],
+        },
+      };
+    case "circle":
+    case "point":
+      // Handle point layers
+      return {
+        id: "",
+        type: "circle", 
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            0, 2,
+            12, 8,
+            22, 15
+          ],
+          "circle-color": [
+            "case",
+            ["==", ["feature-state", "selected"], true],
+            "blue",
+            "transparent",
+          ],
+          "circle-opacity": 0.75,
+          "circle-stroke-width": 2,
+          "circle-stroke-color":  [
+            "case",
+            ["==", ["feature-state", "selected"], true],
+            "black",
+            "transparent"
+          ],
+        },
+      };
+    default:
+      // Handle other layer types if necessary
+      console.warn(`Unhandled layer type: ${layerType}`);
+      return {}; // Return empty object if the layer type is not supported
+  }
+};
+
+/**
  * Retrieves the source layer of a specified layer from a map.
  *
  * @param {Object} map - The map object from which to retrieve the layer.
