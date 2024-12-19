@@ -309,30 +309,13 @@ export const useFeatureSelect = (
     mapState.drawInstance
   ]);
 
-  // useEffect(() => {
-  //   if (!map) return;
-  
-  //   const onStyleData = () => {
-  //     moveDrawLayersToTop();
-  //   };
-  
-  //   // Listen only to 'styledata' events
-  //   map.on('styledata', onStyleData);
-  
-  //   // Ensure draw layers are on top after initial load
-  //   if (map.isStyleLoaded()) {
-  //     moveDrawLayersToTop();
-  //   } else {
-  //     map.once('style.load', () => {
-  //       moveDrawLayersToTop();
-  //     });
-  //   }
-  
-  //   // Cleanup on unmount
-  //   return () => {
-  //     map.off('styledata', onStyleData);
-  //   };
-  // }, [map, moveDrawLayersToTop]);
+    // **Effect to restore handlers
+    useEffect(() => {
+      if (selectionMode === "feature" && !isFeatureSelectActive && existingClickHandlersRef.current.length > 0) {
+        existingClickHandlersRef.current.forEach(handler => map.on("click", handler));
+        existingClickHandlersRef.current = [];
+      }
+    }, [isFeatureSelectActive, selectionMode, map]);
 
   return transformedFeaturesState;
 };
