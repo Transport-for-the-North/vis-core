@@ -108,21 +108,51 @@ export const useFeatureSelect = (
       });
 
       if (allFeatures.length > 0) {
-        const clickedFeature = allFeatures
-          .reduce((closestFeature, feature) => {
+        const clickPoint = turf.point([e.lngLat.lng, e.lngLat.lat]);
+        // Define threshold distance to search within (if no feature directly clicked)
+        // NB we may need to adjust this!!!
+        const thresholdDistance = 0.01;
+
+        let clickedFeature = null;
+
+        // First, try to find a feature that contains the click point (for polygons)
+        clickedFeature = allFeatures.find((feature) =>
+          feature.geometry.type === "Polygon" &&
+          turf.booleanPointInPolygon(clickPoint, feature.geometry)
+        );
+  
+        // If no polygon contains the click point, check for points and lines
+        if (!clickedFeature) {
+          clickedFeature = allFeatures.find((feature) => {
+            if (feature.geometry.type === "Point") {
+              const featurePoint = turf.point(feature.geometry.coordinates);
+              const distance = turf.distance(clickPoint, featurePoint);
+              return distance <= thresholdDistance;
+            } else if (feature.geometry.type === "LineString") {
+              const line = turf.lineString(feature.geometry.coordinates);
+              const nearestPoint = turf.nearestPointOnLine(line, clickPoint);
+              const distance = turf.distance(clickPoint, nearestPoint);
+              return distance <= thresholdDistance;
+            }
+            return false;
+          });
+        }
+  
+        // If no feature is directly clicked, find the closest feature
+        if (!clickedFeature) {
+          clickedFeature = allFeatures.reduce((closestFeature, feature) => {
             const featurePoint = turf.pointOnFeature(feature.geometry);
-            const distance = turf.distance(
-              turf.point([e.lngLat.lng, e.lngLat.lat]),
-              featurePoint
-            );
+            const distance = turf.distance(clickPoint, featurePoint);
 
             if (!closestFeature || distance < closestFeature.distance) {
               return { feature: feature.toJSON(), distance };
             }
 
             return closestFeature;
-          }, null)
-          .feature;
+          }, null).feature;
+        } else {
+          clickedFeature = clickedFeature.toJSON();
+        }
 
         const isFeatureAlreadySelected = selectedFeatureValues.some(
           (feature) => feature.value === clickedFeature.id
