@@ -31,7 +31,7 @@ export const enrouteChargingDemand = {
         name: "Major Roads",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/evci_links/{z}/{x}/{y}?stb_zone_id=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/mrn_links/{z}/{x}/{y}?stb_zone_id=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "geometry",
         geometryType: "line",
         visualisationName: "Forecast En-route Charging Demand",
