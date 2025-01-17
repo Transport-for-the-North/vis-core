@@ -165,6 +165,7 @@ export const combinedAuthority = {
       { ...selectors.zoneTypeCAFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information']},
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.oaOrPtEngHighRiskFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
       selectors.oaFeatureType,
       selectors.ptFeature,
