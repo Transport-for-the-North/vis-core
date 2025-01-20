@@ -293,7 +293,7 @@ const oaOrPtvariableSelector = {
 };
 
 const oaOrPtPercentileFilter = {
-  filterName: "Filter by TRSE risk...",
+  filterName: "Filter by percentile within the area selected...",
   paramName: "percentileFilter",
   target: "api",
   actions: [
@@ -321,7 +321,7 @@ const oaOrPtPercentileFilter = {
 };
 
 const oaOrPtEngHighRiskFilter = {
-  filterName: "England Only",
+  filterName: "Filter by national risk category",
   paramName: "engHighRisk",
   target: "api",
   actions: [
@@ -337,7 +337,7 @@ const oaOrPtEngHighRiskFilter = {
         paramValue: "0",
       },
       {
-        displayValue: "England High Risk",
+        displayValue: "High risk nationally",
         paramValue: true,
       }
     ],
