@@ -334,7 +334,7 @@ const oaOrPtEngHighRiskFilter = {
     values: [
       {
         displayValue: "All",
-        paramValue: "",
+        paramValue: "0",
       },
       {
         displayValue: "England High Risk",
