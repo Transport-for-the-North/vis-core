@@ -138,6 +138,28 @@ const originOrDestinationValues = {
   ],
 }
 
+const thresholdValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "30",
+      paramValue: 30,
+    },
+    {
+      displayValue: "60",
+      paramValue: 60,
+    },
+    {
+      displayValue: "90",
+      paramValue: 90,
+    },
+    {
+      displayValue: "120",
+      paramValue: 120,
+    },
+  ]
+}
+
 const inputNormsScenarioMetadataTable = {
   name: "input_norms_scenario",
   path: "/api/getgenericdataset?dataset_id=rail_data.input_norms_scenario",
@@ -5268,14 +5290,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 45,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
         ]
       }
@@ -5627,14 +5644,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Totals Difference"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 15,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
         ]
       }
@@ -6761,14 +6773,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 15,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
         ]
       }
@@ -7121,14 +7128,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Accessibility Pair Difference"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 15,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
           {
             filterName: "Select a zone in the map",
@@ -7472,14 +7474,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 15,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
         ]
       }
@@ -7897,14 +7894,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Totals Difference"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 45,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
         ]
       }
@@ -8239,14 +8231,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 15,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
           {
             filterName: "Select a zone in the map",
@@ -8674,14 +8661,9 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Landuse Accessibility Pair Difference"],
-            type: "slider",
+            type: "dropdown",
             info: "Threshold value to filter data",
-            min: 45,
-            max: 300,
-            interval: 15,
-            displayAs: {
-              unit: "mins",
-            },
+            values: thresholdValues
           },
           {
             filterName: "Select a zone in the map",
