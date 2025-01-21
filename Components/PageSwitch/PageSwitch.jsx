@@ -1,6 +1,7 @@
 import React from "react";
 import { MapLayout } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
+import { IFrameEmbedPage } from "Components";
 
 /**
  * PageSwitch component dynamically renders different page layouts based on the provided page configuration.
@@ -24,6 +25,8 @@ export const PageSwitch = ({ pageConfig }) => {
                 </MapProvider>
               </FilterProvider>
             );
+          case "IFrameEmbed":
+            return <IFrameEmbedPage config={pageConfig.config} />;            
           default:
             return <div>Nothing</div>;
         }
