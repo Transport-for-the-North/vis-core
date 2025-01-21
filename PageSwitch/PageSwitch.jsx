@@ -1,7 +1,6 @@
 import React from "react";
-import { MapLayout } from "Components";
+import { MapLayout, IFrameEmbedPage } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
-import { IFrameEmbedPage } from "Components";
 
 /**
  * PageSwitch component dynamically renders different page layouts based on the provided page configuration.
