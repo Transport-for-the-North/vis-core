@@ -1,4 +1,4 @@
-import { termsOfUse } from "configs/trse/termsOfUse";
+import { termsOfUse } from "./termsOfUse";
 import { pages as trsePages } from "configs/trse/pages";
 import { pages as mePages } from "./pages";
 import { mapStyles } from "defaults";
