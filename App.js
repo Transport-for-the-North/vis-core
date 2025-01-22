@@ -30,8 +30,21 @@ function App() {
 
         const configModule = await import(`configs/${appName}/appConfig`);
         const initialAppConfig = configModule.appConfig;
-        const defaultBands = await import(`configs/${appName}/bands`);
-        const bands = defaultBands.bands;
+
+        let bands = null; // Ensure bands is properly initialized
+        try{
+          const defaultBands = await import(`configs/${appName}/bands`);
+          bands = defaultBands.bands;
+        } catch (bandError) {
+          console.warn(`Warning: ${appName} bands module not found. Attempting to load from appConfig...`);
+          // If the bands file is missing, use loadBands from appConfig
+          if (initialAppConfig.loadBands) {
+            bands = await initialAppConfig.loadBands();
+          } else {
+            throw new Error("Bands module is missing, and appConfig.loadBands is not defined.");
+          }
+        }
+
         const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired = initialAppConfig.authenticationRequired ?? true
 

@@ -2,6 +2,7 @@ import { termsOfUse } from "./termsOfUse";
 import { pages as trsePages } from "configs/trse/pages";
 import { pages as mePages } from "./pages";
 import { mapStyles } from "defaults";
+import { bands } from "configs/trse/bands"
 
 export const appConfig = {
   title: "Monitoring & Evaluation Dashboard",
@@ -27,6 +28,9 @@ export const appConfig = {
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   authenticationRequired: false,
+  loadBands: async() => {
+    return bands.bands;
+  },
   appPages: [
     ...Object.values(trsePages).map(page => ({
       ...page, // Spread the properties of the page
