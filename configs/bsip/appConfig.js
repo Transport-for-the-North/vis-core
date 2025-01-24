@@ -192,48 +192,15 @@ export const appConfig = {
             joinField: "id",
             valueField: "value",
             dataSource: "api",
-            dataPath: "/api/bsip/accessibility",
+            dataPath: "/api/bsip/accessibility/staging",
           },
         ],
         metadataTables: [],
 
         filters: [
           {
-            filterName: "Region",
-            paramName: "zoneTypeId",
-            target: "api",
-            actions: [
-              { 
-                action: "UPDATE_PARAMETERISED_LAYER", 
-                payload: { targetLayer: "Accessibility" } 
-              },
-              { action: "UPDATE_QUERY_PARAMS" },
-            ],
-            visualisations: ["Bus Accessibility"],
-            layer: "Accessibility",
-            type: "dropdown",
-            info: "Select the region for which to view metrics.",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "North East MSOA",
-                  paramValue: 2,
-                },
-                {
-                  displayValue: "North West MSOA",
-                  paramValue: 3,
-                },
-                {
-                  displayValue: "Yorkshire and Humber MSOA",
-                  paramValue: 4,
-                },
-              ],
-            },
-          },
-          {
             filterName: "Timetable",
-            paramName: "timetable_id",
+            paramName: "timetableId",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Bus Accessibility"],
@@ -243,19 +210,15 @@ export const appConfig = {
               source: "local",
               values: [
                 {
-                  displayValue: "2024-04-09",
-                  paramValue: 2,
-                },
-                {
-                  displayValue: "2024-04-09 Dummy",
-                  paramValue: 7,
-                },
+                  displayValue: "2024-04-09",                
+                  paramValue: 3,
+                }
               ],
             },
           },
           {
             filterName: "Value type",
-            paramName: "valueType",
+            paramName: "oppTypeId",
             target: "api",
             actions: [
               { action: "UPDATE_QUERY_PARAMS" },
@@ -269,14 +232,29 @@ export const appConfig = {
               source: "local",
               values: [
                 {
-                  displayValue: "Jobs",
-                  paramValue: "jobs",
-                  legendSubtitleText: "accessible from zone",
+                  displayValue: 1,
+                  paramValue: 1,
+                  legendSubtitleText: 1,
                 },
                 {
-                  displayValue: "Schools",
-                  paramValue: "schools",
-                  legendSubtitleText: "accessible from zone",
+                  displayValue: 2,
+                  paramValue: 2,
+                  legendSubtitleText: 2,
+                },
+                {
+                  displayValue: 3,
+                  paramValue: 3,
+                  legendSubtitleText: 3,
+                },
+                {
+                  displayValue: 4,
+                  paramValue: 4,
+                  legendSubtitleText: 4,
+                },
+                {
+                  displayValue: 5,
+                  paramValue: 5,
+                  legendSubtitleText: 5,
                 },
               ],
             },
@@ -289,9 +267,9 @@ export const appConfig = {
             visualisations: ["Bus Accessibility"],
             type: "slider",
             info: "Journey time limit by bus.",
-            min: 15,
-            max: 225,
-            interval: 15,
+            min: 20,
+            max: 300,
+            interval: 20,
             displayAs: {
               unit: "mins",
             },
