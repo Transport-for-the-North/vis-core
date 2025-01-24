@@ -173,7 +173,7 @@ export const appConfig = {
             name: "Accessibility",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "zones",
             geometryType: "polygon",
             visualisationName: "Bus Accessibility",
@@ -195,7 +195,10 @@ export const appConfig = {
             dataPath: "/api/bsip/accessibility/staging",
           },
         ],
-        metadataTables: [],
+        metadataTables: [{
+          name: "landuse_opportunity_type_list",
+          path: "/api/getgenericdataset?dataset_id=foreign_keys.landuse_opportunity_type_list"
+        }],
 
         filters: [
           {
@@ -204,13 +207,13 @@ export const appConfig = {
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Bus Accessibility"],
-            type: "dropdown",
+            type: "fixed",
             info: "Timetable used to calculate metrics.",
             values: {
               source: "local",
               values: [
                 {
-                  displayValue: "2024-04-09",                
+                  displayValue: 3,                
                   paramValue: 3,
                 }
               ],
@@ -226,37 +229,16 @@ export const appConfig = {
             ],
             visualisations: ["Bus Accessibility"],
             type: "dropdown",
+            shouldBeValidated: false,
             info: "Type of opportunity accessed.",
             containsLegendInfo: true,
             values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: 1,
-                  paramValue: 1,
-                  legendSubtitleText: 1,
-                },
-                {
-                  displayValue: 2,
-                  paramValue: 2,
-                  legendSubtitleText: 2,
-                },
-                {
-                  displayValue: 3,
-                  paramValue: 3,
-                  legendSubtitleText: 3,
-                },
-                {
-                  displayValue: 4,
-                  paramValue: 4,
-                  legendSubtitleText: 4,
-                },
-                {
-                  displayValue: 5,
-                  paramValue: 5,
-                  legendSubtitleText: 5,
-                },
-              ],
+              source: "metadataTable",
+              metadataTableName: "landuse_opportunity_type_list",
+              displayColumn: "name",
+              legendSubtitleTextColumn: "code",
+              paramColumn: "id",
+              sort: "ascending",
             },
           },
           {
