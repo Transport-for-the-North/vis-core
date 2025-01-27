@@ -419,16 +419,16 @@ const glossaryData = {
     },
     charger: {
       title: "Charger (existing charge points)",
-      content: `<p>Analysis of existing charge points is provided for:</p>
+      content: `<p>This monitoring capability applies Zap Map data, which has been agreed for sharing within the TfN EVCI Framework. Further information not provided in this 
+      public tool is available for TfN's local authority partners on request.</p>
+      <p>Please note that for current/installed chargepoints, the totals are the number of devices, whereas for the forecasted numbers these are given as chargepoint plugs.</p>
+      <p>Speed definitions:
       <ul>
-      <li>Chargers: A count of individual devices (as defined by the <a href="https://chargepoints.dft.gov.uk/">National Chargepoint Registry</a>), 
-      where a device may have multiple connectors.</li>
-      <li>Installed charger power: The kilowatt rating of the most powerful connector attached to each device.</li>
-      </ul>
-      <p>Chargers with precisely the same geographic coordinates are aggregated.
-      In practice, the accuracy with which devices are located is inconsistent within NCR, so locations should be considered approximate.
-      For example, a charging hub may appear as one multi-device site by postcode, one multi-device site by centroid,
-      or a sequence of charging devices laid out in across a car park.</p>`,
+      <li>Slow - less than 8kW</li>
+      <li>Fast - 8kW to less than 50 kW</li>
+      <li>Rapid - 50kW to less than 150kW</li>
+      <li>Ultra-rapid - 150kW or higher</li>
+      </ul></p>`,
       exclude: [],
     },
     enRouteRoad: {
@@ -524,6 +524,10 @@ const glossaryData = {
       <li>In the ‘filtering and data selection’ section, click either LA or MSOA below ‘administrative boundaries’. Then, under ‘optional location filter’ click on ‘enable selector’. 
       Then simply click on the map and combine the LAs or MSOAs you desire. You can see them compile in the box. Simply re-click on the LA or MSOA on the map to remove or 
       click on the ‘x’ next to the name in the box. To remove them all, click on the larger ‘X’ to the right of the box.   </li>`
+    },
+    chargepointOutput: {
+      title: "What do the chargepoint output numbers refer to?",
+      content: '<p>Please note that for current/installed chargepoints, the totals are the number of devices, whereas for the forecasted numbers these are given as chargepoint plugs.</p>'
     }
   };
   
