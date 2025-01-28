@@ -293,7 +293,7 @@ const oaOrPtvariableSelector = {
 };
 
 const oaOrPtPercentileFilter = {
-  filterName: "Filter by percentile...",
+  filterName: "Filter by percentile within the area selected...",
   paramName: "percentileFilter",
   target: "api",
   actions: [
@@ -315,6 +315,30 @@ const oaOrPtPercentileFilter = {
       {
         displayValue: "Top 10% highest risk",
         paramValue: 10,
+      },
+    ],
+  },
+};
+
+const oaOrPtEngHighRiskFilter = {
+  filterName: "Filter by national risk category",
+  paramName: "engHighRisk",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "toggle",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "All",
+        paramValue: "0",
+      },
+      {
+        displayValue: "High risk nationally",
+        paramValue: true,
       }
     ],
   },
@@ -435,6 +459,7 @@ export const selectors = {
   featureTypePTFixed: featureTypePTFixedSelector,
   oaOrPtvariable: oaOrPtvariableSelector,
   oaOrPtPercentileFilter: oaOrPtPercentileFilter,
+  oaOrPtEngHighRiskFilter: oaOrPtEngHighRiskFilter,
   oaFeature: oaFeatureSelector,
   oaFeatureType: oaFeatureTypeFixedSelector,
   ptFeature: ptFeatureSelector,

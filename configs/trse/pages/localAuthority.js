@@ -43,7 +43,7 @@ export const localAuthority = {
       },
       
       {
-        name: "Local Authorities2",
+        name: "hide_Local Authorities2",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
@@ -165,6 +165,7 @@ export const localAuthority = {
       { ...selectors.zoneTypeLADFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information']},
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.oaOrPtEngHighRiskFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
       selectors.oaFeatureType,
       selectors.ptFeature,

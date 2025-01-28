@@ -35,7 +35,7 @@ export const useFeatureSelect = (
    * Moves the draw layers to the top of the layer stack.
    */
   const moveDrawLayersToTop = useCallback(() => {
-    if (!map.getStyle()) return;
+    if (!map || !map.getStyle() || !map.getStyle().layers) return;
 
     const drawLayerIds = map
       .getStyle()
@@ -43,7 +43,11 @@ export const useFeatureSelect = (
       .map((layer) => layer.id);
 
     drawLayerIds.forEach((layerId) => {
-      map.moveLayer(layerId);
+      try {
+        map.moveLayer(layerId);
+      } catch (e) {
+        console.warn(`Failed to move layer ${layerId} to top: ${e.message}`);
+      }
     });
   }, [map]);
 
@@ -104,21 +108,51 @@ export const useFeatureSelect = (
       });
 
       if (allFeatures.length > 0) {
-        const clickedFeature = allFeatures
-          .reduce((closestFeature, feature) => {
+        const clickPoint = turf.point([e.lngLat.lng, e.lngLat.lat]);
+        // Define threshold distance to search within (if no feature directly clicked)
+        // NB we may need to adjust this!!!
+        const thresholdDistance = 0.01;
+
+        let clickedFeature = null;
+
+        // First, try to find a feature that contains the click point (for polygons)
+        clickedFeature = allFeatures.find((feature) =>
+          feature.geometry.type === "Polygon" &&
+          turf.booleanPointInPolygon(clickPoint, feature.geometry)
+        );
+  
+        // If no polygon contains the click point, check for points and lines
+        if (!clickedFeature) {
+          clickedFeature = allFeatures.find((feature) => {
+            if (feature.geometry.type === "Point") {
+              const featurePoint = turf.point(feature.geometry.coordinates);
+              const distance = turf.distance(clickPoint, featurePoint);
+              return distance <= thresholdDistance;
+            } else if (feature.geometry.type === "LineString") {
+              const line = turf.lineString(feature.geometry.coordinates);
+              const nearestPoint = turf.nearestPointOnLine(line, clickPoint);
+              const distance = turf.distance(clickPoint, nearestPoint);
+              return distance <= thresholdDistance;
+            }
+            return false;
+          });
+        }
+  
+        // If no feature is directly clicked, find the closest feature
+        if (!clickedFeature) {
+          clickedFeature = allFeatures.reduce((closestFeature, feature) => {
             const featurePoint = turf.pointOnFeature(feature.geometry);
-            const distance = turf.distance(
-              turf.point([e.lngLat.lng, e.lngLat.lat]),
-              featurePoint
-            );
+            const distance = turf.distance(clickPoint, featurePoint);
 
             if (!closestFeature || distance < closestFeature.distance) {
               return { feature: feature.toJSON(), distance };
             }
 
             return closestFeature;
-          }, null)
-          .feature;
+          }, null).feature;
+        } else {
+          clickedFeature = clickedFeature.toJSON();
+        }
 
         const isFeatureAlreadySelected = selectedFeatureValues.some(
           (feature) => feature.value === clickedFeature.id
@@ -168,8 +202,6 @@ export const useFeatureSelect = (
   const handleDrawCreate = useCallback(
     (e) => {
       if (selectionMode !== "rectangle" || !isFeatureSelectActive) return;
-      moveDrawLayersToTop();
-
       const rectangleFeature = e.features[0];
       const bbox = turf.bbox(rectangleFeature);
       const bboxPolygon = turf.bboxPolygon(bbox);
@@ -216,6 +248,16 @@ export const useFeatureSelect = (
       }
 
       setFeatureSelectActive(false);
+
+      // Zero timeout to ensure handlers restored after draw created
+      setTimeout(() => {
+        if (existingClickHandlersRef.current.length > 0) {
+          existingClickHandlersRef.current.forEach((handler) =>
+            map.on("click", handler)
+          );
+          existingClickHandlersRef.current = [];
+        }
+      }, 0);
     },
     [
       selectionMode,
@@ -267,6 +309,7 @@ export const useFeatureSelect = (
           }
         } else if (selectionMode === "rectangle" && draw) {
           draw.changeMode("draw_rectangle");
+          moveDrawLayersToTop();
           map.on("draw.create", handleDrawCreate);
         }
       }
@@ -296,13 +339,13 @@ export const useFeatureSelect = (
     mapState.drawInstance
   ]);
 
-  // **Effect to restore handlers
-  useEffect(() => {
-    if (!isFeatureSelectActive && existingClickHandlersRef.current.length > 0) {
-      existingClickHandlersRef.current.forEach(handler => map.on("click", handler));
-      existingClickHandlersRef.current = [];
-    }
-  }, [isFeatureSelectActive, map]);
+    // **Effect to restore handlers
+    useEffect(() => {
+      if (selectionMode === "feature" && !isFeatureSelectActive && existingClickHandlersRef.current.length > 0) {
+        existingClickHandlersRef.current.forEach(handler => map.on("click", handler));
+        existingClickHandlersRef.current = [];
+      }
+    }, [isFeatureSelectActive, selectionMode, map]);
 
   return transformedFeaturesState;
 };
