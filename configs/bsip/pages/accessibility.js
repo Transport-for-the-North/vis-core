@@ -34,7 +34,7 @@ export const accessibility = {
           joinField: "id",
           valueField: "value",
           dataSource: "api",
-          dataPath: "/api/bsip/accessibility/staging",
+          dataPath: "/api/bsip/accessibility/prod",
         },
       ],
       metadataTables: [{
