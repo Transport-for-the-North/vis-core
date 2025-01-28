@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
+import { darken } from "polished"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { AccordionSection, TextSection } from "./Accordion";
 import { SelectorSection } from "./Selectors";
@@ -73,10 +74,10 @@ const SidebarContainer = styled.div`
 
 const ToggleButton = styled.button`
   position: absolute;
-  left: 400px;
+  left: 392px;
   top: 25px;
   z-index: 1001;
-  background-color: ${(props) => props.$bgColor}; /* Access the $bgColor prop */
+  background-color: ${(props) => props.$bgColor};
   color: white;
   border: none;
   border-radius: 5px;
@@ -86,12 +87,37 @@ const ToggleButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 48px; /* Minimum touch target size */
+  min-height: 32px; /* Minimum touch target size */
 
   ${({ $isVisible }) => !$isVisible && `
-    position: fixed;  
+    position: fixed;
     top: 108px;
     left: 10px;
   `}
+
+  @media (max-width: 460px) {
+    left: auto;
+    right: 10px;
+    padding: 8px 16px;
+
+    ${({ $isVisible }) => !$isVisible && `
+      left: 10px;
+      right: auto;
+    `}
+  }
+
+  /* Touch interaction improvements */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* Prevent zoom on touch */
+
+  /* Conditional hover for non-touch devices */
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: ${({ $bgColor }) => 
+        $bgColor && darken(0.1, $bgColor)};
+    }
+  }
 `;
 
 /**
