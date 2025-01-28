@@ -56,8 +56,8 @@ export const Hovertip = ({ isVisible, displayText, side, refElement, offset = 5,
     padding: '5px',
     borderRadius: '6px',
     fontSize: '0.8em',
-    whiteSpace: 'nowrap',
     zIndex: 1002,
+    maxWidth: '15rem'
   };
 
   return createPortal(
