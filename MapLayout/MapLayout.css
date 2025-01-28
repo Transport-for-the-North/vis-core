@@ -18,11 +18,10 @@
   .maplibregl-ctrl-attrib-inner {
     white-space: nowrap; 
     overflow-x: auto; 
-    text-overflow: clip;  
-    max-width: 100%;  
+    text-overflow: clip;
     display: block; 
     width: fit-content; 
-    max-width: 80vw;
+    max-width: calc(100vw - 60px);
   }  
 
   ::-webkit-scrollbar {
