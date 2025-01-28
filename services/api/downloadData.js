@@ -52,14 +52,26 @@ function updateQueryParams(queryParams) {
     delete clonedQueryParams['undefined'];
   }
 
-  // If zoneId is an array, update it with the 'value' from each dictionary
-  if (Array.isArray(clonedQueryParams.zoneId)) {
-    clonedQueryParams.zoneId = clonedQueryParams.zoneId.map(item => {
-      if (item && typeof item.value !== 'undefined') {
-        return parseInt(item.value, 10);
-      }
-      return null;
-    }).filter(value => value !== null); // Remove any null values
+  // Process each parameter that is an array
+  for (const key of Object.keys(clonedQueryParams)) {
+    const paramValue = clonedQueryParams[key];
+    if (Array.isArray(paramValue)) {
+      clonedQueryParams[key] = paramValue
+        .map(item => {
+          // Check if the item is a non-null object and not an array
+          if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+            if (typeof item.value !== 'undefined') {
+              return item.value; // Extract 'value' if present
+            } else {
+              console.warn(`Object in array parameter '${key}' lacks a 'value' property.`);
+              return null; // Mark for removal
+            }
+          } else {
+            return item; // Return primitives, arrays, or null as-is
+          }
+        })
+        .filter(value => value !== null); // Remove null values
+    }
   }
 
   return clonedQueryParams;
