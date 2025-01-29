@@ -4,7 +4,7 @@ import { appConfig as bsipAppConfig } from "configs/bsip/appConfig";
 
 export const appConfig = {
     ...bsipAppConfig,
-    title: "Bus Analytics Tool - Internal",
+    title: "Bus Analytics Tool - Internal Evaluation",
     appPages: [
         ...Object.values(bsipPages).map(page => ({
             ...page,
