@@ -12,7 +12,8 @@ export const appConfig = {
                 ...page.config,
                 visualisations: page.config.visualisations.map((visualisation) => ({
                     ...visualisation,
-                    dataPath: visualisation.name === "Bus Accessibility" ? "/api/bsip/accessibility/staging" : visualisation.dataPath
+                    dataPath: visualisation.name === "Bus Accessibility" ? "/api/bsip/accessibilityV2/staging" : visualisation.dataPath,
+                    dataPath: visualisation.name === "Bus Reliability" ? "/api/bsip/reliabilityV2/staging" : visualisation.dataPath,
                 }))
             }
         }))
