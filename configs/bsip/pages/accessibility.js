@@ -78,7 +78,7 @@ export const accessibility = {
             source: "metadataTable",
             metadataTableName: "landuse_opportunity_type_list",
             displayColumn: "name",
-            legendSubtitleTextColumn: "code",
+            legendSubtitleTextColumn: "units",
             paramColumn: "id",
             sort: "ascending",
           },
