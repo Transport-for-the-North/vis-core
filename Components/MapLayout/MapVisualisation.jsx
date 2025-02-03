@@ -460,6 +460,7 @@ export const MapVisualisation = ({
         return;
       }
       if (!checkGeometryNotNull(featureCollection)) {
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
         return;
       }
       if (!map.getSource(visualisationName)) {
