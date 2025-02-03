@@ -245,7 +245,7 @@ export const MapVisualisation = ({
           map.removeFeatureState({
             source: specifiedLayer.name,
             sourceLayer: specifiedLayer.sourceLayer,
-          });
+          }, 'value');
           data.forEach((row) => {
             map.setFeatureState(
               {
@@ -387,9 +387,10 @@ export const MapVisualisation = ({
           break;
         }
         case "geojson": {
-          if (dataToVisualize[0]) {
+          const parsedDataToVisualize = dataToVisualize[0] ? dataToVisualize[0].feature_collection : dataToVisualize.feature_collection;
+          if (parsedDataToVisualize) {
             reclassifyAndStyleGeoJSONMap(
-              JSON.parse(dataToVisualize[0].feature_collection),
+              JSON.parse(parsedDataToVisualize),
               visualisation.style
             );
           } else {
