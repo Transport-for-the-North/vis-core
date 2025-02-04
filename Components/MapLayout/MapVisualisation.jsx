@@ -460,6 +460,10 @@ export const MapVisualisation = ({
         return;
       }
       if (!checkGeometryNotNull(featureCollection)) {
+        // Remove the layer and source if no valid data is returned
+        if (map.getLayer(visualisationName)) {
+          map.removeLayer(visualisationName);
+        }
         dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
         return;
       }
