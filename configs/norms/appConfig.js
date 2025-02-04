@@ -433,9 +433,7 @@ export const appConfig = {
             visualisations: ["Station Totals"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric",
@@ -693,9 +691,7 @@ export const appConfig = {
             visualisations: ["Station Totals Difference"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric (1 and 2)",
@@ -871,9 +867,7 @@ export const appConfig = {
             visualisations: ["Station Totals Side-by-Side"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter Scenario Right by Network",
@@ -965,9 +959,7 @@ export const appConfig = {
             visualisations: ["Station Totals Side-by-Side"],
             info: "Select the desired time period. ",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric",
@@ -4438,9 +4430,7 @@ export const appConfig = {
             visualisations: ["Zone Totals Side-by-Side"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
         ]
       }
