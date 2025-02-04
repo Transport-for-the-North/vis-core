@@ -26,40 +26,55 @@ function createQueryString(queryParams) {
     return queryString;
 }
 
+/**
+ * Updates the query parameters appropriately, mainly with the zoneIds if they exist.
+ * Removes any undefined entries which might be an issue also.
+*/
 function updateQueryParams(queryParams) {
-  /**
-   * Updates the query parameters appropriately, mainly with the zoneIds if they exist.
-   * Removes any undefined entries which might be an issue also.
-   */
-
+  
   // Check if queryParams is falsy and return it as is
   if (!queryParams) {
     return queryParams;
   }
 
+  // Create a shallow clone of the queryParams object
+  const clonedQueryParams = { ...queryParams };
+
   // Remove keys with values of 0 or null
-  for (const key in queryParams) {
-    if (queryParams[key] === 0 || queryParams[key] === null) {
-      delete queryParams[key];
+  for (const key in clonedQueryParams) {
+    if (clonedQueryParams[key] === 0 || clonedQueryParams[key] === null) {
+      delete clonedQueryParams[key];
     }
   }
 
   // Remove the "undefined" key if it exists
-  if (queryParams.hasOwnProperty('undefined')) {
-    delete queryParams['undefined'];
+  if (clonedQueryParams.hasOwnProperty('undefined')) {
+    delete clonedQueryParams['undefined'];
   }
 
-  // If zoneId is an array, update it with the 'value' from each dictionary
-  if (Array.isArray(queryParams.zoneId)) {
-    queryParams.zoneId = queryParams.zoneId.map(item => {
-      if (item && typeof item.value !== 'undefined') {
-        return parseInt(item.value, 10);
-      }
-      return null;
-    }).filter(value => value !== null); // Remove any null values
+  // Process each parameter that is an array
+  for (const key of Object.keys(clonedQueryParams)) {
+    const paramValue = clonedQueryParams[key];
+    if (Array.isArray(paramValue)) {
+      clonedQueryParams[key] = paramValue
+        .map(item => {
+          // Check if the item is a non-null object and not an array
+          if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+            if (typeof item.value !== 'undefined') {
+              return item.value; // Extract 'value' if present
+            } else {
+              console.warn(`Object in array parameter '${key}' lacks a 'value' property.`);
+              return null; // Mark for removal
+            }
+          } else {
+            return item; // Return primitives, arrays, or null as-is
+          }
+        })
+        .filter(value => value !== null); // Remove null values
+    }
   }
 
-  return queryParams;
+  return clonedQueryParams;
 }
 
 export class DownloadService extends BaseService {
