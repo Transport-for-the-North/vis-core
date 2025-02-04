@@ -660,7 +660,6 @@ const Map = (props) => {
         // Get the top-most feature
         const feature = features[0];
         const layerId = feature.layer.id;
-        console.log(feature);
 
         // Unset the 'selected' state of the previously selected feature for this layer
         if (prevSelectedFeatures.current[layerId]) {
@@ -727,7 +726,6 @@ const Map = (props) => {
           }
         });
       }
-      console.log(prevSelectedFeatures.current);
     },
     [isMapReady, map, memoizedFilters, dispatch, filterDispatch]
   );
