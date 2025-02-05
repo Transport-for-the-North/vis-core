@@ -66,6 +66,25 @@ const zoneSelector = {
   defaultMode: 'draw_rectangle', // Default selection mode
 };
 
+const linkSelector = {
+  filterName: "Optional location filter",
+  type: "mapFeatureSelectWithControls",
+  paramName: "linkId",
+  target: "api",
+  actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
+    {
+      action: 'UPDATE_VISUALISED_FEATURES'
+    },
+  ],
+  visualisations: null,
+  layer: "Major Roads",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
 const siteSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
@@ -577,14 +596,14 @@ const columnNameCPSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Installed charger power",
-        paramValue: "kw_total",
-        legendSubtitleText: "kW"
-      },
-      {
         displayValue: "Installed devices",
         paramValue: "device_count",
         legendSubtitleText: "device count"
+      },
+      {
+        displayValue: "Installed charger power",
+        paramValue: "kw_total",
+        legendSubtitleText: "kW"
       },
     ],
   },
@@ -717,14 +736,14 @@ const columnNameSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Charger power",
-        paramValue: "kw_total",
-        legendSubtitleText: "kW"
-      },
-      {
         displayValue: "Stops count",
         paramValue: "stops_count",
         legendSubtitleText: "stops"
+      },
+      {
+        displayValue: "Charger power",
+        paramValue: "kw_total",
+        legendSubtitleText: "kW"
       },
     ],
   },
@@ -822,5 +841,6 @@ export const selectors = {
   runTypeCodeFixed: runTypeCodeFixedSelector,
   runTypeCodeDynamic: runTypeCodeDynamicSelector,
   zoneSelector: zoneSelector,
-  siteSelector: siteSelector
+  siteSelector: siteSelector,
+  linkSelector: linkSelector
 };

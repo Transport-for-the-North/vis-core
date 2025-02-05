@@ -29,7 +29,7 @@ export const cpMajorRoad = {
         name: "Roads",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/evci_links/{z}/{x}/{y}?stb_zone_id=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/mrn_links/{z}/{x}/{y}?stb_zone_id=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "geometry",
         geometryType: "line",
         visualisationName: "Chargers/Power by Major Road",
@@ -61,13 +61,23 @@ export const cpMajorRoad = {
       { ...selectors.columnNameCP, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.stbTag, visualisations: ['Chargers/Power by Major Road'] },
       { ...selectors.distanceValueDisplay, visualisations: ['Chargers/Power by Major Road'] },
-      { ...selectors.zoneSelector, visualisations: ['Chargers/Power by Major Road'], layer: "Roads" }
+      { ...selectors.linkSelector, visualisations: ['Chargers/Power by Major Road'], layer: "Roads" }
     ],
     additionalFeatures: {
       warning: "This monitoring capability applies Zap Map data, which has been agreed for sharing within TfN’s EVCI Framework. Further information not provided publicly is available for TfNs local authority partners on request.",
       glossary: { 
         dataDictionary: {}
       },
+      download: {
+        filters: [
+          { ...selectors.chargerSpeed, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.columnNameCP, multiSelect: false, type: 'toggle' },
+          { ...selectors.stbTag, type: 'fixed' },
+          { ...selectors.distanceValueDisplay, multiSelect: true, type: 'dropdown' },
+          { ...selectors.linkSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], layer: "Roads"},
+        ],
+        downloadPath: '/api/evci/cp-major-road/download'
+      }
     },
   },
 };
