@@ -12,7 +12,7 @@ import {
   hasAnyGeometryNotNull,
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
 
 /**
@@ -39,6 +39,8 @@ export const MapVisualisation = ({
   const prevVisualisationDataRef = useRef();
   const prevColorRef = useRef({});
   const prevClassMethodRef = useRef({});
+
+  const { addFeaturesToMap } = useFeatureStateUpdater();
 
   // Determine the visualisation based on side (left, right, or single)
   const visualisation =
@@ -219,66 +221,6 @@ export const MapVisualisation = ({
     ]
   );
 
-  /**
-   * Adds features to the map and updates their paint properties for a specified layer.
-   *
-   * @param {Object} map - The map object to which features will be added.
-   * @param {Object} paintProperty - The paint properties to apply to the layer.
-   * @param {Object} layers - The layers to which the features will be added.
-   * @param {Array} data - The data containing features to be added to the map.
-   * @param {string} style - The style string indicating the type of visualisation.
-   * @param {string} layerName - The name of the layer to which features will be added.
-   */
-  const addFeaturesToMap = useCallback(
-    (map, paintProperty, layers, data, style, layerName) => {
-      // Find the specified layer
-      const specifiedLayer = Object.values(layers).find(
-        (layer) => layer.name === layerName
-      );
-
-      if (specifiedLayer && map.getLayer(specifiedLayer.name)) {
-        if (data && data.length > 0 && specifiedLayer.isStylable) {
-          map.getLayer(specifiedLayer.name).metadata = {
-            ...map.getLayer(specifiedLayer.name).metadata,
-            colorStyle: colorStyle,
-          };
-          map.removeFeatureState({
-            source: specifiedLayer.name,
-            sourceLayer: specifiedLayer.sourceLayer,
-          }, 'value');
-          data.forEach((row) => {
-            map.setFeatureState(
-              {
-                source: specifiedLayer.name,
-                sourceLayer: specifiedLayer.sourceLayer,
-                id: Number(row["id"]),
-              },
-              {
-                value: row["value"],
-                valueAbs: Math.abs(row["value"]),
-              }
-            );
-          });
-          for (const [
-            paintPropertyName,
-            paintPropertyArray,
-          ] of Object.entries(paintProperty)) {
-            map.setPaintProperty(
-              specifiedLayer.name,
-              paintPropertyName,
-              paintPropertyArray
-            );
-          }
-        } else if (data && data.length === 0 && specifiedLayer.isStylable) {
-          map.removeFeatureState({
-            source: specifiedLayer.name,
-            sourceLayer: specifiedLayer.sourceLayer,
-          });
-        }
-      }
-    },
-    []
-  );
 
   /**
    * Calculates the color palette based on the provided color scheme and number of bins.
