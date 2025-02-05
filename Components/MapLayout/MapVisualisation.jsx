@@ -9,7 +9,7 @@ import {
   reclassifyData,
   reclassifyGeoJSONData,
   resetPaintProperty,
-  checkGeometryNotNull,
+  hasAnyGeometryNotNull,
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData } from "hooks"; // Import the custom hook
@@ -459,7 +459,7 @@ export const MapVisualisation = ({
       if (!featureCollection) {
         return;
       }
-      if (!checkGeometryNotNull(featureCollection)) {
+      if (!hasAnyGeometryNotNull(featureCollection)) {
         // Remove the layer and source if no valid data is returned
         if (map.getLayer(visualisationName)) {
           map.removeLayer(visualisationName);
