@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
@@ -42,6 +42,11 @@ const Map = (props) => {
   const hoverEventIdRef = useRef(0);
   const hoverInfoRef = useRef({});
   const prevHoveredFeaturesRef = useRef([]);
+  
+  // Keep track of previously selected features per layer
+  const prevSelectedFeatures = useRef({});
+
+  const memoizedFilters = useMemo(() => state.filters, [state.filters]);
 
   // **Draw control logic
   useEffect(() => {
@@ -637,95 +642,92 @@ const Map = (props) => {
   const handleMapClick = useCallback(
     (event) => {
       if (!isMapReady || !map) return;
-  
-      const point = event.point;
-  
-      // Get all map filters
-      const mapFilters = state.filters.filter(
-        (filter) => filter.type === "map"
-      );
-  
-      // For each map filter, check if the clicked point has a feature from the layer
-      mapFilters.forEach((filter) => {
-        const features = map.queryRenderedFeatures(point, {
-          layers: [filter.layer],
-        });
-        if (features.length > 0) {
-          // Assuming the first feature is the one we're interested in
-          const feature = features[0];
-          const value = feature.properties[filter.field];
-  
-          // Remove the previous selection layer if it exists
-          if (map.getLayer("selected-feature-layer")) {
-            map.removeLayer("selected-feature-layer");
-            map.removeSource("selected-feature-source");
-          }
-  
-          let paintProp = {};
-          let layerType = feature.layer.type;
 
-          const outlineOnPolygonSelect = state.layers[feature.layer.id]?.outlineOnPolygonSelect;
-  
-          if (feature.layer.type == "circle") {
-            paintProp = {
-              "circle-radius": 6,
-              "circle-color": "green",
-              "circle-opacity": 0.75,
-              "circle-stroke-width": 2,
-              "circle-stroke-color": "black",
-            };
-            layerType = "circle";
-          } else if (feature.layer.type == "fill") {
-            // If layer has outlineOnPolygonSelect as true, it will do the line to draw otherwise
-            // it will fit the polygon.
-            if (outlineOnPolygonSelect) {
-              paintProp = {
-                "line-color": "#f00",
-                "line-width": 2,
-              };
-              layerType = "line"; // Change layer type to 'line' to draw the outline
-            } else {
-              paintProp = {
-                "fill-color": "#f00",
-                "fill-opacity": 0.5,
-              };
-              layerType = "fill";
-            }
-          } else {
-            // Handle other layer types if necessary
-            paintProp = {
-              // Default paint properties
-            };
-          }
-  
-          // Add a new source and layer for the selected feature
-          map.addSource("selected-feature-source", {
-            type: "geojson",
-            data: feature.toJSON(),
-          });
-  
-          map.addLayer({
-            id: "selected-feature-layer",
-            type: layerType,
-            source: "selected-feature-source",
-            paint: paintProp,
-          });
-  
+      const point = event.point;
+
+      // Get all map filters
+      const mapFilters = memoizedFilters.filter((filter) => filter.type === "map");
+
+      // Get the list of layer names from the filters
+      const layerNames = mapFilters.map((filter) => filter.layer);
+
+      // Query for features from all layers specified in mapFilters
+      const features = map.queryRenderedFeatures(point, {
+        layers: layerNames,
+      });
+
+      if (features.length > 0) {
+        // Get the top-most feature
+        const feature = features[0];
+        const layerId = feature.layer.id;
+
+        // Unset the 'selected' state of the previously selected feature for this layer
+        if (prevSelectedFeatures.current[layerId]) {
+          const prevFeature = prevSelectedFeatures.current[layerId];
+          map.setFeatureState(
+            {
+              source: prevFeature.source,
+              sourceLayer: prevFeature.sourceLayer,
+              id: prevFeature.id,
+            },
+            { selected: false }
+          );
+        }
+
+        // Set the 'selected' state of the currently selected feature
+        map.setFeatureState(
+          {
+            source: feature.layer.source,
+            sourceLayer: feature.layer["source-layer"],
+            id: feature.id,
+          },
+          { selected: true }
+        );
+
+        // Update the reference to the currently selected feature for this layer
+        prevSelectedFeatures.current[layerId] = {
+          id: feature.id,
+          source: feature.layer.source,
+          sourceLayer: feature.layer["source-layer"],
+        };
+
+        // Find the corresponding filter
+        const filter = mapFilters.find((f) => f.layer === layerId);
+
+        if (filter) {
+          const value = feature.properties[filter.field];
+
           // Dispatch the action with the value from the clicked feature
           filterDispatch({
-            type: 'SET_FILTER_VALUE',
+            type: "SET_FILTER_VALUE",
             payload: { filterId: filter.id, value },
           });
-          filter.actions.map((action) => {
+          filter.actions.forEach((action) => {
             dispatch({
               type: action.action,
               payload: { filter, value, ...action.payload },
             });
           });
         }
-      });
+      } else {
+        // When clicking on an area with no features, unset selected features on all layers if needed
+        layerNames.forEach((layerId) => {
+          if (prevSelectedFeatures.current[layerId]) {
+            const prevFeature = prevSelectedFeatures.current[layerId];
+            map.setFeatureState(
+              {
+                source: prevFeature.source,
+                sourceLayer: prevFeature.sourceLayer,
+                id: prevFeature.id,
+              },
+              { selected: false }
+            );
+            delete prevSelectedFeatures.current[layerId];
+          }
+        });
+      }
     },
-    [isMapReady, map, state.filters, dispatch]
+    [isMapReady, map, memoizedFilters, dispatch, filterDispatch]
   );
 
   // **Create map hover handler**

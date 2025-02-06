@@ -77,6 +77,7 @@ function updateQueryParams(queryParams) {
   return clonedQueryParams;
 }
 
+
 export class DownloadService extends BaseService {
     /**
      * Constructs a new GeodataService instance.

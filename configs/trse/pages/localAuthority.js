@@ -1,7 +1,9 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { ladSummaryCallout, oaLaDetailedCallout } from "../templates";
-import { laPopupContent } from "../templates/popup";
+import { parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions";
+import { laPopupContent, laPtPopupContent } from "../templates/popup";
+import glossaryData from "../glossaryData";
 
 export const localAuthority = {
   pageName: "Local Authority",
@@ -39,14 +41,32 @@ export const localAuthority = {
           htmlTemplate: laPopupContent
         }
       },
+      
+      {
+        name: "hide_Local Authorities2",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+        sourceLayer: "zones",
+        geometryType: "polygon",
+        isHoverable: true,
+        isStylable: false,
+        shouldHaveTooltipOnHover: true,
+        shouldHaveLabel: false,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: true,
+      },
       {
         name: "Local Authorities",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
         sourceLayer: "zones",
-        geometryType: "polygon",
-        isHoverable: false,
+        geometryType: "line",
+        customPaint: parentAuthorityBoundaryCustomPaint,
+        isHoverable: true,
         isStylable: false,
         shouldHaveTooltipOnHover: false,
         shouldHaveLabel: false,
@@ -76,7 +96,7 @@ export const localAuthority = {
         trseLabel: true,
         customTooltip: {
           url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
-          htmlTemplate: laPopupContent
+          htmlTemplate: laPtPopupContent
         }
       }
     ],
@@ -145,6 +165,7 @@ export const localAuthority = {
       { ...selectors.zoneTypeLADFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation', 'Detailed Information']},
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.oaOrPtEngHighRiskFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
       selectors.oaFeatureType,
       selectors.ptFeature,
@@ -152,7 +173,17 @@ export const localAuthority = {
     ],
     additionalFeatures: {
       glossary: { 
-        dataDictionary: {}
+        dataDictionary: glossaryData
+      },
+      download: {
+        filters: [
+          { ...selectors.downloadParentLAD, type: 'mapFeatureSelect' },
+          { ...selectors.zoneTypeLADFixed, paramName: 'parentZoneTypeId' },
+          selectors.zoneResolutionLADFixed,
+          selectors.zoneSelector,
+          selectors.includePtPointsCheckbox
+        ],
+        downloadPath: '/api/trse/output-area-data/download'
       },
     },
   },

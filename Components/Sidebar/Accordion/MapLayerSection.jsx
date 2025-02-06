@@ -30,7 +30,9 @@ export const MapLayerSection = ({
             layer.type === "circle") &&
             layer.source !== "default" &&
             !layer.id.endsWith("-hover") &&
+            !layer.id.endsWith("-select") &&
             layer.id !== "selected-feature-layer" &&
+            !layer.id.startsWith("hide_") &&
             !layer.id.startsWith("gl-draw")
       );
       setLayers(filteredLayers);

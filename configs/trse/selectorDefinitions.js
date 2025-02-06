@@ -26,8 +26,64 @@ const parentCombinedAuthoritySelector = {
   forceRequired: true
 };
 
+const downloadParentCombinedAuthoritySelector = {
+  filterName: "Download an entire authority area...",
+  paramName: "parentZoneId",
+  target: "api",
+  actions: [
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "Output Areas"},
+    },
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "PT Points"},
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "zoneId" }
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "parentZoneId" }
+    },
+  ],
+  visualisations: null,
+  layer: "Combined Authorities",
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true
+};
+
 const parentLADSelector = {
   filterName: "Select a Local Authority...",
+  paramName: "parentZoneId",
+  target: "api",
+  actions: [
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "Output Areas"},
+    },
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "PT Points"},
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "zoneId" }
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "parentZoneId" }
+    }
+  ],
+  visualisations: null,
+  layer: "Local Authorities",
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true
+};
+
+const downloadParentLADSelector = {
+  filterName: "Download an entire authority area...",
   paramName: "parentZoneId",
   target: "api",
   actions: [
@@ -208,9 +264,12 @@ const oaOrPtvariableSelector = {
   target: "api",
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_COLOR_SCHEME", payload: { layerName: "Output Areas" } },
+    { action: "UPDATE_COLOR_SCHEME", payload: { layerName: "PT Points" } }
   ],
   visualisations: null,
   type: "toggle",
+  containsLegendInfo: true,
   values: {
     source: "local",
     values: [
@@ -234,7 +293,7 @@ const oaOrPtvariableSelector = {
 };
 
 const oaOrPtPercentileFilter = {
-  filterName: "Filter by percentile...",
+  filterName: "Filter by percentile within the area selected...",
   paramName: "percentileFilter",
   target: "api",
   actions: [
@@ -256,6 +315,30 @@ const oaOrPtPercentileFilter = {
       {
         displayValue: "Top 10% highest risk",
         paramValue: 10,
+      },
+    ],
+  },
+};
+
+const oaOrPtEngHighRiskFilter = {
+  filterName: "Filter by national risk category",
+  paramName: "engHighRisk",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "toggle",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "All",
+        paramValue: "0",
+      },
+      {
+        displayValue: "High risk nationally",
+        paramValue: true,
       }
     ],
   },
@@ -323,9 +406,49 @@ const ptFeatureTypeFixedSelector = {
   },
 };
 
+const zoneSelector = {
+  filterName: "Select output areas",
+  type: "mapFeatureSelectWithControls",
+  paramName: "zoneId",
+  target: "api",
+  actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
+  ],
+  visualisations: null,
+  layer: "Output Areas",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
+const includePtPointsCheckboxSelector = {
+  filterName: "",
+  type: "checkbox",
+  paramName: "includePtPoints",
+  target: "api",
+  actions: [
+    { 
+      action: 'UPDATE_QUERY_PARAMS'
+    }
+  ],
+  visualisations: null,
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Include public transport stops",
+        paramValue: true
+      }
+    ],
+  },
+};
+
 
 export const selectors = {
   parentCombinedAuthority: parentCombinedAuthoritySelector,
+  downloadParentCombinedAuthority: downloadParentCombinedAuthoritySelector,
+  downloadParentLAD: downloadParentLADSelector,
   parentLAD: parentLADSelector,
   zoneResolutionCAFixed: zoneResolutionCAFixedSelector,
   zoneResolutionLADFixed: zoneResolutionLADFixedSelector,
@@ -336,8 +459,11 @@ export const selectors = {
   featureTypePTFixed: featureTypePTFixedSelector,
   oaOrPtvariable: oaOrPtvariableSelector,
   oaOrPtPercentileFilter: oaOrPtPercentileFilter,
+  oaOrPtEngHighRiskFilter: oaOrPtEngHighRiskFilter,
   oaFeature: oaFeatureSelector,
   oaFeatureType: oaFeatureTypeFixedSelector,
   ptFeature: ptFeatureSelector,
-  ptFeatureType: ptFeatureTypeFixedSelector
+  ptFeatureType: ptFeatureTypeFixedSelector,
+  zoneSelector: zoneSelector,
+  includePtPointsCheckbox: includePtPointsCheckboxSelector
 };

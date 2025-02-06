@@ -1,3 +1,4 @@
+import { termsOfUse } from "configs/trse/termsOfUse";
 import { pages } from "./pages";
 import { mapStyles } from "defaults";
 
@@ -7,8 +8,7 @@ export const appConfig = {
     `<p>This tool shows how the risk of transport-related social exclusion (TRSE) varies across England. 
     It does so by measuring access to a wide range of everyday places with the transport options available, 
     and measuring the vulnerability of populations to social exclusion, through factors such as 
-    poverty, disability, caring responsibilities, and poor health.</p>
-    <p>You can view data comparing each neighbourhood to the relevant combined authority, local authority, 
+    poverty, disability, caring responsibilities, and poor health. You can view data comparing each neighbourhood to the relevant combined authority, local authority, 
     or to all of England by selecting the relevant tab above. </p>`,
   background:
     `<p>TRSE means that transport issues have a fundamental impact on everyday life, and limit the ability 
@@ -35,12 +35,7 @@ export const appConfig = {
     statistics produced by the Department for Work and Pensions, the Office for National Statistics, and the 2021 Census to measure 
     each of these factors, and used a factor analysis process to group and weight these. Our approach is inspired by and broadly 
     similar to the English Indices of Deprivation, but has been tailored to reflect the outcomes of our research into TRSE.</p>`,
-  legalText:
-    `<p>This data can be used by third parties as long as the source is clearly attributed to TfN, a logo is added to any maps and, 
-    if online, a link is added back to this webpage. For our terms of use, please see the 
-    <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the TRSE 
-    tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">
-    Disclaimer and Appropriate Use Statement</a>.</p>`,
+  legalText: termsOfUse,
   contactText: "Please contact research@transportforthenorth.com for any questions on this data tool.",
   contactEmail: "research@transportforthenorth.com",
   mapStyle: mapStyles.geoapifyPositron,

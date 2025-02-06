@@ -1,7 +1,8 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { oaEngDetailedCallout } from "../templates";
-import { engPopupContent } from "../templates/popup";
+import { engPopupContent, engPtPopupContent } from "../templates/popup";
+import glossaryData from "../glossaryData";
 
 export const england = {
   pageName: "England",
@@ -77,7 +78,7 @@ export const england = {
         trseLabel: true,
         customTooltip: {
           url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=pt",
-          htmlTemplate: engPopupContent
+          htmlTemplate: engPtPopupContent
         }
       }
     ],
@@ -136,6 +137,7 @@ export const england = {
       { ...selectors.zoneResolutionEngFixed, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtvariable, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       { ...selectors.oaOrPtPercentileFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
+      { ...selectors.oaOrPtEngHighRiskFilter, visualisations: ['TRSE Rank', 'PT Points Visualisation']},
       selectors.oaFeature,
       selectors.oaFeatureType,
       selectors.ptFeature,
@@ -143,7 +145,15 @@ export const england = {
     ],
     additionalFeatures: {
       glossary: { 
-        dataDictionary: {}
+        dataDictionary: glossaryData
+      },
+      download: {
+        filters: [
+          selectors.zoneResolutionEngFixed,
+          selectors.zoneSelector,
+          selectors.includePtPointsCheckbox
+        ],
+        downloadPath: '/api/trse/output-area-data/download'
       },
     },
   },

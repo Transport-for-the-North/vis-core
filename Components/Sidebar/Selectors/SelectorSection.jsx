@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useMapContext, useFilterContext } from "hooks";
+import { InfoBox, WarningBox } from "Components";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
@@ -8,17 +9,13 @@ import { Toggle } from "./Toggle";
 import { AppContext } from 'contexts';
 import { useContext } from "react";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from './MapFeatureSelect';
-import { MapFeatureSelectAndPan } from ".";
+import { CheckboxSelector, MapFeatureSelectAndPan } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
 `;
 
 const NoDataParagraph = styled.p``;
-const NoDataParagraphMessage = styled.p`
-  color: red;
-  `;
-const DiffParagraph = styled.p``;
 
 /**
  * Checks if the geometry property is not null for each feature in the provided feature collection.
@@ -60,47 +57,28 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
     onFilterChange(filter, value);
   };
 
-  const noDataAvailable = mapState.visualisations[
-    Object.keys(mapState.visualisations)[0]
-  ]?.data[0]?.feature_collection
-    ? !checkGeometryNotNull(
-        JSON.parse(
-          mapState.visualisations[Object.keys(mapState.visualisations)[0]].data[0]
-            .feature_collection
-        )
-      )
-    : mapState.visualisations[Object.keys(mapState.visualisations)[0]]?.data // If it's not a GeoJSON feature collection, check if it's an array and if it's empty for each visualisation
-        .length === 0 &&
-      mapState.leftVisualisations[Object.keys(mapState.leftVisualisations)[0]]?.data
-        .length === 0 &&
-      mapState.rightVisualisations[Object.keys(mapState.rightVisualisations)[0]]?.data
-        .length === 0 &&
-      Object.values(
-        mapState.leftVisualisations[Object.keys(mapState.leftVisualisations)[0]] // Finally verify that all query params are defined for each visualisation
-          ?.queryParams ?? {}
-      ).every((el) => el !== undefined) &&
-      Object.values(
-        mapState.rightVisualisations[Object.keys(mapState.rightVisualisations)[0]]
-          ?.queryParams ?? {}
-      ).every((el) => el !== undefined) &&
-      Object.values(
-        mapState.visualisations[Object.keys(mapState.visualisations)[0]]
-          ?.queryParams ?? {}
-      ).every((el) => el !== undefined);
-
+  const noDataAvailable = mapState.noDataReturned;
+  const dataRequested = mapState.dataRequested;
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
   
   const appContext = useContext(AppContext);
   const appName = process.env.REACT_APP_NAME;
   const currentPage = appContext.appPages.find((page) => page.url === window.location.pathname);
-  const DiffPage = currentPage.pageName.includes("Difference") && appName === "noham"
+  const isDiffPage = currentPage.pageName.includes("Difference") && appName === "noham"
+  const isTrsePage = currentPage.pageName.includes("Authority") && appName == "trse"
 
-  const DiffPageMessage = 
+  const diffPageMessage = 
     "The difference is calculated by Scenario 2 minus Scenario 1."
+  const trsePageMessage = "Type an area in the box below to view data."
     return (
       <AccordionSection title="Filtering and data selection" defaultValue={true}>
-      {DiffPage && <DiffParagraph>{DiffPageMessage}</DiffParagraph>}
+      {isDiffPage && <InfoBox text={diffPageMessage} />}
+      {isTrsePage && <InfoBox text={trsePageMessage}/>}
+      {/* Check if no data has been found and display a small message in the sidebar if so */}
+      {dataRequested && noDataAvailable && (
+        <WarningBox text={noDataMessage}/>
+      )}
         {Array.isArray(filters) && filters.length > 0 ? (
           filters
             .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
@@ -129,6 +107,15 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
                 )}
                 {filter.type === "toggle" && (
                   <Toggle
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    onChange={(filter, value) => handleFilterChange(filter, value)}
+                    bgColor={bgColor}
+              />
+            )}
+            {filter.type === "checkbox" && (
+                  <CheckboxSelector
                     key={filter.id}
                     filter={filter}
                     value={filterState[filter.id] || filter.values.values[0].paramValue}
@@ -168,8 +155,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor }) => {
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
       )}
-      {/* Check if no data has been found and display a small message in the sidebar if so */}
-      {noDataAvailable && <NoDataParagraphMessage>{noDataMessage}</NoDataParagraphMessage>}
     </AccordionSection>
   );
 };

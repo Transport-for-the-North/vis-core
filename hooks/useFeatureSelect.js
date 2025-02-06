@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useMapContext } from "hooks";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import * as turf from "@turf/turf";
@@ -23,18 +23,19 @@ export const useFeatureSelect = (
   isFeatureSelectActive,
   setFeatureSelectActive,
   selectionMode,
-  selectedFeatureValues  // Accept selectedFeatureValues as an argument
+  selectedFeatureValues
 ) => {
   const { state: mapState } = useMapContext();
   const [transformedFeaturesState, setTransformedFeaturesState] = useState([]);
   const draw = mapState.drawInstance;
   const { layer } = filterConfig;
+  const existingClickHandlersRef = useRef([]);
 
   /**
    * Moves the draw layers to the top of the layer stack.
    */
   const moveDrawLayersToTop = useCallback(() => {
-    if (!map.getStyle()) return;
+    if (!map || !map.getStyle() || !map.getStyle().layers) return;
 
     const drawLayerIds = map
       .getStyle()
@@ -42,10 +43,20 @@ export const useFeatureSelect = (
       .map((layer) => layer.id);
 
     drawLayerIds.forEach((layerId) => {
-      map.moveLayer(layerId);
+      try {
+        map.moveLayer(layerId);
+      } catch (e) {
+        console.warn(`Failed to move layer ${layerId} to top: ${e.message}`);
+      }
     });
   }, [map]);
 
+  /**
+   * Transforms features into a format suitable for selection display.
+   *
+   * @param {Array} features - The features to transform.
+   * @returns {Array} The transformed features.
+   */
   const transformFeatures = useCallback((features) => {
     return features.map((feature) => ({
       value: feature.id,
@@ -53,6 +64,11 @@ export const useFeatureSelect = (
     }));
   }, []);
 
+  /**
+   * Handles the selection of transformed features.
+   *
+   * @param {Array} transformedFeatures - The transformed features to handle.
+   */
   const handleSelection = useCallback(
     (transformedFeatures) => {
       setTransformedFeaturesState(transformedFeatures);
@@ -92,21 +108,51 @@ export const useFeatureSelect = (
       });
 
       if (allFeatures.length > 0) {
-        const clickedFeature = allFeatures
-          .reduce((closestFeature, feature) => {
+        const clickPoint = turf.point([e.lngLat.lng, e.lngLat.lat]);
+        // Define threshold distance to search within (if no feature directly clicked)
+        // NB we may need to adjust this!!!
+        const thresholdDistance = 0.01;
+
+        let clickedFeature = null;
+
+        // First, try to find a feature that contains the click point (for polygons)
+        clickedFeature = allFeatures.find((feature) =>
+          feature.geometry.type === "Polygon" &&
+          turf.booleanPointInPolygon(clickPoint, feature.geometry)
+        );
+  
+        // If no polygon contains the click point, check for points and lines
+        if (!clickedFeature) {
+          clickedFeature = allFeatures.find((feature) => {
+            if (feature.geometry.type === "Point") {
+              const featurePoint = turf.point(feature.geometry.coordinates);
+              const distance = turf.distance(clickPoint, featurePoint);
+              return distance <= thresholdDistance;
+            } else if (feature.geometry.type === "LineString") {
+              const line = turf.lineString(feature.geometry.coordinates);
+              const nearestPoint = turf.nearestPointOnLine(line, clickPoint);
+              const distance = turf.distance(clickPoint, nearestPoint);
+              return distance <= thresholdDistance;
+            }
+            return false;
+          });
+        }
+  
+        // If no feature is directly clicked, find the closest feature
+        if (!clickedFeature) {
+          clickedFeature = allFeatures.reduce((closestFeature, feature) => {
             const featurePoint = turf.pointOnFeature(feature.geometry);
-            const distance = turf.distance(
-              turf.point([e.lngLat.lng, e.lngLat.lat]),
-              featurePoint
-            );
+            const distance = turf.distance(clickPoint, featurePoint);
 
             if (!closestFeature || distance < closestFeature.distance) {
               return { feature: feature.toJSON(), distance };
             }
 
             return closestFeature;
-          }, null)
-          .feature;
+          }, null).feature;
+        } else {
+          clickedFeature = clickedFeature.toJSON();
+        }
 
         const isFeatureAlreadySelected = selectedFeatureValues.some(
           (feature) => feature.value === clickedFeature.id
@@ -156,8 +202,6 @@ export const useFeatureSelect = (
   const handleDrawCreate = useCallback(
     (e) => {
       if (selectionMode !== "rectangle" || !isFeatureSelectActive) return;
-      moveDrawLayersToTop();
-
       const rectangleFeature = e.features[0];
       const bbox = turf.bbox(rectangleFeature);
       const bboxPolygon = turf.bboxPolygon(bbox);
@@ -199,12 +243,21 @@ export const useFeatureSelect = (
       const transformedFeatures = transformFeatures(updatedFeatures);
       handleSelection(transformedFeatures);
 
-      // const draw = drawRef.current;
       if (draw) {
         draw.deleteAll();
       }
 
       setFeatureSelectActive(false);
+
+      // Zero timeout to ensure handlers restored after draw created
+      setTimeout(() => {
+        if (existingClickHandlersRef.current.length > 0) {
+          existingClickHandlersRef.current.forEach((handler) =>
+            map.on("click", handler)
+          );
+          existingClickHandlersRef.current = [];
+        }
+      }, 0);
     },
     [
       selectionMode,
@@ -223,7 +276,10 @@ export const useFeatureSelect = (
   useEffect(() => {
     if (!map || !filterConfig) return;
 
-    const draw = mapState.drawInstance;
+    // Store existing click handlers only when activating feature select
+    if (isFeatureSelectActive && existingClickHandlersRef.current.length === 0 && map._listeners && map._listeners.click) {
+      existingClickHandlersRef.current = [...map._listeners.click];
+    }
 
     /**
      * Sets up event listeners for feature selection based on the current selection mode.
@@ -231,12 +287,17 @@ export const useFeatureSelect = (
      * Also removes event listeners when required.
      */
     const setupEventListeners = () => {
+      // Remove existing click handlers
+      existingClickHandlersRef.current.forEach(handler => map.off("click", handler));
+
       // Always remove existing listeners before adding new ones
       map.off("click", handleFeatureClick);
       map.off("draw.create", handleDrawCreate);
+
       if (draw) {
         draw.deleteAll();
       }
+
       updateCursorStyle(false);
 
       if (isFeatureSelectActive) {
@@ -248,6 +309,7 @@ export const useFeatureSelect = (
           }
         } else if (selectionMode === "rectangle" && draw) {
           draw.changeMode("draw_rectangle");
+          moveDrawLayersToTop();
           map.on("draw.create", handleDrawCreate);
         }
       }
@@ -259,9 +321,11 @@ export const useFeatureSelect = (
     return () => {
       map.off("click", handleFeatureClick);
       map.off("draw.create", handleDrawCreate);
+      
       if (draw) {
         draw.deleteAll();
       }
+
       updateCursorStyle(false);
     };
   }, [
@@ -274,6 +338,14 @@ export const useFeatureSelect = (
     updateCursorStyle,
     mapState.drawInstance
   ]);
+
+    // **Effect to restore handlers
+    useEffect(() => {
+      if (selectionMode === "feature" && !isFeatureSelectActive && existingClickHandlersRef.current.length > 0) {
+        existingClickHandlersRef.current.forEach(handler => map.on("click", handler));
+        existingClickHandlersRef.current = [];
+      }
+    }, [isFeatureSelectActive, selectionMode, map]);
 
   return transformedFeaturesState;
 };

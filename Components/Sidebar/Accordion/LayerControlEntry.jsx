@@ -74,7 +74,13 @@ const OpacitySlider = styled.input`
  * @returns {JSX.Element} The rendered LayerControlEntry component.
  */
 export const LayerControlEntry = memo(
-  ({ layer, maps, handleColorChange, handleClassificationChange, state }) => {
+  ({
+    layer,
+    maps,
+    handleColorChange,
+    handleClassificationChange,
+    state,
+  }) => {
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
@@ -83,12 +89,19 @@ export const LayerControlEntry = memo(
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
-    const selectedPageBands = appConfig.defaultBands.find(
-      (band) => band.name === currentPage.category
-    );
-    const visualisation = currentPage.pageName.includes("Side-by-Side") || currentPage.pageName.includes("Side by Side")
-      ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
-      : state.visualisations[Object.keys(state.visualisations)[0]];
+    const selectedPageBands = appConfig.defaultBands.find((band) => {
+      if (!currentPage) return false;
+      const categoryOrName = currentPage.category || currentPage.pageName;
+      return band.name === categoryOrName;
+    });
+    const visualisation =
+      currentPage.pageName.includes("Side-by-Side") ||
+      currentPage.pageName.includes("Side by Side")
+        ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
+        : state.visualisations[Object.keys(state.visualisations)[0]];
+
+    const colorStyle = visualisation?.style?.split("-")[1] || "continuous";
+
     const hasDefaultBands = selectedPageBands?.metric.find(
       (metric) =>
         metric.name ===
@@ -167,7 +180,7 @@ export const LayerControlEntry = memo(
         {layer.metadata?.isStylable && (
           <>
             <ColourSchemeDropdown
-              colorStyle={layer?.metadata?.colorStyle ?? "continuous"}
+              colorStyle={colorStyle}
               handleColorChange={handleColorChange}
               layerName={layer.id}
             />
@@ -179,8 +192,8 @@ export const LayerControlEntry = memo(
                 Logarithmic: "l",
                 "K-Means": "k",
               }}
-              classification={state.class_method ?? "d"}
-              onChange={handleClassificationChange}
+              classification={state.layers[layer.id]?.class_method ?? "d"}
+              onChange={(value) => handleClassificationChange(value, layer.id)}
             />
           </>
         )}

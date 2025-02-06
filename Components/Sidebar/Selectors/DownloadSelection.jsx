@@ -6,11 +6,12 @@ import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 import { useEffect, useContext, useState } from "react";
 import { useFilterContext } from "hooks";
+import { InfoBox } from "Components";
 import { api } from "services";
 import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
 import { darken } from "polished";
-import { MapFeatureSelectWithControls } from ".";
+import { MapFeatureSelectWithControls, MapFeatureSelectAndPan, MapFeatureSelect, CheckboxSelector } from ".";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -65,15 +66,22 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
     filters.forEach(filter => {
       filter.id = filter.paramName;
     });
+
     const updatedFilters = filters.reduce((acc, item) => {
-      if (item.type === 'mapFeatureSelectWithControls') {
+      if (item.type.startsWith('mapFeatureSelect')) {
         acc[item.id] = null;
       } else {
-        const paramValues = item.values.values.map(value => value.paramValue);
+        const paramValues = item.values.values.map(value => {
+          if (typeof value.paramValue === 'boolean') {
+            return false; // Default to false if paramValue is a boolean
+          }
+          return value.paramValue;
+        });
         acc[item.id] = paramValues.length === 1 ? paramValues[0] : paramValues;
       }
       return acc;
     }, {});
+    
     filterDispatch({ type: 'INITIALIZE_FILTERS', payload: updatedFilters });
   }, [filters, filterDispatch]);
 
@@ -104,8 +112,8 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
   }
 
   return (
-    <AccordionSection title="Download data" defaultValue={true}>
-      <p>Use the selections to toggle items on and off. See Glossary "Download" for more information.</p>
+    <AccordionSection title="Download data" defaultValue={false}>
+      <InfoBox text={'Use the selections to toggle items on and off. See Glossary "Download" for more information.'} />
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
@@ -142,6 +150,15 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     bgColor={bgColor}
                   />
                 )}
+                {filter.type === "checkbox" && (
+                  <CheckboxSelector
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value)}
+                    bgColor={bgColor}
+              />
+            )}
                 {filter.type === 'mapFeatureSelectWithControls' && (
                   <MapFeatureSelectWithControls
                     key={filter.id}
@@ -150,6 +167,24 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
                 />
+                )}
+                {filter.type === 'mapFeatureSelectAndPan' && (
+                  <MapFeatureSelectAndPan
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value)}
+                    bgColor={bgColor}
+                  />
+                )}
+                {filter.type === 'mapFeatureSelect' && (
+                  <MapFeatureSelect
+                    key={filter.id}
+                    filter={filter}
+                    value={filterState[filter.id]}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value.value)}
+                    bgColor={bgColor}
+                  />
                 )}
               </SelectorContainer>
             ))}

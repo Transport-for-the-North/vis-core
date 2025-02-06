@@ -4,9 +4,10 @@ import { Dimmer, MapLayerSection, Sidebar } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
-import { defaultBgColour } from 'defaults';
+import { defaultBgColour } from "defaults";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
+import { actionTypes } from "reducers";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -76,20 +77,6 @@ export const MapLayout = () => {
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value },
     });
-    
-    // Only proceed if the filter has selectable values
-    if (filter.values?.values && Array.isArray(filter.values.values)) {
-      const selectedOption = filter.values.values.find(
-        (option) => option.paramValue === value
-      );
-  
-      if (selectedOption && selectedOption.colourValue) {
-        dispatch({
-          type: 'UPDATE_COLOR_SCHEME',
-          payload: { color_scheme: selectedOption.colourValue },
-        });
-      } 
-    }
   };
 
   useEffect(() => {
@@ -101,40 +88,56 @@ export const MapLayout = () => {
     });
 
     state.filters.forEach((filter) => {
-      
+      let selectedValue
+      if (filter.values?.values && Array.isArray(filter.values.values)) {
+        selectedValue = filter.values?.values.find(
+          (value) => value.paramValue === filterState[filter.id]
+        );
+      }
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
+          // Add the colour scheme to the payload
+          let additionalPayload
+          if (action.action === "UPDATE_COLOR_SCHEME") {
+            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
+          }
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], ...action.payload },
+            payload: { filter, value: filterState[filter.id], ...action.payload, ...additionalPayload },
           });
         });
       } else {
         filter.actions.forEach((action) => {
           let sides = "";
+          
+          // Add the colour scheme to the payload
+          let additionalPayload
+          if (action.action === "UPDATE_COLOR_SCHEME") {
+            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
+          }
           if (filter.filterName.includes("Left")) sides = "left";
           else if (filter.filterName.includes("Right")) sides = "right";
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], sides, ...action.payload },
+            payload: { filter, value: filterState[filter.id], sides, ...action.payload, ...additionalPayload },
           });
         });
       }
     });
   }, [filterState, state.metadataTables, dispatch]);
 
-  const handleColorChange = (color) => {
+  const handleColorChange = (color, layerName) => {
     dispatch({
-      type: "UPDATE_COLOR_SCHEME",
-      payload: { color_scheme: color },
+      type: actionTypes.UPDATE_COLOR_SCHEME,
+      payload: { layerName: layerName, color_scheme: color },
     });
-  };
+  };  
 
-  const handleClassificationChange = (classType) => {
+  const handleClassificationChange = (classType, layerName) => {
     dispatch({
       type: "UPDATE_CLASSIFICATION_METHOD",
-      payload: { class_method: classType },
+      payload: { class_method: classType, layerName },
     });
   };
 

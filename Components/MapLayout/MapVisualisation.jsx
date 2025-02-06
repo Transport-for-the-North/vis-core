@@ -1,4 +1,3 @@
-
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo } from "react";
 import { useMapContext } from "hooks";
@@ -10,18 +9,19 @@ import {
   reclassifyData,
   reclassifyGeoJSONData,
   resetPaintProperty,
-  checkGeometryNotNull
+  hasAnyGeometryNotNull,
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
+import { defaultMapColourMapper } from "defaults";
 
 /**
- * A React component responsible for rendering visualizations on a map.
+ * MapVisualisation component responsible for rendering visualizations on a map.
  *
  * @param {Object} props - The properties passed to the component.
  * @param {string} props.visualisationName - The name of the visualization.
  * @param {Object} props.map - The Maplibre JS map instance.
- * @param {boolean|null} props.left - A boolean indicating whether the visualisation is for the left or the right map. Null for a single map page.
+ * @param {boolean|null} props.left - A boolean indicating whether the visualization is for the left or the right map. Null for a single map page.
  * @param {Object[]} [props.maps] - An array containing the left and right map instances for side-by-side maps.
  * @returns {null} This component doesn't render anything directly.
  */
@@ -37,8 +37,10 @@ export const MapVisualisation = ({
   // Refs to keep track of previous values
   const prevCombinedDataRef = useRef();
   const prevVisualisationDataRef = useRef();
-  const prevColorRef = useRef();
-  const prevClassMethodRef = useRef();
+  const prevColorRef = useRef({});
+  const prevClassMethodRef = useRef({});
+
+  const { addFeaturesToMap } = useFeatureStateUpdater();
 
   // Determine the visualisation based on side (left, right, or single)
   const visualisation =
@@ -47,6 +49,24 @@ export const MapVisualisation = ({
       : left
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
+
+  const colorStyle = visualisation?.style?.split("-")[1];
+
+  // Determine the layer key based on the visualisation type
+  const layerKey =
+    visualisation.type === "joinDataToMap" ? visualisation.joinLayer : visualisationName;
+
+  // Retrieve classificationMethod per layer
+  const classificationMethod =
+    state.layers[layerKey]?.class_method ?? "d";
+
+  // Determine the layerColorScheme based on visualisation type
+  const layerColorScheme = useMemo(() => {
+    return (
+      state.colorSchemesByLayer[layerKey] ??
+      defaultMapColourMapper[colorStyle]
+    );
+  }, [layerKey, state.colorSchemesByLayer, colorStyle]);
 
   // Use the custom hook to fetch data for the visualisation
   const {
@@ -59,13 +79,27 @@ export const MapVisualisation = ({
   useEffect(() => {
     if (isLoading) {
       dispatch({ type: actionTypes.SET_IS_LOADING });
-    } else if (error) {
-      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
-      // Optionally, handle the error (e.g., dispatch an error action)
+      dispatch({ type: actionTypes.SET_DATA_REQUESTED, payload: true });
     } else {
       dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
-  }, [isLoading, error, dispatch]);
+  }, [isLoading, dispatch]);
+
+  // Handle no data returned state
+  useEffect(() => {
+    if (!isLoading) {
+      if (visualisationData && visualisationData.length === 0) {
+        // No data returned from the API
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+      } else if (visualisationData) {
+        // Data was returned
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
+      } else if (error) {
+        // An error occurred
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+      }
+    }
+  }, [isLoading, visualisationData, error, dispatch]);
 
   // Update the visualisation data in the global state when fetched
   useEffect(() => {
@@ -125,7 +159,8 @@ export const MapVisualisation = ({
       );
 
       // Get trseLabel from state.layers
-      const trseLabel = state.layers[visualisation.joinLayer]?.trseLabel === true;
+      const trseLabel =
+        state.layers[layerKey]?.trseLabel === true;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -138,19 +173,24 @@ export const MapVisualisation = ({
       );
 
       // Determine the current color scheme
-      const currentColor = colorSchemes[style.split("-")[1]].some(
-        (e) => e === state.color_scheme.value
+      const currentColor = colorSchemes[colorStyle].some(
+        (e) => e === layerColorScheme.value
       )
-        ? state.color_scheme.value
-        : colorSchemes[style.split("-")[1]][0];
+        ? layerColorScheme.value
+        : defaultMapColourMapper[colorStyle].value;
 
       // Calculate the color palette based on the classification
-      const invertColorScheme = state.layers[visualisation.joinLayer]?.invertedColorScheme === true;
-      const colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
+      const invertColorScheme =
+        state.layers[layerKey]?.invertedColorScheme === true;
+      const colourPalette = calculateColours(
+        currentColor,
+        reclassifiedData,
+        invertColorScheme
+      );
 
       // Update the map style
       const opacityValue = document.getElementById(
-        "opacity-" + visualisation.joinLayer
+        "opacity-" + layerKey
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
@@ -170,73 +210,17 @@ export const MapVisualisation = ({
       );
     },
     [
-      state.color_scheme,
-      state.layers,
+      JSON.stringify(state.layers),
       visualisation.style,
       appContext,
       visualisation.queryParams,
+      layerColorScheme,
+      layerKey,
+      // calculateColours,
+      colorStyle,
     ]
   );
 
-  /**
-   * Adds features to the map and updates their paint properties for a specified layer.
-   *
-   * @param {Object} map - The map object to which features will be added.
-   * @param {Object} paintProperty - The paint properties to apply to the layer.
-   * @param {Object} layers - The layers to which the features will be added.
-   * @param {Array} data - The data containing features to be added to the map.
-   * @param {string} style - The style string indicating the type of visualisation.
-   * @param {string} layerName - The name of the layer to which features will be added.
-   */
-  const addFeaturesToMap = useCallback(
-    (map, paintProperty, layers, data, style, layerName) => {
-      // Find the specified layer
-      const specifiedLayer = Object.values(layers).find(
-        (layer) => layer.name === layerName
-      );
-
-      if (specifiedLayer && map.getLayer(specifiedLayer.name)) {
-        if (data && data.length > 0 && specifiedLayer.isStylable) {
-          map.getLayer(specifiedLayer.name).metadata = {
-            ...map.getLayer(specifiedLayer.name).metadata,
-            colorStyle: style.split("-")[1],
-          };
-          map.removeFeatureState({
-            source: specifiedLayer.name,
-            sourceLayer: specifiedLayer.sourceLayer,
-          });
-          data.forEach((row) => {
-            map.setFeatureState(
-              {
-                source: specifiedLayer.name,
-                sourceLayer: specifiedLayer.sourceLayer,
-                id: Number(row["id"]),
-              },
-              {
-                value: row["value"],
-                valueAbs: Math.abs(row["value"]),
-              }
-            );
-          });
-          for (const [paintPropertyName, paintPropertyArray] of Object.entries(
-            paintProperty
-          )) {
-            map.setPaintProperty(
-              specifiedLayer.name,
-              paintPropertyName,
-              paintPropertyArray
-            );
-          }
-        } else if (data && data.length === 0 && specifiedLayer.isStylable) {
-          map.removeFeatureState({
-            source: specifiedLayer.name,
-            sourceLayer: specifiedLayer.sourceLayer,
-          });
-        }
-      }
-    },
-    []
-  );
 
   /**
    * Calculates the color palette based on the provided color scheme and number of bins.
@@ -246,12 +230,13 @@ export const MapVisualisation = ({
    * @param {boolean} invert - Whether to invert the color scheme.
    * @returns {string[]} An array of color values representing the color palette.
    */
-  const calculateColours = useCallback((colourScheme, bins, invert=false) => {
+  const calculateColours = useCallback((colourScheme, bins, invert = false) => {
     let colors;
     if (bins.length > 9) {
       colors = chroma.scale(colourScheme).colors(bins.length);
     } else {
-      colors = colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
+      colors =
+        colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
     }
     if (invert) {
       colors = colors.slice().reverse();
@@ -274,21 +259,22 @@ export const MapVisualisation = ({
           state.layers,
           visualisationData,
           style,
-          visualisation.joinLayer
+          layerKey
         );
       }
     },
     [
       map,
-      state.layers,
-      visualisation.joinLayer,
+      JSON.stringify(state.layers),
       addFeaturesToMap,
       visualisationData,
+      layerKey,
     ]
   );
 
-  // Effect to reclassify and restyle the map when data or settings change
   useEffect(() => {
+    if (!map) return;
+
     // Determine if reclassification is needed
     const dataHasChanged =
       combinedData !== prevCombinedDataRef.current &&
@@ -297,65 +283,99 @@ export const MapVisualisation = ({
       visualisationData !== prevVisualisationDataRef.current &&
       prevVisualisationDataRef.current !== undefined;
     const colorHasChanged =
-      state.color_scheme !== null &&
-      state.color_scheme !== prevColorRef.current;
+      layerColorScheme !== null &&
+      prevColorRef.current[layerKey];
+    const prevClassificationMethod =
+      prevClassMethodRef.current[layerKey];
     const classificationHasChanged =
-      state.class_method != null &&
-      state.class_method !== prevClassMethodRef.current;
+      classificationMethod !== prevClassificationMethod;
+
     const needUpdate =
       dataHasChanged ||
       visualisationDataHasChanged ||
       colorHasChanged ||
       classificationHasChanged;
 
-    if (!needUpdate) {
-      return;
-    }
-
-    // Use visualisationData for setting feature states
-    const dataToVisualize = visualisationData || [];
-
-    // Use combinedData for reclassification
-    const dataToClassify = combinedData;
-
-    switch (visualisation.type) {
-      case "geojson": {
-        if (dataToVisualize && dataToVisualize[0]) {
-          reclassifyAndStyleGeoJSONMap(
-            JSON.parse(dataToVisualize[0].feature_collection),
-            visualisation.style
-          );
-        } else {
-          resetMapStyle(visualisation.style);
-        }
-        break;
-      }
-      case "joinDataToMap": {
-        if (Array.isArray(dataToVisualize) && dataToVisualize.length === 0) {
-          resetMapStyle(visualisation.style);
-        } else {
-          reclassifyAndStyleMap(
-            map,
-            dataToClassify,
-            dataToVisualize,
-            visualisation.style,
-            state.class_method,
-            visualisation.joinLayer
-          );
-        }
-        break;
-      }
-      default:
-        break;
-    }
+    if (!needUpdate) return;
 
     // Update the refs to the current data
     prevCombinedDataRef.current = combinedData;
     prevVisualisationDataRef.current = visualisationData;
-    prevColorRef.current = state.color_scheme;
-    prevClassMethodRef.current = state.class_method;
+    prevColorRef.current[layerKey] = layerColorScheme;
+    prevClassMethodRef.current[layerKey] = classificationMethod;
 
-    // Cleanup if necessary
+    const layerName = layerKey;
+    const dataToVisualize = visualisationData || [];
+    const dataToClassify = combinedData;
+
+    const performReclassification = () => {
+      switch (visualisation.type) {
+        case "joinDataToMap": {
+          if (
+            Array.isArray(dataToVisualize) &&
+            dataToVisualize.length === 0
+          ) {
+            resetMapStyle(visualisation.style);
+          } else {
+            reclassifyAndStyleMap(
+              map,
+              dataToClassify,
+              dataToVisualize,
+              visualisation.style,
+              classificationMethod,
+              layerName
+            );
+          }
+          break;
+        }
+        case "geojson": {
+          const parsedDataToVisualize = dataToVisualize[0] ? dataToVisualize[0].feature_collection : dataToVisualize.feature_collection;
+          if (parsedDataToVisualize) {
+            reclassifyAndStyleGeoJSONMap(
+              JSON.parse(parsedDataToVisualize),
+              visualisation.style
+            );
+          } else {
+            resetMapStyle(visualisation.style);
+          }
+          break;
+        }
+        default:
+          break;
+      }
+    };
+
+    if (visualisation.type === "joinDataToMap") {
+      if (map.getLayer(layerName)) {
+        performReclassification();
+      } else {
+        const onStyleData = () => {
+          if (map.getLayer(layerName)) {
+            map.off("styledata", onStyleData);
+            performReclassification();
+          }
+        };
+        map.on("styledata", onStyleData);
+      }
+    } else {
+      performReclassification();
+    }
+  }, [
+    combinedData,
+    visualisationData,
+    map,
+    layerColorScheme,
+    classificationMethod,
+    resetMapStyle,
+    visualisation.style,
+    visualisation.type,
+    visualisationName,
+    // reclassifyAndStyleMap,
+    layerKey,
+  ]);
+
+  // **Run-once cleanup
+  useEffect(() => {
     return () => {
       if (map && visualisation.type === "geojson") {
         if (map.getLayer(visualisationName)) {
@@ -366,19 +386,7 @@ export const MapVisualisation = ({
         }
       }
     };
-  }, [
-    combinedData,
-    visualisationData,
-    map,
-    state.color_scheme,
-    state.class_method,
-    reclassifyAndStyleMap,
-    resetMapStyle,
-    visualisation.joinLayer,
-    visualisation.style,
-    visualisation.type,
-    visualisationName,
-  ]);
+  }, [map, visualisation.type, visualisationName]);
 
   /**
    * Reclassifies GeoJSON data and styles the map accordingly.
@@ -393,7 +401,12 @@ export const MapVisualisation = ({
       if (!featureCollection) {
         return;
       }
-      if (!checkGeometryNotNull(featureCollection)) {
+      if (!hasAnyGeometryNotNull(featureCollection)) {
+        // Remove the layer and source if no valid data is returned
+        if (map.getLayer(visualisationName)) {
+          map.removeLayer(visualisationName);
+        }
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
         return;
       }
       if (!map.getSource(visualisationName)) {
@@ -411,18 +424,18 @@ export const MapVisualisation = ({
       const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
 
       // Determine current color scheme
-      const currentColor = colorSchemes[style.split("-")[1]].some(
-        (e) => e === state.color_scheme.value
+      const currentColor = colorSchemes[colorStyle].some(
+        (e) => e === layerColorScheme.value
       )
-        ? state.color_scheme.value
-        : colorSchemes[style.split("-")[1]][0];
+        ? layerColorScheme.value
+        : defaultMapColourMapper[colorStyle].value;
 
       // Calculate color palette
       const colourPalette = calculateColours(currentColor, reclassifiedData);
 
       // Create paint property
       const opacityValue = document.getElementById(
-        "opacity-" + visualisation.joinLayer
+        "opacity-" + layerKey
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
@@ -449,17 +462,26 @@ export const MapVisualisation = ({
             source: visualisationName,
             paint: paintProperty,
             metadata: {
-              colorStyle: style.split("-")[1],
+              colorStyle: colorStyle,
               isStylable: true,
             },
           },
           beforeLayerId
         );
+
+        dispatch({
+          type: "UPDATE_COLOR_SCHEME",
+          payload: {
+            layerName: visualisationName,
+            color_scheme: layerColorScheme,
+          },
+        });
       } else {
         // Update the paint properties
-        for (const [paintPropertyName, paintPropertyArray] of Object.entries(
-          paintProperty
-        )) {
+        for (const [
+          paintPropertyName,
+          paintPropertyArray,
+        ] of Object.entries(paintProperty)) {
           map.setPaintProperty(
             visualisationName,
             paintPropertyName,
@@ -468,7 +490,15 @@ export const MapVisualisation = ({
         }
       }
     },
-    [map, visualisationName, state.color_scheme, visualisation.joinLayer]
+    [
+      map,
+      visualisationName,
+      layerColorScheme,
+      // calculateColours,
+      colorStyle,
+      dispatch,
+      layerKey,
+    ]
   );
 
   return null;

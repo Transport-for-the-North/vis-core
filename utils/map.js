@@ -307,21 +307,24 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     }
   }
 
-  // Check if trseLabel is true in options
-  if (options.trseLabel) {
-    // Return fixed bins from 0 to 100 in steps of 10
-    return [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-  }
-
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
     if (classificationMethod === 'd') {
-      const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
-      const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      if (selectedPageBands && selectedMetricParamName) {
-        const metrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]?.value);
-        if(metrics.length > 1) return metrics.find((metric) => currentPage.pageName.includes(metric.pageName)).values;
-        if(metrics.length === 1) return metrics[0].values;
+      const pageCategory = currentPage.category || 'England';
+      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
+      let metricName = null;
+      if (options.trseLabel) {
+        metricName = 'trse';
+      } else {
+        const selectedMetricFilter = currentPage.config.filters.find(filter => filter.containsLegendInfo === true);
+        const selectedMetricParamName = selectedMetricFilter?.paramName;
+        metricName = queryParams[selectedMetricParamName]?.value;
+      }
+      if (selectedPageBands && metricName) {
+        const metric = selectedPageBands.metric.find(m => m.name === metricName);
+        if (metric) {
+          return metric.values;
+        }
       }
       classificationMethod = 'q';
     }
@@ -339,15 +342,21 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
     if (classificationMethod === 'd') {
-      const selectedMetricParamName = currentPage.config.filters.find((filter) => filter.containsLegendInfo === true);
-      const selectedPageBands = defaultBands.find((band) => band.name === currentPage.category);
-      if (selectedPageBands) {
-        const listMetrics = selectedPageBands.metric.filter((metric) => metric.name === queryParams[selectedMetricParamName.paramName]?.value);
-        if (listMetrics.length > 1) {
-          const metric = listMetrics.find((metric) => currentPage.pageName.includes(metric.pageName));
-           return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2)
+      const pageCategory = currentPage.category || 'England';
+      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
+      let metricName = null;
+      if (options.trseLabel) {
+        metricName = 'trse';
+      } else {
+        const selectedMetricFilter = currentPage.config.filters.find(filter => filter.containsLegendInfo === true);
+        const selectedMetricParamName = selectedMetricFilter?.paramName;
+        metricName = queryParams[selectedMetricParamName]?.value;
+      }
+      if (selectedPageBands && metricName) {
+        const metric = selectedPageBands.metric.find(m => m.name === metricName);
+        if (metric) {
+          return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2);
         }
-        if(listMetrics.length === 1) return !style.includes("line") ? listMetrics[0].differenceValues : listMetrics[0].differenceValues.slice(listMetrics[0].differenceValues.length / 2);
       }
       classificationMethod = 'q';
     }
@@ -537,6 +546,106 @@ export const getHoverLayerStyle = (geometryType) => {
 };
 
 /**
+ * Generates the style configuration for a selected layer based on the layer
+ * type (e.g., "fill", "line", "circle", "symbol", "polygon", or "point"). 
+ * For polygon layers ("fill" type), this function will always return an outline style.
+ * @component
+ * @property {string} layerType - The type of layer. Possible values are "fill", "line", "circle", "symbol", "polygon", "point", etc.
+ * @returns {Object} The style configuration object for the selected layer.
+ */
+export const getSelectedLayerStyle = (layerType) => {
+  switch (layerType) {
+    case "fill":
+    case "polygon":
+      // Handle fill layers (polygons) by drawing an outline
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": [
+            "case",
+            ["==", ["feature-state", "selected"], true],
+            "#f00",
+            "transparent",
+          ],
+          "line-width": 2,
+        },
+      };
+    case "line":
+      // Handle line layers
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#f00",
+            "transparent",
+          ],
+          "line-width": 4,
+        },
+      };
+    case "symbol":
+      // Handle symbol layers (e.g., icons or labels)
+      return {
+        id: "",
+        type: "symbol",
+        paint: {
+          // Adjust text or icon properties as needed
+          "text-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#f00",
+            "#000",
+          ],
+          "icon-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#f00",
+            "#000",
+          ],
+        },
+      };
+    case "circle":
+    case "point":
+      // Handle point layers
+      return {
+        id: "",
+        type: "circle", 
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            0, 2,
+            12, 8,
+            22, 15
+          ],
+          "circle-color": [
+            "case",
+            ["==", ["feature-state", "selected"], true],
+            "blue",
+            "transparent",
+          ],
+          "circle-opacity": 0.75,
+          "circle-stroke-width": 2,
+          "circle-stroke-color":  [
+            "case",
+            ["==", ["feature-state", "selected"], true],
+            "black",
+            "transparent"
+          ],
+        },
+      };
+    default:
+      // Handle other layer types if necessary
+      console.warn(`Unhandled layer type: ${layerType}`);
+      return {}; // Return empty object if the layer type is not supported
+  }
+};
+
+/**
  * Retrieves the source layer of a specified layer from a map.
  *
  * @param {Object} map - The map object from which to retrieve the layer.
@@ -574,4 +683,24 @@ export const getSourceLayer = (map, layerId) => {
   }
 
   return true; // Return true if geometry is not null for all features
+}
+
+/**
+ * Checks if any feature in the feature collection has a non-null geometry using Array.some().
+ *
+ * @param {Object} featureCollection - A GeoJSON FeatureCollection object.
+ * @returns {boolean} - Returns true if at least one geometry is not null, otherwise false.
+ */
+export function hasAnyGeometryNotNull(featureCollection) {
+  // Validate that the feature collection and its features array exist and are not empty
+  if (
+    !featureCollection ||
+    !Array.isArray(featureCollection.features) ||
+    featureCollection.features.length === 0
+  ) {
+    return false; // No features to check
+  }
+
+  // Use the 'some' method to check for at least one non-null geometry
+  return featureCollection.features.some(feature => !!feature.geometry);
 }

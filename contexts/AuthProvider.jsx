@@ -28,7 +28,14 @@ export const AuthProvider = ({ children }) => {
 
             setUser({ username, roles: userRoles });
             setToken(jwtToken);
-            Cookies.set('token', jwtToken, { expires: 1 / 24, secure: true, sameSite: 'Lax' });
+
+            const tokenExpirationTime = decodedToken.exp;
+
+            // Calculate the expiration date for the cookie
+            const expirationDate = new Date(tokenExpirationTime * 1000);
+
+            // Set the cookie with the calculated expiration date
+            Cookies.set('token', jwtToken, { expires: expirationDate, secure: true, sameSite: 'Lax' });
             Cookies.set('toc', false);
             navigate('/');
         } catch (err) {

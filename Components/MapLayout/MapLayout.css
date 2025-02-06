@@ -14,6 +14,41 @@
     justify-content: center;
     pointer-events: none;
   }
+
+  .maplibregl-ctrl-attrib-inner {
+    white-space: nowrap; 
+    overflow-x: auto; 
+    text-overflow: clip;  
+    max-width: 100%;  
+    display: block; 
+    width: fit-content; 
+    max-width: 80vw;
+  }  
+
+  ::-webkit-scrollbar {
+    height: 4px;             
+    width: 4px;         
+    border: 1px solid #d5d5d5;
+  }
+  
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: transparent;
+  }
+
+  :hover::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: #eeeeee;
+  }
+
+  :hover::-webkit-scrollbar-thumb {
+    background-color: darkgrey; /* Color when hovered */
+  }
   
   .custom-popup .maplibregl-popup-tip {
     border-top-color: rgba(255, 255, 255, 0.8);
@@ -26,6 +61,12 @@
   .feature-name {
     font-weight: bold;
     margin: 0;
+  }
+
+  .summary-text {
+    font-size: 0.9em;
+    margin-bottom: 2px;
+    color: rgb(88, 88, 88);
   }
   
   .divider {
