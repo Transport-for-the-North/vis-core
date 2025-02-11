@@ -86,7 +86,7 @@ export const co2Savings = {
           { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-           { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
         ],
         downloadPath: '/api/evci/co2-savings/download'
       },
@@ -121,7 +121,7 @@ export const tfnCo2Savings = {
           { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
         ],
         downloadPath: '/api/evci/co2-savings/download'
       },

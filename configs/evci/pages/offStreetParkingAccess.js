@@ -86,7 +86,7 @@ export const offStreetParkingAccess = {
           { ...selectors.columnNameOSPA, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] , filterName: "Optional location selector"},
         ],
         downloadPath: '/api/evci/zonal-access/download'
       },

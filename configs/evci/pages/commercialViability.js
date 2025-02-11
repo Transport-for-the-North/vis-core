@@ -82,7 +82,7 @@ export const commercialViability = {
           { ...selectors.administrativeBoundaryFixed, type: 'fixed' },
           { ...selectors.columnNameCVFixed, type: 'fixed' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },

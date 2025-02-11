@@ -84,7 +84,7 @@ export const annualChargingDemand = {
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector"},
         ],
         downloadPath: '/api/evci/annual-charging-demand/download'
       },
@@ -133,7 +133,7 @@ export const tfnAnnualChargingDemand = {
           { ...selectors.tfnChargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
         ],
         downloadPath: '/api/evci/annual-charging-demand/download'
       },
@@ -178,7 +178,7 @@ export const eehAnnualChargingDemand = {
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
         ],
         downloadPath: '/api/evci/annual-charging-demand/download'
       },

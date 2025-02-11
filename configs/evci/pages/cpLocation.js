@@ -72,7 +72,7 @@ export const cpLocation = {
           { ...selectors.chargerSpeed, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.columnNameCP, multiSelect: false, type: 'toggle' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.siteDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], layer: "Charging Sites"},
+          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], layer: "Charging Sites", filterName: "Optional location selector"},
         ],
         downloadPath: '/api/evci/cp-location/download'
       }

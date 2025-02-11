@@ -66,25 +66,6 @@ const zoneSelector = {
   defaultMode: 'draw_rectangle', // Default selection mode
 };
 
-const zoneDownloadSelector = {
-  filterName: "Optional location selector",
-  type: "mapFeatureSelectWithControls",
-  paramName: "zoneId",
-  target: "api",
-  actions: [
-    {
-      action: 'SET_SELECTED_FEATURES'
-    },
-    {
-      action: 'UPDATE_VISUALISED_FEATURES'
-    },
-  ],
-  visualisations: null,
-  layer: "Administrative Boundaries",
-  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
-  defaultMode: 'draw_rectangle', // Default selection mode
-};
-
 const linkSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
@@ -104,46 +85,8 @@ const linkSelector = {
   defaultMode: 'draw_rectangle', // Default selection mode
 };
 
-const linkDownloadSelector = {
-  filterName: "Optional location selector",
-  type: "mapFeatureSelectWithControls",
-  paramName: "linkId",
-  target: "api",
-  actions: [
-    {
-      action: 'SET_SELECTED_FEATURES'
-    },
-    {
-      action: 'UPDATE_VISUALISED_FEATURES'
-    },
-  ],
-  visualisations: null,
-  layer: "Major Roads",
-  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
-  defaultMode: 'draw_rectangle', // Default selection mode
-};
-
 const siteSelector = {
   filterName: "Optional location filter",
-  type: "mapFeatureSelectWithControls",
-  paramName: "siteId",
-  target: "api",
-  actions: [
-    {
-      action: 'SET_SELECTED_FEATURES'
-    },
-    {
-      action: 'UPDATE_VISUALISED_FEATURES',
-    },
-  ],
-  visualisations: null,
-  layer: "Potential Charging Sites",
-  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
-  defaultMode: 'draw_rectangle', // Default selection mode
-};
-
-const siteDownloadSelector = {
-  filterName: "Optional location selector",
   type: "mapFeatureSelectWithControls",
   paramName: "siteId",
   target: "api",
@@ -899,8 +842,5 @@ export const selectors = {
   runTypeCodeDynamic: runTypeCodeDynamicSelector,
   zoneSelector: zoneSelector,
   siteSelector: siteSelector,
-  linkSelector: linkSelector,
-  zoneDownloadSelector: zoneDownloadSelector,
-  siteDownloadSelector: siteDownloadSelector,
-  linkDownloadSelector: linkDownloadSelector
+  linkSelector: linkSelector
 };
