@@ -82,7 +82,7 @@ export const enrouteChargingDemand = {
           { ...selectors.columnName, multiSelect: false, type: 'toggle' },
           { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.linkSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+          { ...selectors.linkDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/enroute-charging-sites/download'
       }

@@ -85,7 +85,7 @@ export const evUptake = {
           { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },
@@ -135,7 +135,7 @@ export const tfnEvUptake = {
           { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },
@@ -182,7 +182,7 @@ export const eehEvUptake = {
           { ...selectors.vehicleTypeWithoutAll, multiSelect: true, type: 'dropdown' },
           { ...selectors.fuelType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/ev-uptake/download'
       },

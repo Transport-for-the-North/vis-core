@@ -87,7 +87,7 @@ export const cpArea = {
           { ...selectors.columnNameCP, multiSelect: false, type: 'toggle' },
           { ...selectors.stbTag, type: 'fixed' },
           { ...selectors.areaValueDisplay, multiSelect: true, type: 'dropdown' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}]},
         ],
         downloadPath: '/api/evci/cp-area/download'
       }

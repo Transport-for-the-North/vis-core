@@ -85,7 +85,7 @@ export const evcpRequirements = {
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/evcp-requirements/download'
       },
@@ -133,7 +133,7 @@ export const tfnEvcpRequirements = {
           { ...selectors.tfnChargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/evcp-requirements/download'
       },
@@ -179,7 +179,7 @@ export const eehEvcpRequirements = {
           { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneDownloadSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
         ],
         downloadPath: '/api/evci/evcp-requirements/download'
       },
