@@ -203,10 +203,17 @@ export const MapProvider = ({ children }) => {
 
         // Initialize filter value if shouldBeBlankOnInit is not true
         if (!filterWithId.shouldBeBlankOnInit) {
-          filterState[filterWithId.id] =
-            filterWithId.defaultValue ||
-            filterWithId.min ||
-            filterWithId.values?.values[0]?.paramValue;
+          if (filterWithId.multiSelect && filterWithId.shouldInitialSelectAllInMultiSelect){
+            filterState[filterWithId.id] =
+              filterWithId.defaultValue ||
+              filterWithId.min ||
+              filterWithId.values?.values?.map(item => item?.paramValue);}
+          else {
+            filterState[filterWithId.id] =
+              filterWithId.defaultValue ||
+              filterWithId.min ||
+              filterWithId.values?.values[0]?.paramValue;
+          }
         } else {
           filterState[filterWithId.id] = null; // Set to null or undefined to represent no initial selection
         }
