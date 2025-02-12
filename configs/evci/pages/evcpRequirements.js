@@ -155,7 +155,7 @@ export const eehEvcpRequirements = {
   config: {
     ...evcpRequirements.config,
     filters: [
-      { ...selectors.runTypeCodeDynamic, visualisations: ['EVCP Requirements'] },
+      { ...selectors.runTypeCodeFixed, visualisations: ['EVCP Requirements'] },
       { ...selectors.year, visualisations: ['EVCP Requirements'] },
       { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
       { ...selectors.travelScenarioBase, visualisations: ['EVCP Requirements'] },
@@ -171,7 +171,7 @@ export const eehEvcpRequirements = {
       },
       download: {
         filters: [
-          { ...selectors.runTypeCodeDynamic, multiSelect: true, type: 'toggle' },
+          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
@@ -184,6 +184,52 @@ export const eehEvcpRequirements = {
         downloadPath: '/api/evci/evcp-requirements/download'
       },
       warning: "To note- the STB EVCI Framework for the England's Economic Heartland is being updated to reflect the new unitary authority boundaries for Buckinghamshire and Northamptonshire. This will be available early in 2025. Multiple local authority zones can be selected on the tool to create a total output for these areas.",
+    },
+  },
+};
+
+export const tfseEvcpRequirements = {
+  ...evcpRequirements,
+  about: `
+  <p>This visualisation shows the forecasted number and type of charging infrastructure requirements across the region.</p>
+  <p>TfN’s methodology for the EVCI Framework 
+  can be found <a
+              href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+             here</a>.</p>`,
+  config: {
+    ...evcpRequirements.config,
+    filters: [
+      { ...selectors.runTypeCodeFixed, visualisations: ['EVCP Requirements'] },
+      { ...selectors.year, visualisations: ['EVCP Requirements'] },
+      { ...selectors.administrativeBoundary, visualisations: ['EVCP Requirements'] },
+      { ...selectors.travelScenarioBase, visualisations: ['EVCP Requirements'] },
+      { ...selectors.behaviouralScenario, visualisations: ['EVCP Requirements'] },
+      { ...selectors.tfseChargingCategory, visualisations: ['EVCP Requirements'] },
+      { ...selectors.stbTag, visualisations: ['EVCP Requirements'] },
+      { ...selectors.areaValueDisplay, visualisations: ['EVCP Requirements'] },
+      { ...selectors.zoneSelector, visualisations: ['EVCP Requirements'] }
+    ],
+    additionalFeatures: {
+      glossary: { 
+        dataDictionary: {}
+      },
+      download: {
+        filters: [
+          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
+          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
+          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
+          { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
+          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
+          { ...selectors.tfseChargingCategory, multiSelect: true, type: 'dropdown' },
+          { ...selectors.stbTag, type: 'fixed' },
+          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] , filterName: "Optional location selector"},
+        ],
+        downloadPath: '/api/evci/evcp-requirements/download'
+      },
     },
   },
 };

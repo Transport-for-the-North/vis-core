@@ -344,6 +344,40 @@ const vehicleTypeWithoutAllSelector = {
   },
 };
 
+const vehicleTypeWithBusTaxi = {
+  filterName: "Vehicle Type",
+  paramName: "modeCode",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Car",
+        paramValue: "car",
+      },
+      {
+        displayValue: "LGV",
+        paramValue: "lgv",
+      },
+      {
+        displayValue: "HGV",
+        paramValue: "hgv",
+      },
+      {
+        displayValue: "Bus",
+        paramValue: "bus",
+      },
+      {
+        displayValue: "Taxi & PHV",
+        paramValue: "phv",
+      },
+    ],
+  },
+};
+
 const vehicleTypeAllSelector = {
   filterName: "Vehicle Type",
   paramName: "modeCode",
@@ -483,6 +517,48 @@ const tfnChargingCategorySelector = {
       {
         displayValue: "Local Charging Hubs",
         paramValue: 8,
+      },
+    ],
+  },
+};
+
+const tfseChargingCategorySelector = {
+  filterName: "Charging Category",
+  paramName: "chargingCategoryId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Destination",
+        paramValue: 1,
+      },
+      {
+        displayValue: "HGV Depot",
+        paramValue: 2,
+      },
+      {
+        displayValue: "Home",
+        paramValue: 3,
+      },
+      {
+        displayValue: "On-street residential charging",
+        paramValue: 4,
+      },
+      {
+        displayValue: "Workplace",
+        paramValue: 5,
+      },
+      {
+        displayValue: "Van Depot",
+        paramValue: 9,
+      },
+      {
+        displayValue: "Bus Depot",
+        paramValue: 10,
       },
     ],
   },
@@ -824,10 +900,12 @@ export const selectors = {
   tfnBehaviouralScenario: tfnBehaviouralScenarioSelector,
   vehicleType: vehicleTypeSelector,
   vehicleTypeWithoutAll: vehicleTypeWithoutAllSelector,
+  vehicleTypeWithBusTaxi: vehicleTypeWithBusTaxi,
   vehicleTypeAll: vehicleTypeAllSelector,
   fuelType: fuelTypeSelector,
   chargingCategory: chargingCategorySelector,
   tfnChargingCategory: tfnChargingCategorySelector,
+  tfseChargingCategory: tfseChargingCategorySelector,
   areaValueDisplay: areaValueDisplaySelector,
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,

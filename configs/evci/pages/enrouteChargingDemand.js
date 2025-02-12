@@ -40,7 +40,7 @@ export const enrouteChargingDemand = {
         isStylable: true,
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
-        labelZoomLevel: 12,
+        labelZoomLevel: 10,
         labelNulls: false,
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: true,

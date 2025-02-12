@@ -37,7 +37,7 @@ export const cpMajorRoad = {
         isStylable: true,
         shouldHaveTooltipOnHover: true,
         shouldHaveLabel: true,
-        labelZoomLevel: 12,
+        labelZoomLevel: 10,
         labelNulls: true,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
