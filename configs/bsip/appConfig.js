@@ -18,9 +18,10 @@ export const appConfig = {
         <li>Public service bus, tram and light rail journey time reliability data, by route.</li>
         <li>Bus accessibility data, segmented by journey type e.g. travel to work, travel to education etc.</li>
     </ul>
-    <p>The above combined with geospatial data on population, jobs and demographic indices.</p>`,
-  dataconfig: `
-  <p> Public transport data presented in this visualisation is derived from scheduled bus, tram and light rail timetable data made available through the national Bus Open Data Service (BODS). Observed performance/reliability is based on observed data via GPS. </p>
+    <p>The above combined with geospatial data on population, jobs and demographic indices.</p>
+    <b></b>
+    <h2> Data Configuration </h2>
+    <p> Public transport data presented in this visualisation is derived from scheduled bus, tram and light rail timetable data made available through the national Bus Open Data Service (BODS). Observed performance/reliability is based on observed data via GPS. </p>
   <p> Scheduled bus timetable data has been sourced from the Bus Open Data Service (BODS) in General Transit Feed Specification (GTFS) format.
       Adjusted  GTFS bus timetable data has been created by TfN, based on observed bus locations from the BODS real time API (GPS), over a period of one week using TfN’s BODSE-Extractor GitHub repository.</p>
   <p> Bus accessibility metrics have been derived using these respective timetables with the open-source route planner OpenTripPlanner (OTP), using TfN’s OTP4GB-py GitHub repository. </p>
@@ -38,8 +39,7 @@ export const appConfig = {
       This visualisation may additionally contain OTP related limitations (if OTP returns an unknown error for a trip that should be possible according to BODS GTFS timetables). </p>
   <p> TfN has performed high-level analysis on the ratio of OTP returned trips possible / trips not possible, along with the number OTP related errors returned from the processing of these respective GTFS datasets in OTP. 
       TfN has not performed any checks on the integrity of BODS data. </p>
-  <p> TfN aim to update the BODS data feed for this visualisation tool every three months.  </p>
-  `,
+  <p> TfN aim to update the BODS data feed for this visualisation tool every three months.  </p>`,
   background: "",
   methodology: "",
   legalText: termsOfUse,
