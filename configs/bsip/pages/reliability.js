@@ -4,7 +4,9 @@ export const reliability = {
     pageName: "Bus Reliability",
     url: "/bus-reliability",
     about:
-      "<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone in the map.</p> <p>The <b>base</b> timetable refers to buses which were scheduled. </p> <p>The <b>adjusted</b> timetable refers to buses which actually ran.</p>",
+      `<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone on the map.</p> 
+      <p>The <b>scheduled</b> timetable refers to buses which were scheduled according to BODS GTFS timetables. </p> 
+      <p>The <b>actual</b> bus journey data refers to buses which actually ran and had their GPS transponder enabled.</p>`,
     type: "MapLayout",
     category: null,
     legalText: termsOfUse,

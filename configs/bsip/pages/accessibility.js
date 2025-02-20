@@ -4,7 +4,7 @@ export const accessibility = {
     pageName: "Bus Accessibility",
     url: "/bus-accessibility",
     type: "MapLayout",
-    about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
+    about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a Destination type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
     category: null,
     legalText: termsOfUse,
     termsOfUse: termsOfUse,
@@ -62,7 +62,7 @@ export const accessibility = {
           },
         },
         {
-          filterName: "Value type",
+          filterName: "Destination type",
           paramName: "oppTypeId",
           target: "api",
           actions: [
