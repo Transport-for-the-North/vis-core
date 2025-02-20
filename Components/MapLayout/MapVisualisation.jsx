@@ -192,11 +192,15 @@ export const MapVisualisation = ({
       const opacityValue = document.getElementById(
         "opacity-" + layerKey
       )?.value;
+      const widthObject = document.getElementById(
+        "width-" + layerKey
+      )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
         visualisation.style,
         colourPalette,
-        opacityValue ? parseFloat(opacityValue) : 0.65
+        opacityValue ? parseFloat(opacityValue) : 0.65,
+        widthObject ? parseFloat(widthObject) : 7.5
       );
 
       // Use visualisationDataForMap to update the map features

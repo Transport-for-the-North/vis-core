@@ -29,6 +29,27 @@ export function getOpacityProperty(layerType) {
   return opacityProp;
 }
 
+export function getWidthProperty(layerType) {
+  let widthProp;
+  switch (layerType) {
+    case "line": {
+      widthProp = "line-width";
+      break;
+    }
+    case "fill": {
+      widthProp = "fill-width";
+      break;
+    }
+    case "circle": {
+      widthProp = "circle-opacity";
+      break;
+    }
+    default:
+      throw new Error(`Invalid layer type ${layerType}`);
+  }
+  return widthProp;
+}
+
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
  * This function is designed to create paint properties for various map features such as polygons, lines, circles, and points.
@@ -38,9 +59,10 @@ export function getOpacityProperty(layerType) {
  * @param {string} style - The type of geometries that we want to display on the map. Supported styles include 'polygon-continuous', 'polygon-diverging', 'line-continuous', 'line-diverging', 'circle-continuous', 'circle-diverging', 'point-continuous', and 'point-diverging'.
  * @param {Array.<string>} colours - The array of colours available for the styling. Usually an array of #FFFF
  * @param {float} opacityValue - The current opacity value, between 0 and 1
+ * @param {float} widthValue - 
  * @returns The paint property for the given geometries
  */
-export function createPaintProperty(bins, style, colours, opacityValue) {
+export function createPaintProperty(bins, style, colours, opacityValue, widthValue) {
   let widthObject = []
   let colors = [];
   let colorObject = [];
@@ -48,7 +70,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     colors.push(bins[i]);
     colors.push(colours[i]);
     widthObject.push(bins[i]);
-    widthObject.push((7.5/bins[bins.length-1]*bins[i]) + 1);
+    widthObject.push((12/bins[bins.length-1]*bins[i]) + 1);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
   switch (style) {
@@ -91,10 +113,13 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ...colors,
         ],
         "line-width": [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "value"],
-          ...widthObject,
+          "case",
+          //["linear"],
+          //["feature-state", "value"],
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          widthObject ?? 7.5
+          //...widthObject,
         ],
         "line-opacity": [
           "case",
@@ -124,10 +149,13 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           "rgba(0, 0, 0, 1)",
         ],
         "line-width": [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "valueAbs"],
-          ...widthObject,
+          "case",
+          //["linear"],
+          //["feature-state", "value"],
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          widthObject ?? 7.5
+          //...widthObject,
         ],
         "line-opacity": [
           "case",

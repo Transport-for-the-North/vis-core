@@ -37,6 +37,7 @@ const ModeButton = styled.button`
   font-family: 'Hanken Grotesk', sans-serif;
   width: 50%;
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
+  width: ${(props) => (props.disabled ? 20 : 7.5)};
   pointer-events: ${(props) => (props.disabled ? 'none' : 'auto')};
 
   &:hover {

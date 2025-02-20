@@ -1,7 +1,7 @@
 import React, { memo, useContext, useState } from "react";
 import styled from "styled-components";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
-import { getOpacityProperty } from "utils";
+import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown } from "../Selectors";
 import { SelectorLabel } from "../Selectors/SelectorLabel";
@@ -63,6 +63,23 @@ const OpacitySlider = styled.input`
 `;
 
 /**
+ * Styled container for the width control.
+ */
+const WidthControl = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+`;
+
+/**
+ * Styled input for the width slider.
+ */
+const WidthSlider = styled.input`
+  flex-grow: 1;
+  margin-right: 10px;
+`;
+
+/**
  * LayerControlEntry component represents a single layer control entry in the map layer control panel.
  *
  * @component
@@ -107,11 +124,14 @@ export const LayerControlEntry = memo(
         metric.name ===
         visualisation.queryParams[selectedMetricParamName.paramName]?.value
     );
+    let currentWidth = null;
     let currentOpacity = null;
 
     if (maps.length > 0 && maps[0].getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
+      const widthProp = getWidthProperty(layer.type);
+      currentWidth = maps[0].getPaintProperty(layer.id, widthProp);
     }
 
     const isFeatureStateExpression =
@@ -120,7 +140,12 @@ export const LayerControlEntry = memo(
       ? currentOpacity[currentOpacity.length - 1]
       : currentOpacity;
 
+    const initialWidth = isFeatureStateExpression
+      ? currentWidth[currentWidth.length - 1]
+      : currentWidth;
+
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
+    const [width, setWidth] = useState(initialWidth || 7.5);
 
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
@@ -154,6 +179,33 @@ export const LayerControlEntry = memo(
         }
       });
       setOpacity(newOpacity);
+    };
+
+    const handleWidthChange = (e) => {
+      const newWidth = parseFloat(e.target.value);
+      const WidthProp = getWidthProperty(layer.type);
+      let WidthExpression;
+
+      if (isFeatureStateExpression) {
+        WidthExpression = [
+          ["linear"],
+          ["feature-state", "value"],
+          //["in", ["feature-state", "value"], ["literal", [null]]],
+          //0,
+          //widthObject ?? 7.5
+          //...widthObject,
+          newWidth,
+        ];
+      } else {
+        WidthExpression = newWidth;
+      }
+
+      maps.forEach((map) => {
+        if (map.getLayer(layer.id)) {
+          map.setPaintProperty(layer.id, WidthProp, WidthExpression);
+        }
+      });
+      setWidth(newWidth);
     };
 
     return (
@@ -195,6 +247,18 @@ export const LayerControlEntry = memo(
               classification={state.layers[layer.id]?.class_method ?? "d"}
               onChange={(value) => handleClassificationChange(value, layer.id)}
             />
+            <SelectorLabel text="Link Width" />
+            <WidthControl>
+              <WidthSlider
+                id={`width-${layer.id}`}
+                type="range"
+                min="7.5"
+                max="50"
+                step="0.1"
+                value={width}
+                onChange={handleWidthChange}
+              />
+            </WidthControl>
           </>
         )}
       </LayerControlContainer>
