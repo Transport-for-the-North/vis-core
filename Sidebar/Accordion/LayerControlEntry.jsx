@@ -140,7 +140,9 @@ export const LayerControlEntry = memo(
       ? currentOpacity[currentOpacity.length - 1]
       : currentOpacity;
 
-    const initialWidth = isFeatureStateExpression
+    const isFeatureStateExpression2 =
+      Array.isArray(currentWidth) && currentWidth[0] === "line";
+    const initialWidth = isFeatureStateExpression2
       ? currentWidth[currentWidth.length - 1]
       : currentWidth;
 
@@ -188,12 +190,9 @@ export const LayerControlEntry = memo(
 
       if (isFeatureStateExpression) {
         WidthExpression = [
+          "interpolate",
           ["linear"],
           ["feature-state", "value"],
-          //["in", ["feature-state", "value"], ["literal", [null]]],
-          //0,
-          //widthObject ?? 7.5
-          //...widthObject,
           newWidth,
         ];
       } else {
