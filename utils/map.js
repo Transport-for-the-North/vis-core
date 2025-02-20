@@ -29,19 +29,25 @@ export function getOpacityProperty(layerType) {
   return opacityProp;
 }
 
-export function getWidthProperty(layerType) {
+
+/**
+ * Retrieves thr line width for givens et of bins
+ * @function getWidthProperty
+ * @param {string} layerType - The type of the layer. Expected values are 'line'
+ * @param {Array.<chroma(number|string)>} bins -- breaks used for legend
+ * @returns {Aarray} The line width property for mapbox styling
+ */
+ 
+ export function getWidthProperty(layerType) {
+  // let widthObject = [];
+  // for (let i = 0; i < bins.length; i++) {
+  //   widthObject.push(bins[i]);
+  //   widthObject.push((7.5/bins[bins.length - 1] * bins[i]) + 1);
+  // }
   let widthProp;
   switch (layerType) {
     case "line": {
       widthProp = "line-width";
-      break;
-    }
-    case "fill": {
-      widthProp = "fill-width";
-      break;
-    }
-    case "circle": {
-      widthProp = "circle-opacity";
       break;
     }
     default:
@@ -50,6 +56,7 @@ export function getWidthProperty(layerType) {
   return widthProp;
 }
 
+ 
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
  * This function is designed to create paint properties for various map features such as polygons, lines, circles, and points.
@@ -62,7 +69,7 @@ export function getWidthProperty(layerType) {
  * @param {float} widthValue - 
  * @returns The paint property for the given geometries
  */
-export function createPaintProperty(bins, style, colours, opacityValue, widthValue) {
+export function createPaintProperty(bins, style, colours, opacityValue) {
   let widthObject = []
   let colors = [];
   let colorObject = [];
@@ -70,7 +77,7 @@ export function createPaintProperty(bins, style, colours, opacityValue, widthVal
     colors.push(bins[i]);
     colors.push(colours[i]);
     widthObject.push(bins[i]);
-    widthObject.push((12/bins[bins.length-1]*bins[i]) + 1);
+    widthObject.push((7.5/bins[bins.length-1]*bins[i]) + 1);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
   switch (style) {
@@ -113,13 +120,10 @@ export function createPaintProperty(bins, style, colours, opacityValue, widthVal
           ...colors,
         ],
         "line-width": [
-          "case",
-          //["linear"],
-          //["feature-state", "value"],
-          ["in", ["feature-state", "value"], ["literal", [null]]],
-          0,
-          widthObject ?? 7.5
-          //...widthObject,
+          "interpolate",
+          ["linear"],
+          ["feature-state", "value"],
+          ...widthObject
         ],
         "line-opacity": [
           "case",
@@ -149,13 +153,10 @@ export function createPaintProperty(bins, style, colours, opacityValue, widthVal
           "rgba(0, 0, 0, 1)",
         ],
         "line-width": [
-          "case",
-          //["linear"],
-          //["feature-state", "value"],
-          ["in", ["feature-state", "value"], ["literal", [null]]],
-          0,
-          widthObject ?? 7.5
-          //...widthObject,
+          "interpolate",
+          ["linear"],
+          ["feature-state", "valueAbs"],
+          ...widthObject,
         ],
         "line-opacity": [
           "case",
