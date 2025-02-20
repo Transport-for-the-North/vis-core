@@ -71,12 +71,6 @@ export const HomePage = () => {
             <p className="container-bg">{parse(appContext.background)}</p>
           </section>
         )}
-        {appContext.dataconfig !== "" && (
-          <section className="data-configuration even-section">
-            <h2>Data Configuration</h2>
-            <p className="container-bg">{parse(appContext.dataconfig)}</p>
-          </section>
-        )}
         {appContext.methodology !== "" && (
           <section className="methodology odd-section">
             <h2>Methodology</h2>
