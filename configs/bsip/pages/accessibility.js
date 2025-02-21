@@ -4,7 +4,11 @@ export const accessibility = {
     pageName: "Bus Accessibility",
     url: "/bus-accessibility",
     type: "MapLayout",
-    about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a Destination type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
+    about: `<p>Visualise the overall accessibility by bus to different opportunities within each region.</p>
+      <p>Set a destination type to visualise the number of each opportunity accessible within the given cutoff time.</p>
+      <p>The <b>scheduled</b> bus data refers to buses which were scheduled according to BODS GTFS timetables. </p> 
+      <p>The <b>actual journeys</b> bus data refers to buses which actually ran and had their GPS transponder enabled.</p>
+      `,
     category: null,
     legalText: termsOfUse,
     termsOfUse: termsOfUse,
@@ -44,20 +48,24 @@ export const accessibility = {
 
       filters: [
         {
-          filterName: "Timetable",
-          paramName: "timetableId",
+          filterName: "Bus data display",
+          info: "Display scheduled timetable data, or actual journey data",
+          paramName: "scheduledOrAdjusted",
           target: "api",
           actions: [{ action: "UPDATE_QUERY_PARAMS" }],
           visualisations: ["Bus Accessibility"],
-          type: "fixed",
-          info: "Timetable used to calculate metrics.",
+          type: "toggle",
           values: {
             source: "local",
             values: [
               {
-                displayValue: 3,                
-                paramValue: 3,
-              }
+                displayValue: "Scheduled",
+                paramValue: "scheduled",
+              },
+              {
+                displayValue: "Actual journeys",
+                paramValue: "adjusted",
+              },
             ],
           },
         },
@@ -96,6 +104,24 @@ export const accessibility = {
           interval: 20,
           displayAs: {
             unit: "mins",
+          },
+        },
+        {
+          filterName: "Time period",
+          paramName: "timeperiod",
+          target: "api",
+          actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+          visualisations: ["Bus Accessibility"],
+          type: "fixed",
+          info: "Time period used to calculate metrics.",
+          values: {
+            source: "local",
+            values: [
+              {
+                displayValue: 'AM',                
+                paramValue: 'AM',
+              }
+            ],
           },
         },
       ],
