@@ -1,4 +1,5 @@
 import { termsOfUse } from "../termsOfUse"
+import { combinedAuthorityLayer, combinedAuthorityLayerBase } from "../mapLayers"
 
 export const reliability = {
     pageName: "Bus Reliability",
@@ -28,6 +29,8 @@ export const reliability = {
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
         },
+        combinedAuthorityLayer,
+        combinedAuthorityLayerBase
       ],
       visualisations: [
         {

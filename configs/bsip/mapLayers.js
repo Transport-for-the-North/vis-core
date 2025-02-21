@@ -1,0 +1,55 @@
+import { parentAuthorityBoundaryCustomPaint, invisiblePolygonCustomPaint } from "./customPaintDefinitions";
+
+export const localAuthorityLayer = {
+  name: "Local Authorities",
+  type: "tile",
+  source: "api",
+  path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+  sourceLayer: "zones",
+  geometryType: "line",
+  customPaint: parentAuthorityBoundaryCustomPaint,
+  isHoverable: true,
+  isStylable: false,
+  shouldHaveTooltipOnHover: false,
+  shouldHaveLabel: false,
+  labelZoomLevel: 12,
+  labelNulls: false,
+  hoverNulls: false,
+  hoverTipShouldIncludeMetadata: false,
+};
+
+export const combinedAuthorityLayer = {
+  name: "Combined Authorities",
+  type: "tile",
+  source: "api",
+  path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
+  sourceLayer: "zones",
+  geometryType: "line",
+  customPaint: parentAuthorityBoundaryCustomPaint,
+  isHoverable: false,
+  isStylable: false,
+  shouldHaveTooltipOnHover: false,
+  shouldHaveLabel: true,
+  labelZoomLevel: 10,
+  labelNulls: false,
+  hoverNulls: false,
+  hoverTipShouldIncludeMetadata: false,
+};
+
+export const combinedAuthorityLayerBase = {
+  name: "hide_Combined Authorities",
+  type: "tile",
+  source: "api",
+  path: "/api/vectortiles/zones/16/{z}/{x}/{y}",
+  sourceLayer: "zones",
+  geometryType: "polygon",
+  customPaint: invisiblePolygonCustomPaint,
+  isHoverable: false,
+  isStylable: false,
+  shouldHaveTooltipOnHover: true,
+  shouldHaveLabel: false,
+  labelZoomLevel: 12,
+  labelNulls: false,
+  hoverNulls: true,
+  hoverTipShouldIncludeMetadata: false,
+};

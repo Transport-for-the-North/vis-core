@@ -1,3 +1,4 @@
+import { combinedAuthorityLayer, combinedAuthorityLayerBase } from "../mapLayers"
 import { termsOfUse } from "../termsOfUse"
 
 export const accessibility = {
@@ -28,6 +29,8 @@ export const accessibility = {
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
         },
+        combinedAuthorityLayer,
+        combinedAuthorityLayerBase
       ],
       visualisations: [
         {
