@@ -52,6 +52,7 @@ export const reliability = {
           min: 600,
           max: 12000,
           interval: 300,
+          defaultValue: 3600,
           displayAs: {
             operation: "divide",
             operand: 60,
