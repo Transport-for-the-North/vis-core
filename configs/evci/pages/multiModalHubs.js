@@ -83,7 +83,7 @@ export const multiModalHubs = {
           { ...selectors.columnNameMMHFixed, type: 'fixed' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] },
+          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },

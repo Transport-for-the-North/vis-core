@@ -58,9 +58,9 @@ export const stbConfig = [
     primaryFontColour: "#ffffff",
     secondaryFontColour: "#000000",
     pages: [
-      "evUptake",
-      "evcpRequirements",
-      "annualChargingDemand",
+      "tfseEvUptake",
+      "tfseEvcpRequirements",
+      "tfseAnnualChargingDemand",
       "potentialChargingSites"
     ],
     termsOfUseText: "Welcome",

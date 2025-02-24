@@ -1,6 +1,6 @@
-import { eehEvUptake, evUptake, tfnEvUptake } from "./evUptake"
-import { annualChargingDemand, eehAnnualChargingDemand, tfnAnnualChargingDemand } from "./annualChargingDemand"
-import { eehEvcpRequirements, evcpRequirements, tfnEvcpRequirements } from "./evcpRequirements"
+import { eehEvUptake, evUptake, tfnEvUptake, tfseEvUptake } from "./evUptake"
+import { annualChargingDemand, eehAnnualChargingDemand, tfnAnnualChargingDemand, tfseAnnualChargingDemand } from "./annualChargingDemand"
+import { eehEvcpRequirements, evcpRequirements, tfnEvcpRequirements, tfseEvcpRequirements } from "./evcpRequirements"
 import { eehPotentialChargingSites, potentialChargingSites, tfnPotentialChargingSites } from "./potentialChargingSites"
 import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
@@ -35,5 +35,8 @@ export const pages = {
     eehEvUptake: eehEvUptake,
     eehAnnualChargingDemand: eehAnnualChargingDemand,
     eehEvcpRequirements: eehEvcpRequirements,
-    eehPotentialChargingSites: eehPotentialChargingSites
+    eehPotentialChargingSites: eehPotentialChargingSites,
+    tfseEvUptake: tfseEvUptake,
+    tfseAnnualChargingDemand: tfseAnnualChargingDemand,
+    tfseEvcpRequirements: tfseEvcpRequirements
 }

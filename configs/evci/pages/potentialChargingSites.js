@@ -83,7 +83,7 @@ export const potentialChargingSites = {
         filters: [
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] }
+          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] , filterName: "Optional location selector"}
         ],
         downloadPath: '/api/evci/potential-charging-sites/download'
       },
@@ -148,7 +148,7 @@ export const eehPotentialChargingSites = {
         filters: [
           { ...selectors.vehicleType, multiSelect: true, type: 'dropdown' },
           { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] }
+          { ...selectors.siteSelector, actions: [{action: 'SET_SELECTED_FEATURES'}] , filterName: "Optional location selector"}
         ],
         downloadPath: '/api/evci/potential-charging-sites/download'
       },
