@@ -1,5 +1,6 @@
 import { termsOfUse } from "../termsOfUse"
 import { combinedAuthorityLayer, combinedAuthorityLayerBase } from "../mapLayers"
+import glossaryData from "../glossaryData";
 
 export const reliability = {
     pageName: "Bus Reliability",
@@ -73,5 +74,11 @@ export const reliability = {
           field: "id",
         },
       ],
+      additionalFeatures: {
+        glossary: { 
+          dataDictionary: glossaryData
+        },
+        warning: "This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page."
+      },
     },
 }

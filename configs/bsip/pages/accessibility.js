@@ -1,5 +1,6 @@
 import { combinedAuthorityLayer, combinedAuthorityLayerBase } from "../mapLayers"
 import { termsOfUse } from "../termsOfUse"
+import glossaryData from "../glossaryData";
 
 export const accessibility = {
     pageName: "Bus Accessibility",
@@ -95,7 +96,7 @@ export const accessibility = {
           },
         },
         {
-          filterName: "Cutoff time",
+          filterName: "Cut off time",
           paramName: "cutoffTimeMinutes",
           target: "api",
           actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -128,5 +129,11 @@ export const accessibility = {
           },
         },
       ],
+      additionalFeatures: {
+        glossary: { 
+          dataDictionary: glossaryData
+        },
+        warning: "This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page."
+      },
     },
 }
