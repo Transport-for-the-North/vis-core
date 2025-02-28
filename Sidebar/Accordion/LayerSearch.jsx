@@ -111,7 +111,10 @@ export const LayerSearch = ({ map, layer }) => {
 
   return (
     <SearchContainer>
-      <SelectorLabel text="Zoom to map feature" info="Search for a feature to zoom to" />
+      <SelectorLabel 
+        text= {`Zoom to feature in ${layer.id} layer`}
+        info="Search for a feature to zoom to. Hover over the desired zone to get valid values" 
+      />
       <FeatureSelect
         layerPath={layer.metadata.path}
         value={selectedOption}
