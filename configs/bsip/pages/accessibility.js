@@ -16,6 +16,7 @@ export const accessibility = {
     termsOfUse: termsOfUse,
     config: {
       layers: [
+        combinedAuthorityLayer,
         {
           uniqueId: "BsipZoneVectorTile",
           name: "Accessibility",
@@ -30,7 +31,6 @@ export const accessibility = {
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
         },
-        combinedAuthorityLayer,
         combinedAuthorityLayerBase
       ],
       visualisations: [

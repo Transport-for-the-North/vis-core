@@ -15,6 +15,7 @@ export const reliability = {
     termsOfUse: termsOfUse,
     config: {
       layers: [
+        combinedAuthorityLayer,
         {
           uniqueId: "BsipZoneVectorTile",
           name: "Origin Zones",
@@ -30,7 +31,6 @@ export const reliability = {
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
         },
-        combinedAuthorityLayer,
         combinedAuthorityLayerBase
       ],
       visualisations: [
