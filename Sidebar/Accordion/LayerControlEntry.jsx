@@ -196,6 +196,7 @@ export const LayerControlEntry = memo(
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
+
     // Determine selected page bands
     const selectedPageBands = appConfig.defaultBands.find((band) => {
       if (!currentPage) return false;
