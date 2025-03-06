@@ -421,9 +421,7 @@ export const appConfig = {
             visualisations: ["Station Totals"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric",
@@ -681,9 +679,7 @@ export const appConfig = {
             visualisations: ["Station Totals Difference"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric (1 and 2)",
@@ -859,9 +855,7 @@ export const appConfig = {
             visualisations: ["Station Totals Side-by-Side"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Filter Scenario Right by Network",
@@ -953,9 +947,7 @@ export const appConfig = {
             visualisations: ["Station Totals Side-by-Side"],
             info: "Select the desired time period. ",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
           {
             filterName: "Metric",
@@ -4425,9 +4417,7 @@ export const appConfig = {
             visualisations: ["Zone Totals Side-by-Side"],
             info:"Select the desired time period.",
             type: "toggle",
-            values: {
-              source: "api"
-            },
+            values: timePeriodCodeValues,
           },
         ]
       }
@@ -5233,11 +5223,12 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Totals"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -5583,11 +5574,12 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Totals Difference"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -6706,11 +6698,12 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Pair"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7067,11 +7060,12 @@ export const appConfig = {
             visualisations: ["Zone Accessibility Pair Difference"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7362,11 +7356,12 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Totals"],
             info: "Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -7860,11 +7855,12 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Totals Difference"],
             info: "Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -8119,11 +8115,12 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Pair"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -8627,11 +8624,12 @@ export const appConfig = {
             visualisations: ["Landuse Accessibility Pair Difference"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -9487,11 +9485,12 @@ export const appConfig = {
             visualisations: ["Journey Time Accessibility Pair"],
             info:"Select the desired user-class by filtering via Segment (trip purpose) and Car Availability.",
             type: "dropdown",
-            shouldBeBlankOnInit: true,
+            shouldBeBlankOnInit: false,
             shouldFilterOnValidation: true,
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",
@@ -9845,6 +9844,7 @@ export const appConfig = {
             shouldBeValidated: true,
             shouldFilterOthers: false,
             multiSelect: true,
+            shouldInitialSelectAllInMultiSelect: true,
             isClearable: true,
             values: {
               source: "metadataTable",

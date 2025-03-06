@@ -301,6 +301,7 @@ const Map = (props) => {
         const layerConfig = state.layers[layerId];
         const customTooltip = layerConfig?.customTooltip;
         const hoverNulls = layerConfig.hoverNulls ?? true;
+        const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
 
         const featureValue = feature.state.value;
         if (
@@ -330,20 +331,45 @@ const Map = (props) => {
             featureValue !== null
           ) {
             description = `
-                  <div class="popup-content">
-                    <p class="feature-name">${featureName}</p>
-                    <hr class="divider">
-                    <div class="metadata-item">
-                      <span class="metadata-key">Value:</span>
-                      <span class="metadata-value">${featureValueDisplay} ${legendText}</span>
-                    </div>
-                  </div>`;
+                    <div class="popup-content">
+                      <p class="feature-name">${featureName}</p>
+                      <hr class="divider">
+                      <div class="metadata-item">
+                        <span class="metadata-key">Value:</span>
+                        <span class="metadata-value">${featureValueDisplay} ${legendText}</span>
+                      </div>
+                    </div>`;
           } else if (featureName) {
             description = `
-                  <div class="popup-content">
-                    <p class="feature-name">${featureName}</p>
-                  </div>`;
+                    <div class="popup-content">
+                      <p class="feature-name">${featureName}</p>
+                    </div>`;
           }
+
+          // Inject additional metadata if available and enabled
+          if (description && shouldIncludeMetadata) {
+            const metadataKeys = Object.keys(feature.properties).filter(
+              (key) => !["id", "name", "value"].includes(key)
+            );
+            if (metadataKeys.length > 0) {
+              let metadataDescription = '<div class="metadata-section">';
+              metadataKeys.forEach((key) => {
+                metadataDescription += `
+                  <div class="metadata-item">
+                    <span class="metadata-key">${key}:</span>
+                    <span class="metadata-value">${feature.properties[key]}</span>
+                  </div>`;
+              });
+              metadataDescription += '</div>';
+          
+              // Get the index of the last closing </div> to ensure we are appending the metadata inside .popup-content
+              const lastDivIndex = description.lastIndexOf("</div>");
+              if (lastDivIndex !== -1) {
+                description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
+              }
+            }
+          }
+
           if (description) {
             descriptions.push(description);
           }
@@ -351,10 +377,10 @@ const Map = (props) => {
           // Custom tooltip requiring API call
           // Add a placeholder
           description = `
-              <div class="popup-content">
-                <p class="feature-name">${featureName}</p>
-                <p>Loading data...</p>
-              </div>`;
+                <div class="popup-content">
+                  <p class="feature-name">${featureName}</p>
+                  <p>Loading data...</p>
+                </div>`;
           descriptions.push(description);
 
           // Prepare the API request
@@ -362,7 +388,7 @@ const Map = (props) => {
         }
       });
 
-      // Show the popup with initial descriptions
+      // Show the popup with the initial descriptions
       if (descriptions.length > 0) {
         const aggregatedHtml = descriptions.join('<hr class="thick-divider">');
         const popup = new maplibregl.Popup({
@@ -387,35 +413,35 @@ const Map = (props) => {
 
           const fetchPromises = apiRequests.map(
             ({ feature, layerId, featureName }) => {
-              const layerConfig = state.layers[layerId];
-              const customTooltip = layerConfig?.customTooltip;
-              const { url, htmlTemplate } = customTooltip;
-              const featureId = feature.id;
-              const requestUrl = url.replace("{id}", featureId);
+            const layerConfig = state.layers[layerId];
+            const customTooltip = layerConfig?.customTooltip;
+            const { url, htmlTemplate } = customTooltip;
+            const featureId = feature.id;
+            const requestUrl = url.replace("{id}", featureId);
 
-              return api.baseService
-                .get(requestUrl, { signal: controller.signal })
-                .then((responseData) => {
-                  let tooltipHtml = htmlTemplate;
-                  for (const key in responseData) {
-                    tooltipHtml = tooltipHtml.replace(
-                      new RegExp(`\\{${key}\\}`, "g"),
-                      responseData[key]
-                    );
-                  }
-                  return tooltipHtml;
-                })
-                .catch((error) => {
-                  if (error.name !== "AbortError") {
-                    console.error("Failed to fetch tooltip data:", error);
-                  }
-                  // Return placeholder or null
-                  return `
-                        <div class="popup-content">
-                          <p class="feature-name">${featureName}</p>
-                          <p>Data unavailable.</p>
-                        </div>`;
-                });
+            return api.baseService
+              .get(requestUrl, { signal: controller.signal })
+              .then((responseData) => {
+                let tooltipHtml = htmlTemplate;
+                for (const key in responseData) {
+                  tooltipHtml = tooltipHtml.replace(
+                    new RegExp(`\\{${key}\\}`, "g"),
+                    responseData[key]
+                  );
+                }
+                return tooltipHtml;
+              })
+              .catch((error) => {
+                if (error.name !== "AbortError") {
+                  console.error("Failed to fetch tooltip data:", error);
+                }
+                // Return placeholder or null
+                return `
+                          <div class="popup-content">
+                            <p class="feature-name">${featureName}</p>
+                            <p>Data unavailable.</p>
+                          </div>`;
+              });
             }
           );
 
@@ -660,7 +686,6 @@ const Map = (props) => {
         // Get the top-most feature
         const feature = features[0];
         const layerId = feature.layer.id;
-        console.log(feature);
 
         // Unset the 'selected' state of the previously selected feature for this layer
         if (prevSelectedFeatures.current[layerId]) {
@@ -727,7 +752,6 @@ const Map = (props) => {
           }
         });
       }
-      console.log(prevSelectedFeatures.current);
     },
     [isMapReady, map, memoizedFilters, dispatch, filterDispatch]
   );

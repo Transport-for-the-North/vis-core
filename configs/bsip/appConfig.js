@@ -1,3 +1,6 @@
+import { termsOfUse } from "configs/bsip/termsOfUse";
+import { pages } from "./pages";
+
 export const appConfig = {
   title: "Bus Analytics Tool",
   introduction:
@@ -15,11 +18,37 @@ export const appConfig = {
         <li>Public service bus, tram and light rail journey time reliability data, by route.</li>
         <li>Bus accessibility data, segmented by journey type e.g. travel to work, travel to education etc.</li>
     </ul>
-    <p>The above combined with geospatial data on population, jobs and demographic indices.</p>`,
+    <p>The above combined with geospatial data on population, jobs and demographic indices.</p>
+    `,
   background: "",
   methodology: "",
-  legalText:
-        '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the Bus Analytical Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+  homePageFragments: [
+    {
+      content: `
+        <p> Public transport data presented in this visualisation is derived from scheduled bus, tram and light rail timetable data made available through the national Bus Open Data Service (BODS). Observed performance/reliability is based on observed data via GPS. </p>
+      <p> Scheduled bus timetable data has been sourced from the Bus Open Data Service (BODS) in General Transit Feed Specification (GTFS) format.
+          Adjusted  GTFS bus timetable data has been created by TfN, based on observed bus locations from the BODS real time API (GPS), over a period of one week using TfN’s BODSE-Extractor GitHub repository.</p>
+      <p> Bus accessibility metrics have been derived using these respective timetables with the open-source route planner OpenTripPlanner (OTP), using TfN’s OTP4GB-py GitHub repository. </p>
+      <p> Accessibility via public transport to destinations within a single zone are not captured. TfN is investigating options for processing the large datasets required to map accessibility/reliability at a more refined zoning level.  </p>
+      <p> Specific parameters used for the current data: </p>
+      <ul>
+            <li>Bus travel times from OTP were specifically calculated on the timetable for Monday 15th April 2024.</li>
+            <li>Travel times are calculated between the population weighted centroids of each zone. The actual start point for the calculation is the Open Street Map link nearest the centroid</li>
+            <li>Maximum walk distance to / from bus stops is 10km</li>
+            <li>Routes are not calculated for zone pairs which are further than 150km apart (crow-fly).</li>
+            <li>Routes are only included if they arrive at their destination between 7am and 10am, weekday only.</li>
+            <li>Destinations used within the accessiiblity visualisation are restricted to England only.</li>
+        </ul>
+      <p> Data utilised within this visualisation will contain any limitations within BODS services (both scheduled timetables and real time API). 
+          This visualisation may additionally contain OTP related limitations (if OTP returns an unknown error for a trip that should be possible according to BODS GTFS timetables). </p>
+      <p> TfN has performed high-level analysis on the ratio of OTP returned trips possible / trips not possible, along with the number OTP related errors returned from the processing of these respective GTFS datasets in OTP. 
+          TfN has not performed any checks on the integrity of BODS data. </p>
+      <p> TfN aim to update the BODS data feed for this visualisation tool every three months.  </p>`,
+      sectionTitle: "Data Configuration",
+      alignment: "left",
+    }
+  ],
+  legalText: termsOfUse,
   contactText: "Please contact Kirsten Keen for any questions on this data tool or on Transport for the North’s work supporting Bus Service Improvements.",
   contactEmail: "kirsten.keen@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
@@ -27,277 +56,13 @@ export const appConfig = {
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   appPages: [
-    {
-      pageName: "Bus Reliability",
-      url: "/bus-reliability",
-      about:
-        "<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone in the map.</p> <p>The <b>base</b> timetable refers to buses which were scheduled. </p> <p>The <b>adjusted</b> timetable refers to buses which actually ran.</p>",
-      type: "MapLayout",
-      category: null,
-      config: {
-        layers: [
-          {
-            uniqueId: "BsipZoneVectorTile",
-            name: "Origin Zones",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "zones",
-            geometryType: "polygon",
-            visualisationName: "Bus Reliability",
-            isHoverable: true,
-            isStylable: false,
-            shouldHaveTooltipOnClick: false,
-            shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false,
-          },
-        ],
-        visualisations: [
-          {
-            name: "Bus Reliability",
-            type: "geojson",
-            style: "polygon-categorical",
-            valueField: "category",
-            dataSource: "api",
-            dataPath: "/api/bsip/reliability",
-          },
-        ],
-        metadataTables: [
-        ],
-        filters: [
-          {
-            filterName: "Region",
-            paramName: "zoneTypeId",
-            target: "api",
-            actions: [
-              { 
-                action: "UPDATE_PARAMETERISED_LAYER", 
-                payload: { targetLayer: "Origin Zones" } 
-              },
-              { action: "UPDATE_QUERY_PARAMS" },
-            ],
-            visualisations: ["Bus Reliability"],
-            layer: "Origin Zones",
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "North East MSOA",
-                  paramValue: 2,
-                },
-                {
-                  displayValue: "North West MSOA",
-                  paramValue: 3,
-                },
-                {
-                  displayValue: "Yorkshire and Humber MSOA",
-                  paramValue: 4,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Base timetable",
-            paramName: "baseTimetableId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Bus Reliability"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2024-04-09",
-                  paramValue: 2,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Adjusted timetable",
-            paramName: "adjustedTimetableId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Bus Reliability"],
-            type: "dropdown",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2024-04-09 Dummy",
-                  paramValue: 7,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Journey time limit",
-            paramName: "medianDurationSecs",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Bus Reliability"],
-            type: "slider",
-            min: 1200,
-            max: 12000,
-            interval: 1200,
-            displayAs: {
-              operation: "divide",
-              operand: 60,
-              unit: "mins",
-            },
-          },
-          {
-            filterName: "Select origin zone in map",
-            paramName: "originZoneId",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Bus Reliability"],
-            type: "map",
-            layer: "Origin Zones",
-            field: "id",
-          },
-        ],
-      },
-    },
-    {
-      pageName: "Bus Accessibility",
-      url: "/bus-accessibility",
-      type: "MapLayout",
-      about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
-      category: null,
-      config: {
-        layers: [
-          {
-            uniqueId: "BsipZoneVectorTile",
-            name: "Accessibility",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
-            sourceLayer: "zones",
-            geometryType: "polygon",
-            visualisationName: "Bus Accessibility",
-            isHoverable: true,
-            isStylable: true,
-            shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false,
-          },
-        ],
-        visualisations: [
-          {
-            name: "Bus Accessibility",
-            type: "joinDataToMap",
-            joinLayer: "Accessibility",
-            style: "polygon-continuous",
-            joinField: "id",
-            valueField: "value",
-            dataSource: "api",
-            dataPath: "/api/bsip/accessibility",
-          },
-        ],
-        metadataTables: [],
-
-        filters: [
-          {
-            filterName: "Region",
-            paramName: "zoneTypeId",
-            target: "api",
-            actions: [
-              { 
-                action: "UPDATE_PARAMETERISED_LAYER", 
-                payload: { targetLayer: "Accessibility" } 
-              },
-              { action: "UPDATE_QUERY_PARAMS" },
-            ],
-            visualisations: ["Bus Accessibility"],
-            layer: "Accessibility",
-            type: "dropdown",
-            info: "Select the region for which to view metrics.",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "North East MSOA",
-                  paramValue: 2,
-                },
-                {
-                  displayValue: "North West MSOA",
-                  paramValue: 3,
-                },
-                {
-                  displayValue: "Yorkshire and Humber MSOA",
-                  paramValue: 4,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Timetable",
-            paramName: "timetable_id",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Bus Accessibility"],
-            type: "dropdown",
-            info: "Timetable used to calculate metrics.",
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "2024-04-09",
-                  paramValue: 2,
-                },
-                {
-                  displayValue: "2024-04-09 Dummy",
-                  paramValue: 7,
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Value type",
-            paramName: "valueType",
-            target: "api",
-            actions: [
-              { action: "UPDATE_QUERY_PARAMS" },
-              { action: "UPDATE_LEGEND_TEXT" }
-            ],
-            visualisations: ["Bus Accessibility"],
-            type: "dropdown",
-            info: "Type of opportunity accessed.",
-            containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "Jobs",
-                  paramValue: "jobs",
-                  legendSubtitleText: "accessible from zone",
-                },
-                {
-                  displayValue: "Schools",
-                  paramValue: "schools",
-                  legendSubtitleText: "accessible from zone",
-                },
-              ],
-            },
-          },
-          {
-            filterName: "Cutoff time",
-            paramName: "cutoffTimeMinutes",
-            target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-            visualisations: ["Bus Accessibility"],
-            type: "slider",
-            info: "Journey time limit by bus.",
-            min: 20,
-            max: 200,
-            interval: 20,
-            displayAs: {
-              unit: "mins",
-            },
-          },
-        ],
-      },
-    },
+    pages.accessibility,
+    pages.reliability
   ],
+  footer: {
+    creditsText: "© Transport for the North 2024. All rights reserved.",
+    privacyPolicyLink: "https://transportforthenorth.com/privacy-policy/",
+    cookiesLink: "https://transportforthenorth.com/cookies/",
+    contactUsLink: "https://transportforthenorth.com/about-transport-for-the-north/contact-us/"
+  }
 };
