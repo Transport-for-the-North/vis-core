@@ -11,7 +11,7 @@ export function generatePopupContent() {
       <hr class="divider">
       <div class="metadata-item">
         <span class="metadata-key">Population:</span>
-        <span class="metadata-value">{Population}%</span>
+        <span class="metadata-value">{population_census_2021}%</span>
       </div>
       <div class="metadata-item">
         <span class="metadata-key">Overall Decile Risk:</span>
