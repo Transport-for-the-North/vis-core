@@ -66,7 +66,7 @@ export const england = {
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/severance/data",
+        dataPath: "/api/severance/decile-data",
         legendText: [
           {
             displayValue: "Output Areas",
