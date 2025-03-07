@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { oaEngDetailedCallout } from "../templates";
-import { engPopupContent } from "../templates/popup";
+import { generateDetailedCallout } from "../templates";
+import { generatePopupContent } from "../templates/popup";
 import glossaryData from "../glossaryData";
 
 export const england = {
@@ -37,8 +37,8 @@ export const england = {
         trseLabel: true,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
-          htmlTemplate: engPopupContent
+          url: "/api/severance/callout-data/zoneId={id}",
+          htmlTemplate: generateDetailedCallout
         }
       },
       {
@@ -67,7 +67,7 @@ export const england = {
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/trse/output-area-data",
+        dataPath: "/api/severance/data",
         legendText: [
           {
             displayValue: "Output Areas",
@@ -76,12 +76,12 @@ export const england = {
         ]
       },
       {
-        name: "OA Callout",
+        name: "Severence Callout",
         type: "calloutCard",
         cardName: "Output Area Summary",
         dataSource: "api",
-        dataPath: "/api/trse/callout-data/oa-or-pt-point",
-        htmlFragment: oaEngDetailedCallout
+        dataPath: "/api/severance/callout-data",
+        htmlFragment: generateDetailedCallout
       },
     ],
     metadataTables: [],
