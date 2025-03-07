@@ -22,7 +22,6 @@ export const england = {
         source: "api",
         path: "/api/vectortiles/zones/28/{z}/{x}/{y}", // specify query params empty if to be set
         sourceLayer: "zones",
-        minZoom: 9,
         geometryType: "polygon",
         visualisationName: "Severance Decile",
         isHoverable: true,
