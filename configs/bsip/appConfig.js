@@ -46,6 +46,11 @@ export const appConfig = {
       <p> TfN aim to update the BODS data feed for this visualisation tool every three months.  </p>`,
       sectionTitle: "Data Configuration",
       alignment: "left",
+      images: [
+        "img/bsip/1.jpg",
+        "img/bsip/2.jpg",
+        "img/bsip/4.jpg"
+      ],
     }
   ],
   legalText: termsOfUse,
