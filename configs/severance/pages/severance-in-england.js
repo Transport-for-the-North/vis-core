@@ -59,10 +59,10 @@ export const england = {
     ],
     visualisations: [
       {
-        name: "Severance Risk",
+        name: "Severance Decile",
         type: "joinDataToMap",
         joinLayer: "Output Areas",
-        style: "polygon-continuous",
+        style: "polygon-categorical", //"polygon-continuous"
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -83,9 +83,17 @@ export const england = {
         htmlFragment: generateDetailedCallout
       },
     ],
-    metadataTables: [],
+    metadataTables: [{
+      name: "severance_destination",
+      path: "/api/getgenericdataset?dataset_id=foreign_keys.severance_destination"
+    },{
+      name: "severance_barrier_type",
+      path: "/api/getgenericdataset?dataset_id=foreign_keys.severance_barrier_type"
+    }],
     filters: [
-      selectors.oaFeature,
+      selectors.barrierType,
+      selectors.walkSpeed,
+      selectors.destinationType
     ],
     additionalFeatures: {
       glossary: { 
