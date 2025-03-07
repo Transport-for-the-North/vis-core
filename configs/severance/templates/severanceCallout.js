@@ -9,7 +9,7 @@ export function generateDetailedCallout() {
     <div class="card-container">
       <div class="card">
         <div class="label">Population</div>
-        <div class="value">{formatNumber(population)}</div>
+        <div class="value">{formatNumber(population_census_2021)}</div>
       </div>
       <div class="card">
         <div class="label">Overall Decile Risk</div>
@@ -25,7 +25,7 @@ export function generateDetailedCallout() {
       </div>
       <div class="card">
         <div class="label">Severed Reach Decile</div>
-        <div class="value">{formatNumber(severed_reach_decile)}</div>
+        <div class="value">{formatNumber(severed_area_decile)}</div>
       </div>
     </div>
     `;
