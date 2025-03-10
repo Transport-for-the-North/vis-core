@@ -1,7 +1,5 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { generateDetailedCallout } from "../templates";
-import { generatePopupContent } from "../templates/popup";
 import glossaryData from "../glossaryData";
 
 export const england = {
@@ -37,7 +35,7 @@ export const england = {
         outlineOnPolygonSelect: true,
         customTooltip: {
           url: "/api/severance/callout-data/zoneId={id}",
-          htmlTemplate: generateDetailedCallout
+          html: "../templates/severanceCallout.html"
         }
       },
       {
@@ -114,7 +112,7 @@ export const england = {
         cardName: "Output Area Summary",
         dataSource: "api",
         dataPath: "/api/severance/callout-data",
-        htmlFragment: generateDetailedCallout
+        html: "../templates/popup.html"
       },
     ],
     metadataTables: [{
