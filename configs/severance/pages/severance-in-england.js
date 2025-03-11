@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import glossaryData from "../glossaryData";
+import {severancePopup, severanceCallout} from '../templates/index';
 
 export const england = {
   pageName: "Severance in England",
@@ -34,8 +35,8 @@ export const england = {
         trseLabel: true,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: "/api/severance/callout-data/zoneId={id}",
-          html: "../templates/severanceCallout.html"
+          url: "/api/severance/callout-data?zoneId={id}&barrierId=1&walkSpeed=1.333&destinationId=4&severity=low%20severance", //Change it after asking ABH
+          htmlTemplate: severancePopup
         }
       },
       {
@@ -94,7 +95,7 @@ export const england = {
         name: "Severance Decile",
         type: "joinDataToMap",
         joinLayer: "Output Areas",
-        style: "polygon-categorical", //"polygon-continuous"
+        style: "polygon-continuous", //"polygon-categorical"
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -111,21 +112,25 @@ export const england = {
         type: "calloutCard",
         cardName: "Output Area Summary",
         dataSource: "api",
-        dataPath: "/api/severance/callout-data",
-        html: "../templates/popup.html"
+        dataPath: "/api/severance/callout-data?zoneId={id}&barrierId=1&walkSpeed=1.333&destinationId=4&severity=low%20severance",
+        htmlTemplate: severanceCallout
       },
     ],
     metadataTables: [{
-      name: "severance_destination",
-      path: "/api/getgenericdataset?dataset_id=foreign_keys.severance_destination"
+      name: "destination_list",
+      path: "/api/getgenericdataset?dataset_id=foreign_keys.destination_list"
     },{
-      name: "severance_barrier_type",
-      path: "/api/getgenericdataset?dataset_id=foreign_keys.severance_barrier_type"
+      name: "barrier_list",
+      path: "/api/getgenericdataset?dataset_id=foreign_keys.barrier_list"
+    },{
+      name: "v_vis_severance_walk_speed",
+      path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_severance_walk_speed"
     }],
     filters: [
       selectors.barrierType,
       selectors.walkSpeed,
-      selectors.destinationType
+      selectors.destinationType,
+      selectors.severanceType
     ],
     additionalFeatures: {
       glossary: { 
