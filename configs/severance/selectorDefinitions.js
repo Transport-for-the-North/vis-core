@@ -12,9 +12,9 @@ const barrierTypeSelector = {
   containsLegendInfo: false,
   values: {
     source: "metadataTable",
-    metadataTableName: "severance_barrier_type",
+    metadataTableName: "barrier_list",
     displayColumn: "name",
-    paramColumn: "code",
+    paramColumn: "id",
     sort: "ascending",
   },
 }
@@ -27,13 +27,11 @@ const walkSpeedSelector = {
   visualisations: ["Severance Decile"],
   type: "fixed",
   values: {
-    source: "local",
-    values: [
-      {
-        displayValue: 1.333,
-        paramValue: 1.333,
-      }
-    ],
+    source: "metadataTable",
+    metadataTableName: "v_vis_severance_walk_speed",
+    displayColumn: "walk_speed_ms",
+    paramColumn: "walk_speed_ms",
+    sort: "ascending",
   },
 };
 
@@ -51,10 +49,49 @@ const destinationTypeSelector = {
   containsLegendInfo: false,
   values: {
     source: "metadataTable",
-    metadataTableName: "severance_destination",
+    metadataTableName: "destination_list",
     displayColumn: "name",
     paramColumn: "id",
     sort: "ascending",
+  },
+}
+
+const severanceTypeSelector = {
+  filterName: "Affected area type",
+  paramName: "severity",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" }
+  ],
+  visualisations: ["Severance Decile"],
+  type: "dropdown",
+  shouldBeValidated: false,
+  info: "Type of affected area",
+  containsLegendInfo: false,
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Lowest affected areas",
+        paramValue: "low severance",
+      },
+      {
+        displayValue: "Moderately affected areas",
+        paramValue: "moderate severance",
+      },
+      {
+        displayValue: "Severely affected areas",
+        paramValue: "high severance",
+      },
+      {
+        displayValue: "Perfect access areas",
+        paramValue: "perfect access",
+      },
+      {
+        displayValue: "No access areas",
+        paramValue: "no access",
+      },
+    ],
   },
 }
 
@@ -62,5 +99,6 @@ const destinationTypeSelector = {
 export const selectors = {
   barrierType: barrierTypeSelector,
   walkSpeed: walkSpeedSelector,
-  destinationType: destinationTypeSelector
+  destinationType: destinationTypeSelector,
+  severanceType: severanceTypeSelector
 };
