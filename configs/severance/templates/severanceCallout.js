@@ -3,7 +3,7 @@
  */
 
  export const severanceCallout = `
-  <h2>{feature_name}</h2>
+  <h2>{lsoa21_nm}</h2>
   <div class="card-container">
     <div class="card">
       <div class="label">Population</div>

@@ -5,7 +5,7 @@ const barrierTypeSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }
   ],
-  visualisations: ["Severance Decile"],
+  visualisations: ["Severance Decile", "Severence Callout"],
   type: "toggle",
   shouldBeValidated: false,
   info: "Type of barrier selected.",
@@ -24,7 +24,7 @@ const walkSpeedSelector = {
   paramName: "walkSpeed",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-  visualisations: ["Severance Decile"],
+  visualisations: ["Severance Decile", "Severence Callout"],
   type: "fixed",
   values: {
     source: "metadataTable",
@@ -42,7 +42,7 @@ const destinationTypeSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }
   ],
-  visualisations: ["Severance Decile"],
+  visualisations: ["Severance Decile", "Severence Callout"],
   type: "dropdown",
   shouldBeValidated: false,
   info: "Type of opportunity accessed.",
@@ -63,7 +63,7 @@ const severanceTypeSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }
   ],
-  visualisations: ["Severance Decile"],
+  visualisations: ["Severance Decile", "Severence Callout"],
   type: "dropdown",
   shouldBeValidated: false,
   info: "Type of affected area",
@@ -95,10 +95,21 @@ const severanceTypeSelector = {
   },
 }
 
+const zoneIdSelector = {
+  filterName: "",
+  paramName: "zoneId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: ["Severence Callout"],
+  type: "map",
+  layer: "Output Areas",
+  field: "id",
+};
 
 export const selectors = {
   barrierType: barrierTypeSelector,
   walkSpeed: walkSpeedSelector,
   destinationType: destinationTypeSelector,
-  severanceType: severanceTypeSelector
+  severanceType: severanceTypeSelector,
+  zoneId: zoneIdSelector
 };
