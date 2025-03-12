@@ -13,7 +13,7 @@ export const severancePopup = `
     </div>
     <div class="metadata-item">
       <span class="metadata-key">Overall Decile Risk:</span>
-      <span class="metadata-value">{overall_decile_risk}</span>
+      <span class="metadata-value"> {overall_decile_risk} ({overall_decile_string})</span>
     </div>
   </div>
 `;
