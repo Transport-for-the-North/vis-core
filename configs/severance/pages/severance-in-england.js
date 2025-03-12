@@ -112,8 +112,8 @@ export const england = {
         type: "calloutCard",
         cardName: "Output Area Summary",
         dataSource: "api",
-        dataPath: "/api/severance/callout-data?zoneId={id}&barrierId=1&walkSpeed=1.333&destinationId=4&severity=low%20severance",
-        htmlTemplate: severanceCallout
+        dataPath: "/api/severance/callout-data",
+        htmlFragment: severanceCallout
       },
     ],
     metadataTables: [{
@@ -130,7 +130,8 @@ export const england = {
       selectors.barrierType,
       selectors.walkSpeed,
       selectors.destinationType,
-      selectors.severanceType
+      selectors.severanceType,
+      selectors.zoneId
     ],
     additionalFeatures: {
       glossary: { 
