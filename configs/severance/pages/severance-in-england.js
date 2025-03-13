@@ -35,7 +35,7 @@ export const england = {
         trseLabel: true,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: "/api/severance/callout-data?zoneId={id}&barrierId=1&walkSpeed=1.333&destinationId=4&severity=low%20severance", //Change it after asking ABH
+          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierType}&walkSpeed={walkSpeed}&destinationId={destinationType}&severity={severanceType}`,
           htmlTemplate: severancePopup
         }
       },
