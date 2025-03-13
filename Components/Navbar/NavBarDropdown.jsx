@@ -54,7 +54,8 @@ const DropdownIndicator = styled.span`
 `;
 
 /**
- * Container for the dropdown menu. It appears as an absolute element.
+ * Container for the dropdown menu. It appears as an absolute element below the top bar.
+ * This container is scrollable when the items height overflows.
  */
 const DropdownMenu = styled.div`
   display: ${(props) => (props.open ? "block" : "none")};
@@ -69,10 +70,11 @@ const DropdownMenu = styled.div`
   transition: background-color 0.2s;
   z-index: 1001;
   border-radius: 0 0 5px 5px;
-  overflow-y: auto; /* Enable vertical scrolling */
+  overflow: visible;
   max-height: calc(100vh - 80px); /* Set a maximum height for the dropdown */
+
   /* Custom Scrollbar Styles for non-Firefox browsers */
-   /* Webkit-based browsers (Chrome, Safari, Edge) */
+  /* Webkit-based browsers (Chrome, Safari, Edge) */
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -89,6 +91,24 @@ const DropdownMenu = styled.div`
   &:hover::-webkit-scrollbar-thumb {
     background-color: darkgrey; /* Color when hovered */
   }
+`;
+
+/**
+ * Styled container for nested dropdown menus.
+ *
+ * The nested menu will slide out to the side of its parent.
+ */
+const NestedDropdownMenu = styled.div`
+  display: ${(props) => (props.open ? "block" : "none")};
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 160px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  white-space: normal;
+  overflow-wrap: break-word;
 `;
 
 /**
@@ -113,7 +133,6 @@ const DropdownItemLink = styled(Link)`
   color: ${({ $active }) => ($active ? "#f9f9f9" : "#4b3e91")};
   transition: background-color 0.3s ease, color 0.3s ease;
   white-space: normal;
-  // overflow-wrap: break-word;
   &:hover {
     background-color: ${({ $bgColor }) => $bgColor};
     color: #ffffff;
@@ -144,10 +163,16 @@ export function RecursiveDropdownItem({ item, activeLink, onClick, bgColor }) {
   const [subOpen, setSubOpen] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
 
+  /**
+   * Handle mouse entering this dropdown item.
+   */
   const handleMouseEnter = () => {
     if (hasChildren) setSubOpen(true);
   };
 
+  /**
+   * Handle mouse leaving this dropdown item.
+   */
   const handleMouseLeave = () => {
     if (hasChildren) setSubOpen(false);
   };
@@ -167,7 +192,7 @@ export function RecursiveDropdownItem({ item, activeLink, onClick, bgColor }) {
         {hasChildren && <SubIndicator>▸</SubIndicator>}
       </DropdownItemLink>
       {hasChildren && (
-        <DropdownMenu
+        <NestedDropdownMenu
           open={subOpen}
           onMouseEnter={() => setSubOpen(true)}
           onMouseLeave={() => setSubOpen(false)}
@@ -181,7 +206,7 @@ export function RecursiveDropdownItem({ item, activeLink, onClick, bgColor }) {
               bgColor={bgColor}
             />
           ))}
-        </DropdownMenu>
+        </NestedDropdownMenu>
       )}
     </DropdownItemWrapper>
   );
@@ -243,4 +268,3 @@ export function NavBarDropdown(props) {
     </DropdownContainer>
   );
 }
-
