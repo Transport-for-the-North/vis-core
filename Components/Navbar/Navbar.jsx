@@ -1,161 +1,198 @@
-import { useContext, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
 import { AppContext } from "contexts";
 import { useAuth } from "contexts/AuthProvider";
+import { useWindowWidth } from "hooks";
+import { buildDropdownTree } from "utils/nav";
 import { Button } from "./Button";
-import { LateralNavbar } from "./LateralNavbar";
 import { Logo } from "./Logo";
-import { NavBarDropdown } from "./NavBarDropdown";
-import "./Navbar.styles.css";
+import { LateralNavbar } from "./LateralNavbar";
+import { ResponsiveNavbarLinks } from "./ResponsiveNavbarLinks";
 
 const StyledNavbar = styled.nav`
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Space between logo, navbar content, and logout section */
+  justify-content: space-between;
   padding: 0px;
-  background-color: #f8f9fa;
+  background-color: ${({ theme }) => theme.navbarBg};
   width: 100%;
+  box-sizing: border-box;
+  height: 75px;
+  z-index: 1001;
+  border-bottom: 1px solid #e0e0e0;
+  position: fixed;
+  top: 0;
+  font-family: ${({ theme }) => theme.standardFontFamily};
 `;
-
 const NavbarContent = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
-  flex-grow: 1; /* Allow the navbar content to grow within its limited space */
-  justify-content: flex-start; /* Align the items to the left */
+  flex-grow: 1;
+  justify-content: space-between;
 `;
-
+// Hamburger button for mobile.
+const NavbarMobileButton = styled(Button)`
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 10px;
+  @media only screen and (max-width: 767px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+`;
 const LogoutSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px; /* Fixed width for the logout section */
+  width: 40px;
 `;
-
 const StyledLogout = styled.img`
   cursor: pointer;
-  width: 75%; /* Make sure the logout image fills the container */
+  width: 50%;
   height: auto;
 `;
 
 /**
- * Navbar component represents the navigation bar of the application.
- * It includes the logo, navigation links, and a button for opening/closing the side navigation menu.
- * @function Navbar
- * @returns {JSX.Element} The rendered Navbar component.
+ * The main top navigation bar.
+ *
+ * @component
+ * @returns {JSX.Element|null} The rendered navbar, or null on routes like "/login".
  */
 export function Navbar() {
   const location = useLocation();
-  const [isClicked, setIsClicked] = useState(false);
+  const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
-  const [sideNavOpen, setSideNavOpen] = useState("sideNavbar-notShown");
-  const listCategories = [];
   const appContext = useContext(AppContext);
   const { logOut } = useAuth();
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
   const [bgColor, setBgColor] = useState("#7317de");
-
   const navigate = useNavigate();
+  const windowWidth = useWindowWidth();
 
-  const onClick = (url, newLogo, navColor) => {
-    setLogoImage(newLogo || appContext.logoImage); // Default to appContext.logoImage if newLogo is not provided
-    navigate(url);
-    if (navColor !== bgColor) {
-      setBgColor(navColor);
-    }
+  // Build the unified links array.
+  const links = [{ label: "Home", url: "/", navbarLinkBgColour: "#7317de" }];
+  // Add pages without a category.
+  appContext.appPages
+    .filter((page) => !page.category)
+    .forEach((page) => {
+      links.push({
+        label: page.pageName,
+        url: page.url,
+        customLogoPath: page.customLogoPath,
+        navbarLinkBgColour: page.navbarLinkBgColour,
+      });
+    });
+  // Group pages with a category and transform them with buildDropdownTree.
+  const pagesByCategory = {};
+  appContext.appPages
+    .filter((page) => page.category)
+    .forEach((page) => {
+      if (!pagesByCategory[page.category]) pagesByCategory[page.category] = [];
+      pagesByCategory[page.category].push(page);
+    });
+  Object.keys(pagesByCategory).forEach((cat) => {
+    const tree = buildDropdownTree(pagesByCategory[cat]);
+    links.push({
+      label: cat,
+      dropdownItems: tree,
+      navbarLinkBgColour: pagesByCategory[cat][0].navbarLinkBgColour,
+    });
+  });
+
+  const MOBILE_BREAKPOINT = 768;
+  const MIN_NAV_ITEM_WIDTH = 120;
+  const isMobile =
+    windowWidth < MOBILE_BREAKPOINT ||
+    links.length * MIN_NAV_ITEM_WIDTH > windowWidth;
+
+  // When a link is clicked, update the logo and active bg colour appropriately.
+  const onClick = (url, newLogo, navLinkBgColour) => {
+    setLogoImage(newLogo || appContext.logoImage);
+    if (url) navigate(url);
+    if (navLinkBgColour && navLinkBgColour !== bgColor)
+      setBgColor(navLinkBgColour);
   };
 
-  const updateMenu = () => {
-    if (!isClicked) {
-      setSideNavOpen("sideNavbar-shown");
-    } else {
-      setSideNavOpen("sideNavbar-notShown");
-    }
-    setIsClicked(!isClicked);
+  const updateSideNav = () => {
+    setSideNavOpen((prev) => !prev);
   };
 
   const handleLogout = () => {
-    logOut(); // Call logout function from AuthContext
+    logOut();
   };
 
   useEffect(() => {
     setActiveLink(location.pathname);
-    if (sideNavOpen === "sideNavbar-shown") updateMenu();
+    setSideNavOpen(false);
   }, [location]);
 
-  // Check if the current path is "/login"
-  if (location.pathname === "/login" || location.pathname === "/unauthorized") {
-    return null; // Do not render the navbar
-  }
+  if (
+    location.pathname === "/login" ||
+    location.pathname === "/unauthorized"
+  )
+    return null;
 
-  const isLogoLeft = appContext.logoPosition !== "right"; // Default to left if not provided
+  // Simplified logo logic: on mobile the logo is always left, on non-mobile
+  // display the logo on the side indicated by appContext.logoPosition.
+  const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
 
   return (
     <>
-      <StyledNavbar className="navbar">
-        {isLogoLeft && (
-          <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
-        )}
+      <StyledNavbar>
         <NavbarContent>
-          <LateralNavbar className={sideNavOpen} onClick={() => handleLogout()} />
-          <Link
-            key="Home"
-            className={activeLink === "/" ? "ActiveNavButton" : "NavButton"}
-            to="/"
-            onClick={() => onClick("/", appContext.logoImage)}
-          >
-            Home
-          </Link>
-          {appContext.appPages.map((page) => {
-            if (page.category === null) {
-              return (
-                <Link
-                  key={page.pageName}
-                  className={activeLink === page.url ? "ActiveNavButton" : "NavButton"}
-                  to={page.url}
-                  onClick={() => onClick(page.url, page.logoImage, page.navbarLinkBgColour)}
-                >
-                  {page.pageName}
-                </Link>
-              );
-            } else if (!listCategories.includes(page.category)) {
-              listCategories.push(page.category);
-              const dropdownItems = appContext.appPages.filter(
-                (pageToTest) => pageToTest.category === page.category
-              );
-              return (
-                <NavBarDropdown
-                  key={page.category}
-                  dropdownItems={dropdownItems}
-                  activeLink={activeLink}
-                  dropdownName={page.category}
-                  onClick={onClick}
-                  bgColor={page.navbarLinkBgColour || bgColor}
-                />
-              );
-            } else {
-              return null;
-            }
-          })}
-          <Button
-            className="navbarMobile"
+          {isMobile && <NavbarMobileButton
             src={appContext.logoutButtonImage}
             alt="Burger Button Navbar"
-            onClick={updateMenu}
-          />
+            onClick={updateSideNav}
+          />}
+          {(!isMobile && logoPosition === "left") && (
+            <Logo
+              logoImage={logoImage}
+              onClick={() => onClick(null, logoImage)}
+              position="left"
+            />
+          )}
+          {!isMobile && (
+            <ResponsiveNavbarLinks
+              links={links}
+              activeLink={activeLink}
+              onClick={onClick}
+              bgColor={bgColor}
+            />
+          )}
+          {(!isMobile && logoPosition === "right") && (
+            <Logo
+              logoImage={logoImage}
+              onClick={() => onClick(null, logoImage)}
+              position="right"
+            />
+          )}
+          {isMobile && (
+            <Logo
+              logoImage={logoImage}
+              onClick={() => onClick(null, logoImage)}
+              position="left"
+            />
+          )}
         </NavbarContent>
-        {!isLogoLeft && (
-          <Logo className="logoNav" logoImage={logoImage} onClick={() => onClick(null, logoImage)} />
-        )}
         {appContext.authenticationRequired && (
           <LogoutSection>
             <StyledLogout src="/img/logout.png" onClick={handleLogout} />
           </LogoutSection>
         )}
       </StyledNavbar>
-      <div className="empty-blank-nav"></div>
+      {isMobile && (
+        <LateralNavbar
+          className={isSideNavOpen ? "sideNavbar-shown" : "sideNavbar-notShown"}
+          onClick={onClick}
+          bgColor={bgColor}
+        />
+      )}
+      <div style={{ height: "75px" }}></div>
     </>
   );
 }
