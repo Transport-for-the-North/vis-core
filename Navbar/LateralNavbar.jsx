@@ -1,105 +1,122 @@
-import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-import { LateralDropdown } from "./LateralDropdown";
+import React, { useState, useEffect, useContext } from "react";
+import { useLocation, Link } from "react-router-dom";
 import styled from "styled-components";
 
+import { buildDropdownTree, createNavItemClickHandler } from "utils/nav";
+import { LateralRecursiveDropdown } from "./LateralRecursiveDropdown";
 import { AppContext } from "contexts";
 
-const StyledLogout = styled.img`
+/**
+ * Container for the lateral (side) navigation bar.
+ */
+const LateralNavbarContainerStyled = styled.div`
+  position: fixed;
+  top: 75px;
+  left: ${(props) =>
+    props.className === "sideNavbar-shown" ? "0" : "-100%"};
+  height: calc(100vh - 75px);
+  width: 250px;
+  background: ${({ theme }) => theme.navbarBg || "#f8f9fa"};
+  border-right: 1px solid #e0e0e0;
+  transition: left 0.3s ease;
+  z-index: 1001;
+  overflow-y: auto;
 `;
 
 /**
- * Renders a lateral navigation bar component.
- * @param {Object} props - The props for the LateralNavbar component.
- * @property {string} props.className - The class name for styling the component.
- * @property {Function} props.onClick - The function to handle click events.
- * @returns {JSX.Element} The rendered LateralNavbar component.
+ * Styled navigation link for the side menu.
+ */
+const StyledSideNavLink = styled(Link)`
+  display: block;
+  padding: 12px 10px;
+  text-decoration: none;
+  background-color: ${({ active, theme, bgColor }) =>
+    active ? bgColor || theme.activeBg : theme.navbarBg};
+  color: ${({ active, theme }) => (active ? "#f9f9f9" : theme.navText)};
+  transition: background-color 0.2s;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-align: left;
+  font-size: 16px;
+  &:hover {
+    background-color: ${({ bgColor, theme }) =>
+      bgColor || theme.activeBg};
+    color: #f9f9f9;
+  }
+`;
+
+/**
+ * The side navigation bar component (for mobile view).
+ *
+ * @component
+ * @param {Object} props - Component props.
+ * @param {string} props.className - Determines whether the side nav should be visible.
+ * @param {Function} props.onClick - Callback function when a link is clicked.
+ * @param {string} props.bgColor - The default active background colour.
+ * @returns {JSX.Element} The rendered side navigation.
  */
 export function LateralNavbar(props) {
   const location = useLocation();
   const [activeLink, setActiveLink] = useState("");
-  const [scrollable, setScrollable] = useState(false);
-  const listCategories = [];
   const appContext = useContext(AppContext);
-
-  const handleClick = () => {
-    props.onClick();
-  };
 
   useEffect(() => {
     setActiveLink(location.pathname);
   }, [location]);
 
-  useEffect(() => {
-    const calulateOverflow = () => {
-      const elements = document.querySelector(".sideNavbar-shown")?.children;
-      if (elements) {
-        let totalHeight = 0;
-        for (let i = 0; i < elements.length; i++) {
-          totalHeight += elements[i].offsetHeight;
-        }
-        if (
-          totalHeight + 280 >
-          document.querySelector(".sideNavbar-shown").clientHeight
-        ) {
-          setScrollable(true);
-        } else {
-          setScrollable(false);
-        }
-      }
-    };
-    document.addEventListener("click", calulateOverflow);
-
-    return () => {
-      document.removeEventListener("click", calulateOverflow);
-    };
-  }, []);
+  // Get pages that do not belong to a category.
+  const noCategoryPages = appContext.appPages.filter((p) => !p.category);
+  // Group pages by category.
+  const pagesByCategory = {};
+  appContext.appPages
+    .filter((p) => p.category)
+    .forEach((p) => {
+      if (!pagesByCategory[p.category]) pagesByCategory[p.category] = [];
+      pagesByCategory[p.category].push(p);
+    });
 
   return (
-    <div className={props.className}>
+    <LateralNavbarContainerStyled className={props.className}>
       {props.className === "sideNavbar-shown" && (
-        <Link
-          className={activeLink === "/" ? "ActiveLatButton" : "LatButton"}
-          to={"/"}
-          onClick={setActiveLink}
+        <StyledSideNavLink
+          to="/"
+          active={activeLink === "/"}
+          bgColor="#7317de"
+          onClick={createNavItemClickHandler({ url: "/" }, props.onClick, props.bgColor)}
         >
           Home
-        </Link>
+        </StyledSideNavLink>
       )}
       {props.className === "sideNavbar-shown" &&
-        appContext.appPages.map((page) => {
-          if (page.category === null) {
-            return (
-              <Link
-                key={page.pageName}
-                className={
-                  activeLink === page.url ? "ActiveLatButton" : "LatButton"
-                }
-                to={page.url}
-              >
-                {page.pageName}
-              </Link>
-            );
-          } else if (!listCategories.includes(page.category)) {
-            listCategories.push(page.category);
-            const dropdownItems = appContext.appPages.filter(
-              (pageToTest) => pageToTest.category === page.category
-            );
-            return (
-              <LateralDropdown
-                key={page.category}
-                dropdownItems={dropdownItems}
-                activeLink={activeLink}
-                dropdownName={page.category}
-              />
-            );
-          } else {
-            return null;
-          }
+        noCategoryPages.map((page) => (
+          <StyledSideNavLink
+            key={page.pageName}
+            to={page.url}
+            active={activeLink === page.url}
+            bgColor={page.navbarLinkBgColour || props.bgColor}
+            onClick={createNavItemClickHandler(
+              page,
+              props.onClick,
+              page.navbarLinkBgColour || props.bgColor
+            )}
+          >
+            {page.pageName}
+          </StyledSideNavLink>
+        ))}
+      {props.className === "sideNavbar-shown" &&
+        Object.keys(pagesByCategory).map((category) => {
+          const tree = buildDropdownTree(pagesByCategory[category]);
+          return (
+            <LateralRecursiveDropdown
+              key={category}
+              label={category}
+              items={tree}
+              activeLink={activeLink}
+              onClick={props.onClick}
+              bgColor={props.bgColor}
+            />
+          );
         })}
-      <div className={scrollable ? "scrollable" : "notScrollable"}>
-        <StyledLogout src="/img/logout.png" onClick={handleClick} />
-      </div>
-    </div>
+    </LateralNavbarContainerStyled>
   );
 }

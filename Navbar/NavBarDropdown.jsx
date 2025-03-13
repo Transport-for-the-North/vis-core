@@ -1,174 +1,246 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { AppContext } from "contexts";
-import "./Navbar.styles.css";
+import { createNavItemClickHandler } from "utils/nav";
 
+/**
+ * Container for the top navbar dropdown.
+ */
 const DropdownContainer = styled.div`
   position: relative;
-  display: inline-block;
-  font-family: var(--standardFontFamily);
-  font-size: clamp(12px, 1.2vw, 18px); 
-  background-color: ${(props) => (props.$isActive ? props.$bgColor : "#f9f9f9")};
-  color: ${(props) => (props.$isActive ? "#f9f9f9" : "#4b3e91")};
-  &:hover {
-    background-color: ${(props) => (props.$bgColor)};
-    cursor: default;
-  }
+  display: inline-flex;
+  align-items: center;
+  font-family: ${({ theme }) => theme.standardFontFamily};
+  font-size: clamp(12px, 1.2vw, 18px);
+  background-color: ${({ $isActive, $bgColor }) =>
+    $isActive ? $bgColor : "#f9f9f9"};
+  color: ${({ $isActive }) => ($isActive ? "#f9f9f9" : "#4b3e91")};
+  padding: 0 5px;
+  height: 100%;
+  cursor: default;
+  justify-content: space-between;
   text-decoration: none;
-  width: 15%;
-  max-width: 300px;
-  text-align: center;
-  cursor: pointer;
-  padding: 0 5px 0 5px;
-  height: 100%; /* Full height of navbar */
-  display: flex;
-  align-items: center; /* Vertically centre text */
-  justify-content: space-between; /* Space between title and icon */
   border-bottom-right-radius: 20px;
-  transition: background-color 0.3s ease;
-
-  @media only screen and (max-width: 1165px) {
-    font-size: clamp(12px, 1.2vw, 18px); 
-    border-bottom-right-radius: 30px;
+  transition: background-color 0.2s;
+  white-space: normal;
+  overflow-wrap: break-word;
+  z-index: 1000;
+  &:hover {
+    background-color: ${({ $bgColor }) => $bgColor};
+    color: #ffffff;
   }
-
-  @media only screen and (max-width: 930px) {
-    width: 10%;
-  }
-
-  @media only screen and (max-width: 765px) {
+  @media only screen and (max-width: 767px) {
     display: none;
   }
 `;
 
+/**
+ * Title for the dropdown.
+ */
+const DropdownTitle = styled.span`
+  flex-grow: 1;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+`;
 
+/**
+ * Indicator (arrow) for the dropdown.
+ */
+const DropdownIndicator = styled.span`
+  margin-left: 5px;
+  white-space: normal;
+  overflow-wrap: break-word;
+`;
+
+/**
+ * Container for the dropdown menu. It appears as an absolute element.
+ */
 const DropdownMenu = styled.div`
   display: ${(props) => (props.open ? "block" : "none")};
   position: absolute;
-  left: 0; /* Align to the right of the dropdown item */
-  top: 75px; /* Position dropdown at the bottom of the navbar */
+  left: 0;
+  top: 75px;
   background-color: #f9f9f9;
-  color: #ff0000;
   min-width: 160px;
   width: 100%;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-bottom-right-radius: 20px;
+  transition: background-color 0.2s;
+  z-index: 1001;
   border-radius: 0 0 5px 5px;
   overflow-y: auto; /* Enable vertical scrolling */
   max-height: calc(100vh - 80px); /* Set a maximum height for the dropdown */
   /* Custom Scrollbar Styles for non-Firefox browsers */
    /* Webkit-based browsers (Chrome, Safari, Edge) */
-    &::-webkit-scrollbar {
-      width: 4px; /* Custom scrollbar width */
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 10px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: transparent;
-      border-radius: 10px;
-      background-clip: padding-box;
-      transition: background-color 0.3s ease-in-out;
-    }
-    &:hover::-webkit-scrollbar-thumb {
-      background-color: darkgrey; /* Color when hovered */
-    }
-  `;
-
-const DropdownItem = styled(Link)`
-  width: 100%;
-  padding: 12px 10px 12px 10px; /* Adjusted padding */
-  text-decoration: none;
-  display: block;
-  font-size: smaller;
-  border-radius: 0px;
-  text-align: left;
-  box-sizing: border-box; /* Ensure padding is inside the container */
-  background-color: ${(props) => (props.$activeLink ? props.$bgColor : "#f9f9f9")};
-  color: ${(props) => (props.$activeLink ? "#f9f9f9" : "#4b3e91")};
-  transition: background-color 0.3s ease, color 0.3s ease;
-
-  &:hover {
-    background-color: ${(props) => (props.$bgColor)};
-    color: #f9f9f9;
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    background-clip: padding-box;
+    transition: background-color 0.3s ease-in-out;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: darkgrey; /* Color when hovered */
   }
 `;
 
-const Title = styled.span`
-  flex-grow: 1; /* Take up remaining space */
-  text-align: center; /* Center the title */
+/**
+ * Wrapper for each dropdown item.
+ */
+const DropdownItemWrapper = styled.div`
+  position: relative;
 `;
 
-const Icon = styled.span`
-  margin-left: 5px; /* Add some space between title and icon */
+/**
+ * Styled link for a dropdown item.
+ */
+const DropdownItemLink = styled(Link)`
+  display: block;
+  padding: 12px 10px;
+  text-decoration: none;
+  font-size: smaller;
+  text-align: left;
+  box-sizing: border-box;
+  background-color: ${({ $active, $bgColor }) =>
+    $active ? $bgColor : "#f9f9f9"};
+  color: ${({ $active }) => ($active ? "#f9f9f9" : "#4b3e91")};
+  transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: normal;
+  // overflow-wrap: break-word;
+  &:hover {
+    background-color: ${({ $bgColor }) => $bgColor};
+    color: #ffffff;
+  }
 `;
 
+/**
+ * Sub-indicator for dropdown items with nested children.
+ */
+const SubIndicator = styled.span`
+  margin-left: auto;
+  white-space: normal;
+  overflow-wrap: break-word;
+`;
+
+/**
+ * Recursively renders a dropdown item that may contain nested children.
+ *
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Object} props.item - A navigation item (may include a 'children' array).
+ * @param {string} props.activeLink - The currently active navigation URL.
+ * @param {Function} props.onClick - Callback function when an item is clicked.
+ * @param {string} props.bgColor - Background colour for active items.
+ * @returns {JSX.Element} The rendered recursive dropdown item.
+ */
+export function RecursiveDropdownItem({ item, activeLink, onClick, bgColor }) {
+  const [subOpen, setSubOpen] = useState(false);
+  const hasChildren = item.children && item.children.length > 0;
+
+  const handleMouseEnter = () => {
+    if (hasChildren) setSubOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (hasChildren) setSubOpen(false);
+  };
+
+  return (
+    <DropdownItemWrapper
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <DropdownItemLink
+        to={item.url}
+        onClick={createNavItemClickHandler(item, onClick, bgColor)}
+        $active={activeLink === item.url}
+        $bgColor={bgColor}
+      >
+        {item.pageName}
+        {hasChildren && <SubIndicator>▸</SubIndicator>}
+      </DropdownItemLink>
+      {hasChildren && (
+        <DropdownMenu
+          open={subOpen}
+          onMouseEnter={() => setSubOpen(true)}
+          onMouseLeave={() => setSubOpen(false)}
+        >
+          {item.children.map((child) => (
+            <RecursiveDropdownItem
+              key={child.pageName}
+              item={child}
+              activeLink={activeLink}
+              onClick={onClick}
+              bgColor={bgColor}
+            />
+          ))}
+        </DropdownMenu>
+      )}
+    </DropdownItemWrapper>
+  );
+}
+
+/**
+ * Renders a top–navbar dropdown menu.
+ *
+ * The dropdown opens on mouse enter and closes on mouse leave.
+ *
+ * @component
+ * @param {Object} props - Component props.
+ * @param {string} props.dropdownName - The label of the dropdown.
+ * @param {Array} props.dropdownItems - Array of navigation items (some may contain children).
+ * @param {string} props.activeLink - The active URL.
+ * @param {Function} props.onClick - Callback when a dropdown item is clicked.
+ * @param {string} props.bgColor - Active background colour.
+ * @returns {JSX.Element} The rendered dropdown.
+ */
 export function NavBarDropdown(props) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
-  const appContext = useContext(AppContext);
 
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
-
-  const handleClose = (event) => {
-    setOpen(false);
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
-      return;
-    }
-  };
-
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (anchorRef.current && !anchorRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
+  const isActive = props.dropdownItems.some(
+    (item) =>
+      item.url === props.activeLink ||
+      (item.children &&
+        item.children.some((child) => child.url === props.activeLink))
+  );
 
   return (
     <DropdownContainer
       ref={anchorRef}
-      className="NavButton"
-      onMouseOver={() => setOpen(true)}
-      onMouseLeave={handleClose}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
       $bgColor={props.bgColor}
-      $isActive={props.dropdownItems.find(item => item.url === props.activeLink) ? true : false}
+      $isActive={isActive}
     >
-      <Title>{props.dropdownName}</Title>
-      <Icon>▾</Icon>
-      <DropdownMenu onMouseLeave={handleToggle} open={open}>
-        {props.dropdownItems.map((page) => (
-          <DropdownItem
-            key={page.pageName}
-            className={
-              props.activeLink === page.url ? "ActiveNavButton" : "NavButton"
-            }
-            to={page.url}
-            onClick={(e) => {
-              props.onClick(
-                page.url, 
-                page.customLogoPath || appContext.logoImage, 
-                page.navbarLinkBgColour || "#7317de"
-              );
-              handleClose(e);
+      <DropdownTitle>{props.dropdownName}</DropdownTitle>
+      <DropdownIndicator>▾</DropdownIndicator>
+      <DropdownMenu
+        open={open}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        {props.dropdownItems.map((item) => (
+          <RecursiveDropdownItem
+            key={item.pageName}
+            item={item}
+            activeLink={props.activeLink}
+            onClick={(url, customLogo, navBg) => {
+              props.onClick(url, customLogo, navBg);
+              setOpen(false);
             }}
-            $activeLink={props.activeLink === page.url}
-            $bgColor={props.bgColor}
-          >
-            {page.pageName}
-          </DropdownItem>
+            bgColor={props.bgColor}
+          />
         ))}
       </DropdownMenu>
     </DropdownContainer>
   );
 }
+
