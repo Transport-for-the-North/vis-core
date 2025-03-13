@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useContext  } from "react";
 import { api } from "services";
 import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle } from "utils";
-import { useMapContext } from "hooks";
+import { useMapContext} from "hooks";
+import { FilterContext } from "contexts";
 
 /**
  * Layer component that adds a layer to the map(s) and handles its lifecycle.
@@ -28,6 +29,10 @@ export const Layer = ({ layer }) => {
   const { state } = useMapContext();
   const { map, maps } = state;
 
+  // Access filters from FilterContext
+  const filterContext = useContext(FilterContext);
+  const filters = filterContext?.state || {};
+
   useEffect(() => {
     // Determine the maps to operate on
     const targetMaps = maps || (map ? [map] : []);
@@ -37,11 +42,21 @@ export const Layer = ({ layer }) => {
 
     // Check for missing customTooltip parameters
     if (layer.customTooltip) {
-      const { url, htmlTemplate } = layer.customTooltip;
+      let { url, htmlTemplate } = layer.customTooltip;
       if (!url || !htmlTemplate) {
         console.error("Both url and htmlTemplate must be provided for customTooltip.");
         return;
       }
+
+      // Replace filter placeholders if FilterContext is available
+      // key needs to be fixed with identifier generated using FilterContext
+      if (filterContext) {
+        url = url.replace(/\{(\w+)\}/g, (_, key) => {
+          return filters[key] !== undefined ? filters[key] : `{${key}}`;  // Replace with filter value or empty string
+        });
+      }
+      console.log(filters)
+      layer.customTooltip.url = url;
     }
 
     // If missingParams are present, remove the layer if it exists
@@ -180,7 +195,7 @@ export const Layer = ({ layer }) => {
         }
       });
     };
-  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType]);
+  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType, filters]);
 
   // This component does not render any visible elements
   return null;
