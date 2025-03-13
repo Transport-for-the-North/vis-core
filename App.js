@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
 import "./App.css";
 import { PageSwitch, HomePage, Navbar, Login, Unauthorized, TermsOfUse } from "Components";
 import { Dashboard } from "layouts";
 import { AppContext, AuthProvider } from "contexts";
 import { api } from "services";
 import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
+import { theme } from "theme";
 
 /**
  * Main application component.
@@ -72,6 +74,7 @@ function App() {
   return (
     <div className="App">
       <AuthProvider>
+        <ThemeProvider theme={theme}>
         <AppContext.Provider value={appConfig}>
           <Navbar />
           <Dashboard>
@@ -96,6 +99,7 @@ function App() {
             </Routes>
           </Dashboard>
         </AppContext.Provider>
+        </ThemeProvider>
       </AuthProvider>
     </div>
   );
