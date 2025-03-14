@@ -9,12 +9,12 @@ const LogoContainer = styled.div`
   height: 75px;
   display: flex;
   align-items: center;
-  justify-content: ${({ position }) =>
-    position === "left" ? "flex-start" : "flex-end"};
+  justify-content: ${({ $position }) =>
+    $position === "left" ? "flex-start" : "flex-end"};
   @media only screen and (min-width: 768px) {
     padding: 0 1rem;
-    cursor: ${({ hasImage }) => (hasImage ? "pointer" : "default")};
-    margin-left: ${({ position }) => (position === "left" ? "0" : "auto")};
+    cursor: ${({ $hasImage }) => ($hasImage ? "pointer" : "default")};
+    margin-left: ${({ $position }) => ($position === "left" ? "0" : "auto")};
   }
   @media only screen and (max-width: 767px) {
     position: relative;
@@ -45,7 +45,7 @@ export function Logo({ onClick, logoImage, position }) {
   const handleClick = () => onClick && onClick();
 
   return (
-    <LogoContainer onClick={handleClick} position={position} hasImage={!!logoImage}>
+    <LogoContainer onClick={handleClick} $position={position} $hasImage={!!logoImage}>
       {logoImage && <LogoImage src={logoImage} alt="Logo" />}
     </LogoContainer>
   );
