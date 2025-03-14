@@ -69,7 +69,7 @@ export function Navbar() {
   const appContext = useContext(AppContext);
   const { logOut } = useAuth();
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
-  const [bgColor, setBgColor] = useState("#7317de");
+  const [$bgColor, setBgColor] = useState("#7317de");
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
@@ -113,7 +113,7 @@ export function Navbar() {
   const onClick = (url, newLogo, navLinkBgColour) => {
     setLogoImage(newLogo || appContext.logoImage);
     if (url) navigate(url);
-    if (navLinkBgColour && navLinkBgColour !== bgColor)
+    if (navLinkBgColour && navLinkBgColour !== $bgColor)
       setBgColor(navLinkBgColour);
   };
 
@@ -161,7 +161,7 @@ export function Navbar() {
               links={links}
               activeLink={activeLink}
               onClick={onClick}
-              bgColor={bgColor}
+              $bgColor={$bgColor}
             />
           )}
           {(!isMobile && logoPosition === "right") && (
@@ -189,7 +189,7 @@ export function Navbar() {
         <LateralNavbar
           className={isSideNavOpen ? "sideNavbar-shown" : "sideNavbar-notShown"}
           onClick={onClick}
-          bgColor={bgColor}
+          $bgColor={$bgColor}
         />
       )}
       <div style={{ height: "75px" }}></div>

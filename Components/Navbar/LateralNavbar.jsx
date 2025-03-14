@@ -30,17 +30,17 @@ const StyledSideNavLink = styled(Link)`
   display: block;
   padding: 12px 10px;
   text-decoration: none;
-  background-color: ${({ active, theme, bgColor }) =>
-    active ? bgColor || theme.activeBg : theme.navbarBg};
-  color: ${({ active, theme }) => (active ? "#f9f9f9" : theme.navText)};
+  background-color: ${({ $isActive, theme, $bgColor }) =>
+    $isActive ? $bgColor || theme.activeBg : theme.navbarBg};
+  color: ${({ $isActive, theme }) => ($isActive ? "#f9f9f9" : theme.navText)};
   transition: background-color 0.2s;
   white-space: normal;
   overflow-wrap: break-word;
   text-align: left;
   font-size: 16px;
   &:hover {
-    background-color: ${({ bgColor, theme }) =>
-      bgColor || theme.activeBg};
+    background-color: ${({ $bgColor, theme }) =>
+      $bgColor || theme.activeBg};
     color: #f9f9f9;
   }
 `;
@@ -52,7 +52,7 @@ const StyledSideNavLink = styled(Link)`
  * @param {Object} props - Component props.
  * @param {string} props.className - Determines whether the side nav should be visible.
  * @param {Function} props.onClick - Callback function when a link is clicked.
- * @param {string} props.bgColor - The default active background colour.
+ * @param {string} props.$bgColor - The default active background colour.
  * @returns {JSX.Element} The rendered side navigation.
  */
 export function LateralNavbar(props) {
@@ -80,9 +80,9 @@ export function LateralNavbar(props) {
       {props.className === "sideNavbar-shown" && (
         <StyledSideNavLink
           to="/"
-          active={activeLink === "/"}
-          bgColor="#7317de"
-          onClick={createNavItemClickHandler({ url: "/" }, props.onClick, props.bgColor)}
+          $isActive={activeLink === "/"}
+          $bgColor="#7317de"
+          onClick={createNavItemClickHandler({ url: "/" }, props.onClick, props.$bgColor)}
         >
           Home
         </StyledSideNavLink>
@@ -92,12 +92,12 @@ export function LateralNavbar(props) {
           <StyledSideNavLink
             key={page.pageName}
             to={page.url}
-            active={activeLink === page.url}
-            bgColor={page.navbarLinkBgColour || props.bgColor}
+            $isActive={activeLink === page.url}
+            $bgColor={page.navbarLinkBgColour || props.$bgColor}
             onClick={createNavItemClickHandler(
               page,
               props.onClick,
-              page.navbarLinkBgColour || props.bgColor
+              page.navbarLinkBgColour || props.$bgColor
             )}
           >
             {page.pageName}
@@ -113,7 +113,7 @@ export function LateralNavbar(props) {
               items={tree}
               activeLink={activeLink}
               onClick={props.onClick}
-              bgColor={props.bgColor}
+              $bgColor={props.$bgColor}
             />
           );
         })}

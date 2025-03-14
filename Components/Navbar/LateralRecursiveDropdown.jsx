@@ -13,9 +13,9 @@ const SideAccordionIcon = styled.span`
   height: 10px;
   margin-left: 4px;
   border-right: 2px solid
-    ${({ theme, $active }) => ($active ? theme.activeNavText : theme.navText)};
+    ${({ theme, $isActive }) => ($isActive ? theme.activeNavText : theme.navText)};
   border-bottom: 2px solid
-    ${({ theme, $active }) => ($active ? theme.activeNavText : theme.navText)};
+    ${({ theme, $isActive }) => ($isActive ? theme.activeNavText : theme.navText)};
   transform: ${({ $isOpen }) =>
     $isOpen ? "rotate(45deg)" : "rotate(-45deg)"};
   transition: transform 0.3s ease, border-color 0.2s ease;
@@ -26,10 +26,10 @@ const SideAccordionIcon = styled.span`
  */
 const LateralDropdownHeader = styled.div`
   padding: 12px 10px;
-  padding-left: ${({ depth }) => `calc(10px + ${depth * 10}px)`};
-  background-color: ${({ active, theme, depth }) =>
-    active ? theme.activeBg : darken(depth / 10, theme.navbarBg)};
-  color: ${({ active, theme }) => (active ? theme.activeNavText : theme.navText)};
+  padding-left: ${({ $depth }) => `calc(10px + ${$depth * 10}px)`};
+  background-color: ${({ $isActive, theme, $depth }) =>
+    $isActive ? theme.activeBg : darken($depth / 10, theme.navbarBg)};
+  color: ${({ $isActive, theme }) => ($isActive ? theme.activeNavText : theme.navText)};
   font-weight: normal;
   cursor: pointer;
   display: flex;
@@ -69,20 +69,20 @@ const LateralNestedMenu = styled.div`
  */
 const LateralMenuItem = styled(Link)`
   padding: 0.5rem 1.5rem;
-  padding-left: ${({ depth }) => `calc(1.5rem + ${depth * 10}px)`};
+  padding-left: ${({ $depth }) => `calc(1.5rem + ${$depth * 10}px)`};
   text-decoration: none;
   display: block;
-  background-color: ${({ active, theme, bgColor, depth }) =>
-    active ? (bgColor || theme.activeNavColour) : darken(depth / 10, theme.navbarBg)};
-  color: ${({ active, theme }) => (active ? "#f9f9f9" : theme.navText)};
+  background-color: ${({ $isActive, theme, $bgColor, $depth }) =>
+    $isActive ? ($bgColor || theme.activeNavColour) : darken($depth / 10, theme.navbarBg)};
+  color: ${({ $isActive, theme }) => ($isActive ? "#f9f9f9" : theme.navText)};
   white-space: normal;
   overflow-wrap: break-word;
   text-align: left;
   transition: background-color 0.2s;
   font-size: smaller;
   &:hover {
-    background-color: ${({ bgColor, theme }) =>
-      bgColor || theme.activeNavColour};
+    background-color: ${({ $bgColor, theme }) =>
+      $bgColor || theme.activeNavColour};
     color: #f9f9f9;
   }
 `;
@@ -97,7 +97,7 @@ const LateralMenuItem = styled(Link)`
  * @param {string} props.activeLink - The URL of the currently active navigation item.
  * @param {number} [props.depth=0] - Current nesting depth for proper indentation.
  * @param {Function} props.onClick - Callback function when a navigation item is clicked.
- * @param {string} props.bgColor - Background colour to use for active states.
+ * @param {string} props.$bgColor - Background colour to use for active states.
  * @returns {JSX.Element} The rendered lateral recursive dropdown.
  */
 export function LateralRecursiveDropdown({
@@ -106,7 +106,7 @@ export function LateralRecursiveDropdown({
   activeLink,
   depth = 0,
   onClick,
-  bgColor,
+  $bgColor,
 }) {
   const [open, setOpen] = useState(false);
   const toggle = () => setOpen((prev) => !prev);
@@ -124,15 +124,15 @@ export function LateralRecursiveDropdown({
         (item.children && isActiveRecursive(item.children))
     );
 
-  const active = isActiveRecursive(items);
+  const isActive = isActiveRecursive(items);
 
   return (
     <div>
-      <LateralDropdownHeader onClick={toggle} depth={depth} active={active}>
+      <LateralDropdownHeader onClick={toggle} $depth={depth} $isActive={isActive}>
         <TextContainer>{label}</TextContainer>
-        <SideAccordionIcon $isOpen={open} $active={active} />
+        <SideAccordionIcon $isOpen={open} $isActive={isActive} />
       </LateralDropdownHeader>
-      <LateralNestedMenu open={open} depth={depth + 1}>
+      <LateralNestedMenu open={open} $depth={depth + 1}>
         {items.map((item) =>
           item.children ? (
             <LateralRecursiveDropdown
@@ -140,21 +140,21 @@ export function LateralRecursiveDropdown({
               label={item.pageName}
               items={item.children}
               activeLink={activeLink}
-              depth={depth + 1}
+              $depth={depth + 1}
               onClick={onClick}
-              bgColor={bgColor}
+              $bgColor={$bgColor}
             />
           ) : (
             <LateralMenuItem
               key={item.pageName}
               to={item.url}
-              active={activeLink === item.url}
-              depth={depth + 1}
-              bgColor={item.navbarLinkBgColour || bgColor}
+              $isActive={activeLink === item.url}
+              $depth={depth + 1}
+              $bgColor={item.navbarLinkBgColour || $bgColor}
               onClick={createNavItemClickHandler(
                 item,
                 onClick,
-                item.navbarLinkBgColour || bgColor
+                item.navbarLinkBgColour || $bgColor
               )}
             >
               {item.pageName}

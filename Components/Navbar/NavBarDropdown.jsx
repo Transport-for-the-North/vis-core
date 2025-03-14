@@ -14,6 +14,7 @@ import { createNavItemClickHandler } from "utils/nav";
  */
 const DropdownMenuWrapper = styled.div`
   position: absolute;
+  width: 100%;
   left: 0;
   top: 75px;
   z-index: 1001;
@@ -219,7 +220,7 @@ function NestedDropdownPortal({
  * @param {Object} props.item - Navigation item. It may include a "children" array.
  * @param {string} props.activeLink - The current active URL.
  * @param {Function} props.onClick - Callback fired when an item is clicked.
- * @param {string} props.bgColor - Background color to use when the item is active or hovered.
+ * @param {string} props.$bgColor - Background color to use when the item is active or hovered.
  * @param {Function} [props.onChildHoverChange] - Optional callback to notify the parent of nested hover state changes.
  * @returns {JSX.Element} The rendered dropdown item.
  */
@@ -227,7 +228,7 @@ export function RecursiveDropdownItem({
   item,
   activeLink,
   onClick,
-  bgColor,
+  $bgColor,
   onChildHoverChange = () => {},
 }) {
   // Local state for header hover and nested submenu hover.
@@ -277,9 +278,9 @@ export function RecursiveDropdownItem({
       <DropdownItemLink
         ref={itemRef}
         to={item.url}
-        onClick={createNavItemClickHandler(item, onClick, bgColor)}
+        onClick={createNavItemClickHandler(item, onClick, $bgColor)}
         $active={activeLink === item.url}
-        $bgColor={bgColor}
+        $bgColor={$bgColor}
         $hovered={hovered}
       >
         <span>{item.pageName}</span>
@@ -305,7 +306,7 @@ export function RecursiveDropdownItem({
               item={child}
               activeLink={activeLink}
               onClick={onClick}
-              bgColor={bgColor}
+              $bgColor={$bgColor}
               onChildHoverChange={onChildHoverChange}
             />
           ))}
@@ -324,7 +325,7 @@ export function RecursiveDropdownItem({
  * @param {Array} props.dropdownItems - Array of navigation items (each may include nested children).
  * @param {string} props.activeLink - The currently active URL.
  * @param {Function} props.onClick - Callback triggered when a dropdown item is clicked.
- * @param {string} props.bgColor - Background color used for active or hovered states.
+ * @param {string} props.$bgColor - Background color used for active or hovered states.
  * @returns {JSX.Element} The rendered dropdown component.
  */
 export function NavBarDropdown({
@@ -332,7 +333,7 @@ export function NavBarDropdown({
   dropdownItems,
   activeLink,
   onClick,
-  bgColor,
+  $bgColor,
 }) {
   // Local state to determine if the main dropdown is open
   // or if any nested submenu item is hovered.
@@ -369,7 +370,7 @@ export function NavBarDropdown({
       ref={anchorRef}
       onMouseEnter={handleContainerMouseEnter}
       onMouseLeave={handleContainerMouseLeave}
-      $bgColor={bgColor}
+      $bgColor={$bgColor}
       $isActive={isActive}
       $hovered={navChildHovered}
     >
@@ -390,7 +391,7 @@ export function NavBarDropdown({
                   onClick(url, customLogo, navBg);
                   setOpen(false);
                 }}
-                bgColor={bgColor}
+                $bgColor={$bgColor}
                 onChildHoverChange={setNavChildHovered}
               />
             ))}
