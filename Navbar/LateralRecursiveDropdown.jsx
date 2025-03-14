@@ -26,9 +26,9 @@ const SideAccordionIcon = styled.span`
  */
 const LateralDropdownHeader = styled.div`
   padding: 12px 10px;
-  padding-left: ${({ $depth }) => `calc(10px + ${$depth * 10}px)`};
-  background-color: ${({ $isActive, theme, $depth }) =>
-    $isActive ? theme.activeBg : darken($depth / 10, theme.navbarBg)};
+  padding-left: ${({ depth }) => `calc(10px + ${depth * 10}px)`};
+  background-color: ${({ $isActive, theme, depth }) =>
+    $isActive ? theme.activeBg : darken(depth / 10, theme.navbarBg)};
   color: ${({ $isActive, theme }) => ($isActive ? theme.activeNavText : theme.navText)};
   font-weight: normal;
   cursor: pointer;
@@ -69,11 +69,11 @@ const LateralNestedMenu = styled.div`
  */
 const LateralMenuItem = styled(Link)`
   padding: 0.5rem 1.5rem;
-  padding-left: ${({ $depth }) => `calc(1.5rem + ${$depth * 10}px)`};
+  padding-left: ${({ depth }) => `calc(1.5rem + ${depth * 10}px)`};
   text-decoration: none;
   display: block;
-  background-color: ${({ $isActive, theme, $bgColor, $depth }) =>
-    $isActive ? ($bgColor || theme.activeNavColour) : darken($depth / 10, theme.navbarBg)};
+  background-color: ${({ $isActive, theme, $bgColor, depth }) =>
+    $isActive ? ($bgColor || theme.activeNavColour) : darken(depth / 10, theme.navbarBg)};
   color: ${({ $isActive, theme }) => ($isActive ? "#f9f9f9" : theme.navText)};
   white-space: normal;
   overflow-wrap: break-word;
@@ -128,11 +128,11 @@ export function LateralRecursiveDropdown({
 
   return (
     <div>
-      <LateralDropdownHeader onClick={toggle} $depth={depth} $isActive={isActive}>
+      <LateralDropdownHeader onClick={toggle} depth={depth} $isActive={isActive}>
         <TextContainer>{label}</TextContainer>
         <SideAccordionIcon $isOpen={open} $isActive={isActive} />
       </LateralDropdownHeader>
-      <LateralNestedMenu open={open} $depth={depth + 1}>
+      <LateralNestedMenu open={open} depth={depth + 1}>
         {items.map((item) =>
           item.children ? (
             <LateralRecursiveDropdown
@@ -140,7 +140,7 @@ export function LateralRecursiveDropdown({
               label={item.pageName}
               items={item.children}
               activeLink={activeLink}
-              $depth={depth + 1}
+              depth={depth + 1}
               onClick={onClick}
               $bgColor={$bgColor}
             />
@@ -149,7 +149,7 @@ export function LateralRecursiveDropdown({
               key={item.pageName}
               to={item.url}
               $isActive={activeLink === item.url}
-              $depth={depth + 1}
+              depth={depth + 1}
               $bgColor={item.navbarLinkBgColour || $bgColor}
               onClick={createNavItemClickHandler(
                 item,
