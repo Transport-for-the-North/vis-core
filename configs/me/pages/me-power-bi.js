@@ -1,5 +1,5 @@
 export const mePowerBi = {
-  pageName: "Metrics Dashboard",
+  pageName: "M&E Dashboard",
   url: "/me-metrics",
   type: "IFrameEmbed",
   category: null,
