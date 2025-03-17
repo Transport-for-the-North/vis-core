@@ -3,6 +3,7 @@ import { api } from "services";
 import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle } from "utils";
 import { useMapContext} from "hooks";
 import { FilterContext } from "contexts";
+import { actionTypes } from "reducers";
 
 /**
  * Layer component that adds a layer to the map(s) and handles its lifecycle.
@@ -26,8 +27,8 @@ import { FilterContext } from "contexts";
  */
 export const Layer = ({ layer }) => {
   // Access the map context to get the current map instance(s)
-  const { state } = useMapContext();
-  const { map, maps } = state;
+  const { state, dispatch } = useMapContext();
+  const { map, maps, paramNameToUuidMap } = state;
 
   // Access filters from FilterContext
   const filterContext = useContext(FilterContext);
@@ -40,24 +41,6 @@ export const Layer = ({ layer }) => {
     // If no map instances are available, exit early
     if (targetMaps.length === 0) return;
 
-    // Check for missing customTooltip parameters
-    if (layer.customTooltip) {
-      let { url, htmlTemplate } = layer.customTooltip;
-      if (!url || !htmlTemplate) {
-        console.error("Both url and htmlTemplate must be provided for customTooltip.");
-        return;
-      }
-
-      // Replace filter placeholders if FilterContext is available
-      // key needs to be fixed with identifier generated using FilterContext
-      if (filterContext) {
-        url = url.replace(/\{(\w+)\}/g, (_, key) => {
-          return filters[key] !== undefined ? filters[key] : `{${key}}`;  // Replace with filter value or empty string
-        });
-      }
-      console.log(filters)
-      layer.customTooltip.url = url;
-    }
 
     // If missingParams are present, remove the layer if it exists
     if (layer.missingParams?.length > 0) {
@@ -195,8 +178,35 @@ export const Layer = ({ layer }) => {
         }
       });
     };
-  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType, filters]);
+  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType]);
 
+  useEffect(() => {
+    // Determine target map(s)
+    const targetMaps = maps || (map ? [map] : []);
+    if (targetMaps.length === 0) return;
+
+    // Update the tooltip URL dynamically based on filters
+    if (layer.customTooltip) {
+      const { url, htmlTemplate } = layer.customTooltip;
+      let requestUrl = url;
+      if (!url || !htmlTemplate) {
+        console.error("Both url and htmlTemplate must be provided for customTooltip.");
+        return;
+      }
+      if (Object.keys(filters).length > 0) {
+        requestUrl = url.replace(/\{(\w+)\}/g, (_, key) => {
+          const uuid = paramNameToUuidMap[key];
+          return uuid && filters[uuid] !== undefined ? filters[uuid] : `{${key}}`;
+        });
+        dispatch({
+          type: actionTypes.UPDATE_LAYER_TOOLTIP_URL,
+          payload: { layerName: layer.name, requestUrl },
+        });
+      }
+    }
+
+  }, [filters, paramNameToUuidMap, map, maps, dispatch]);
+  
   // This component does not render any visible elements
   return null;
 };
