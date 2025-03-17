@@ -13,7 +13,7 @@ const StyledScrollableContainer = styled.div`
   gap: ${PADDING}px;
   scrollbar-width: thin;
   z-index: 1000;
-  max-height: 52vh;
+  max-height: 50vh;
   overflow-y: auto;
   overflow-x: hidden;
   width: fit-content;
