@@ -125,8 +125,10 @@ export const MapProvider = ({ children }) => {
     const initializeFilters = async (metadataTables) => {
       const filters = [];
       const filterState = {};
+      const paramNameToUuidMap = {};
       for (const filter of pageContext.config.filters) {
         const filterWithId = { ...filter, id: uuidv4() }; // Add unique ID to each filter
+        paramNameToUuidMap[filter.paramName] = filterWithId.id; // Add mapping from paramName to UUID
         switch (filter.type) {
           case 'map':
           case 'slider':
@@ -235,6 +237,7 @@ export const MapProvider = ({ children }) => {
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
+      dispatch({ type: actionTypes.SET_PARAM_NAME_TO_UUID_MAP, payload: paramNameToUuidMap });
 
       // Set pageIsReady to true once all filters are initialized
       dispatch({ type: actionTypes.SET_PAGE_IS_READY, payload: true });
