@@ -53,7 +53,9 @@ export const actionTypes = {
   CLEAR_BOUNDS_AND_CENTROID: 'CLEAR_BOUNDS_AND_CENTROID',
   UPDATE_DOWNLOAD_QUERY_PARAMS: "UPDATE_DOWNLOAD_QUERY_PARAMS",
   SET_DRAW_INSTANCE: "SET_DRAW_INSTANCE",
-  STORE_CURRENT_ZOOM: "STORE_CURRENT_ZOOM"
+  STORE_CURRENT_ZOOM: "STORE_CURRENT_ZOOM",
+  UPDATE_LAYER_TOOLTIP_URL: 'UPDATE_LAYER_TOOLTIP_URL',
+  SET_PARAM_NAME_TO_UUID_MAP: 'SET_PARAM_NAME_TO_UUID_MAP',
 };
 
 /**
@@ -469,6 +471,28 @@ export const mapReducer = (state, action) => {
         pageIsReady: action.payload,
       };
     }
+    case actionTypes.UPDATE_LAYER_TOOLTIP_URL: {
+      const { layerName, requestUrl } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            customTooltip: {
+              ...state.layers[layerName].customTooltip,
+              requestUrl,
+            },
+          },
+        },
+      };
+    }
+
+    case actionTypes.SET_PARAM_NAME_TO_UUID_MAP:
+      return {
+        ...state,
+        paramNameToUuidMap: action.payload,
+      };
     default:
       return state;
   }
