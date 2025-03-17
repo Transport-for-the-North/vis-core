@@ -173,15 +173,14 @@ const ToggleButton = styled.button`
 
 /**
  * CalloutCardVisualisation component to display a card-like element within the map.
- * It fetches data using the useFetchVisualisationData hook, uses an htmlFragment with
- * placeholders, sanitizes the HTML, and populates the placeholders with the fetched data.
  *
  * @param {Object} props - The component props.
  * @param {string} props.visualisationName - The name of the visualisation.
  * @param {string} [props.cardName] - Optional name for the card.
+ * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
+export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
   const buttonRef = useRef(null);
@@ -197,11 +196,18 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
       setIsVisible(true);
-      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, data);
+      const htmlWithPlaceholdersReplaced = replacePlaceholders(
+        visualisation.htmlFragment,
+        data
+      );
       // Sanitize the HTML to prevent XSS attacks
       const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
       setRenderedContent(sanitizedHtml);
-      
+
+      // Call onUpdate when new data is set
+      if (onUpdate) {
+        onUpdate();
+      }
     }
   }, [data, visualisation.htmlFragment]);
 
