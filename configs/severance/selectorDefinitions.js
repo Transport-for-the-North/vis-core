@@ -106,10 +106,28 @@ const zoneIdSelector = {
   field: "id",
 };
 
+const variableSelector = {
+  filterName: "variableName",
+  type: "fixed",
+  paramName: "variableName",
+  target: null,
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: ["Severance Decile"],
+  containsLegendInfo: true,
+  values: {
+    source: "local",
+    values: [{
+      displayValue: "Severance Decile",
+      paramValue: "overall_decile_risk",
+    },],
+  },
+};
+
 export const selectors = {
   barrierType: barrierTypeSelector,
   walkSpeed: walkSpeedSelector,
   destinationType: destinationTypeSelector,
   severanceType: severanceTypeSelector,
-  zoneId: zoneIdSelector
+  zoneId: zoneIdSelector,
+  variable: variableSelector
 };

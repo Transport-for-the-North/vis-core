@@ -21,6 +21,7 @@ export const england = {
         source: "api",
         path: "/api/vectortiles/zones/28/{z}/{x}/{y}", // specify query params empty if to be set
         sourceLayer: "zones",
+        minZoom: 10,
         geometryType: "polygon",
         visualisationName: "Severance Decile",
         isHoverable: true,
@@ -32,7 +33,6 @@ export const england = {
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: true,
-        trseLabel: true,
         outlineOnPolygonSelect: true,
         customTooltip: {
           url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierType}&walkSpeed={walkSpeed}&destinationId={destinationType}&severity={severanceType}`,
@@ -129,7 +129,8 @@ export const england = {
       selectors.walkSpeed,
       selectors.destinationType,
       selectors.severanceType,
-      selectors.zoneId
+      selectors.zoneId,
+      selectors.variable
     ],
     additionalFeatures: {
       glossary: { 
