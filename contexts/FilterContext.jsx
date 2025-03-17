@@ -47,7 +47,6 @@ const filterReducer = (state, action) => {
       return initialFilterState;
     case filterActionTypes.INITIALIZE_FILTERS:
       return {
-        ...state,
         ...action.payload,
       };
     default:
