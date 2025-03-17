@@ -96,6 +96,7 @@ export const england = {
         style: "polygon-continuous", //"polygon-categorical"
         joinField: "id",
         valueField: "value",
+        shouldFilterDataToViewport: true, // ideally only do this if we have fixed categories, otherwise the classes will shift with each view change
         dataSource: "api",
         dataPath: "/api/severance/decile-data",
         legendText: [

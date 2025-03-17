@@ -68,12 +68,14 @@ export const MapVisualisation = ({
     );
   }, [layerKey, state.colorSchemesByLayer, colorStyle]);
 
+  const shouldFilterDataToViewport = visualisation.shouldFilterDataToViewport || false;
+
   // Use the custom hook to fetch data for the visualisation
   const {
     isLoading,
     data: visualisationData,
     error,
-  } = useFetchVisualisationData(visualisation, map, layerKey);
+  } = useFetchVisualisationData(visualisation, map, layerKey, shouldFilterDataToViewport);
 
   // Handle loading state
   useEffect(() => {
