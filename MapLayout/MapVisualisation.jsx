@@ -73,7 +73,7 @@ export const MapVisualisation = ({
     isLoading,
     data: visualisationData,
     error,
-  } = useFetchVisualisationData(visualisation);
+  } = useFetchVisualisationData(visualisation, map, layerKey);
 
   // Handle loading state
   useEffect(() => {
@@ -307,6 +307,7 @@ export const MapVisualisation = ({
     const layerName = layerKey;
     const dataToVisualize = visualisationData || [];
     const dataToClassify = combinedData;
+    // const dataForClassification = filterDataToViewport(dataToClassify, map, layerName);
 
     const performReclassification = () => {
       switch (visualisation.type) {
