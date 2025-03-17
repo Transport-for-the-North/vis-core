@@ -32,10 +32,10 @@ export const england = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
-        invertedColorScheme: true,
+        invertedColorScheme: false,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierType}&walkSpeed={walkSpeed}&destinationId={destinationType}&severity={severanceType}`,
+          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}`,
           htmlTemplate: severancePopup
         }
       },
