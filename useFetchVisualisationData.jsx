@@ -37,7 +37,7 @@ const filterDataToViewport = (data, map, mapLayerId) => {
  * @property {boolean} isLoading - Indicates if the data is currently being fetched.
  * @property {Array|Object|null} data - The (possibly filtered) data fetched for the visualisation.
  */
-export const useFetchVisualisationData = (visualisation, map, mapLayerId) => {
+export const useFetchVisualisationData = (visualisation, map, mapLayerId, shouldFilterDataToViewport = false) => {
   const [isLoading, setLoading] = useState(false);
   const [rawData, setRawData] = useState(null);
   // filteredData is the viewport‑filtered version of the data.
@@ -98,7 +98,7 @@ export const useFetchVisualisationData = (visualisation, map, mapLayerId) => {
   // Set up an effect to refilter the raw data when the map viewport changes.
   useEffect(() => {
     // Only run if both map and mapLayerId are provided and when rawData is available.
-    if (!map || !mapLayerId || rawData === null) return;
+    if (!map || !mapLayerId || rawData === null || !shouldFilterDataToViewport) return;
 
     // Define a debounced filtering function so that rapid viewport changes do not swamp the updates.
     const applyViewportFilter = debounce(() => {
@@ -113,7 +113,7 @@ export const useFetchVisualisationData = (visualisation, map, mapLayerId) => {
     return () => {
       map.off('moveend', applyViewportFilter);
     };
-  }, [map, mapLayerId, rawData]);
+  }, [map, mapLayerId, rawData, shouldFilterDataToViewport]);
 
   // Return the filtered data if available; otherwise return the raw data.
   return { isLoading, data: filteredData || rawData };
