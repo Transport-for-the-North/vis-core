@@ -1,8 +1,8 @@
 import { termsOfUse } from "../termsOfUse"
 
-export const hansen = {
-    pageName: "zone select",
-    url: "/pti-zone-select",
+export const potential = {
+    pageName: "PTI",
+    url: "/pti",
     type: "MapLayout",
     about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
     category: null,
@@ -34,7 +34,7 @@ export const hansen = {
           joinField: "id",
           valueField: "value",
           dataSource: "api",
-          dataPath: "/api/tina/zone-pti-select",
+          dataPath: "/api/tina/zone-pti",
         },
       ],
       metadataTables: [{
@@ -106,16 +106,6 @@ export const hansen = {
               }
             ],
           },
-        },
-        {
-          filterName: "Select zone in map",
-          paramName: "throughZoneId",
-          target: "api",
-          actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-          visualisations: ["zonepti"],
-          type: "map",
-          layer: "zonepti",
-          field: "id",
         }
       ],
     },

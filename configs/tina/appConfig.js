@@ -15,7 +15,7 @@ export const appConfig = {
   legalText: termsOfUse,
   contactText: "Please contact tfnoffer@transportforthenorth.com for any questions on this data tool.",
   contactEmail: "tfnoffer@transportforthenorth.com",
-  mapStyle: mapStyles.geoapifyPositron,
+  //mapStyle: mapStyles.geoapifyPositron,
   logoImage: "img/tfn-logo-fullsize.png",
   logoPosition: 'left',
   backgroundImage: "img/trse/TRSE_bg.jpg",
@@ -24,8 +24,10 @@ export const appConfig = {
   authenticationRequired: false,
   appPages: [
     pages.hansen,
-    pages.tinaConnectivity,
-    pages.dataExplorer
+    //pages.tinaConnectivity,
+    //pages.dataExplorer,
+    //pages.pti,
+    pages.potential
     
   ],
   footer: {

@@ -1,62 +1,11 @@
 export const bands = [
     {
-        name: "Combined Authority",
+        name: "pti",
         metric: [
             {
-                name: "trse",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            },
-            {
-                name: "acc",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            },
-            {
-                name: "vul",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            }
-        ]
-    },
-    {
-        name: "Local Authority",
-        metric: [
-            {
-                name: "trse",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            },
-            {
-                name: "acc",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            },
-            {
-                name: "vul",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            }
-        ]
-    },
-    {
-        name: "England",
-        metric: [
-            {
-                name: "trse",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            },
-            {
-                name: "acc",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
-            },
-            {
-                name: "vul",
-                values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                differenceValues: [-100, -75, -50, -25, 0, 25, 50, 75, 100]
+                name: "pti",
+                values: [0, 0.1, 0.2, 0.5, 1, 1.5, 2, 2.2, 2.3, 2.4, 2.5],
             }
         ]
     }
-];
+]
