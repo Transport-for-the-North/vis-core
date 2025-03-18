@@ -218,6 +218,10 @@ export const LayerControlEntry = memo(
         visualisation.queryParams[selectedMetricParamName.paramName]?.value
     );
 
+    const shouldHaveOpacityControl = layer.metadata?.shouldHaveOpacityControl ?? true;
+    const enforceNoColourSchemeSelector = layer.metadata?.enforceNoColourSchemeSelector ?? false;
+    const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
+
     let currentOpacity = null;
 
     if (maps.length > 0 && maps[0].getLayer(layer.id)) {
@@ -320,7 +324,7 @@ export const LayerControlEntry = memo(
             <LayerSearch map={maps[0]} layer={layer} />
           )}
           {/* Opacity Control */}
-          <OpacityControl>
+          {shouldHaveOpacityControl && (<OpacityControl>
             <ControlLabel htmlFor={`opacity-${layer.id}`}>
               Opacity
             </ControlLabel>
@@ -334,16 +338,16 @@ export const LayerControlEntry = memo(
               onChange={handleOpacityChange}
             />
             <OpacityValue>{(opacity * 100).toFixed(0)}%</OpacityValue>
-          </OpacityControl>
+          </OpacityControl>)}
           {/* Color Scheme and Classification (if stylable) */}
           {layer.metadata?.isStylable && (
             <div style={{ marginTop: "1rem" }}>
-              <ColourSchemeDropdown
+              {!enforceNoColourSchemeSelector && <ColourSchemeDropdown
                 colorStyle={colorStyle}
                 handleColorChange={handleColorChange}
                 layerName={layer.id}
-              />
-              <ClassificationDropdown
+              />}
+              {!enforceNoClassificationMethod && <ClassificationDropdown
                 classType={{
                   Default: "d",
                   Quantile: "q",
@@ -357,7 +361,7 @@ export const LayerControlEntry = memo(
                 onChange={(value) =>
                   handleClassificationChange(value, layer.id)
                 }
-              />
+              />}
             </div>
           )}
         </CollapsibleContent>

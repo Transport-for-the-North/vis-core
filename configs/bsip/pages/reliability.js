@@ -30,7 +30,8 @@ export const reliability = {
           shouldHaveTooltipOnClick: false,
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
-                  },
+          shouldHaveOpacityControl: false,
+        },
         combinedAuthorityLayerBase
       ],
       visualisations: [
@@ -41,7 +42,9 @@ export const reliability = {
           valueField: "category",
           dataSource: "api",
           dataPath: "/api/bsip/reliabilityV2/prod", 
-                  },
+          enforceNoColourSchemeSelector: true, // this is to enforce the colour scheme selector to be hidden
+          enforceNoClassificationMethod: true, // this is to enforce the classification method selector to be hidden
+        },
       ],
       metadataTables: [
       ],
