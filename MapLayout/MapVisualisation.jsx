@@ -464,6 +464,8 @@ export const MapVisualisation = ({
             metadata: {
               colorStyle: colorStyle,
               isStylable: true,
+              enforceNoColourSchemeSelector: visualisation.enforceNoColourSchemeSelector ?? false,
+              enforceNoClassificationMethod: visualisation.enforceNoClassificationMethod ?? false,
             },
           },
           beforeLayerId
