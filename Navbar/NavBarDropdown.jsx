@@ -64,6 +64,7 @@ const DropdownMenuScroll = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-flex;
+  max-width: 200px;
   align-items: center;
   font-family: ${({ theme }) => theme.standardFontFamily};
   font-size: clamp(12px, 1.2vw, 18px);
@@ -71,7 +72,7 @@ const DropdownContainer = styled.div`
     $isActive || $hovered ? $bgColor : "#f9f9f9"};
   color: ${({ $isActive, $hovered }) =>
     $isActive || $hovered ? "#ffffff" : "#4b3e91"};
-  padding: 0 5px;
+  padding: 0 10px;
   height: 100%;
   cursor: default;
   justify-content: space-between;
