@@ -25,6 +25,7 @@ const NavLinksContainer = styled.div`
 const StyledNavLink = styled(Link)`
   text-decoration: none;
   display: flex;
+  max-width: 200px;
   align-items: center;
   justify-content: center;
   padding: 0 10px;
