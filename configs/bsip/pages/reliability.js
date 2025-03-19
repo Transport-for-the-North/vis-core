@@ -31,6 +31,7 @@ export const reliability = {
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
           shouldHaveOpacityControl: false,
+          zoomToFeaturePlaceholderText: "Search by zone number/ID..."
         },
         combinedAuthorityLayerBase
       ],
@@ -42,7 +43,7 @@ export const reliability = {
           valueField: "category",
           dataSource: "api",
           dataPath: "/api/bsip/reliabilityV2/prod", 
-          enforceNoColourSchemeSelector: true, // this is to enforce the colour scheme selector to be hidden
+          enforceNoColourSchemeSelector: false, // this is to enforce the colour scheme selector to be hidden
           enforceNoClassificationMethod: true, // this is to enforce the classification method selector to be hidden
         },
       ],
