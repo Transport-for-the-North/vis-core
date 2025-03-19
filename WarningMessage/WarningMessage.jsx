@@ -51,6 +51,7 @@ export const WarningMessage = styled.div`
     display: flex;
     align-items: flex-start;
     width: 100%;
+    white-space: pre-wrap;
   }
 
   .icon-container {

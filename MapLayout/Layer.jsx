@@ -83,6 +83,10 @@ export const Layer = ({ layer }) => {
           isStylable: layer.isStylable ?? false,
           path: layer.path ?? null,
           shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false),
+          shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true, // opacity control should appear by default
+          enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false, // colour scheme selector should appear if stylable, unless this is enforced
+          enforceNoClassificationMethod: layer.enforceNoClassificationMethod ?? false, // classification method selector should appear if stylable, unless this is enforced
+          zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
         };
 
         // Handle GeoJSON layer type
