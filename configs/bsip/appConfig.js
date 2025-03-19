@@ -65,7 +65,7 @@ export const appConfig = {
     pages.reliability
   ],
   footer: {
-    creditsText: "© Transport for the North 2024. All rights reserved.",
+    creditsText: "© Transport for the North 2024-5. All rights reserved.",
     privacyPolicyLink: "https://transportforthenorth.com/privacy-policy/",
     cookiesLink: "https://transportforthenorth.com/cookies/",
     contactUsLink: "https://transportforthenorth.com/about-transport-for-the-north/contact-us/"

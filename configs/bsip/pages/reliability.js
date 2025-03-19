@@ -30,6 +30,8 @@ export const reliability = {
           shouldHaveTooltipOnClick: false,
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
+          shouldHaveOpacityControl: false,
+          zoomToFeaturePlaceholderText: "Search by zone number/ID..."
         },
         combinedAuthorityLayerBase
       ],
@@ -40,7 +42,9 @@ export const reliability = {
           style: "polygon-categorical",
           valueField: "category",
           dataSource: "api",
-          dataPath: "/api/bsip/reliabilityV2/prod",
+          dataPath: "/api/bsip/reliabilityV2/prod", 
+          enforceNoColourSchemeSelector: false, // this is to enforce the colour scheme selector to be hidden
+          enforceNoClassificationMethod: true, // this is to enforce the classification method selector to be hidden
         },
       ],
       metadataTables: [
@@ -78,7 +82,10 @@ export const reliability = {
         glossary: { 
           dataDictionary: glossaryData
         },
-        warning: "This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page."
+        dynamicWarning: {
+          url: '/api/bsip/modelled-date/prod',
+          template: `This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page.\n\nData last modified: {data}`
+        }
       },
     },
 }
