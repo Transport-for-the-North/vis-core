@@ -494,3 +494,325 @@ const catchmentMetricFilter = {
         ]
     },
 }
+
+const linkMetricFilter = {
+  filterName: "Metric",
+  paramName: "propertyName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  info:"Select the desired metric.",
+  type: "dropdown",
+  containsLegendInfo: true,
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "No. Passengers",
+        paramValue: "No. Passengers",
+        legendSubtitleText: "Passengers",
+      },
+      {
+        displayValue: "Total Crush Capacity",
+        paramValue: "Total Crush Capacity",
+        legendSubtitleText: "Capacity",
+      },
+      {
+        displayValue: "Total Crush Load Factor",
+        paramValue: "Total Crush Load Factor",
+        legendSubtitleText: "Factor",
+      },
+      {
+        displayValue: "Total Seat Capacity",
+        paramValue: "Total Seat Capacity",
+        legendSubtitleText: "Capacity",
+      },
+      {
+        displayValue: "Total Seat Load Factor",
+        paramValue: "Total Seat Load Factor",
+        legendSubtitleText: "Factor",
+      },
+      {
+        displayValue: "Trains per hour",
+        paramValue: "Trains per hour",
+        legendSubtitleText: "units",
+      },
+    ]
+  },
+}
+
+const zoneMetricFilter = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  info:"Select the desired metric.",
+  type: "dropdown",
+  containsLegendInfo: true,
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: 'Revenue',
+        paramValue: 'revenue',
+        legendSubtitleText: "£",
+      },
+      {
+        displayValue: 'Demand',
+        paramValue: 'demand',
+        legendSubtitleText: "Passengers",
+      },
+    ],
+  },
+}
+
+const benefitsMetricFilter = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  info:"Select the desired metric.",
+  type: "dropdown",
+  containsLegendInfo: true,
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: 'Total Generalised Cost',
+        paramValue: 'total_gen_cost',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'IVT',
+        paramValue: 'ivt',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'Crowding',
+        paramValue: 'crowding',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'Wait Time',
+        paramValue: 'wait_time',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'Walk Time',
+        paramValue: 'walk_time',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'Penalty',
+        paramValue: 'penalty',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'Access Egress',
+        paramValue: 'access_egress',
+        legendSubtitleText: "Pass. Mins",
+      },
+      {
+        displayValue: 'Value of choice',
+        paramValue: 'value_of_choice',
+        legendSubtitleText: "Pass. Mins",
+      },
+    ],
+  },
+}
+
+const benefitsScenariosFilter = {
+  filterName: "Scenario 1/Scenario 2 Do Minimum",
+  target: "validate",
+  actions: [{ action: "none" }],
+  visualisations: null,
+  info:"Select a 1 scenario for both scenario 1 and scenario 2.",
+  type: "dropdown",
+  shouldBeBlankOnInit: false,
+  shouldFilterOnValidation: false,
+  shouldFilterOthers: false,
+  isClearable: false,
+  multiSelect: false,
+  values: {
+    source: "metadataTable",
+    metadataTableName: "input_norms_scenario",
+    displayColumn: "dm_scenario_code",
+    paramColumn: "dm_scenario_code",
+    sort: "ascending",
+    exclude: ["NA"]
+  },
+}
+
+const segmentUserClassFilter = {
+  filterName: "Filter User Class by Segment",
+  paramName: "userClassIds",
+  target: "validate",
+  actions: [{ action: "none" }],
+  visualisations: null,
+  type: "dropdown",
+  shouldBeBlankOnInit: true,
+  shouldFilterOnValidation: false,
+  shouldBeValidated: false,
+  shouldFilterOthers: true,
+  multiSelect: true,
+  isClearable: true,
+  values: {
+    source: "metadataTable",
+    metadataTableName: "norms_userclass_list",
+    displayColumn: "user_segment",
+    paramColumn: "user_segment",
+    sort: "ascending",
+    exclude: ['All']
+  },
+}
+
+const keyLocationTypeFilter = {
+  filterName: "Key Location Type",
+  paramName: "keyLocationTypeId",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  info:"Select the desired key location.",
+  type: "dropdown",
+  containsLegendInfo: true,
+  shouldBeBlankOnInit: false,
+  shouldFilterOnValidation: false,
+  shouldBeValidated: false,
+  shouldFilterOthers: false,
+  multiSelect: false,
+  isClearable: false,
+  values: {
+    source: "metadataTable",
+    metadataTableName: "key_location_type_list",
+    displayColumn: "name",
+    paramColumn: "id",
+    sort: "ascending",
+    legendSubtitleTextColumn: "name"
+  },
+}
+
+const thresholdValueFilter = {
+  filterName: "Threshold Value",
+  paramName: "thresholdValue",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  info: "Threshold value to filter data",
+  values: thresholdValues
+}
+
+const zoneSelectionFilter = {
+  filterName: "Select a zone in the map",
+  paramName: "zoneId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "map",
+  layer: "NoRMS Zones Pair Result",
+  field: "id",
+}
+
+const landuseFilter = {
+  filterName: "Landuse",
+  paramName: "landuse",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  info:"Select the Land Use metric to show. Choose between population and employment and desired segmentation (please refer to the “about this visualisation” to know more). ",
+  type: "dropdown",
+  containsLegendInfo: true,
+  shouldBeBlankOnInit: false,
+  shouldFilterOnValidation: false,
+  shouldBeValidated: false,
+  shouldFilterOthers: false,
+  multiSelect: false,
+  isClearable: false,
+  values: landuseValues
+}
+
+const landuseSegFilter = {
+  filterName: "Landuse Segment 1",
+  paramName: "landuseSegment1",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  shouldBeBlankOnInit: false,
+  shouldFilterOnValidation: false,
+  shouldBeValidated: true,
+  shouldFilterOthers: false,
+  multiSelect: false,
+  isClearable: true,
+  values: {
+    source: "metadataTable",
+    metadataTableName: "landuse_segment_list",
+    displayColumn: "segment1",
+    paramColumn: "segment1",
+    sort: "ascending",
+    exclude: []
+  },
+}
+
+const landuseRefFilter = {
+  filterName: "Landuse Reference",
+  paramName: "landuseReference",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: landuseReferenceValues
+}
+
+const landuseExogFilter = {
+  filterName: "Landuse Exog",
+  paramName: "landuseExog",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "toggle",
+  values: landuseExogValues
+}
+
+const journeyTimeMetricFilter = {
+  filterName: "Metric",
+  paramName: "journey_time",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: ["Journey Time Accessibility Pair"],
+  info:"Select the desired metric.",
+  type: "dropdown",
+  containsLegendInfo: true,
+  shouldBeBlankOnInit: false,
+  shouldFilterOnValidation: false,
+  shouldBeValidated: false,
+  shouldFilterOthers: false,
+  multiSelect: false,
+  isClearable: false,
+  values: {
+    source: "local",
+    values: [
+      { paramValue: "journey_time", displayValue: "Journey Time", legendSubtitleText: "mins" },
+    ]
+  },
+}
