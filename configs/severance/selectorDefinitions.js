@@ -6,16 +6,17 @@ const barrierTypeSelector = {
     { action: "UPDATE_QUERY_PARAMS" }
   ],
   visualisations: ["Severance Decile", "Severence Callout"],
-  type: "toggle",
-  shouldBeValidated: false,
+  type: "fixed",
   info: "Type of barrier selected.",
   containsLegendInfo: false,
   values: {
-    source: "metadataTable",
-    metadataTableName: "barrier_list",
-    displayColumn: "name",
-    paramColumn: "id",
-    sort: "ascending",
+    source: "local",
+    values: [
+      {
+        displayValue: "MRN, SRN, Rail",
+        paramValue: "1"
+      },
+    ],
   },
 }
 
