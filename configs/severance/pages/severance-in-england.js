@@ -35,7 +35,7 @@ export const england = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}`,
+          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}&severity={severity}`,
           htmlTemplate: severancePopup
         }
       },
@@ -96,7 +96,7 @@ export const england = {
         style: "polygon-continuous", //"polygon-categorical"
         joinField: "id",
         valueField: "value",
-        shouldFilterDataToViewport: true, // ideally only do this if we have fixed categories, otherwise the classes will shift with each view change
+        //shouldFilterDataToViewport: true, // ideally only do this if we have fixed categories, otherwise the classes will shift with each view change
         dataSource: "api",
         dataPath: "/api/severance/decile-data",
         legendText: [
