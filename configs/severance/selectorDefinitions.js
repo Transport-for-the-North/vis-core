@@ -5,7 +5,7 @@ const barrierTypeSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }
   ],
-  visualisations: ["Severance Decile", "Severence Callout"],
+  visualisations: ["Severance Decile", "Severence Callout", "Summary Callout"],
   type: "fixed",
   info: "Type of barrier selected.",
   containsLegendInfo: false,
@@ -25,7 +25,7 @@ const walkSpeedSelector = {
   paramName: "walkSpeed",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-  visualisations: ["Severance Decile", "Severence Callout"],
+  visualisations: ["Severance Decile", "Severence Callout", "Summary Callout"],
   type: "fixed",
   values: {
     source: "metadataTable",
@@ -43,7 +43,7 @@ const destinationTypeSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }
   ],
-  visualisations: ["Severance Decile", "Severence Callout"],
+  visualisations: ["Severance Decile", "Severence Callout", "Summary Callout"],
   type: "dropdown",
   shouldBeValidated: false,
   info: "Type of opportunity accessed.",
@@ -64,7 +64,7 @@ const severanceTypeSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }
   ],
-  visualisations: ["Severance Decile", "Severence Callout"],
+  visualisations: ["Severance Decile", "Severence Callout", "Summary Callout"],
   type: "dropdown",
   shouldBeValidated: false,
   info: "Type of affected area",
@@ -101,7 +101,7 @@ const zoneIdSelector = {
   paramName: "zoneId",
   target: "api",
   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-  visualisations: ["Severence Callout"],
+  visualisations: ["Severence Callout", "Summary Callout"],
   type: "map",
   layer: "Output Areas",
   field: "id",

@@ -3,8 +3,10 @@
 */
 
 export const severanceSummaryCallout = 
-`<h2>Severance index scores based on the presence of {barrier_type}</h2>
+`<h2>Severance index scores based on the presence of {barrierId}</h2>
 <p>
-  If this area had no {barrier_type} infrastructure acting as a potential active travel barrier, residents in this OA would have additional walkable access to {formatNumber(perfect_reach_decile)} (current walkable access: {formatNumber(isochrone_reach_decile)}) 
+  If this area had no <span class="highlight">{barrierId}</span> infrastructure acting as a 
+  <span class="highlight">potential active travel barrier</span>, residents in this OA would have 
+  <span class="highlight">additional walkable access</span> to {formatNumber(perfect_reach_decile)} {destinationId} (current walkable access: {formatNumber(isochrone_reach_decile)} {destinationId}) 
 </p>`
 ;
