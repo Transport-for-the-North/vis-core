@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { createNavItemClickHandler } from "utils/nav";
+import { FixedExternalIcon } from "./FixedExternalIcon";
 
 /* ----------------------------------
    Styled Components Definitions
@@ -10,7 +11,6 @@ import { createNavItemClickHandler } from "utils/nav";
 
 /**
  * Outer wrapper for a dropdown menu.
- * Maintains the border radius so that the bottom–corner rounding is visible.
  */
 const DropdownMenuWrapper = styled.div`
   position: absolute;
@@ -20,7 +20,7 @@ const DropdownMenuWrapper = styled.div`
   z-index: 1001;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  overflow: visible; /* Allow portal content not to be clipped */
+  overflow: visible;
 `;
 
 /**
@@ -38,7 +38,6 @@ const DropdownMenuScroll = styled.div`
   border-bottom-right-radius: 5px;
   position: relative;
 
-  /* Custom Webkit scrollbar */
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -120,11 +119,16 @@ const DropdownItemWrapper = styled.div`
 `;
 
 /**
- * Styled link used for dropdown items.
- * Accepts custom props to determine the active and hover styles.
+ * Common styles for dropdown items.
+ *
+ * This css helper includes the shared styles for both internal (Link)
+ * and external (a) dropdown items, such as layout, typography, colors, and
+ * hover effects. It leverages props ($active, $hovered, $bgColor) to decide 
+ * the background and text colours.
  */
-const DropdownItemLink = styled(Link)`
+const dropdownItemStyles = css`
   display: flex;
+  align-items: center; /* Ensure vertical centering */
   justify-content: space-between;
   padding: 12px 10px;
   text-decoration: none;
@@ -137,11 +141,25 @@ const DropdownItemLink = styled(Link)`
     $active || $hovered ? "#f9f9f9" : "#4b3e91"};
   transition: background-color 0.3s ease, color 0.3s ease;
   white-space: normal;
-
   &:hover {
     background-color: ${({ $bgColor }) => $bgColor};
     color: #ffffff;
   }
+`;
+
+/**
+ * Styled link used for dropdown items.
+ * Accepts custom props to determine the active and hover styles.
+ */
+const DropdownItemLink = styled(Link)`
+  ${dropdownItemStyles}
+`;
+
+/**
+ * Styled anchor for dropdown items that are external.
+ */
+const DropdownItemAnchor = styled.a`
+  ${dropdownItemStyles}
 `;
 
 /**
@@ -276,17 +294,33 @@ export function RecursiveDropdownItem({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <DropdownItemLink
-        ref={itemRef}
-        to={item.url}
-        onClick={createNavItemClickHandler(item, onClick, $bgColor)}
-        $active={activeLink === item.url}
-        $bgColor={$bgColor}
-        $hovered={hovered}
-      >
-        <span>{item.pageName}</span>
-        {hasChildren && <SubIndicator>▸</SubIndicator>}
-      </DropdownItemLink>
+      {item.external ? (
+        <DropdownItemAnchor
+          ref={itemRef}
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          $active={false}
+          $bgColor={$bgColor}
+          $hovered={hovered}
+        >
+          <span>{item.pageName || item.label}</span>
+          <FixedExternalIcon />
+          {hasChildren && <SubIndicator>▸</SubIndicator>}
+        </DropdownItemAnchor>
+      ) : (
+        <DropdownItemLink
+          ref={itemRef}
+          to={item.url}
+          onClick={createNavItemClickHandler(item, onClick, $bgColor)}
+          $active={activeLink === item.url}
+          $bgColor={$bgColor}
+          $hovered={hovered}
+        >
+          <span>{item.pageName || item.label}</span>
+          {hasChildren && <SubIndicator>▸</SubIndicator>}
+        </DropdownItemLink>
+      )}
 
       {hasChildren && (
         <NestedDropdownPortal
@@ -319,15 +353,15 @@ export function RecursiveDropdownItem({
 
 /**
  * NavBarDropdown renders a top–navbar dropdown menu that opens on hover.
- * It passes down hover state to its recursive dropdown items so that the label remains highlighted.
+ * It supports both internal and external links.
  *
  * @param {Object} props - Component props.
- * @param {string} props.dropdownName - The label displayed on the navbar.
- * @param {Array} props.dropdownItems - Array of navigation items (each may include nested children).
- * @param {string} props.activeLink - The currently active URL.
- * @param {Function} props.onClick - Callback triggered when a dropdown item is clicked.
- * @param {string} props.$bgColor - Background color used for active or hovered states.
- * @returns {JSX.Element} The rendered dropdown component.
+ * @param {string} props.dropdownName - Label displayed on the navbar.
+ * @param {Array} props.dropdownItems - Array of links (may include nested children).
+ * @param {string} props.activeLink - Currently active URL.
+ * @param {Function} props.onClick - Callback when an item is clicked.
+ * @param {string} props.$bgColor - Background color for active/hovered states.
+ * @returns {JSX.Element}
  */
 export function NavBarDropdown({
   dropdownName,
@@ -385,7 +419,7 @@ export function NavBarDropdown({
           >
             {dropdownItems.map((item) => (
               <RecursiveDropdownItem
-                key={item.pageName}
+                key={item.pageName || item.label}
                 item={item}
                 activeLink={activeLink}
                 onClick={(url, customLogo, navBg) => {
