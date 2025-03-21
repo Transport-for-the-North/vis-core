@@ -1,3 +1,4 @@
+
 import { nodeCustomPaint } from "./customPaintDefinitions"
 
 const networkScenarioValues = {
@@ -1565,18 +1566,15 @@ export const appConfig = {
             joinField: "id",
             valueField: "value",
             dataSource: "api",
-            dataPath: "/api/tina/zone-pti",
+            dataPath: "/api/noham/matrix-demand",
             
           },
         ],
-        metadataTables: [{
-          name: "ntem_purpose_codes",
-          path: "/api/getgenericdataset?dataset_id=foreign_keys.ntem_purpose_list"
-        }],
+        metadataTables: [inputScenariosMetadataTable],
         filters: [
           {
-            filterName: "Time Period",
-            paramName: "timePeriodCode",
+            filterName: "Trip Type",
+            paramName: "columnName",
             info: "Select whether you want to display the number of origin or destination trips assigned for each zone",
             target: "api",
             actions: [
@@ -1586,23 +1584,11 @@ export const appConfig = {
             visualisations: ["Zone Results"],
             type: "toggle",
             containsLegendInfo: true,
-            values: {
-              source: "local",
-              values: [
-                {
-                  displayValue: "am",                
-                  paramValue: "am",
-                },
-                {
-                  displayValue: "pm",
-                  paramValue:"pm"
-                }
-              ],
-            },
+            values: originOrDestTripValues,
           },
           {
-            filterName: "ntem",
-            paramName: "ntemPurposeCode",
+            filterName: "Delivery Programme",
+            paramName: "deliveryProgrammeName",
             info: "Assignment delivery programme",
             target: "api",
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -1610,14 +1596,62 @@ export const appConfig = {
             type: "dropdown",
             values: {
               source: "metadataTable",
-              metadataTableName: "ntem_purpose_codes",
-              displayColumn: "name",
-              legendSubtitleTextColumn: "id",
-              paramColumn: "id",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "delivery_programme_name",
+              paramColumn: "delivery_programme_name",
               sort: "ascending",
             },
           },
-          ,
+          {
+            filterName: "Year",
+            paramName: "year",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Results"],
+            type: "dropdown",
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_year",
+              paramColumn: "demand_year",
+              sort: "ascending",
+            },
+          },
+          {
+            filterName: "Demand Scenario",
+            paramName: "demandScenarioName",
+            info: "Matrix demand scenario",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Results"],
+            type: "dropdown",
+            values: {
+              source: "metadataTable",
+              metadataTableName: "v_input_scenarios",
+              displayColumn: "demand_scenario_name",
+              paramColumn: "demand_scenario_name",
+              sort: "ascending",
+            },
+          },
+          {
+            filterName: "Time Period",
+            paramName: "timePeriodCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Results"],
+            type: "toggle",
+            values: timePeriodValues
+          },
+          {
+            filterName: "User Class",
+            paramName: "userClassCode",
+            target: "api",
+            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            visualisations: ["Zone Results"],
+            type: "dropdown",
+            containsLegendInfo: true,
+            values: userClassValues
+          },
         ]
       }
     },
