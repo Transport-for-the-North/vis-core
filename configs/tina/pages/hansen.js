@@ -1,5 +1,24 @@
 import { termsOfUse } from "../termsOfUse"
 
+
+const ntemPurposeCode = {
+  source: "local",
+  values: [
+    {
+      displayValue: "1",
+      paramValue: 1,
+    },
+    {
+      displayValue: "2",
+      paramValue: 2,
+    },
+    {
+      displayValue: "3",
+      paramValue: 3,
+    },
+  ],
+}
+
 export const hansen = {
     pageName: "Zone PTI",
     url: "/pti-zone-select",
@@ -80,13 +99,26 @@ export const hansen = {
           info: "Type of opportunity accessed.",
           containsLegendInfo: true,
           values: {
-            source: "metadataTable",
-            metadataTableName: "ntem_purpose_codes",
-            displayColumn: "name",
-            legendSubtitleTextColumn: "id",
-            paramColumn: "id",
-            sort: "ascending",
+            source: "local",
+            values: [
+              {
+                displayValue: "Commute",                
+                paramValue: 1,
+              },
+              {
+                displayValue: "Education",
+                paramValue:3
+              }
+            ],
           },
+          // {
+          //   source: "metadataTable",
+          //   metadataTableName: "ntem_purpose_list",
+          //   displayColumn: "name",
+          //   legendSubtitleTextColumn: "id",
+          //   paramColumn: "id",
+          //   sort: "ascending",
+          // },
         },
         {
           filterName: "PTI",

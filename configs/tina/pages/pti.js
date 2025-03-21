@@ -23,23 +23,23 @@ import { bands } from "../bands.js"
   //   ],
   // }
 
-  // const ntemPurposeCode = {
-  //   source: "local",
-  //   values: [
-  //     {
-  //       displayValue: "1",
-  //       paramValue: 1,
-  //     },
-  //     {
-  //       displayValue: "2",
-  //       paramValue: 2,
-  //     },
-  //     {
-  //       displayValue: "3",
-  //       paramValue: 3,
-  //     },
-  //   ],
-  // }
+  const ntemPurposeCode = {
+    source: "local",
+    values: [
+      {
+        displayValue: "1",
+        paramValue: 1,
+      },
+      {
+        displayValue: "2",
+        paramValue: 2,
+      },
+      {
+        displayValue: "3",
+        paramValue: 3,
+      },
+    ],
+  }
 export const pti = {
     pageName: "Potential to Improve",
     url: "/zone-results",
@@ -124,14 +124,15 @@ export const pti = {
           type: "dropdown",
           shouldBeValidated: false,
           containsLegendInfo: true,
-          values: {
-            source: "metadataTable",
-            metadataTableName: "ntem_purpose_list",
-            displayColumn: "name",
-            legendSubtitleTextColumn: "id",
-            paramColumn: "id",
-            sort: "ascending",
-          }
+          values: ntemPurposeCode
+          // {
+          //   source: "metadataTable",
+          //   metadataTableName: "ntem_purpose_list",
+          //   displayColumn: "name",
+          //   legendSubtitleTextColumn: "id",
+          //   paramColumn: "id",
+          //   sort: "ascending",
+          // }
         },
       ]
     }
