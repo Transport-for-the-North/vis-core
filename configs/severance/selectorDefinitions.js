@@ -69,6 +69,8 @@ const severanceTypeSelector = {
   shouldBeValidated: false,
   info: "Type of affected area",
   containsLegendInfo: false,
+  multiSelect: true,
+  shouldInitialSelectAllInMultiSelect: true,
   values: {
     source: "local",
     values: [
