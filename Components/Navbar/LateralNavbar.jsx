@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useLocation, Link } from "react-router-dom";
-import styled from "styled-components";
-
+import styled, { css } from "styled-components";
 import { buildDropdownTree, createNavItemClickHandler } from "utils/nav";
 import { LateralRecursiveDropdown } from "./LateralRecursiveDropdown";
 import { AppContext } from "contexts";
+import { FixedExternalIcon } from "./FixedExternalIcon";
 
 /**
  * Container for the lateral (side) navigation bar.
@@ -24,25 +24,43 @@ const LateralNavbarContainerStyled = styled.div`
 `;
 
 /**
- * Styled navigation link for the side menu.
+ * Common styles shared between internal and external side navigation links.
  */
-const StyledSideNavLink = styled(Link)`
-  display: block;
+const baseSideNavLinkStyles = css`
   padding: 12px 10px;
   text-decoration: none;
   background-color: ${({ $isActive, theme, $bgColor }) =>
-    $isActive ? $bgColor || theme.activeBg : theme.navbarBg};
+    $isActive ? ($bgColor || theme.activeBg) : theme.navbarBg};
   color: ${({ $isActive, theme }) => ($isActive ? "#f9f9f9" : theme.navText)};
   transition: background-color 0.2s;
   white-space: normal;
   overflow-wrap: break-word;
   text-align: left;
   font-size: 16px;
+
   &:hover {
     background-color: ${({ $bgColor, theme }) =>
       $bgColor || theme.activeBg};
     color: #f9f9f9;
   }
+`;
+
+/**
+ * Styled navigation link for internal side menu navigation.
+ */
+export const StyledSideNavLink = styled(Link)`
+  ${baseSideNavLinkStyles}
+  display: block;
+`;
+
+/**
+ * Styled navigation link for external side menu navigation.
+ */
+export const StyledExternalSideNavLink = styled.a`
+  ${baseSideNavLinkStyles}
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 /**
@@ -66,9 +84,19 @@ export function LateralNavbar(props) {
 
   // Get pages that do not belong to a category.
   const noCategoryPages = appContext.appPages.filter((p) => !p.category);
+  noCategoryPages.push(...(appContext.externalLinks || []).filter((p) => !p.category));
+
+
   // Group pages by category.
   const pagesByCategory = {};
   appContext.appPages
+    .filter((p) => p.category)
+    .forEach((p) => {
+      if (!pagesByCategory[p.category]) pagesByCategory[p.category] = [];
+      pagesByCategory[p.category].push(p);
+    });
+  
+  appContext.externalLinks && appContext.externalLinks
     .filter((p) => p.category)
     .forEach((p) => {
       if (!pagesByCategory[p.category]) pagesByCategory[p.category] = [];
@@ -88,20 +116,33 @@ export function LateralNavbar(props) {
         </StyledSideNavLink>
       )}
       {props.className === "sideNavbar-shown" &&
-        noCategoryPages.map((page) => (
-          <StyledSideNavLink
-            key={page.pageName}
-            to={page.url}
-            $isActive={activeLink === page.url}
-            $bgColor={page.navbarLinkBgColour || props.$bgColor}
-            onClick={createNavItemClickHandler(
-              page,
-              props.onClick,
-              page.navbarLinkBgColour || props.$bgColor
-            )}
-          >
-            {page.pageName}
-          </StyledSideNavLink>
+        noCategoryPages.map((page) =>
+          page.external ? (
+            <StyledExternalSideNavLink
+              key={page.pageName || page.label}
+              href={page.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              $isActive={activeLink === page.url}
+              $bgColor={page.navbarLinkBgColour || props.$bgColor}
+            >
+              {page.pageName || page.label}
+              <FixedExternalIcon />
+            </StyledExternalSideNavLink>
+          ) : (
+            <StyledSideNavLink
+              key={page.pageName}
+              to={page.url}
+              $isActive={activeLink === page.url}
+              $bgColor={page.navbarLinkBgColour || props.$bgColor}
+              onClick={createNavItemClickHandler(
+                page,
+                props.onClick,
+                page.navbarLinkBgColour || props.$bgColor
+              )}
+            >
+              {page.pageName}
+            </StyledSideNavLink>
         ))}
       {props.className === "sideNavbar-shown" &&
         Object.keys(pagesByCategory).map((category) => {

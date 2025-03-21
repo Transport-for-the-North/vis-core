@@ -42,12 +42,21 @@ export const appConfig = {
     return bands.bands;
   },
   appPages: [
-    mePages.mePowerBi, // Include M&E-specific page
-    ...Object.values(trsePages).map(page => ({
-      ...page, // Spread the properties of the page
-      category: "TRSE", // Set the category to "TRSE"
-    })) // Include TRSE pages
-    
+    mePages.mePowerBi,
+  ],
+  externalLinks: [
+    {
+      category: "M&E Metrics",
+      external: true,
+      label: "Transport-Related Social Exclusion Visualiser",
+      url: "https://trse.transportforthenorth.com/",
+    },
+    {
+      category: "M&E Metrics",
+      external: true,
+      label: "EV Charging Infrastructure Visualiser",
+      url: "https://evci-visualiser.transportforthenorth.com/"
+    },
   ],
   footer: {
     creditsText: "© Transport for the North 2024. All rights reserved.",

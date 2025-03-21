@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { AppContext } from "contexts";
 import { useAuth } from "contexts/AuthProvider";
 import { useWindowWidth } from "hooks";
-import { buildDropdownTree } from "utils/nav";
+import { buildNavbarLinks } from "utils";
 import { Button } from "./Button";
 import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
@@ -25,6 +25,7 @@ const StyledNavbar = styled.nav`
   top: 0;
   font-family: ${({ theme }) => theme.standardFontFamily};
 `;
+
 const NavbarContent = styled.div`
   display: flex;
   align-items: center;
@@ -32,7 +33,7 @@ const NavbarContent = styled.div`
   flex-grow: 1;
   justify-content: space-between;
 `;
-// Hamburger button for mobile.
+
 const NavbarMobileButton = styled(Button)`
   cursor: pointer;
   margin-left: 10px;
@@ -44,12 +45,14 @@ const NavbarMobileButton = styled(Button)`
     height: 100%;
   }
 `;
+
 const LogoutSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
 `;
+
 const StyledLogout = styled.img`
   cursor: pointer;
   width: 50%;
@@ -73,36 +76,10 @@ export function Navbar() {
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
-  // Build the unified links array.
-  const links = [{ label: "Home", url: "/", navbarLinkBgColour: "#7317de" }];
-  // Add pages without a category.
-  appContext.appPages
-    .filter((page) => !page.category)
-    .forEach((page) => {
-      links.push({
-        label: page.pageName,
-        url: page.url,
-        customLogoPath: page.customLogoPath,
-        navbarLinkBgColour: page.navbarLinkBgColour,
-      });
-    });
-  // Group pages with a category and transform them with buildDropdownTree.
-  const pagesByCategory = {};
-  appContext.appPages
-    .filter((page) => page.category)
-    .forEach((page) => {
-      if (!pagesByCategory[page.category]) pagesByCategory[page.category] = [];
-      pagesByCategory[page.category].push(page);
-    });
-  Object.keys(pagesByCategory).forEach((cat) => {
-    const tree = buildDropdownTree(pagesByCategory[cat]);
-    links.push({
-      label: cat,
-      dropdownItems: tree,
-      navbarLinkBgColour: pagesByCategory[cat][0].navbarLinkBgColour,
-    });
-  });
+  // Build unified links array from shared function.
+  const links = buildNavbarLinks(appContext);
 
+  // Determine mobile view based on links length and window width.
   const MOBILE_BREAKPOINT = 768;
   const MIN_NAV_ITEM_WIDTH = 120;
   const isMobile =
@@ -145,9 +122,9 @@ export function Navbar() {
       <StyledNavbar>
         <NavbarContent>
           {isMobile && <NavbarMobileButton
-            src={appContext.logoutButtonImage}
-            alt="Burger Button Navbar"
-            onClick={updateSideNav}
+              src={appContext.logoutButtonImage}
+              alt="Burger Button Navbar"
+              onClick={updateSideNav}
           />}
           {(!isMobile && logoPosition === "left") && (
             <Logo
