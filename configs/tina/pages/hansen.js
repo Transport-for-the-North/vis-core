@@ -1,10 +1,10 @@
 import { termsOfUse } from "../termsOfUse"
 
 export const hansen = {
-    pageName: "zone select",
+    pageName: "Zone PTI",
     url: "/pti-zone-select",
     type: "MapLayout",
-    about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
+    about: "<p>Click on a zone to visualise the Potential to Improve (PTI) of the surrounding zones.</p> <p>The zone you select will be the assumed through zone where an intervention is placed.</p>",
     category: null,
     legalText: termsOfUse,
     termsOfUse: termsOfUse,
@@ -56,18 +56,18 @@ export const hansen = {
             source: "local",
             values: [
               {
-                displayValue: "am",                
+                displayValue: "AM",                
                 paramValue: "am",
               },
               {
-                displayValue: "pm",
+                displayValue: "PM",
                 paramValue:"pm"
               }
             ],
           },
         },
         {
-          filterName: "ntem",
+          filterName: "Purpose of Trip (NTEM)",
           paramName: "ntemPurposeCode",
           target: "api",
           actions: [

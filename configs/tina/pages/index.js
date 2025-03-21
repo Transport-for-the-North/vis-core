@@ -8,6 +8,6 @@ export const pages = {
     hansen: hansen,
     //dataExplorer: dataExplorer,
     //tinaConnectivity: tinaConnectivity,
-    pti: pti,
-    potential: potential
+    //pti: pti,
+    //potential: potential
 }

@@ -27,7 +27,7 @@ export const appConfig = {
     //pages.tinaConnectivity,
     //pages.dataExplorer,
     //pages.pti,
-    pages.potential
+    //pages.potential
     
   ],
   footer: {
