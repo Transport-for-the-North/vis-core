@@ -14,6 +14,7 @@ export const linkTotalsDifference = {
     <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
     `, //to be added
     category: "Link",
+    subcategory: "Link Totals",
     config: {
       layers: [
         {

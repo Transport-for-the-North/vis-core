@@ -7,7 +7,8 @@ export const journeyTimeZonePair = {
       url: "/accessibility-journey-time-pair",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Journey Time)",
+      category: "Accessbility",
+      subcategory: "Accessibility (Journey Time)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the distribution (catchment) of the modelled journey time for the selected OD. </p>

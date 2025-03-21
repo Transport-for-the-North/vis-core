@@ -16,6 +16,7 @@ export const zonePairsDifference = {
       <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
+      subcategory: "Zone Pairs",
       config: {
         layers: [
           {

@@ -8,6 +8,7 @@ export const zoneBenefits = {
     type: "MapLayout",
     //termsOfUse: termsOfUse,
     category: "Zone",
+    subcategory: "Zone Benefits",
     legalText: termsOfUse,
     about: "Shows the zonal benefits (summed to origin or destination for the selected scenario compared with its DM.",
     config: {

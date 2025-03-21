@@ -7,7 +7,8 @@ export const journeyTimeZonePairDifference = {
     url: "/accessibility-journey-time-pair-difference",
     type: "MapLayout",
     //termsOfUse: termsOfUse,
-    category: "Accessibility (Journey Time)",
+    category: "Accessibility",
+    subcategory: "Accessibility (Journey Time)",
     legalText: termsOfUse,
     about: `
     <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the modelled journey time for the selected OD. </p>

@@ -7,7 +7,8 @@ export const popEmpZonePairDifference = {
       url: "/accessibility-landuse-pair-difference",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Land Use)",
+      category: "Accessibility",
+      subcategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>

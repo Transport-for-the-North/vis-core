@@ -7,7 +7,8 @@ export const popEmpZoneTotals = {
       url: "/accessibility-landuse-totals",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Land Use)",
+      category: "Accessibility",
+      subcategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>

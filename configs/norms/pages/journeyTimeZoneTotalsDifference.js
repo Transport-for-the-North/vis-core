@@ -8,6 +8,7 @@ export const journeyTimeZoneTotalsDifference = {
     type: "MapLayout",
     //termsOfUse: termsOfUse,
     category: "Accessibility",
+    subcategory: "Accessibility (Journey Time)",
     about: "", //To be added.
     config: {
       layers: [

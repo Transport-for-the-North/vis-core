@@ -7,7 +7,8 @@ export const keyLocationZonePairDifference = {
       url: "/accessibility-key-location-pair-difference",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Key Location)",
+      category: "Accessibility",
+      subcategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>

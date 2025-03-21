@@ -16,6 +16,7 @@ export const stationPairs = {
     <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
     `, // TODO - Insert classification explanation or change the numbers to words??
     category: "Station",
+    subcategory: "Station Pairs",
     config: {
     layers: [
         {

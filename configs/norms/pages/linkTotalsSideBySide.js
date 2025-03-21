@@ -14,6 +14,7 @@ export const linkTotalsSideBySide = {
     <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
     `, 
     category: "Link",
+    subcategory: "Link Totals",
     config: {
       layers: [
         {

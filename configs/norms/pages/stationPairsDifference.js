@@ -16,6 +16,7 @@ export const stationPairsDifference = {
     <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
     `, // TODO Double check final point units for GC and GJT
     category: "Station",
+    subcategory: "Station Pairs",
     config: {
     layers: [
         {

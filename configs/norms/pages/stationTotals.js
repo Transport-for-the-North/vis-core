@@ -13,6 +13,7 @@ export const stationTotals = {
     <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
     `,
     category: "Station",
+    subcategory: "Station Totals",
     config: {
     layers: [
         {

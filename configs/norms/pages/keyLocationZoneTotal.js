@@ -7,7 +7,8 @@ export const keyLocationZoneTotal = {
       url: "/accessibility-key-location-totals",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Key Location)",
+      category: "Accessibility",
+      subcategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>

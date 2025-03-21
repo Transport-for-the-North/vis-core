@@ -13,6 +13,7 @@ export const stationTotalsDifference = {
     <p>It is possible to show the total passengers that board, alight or interchange on a train at a station, or the total passengers that access (enter) or egress (exit) a station.  </p>
     `,
     category: "Station",
+    subcategory: "Station Totals",
     config: {
     layers: [
         {

@@ -8,6 +8,7 @@ export const zoneTotals = {
     type: "MapLayout",
     //termsOfUse: termsOfUse,
     category: "Zone",
+    subcategory: "Zone Totals",
     legalText: termsOfUse,
     about: `
     <p>The NorTMS zones included in the model are displayed by default and no selection is required. This visual can be further aggregated by selecting a Scenario, Time Period and one of the Metrics. </p>

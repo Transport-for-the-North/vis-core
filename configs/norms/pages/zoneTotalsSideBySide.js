@@ -8,6 +8,7 @@ export const zoneTotalsSideBySide = {
     type: "DualMapLayout",
     //termsOfUse: termsOfUse,
     category: "Zone",
+    subcategory: "Zone Totals",
     legalText: termsOfUse,
     about: `
     <p>This visual can be used to simultaneously display two different scenarios. To do so, adjust both of the Scenarios, both Time Periods and a Metric of choice. </p>

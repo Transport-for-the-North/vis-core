@@ -7,7 +7,8 @@ export const popEmpZonePair = {
       url: "/accessibility-landuse-pair",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Land Use)",
+      category: "Accessibility",
+      subcategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about:`
       <p>This functionality shows the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>

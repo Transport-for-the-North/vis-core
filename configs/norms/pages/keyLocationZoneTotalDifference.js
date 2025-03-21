@@ -7,7 +7,8 @@ export const keyLocationZoneTotalDifference = {
       url: "/accessibility-key-location-totals-difference",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessibility (Key Location)",
+      category: "Accessibility",
+      subcategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</u></b> the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
