@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import glossaryData from "../glossaryData";
-import {severancePopup, severanceCallout, severanceSummaryCallout} from '../templates/index';
+import {severancePopup, severanceCallout} from '../templates/index';
 
 export const england = {
   pageName: "Severance in England",
@@ -113,15 +113,7 @@ export const england = {
         dataSource: "api",
         dataPath: "/api/severance/callout-data",
         htmlFragment: severanceCallout
-      },
-      {
-        name: "Summary Callout",
-        type: "calloutCard",
-        cardName: "Summary",
-        dataSource: "api",
-        dataPath: "/api/severance/callout-data",
-        htmlFragment: severanceSummaryCallout
-      },
+      }
     ],
     metadataTables: [{
       name: "destination_list",
