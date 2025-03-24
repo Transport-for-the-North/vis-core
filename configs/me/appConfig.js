@@ -34,7 +34,7 @@ export const appConfig = {
   mapStyle: mapStyles.geoapifyPositron,
   logoImage: "img/tfn-logo-fullsize.png",
   logoPosition: 'left',
-  backgroundImage: "img/me/me_homepage.png",
+  backgroundImage: "img/me/me_homepage.jpg",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   authenticationRequired: false,
