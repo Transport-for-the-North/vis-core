@@ -270,6 +270,12 @@ export const appConfig = {
   backgroundImage: "img/nortms-bradford/bradford_citycentre.jpg",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
+  footer: {
+    creditsText: "© Transport for the North 2024-5. All rights reserved.",
+    privacyPolicyLink: "https://transportforthenorth.com/privacy-policy/",
+    cookiesLink: "https://transportforthenorth.com/cookies/",
+    contactUsLink: "https://transportforthenorth.com/about-transport-for-the-north/contact-us/"
+  },
   appPages: [
     {
       pageName: "Station Totals",
