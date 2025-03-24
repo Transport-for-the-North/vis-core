@@ -35,7 +35,7 @@ export const england = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}&severity={severity}`,
+          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}`,
           htmlTemplate: severancePopup
         }
       },
