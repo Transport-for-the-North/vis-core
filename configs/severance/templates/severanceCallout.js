@@ -11,7 +11,7 @@
     </div>
     <div class="card">
       <div class="label">Severance Risk Decile</div>
-      <div class="value">{formatNumber(severed_area_decile)}</div>
+      <div class="value">{formatNumber(overall_decile_risk)}</div>
     </div>
     <div class="card">
     <div class="label">Severance Risk String</div>
