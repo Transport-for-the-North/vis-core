@@ -32,7 +32,7 @@ export const appConfig = {
       <p> Accessibility via public transport to destinations within a single zone are not captured. TfN is investigating options for processing the large datasets required to map accessibility/reliability at a more refined zoning level.  </p>
       <p> Specific parameters used for the current data: </p>
       <ul>
-            <li>Bus travel times from OTP were specifically calculated on the timetable for Monday 15th April 2024.</li>
+            <li>Bus travel times from OTP were specifically calculated on the timetable for <strong><span data-placeholder="modelled_date">date unknown</span></strong>.</li>
             <li>Travel times are calculated between the population weighted centroids of each zone. The actual start point for the calculation is the Open Street Map link nearest the centroid</li>
             <li>Maximum walk distance to / from bus stops is 10km</li>
             <li>Routes are not calculated for zone pairs which are further than 150km apart (crow-fly).</li>
@@ -51,6 +51,14 @@ export const appConfig = {
         "img/bsip/2.jpg",
         "img/bsip/4.jpg"
       ],
+      apiConfig: {
+        url: "/api/bsip/modelled-date/prod",
+        method: "GET",
+        mapping: {
+          modelled_date: "data"
+        },
+        dataFormat: "longdate",
+      },
     }
   ],
   legalText: termsOfUse,
