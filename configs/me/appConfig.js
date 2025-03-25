@@ -38,6 +38,7 @@ export const appConfig = {
   logoImage: "img/tfn-logo-fullsize.png",
   logoPosition: 'left',
   backgroundImage: "img/me/me_homepage.jpg",
+  additionalImage: "img/me/M&E Dashboard.png",
   logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   authenticationRequired: false,
