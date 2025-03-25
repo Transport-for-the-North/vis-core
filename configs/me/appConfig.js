@@ -22,11 +22,6 @@ export const appConfig = {
     TfN recognises that local targets may vary, due to variations in place types across the North; 
     Local Transport Authorities will progress towards their own specified targets at different paces.</p> 
      `,
-  background:`
-  The M&E dashboard provides time series data, where appropriate,  for each of the STP targets,  including a baseline measurement for each. 
-  The data sources for the metrics are a mix of open-source data, data from TfN’s in-house modelling (our Analytical Framework), 
-  and commissioned data to measure progress.  
-  `,
   methodology:"",
   legalText: termsOfUse,
   contactText: "Please contact research@transportforthenorth.com for any questions on this data tool.",
