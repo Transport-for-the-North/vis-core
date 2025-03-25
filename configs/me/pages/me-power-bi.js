@@ -1,7 +1,7 @@
 import { termsOfUse } from "../termsOfUse";
 
 export const mePowerBi = {
-  pageName: "Metrics Dashboard",
+  pageName: "M&E dashboard",
   url: "/me-metrics",
   type: "IFrameEmbed",
   category: null,
