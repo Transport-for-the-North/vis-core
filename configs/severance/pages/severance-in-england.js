@@ -107,7 +107,7 @@ export const england = {
         ]
       },
       {
-        name: "Severence Callout",
+        name: "Severance Callout",
         type: "calloutCard",
         cardName: "Output Area Summary",
         dataSource: "api",

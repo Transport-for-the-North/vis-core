@@ -4,7 +4,7 @@
 
 export const severancePopup = `
   <div class="popup-content">
-    <p class="summary-text">Severence of zone:</p>
+    <p class="summary-text">Severance of zone:</p>
     <p class="feature-name">{lsoa21_nm}</p>
     <hr class="divider">
     <div class="metadata-item">
