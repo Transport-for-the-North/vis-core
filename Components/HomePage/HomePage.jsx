@@ -102,6 +102,13 @@ export const HomePage = () => {
       content: parse(appContext.methodology)
     });
   }
+  if (appContext.additionalImage) {
+    fixedSections.push({
+      key: "additionalImage",
+      title: "",
+      content: <img className="additional-image" src={appContext.additionalImage} alt="Additional Image" />
+    });
+  }
 
   return (
     <>
