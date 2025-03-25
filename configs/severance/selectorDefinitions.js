@@ -70,10 +70,15 @@ const severanceTypeSelector = {
   info: "Type of affected area",
   containsLegendInfo: false,
   multiSelect: true,
-  shouldInitialSelectAllInMultiSelect: true,
+  shouldInitialSelectAllInMultiSelect: false,
+  shouldBeBlankOnInit: true,
   values: {
     source: "local",
     values: [
+      {
+        displayValue: "Perfect access areas",
+        paramValue: "perfect access",
+      },
       {
         displayValue: "Lowest affected areas",
         paramValue: "low severance",
@@ -85,10 +90,6 @@ const severanceTypeSelector = {
       {
         displayValue: "Severely affected areas",
         paramValue: "high severance",
-      },
-      {
-        displayValue: "Perfect access areas",
-        paramValue: "perfect access",
       },
       {
         displayValue: "No access areas",
