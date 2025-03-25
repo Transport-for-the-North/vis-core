@@ -116,5 +116,5 @@ export const useFetchVisualisationData = (visualisation, map, mapLayerId, should
   }, [map, mapLayerId, rawData, shouldFilterDataToViewport]);
 
   // Return the filtered data if available; otherwise return the raw data.
-  return { isLoading, data: filteredData || rawData };
+  return { isLoading, data: filteredData || rawData, dataWasReturnedButFiltered: rawData !== null && filteredData?.length === 0 };
 };
