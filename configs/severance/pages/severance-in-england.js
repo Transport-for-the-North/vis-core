@@ -30,7 +30,7 @@ export const england = {
         shouldHaveLabel: false,
         labelZoomLevel: 12,
         labelNulls: false,
-        hoverNulls: true,
+        hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
@@ -56,7 +56,7 @@ export const england = {
         hoverTipShouldIncludeMetadata: false,
       },
       {
-        name: "MRN Links DfT",
+        name: "Major Road Network",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/mrn_links_dft/{z}/{x}/{y}",
@@ -70,9 +70,10 @@ export const england = {
         labelNulls: false,
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
+        shouldShowInLegend: true
       },
       {
-        name: "SRN Links DfT",
+        name: "Strategic Road Network",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/srn_links_dft/{z}/{x}/{y}",
@@ -86,6 +87,7 @@ export const england = {
         labelNulls: false,
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
+        shouldShowInLegend: true
       },
     ],
     visualisations: [
@@ -96,7 +98,7 @@ export const england = {
         style: "polygon-continuous", //"polygon-categorical"
         joinField: "id",
         valueField: "value",
-        //shouldFilterDataToViewport: true, // ideally only do this if we have fixed categories, otherwise the classes will shift with each view change
+        shouldFilterDataToViewport: true, // ideally only do this if we have fixed categories, otherwise the classes will shift with each view change
         dataSource: "api",
         dataPath: "/api/severance/decile-data",
         legendText: [
