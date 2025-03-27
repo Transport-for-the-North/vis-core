@@ -84,7 +84,14 @@ export const popEmpZonePair = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Pair'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Pair'],
+              shouldBeBlankOnInit: true,
+              shouldFilterOnValidation: false,
+              shouldBeValidated: false,
+              shouldFilterOthers: true,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Pair'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
@@ -92,7 +99,13 @@ export const popEmpZonePair = {
                 paramColumn: "car_availability",
                 sort: "ascending",
                 exclude: ['All']
-                }
+                },
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: false,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                isClearable: true,
             },
             { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Pair'], values: {
                 source: "metadataTable",
@@ -101,9 +114,20 @@ export const popEmpZonePair = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-                } 
+                },
+                shouldBeBlankOnInit: false,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: true,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                shouldInitialSelectAllInMultiSelect: true,
+                isClearable: true,
             },
-            { ...selectors.timePeriod, visualisations: ['Landuse Accessibility Pair'] },
+            { ...selectors.timePeriod, visualisations: ['Landuse Accessibility Pair'],
+              shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.landuseFilter, visualisations: ['Landuse Accessibility Pair']},
             { ...selectors.landuseSegFilter, visualisations: ['Landuse Accessibility Pair']},
             { ...selectors.landuseSegFilter, filterName: "Landuse Segment 2", paramName: "landuseSegment2", visualisations: ['Landuse Accessibility Pair'], values: {

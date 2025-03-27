@@ -108,7 +108,14 @@ export const popEmpZoneTotalsDifference = {
             { ...selectors.landuseRefFilter, filterName: "Landuse Reference (1 and 2)", visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.landuseExogFilter, filterName: "Landuse Exog (1 and 2)", visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Landuse Accessibility Totals Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Landuse Accessibility Totals Difference'], paramName: "userClassId",},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Landuse Accessibility Totals Difference'], paramName: "userClassId",
+              shouldBeBlankOnInit: true,
+              shouldFilterOnValidation: false,
+              shouldBeValidated: false,
+              shouldFilterOthers: true,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Landuse Accessibility Totals Difference'], paramName: "userClassId",
                 values: {
                     source: "metadataTable",
@@ -117,7 +124,13 @@ export const popEmpZoneTotalsDifference = {
                     paramColumn: "car_availability",
                     sort: "ascending",
                     exclude: ['All']
-                  }
+                  },
+                  shouldBeBlankOnInit: true,
+                  shouldFilterOnValidation: true,
+                  shouldBeValidated: false,
+                  shouldFilterOthers: false,
+                  multiSelect: true,
+                  isClearable: true,
             },
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Landuse Accessibility Totals Difference'], values: {
                 source: "metadataTable",
@@ -126,9 +139,20 @@ export const popEmpZoneTotalsDifference = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-              }
+              },
+              shouldBeBlankOnInit: false,
+              shouldFilterOnValidation: true,
+              shouldBeValidated: true,
+              shouldFilterOthers: false,
+              multiSelect: true,
+              shouldInitialSelectAllInMultiSelect: true,
+              isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Totals Difference']},
+            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Totals Difference'],
+              shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Landuse Accessibility Totals Difference"], }
         ]
       }

@@ -81,7 +81,14 @@ export const journeyTimeZonePair = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Pair'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Pair'],
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+             },
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Journey Time Accessibility Pair'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
@@ -89,7 +96,13 @@ export const journeyTimeZonePair = {
                 paramColumn: "car_availability",
                 sort: "ascending",
                 exclude: ['All']
-                }
+                },
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: false,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                isClearable: true,
             },
             { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Pair'], values: {
                 source: "metadataTable",
@@ -98,9 +111,20 @@ export const journeyTimeZonePair = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-                } 
+                },
+                shouldBeBlankOnInit: false,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: true,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                shouldInitialSelectAllInMultiSelect: true,
+                isClearable: true,
             },
-            { ...selectors.timePeriod, visualisations: ['Journey Time Accessibility Pair'] },
+            { ...selectors.timePeriod, visualisations: ['Journey Time Accessibility Pair'],
+                shouldBeBlankOnInit: false,
+                multiSelect: true,
+                isClearable: true,
+             },
             { ...selectors.originOrDestinationFilter, visualisations: ['Journey Time Accessibility Pair']},
             { ...selectors.journeyTimeMetricFilter, visualisations: ['Journey Time Accessibility Pair']},
             { ...selectors.zoneSelectionFilter, visualisations: ['Journey Time Accessibility Pair'], layer: "NoRMS Journey Time Accessibility Pair" }

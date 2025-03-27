@@ -87,7 +87,14 @@ export const keyLocationZoneTotalDifference = {
               exclude: [0]
             }},
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Accessibility Totals Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Totals Difference']},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Totals Difference'],
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Zone Accessibility Totals Difference'],
                 values: {
                     source: "metadataTable",
@@ -96,7 +103,13 @@ export const keyLocationZoneTotalDifference = {
                     paramColumn: "car_availability",
                     sort: "ascending",
                     exclude: ['All']
-                  }
+                  },
+                  shouldBeBlankOnInit: true,
+                  shouldFilterOnValidation: true,
+                  shouldBeValidated: false,
+                  shouldFilterOthers: false,
+                  multiSelect: true,
+                  isClearable: true,
             },
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Accessibility Totals Difference'], values: {
                 source: "metadataTable",
@@ -105,9 +118,20 @@ export const keyLocationZoneTotalDifference = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-              }
+              },
+              shouldBeBlankOnInit: false,
+              shouldFilterOnValidation: true,
+              shouldBeValidated: true,
+              shouldFilterOthers: false,
+              multiSelect: true,
+              shouldInitialSelectAllInMultiSelect: true,
+              isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Accessibility Totals Difference']},
+            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Accessibility Totals Difference'],
+              shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualisations: ["Zone Accessibility Totals Difference"], },
             { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Zone Accessibility Totals Difference"], }
         ]

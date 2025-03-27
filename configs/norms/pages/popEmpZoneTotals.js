@@ -83,7 +83,14 @@ export const popEmpZoneTotals = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'],
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Totals'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
@@ -91,18 +98,35 @@ export const popEmpZoneTotals = {
                 paramColumn: "car_availability",
                 sort: "ascending",
                 exclude: ['All']
-                }
+                },
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: false,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                isClearable: true,
             },
             { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'], values: {
-                source: "metadataTable",
-                metadataTableName: "norms_userclass_list",
-                displayColumn: "name",
-                paramColumn: "id",
-                sort: "ascending",
-                exclude: [0, 123, 456, 789]
-                } 
+                  source: "metadataTable",
+                  metadataTableName: "norms_userclass_list",
+                  displayColumn: "name",
+                  paramColumn: "id",
+                  sort: "ascending",
+                  exclude: [0, 123, 456, 789]
+                },
+                shouldBeBlankOnInit: false,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: true,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                shouldInitialSelectAllInMultiSelect: true,
+                isClearable: true,
             },
-            { ...selectors.timePeriod, visualisations: ['Landuse Accessibility Totals'] },
+            { ...selectors.timePeriod, visualisations: ['Landuse Accessibility Totals'],
+                shouldBeBlankOnInit: false,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.landuseFilter, visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.landuseSegFilter, visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.landuseSegFilter, filterName: "Landuse Segment 2", paramName: "landuseSegment2", visualisations: ['Landuse Accessibility Totals'], values: {

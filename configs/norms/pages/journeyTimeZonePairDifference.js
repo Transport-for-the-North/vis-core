@@ -94,7 +94,14 @@ export const journeyTimeZonePairDifference = {
               }
             },
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",
                 values: {
                     source: "metadataTable",
@@ -103,7 +110,13 @@ export const journeyTimeZonePairDifference = {
                     paramColumn: "car_availability",
                     sort: "ascending",
                     exclude: ['All']
-                  }
+                  },
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: false,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                isClearable: true,
             },
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], values: {
                 source: "metadataTable",
@@ -112,9 +125,20 @@ export const journeyTimeZonePairDifference = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-              }
+              },
+              shouldBeBlankOnInit: false,
+              shouldFilterOnValidation: true,
+              shouldBeValidated: true,
+              shouldFilterOthers: false,
+              multiSelect: true,
+              shouldInitialSelectAllInMultiSelect: true,
+              isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference']},
+            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'],
+              shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.journeyTimeMetricFilter, visualiations: ["Journey Time Accessibility Pair Difference"], },
             { ...selectors.zoneSelectionFilter, layer: "NoRMS Journey Time Accessibility Pair Difference", visualisations: ["Journey Time Accessibility Pair Difference"], } 
       ]

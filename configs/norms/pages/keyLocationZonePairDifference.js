@@ -90,7 +90,14 @@ export const keyLocationZonePairDifference = {
               }
             },
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Accessibility Pair Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Pair Difference'], paramName: "userClassId",},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Pair Difference'], paramName: "userClassId",
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Zone Accessibility Pair Difference'], paramName: "userClassId",
                 values: {
                     source: "metadataTable",
@@ -99,7 +106,13 @@ export const keyLocationZonePairDifference = {
                     paramColumn: "car_availability",
                     sort: "ascending",
                     exclude: ['All']
-                  }
+                  },
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: false,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                isClearable: true,
             },
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Accessibility Pair Difference'], values: {
                 source: "metadataTable",
@@ -108,9 +121,20 @@ export const keyLocationZonePairDifference = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-              }
+              },
+              shouldBeBlankOnInit: false,
+              shouldFilterOnValidation: true,
+              shouldBeValidated: true,
+              shouldFilterOthers: false,
+              multiSelect: true,
+              shouldInitialSelectAllInMultiSelect: true,
+              isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Accessibility Pair Difference']},
+            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Accessibility Pair Difference'],
+              shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualisations: ["Zone Accessibility Pair Difference"], },
             { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Zone Accessibility Pair Difference"], },
             { ...selectors.zoneSelectionFilter, layer: "NoRMS Zone Accessibility Pair Difference", visualisations: ["Zone Accessibility Pair Difference"], }

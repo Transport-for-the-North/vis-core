@@ -85,7 +85,15 @@ export const stationCatchment = {
         { ...selectors.scenarioFilterYear, visualisations: ['Station Catchment'] },
         { ...selectors.scenarioFilter, visualisations: ['Station Catchment'] },
         { ...selectors.timePeriod, visualisations: ['Station Catchment'] },
-        { ...selectors.userClassFilter, visualisations: ['Station Catchment'] },
+        { ...selectors.userClassFilter, visualisations: ['Station Catchment'], values: {
+            source: "metadataTable",
+            metadataTableName: "norms_userclass_list",
+            displayColumn: "name",
+            paramColumn: "id",
+            sort: "ascending",
+            exclude: [123, 456, 789]
+          } 
+        },
         { ...selectors.originOrDestinationFilter, visualisations: ['Station Catchment'] },
         { ...selectors.catchmentMetricFilter, visualisations: ['Station Catchment'] },
         { ...selectors.stationMapSelection, layer: "NoRMS Nodes", filterName: "Select station in map", visualisations: ['Station Catchment'] }

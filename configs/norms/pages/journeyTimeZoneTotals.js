@@ -62,7 +62,14 @@ export const journeyTimeZoneTotals = {
             exclude: [0]
             }
         },
-        { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Totals'] },
+        { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Totals'], 
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: false,
+            shouldBeValidated: false,
+            shouldFilterOthers: true,
+            multiSelect: true,
+            isClearable: true,
+        },
         { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Journey Time Accessibility Totals'], values:{
             source: "metadataTable",
             metadataTableName: "norms_userclass_list",
@@ -70,7 +77,13 @@ export const journeyTimeZoneTotals = {
             paramColumn: "car_availability",
             sort: "ascending",
             exclude: ['All']
-            }
+            },
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: false,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
         },
         { ...selectors.userClass, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Totals'], paramName: "userClassIds", values: {
             source: "metadataTable",
@@ -79,9 +92,19 @@ export const journeyTimeZoneTotals = {
             paramColumn: "id",
             sort: "ascending",
             exclude: [0, 123, 456, 789]
-            } 
+            },
+            shouldBeBlankOnInit: true,
+            shouldFilterOnValidation: true,
+            shouldBeValidated: true,
+            shouldFilterOthers: false,
+            multiSelect: true,
+            isClearable: true,
         },
-        { ...selectors.timePeriod, visualisations: ['Journey Time Accessibility Totals'] },
+        { ...selectors.timePeriod, visualisations: ['Journey Time Accessibility Totals'],
+            shouldBeBlankOnInit: false,
+            multiSelect: true,
+            isClearable: true,
+        },
         { ...selectors.originOrDestinationFilter, visualisations: ['Journey Time Accessibility Totals']}
       ]
     }

@@ -77,7 +77,14 @@ export const keyLocationZonePair = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Pair'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Pair'],
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Zone Accessibility Pair'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
@@ -85,7 +92,13 @@ export const keyLocationZonePair = {
                 paramColumn: "car_availability",
                 sort: "ascending",
                 exclude: ['All']
-                }
+                },
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: true,
+                shouldBeValidated: false,
+                shouldFilterOthers: false,
+                multiSelect: true,
+                isClearable: true,
             },
             { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Pair'], values: {
                 source: "metadataTable",
@@ -94,9 +107,19 @@ export const keyLocationZonePair = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-              }
+              },
+              shouldBeBlankOnInit: false,
+              shouldFilterOnValidation: true,
+              shouldBeValidated: true,
+              shouldFilterOthers: false,
+              multiSelect: true,
+              shouldInitialSelectAllInMultiSelect: true,
+              isClearable: true,
             },
-            { ...selectors.timePeriod, visualisations: ['Zone Accessibility Pair'] },
+            { ...selectors.timePeriod, visualisations: ['Zone Accessibility Pair'], shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true
+            },
             { ...selectors.keyLocationTypeFilter, visualisations: ['Zone Accessibility Pair']},
             { ...selectors.originOrDestinationFilter, visualisations: ['Zone Accessibility Pair']},
             { ...selectors.thresholdValueFilter, visualisations: ['Zone Accessibility Pair']},

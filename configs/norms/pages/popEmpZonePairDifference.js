@@ -95,7 +95,7 @@ export const popEmpZonePairDifference = {
               exclude: [0]
             }},
             { ...selectors.landuseFilter, filterName: "Landuse (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
-            { ...selectors.landuseSegFilter, filterName: "Landuse Segment 1 (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
+            { ...selectors.landuseSegFilter, filterName: "Landuse Segment 1 (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference'],},
             { ...selectors.landuseSegFilter, filterName: "Landuse Segment 2 (1 and 2)", paramName: "landuseSegment2", visualisations: ['Landuse Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "landuse_segment_list",
@@ -109,7 +109,14 @@ export const popEmpZonePairDifference = {
             { ...selectors.landuseRefFilter, filterName: "Landuse Reference (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
             { ...selectors.landuseExogFilter, filterName: "Landuse Exog (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference'], paramName: "userClassId",},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference'], paramName: "userClassId",
+                shouldBeBlankOnInit: true,
+                shouldFilterOnValidation: false,
+                shouldBeValidated: false,
+                shouldFilterOthers: true,
+                multiSelect: true,
+                isClearable: true,
+            },
             { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference'], paramName: "userClassId",
                 values: {
                     source: "metadataTable",
@@ -118,7 +125,13 @@ export const popEmpZonePairDifference = {
                     paramColumn: "car_availability",
                     sort: "ascending",
                     exclude: ['All']
-                  }
+                  },
+                  shouldBeBlankOnInit: true,
+                  shouldFilterOnValidation: true,
+                  shouldBeValidated: false,
+                  shouldFilterOthers: false,
+                  multiSelect: true,
+                  isClearable: true,
             },
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference'], values: {
                 source: "metadataTable",
@@ -127,9 +140,20 @@ export const popEmpZonePairDifference = {
                 paramColumn: "id",
                 sort: "ascending",
                 exclude: [0, 123, 456, 789]
-              }
+              },
+              shouldBeBlankOnInit: false,
+              shouldFilterOnValidation: true,
+              shouldBeValidated: true,
+              shouldFilterOthers: false,
+              multiSelect: true,
+              shouldInitialSelectAllInMultiSelect: true,
+              isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference']},
+            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference'],
+              shouldBeBlankOnInit: false,
+              multiSelect: true,
+              isClearable: true,
+            },
             { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Landuse Accessibility Pair Difference Difference"]},
             { ...selectors.zoneSelectionFilter , layer: "NoRMS Landuse Accessibility Pair Difference", visualisations: ["Landuse Accessibility Pair Difference Difference"]}
         ]
