@@ -7,7 +7,7 @@ export const journeyTimeZonePair = {
       url: "/accessibility-journey-time-pair",
       type: "MapLayout",
       //termsOfUse: termsOfUse,
-      category: "Accessbility",
+      category: "Accessibility",
       subcategory: "Accessibility (Journey Time)",
       legalText: termsOfUse,
       about: `

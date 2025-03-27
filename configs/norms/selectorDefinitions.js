@@ -816,3 +816,31 @@ const journeyTimeMetricFilter = {
     ]
   },
 }
+
+// Export all the filter objects as part of the selectors object
+export const selectors = {
+  scenarioFilterNetwork,
+  scenarioFilterDemand,
+  scenarioFilterYear,
+  scenarioFilter,
+  timePeriod,
+  metricFilter,
+  userClassFilter,
+  originOrDestinationFilter,
+  pairsMetricFilter,
+  stationMapSelection,
+  catchmentMetricFilter,
+  linkMetricFilter,
+  zoneMetricFilter,
+  benefitsMetricFilter,
+  benefitsScenariosFilter,
+  segmentUserClassFilter,
+  keyLocationTypeFilter,
+  thresholdValueFilter,
+  zoneSelectionFilter,
+  landuseFilter,
+  landuseSegFilter,
+  landuseRefFilter,
+  landuseExogFilter,
+  journeyTimeMetricFilter
+};

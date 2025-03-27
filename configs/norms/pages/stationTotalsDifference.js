@@ -1,5 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { metadataTables } from '../metadataTables';
 
 export const stationTotalsDifference = {
     pageName: "Station Totals Difference (2-1)",

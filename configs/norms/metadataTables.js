@@ -17,3 +17,11 @@ const landUseSegmentMetadataTable = {
     name: "landuse_segment_list",
     path: "/api/getgenericdataset?dataset_id=foreign_keys.landuse_segment_list"
 }
+
+// Export the metadata tables
+export const metadataTables = {
+    inputNormsScenarioMetadataTable,
+    keyLocationTypeMetadataTable,
+    userClassMetadataTable,
+    landUseSegmentMetadataTable
+};
