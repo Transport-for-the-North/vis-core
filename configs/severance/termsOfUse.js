@@ -1,7 +1,7 @@
 export const termsOfUse = `
  <p>
             This data can be used by third parties as long as the source is
-            clearly attributed to TfN, a logo is added to any
+            clearly attributed to Transport for the North, a logo is added to any
             graphs and if online, a link is added back to this webpage
             . For our terms of use, please see the
             <a
@@ -11,7 +11,7 @@ export const termsOfUse = `
             >
               Open Government Licence
             </a>
-            . Use of the TRSE data tool also indicates your acceptance of
+            . Use of the severance data tool also indicates your acceptance of
             <a
               href="https://www.transportforthenorth.com/wp-content/uploads/Disclaimer-and-Appropriate-Use-TRSE.pdf"
               target="_blank"
