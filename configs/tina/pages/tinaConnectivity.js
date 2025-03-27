@@ -1,21 +1,17 @@
 import { termsOfUse } from "../termsOfUse"
-import { combinedAuthorityLayer, combinedAuthorityLayerBase } from "../mapLayers"
-import glossaryData from "../glossaryData";
 
-export const reliability = {
-    pageName: "Bus Reliability",
-    url: "/bus-reliability",
+export const tinaConnectivity = {
+    pageName: "Zonal Connectivity",
+    url: "/tina-connectivity",
     about:
-      `<p>Visualise the overall reliability of bus services within the set journey time by selecting a zone on the map.</p> 
-      <p>The <b>scheduled</b> timetable refers to buses which were scheduled according to BODS GTFS timetables. </p> 
-      <p>The <b>actual</b> bus journey data refers to buses which actually ran and had their GPS transponder enabled.</p>`,
+      `<p>Interaction to Calculate Hansen Metric</p>
+  <p> This page allows you to click a zone to calculate the PTI access to surrounding zones. </p>`,
     type: "MapLayout",
     category: null,
     legalText: termsOfUse,
     termsOfUse: termsOfUse,
     config: {
       layers: [
-        combinedAuthorityLayer,
         {
           uniqueId: "BsipZoneVectorTile",
           name: "Origin Zones",
@@ -30,10 +26,7 @@ export const reliability = {
           shouldHaveTooltipOnClick: false,
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
-          shouldHaveOpacityControl: false,
-          zoomToFeaturePlaceholderText: "Search by zone number/ID..."
         },
-        combinedAuthorityLayerBase
       ],
       visualisations: [
         {
@@ -42,9 +35,7 @@ export const reliability = {
           style: "polygon-categorical",
           valueField: "category",
           dataSource: "api",
-          dataPath: "/api/bsip/reliabilityV2/prod", 
-          enforceNoColourSchemeSelector: false, // this is to enforce the colour scheme selector to be hidden
-          enforceNoClassificationMethod: true, // this is to enforce the classification method selector to be hidden
+          dataPath: "/api/bsip/reliabilityV2/prod",
         },
       ],
       metadataTables: [
@@ -60,7 +51,6 @@ export const reliability = {
           min: 600,
           max: 12000,
           interval: 300,
-          defaultValue: 3600,
           displayAs: {
             operation: "divide",
             operand: 60,
@@ -78,14 +68,5 @@ export const reliability = {
           field: "id",
         },
       ],
-      additionalFeatures: {
-        glossary: { 
-          dataDictionary: glossaryData
-        },
-        dynamicWarning: {
-          url: '/api/bsip/modelled-date/prod',
-          template: `This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page.\n\nDate of Modelled data: {data}`
-        }
-      },
     },
 }

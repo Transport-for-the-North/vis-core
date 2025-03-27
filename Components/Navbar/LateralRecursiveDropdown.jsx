@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { darken } from "polished";
 import { createNavItemClickHandler } from "utils/nav";
+import { FixedExternalIcon } from "./FixedExternalIcon";
 
 /**
  * Styled icon for the lateral accordion. It rotates on open/close and its border colors update based on state.
@@ -65,13 +66,12 @@ const LateralNestedMenu = styled.div`
 `;
 
 /**
- * Styled lateral menu link that accepts a depth prop for indentation.
+ * Common styles shared between internal and external lateral menu items.
  */
-const LateralMenuItem = styled(Link)`
+const baseLateralMenuItemStyles = css`
   padding: 0.5rem 1.5rem;
   padding-left: ${({ depth }) => `calc(1.5rem + ${depth * 10}px)`};
   text-decoration: none;
-  display: block;
   background-color: ${({ $isActive, theme, $bgColor, depth }) =>
     $isActive ? ($bgColor || theme.activeNavColour) : darken(depth / 10, theme.navbarBg)};
   color: ${({ $isActive, theme }) => ($isActive ? "#f9f9f9" : theme.navText)};
@@ -80,11 +80,30 @@ const LateralMenuItem = styled(Link)`
   text-align: left;
   transition: background-color 0.2s;
   font-size: smaller;
+
   &:hover {
     background-color: ${({ $bgColor, theme }) =>
       $bgColor || theme.activeNavColour};
     color: #f9f9f9;
   }
+`;
+
+/**
+ * Styled lateral menu link for internal navigation.
+ */
+export const LateralMenuItem = styled(Link)`
+  ${baseLateralMenuItemStyles}
+  display: block;
+`;
+
+/**
+ * Styled lateral menu link for external navigation.
+ */
+export const StyledExternalLateralMenuItem = styled.a`
+  ${baseLateralMenuItemStyles}
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 /**
@@ -123,7 +142,6 @@ export function LateralRecursiveDropdown({
         item.url === activeLink ||
         (item.children && isActiveRecursive(item.children))
     );
-
   const isActive = isActiveRecursive(items);
 
   return (
@@ -144,6 +162,19 @@ export function LateralRecursiveDropdown({
               onClick={onClick}
               $bgColor={$bgColor}
             />
+          ) : item.external ? (
+            <StyledExternalLateralMenuItem
+              key={item.label}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              $isActive={activeLink === item.url}
+              depth={depth + 1}
+              $bgColor={item.navbarLinkBgColour || $bgColor}
+            >
+              {item.label}
+              <FixedExternalIcon />
+            </StyledExternalLateralMenuItem>
           ) : (
             <LateralMenuItem
               key={item.pageName}

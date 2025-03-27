@@ -7,12 +7,24 @@
  * • The HTML content is split into smaller blocks that are interleaved with the images.
  * • On wide screens images are rendered to one side of the text (alternating left/right).
  * • On narrow screens, images and content are interleaved vertically.
+ *
+ * Supports placeholders in HTML fragments.
+ * For example:
+ *   <span data-placeholder="modelled_date">Loading...</span>
+ * If the fragment defines an "apiConfig", the component will fetch additional data
+ * and replace any placeholders based on the mapping configuration provided.
+ *
+ * Also note that if the fetched api url is relative (i.e. starts with '/api/'),
+ * then the call is delegated to our baseService. Otherwise, a normal fetch call is used.
  */
-
 import React, { useContext, useEffect, useState } from "react";
 import parse from "html-react-parser";
 import { Footer } from "./Footer";
-import { createBlockSections, interweaveContentWithImages } from "./helpers";
+import { 
+  createBlockSections,
+  interweaveContentWithImages,
+  processFragmentContent
+} from "./helpers";
 import { MAX_IMAGE_HEIGHT, WIDTH_BREAKPOINT, MAX_IMAGES_ALLOWED } from "./constants";
 import "./HomePage.styles.css";
 import { AppContext } from "contexts";
@@ -29,37 +41,46 @@ import { useWindowWidth } from "hooks/useWindowWidth";
  *
  * The component handles both wide (two-column) and narrower (vertical interleaved)
  * layouts when multiple images are provided in a fragment.
- */
+  */
 export const HomePage = () => {
   const appContext = useContext(AppContext);
   const { footer, homePageFragments } = appContext;
-  const [fragmentsContent, setFragmentsContent] = useState({});
+  // Changed fragmentsContent to be an array that corresponds to homePageFragments order.
+  const [fragmentsContent, setFragmentsContent] = useState([]);
   const windowWidth = useWindowWidth();
 
   /**
    * Fetches content for each fragment defined in homePageFragments.
    * If a fragment has a URL, it fetches the content from the URL.
    * If a fragment has inline content, it uses that content directly.
+   * If a fragment defines an API configuration, it additionally fetches data
+   * to replace any placeholders in the content.
    */
   useEffect(() => {
     const fetchFragments = async () => {
-      const content = {};
-      if (homePageFragments) {
-        for (const [key, fragment] of Object.entries(homePageFragments)) {
+      const contentArray = [];
+      if (homePageFragments && Array.isArray(homePageFragments)) {
+        for (let i = 0; i < homePageFragments.length; i++) {
+          const fragment = homePageFragments[i];
+          let content = "";
+          // Fetch content from URL if provided, else use inline content.
           if (fragment.url) {
             try {
               const response = await fetch(fragment.url);
-              const data = await response.text();
-              content[key] = data;
+              content = await response.text();
             } catch (error) {
-              console.error(`Failed to fetch content for ${key}:`, error);
+              console.error(`Failed to fetch content for fragment at index ${i}:`, error);
+              content = "";
             }
           } else if (fragment.content) {
-            content[key] = fragment.content;
+            content = fragment.content;
           }
+          // Process any placeholders if apiConfig is provided.
+          content = await processFragmentContent(fragment, content);
+          contentArray.push(content);
         }
       }
-      setFragmentsContent(content);
+      setFragmentsContent(contentArray);
     };
 
     fetchFragments();
@@ -79,6 +100,13 @@ export const HomePage = () => {
       key: "methodology",
       title: "Methodology",
       content: parse(appContext.methodology)
+    });
+  }
+  if (appContext.additionalImage) {
+    fixedSections.push({
+      key: "additionalImage",
+      title: "",
+      content: <img className="additional-image" src={appContext.additionalImage} alt="Additional Image" />
     });
   }
 
@@ -116,14 +144,15 @@ export const HomePage = () => {
 
         {/* Additional Fragments */}
         {homePageFragments &&
-          Object.keys(fragmentsContent).length > 0 &&
-          Object.entries(fragmentsContent).map(([title, content], idx) => {
-            const fragment = homePageFragments[title];
+          Array.isArray(homePageFragments) &&
+          fragmentsContent.length === homePageFragments.length &&
+          homePageFragments.map((fragment, idx) => {
+            const content = fragmentsContent[idx];
             const effectiveIndex = fixedSections.length + idx;
-            const alignmentClass = fragment?.alignment || "center";
-            const backgroundColor = fragment?.backgroundColor || "";
-            const sectionTitle = fragment?.sectionTitle;
-            const imagePosition = fragment?.imagePosition || "right";
+            const alignmentClass = fragment.alignment || "center";
+            const backgroundColor = fragment.backgroundColor || "";
+            const sectionTitle = fragment.sectionTitle;
+            const imagePosition = fragment.imagePosition || "right";
             // Use provided "images" array if available (limit to MAX_IMAGES_ALLOWED)
             const images =
               fragment.images &&
@@ -133,11 +162,12 @@ export const HomePage = () => {
                 : null;
             // Fallback to a single image if provided.
             const singleImage = !images && fragment.image;
-
             return (
               <section
-                key={title}
-                className={`additional-section ${effectiveIndex % 2 === 0 ? "even-section" : "odd-section"} container-content`}
+                key={idx}
+                className={`additional-section ${
+                  effectiveIndex % 2 === 0 ? "even-section" : "odd-section"
+                } container-content`}
                 style={{ backgroundColor }}
               >
                 <h2 className={`title-${alignmentClass}`}>{sectionTitle}</h2>

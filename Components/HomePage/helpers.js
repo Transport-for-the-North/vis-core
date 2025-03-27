@@ -1,6 +1,8 @@
 import React from "react";
 import parse from "html-react-parser";
 
+import { api } from "services";
+import { formatDataValue } from "utils";
 import { MAX_IMAGE_HEIGHT } from "./constants";
 
 /**
@@ -25,7 +27,9 @@ export const interweaveContentWithImages = (htmlContent, images) => {
 
   // If there are no child elements, simply render the HTML content inside a div.
   if (!children.length) {
-    return [<div key="content" dangerouslySetInnerHTML={{ __html: htmlContent }} />];
+    return [
+      <div key="content" dangerouslySetInnerHTML={{ __html: htmlContent }} />
+    ];
   }
 
   const imageCount = images.length;
@@ -36,15 +40,22 @@ export const interweaveContentWithImages = (htmlContent, images) => {
 
   // Loop through each block element and interweave images after each segment.
   children.forEach((child, idx) => {
-    // Use html-react-parser so that any HTML (including lists) is correctly rendered.
-    elements.push(parse(child.outerHTML));
+    // Parse the outerHTML of the child.
+    const parsedElement = parse(child.outerHTML);
+    // Ensure the parsed element gets a unique key.
+    if (React.isValidElement(parsedElement)) {
+      elements.push(React.cloneElement(parsedElement, { key: `child-${idx}` }));
+    } else {
+      // In case it's not a valid React element, wrap it in a fragment with a key.
+      elements.push(<React.Fragment key={`child-${idx}`}>{parsedElement}</React.Fragment>);
+    }
+
     // After each segment, if there is an image available, insert it.
     if ((idx + 1) % segmentSize === 0 && imageIdx < imageCount) {
       elements.push(
         <img
           key={`img-${imageIdx}`}
           src={images[imageIdx]}
-          alt={`Image ${imageIdx + 1}`}
           style={{
             width: "100%",
             maxHeight: MAX_IMAGE_HEIGHT,
@@ -58,6 +69,7 @@ export const interweaveContentWithImages = (htmlContent, images) => {
       imageIdx++;
     }
   });
+
   return elements;
 };
 
@@ -96,4 +108,73 @@ export const createBlockSections = (htmlContent, images) => {
     blocks.push({ textSegment, image: images[i] || null });
   }
   return blocks;
+};
+
+/**
+ * Replaces placeholders in the provided HTML content.
+ *
+ * Searches for elements like:
+ *   <span data-placeholder="some_key">...</span>
+ * and replaces the inner HTML with the corresponding value from replacements.
+ *
+ * @param {string} content - The HTML content as a string.
+ * @param {object} replacements - An object where keys are placeholder names and values are the fetched data.
+ * @returns {string} - The updated HTML content with replaced placeholders.
+ */
+const replacePlaceholders = (content, replacements) => {
+  return content.replace(
+    /<span\s+([^>]*data-placeholder="([^"]+)"[^>]*)>(.*?)<\/span>/g,
+    (match, attrs, placeholderName) => {
+      if (replacements.hasOwnProperty(placeholderName)) {
+        return `<span ${attrs}>${replacements[placeholderName]}</span>`;
+      }
+      return match;
+    }
+  );
+};
+
+/**
+ * Fetches additional data based on the API configuration and replaces any placeholder
+ * values found in the content.
+ *
+ * Uses our baseService if the API url is relative (i.e. starts with '/api/'),
+ * otherwise uses the standard fetch.
+ *
+ * @param {object} fragment - The fragment configuration object.
+ * @param {string} content - The original HTML content.
+ * @returns {Promise<string>} - The updated content with placeholders replaced if applicable.
+ */
+export const processFragmentContent = async (fragment, content) => {
+  if (fragment.apiConfig && fragment.apiConfig.url && fragment.apiConfig.mapping) {
+    try {
+      let apiData;
+      // Use our baseService if the API URL is relative; otherwise, use the standard fetch.
+      if (fragment.apiConfig.url.startsWith("/api/")) {
+        // baseService is assumed to be a wrapper around fetch that handles our app-specific api requests.
+        apiData = await api.baseService.get(fragment.apiConfig.url);
+      } else {
+        const response = await fetch(fragment.apiConfig.url, {
+          method: fragment.apiConfig.method || "GET"
+        });
+        apiData = await response.json();
+      }
+      
+      const replacements = {};
+      // Iterate over mapping so that for each placeholder we extract the value from the API response
+      Object.entries(fragment.apiConfig.mapping).forEach(([placeholderKey, dataKey]) => {
+        let value = apiData[dataKey];
+        // Format the value if a dataFormat is provided.
+        if (fragment.apiConfig.dataFormat) {
+          value = formatDataValue(value, fragment.apiConfig.dataFormat);
+        }
+        replacements[placeholderKey] = value;
+      });
+      // Replace placeholders in the content string using the replacements object.
+      return replacePlaceholders(content, replacements);
+    } catch (error) {
+      console.error("Failed to fetch API data for placeholders:", error);
+      return content; // Fallback to the original content if the API call fails.
+    }
+  }
+  return content;
 };

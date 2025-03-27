@@ -103,13 +103,11 @@ export const accessibility = {
           visualisations: ["Bus Accessibility"],
           type: "slider",
           info: "Journey time limit by bus.",
-          min: 600,
-          max: 12000,
-          interval: 300,
-          defaultValue: 1800,
+          min: 20,
+          max: 300,
+          interval: 20,
+          defaultValue: 60,
           displayAs: {
-            operation: "divide",
-            operand: 60,
             unit: "mins",
           },
         },
@@ -136,7 +134,10 @@ export const accessibility = {
         glossary: { 
           dataDictionary: glossaryData
         },
-        warning: "This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page."
+        dynamicWarning: {
+          url: '/api/bsip/modelled-date/prod',
+          template: `This area coverage is for TfN's Area of Interest. Routes are only included if they arrive at their destination between 7am and 10am. Travel times are calculated between the population weighted centroids of each zone. Maximum walk distance to/from bus stops is 10km. For further details, please see the home page.\n\nDate of Modelled data: {data}`
+        }
       },
     },
 }

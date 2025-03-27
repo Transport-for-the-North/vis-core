@@ -1,8 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { oaEngDetailedCallout } from "../templates";
-import { engPopupContent } from "../templates/popup";
 import glossaryData from "../glossaryData";
+import {severancePopup, severanceCallout} from '../templates/index';
 
 export const england = {
   pageName: "Severance in England",
@@ -22,7 +21,7 @@ export const england = {
         source: "api",
         path: "/api/vectortiles/zones/28/{z}/{x}/{y}", // specify query params empty if to be set
         sourceLayer: "zones",
-        minZoom: 9,
+        minZoom: 10,
         geometryType: "polygon",
         visualisationName: "Severance Decile",
         isHoverable: true,
@@ -31,14 +30,13 @@ export const england = {
         shouldHaveLabel: false,
         labelZoomLevel: 12,
         labelNulls: false,
-        hoverNulls: true,
+        hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
-        invertedColorScheme: true,
-        trseLabel: true,
+        invertedColorScheme: false,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
-          htmlTemplate: engPopupContent
+          url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}`,
+          htmlTemplate: severancePopup
         }
       },
       {
@@ -57,17 +55,52 @@ export const england = {
         hoverNulls: false,
         hoverTipShouldIncludeMetadata: false,
       },
+      {
+        name: "Major Road Network",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/mrn_links_dft/{z}/{x}/{y}",
+        sourceLayer: "geometry",
+        geometryType: "line",
+        isHoverable: false,
+        isStylable: false,
+        shouldHaveTooltipOnHover: false,
+        shouldHaveLabel: true,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: false,
+        hoverTipShouldIncludeMetadata: false,
+        shouldShowInLegend: true
+      },
+      {
+        name: "Strategic Road Network",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/srn_links_dft/{z}/{x}/{y}",
+        sourceLayer: "geometry",
+        geometryType: "line",
+        isHoverable: false,
+        isStylable: false,
+        shouldHaveTooltipOnHover: false,
+        shouldHaveLabel: true,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: false,
+        hoverTipShouldIncludeMetadata: false,
+        shouldShowInLegend: true
+      },
     ],
     visualisations: [
       {
-        name: "Severance Risk",
+        name: "Severance Decile",
         type: "joinDataToMap",
         joinLayer: "Output Areas",
-        style: "polygon-continuous",
+        style: "polygon-continuous", //"polygon-categorical"
         joinField: "id",
         valueField: "value",
+        shouldFilterDataToViewport: true, // ideally only do this if we have fixed categories, otherwise the classes will shift with each view change
         dataSource: "api",
-        dataPath: "/api/trse/output-area-data",
+        dataPath: "/api/severance/decile-data",
         legendText: [
           {
             displayValue: "Output Areas",
@@ -76,17 +109,31 @@ export const england = {
         ]
       },
       {
-        name: "OA Callout",
+        name: "Severance Callout",
         type: "calloutCard",
         cardName: "Output Area Summary",
         dataSource: "api",
-        dataPath: "/api/trse/callout-data/oa-or-pt-point",
-        htmlFragment: oaEngDetailedCallout
-      },
+        dataPath: "/api/severance/callout-data",
+        htmlFragment: severanceCallout
+      }
     ],
-    metadataTables: [],
+    metadataTables: [{
+      name: "destination_list",
+      path: "/api/getgenericdataset?dataset_id=foreign_keys.destination_list"
+    },{
+      name: "barrier_list",
+      path: "/api/getgenericdataset?dataset_id=foreign_keys.barrier_list"
+    },{
+      name: "v_vis_severance_walk_speed",
+      path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_severance_walk_speed"
+    }],
     filters: [
-      selectors.oaFeature,
+      selectors.barrierType,
+      selectors.walkSpeed,
+      selectors.destinationType,
+      selectors.severanceType,
+      selectors.zoneId,
+      selectors.variable
     ],
     additionalFeatures: {
       glossary: { 

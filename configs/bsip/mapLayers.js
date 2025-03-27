@@ -34,6 +34,7 @@ export const combinedAuthorityLayer = {
   labelNulls: false,
   hoverNulls: false,
   hoverTipShouldIncludeMetadata: false,
+  zoomToFeaturePlaceholderText: "Search by name..."
 };
 
 export const combinedAuthorityLayerBase = {
