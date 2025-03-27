@@ -15,7 +15,7 @@ export const zonePairsSideBySide = {
       <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
-      subcategory: "Zone Pairs",
+      subCategory: "Zone Pairs",
       config: {
         layers: [
           {
@@ -63,7 +63,7 @@ export const zonePairsSideBySide = {
           { ...selectors.scenarioFilter, filterName: "Right Scenario", visualisations: ['Zone Pairs Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
           { ...selectors.timePeriod, filterName: "Right Time Period", visualisations: ['Zone Pairs Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
           { ...selectors.userClassFilter, filterName: "Right User Class", visualisations: ['Zone Pairs Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
-          { ...selectors.zoneSelectionFilter, layer: "NoRMS Zones Pair Result", visualisations: ['Zone Pairs Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]}
+          { ...selectors.zoneSelectionFilter, layer: "NoRMS Zones Pair Result", visualisations: ['Zone Pairs Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, { action: "UPDATE_DUAL_QUERY_PARAMS" }]}
         ]
       },
     }

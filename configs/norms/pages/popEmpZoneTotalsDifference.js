@@ -8,7 +8,7 @@ export const popEmpZoneTotalsDifference = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Land Use)",
+      subCategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</u></b> the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
@@ -129,8 +129,7 @@ export const popEmpZoneTotalsDifference = {
               }
             },
             { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Totals Difference']},
-            { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualiations: ["Landuse Accessibility Totals Difference"], },
-            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualiations: ["Landuse Accessibility Totals Difference"], }
+            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Landuse Accessibility Totals Difference"], }
         ]
       }
     }

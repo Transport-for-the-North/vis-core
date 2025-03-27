@@ -8,7 +8,7 @@ export const zoneTotalsDifference = {
     type: "MapLayout",
     //termsOfUse: termsOfUse,
     category: "Zone",
-    subcategory: "Zone Totals",
+    subCategory: "Zone Totals",
     legalText: termsOfUse,
     about: `
     <p>This visual can be used in comparing differences between two Scenarios. To do so, adjust both of the Scenarios, both Time Periods and both Metrics (note: the metrics selection should match). </p>

@@ -14,7 +14,7 @@ export const linkTotalsSideBySide = {
     <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
     `, 
     category: "Link",
-    subcategory: "Link Totals",
+    subCategory: "Link Totals",
     config: {
       layers: [
         {
@@ -75,7 +75,7 @@ export const linkTotalsSideBySide = {
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Link Totals Side-by-Side'] },
         { ...selectors.scenarioFilter, filterName: "Right Scenario", visualisations: ['Link Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
         { ...selectors.timePeriod, filterName: "Right Time Period", visualisations: ['Link Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
-        { ...selectors.catchmentMetricFilter, visualisations: ['Link Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}]},
+        { ...selectors.linkMetricFilter, visualisations: ['Link Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}]},
       ],
     },
   }

@@ -8,7 +8,7 @@ export const popEmpZonePair = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Land Use)",
+      subCategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about:`
       <p>This functionality shows the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
@@ -84,8 +84,8 @@ export const popEmpZonePair = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, visualisations: ['Landuse Accessibility Pair'] },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Pair'], values:{
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Pair'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Pair'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "car_availability",
@@ -94,7 +94,7 @@ export const popEmpZonePair = {
                 exclude: ['All']
                 }
             },
-            { ...selectors.userClass, visualisations: ['Landuse Accessibility Pair'], values: {
+            { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -118,7 +118,7 @@ export const popEmpZonePair = {
             },
             { ...selectors.landuseRefFilter, visualisations: ['Landuse Accessibility Pair']},
             { ...selectors.landuseExogFilter, visualisations: ['Landuse Accessibility Pair']},
-            { ...selectors.originOrDestinationValues, visualisations: ['Landuse Accessibility Pair']},
+            { ...selectors.originOrDestinationFilter, visualisations: ['Landuse Accessibility Pair']},
             { ...selectors.thresholdValueFilter, visualisations: ['Landuse Accessibility Pair']},
             { ...selectors.zoneSelectionFilter, visualisations: ['Landuse Accessibility Pair'], layer: "NoRMS Landuse Accessibility Pair" }
         ]

@@ -8,7 +8,7 @@ export const keyLocationZoneTotalDifference = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Key Location)",
+      subCategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</u></b> the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
@@ -87,8 +87,8 @@ export const keyLocationZoneTotalDifference = {
               exclude: [0]
             }},
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Accessibility Totals Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Totals Difference'], paramName: "userClassId",},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Zone Accessibility Totals Difference'], paramName: "userClassId",
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Totals Difference']},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Zone Accessibility Totals Difference'],
                 values: {
                     source: "metadataTable",
                     metadataTableName: "norms_userclass_list",
@@ -108,8 +108,8 @@ export const keyLocationZoneTotalDifference = {
               }
             },
             { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Accessibility Totals Difference']},
-            { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualiations: ["Zone Accessibility Totals Difference"], },
-            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualiations: ["Zone Accessibility Totals Difference"], }
+            { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualisations: ["Zone Accessibility Totals Difference"], },
+            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Zone Accessibility Totals Difference"], }
         ]
       }
     }

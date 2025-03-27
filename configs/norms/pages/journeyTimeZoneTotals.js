@@ -8,7 +8,7 @@ export const journeyTimeZoneTotals = {
     type: "MapLayout",
     //termsOfUse: termsOfUse,
     category: "Accessibility",
-    subcategory: "Accessibility (Journey Time)",
+    subCategory: "Accessibility (Journey Time)",
     about: "", //To be added.
     config: {
       layers: [
@@ -62,8 +62,8 @@ export const journeyTimeZoneTotals = {
             exclude: [0]
             }
         },
-        { ...selectors.segmentUserClassFilter, visualisations: ['Journey Time Accessibility Totals'] },
-        { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability", visualisations: ['Journey Time Accessibility Totals'], values:{
+        { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Totals'] },
+        { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Journey Time Accessibility Totals'], values:{
             source: "metadataTable",
             metadataTableName: "norms_userclass_list",
             displayColumn: "car_availability",
@@ -72,7 +72,7 @@ export const journeyTimeZoneTotals = {
             exclude: ['All']
             }
         },
-        { ...selectors.userClass, visualisations: ['Journey Time Accessibility Totals'], values: {
+        { ...selectors.userClass, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Totals'], paramName: "userClassIds", values: {
             source: "metadataTable",
             metadataTableName: "norms_userclass_list",
             displayColumn: "name",
@@ -82,7 +82,7 @@ export const journeyTimeZoneTotals = {
             } 
         },
         { ...selectors.timePeriod, visualisations: ['Journey Time Accessibility Totals'] },
-        { ...selectors.originOrDestinationValues, visualisations: ['Journey Time Accessibility Totals']}
+        { ...selectors.originOrDestinationFilter, visualisations: ['Journey Time Accessibility Totals']}
       ]
     }
 }

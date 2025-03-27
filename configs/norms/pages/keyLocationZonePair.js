@@ -8,7 +8,7 @@ export const keyLocationZonePair = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Key Location)",
+      subCategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
@@ -77,8 +77,8 @@ export const keyLocationZonePair = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, visualisations: ['Zone Accessibility Pair'] },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability", visualisations: ['Zone Accessibility Pair'], values:{
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Pair'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Zone Accessibility Pair'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "car_availability",
@@ -87,7 +87,7 @@ export const keyLocationZonePair = {
                 exclude: ['All']
                 }
             },
-            { ...selectors.userClass, visualisations: ['Zone Accessibility Pair'], values: {
+            { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -98,9 +98,9 @@ export const keyLocationZonePair = {
             },
             { ...selectors.timePeriod, visualisations: ['Zone Accessibility Pair'] },
             { ...selectors.keyLocationTypeFilter, visualisations: ['Zone Accessibility Pair']},
-            { ...selectors.originOrDestinationValues, visualisations: ['Zone Accessibility Pair']},
+            { ...selectors.originOrDestinationFilter, visualisations: ['Zone Accessibility Pair']},
             { ...selectors.thresholdValueFilter, visualisations: ['Zone Accessibility Pair']},
-            { ...selectors.zoneSelectionFilter, visualisations: ['Zone Accessibility Pair']}
+            { ...selectors.zoneSelectionFilter, visualisations: ['Zone Accessibility Pair'], layer: "NoRMS Zone Accessibility Pair"}
         ]
       }
     }

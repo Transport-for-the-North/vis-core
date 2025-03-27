@@ -656,7 +656,7 @@ const benefitsScenariosFilter = {
 
 const segmentUserClassFilter = {
   filterName: "Filter User Class by Segment",
-  paramName: "userClassIds",
+  paramName: "userClassId",
   target: "validate",
   actions: [{ action: "none" }],
   visualisations: null,

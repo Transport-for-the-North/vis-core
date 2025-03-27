@@ -38,7 +38,7 @@ export const MapLayout = () => {
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
-
+  console.log(state.filters);
   const layerZoomMessage = useLayerZoomMessage();
 
   useEffect(() => {

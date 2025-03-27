@@ -15,7 +15,7 @@ export const zonePairs = {
       <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
-      subcategory: "Zone Pairs",
+      subCategory: "Zone Pairs",
       config: {
         layers: [
           {
@@ -53,6 +53,7 @@ export const zonePairs = {
             { ...selectors.scenarioFilterYear, visualisations: ['Zone Pairs'] },
             { ...selectors.scenarioFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.timePeriod, visualisations: ['Zone Pairs'] },
+            { ...selectors.userClassFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.linkMetricFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.originOrDestinationFilter, visualisations: ['Zone Pairs']},
             { ...selectors.pairsMetricFilter, visualisations: ['Zone Pairs']},

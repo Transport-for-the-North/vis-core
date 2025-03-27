@@ -8,7 +8,7 @@ export const keyLocationZonePairDifference = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Key Location)",
+      subCategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible key locations from/to the given modelled zone. </p>
@@ -111,8 +111,8 @@ export const keyLocationZonePairDifference = {
               }
             },
             { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Accessibility Pair Difference']},
-            { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualiations: ["Zone Accessibility Pair Difference"], },
-            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualiations: ["Zone Accessibility Pair Difference"], },
+            { ...selectors.keyLocationTypeFilter, filterName: "Key Location Type (1 and 2)", visualisations: ["Zone Accessibility Pair Difference"], },
+            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Zone Accessibility Pair Difference"], },
             { ...selectors.zoneSelectionFilter, layer: "NoRMS Zone Accessibility Pair Difference", visualisations: ["Zone Accessibility Pair Difference"], }
         ]
       }

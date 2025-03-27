@@ -16,7 +16,7 @@ export const stationPairsSideBySide = {
     <p>Column Name refers to Demand (Passengers), Generalised Cost and Generalised Journey Time. </p>
     `, // TODO Find out what is to go here.
     category: "Station",
-    subcategory: "Station Pairs",
+    subCategory: "Station Pairs",
     config: {
     layers: [
         {

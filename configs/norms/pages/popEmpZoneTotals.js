@@ -8,7 +8,7 @@ export const popEmpZoneTotals = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Land Use)",
+      subCategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the number of accessible population and employment from/to each modelled zone within a given journey time threshold.  </p>
@@ -83,8 +83,8 @@ export const popEmpZoneTotals = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, visualisations: ['Landuse Accessibility Totals'] },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Totals'], values:{
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Totals'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "car_availability",
@@ -93,7 +93,7 @@ export const popEmpZoneTotals = {
                 exclude: ['All']
                 }
             },
-            { ...selectors.userClass, visualisations: ['Landuse Accessibility Totals'], values: {
+            { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -117,7 +117,7 @@ export const popEmpZoneTotals = {
             },
             { ...selectors.landuseRefFilter, visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.landuseExogFilter, visualisations: ['Landuse Accessibility Totals']},
-            { ...selectors.originOrDestinationValues, visualisations: ['Landuse Accessibility Totals']},
+            { ...selectors.originOrDestinationFilter, visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.thresholdValueFilter, visualisations: ['Landuse Accessibility Totals']}
         ]
       }

@@ -8,7 +8,7 @@ export const popEmpZonePairDifference = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Land Use)",
+      subCategory: "Accessibility (Land Use)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows <b><u>the difference in</b></u> the distribution (catchment) of the number of accessible population and employment from/to the given modelled zone. </p>
@@ -130,8 +130,8 @@ export const popEmpZonePairDifference = {
               }
             },
             { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Pair Difference Difference']},
-            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualiations: ["Landuse Accessibility Pair Difference Difference"]},
-            { ...selectors.zoneSelectionFilter , layer: "NoRMS Landuse Accessibility Pair Difference", visualiations: ["Landuse Accessibility Pair Difference Difference"]}
+            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Landuse Accessibility Pair Difference Difference"]},
+            { ...selectors.zoneSelectionFilter , layer: "NoRMS Landuse Accessibility Pair Difference", visualisations: ["Landuse Accessibility Pair Difference Difference"]}
         ]
       }
     }

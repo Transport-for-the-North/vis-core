@@ -8,7 +8,7 @@ export const journeyTimeZonePair = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Journey Time)",
+      subCategory: "Accessibility (Journey Time)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the distribution (catchment) of the modelled journey time for the selected OD. </p>
@@ -81,8 +81,8 @@ export const journeyTimeZonePair = {
                 exclude: [0]
               }
             },
-            { ...selectors.segmentUserClassFilter, visualisations: ['Journey Time Accessibility Pair'] },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability", visualisations: ['Journey Time Accessibility Pair'], values:{
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Pair'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Journey Time Accessibility Pair'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "car_availability",
@@ -91,7 +91,7 @@ export const journeyTimeZonePair = {
                 exclude: ['All']
                 }
             },
-            { ...selectors.userClass, visualisations: ['Journey Time Accessibility Pair'], values: {
+            { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -101,7 +101,7 @@ export const journeyTimeZonePair = {
                 } 
             },
             { ...selectors.timePeriod, visualisations: ['Journey Time Accessibility Pair'] },
-            { ...selectors.originOrDestinationValues, visualisations: ['Journey Time Accessibility Pair']},
+            { ...selectors.originOrDestinationFilter, visualisations: ['Journey Time Accessibility Pair']},
             { ...selectors.journeyTimeMetricFilter, visualisations: ['Journey Time Accessibility Pair']},
             { ...selectors.zoneSelectionFilter, visualisations: ['Journey Time Accessibility Pair'], layer: "NoRMS Journey Time Accessibility Pair" }
         ]

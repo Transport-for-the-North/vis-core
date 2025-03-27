@@ -16,7 +16,7 @@ export const stationCatchmentSideBySide = {
       <p>Metric allows to further aggregate the catchment in by the mode of transport used to access or egress the station such as car, walk, bus, Light Rail Transit. Alternatively, a Total Demand, by mode, can also be displayed.  </p>
       `,
       category: "Station",
-      subcategory: "Station Catchment",
+      subCategory: "Station Catchment",
       config: {
         layers: [
           {

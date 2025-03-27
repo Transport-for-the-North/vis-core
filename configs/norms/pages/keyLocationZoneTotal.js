@@ -8,7 +8,7 @@ export const keyLocationZoneTotal = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       category: "Accessibility",
-      subcategory: "Accessibility (Key Location)",
+      subCategory: "Accessibility (Key Location)",
       legalText: termsOfUse,
       about: `
       <p>This functionality shows the number of accessible key locations from/to each modelled zone within a given journey time threshold.</p>
@@ -75,8 +75,8 @@ export const keyLocationZoneTotal = {
               sort: "ascending",
               exclude: [0]
             }},
-            { ...selectors.segmentUserClassFilter, visualisations: ['Zone Accessibility Totals'] },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability", visualisations: ['Zone Accessibility Totals'], values:{
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Totals'] },
+            { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Zone Accessibility Totals'], values:{
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "car_availability",
@@ -85,7 +85,7 @@ export const keyLocationZoneTotal = {
                 exclude: ['All']
                 }
             },
-            { ...selectors.userClass, visualisations: ['Zone Accessibility Totals'], values: {
+            { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Totals'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -96,7 +96,7 @@ export const keyLocationZoneTotal = {
             },
             { ...selectors.timePeriod, visualisations: ['Zone Accessibility Totals'] },
             { ...selectors.keyLocationTypeFilter, visualisations: ['Zone Accessibility Totals']},
-            { ...selectors.originOrDestinationValues, visualisations: ['Zone Accessibility Totals']},
+            { ...selectors.originOrDestinationFilter, visualisations: ['Zone Accessibility Totals']},
             { ...selectors.thresholdValueFilter, visualisations: ['Zone Accessibility Totals']}
         ]
       }

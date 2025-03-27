@@ -16,7 +16,7 @@ export const zonePairsDifference = {
       <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
       `,
       category: "Zone",
-      subcategory: "Zone Pairs",
+      subCategory: "Zone Pairs",
       config: {
         layers: [
           {
@@ -62,7 +62,7 @@ export const zonePairsDifference = {
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Pairs Difference']},
             { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Pairs Difference']},
             { ...selectors.pairsMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Zone Pairs Difference']},
-            { ...selectors.zoneSelectionFilter, visualisations: ['Zone Pairs Difference']}
+            { ...selectors.zoneSelectionFilter, layer: "NoRMS Zones Pair Result Difference", visualisations: ['Zone Pairs Difference']}
         ]
       },
     }

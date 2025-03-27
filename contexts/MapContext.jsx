@@ -202,7 +202,7 @@ export const MapProvider = ({ children }) => {
                 console.error('Unknown filter source:', filter.values.source);
             }
         }
-
+        console.log(filter);
         // Initialize filter value if shouldBeBlankOnInit is not true
         if (!filterWithId.shouldBeBlankOnInit) {
           if (filterWithId.multiSelect && filterWithId.shouldInitialSelectAllInMultiSelect){
@@ -220,9 +220,9 @@ export const MapProvider = ({ children }) => {
           filterState[filterWithId.id] = null; // Set to null or undefined to represent no initial selection
         }
       }
-
       // Incorporate 'sides' logic
       const updatedFilters = filters.map((filter) => {
+        console.log(filter);
         if (filter.visualisations[0].includes('Side')) {
           const sides =
             filter.filterName.includes('Left')
