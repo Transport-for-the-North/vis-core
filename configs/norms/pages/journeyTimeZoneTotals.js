@@ -104,6 +104,7 @@ export const journeyTimeZoneTotals = {
             shouldBeBlankOnInit: false,
             multiSelect: true,
             isClearable: true,
+            paramName: "timePeriodCodes"
         },
         { ...selectors.originOrDestinationFilter, visualisations: ['Journey Time Accessibility Totals']}
       ]

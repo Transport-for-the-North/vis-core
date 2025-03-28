@@ -73,7 +73,14 @@ export const popEmpZoneTotals = {
         filters: [
             { ...selectors.scenarioFilterNetwork, visualisations: ['Landuse Accessibility Totals'] },
             { ...selectors.scenarioFilterDemand, visualisations: ['Landuse Accessibility Totals'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Landuse Accessibility Totals'] },
+            { ...selectors.scenarioFilterYear, paramName: "scenarioYear", visualisations: ['Landuse Accessibility Totals'],
+              shouldBeBlankOnInit: true,
+              shouldFilterOnValidation: true,
+              shouldFilterOthers: true,
+              multiSelect: false,
+              isClearable: true,
+              actions: [{ action: "UPDATE_QUERY_PARAMS" }]
+            },
             { ...selectors.scenarioFilter, visualisations: ['Landuse Accessibility Totals'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -90,6 +97,7 @@ export const popEmpZoneTotals = {
                 shouldFilterOthers: true,
                 multiSelect: true,
                 isClearable: true,
+                paramName: "userClassIds",
             },
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", filterName: "Filter User Class by Car Availability", visualisations: ['Landuse Accessibility Totals'], values:{
                 source: "metadataTable",
@@ -105,6 +113,7 @@ export const popEmpZoneTotals = {
                 shouldFilterOthers: false,
                 multiSelect: true,
                 isClearable: true,
+                paramName: "userClassIds",
             },
             { ...selectors.userClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'], values: {
                   source: "metadataTable",
@@ -121,11 +130,13 @@ export const popEmpZoneTotals = {
                 multiSelect: true,
                 shouldInitialSelectAllInMultiSelect: true,
                 isClearable: true,
+                paramName: "userClassIds",
             },
             { ...selectors.timePeriod, visualisations: ['Landuse Accessibility Totals'],
                 shouldBeBlankOnInit: false,
                 multiSelect: true,
                 isClearable: true,
+                paramName: "timePeriodCodes",
             },
             { ...selectors.landuseFilter, visualisations: ['Landuse Accessibility Totals']},
             { ...selectors.landuseSegFilter, visualisations: ['Landuse Accessibility Totals']},

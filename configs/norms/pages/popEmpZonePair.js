@@ -74,7 +74,10 @@ export const popEmpZonePair = {
         filters: [
             { ...selectors.scenarioFilterNetwork, visualisations: ['Landuse Accessibility Pair'] },
             { ...selectors.scenarioFilterDemand, visualisations: ['Landuse Accessibility Pair'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Landuse Accessibility Pair'] },
+            { ...selectors.scenarioFilterYear, visualisations: ['Landuse Accessibility Pair'], paramName: "scenarioYear",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                shouldFilterOnValidation: true
+            },
             { ...selectors.scenarioFilter, visualisations: ['Landuse Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -127,6 +130,7 @@ export const popEmpZonePair = {
               shouldBeBlankOnInit: false,
               multiSelect: true,
               isClearable: true,
+              paramName: "timePeriodCodes",
             },
             { ...selectors.landuseFilter, visualisations: ['Landuse Accessibility Pair']},
             { ...selectors.landuseSegFilter, visualisations: ['Landuse Accessibility Pair']},
