@@ -72,7 +72,7 @@ export const stationPairsDifference = {
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Station Pairs Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Station Pairs Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Station Pairs Difference'] },
-        { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoScenario", visualisations: ['Station Pairs Difference'] },
+        { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Station Pairs Difference'] },
         { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Station Pairs Difference']},
         { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Station Pairs Difference']},
         { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Station Pairs Difference']},

@@ -94,7 +94,23 @@ export const stationCatchment = {
             exclude: [123, 456, 789]
           } 
         },
-        { ...selectors.originOrDestinationFilter, visualisations: ['Station Catchment'] },
+        { ...selectors.originOrDestinationFilter, paramName: "directionId", visualisations: ['Station Catchment'],
+            values: {
+                source: "local",
+                values: [
+                {
+                  displayValue: "Origin",
+                  paramValue: "0",
+                  legendSubtitleText:"Origin"
+                },
+                {
+                  displayValue: "Destination",
+                  paramValue: "1",
+                  legendSubtitleText:"Destination"
+                }
+              ]
+            }
+        },
         { ...selectors.catchmentMetricFilter, visualisations: ['Station Catchment'] },
         { ...selectors.stationMapSelection, layer: "NoRMS Nodes", filterName: "Select station in map", visualisations: ['Station Catchment'] }
     ],

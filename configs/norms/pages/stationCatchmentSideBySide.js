@@ -82,7 +82,24 @@ export const stationCatchmentSideBySide = {
         ],
         metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
         filters: [
-        { ...selectors.originOrDestinationFilter, visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
+        { ...selectors.originOrDestinationFilter, visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+            values: {
+              source: "local",
+              values: [
+              {
+                displayValue: "Origin",
+                paramValue: "0",
+                legendSubtitleText:"Origin"
+              },
+              {
+                displayValue: "Destination",
+                paramValue: "1",
+                legendSubtitleText:"Destination"
+              }
+            ]
+          },
+          paramName: "directionId"
+        },
         { ...selectors.catchmentMetricFilter, visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}]},
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Station Catchment Side-by-Side'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Station Catchment Side-by-Side'] },

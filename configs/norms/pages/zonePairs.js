@@ -57,7 +57,7 @@ export const zonePairs = {
             { ...selectors.linkMetricFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.originOrDestinationFilter, visualisations: ['Zone Pairs']},
             { ...selectors.pairsMetricFilter, visualisations: ['Zone Pairs']},
-            { ...selectors.zoneSelectionFilter, visualisations: ['Zone Pairs']}
+            { ...selectors.zoneSelectionFilter, layer: "NoRMS Zones Pair Result", visualisations: ['Zone Pairs']}
         ]
       },
     }

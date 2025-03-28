@@ -90,7 +90,24 @@ export const stationCatchmentDifference = {
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Station Catchment Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Station Catchment Difference'] },
         { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Station Catchment Difference']},
+        { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Station Catchment Difference'],
+            values: {
+              source: "local",
+              values: [
+              {
+                displayValue: "Origin",
+                paramValue: "0",
+                legendSubtitleText:"Origin"
+              },
+              {
+                displayValue: "Destination",
+                paramValue: "1",
+                legendSubtitleText:"Destination"
+              }
+            ]
+          },
+          paramName: "directionId"
+        },
         { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Station Catchment Difference'], values: {
             source: "metadataTable",
             metadataTableName: "norms_userclass_list",

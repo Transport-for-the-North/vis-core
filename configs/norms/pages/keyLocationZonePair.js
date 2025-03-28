@@ -116,7 +116,7 @@ export const keyLocationZonePair = {
               shouldInitialSelectAllInMultiSelect: true,
               isClearable: true,
             },
-            { ...selectors.timePeriod, visualisations: ['Zone Accessibility Pair'], shouldBeBlankOnInit: false,
+            { ...selectors.timePeriod, visualisations: ['Zone Accessibility Pair'], shouldBeBlankOnInit: false, paramName: "timePeriodCodes",
               multiSelect: true,
               isClearable: true
             },
