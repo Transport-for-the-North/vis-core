@@ -1,5 +1,5 @@
 import { forEach } from "lodash";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
@@ -7,12 +7,11 @@ import { useMapContext } from "hooks";
 // Styled components for the legend UI
 const LegendContainer = styled.div`
   --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
-  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */  
-  
-  display: inline-flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  gap: 0 15px;
+  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */
+
+  display: flex;
+  flex-direction: row; /* Row-based flex layout */
+  gap: 8px;
   position: absolute;
   bottom: 40px;
   right: 10px;
@@ -23,15 +22,15 @@ const LegendContainer = styled.div`
   box-sizing: border-box; /* Include padding and border in width */
   border-radius: 10px;
   z-index: 10;
-  min-width: 0;
   max-height: 35vh;
-  max-width: 80vw;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden; /* Hide horizontal scrollbar if any */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
   font-size: medium;
-  
-  /* Custom scrollbar styling for Webkit-based browsers */
+
+  /* Webkit-based browsers (Chrome, Safari, Edge) */
+  /* Custom Scrollbar Styles */
   &::-webkit-scrollbar {
     width: var(--scrollbar-width);
   }
@@ -57,18 +56,12 @@ const LegendContainer = styled.div`
     &:hover {
       scrollbar-color: darkgrey transparent; /* Color when hovered */
     }
-  }
 `;
 
 const LegendItemContainer = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: 0;
-`;
-
-const LegendGroup = styled.div`
-  width: max-content;
-  min-width: 0;
+  margin-bottom: 6px;
 `;
 
 const LegendTitle = styled.div`
@@ -91,7 +84,7 @@ const LegendSubtitle = styled.h2`
 const LegendItem = styled.div`
   display: flex;
   align-items: center;
-  min-width: 0;
+  margin-bottom: 2px;
   font-size: medium;
 `;
 
@@ -126,20 +119,18 @@ const LegendLabel = styled.span`
 const LegendDivider = styled.div`
   height: 1px;
   background-color: #ccc;
-  margin: 4px;
-  max-width: 80%;
-  width: 80px;
+  margin: 6px 0;
 `;
 
 /**
-* Interpolates widths for color stops based on width stops.
-*
-* @param {Array} colorStops - An array of color stop objects, each with a `value` property.
-* @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
-* @param {string} type - The type of the layer (e.g., 'circle', 'line').
-* @returns {Array} An array of objects with `value` and `width` properties, where `width` is the interpolated diameter.
-* @throws Will throw an error if less than two color stops or width stops are provided.
-*/
+ * Interpolates widths for color stops based on width stops.
+ *
+ * @param {Array} colorStops - An array of color stop objects, each with a `value` property.
+ * @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
+ * @param {string} type - The type of the layer (e.g., 'circle', 'line').
+ * @returns {Array} An array of objects with `value` and `width` properties, where `width` is the interpolated diameter.
+ * @throws Will throw an error if less than two color stops or width stops are provided.
+ */
 function interpolateWidths(colorStops, widthStops, type) {
   if (!colorStops || colorStops.length < 2) {
     throw new Error('At least two color stops are required.');
@@ -165,12 +156,12 @@ function interpolateWidths(colorStops, widthStops, type) {
 }
 
 /**
-* Interpolates the width at a given value based on width stops.
-*
-* @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
-* @param {number} value - The value at which to interpolate the width.
-* @returns {number} The interpolated width.
-*/
+ * Interpolates the width at a given value based on width stops.
+ *
+ * @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
+ * @param {number} value - The value at which to interpolate the width.
+ * @returns {number} The interpolated width.
+ */
 function interpolateWidthAtValue(widthStops, value) {
   if (value <= widthStops[0].value) {
     return widthStops[0].width;
@@ -197,16 +188,16 @@ function interpolateWidthAtValue(widthStops, value) {
 }
 
 /**
-* Interprets a color expression from a map style specification and returns a list of color stops.
+ * Interprets a color expression from a map style specification and returns a list of color stops.
  * A color expression can be a simple string representing a color, or an array that defines
  * a color interpolation or match expression.
-*
+ *
  * @param {string|array} expression - The color expression to interpret. This can be a simple
  *                                    color string or an array representing an 'interpolate',
  *                                    'step', or 'match' expression.
  * @returns {array|null} An array of objects with 'value' and 'color' properties representing
  *                       the color stops, or null if the expression cannot be interpreted.
-*/
+ */
 const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "string") {
@@ -261,10 +252,10 @@ const interpretColorExpression = (expression) => {
  * Interprets a width expression from a map style specification and calculates
  * intermediate width stops. The function assumes linear interpolation between stops.
  * The number of intermediate stops is dynamic and can be specified.
-*
-* @param {Array|number} expression - The width expression from the map style.
-* @returns {Array|null} - An array of width stops or null if the expression is invalid.
-*/
+ *
+ * @param {Array|number} expression - The width expression from the map style.
+ * @returns {Array|null} - An array of width stops or null if the expression is invalid.
+ */
 const interpretWidthExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "number") {
@@ -293,18 +284,17 @@ const interpretWidthExpression = (expression) => {
 };
 
 /**
-* DynamicLegend is a React component that renders a map legend based on the styles of map layers.
+ * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
  * item displays color and/or width swatches along with labels indicating the corresponding values.
-*
-* @component
-* @property {Object} map - The map instance from Mapbox or MapLibre.
-* @returns {JSX.Element|null} The rendered legend component or null if there are no legend items.
-*/
+ * 
+ * @component
+ * @property {Object} map - The map instance from Mapbox or MapLibre.
+ * @returns {JSX.Element|null} The rendered legend component or null if there are no legend items.
+ */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
-  const legendRef = useRef(null);
 
   useEffect(() => {
     if (!map) return;
@@ -316,7 +306,7 @@ export const DynamicLegend = ({ map }) => {
         .filter((layer) => {
           const isStylableOrShouldShow = layer.metadata && (layer.metadata.isStylable || layer.metadata.shouldShowInLegend);
           const isWithinZoomRange = (layer.minzoom === undefined || state.currentZoom >= layer.minzoom) &&
-            (layer.maxzoom === undefined || state.currentZoom <= layer.maxzoom);
+                                    (layer.maxzoom === undefined || state.currentZoom <= layer.maxzoom);
           return isStylableOrShouldShow && isWithinZoomRange;
         })
         .map((layer, index) => {
@@ -342,8 +332,9 @@ export const DynamicLegend = ({ map }) => {
               const filter = state.filters.find(
                 (filter) => filter.paramName === filterParamName
               );
-              const filterValues = filter?.values?.values || [];
-              const defaultDisplayValue = filterValues[0]?.displayValue || title;
+              const filterValues = filter?.values.values || [];
+              const defaultDisplayValue =
+                filterValues[0]?.displayValue || title;
               const defaultLegendSubtitleText =
                 filterValues[0]?.legendSubtitleText || "";
 
@@ -365,26 +356,22 @@ export const DynamicLegend = ({ map }) => {
           // Interpret expressions
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
-              paintProps["circle-color"] ||
-              paintProps["fill-color"]
+            paintProps["circle-color"] ||
+            paintProps["fill-color"]
           );
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
           );
 
           // Invert color and width stops if necessary
-          if (invertColorScheme && colorStops) {
+          if (invertColorScheme) {
             colorStops = colorStops.slice().reverse();
             if (widthStops) {
               widthStops = widthStops.slice().reverse();
             }
           }
-          if (
-            layer.type === "circle" &&
-            colorStops &&
-            widthStops?.length > 0 &&
-            colorStops.length !== widthStops.length
-          ) {
+
+          if (layer.type === "circle" && colorStops && widthStops?.length > 0 && colorStops.length !== widthStops.length) {
             widthStops = interpolateWidths(colorStops, widthStops, layer.type);
           }
 
@@ -444,129 +431,60 @@ export const DynamicLegend = ({ map }) => {
               });
             }
           }
-          // If no legend entries or exactly one, consider this a default style scenario.
-          let noStyle = false;
-          if (legendEntries.length <= 1) {
-            noStyle = true;
-            if (legendEntries.length === 0) {
-              const defaultColor =
-                paintProps["line-color"] ||
-                paintProps["circle-color"] ||
-                paintProps["fill-color"] ||
-                "#000";
-              let defaultWidth;
-              if (layer.type === "circle") {
-                defaultWidth = paintProps["circle-radius"]
-                  ? paintProps["circle-radius"] * 2
-                  : 10;
-              } else if (layer.type === "line") {
-                defaultWidth = paintProps["line-width"] || 2;
-              } else {
-                defaultWidth = 10;
-              }
-              legendEntries.push({
-                color: defaultColor,
-                width: defaultWidth,
-                label: title,
-                type: layer.type,
-              });
-            } else {
-              // If there is exactly one entry, force the label to be the layer name.
-              legendEntries[0].label = title;
-            }
-          }
-  
+
           return {
             layerId: layer.id,
             title: displayValue,
             subtitle: legendSubtitleText,
-            legendEntries,
+            legendEntries: legendEntries,
             trseLabel,
             type: layer.type,
             style: layer.metadata.colorStyle,
-            noStyle,
           };
         });
       setLegendItems(items);
     };
-  
+
     map.on("styledata", updateLegend);
-  
+
     updateLegend();
-  
+
     return () => {
       map.off("styledata", updateLegend);
     };
   }, [state.filters, map, state.visualisations, state.currentZoom]);
 
-  // This effect forces the container's width to update after legendItems change,
-  // working around Firefox's flex-wrap column bug.
-  useEffect(() => {
-    if (legendRef.current) {
-      // Reset width so container can shrink-wrap its content naturally.
-      legendRef.current.style.width = "auto";
-      
-      // Calculate the scrollbar width:
-      // offsetWidth includes scrollbar, clientWidth does not.
-      const scrollbarWidth = legendRef.current.offsetWidth - legendRef.current.clientWidth;
-      
-      // Get the container's natural content width plus the scrollbar width.
-      const newWidth = legendRef.current.scrollWidth + scrollbarWidth;
-      legendRef.current.style.width = `${newWidth}px`;
-    }
-  }, [legendItems]);
-
   if (legendItems.length === 0) {
     return null;
   }
   return (
-    <LegendContainer ref={legendRef}>
+    <LegendContainer>
       {legendItems.map((item, index) => (
-        <LegendGroup key={item.layerId}>
-          <LegendItemContainer>
-            {item.noStyle ? (
-              item.legendEntries.map((entry, idx) => (
-                <LegendItem key={idx}>
-                  {item.type === "circle" ? (
-                    <CircleSwatch diameter={entry.width || 10} color={entry.color} />
-                  ) : item.type === "line" ? (
-                    <LineSwatch height={entry.width || 2} color={entry.color} />
-                  ) : item.type === "fill" ? (
-                    <PolygonSwatch color={entry.color} />
-                  ) : null}
-                  <LegendLabel>{item.title}</LegendLabel>
-                </LegendItem>
-              ))
-            ) : (
-              <>
-                <LegendTitle>{item.title}</LegendTitle>
-                <LegendSubtitle>{item.subtitle}</LegendSubtitle>
-                {item.legendEntries.map((entry, idx) => (
-                  <LegendItem key={idx}>
-                    {entry.type === "circle" ? (
-                      <CircleSwatch
-                        diameter={entry.width || 10}
-                        color={entry.color}
-                      />
-                    ) : entry.type === "line" ? (
-                      <LineSwatch
-                        height={entry.width || 2}
-                        color={entry.color}
-                      />
-                    ) : entry.type === "fill" ? (
-                      <PolygonSwatch
-                        color={entry.color}
-                      />
-                    ) : null}
-                    <LegendLabel>{entry.label}</LegendLabel>
-                  </LegendItem>
-                ))}
-              </>
-            )}
-          </LegendItemContainer>
-          {/* Render divider within the group, if not the last group */}
+        <LegendItemContainer key={index}>
+          <LegendTitle>{item.title}</LegendTitle>
+          <LegendSubtitle>{item.subtitle}</LegendSubtitle>
+          {item.legendEntries.map((entry, idx) => (
+            <LegendItem key={idx}>
+              {entry.type === "circle" ? (
+                <CircleSwatch
+                  diameter={entry.width || 10}
+                  color={entry.color}
+                />
+              ) : entry.type === "line" ? (
+                <LineSwatch
+                  height={entry.width || 2}
+                  color={entry.color}
+                />
+              ) : entry.type === "fill" ? (
+                <PolygonSwatch
+                  color={entry.color}
+                />
+              ) : null}
+              <LegendLabel>{entry.label}</LegendLabel>
+            </LegendItem>
+          ))}
           {index < legendItems.length - 1 && <LegendDivider />}
-        </LegendGroup>
+        </LegendItemContainer>
       ))}
     </LegendContainer>
   );
