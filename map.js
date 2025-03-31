@@ -311,7 +311,7 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
     let values = data.map((value) => value.value);
     if (classificationMethod === 'd') {
       const pageCategory = currentPage.category || 'England';
-      const selectedPageBands = defaultBands?.find(band => band.name === pageCategory);
+      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
       let metricName = null;
       if (options.trseLabel) {
         metricName = 'trse';
