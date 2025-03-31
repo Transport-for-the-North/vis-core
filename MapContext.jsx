@@ -125,10 +125,8 @@ export const MapProvider = ({ children }) => {
     const initializeFilters = async (metadataTables) => {
       const filters = [];
       const filterState = {};
-      const paramNameToUuidMap = {};
       for (const filter of pageContext.config.filters) {
         const filterWithId = { ...filter, id: uuidv4() }; // Add unique ID to each filter
-        paramNameToUuidMap[filter.paramName] = filterWithId.id; // Add mapping from paramName to UUID
         switch (filter.type) {
           case 'map':
           case 'slider':
@@ -205,17 +203,10 @@ export const MapProvider = ({ children }) => {
 
         // Initialize filter value if shouldBeBlankOnInit is not true
         if (!filterWithId.shouldBeBlankOnInit) {
-          if (filterWithId.multiSelect && filterWithId.shouldInitialSelectAllInMultiSelect){
-            filterState[filterWithId.id] =
-              filterWithId.defaultValue ||
-              filterWithId.min ||
-              filterWithId.values?.values?.map(item => item?.paramValue);}
-          else {
-            filterState[filterWithId.id] =
-              filterWithId.defaultValue ||
-              filterWithId.min ||
-              filterWithId.values?.values[0]?.paramValue;
-          }
+          filterState[filterWithId.id] =
+            filterWithId.defaultValue ||
+            filterWithId.min ||
+            filterWithId.values?.values[0]?.paramValue;
         } else {
           filterState[filterWithId.id] = null; // Set to null or undefined to represent no initial selection
         }
@@ -237,7 +228,6 @@ export const MapProvider = ({ children }) => {
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
-      dispatch({ type: actionTypes.SET_PARAM_NAME_TO_UUID_MAP, payload: paramNameToUuidMap });
 
       // Set pageIsReady to true once all filters are initialized
       dispatch({ type: actionTypes.SET_PAGE_IS_READY, payload: true });
