@@ -13,7 +13,7 @@ export const termsOfUse = `
             </a>
             . Use of the severance data tool also indicates your acceptance of
             <a
-              href="https://www.transportforthenorth.com/wp-content/uploads/Disclaimer-and-Appropriate-Use-TRSE.pdf"
+              href="https://tfnshare.blob.core.windows.net/visdocs/Licensing%20of%20TfN%20Tools_severence.pdf?sp=r&st=2025-03-31T10:11:51Z&se=2027-01-13T19:11:51Z&spr=https&sv=2024-11-04&sr=b&sig=lS%2B%2FPiyLvLCrdZQyllqGC%2B%2FA95bD748ZUgbcB3cjtAw%3D"
               target="_blank"
               rel="noopener noreferrer"
             >
