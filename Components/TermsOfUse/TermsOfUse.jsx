@@ -9,8 +9,8 @@ const Overlay = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-  z-index: 999999; /* Very high z-index */
-  pointer-events: auto; /* Allow interaction */
+  z-index: 9999; /* Ensure it's below the StyledBox but above other content */
+  pointer-events: auto; /* Allow interaction with nothing */
 `;
 
 const StyledBox = styled.div`
@@ -23,7 +23,7 @@ const StyledBox = styled.div`
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000000; /* Very high z-index */
+  z-index: 10000; 
   display: flex;
   flex-direction: column;
   align-items: center;

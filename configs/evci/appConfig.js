@@ -39,7 +39,7 @@ export const baseAppConfig = {
   logoImage: null,
   logoPosition: 'right',
   backgroundImage: "img/evci/placeholderTFN.png",
-  logoutButtonImage: "/img/burgerIcon.png",
+  logoutButtonImage: "img/burgerIcon.png",
   logoutImage: "img/logout.png",
   authenticationRequired: false,
   appPages: [],

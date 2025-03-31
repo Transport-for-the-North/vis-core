@@ -68,15 +68,12 @@ export const MapVisualisation = ({
     );
   }, [layerKey, state.colorSchemesByLayer, colorStyle]);
 
-  const shouldFilterDataToViewport = visualisation.shouldFilterDataToViewport || false;
-
   // Use the custom hook to fetch data for the visualisation
   const {
     isLoading,
     data: visualisationData,
     error,
-    dataWasReturnedButFiltered
-  } = useFetchVisualisationData(visualisation, map, layerKey, shouldFilterDataToViewport);
+  } = useFetchVisualisationData(visualisation);
 
   // Handle loading state
   useEffect(() => {
@@ -91,10 +88,10 @@ export const MapVisualisation = ({
   // Handle no data returned state
   useEffect(() => {
     if (!isLoading) {
-      if ((visualisationData && visualisationData.length === 0) && !dataWasReturnedButFiltered) {
+      if (visualisationData && visualisationData.length === 0) {
         // No data returned from the API
         dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
-      } else if (visualisationData || dataWasReturnedButFiltered) {
+      } else if (visualisationData) {
         // Data was returned
         dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
       } else if (error) {
@@ -310,7 +307,6 @@ export const MapVisualisation = ({
     const layerName = layerKey;
     const dataToVisualize = visualisationData || [];
     const dataToClassify = combinedData;
-    // const dataForClassification = filterDataToViewport(dataToClassify, map, layerName);
 
     const performReclassification = () => {
       switch (visualisation.type) {
@@ -468,8 +464,6 @@ export const MapVisualisation = ({
             metadata: {
               colorStyle: colorStyle,
               isStylable: true,
-              enforceNoColourSchemeSelector: visualisation.enforceNoColourSchemeSelector ?? false,
-              enforceNoClassificationMethod: visualisation.enforceNoClassificationMethod ?? false,
             },
           },
           beforeLayerId

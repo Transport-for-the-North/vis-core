@@ -10,17 +10,19 @@
  * @property {function} props.onClick - The function to be called when the button is clicked.
  * @returns {JSX.Element} A button element with an image icon.
  */
-export function Button({ className, src, alt, onClick }) {
-  const handleClick = () => {
-    onClick();
-  };
-
-  return (
-    <div className={`Button ${className || ""}`} onClick={handleClick}>
-      <img
-        src={`${process.env.PUBLIC_URL}${src}`}
-        alt={alt}
-      />
-    </div>
-  );
-}
+export function Button(props) {
+    const handleClick = () => {
+      props.onClick();
+    };
+  
+    return (
+      <>
+        <div className="Button" onClick={handleClick}>
+          <img
+            src={`${process.env.PUBLIC_URL}${props.src}`}
+            alt={props.alt}
+          ></img>
+        </div>
+      </>
+    );
+  }

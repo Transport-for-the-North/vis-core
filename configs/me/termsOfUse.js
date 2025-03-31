@@ -11,9 +11,9 @@ export const termsOfUse = `
             >
               Open Government Licence
             </a>
-            . Use of the M&E dashboard also indicates your acceptance of
+            . Use of the TRSE data tool also indicates your acceptance of
             <a
-              href="https://tfnshare.blob.core.windows.net/visdocs/Licensing of TfN Tools- ME.pdf?sp=r&st=2025-03-06T10:27:40Z&se=2030-03-06T18:27:40Z&spr=https&sv=2022-11-02&sr=b&sig=zcyZL4yY1VcTKNhTulHoKUdixMixFL2oHaX5rg%2F%2F4oM%3D"
+              href="https://www.transportforthenorth.com/wp-content/uploads/Disclaimer-and-Appropriate-Use-TRSE.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >

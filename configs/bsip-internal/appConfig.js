@@ -14,16 +14,7 @@ export const appConfig = {
                     ...visualisation,
                     dataPath: visualisation.name === "Bus Accessibility" ? "/api/bsip/accessibilityV2/staging" : visualisation.dataPath,
                     dataPath: visualisation.name === "Bus Reliability" ? "/api/bsip/reliabilityV2/staging" : visualisation.dataPath,
-                })),
-                additionalFeatures: {
-                    ...page.config.additionalFeatures,
-                    dynamicWarning: page.config.additionalFeatures?.dynamicWarning
-                        ? {
-                            ...page.config.additionalFeatures.dynamicWarning,
-                            url: page.config.additionalFeatures.dynamicWarning.url.replace('/prod', '/staging')
-                        }
-                        : page.config.additionalFeatures.dynamicWarning
-                }
+                }))
             }
         }))
     ]
