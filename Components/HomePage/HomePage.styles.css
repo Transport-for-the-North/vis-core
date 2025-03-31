@@ -1,3 +1,4 @@
+/* --- Base Styles --- */
 .landing {
   background-color: white;
 }
@@ -10,6 +11,12 @@
   background-size: cover;
   background-position: center;
   position: relative;
+}
+
+.additional-image{
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: cover; /* Ensures the image covers the container without distorting */
 }
 
 .header-landing::before {
@@ -43,8 +50,15 @@
   text-align: center;
 }
 
+/* --- Container for Content Limiting Width --- */
+.container-content {
+  margin: 0 auto;
+  padding: 2rem 5vw;
+}
+
+/* --- Introduction Section --- */
 .introduction {
-  padding: 3vh 10vw;
+  padding: 2rem 10vw;
   font-size: larger;
   background-color: #f5f5f5;
   text-align: start;
@@ -53,7 +67,7 @@
 .introduction h2 {
   color: #0d0f3d;
   text-align: start;
-  margin-bottom: 2vh;
+  margin-bottom: 1rem;
 }
 
 .container-legalText,
@@ -63,10 +77,12 @@
   text-indent: 0em;
 }
 
+/* --- Legal and Fixed Sections --- */
 .legalText {
-  padding: 3vh 10vw 0vh 10vw;
-  font-size: medium; /* Slightly smaller font size */
+  padding: 2rem 10vw 0rem 10vw;
+  font-size: medium;
   text-align: center;
+  margin-bottom: 1rem;
 }
 
 .methodology,
@@ -74,8 +90,8 @@
 .additional-section,
 .even-section,
 .odd-section {
-  padding: 3vh 10vw;
-  font-size: medium; /* Slightly smaller font size */
+  padding: 2rem 10vw;
+  font-size: medium;
   text-align: start;
 }
 
@@ -86,12 +102,13 @@
 
 .background h2,
 .additional-section h2 {
-  margin-bottom: 2vh;
+  margin-bottom: 1rem;
 }
 
-.container-bg,
-.container-section {
-  text-indent: 0em;
+.container-section,
+.container-legalText,
+.container-methodology {
+  text-indent: 0;
 }
 
 .even-section {
@@ -104,44 +121,45 @@
   color: #0d0f3d;
 }
 
+/* --- Contacts --- */
 .contacts {
   text-align: center;
   font-size: larger;
   color: #0d0f3d;
-  margin: 10vh 0 5vh;
+  margin: 4rem 0;
 }
 
 .contacts p {
-  padding-bottom: 2vh;
+  margin-bottom: 1rem;
 }
 
 .contact {
   font-size: large;
   color: #0d0f3d;
   text-decoration: none;
-  border-width: thin;
-  border-style: solid;
+  border: 1px solid;
   border-radius: 25px;
-  padding: 10px;
+  padding: 0.5rem 1rem;
 }
 
 .contact:hover {
   color: #0d0f3d;
 }
 
+/* --- Contacts List --- */
 .contactsList {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   flex-wrap: wrap;
-  width: 100%; /* Ensure it occupies the full width of the parent */
+  width: 100%;
 }
 
 .contactItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px;
+  margin: 0.5rem;
   flex: 1 1 25%;
   box-sizing: border-box;
   min-width: 200px;
@@ -149,7 +167,7 @@
 
 .contactsList .stb-logo {
   max-width: 235px;
-  max-height: 66px; /* Adjust the size of the STB logo */
+  max-height: 66px;
   height: auto;
   margin-bottom: 10px;
 }
@@ -171,6 +189,7 @@
   width: auto;
 }
 
+/* --- Responsive Contacts --- */
 @media (max-width: 768px) {
   .contactItem {
     flex: 1 1 100%;
@@ -182,22 +201,75 @@
   }
 }
 
+/* --- Interleaved Content --- */
+.interleaved-content p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1em;
+}
+
+.interleaved-content img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin: 10px 0;
+}
+
+/* Container for interleaved content */
+.content-wrapper {
+  display: block;
+}
+
+/* --- Alternating Layout for Wide Screens --- */
+@media (min-width: 1000px) {
+  /* Multiple blocks layout */
+  .alternating-layout-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .alternating-layout-block.reverse {
+    grid-template-areas: "images text";
+  }
+  .alternating-layout-block:not(.reverse) {
+    grid-template-areas: "text images";
+  }
+  .alternating-layout-block > .text-block {
+    grid-area: text;
+  }
+  .alternating-layout-block > .image-block {
+    grid-area: images;
+  }
+}
+
+/* --- Fallback Single Image/Two-Column Styles --- */
 .section-content {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
+  gap: 20px;
+  align-items: stretch;
 }
 
 .section-content img {
   max-width: 45%;
-  height: auto;
-  margin: 10px;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.section-content.full-width img {
-  max-width: 100%;
-  margin: 10px 0;
+@media (max-width: 768px) {
+  .section-content {
+    flex-direction: column;
+  }
+  .section-content img {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 1100px) and (min-width: 769px) {
@@ -207,16 +279,6 @@
   }
 
   .stb-logo {
-    max-width: 150px; /* Adjust the logo size for this range */
-  }
-}
-
-@media (max-width: 768px) {
-  .section-content {
-    flex-direction: column;
-  }
-
-  .section-content img {
-    max-width: 100%;
+    max-width: 150px;
   }
 }

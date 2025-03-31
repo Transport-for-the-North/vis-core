@@ -76,19 +76,19 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
         styles={{
           control: (base) => ({
             ...base,
-            minHeight: '35px',
-            maxHeight: '100px',
+            minHeight: '1rem',
+            maxHeight: '10rem',
             overflowY: 'auto', // Ensure control itself can scroll if needed
           }),
           menu: (base) => ({
             ...base,
-            maxHeight: '100px',
+            maxHeight: '10rem',
             overflowY: 'auto', // Enable scrolling for dropdown menu
           }),
           menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           menuList: (base) => ({
             ...base,
-            maxHeight: '100px',
+            maxHeight: '10rem',
             overflowY: 'auto', // Ensure menu list is scrollable
           }),
           clearIndicator: (base) => ({

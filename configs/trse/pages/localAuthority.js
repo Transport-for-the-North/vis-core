@@ -56,7 +56,7 @@ export const localAuthority = {
         labelZoomLevel: 12,
         labelNulls: false,
         hoverNulls: true,
-        hoverTipShouldIncludeMetadata: true,
+        hoverTipShouldIncludeMetadata: false,
       },
       {
         name: "Local Authorities",
