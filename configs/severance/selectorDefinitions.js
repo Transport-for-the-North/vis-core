@@ -6,17 +6,17 @@ const barrierTypeSelector = {
     { action: "UPDATE_QUERY_PARAMS" }
   ],
   visualisations: ["Severance Decile", "Severance Callout"],
-  type: "fixed",
-  info: "Type of barrier selected.",
+  type: "dropdown",
+  info: "Type of barrier selected",
   containsLegendInfo: false,
+  shouldBeValidated: false,
   values: {
-    source: "local",
-    values: [
-      {
-        displayValue: "MRN, SRN, Rail",
-        paramValue: "1"
-      },
-    ],
+    source: "metadataTable",
+    metadataTableName: "barrier_list",
+    displayColumn: "name",
+    paramColumn: "id",
+    sort: "ascending",
+    exclude: [2, 3]
   },
 }
 
@@ -46,7 +46,7 @@ const destinationTypeSelector = {
   visualisations: ["Severance Decile", "Severance Callout"],
   type: "dropdown",
   shouldBeValidated: false,
-  info: "Type of opportunity accessed.",
+  info: "Type of destination accessed",
   containsLegendInfo: false,
   values: {
     source: "metadataTable",

@@ -4,13 +4,13 @@ import glossaryData from "../glossaryData";
 import {severancePopup, severanceCallout} from '../templates/index';
 
 export const england = {
-  pageName: "Severance in England",
+  pageName: "Severance across England",
   url: "/severance-in-england",
   category: null,
   type: "MapLayout",
   about: `
-  <p>View Severance data nationally.</p>
-  <p>This map shows the Severance index for Output Areas in England. Click on areas to see more information.</p>`,
+  <p>This interactive map shows the severance index for Output Areas across England. These scores indicate the ability to access a range of destination types due to the presence of the SRN, MRN, and Rail infrastructure. </p>
+  <p>Zoom in and click on areas to see more information.</p>`,
   legalText: termsOfUse,
   termsOfUse: termsOfUse,
   config: {

@@ -3,7 +3,7 @@ import { pages } from "./pages";
 import { mapStyles } from "defaults";
 
 export const appConfig = {
-  title: "Severance in England",
+  title: "Severance across England",
   introduction:
     `<p>This tool reveals the extent of severance from key road and rail infrastructures across England. 
     We have quantified the extent of severance from the strategic road network (SRN), the major road network (MRN), 
@@ -48,7 +48,7 @@ export const appConfig = {
     <p>To learn more about our methodological approach and how we devised the severance scoring system, read our 2024 severance report 
     <a href="https://www.transportforthenorth.com/reports/community-severance-across-england/" target="_blank">here</a>.</p>`,
   legalText: termsOfUse,
-  contactText: "Please contact research@transportforthenorth.com for any questions on this data tool.",
+  contactText: "For any questions or suggestions on enhancements for this data tool, please contact research@transportforthenorth.com",
   contactEmail: "research@transportforthenorth.com",
   mapStyle: mapStyles.geoapifyPositron,
   logoImage: "img/tfn-logo-fullsize.png",

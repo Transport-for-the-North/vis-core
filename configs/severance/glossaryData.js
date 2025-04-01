@@ -13,10 +13,6 @@ const glossaryData = {
     title:"Access",
     content: `<p>The ability to reach everyday places with the transport options available. This includes, shops and basic services, work, education, and healthcare.</p>`,
    },
-   ca: {
-    title:"CA",
-    content: `<p>Combined Authorities bring together multiple local authorities to share responsibilities. Some but not all have elected Mayors.</p>`,
-   },
    download: {
     title:"Download",
     content: `<p>How do I view and download the results?</p>
@@ -27,41 +23,41 @@ const glossaryData = {
     <p>4. Tick ‘Include public transport stops’ if you would like this information within the selected Output areas included also.</p>
     <p>Click ‘download’. Doing this will create a downloaded excel document in the top right which will save in your downloads folder on your computer. Once downloaded, you can use the excel functions such as ‘filter and ‘autosum’ to support your calculations.</p>`,
    },
-   factor_analysis: {
-    title:"Factor Analysis",
-    content: `<p>A statistical process for grouping data and identifying the relative significance of different variables.</p>`,
+   isochrone: {
+    title: "Isochrone",
+    content: `<p>"A continuous line on a graph or map relating to the same time, or equal times" i.e. an isochrone representing walkability within 5 minutes`
    },
    lad: {
     title:"LAD",
     content: `<p>Local Authority Districts is a collective term for the approximately 300 local government bodies in England.</p>`,
    },
+   mrn: {
+    title: "Major Road Network (MRN)",
+    content: `<p>The Major Road Network (MRN) is a classification of local authority roads in England. It incorporates the National Highways -controlled Strategic Road Network (SRN) and the more major local authority controlled A road.`,
+   },
    output_area: {
     title:"Output Area",
     content: `<p>A small area, with an average population of 300, based on the 2021 Census.</p>`,
    },
-   risk: {
-    title:"Risk",
-    content: `<p>How likely it is that people in an area are affected by TRSE, compared to the rest of the local or combined authority, or to England as a whole.</p>`,
+   severance: {
+    title: "Severance",
+    content: `<p>Severance is defined as "The state of being seperated or cut-off". For the purpose of this tool severance refers to the act of not having access to a destination, which you hypothetically should, based on walking distance isochrones.`
+   },
+   srn: {
+    title: "Strategic Road Network (SRN)",
+    content: `<p>The strategic road network (SRN) is arguably the biggest and most important piece of infrastructure in the country. It comprises more than 4,500 miles of motorways and major A roads which are at the core of our national transport system.`
    },
    stb: {
     title:"STB",
     content: `<p>Sub-national transport bodies provide strategic direction and advice on the transport needs of the regions of England.</p>`,
    },
-   stp: {
-    title:"STP",
-    content: `<p>The Strategic Transport Plan is TfN's strategy for economic transformation, decarbonisation, and social inclusion in the North of England.</p>`,
-   },
    tfn: {
     title:"TfN",
     content: `<p>Transport for the North is the sub-national transport body for the North of England.</p>`,
    },
-   trse: {
-    title:"TRSE",
-    content: `<p>Transport-related social exclusion means that transport issues have a fundamental impact on everyday life, and limit the ability to fulfil everyday needs.</p>`,
-   },
-   vulnerability: {
-    title:"Vulnerability",
-    content: `<p>The set of factors that make social exclusion more likely, such as poverty, disability, poor health, and caring responsibilities. </p>`,
+   tire: {
+    title: "Transport Infrastructure Related Severance",
+    content: `<p>For the purpose of this tool, is defined as the severance to destinations that is attributable to transport related infrastructure as opposed to other forms of severance (other severance not attributable to transport infrastructure such as cul-de-sac design, or canals).`
    },
   };
   
