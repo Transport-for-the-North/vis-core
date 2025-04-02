@@ -13,6 +13,22 @@ const glossaryData = {
     title:"Access",
     content: `<p>The ability to reach everyday places with the transport options available. This includes, shops and basic services, work, education, and healthcare.</p>`,
    },
+   active_travel: {
+    title: "Active travel",
+    content: `<p>Active travel refers to modes of transportation that involve physical activity, such as <b>walking, cycling, wheeling</b>, and <b>scootering.</b> This form of travel promotes <b>health benefits, reduces carbon emissions</b>, and can <b>improve air quality</b> and <b>road safety.</b>`
+   },
+   affected_area: {
+    title: "Affected area types",
+    content: `<p>In our study of severance based on the SRN, MRN, and rail network, we identified <b>5 affected area types.</b>
+    <p>The below area types <b>experience severance to varying extents</b> due to the SRN, MRN, or rail network when walking to select, key services.
+    <ol><b><li>Lowest affected area type</li> <li>Moderately affected area type</li> <li>Severely affected area type </li></b></ol>
+    <p>The remaining two types are areas which are not impacted by severance in our defined parameters. Instead, these are areas which show OAs which either have a perfect 10-minute walkable reach to all select, key destinations or have no perfect 10-minute walkable reach to select, key destinations.
+    <ol start="4"><b><li>Perfect access areas</li> <li>No access areas</li></b></ol>`
+   },
+   barrier: {
+    title: "Barrier types",
+    content: `<p>Barrier types in our study of severance refers to the three infrastructure types we are exploring as barriers to walking: <b>the strategic road network, the major road network</b>, and <b>the rail network.</b>`
+   },
    download: {
     title:"Download",
     content: `<p>How do I view and download the results?</p>
@@ -25,39 +41,88 @@ const glossaryData = {
    },
    isochrone: {
     title: "Isochrone",
-    content: `<p>"A continuous line on a graph or map relating to the same time, or equal times" i.e. an isochrone representing walkability within 5 minutes`
+    content: `<p>An isochrone is a line on a map that <b>connects points</b> where an event occurs simultaneously or <b>within the same time frame.</b>
+    <p>Isochrone maps are often used to <b>show areas that can be reached from a specific point</b> within a <b>certain amount of time.</b>`
    },
    lad: {
     title:"LAD",
     content: `<p>Local Authority Districts is a collective term for the approximately 300 local government bodies in England.</p>`,
    },
+   lowest_areas: {
+    title: "Lowest affected area types",
+    content: `<p>An area which has been identified as having SRN, MRN, and/or rail network infrastructure which restricts walkable access to select, key destination(s).
+    <p>Lowest affected area types score between <b>1 - 3 on the severance index.</b>`
+   },
+   moderate_areas: {
+    title: "Moderately affected area types",
+    content: `<p>An area which has been identified as having SRN, MRN, and/or rail network infrastructure which restricts walkable access to select, key destination(s).
+    <p>Moderately affected area types score between <b>4 - 7 on the severance index.</b>`
+   },
    mrn: {
     title: "Major Road Network (MRN)",
-    content: `<p>The Major Road Network (MRN) is a classification of local authority roads in England. It incorporates the National Highways -controlled Strategic Road Network (SRN) and the more major local authority controlled A road.`,
+    content: `<p>The major road network (MRN) in England is a classification of local authority roads that includes the Strategic Road Network (SRN) managed by <b>National Highways</b> and other <b>major local authority-controlled A roads.</b>
+    <p>The MRN accounts for about <b>4% of the nation's road length</b> but handles <b>43% of traffic flows.</b>
+    <p>The MRN was established to ensure <b>central government funding</b> is effectively targeted towards <b>economically critical road infrastructure</b>. It includes roads with high traffic volumes and those connecting towns with <b>populations over 50,000.</b>`,
+   },
+   no_access: {
+    title: "No access areas",
+    content: `<p>An area which has been identified as having <b>no severance</b> due to the SRN, MRN, and/or rail network infrastructure and residents <b>have no perfect 10-minute walkable access</b> to any select, key destination(s).`
    },
    output_area: {
-    title:"Output Area",
-    content: `<p>A small area, with an average population of 300, based on the 2021 Census.</p>`,
+    title:"Output areas (OAs)",
+    content: `<p>Output areas (OAs) are the <b>smallest geographical units</b> used for census data in the UK. Each OA typically consists of <b>40 to 250 households</b> and a <b>population of 100 to 625 people.</b> They were first created for the 2001 Census and are designed to be as socially homogeneous as possible.
+    <p>OAs are used to ensure <b>detailed</b> and <b>accurate statistical analysis</b> while maintaining the confidentiality of individuals. They form the building blocks for larger geographical areas like <b>Lower Layer Super Output Areas (LSOAs)</b> and <b>Middle Layer Super Output Areas (MSOAs).</b>`,
+   },
+   perfect_areas: {
+    title: "Perfect access areas",
+    content: `<p>An area which has been identified as having <b>no severance</b> due to the SRN, MRN, and/or rail network infrastructure and residents <b>have a perfect 10-minute walkable access</b> to select, key destination(s).`
+   },
+   rail_network: {
+    title: "Rail network",
+    content: `<p>The rail network refers to a system of intersecting rail routes used for transporting <b>passengers</b> and <b>freight.</b>
+    <p><b>Network Rail</b> manages railway infrastructure in Great Britain.`
    },
    severance: {
     title: "Severance",
-    content: `<p>Severance is defined as "The state of being seperated or cut-off". For the purpose of this tool severance refers to the act of not having access to a destination, which you hypothetically should, based on walking distance isochrones.`
+    content: `<p>Severance can be understood as the <b>negative impact</b> that infrastructure and public realm design can have on the travel <b>behaviours, perceptions</b>, and <b>wellbeing of local people</b> and those who need to navigate a particular area. Sometimes described as the <b>barrier effect</b>, severance often refers to the separation of people from facilities, services, and social networks within a community.`
+   },
+   severe_areas: {
+    title: "Severely affected area types",
+    content: `<p>An area which has been identified as having SRN, MRN, and/or rail network infrastructure which restricts walkable access to select, key destination(s).
+    <p>Severely affected area types score between <b>8 - 10 on the severance index.</b>`
+   },
+   severence_index: {
+    title: "Severance index score",
+    content: `<p>The severance index score is a <b>10-point decile scoring system</b> developed for our analysis of severance across England.
+    <p>The scoring system is applied to <b>each OA</b> where the SRN, MRN, or rail network are found, along with the key service destinations. In its purest form, the decile scoring system <b>ranks residents’ ability in an OA</b> to access key services within a 10-minute walking reach distance where the SRN, MRN, or rail network intersect with communities.`
    },
    srn: {
     title: "Strategic Road Network (SRN)",
-    content: `<p>The strategic road network (SRN) is arguably the biggest and most important piece of infrastructure in the country. It comprises more than 4,500 miles of motorways and major A roads which are at the core of our national transport system.`
+    content: `<p>The strategic road network (SRN) in England consists of motorways and major A roads. It spans over <b>4,500 miles</b> and is managed by <b>National Highways.</b> The network is crucial for the nation's economy, facilitating the movement of people and goods, and connecting major towns and cities. 
+    <p>The SRN carries a significant portion of traffic, including a <b>third of all road traffic</b> and <b>two-thirds of all freight.</b> It includes secondary arterial roads, primary arterial roads, expressways, and motorways.`
    },
    stb: {
     title:"STB",
-    content: `<p>Sub-national transport bodies provide strategic direction and advice on the transport needs of the regions of England.</p>`,
+    content: `<p>A sub-national transport body (STB) is a transport governance organisation in England, designed to <b>provide strategic transport planning</b> and coordination at a larger scale than local transport authorities. STBs work with their respective councils to develop and implement transport strategies for their regions.
+    <p>England’s STBs are: 
+    <ul><b><li>Transport for the North</li><li>Midlands Connect</li><li>Transport East</li><li>England’s Economic Heartland</li><li>Transport for the South East</li><li>Western Gateway</li><li>Peninsula Transport</li></b></ul>`,
    },
    tfn: {
     title:"TfN",
-    content: `<p>Transport for the North is the sub-national transport body for the North of England.</p>`,
+    content: `<p>Transport for the North (TfN) is the <b>North of England’s STB.</b><p>TfN was the first statutory STB to be <b>created in 2018</b> under the Cities and Local Government Devolution Act 2016.`,
    },
    tire: {
     title: "Transport Infrastructure Related Severance",
     content: `<p>For the purpose of this tool, is defined as the severance to destinations that is attributable to transport related infrastructure as opposed to other forms of severance (other severance not attributable to transport infrastructure such as cul-de-sac design, or canals).`
+   },
+   trse: {
+    title: "Transport-related social exclusion (TRSE)",
+    content: `<p>Transport-related social exclusion (TRSE) is the <b>inability to participate in society</b> as much as required due to transport issues.
+    <p>An impact of severance is TRSE.`
+   },
+   walkable_reach: {
+    title: "10-minute walkable reach",
+    content: `<p>A 10-minute walkable reach (also referred to as a ‘perfect 10-minute walkable reach’) refers to the <b>10-minute distance covered when walking at 4.82 km/h</b> and what destinations you are able to access in this timeframe.`
    },
   };
   
