@@ -9,10 +9,6 @@ const glossaryData = {
     Duplicate entries can be hacked in under different names by adding this below infoFragments, eg:
     infoFragments.new_key = { title: "New title", content: infoFragments[old_key].content}
     */
-   access: {
-    title:"Access",
-    content: `<p>The ability to reach everyday places with the transport options available. This includes, shops and basic services, work, education, and healthcare.</p>`,
-   },
    active_travel: {
     title: "Active travel",
     content: `<p>Active travel refers to modes of transportation that involve physical activity, such as <b>walking, cycling, wheeling</b>, and <b>scootering.</b> This form of travel promotes <b>health benefits, reduces carbon emissions</b>, and can <b>improve air quality</b> and <b>road safety.</b>`
@@ -29,24 +25,10 @@ const glossaryData = {
     title: "Barrier types",
     content: `<p>Barrier types in our study of severance refers to the three infrastructure types we are exploring as barriers to walking: <b>the strategic road network, the major road network</b>, and <b>the rail network.</b>`
    },
-   download: {
-    title:"Download",
-    content: `<p>How do I view and download the results?</p>
-    <p>1. Select a Combined/Local Authority within the ‘Filtering and data selection’ section, if this exists for your current visual.</p>
-    <p>2. Select a Combined/Local Authority within the ‘Download data’ section, if this option exists for your current visual.</p>
-    <p>3. Under ‘Select output areas’, you can either enter your output area code, if known, or make use of the selector tool by clicking ‘Enable Selector’ and using either ‘Pointer Select’ to select individual OA areas or ‘Rectangle Select’ to highlight a selection of OA areas to include. You can see them compile in the box. Simply re-click on the OA on the map to remove or click on the ‘x’ next to the name in the box. To remove them all, click on the larger ‘X’ to the right of the box.
-    Note: Leaving this box empty will allow you to download all the OA data within the chosen Combined/Local Authority.</p>
-    <p>4. Tick ‘Include public transport stops’ if you would like this information within the selected Output areas included also.</p>
-    <p>Click ‘download’. Doing this will create a downloaded excel document in the top right which will save in your downloads folder on your computer. Once downloaded, you can use the excel functions such as ‘filter and ‘autosum’ to support your calculations.</p>`,
-   },
    isochrone: {
     title: "Isochrone",
     content: `<p>An isochrone is a line on a map that <b>connects points</b> where an event occurs simultaneously or <b>within the same time frame.</b>
     <p>Isochrone maps are often used to <b>show areas that can be reached from a specific point</b> within a <b>certain amount of time.</b>`
-   },
-   lad: {
-    title:"LAD",
-    content: `<p>Local Authority Districts is a collective term for the approximately 300 local government bodies in England.</p>`,
    },
    lowest_areas: {
     title: "Lowest affected area types",
@@ -102,18 +84,14 @@ const glossaryData = {
     <p>The SRN carries a significant portion of traffic, including a <b>third of all road traffic</b> and <b>two-thirds of all freight.</b> It includes secondary arterial roads, primary arterial roads, expressways, and motorways.`
    },
    stb: {
-    title:"STB",
+    title:"Sub-national transport body (STB)",
     content: `<p>A sub-national transport body (STB) is a transport governance organisation in England, designed to <b>provide strategic transport planning</b> and coordination at a larger scale than local transport authorities. STBs work with their respective councils to develop and implement transport strategies for their regions.
     <p>England’s STBs are: 
     <ul><b><li>Transport for the North</li><li>Midlands Connect</li><li>Transport East</li><li>England’s Economic Heartland</li><li>Transport for the South East</li><li>Western Gateway</li><li>Peninsula Transport</li></b></ul>`,
    },
    tfn: {
-    title:"TfN",
+    title:"Transport for the North (TfN)",
     content: `<p>Transport for the North (TfN) is the <b>North of England’s STB.</b><p>TfN was the first statutory STB to be <b>created in 2018</b> under the Cities and Local Government Devolution Act 2016.`,
-   },
-   tire: {
-    title: "Transport Infrastructure Related Severance",
-    content: `<p>For the purpose of this tool, is defined as the severance to destinations that is attributable to transport related infrastructure as opposed to other forms of severance (other severance not attributable to transport infrastructure such as cul-de-sac design, or canals).`
    },
    trse: {
     title: "Transport-related social exclusion (TRSE)",
