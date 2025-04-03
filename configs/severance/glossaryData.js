@@ -124,6 +124,18 @@ const glossaryData = {
     title: "10-minute walkable reach",
     content: `<p>A 10-minute walkable reach (also referred to as a ‘perfect 10-minute walkable reach’) refers to the <b>10-minute distance covered when walking at 4.82 km/h</b> and what destinations you are able to access in this timeframe.`
    },
+   key_services: {
+    title:"Key Services",
+    content: `<p>For this iteration of the tool, we are looking at the walkable access to key, select destinations. These destinations are primary schools, secondary schools, further education centres, GPs, and hospitals.</p>`,
+   },
+   education: {
+    title:"Education",
+    content: `<p>Education-based destinations refers to primary schools, secondary schools, and further education centres.</p>`,
+   },
+   health: {
+    title:"Health",
+    content: `<p>Health-based destinations refers to GPs and hospitals.</p>`,
+   },
   };
   
   function getInfo(key) {

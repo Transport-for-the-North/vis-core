@@ -51,7 +51,7 @@ const destinationTypeSelector = {
   values: {
     source: "metadataTable",
     metadataTableName: "destination_list",
-    displayColumn: "name",
+    displayColumn: "display_text",
     paramColumn: "id",
     sort: "ascending",
   },
