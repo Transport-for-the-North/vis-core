@@ -348,7 +348,7 @@ export const appConfig = {
             name: "NoHAM Nodes",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}?network_scenario_name={networkScenarioName}&network_year={year}&demand_scenario_name={demandScenarioName}&demand_year={year}&time_period_code=am", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             customPaint: nodeCustomPaint,
@@ -412,7 +412,13 @@ export const appConfig = {
             filterName: "Year",
             paramName: "year",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: {targetLayer: "NoHAM Nodes"}
+              }
+            ],
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
@@ -429,7 +435,13 @@ export const appConfig = {
             paramName: "networkScenarioName",
             info: "Network DM/DS",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: {targetLayer: "NoHAM Nodes"}
+              }
+            ],
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
@@ -446,7 +458,13 @@ export const appConfig = {
             paramName: "demandScenarioName",
             info: "Matrix demand scenario",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: {targetLayer: "NoHAM Nodes"}
+              }
+            ],
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
@@ -526,7 +544,7 @@ export const appConfig = {
             name: "NoHAM Nodes",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/noham_nodes/{z}/{x}/{y}?network_scenario_name={networkScenarioNameDoSomething}&network_year={yearDoSomething}&demand_scenario_name={demandScenarioNameDoSomething}&demand_year={yearDoSomething}&time_period_code=am", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             customPaint: nodeCustomPaint,
@@ -668,7 +686,13 @@ export const appConfig = {
             filterName: "Scen. 2 Year",
             paramName: "yearDoSomething",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: {targetLayer: "NoHAM Nodes"}
+              }
+            ],
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
@@ -685,7 +709,13 @@ export const appConfig = {
             paramName: "networkScenarioNameDoSomething",
             info: "Network DM/DS",
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: {targetLayer: "NoHAM Nodes"}
+              }
+            ],
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
@@ -702,7 +732,13 @@ export const appConfig = {
             paramName: "demandScenarioNameDoSomething",
             info: "Matrix demand scenario do something",  
             target: "api",
-            actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+            actions: [
+              { action: "UPDATE_QUERY_PARAMS" },
+              { 
+                action: "UPDATE_PARAMETERISED_LAYER",
+                payload: {targetLayer: "NoHAM Nodes"}
+              }
+            ],
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
