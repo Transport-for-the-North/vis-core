@@ -277,9 +277,9 @@ export const MapProvider = ({ children }) => {
           excludedParams
         );
       
-        // Update the path using the extracted and found parameters
-        const updatedPath = updateUrlParameters(layer.path, params);
-      
+        // Update the path using the extracted and found parameters.
+        const updatedPath = updateUrlParameters(layer.path, layer.path, params);
+        
         // Dispatch the layer with the updated path and any missing parameters
         dispatch({
           type: actionTypes.ADD_LAYER,
