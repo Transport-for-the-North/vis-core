@@ -21,7 +21,7 @@ export const combinedAuthority = {
         name: "Output Areas",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/28/{z}/{x}/{y}?parentZoneType=16&parentZoneId=", // specify query params empty if to be set
+        path: "/api/vectortiles/zones/28/{z}/{x}/{y}?parentZoneType=16&parentZoneId={parentZoneId}", // specify query params empty if to be set
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "TRSE Rank",
@@ -79,7 +79,7 @@ export const combinedAuthority = {
         name: "PT Points",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=16&parentZoneId=",
+        path: "/api/vectortiles/public_transport_points/{z}/{x}/{y}?parentZoneType=16&parentZoneId={parentZoneId}",
         sourceLayer: "geometry",
         geometryType: "point",
         visualisationName: "PT Points Visualisation",

@@ -73,38 +73,109 @@ export const checkSecurityRequirements = (apiSchema, apiRoute) => {
 };
 
 /**
- * Updates the URL by replacing route parameters and query parameters with provided values.
- * @function updateUrlParameters
- * @param {string} url - The URL or path to update.
- * @param {Object} params - An object containing parameter names and their replacement values.
- * @returns {string} The updated URL with parameters replaced.
+ * Updates a URL based on a template by merging route values from the current URL with
+ * new values provided via params. Query parameters are updated only if every route
+ * placeholder is fulfilled—except for the excluded ones ("x", "y", and "z"), which
+ * can remain unresolved.
+ *
+ * Note: Unresolved placeholder detection is based on the original (unencoded) template,
+ * not on the encoded value.
+ *
+ * @param {string} template - A URL template.
+ *   E.g. "/api/vectortiles/noham_nodes/{z}/{x}/{y}?network_scenario_name={networkScenarioName}&network_year={year}&demand_scenario_name={demandScenarioName}&demand_year={year}&time_period_code={timePeriodCode}"
+ * @param {string} current - The current URL (path + query).
+ * @param {Object} params - New parameter values that override existing ones.
+ * @returns {string} - The updated URL.
  */
-export const updateUrlParameters = (url, params) => {
-  let updatedUrl = url;
+export const updateUrlParameters = (template, current, params) => {
+  const excluded = new Set(["x", "y", "z"]);
 
-  // Replace route parameters
-  updatedUrl = updatedUrl.replace(/\{([^}]+)\}/g, (match, paramName) => {
-    return params.hasOwnProperty(paramName) ? encodeURIComponent(params[paramName]) : match;
+  // Split the current URL into path and query components.
+  const [currentPath, currentQuery = ""] = current.split("?");
+  // Split the template URL into path and query components.
+  const [templatePath, templateQuery = ""] = template.split("?");
+
+  // --- Process the path portion ---
+
+  // Extract all placeholder names from the unencoded template path.
+  const paramNames = [];
+  templatePath.replace(/\{([^}]+)\}/g, (_, name) => {
+    paramNames.push(name);
+    return _;
   });
 
-  // Split the URL into path and query string
-  const [path, queryString] = updatedUrl.split('?');
-
-  if (queryString) {
-    const queryParams = new URLSearchParams(queryString);
-
-    // Iterate over each query parameter
-    for (let key of queryParams.keys()) {
-      if (params.hasOwnProperty(key)) {
-        queryParams.set(key, params[key]);
-      }
-    }
-
-    // Reconstruct the updated URL with modified query parameters
-    updatedUrl = `${path}?${queryParams.toString()}`;
+  // Build a regex pattern from the unencoded template path to capture existing route values.
+  const regexPattern = templatePath.replace(/\{([^}]+)\}/g, "([^/]+)");
+  const routeRegex = new RegExp(`^${regexPattern}$`);
+  const routeMatch = routeRegex.exec(currentPath);
+  const currentRoute = {};
+  if (routeMatch) {
+    paramNames.forEach((name, i) => {
+      currentRoute[name] = decodeURIComponent(routeMatch[i + 1]);
+    });
   }
 
-  return updatedUrl;
+  // Create a "resolved" mapping using new params or fallback to values extracted from currentRoute.
+  const resolved = {};
+  paramNames.forEach(name => {
+    if (Object.prototype.hasOwnProperty.call(params, name)) {
+      resolved[name] = params[name];
+    } else if (currentRoute.hasOwnProperty(name)) {
+      resolved[name] = currentRoute[name];
+    }
+  });
+
+  // Determine if any non-excluded placeholders remain unresolved by using the original list.
+  const hasUnresolvedNonExcluded = paramNames.some(
+    name => !(name in resolved) && !excluded.has(name)
+  );
+
+  // Replace placeholders in the template path.
+  // Resolved values are encoded, while unresolved ones remain as "{name}".
+  let updatedPath = templatePath.replace(/\{([^}]+)\}/g, (_, name) =>
+    resolved.hasOwnProperty(name)
+      ? encodeURIComponent(String(resolved[name]))
+      : `{${name}}`
+  );
+
+  // --- Process the query portion ---
+
+  let updatedQuery = "";
+  if (templateQuery) {
+    if (!hasUnresolvedNonExcluded) {
+      // Use URLSearchParams to parse the query template and current query.
+      const templateQueryParams = new URLSearchParams(templateQuery);
+      const currentQueryParams = new URLSearchParams(currentQuery);
+      const mergedQueryParams = new URLSearchParams();
+
+      // Replace any placeholders in each query parameter value.
+      for (const [key, value] of templateQueryParams.entries()) {
+        const newVal = value.replace(/\{([^}]+)\}/g, (_, pName) => {
+          if (Object.prototype.hasOwnProperty.call(params, pName)) {
+            return params[pName];
+          } else if (currentQueryParams.has(key)) {
+            return currentQueryParams.get(key);
+          }
+          return `{${pName}}`;
+        });
+        mergedQueryParams.set(key, newVal);
+      }
+      updatedQuery = mergedQueryParams.toString();
+      // Undo any encoding on curly braces (which URLSearchParams does automatically).
+      updatedQuery = updatedQuery.replace(/%7B/gi, "{").replace(/%7D/gi, "}");
+    } else {
+      // If required route values are not fully resolved, use the current query string.
+      updatedQuery = currentQuery;
+    }
+  } else {
+    updatedQuery = currentQuery;
+  }
+
+  // --- Final assembly ---
+  const combinedUrl = updatedQuery ? `${updatedPath}?${updatedQuery}` : updatedPath;
+  // Ensure that any accidentally encoded curly braces in the full URL are reverted.
+  const finalUrl = combinedUrl.replace(/%7B/gi, "{").replace(/%7D/gi, "}");
+  return finalUrl;
 };
 
 /**
@@ -190,12 +261,11 @@ export function extractParamsWithValues(layerPath) {
     params.forEach((param) => {
       const [key, value] = param.split('=');
       if (
-        value === undefined &&
-        key.includes('{') &&
-        key.includes('}')
+        value.includes('{') &&
+        value.includes('}')
       ) {
-        // It's a parameter placeholder in the query, e.g., ?{param}
-        const paramName = key.replace(/{|}/g, '');
+        // It's a parameter placeholder in the query, e.g., ?param={paramName}
+        const paramName = value.replace(/{|}/g, '');
         queryParams[paramName] = undefined;
       } else {
         queryParams[key] = value;

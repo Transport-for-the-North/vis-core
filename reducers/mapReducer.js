@@ -162,6 +162,7 @@ export const mapReducer = (state, action) => {
       // Update the path of the layer with the new parameters
       const updatedPath = updateUrlParameters(
         state.layers[layerName].pathTemplate,
+        state.layers[layerName].path,
         params
       );
 
