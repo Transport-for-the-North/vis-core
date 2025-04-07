@@ -50,12 +50,72 @@ export function getOpacityProperty(layerType) {
       widthProp = "line-width";
       break;
     }
-    default:
-      throw new Error(`Invalid layer type ${layerType}`);
   }
   return widthProp;
 }
 
+export const calculateMaxWidthFactor = (width) => {
+  if (typeof width !== 'number') {
+    throw new Error("Invalid maximum width value");
+  }
+
+  const factor = width / MAP_CONSTANTS.defaultMaxWidth;
+  return factor;
+};
+
+export const MAP_CONSTANTS = {
+  defaultMinWidth: 1,
+  defaultMaxWidth: 8.5,
+  defaultWidthFactor: 1
+}
+
+/**
+ * Adjusts an existing interpolation array by applying a width factor.
+ *
+ * This function takes an interpolation array, which is expected to start with the keyword "interpolate",
+ * and applies a scaling factor to the width values within the array. The function ensures that the existing
+ * interpolation is consistent with a default width before applying the new factor.
+ *
+ * @param {Array} existingInterpolationArray - The interpolation array to be adjusted. It must start with the
+ *                                              keyword "interpolate" and contain width values at specific positions.
+ * @param {number} factor - The factor by which to scale the width values in the interpolation array.
+ * @returns {Array} A new interpolation array with the width values adjusted by the specified factor.
+ * @throws {Error} If the input array is not a valid interpolation expression or if the existing factors
+ *                 in the interpolation are inconsistent.
+ */
+export const applyWidthFactor = (existingInterpolationArray, factor) => {
+  if (!Array.isArray(existingInterpolationArray) || existingInterpolationArray[0] !== "interpolate") {
+    throw new Error("Invalid interpolation expression");
+  };
+
+  // Extract the existing widths
+  const existingMin = existingInterpolationArray[3];
+  const existingMax = existingInterpolationArray[existingInterpolationArray.length - 1];
+
+  // Calculate the existing factoring - this shouldbe relative to the default widths
+  const oldFactorMin = existingMin / MAP_CONSTANTS.defaultMinWidth;
+  const oldFactorMax = existingMax / MAP_CONSTANTS.defaultMaxWidth;
+
+  // Check that they're consistent before continuing
+  // if (oldFactorMax !== oldFactorMin) {
+  //   throw new Error("Inconsistent factors in the existing interpolation");
+  // }
+
+  const overallFactor = factor / oldFactorMax;
+
+  const newInterpolationArray = [...existingInterpolationArray];
+
+  for (let i = 4; i <= newInterpolationArray.length; i += 2) {
+    if (typeof newInterpolationArray[i] === "number") {
+      newInterpolationArray[i] *= overallFactor;
+    }
+  }
+  console.log(existingInterpolationArray)
+  console.log(overallFactor)
+  console.log(newInterpolationArray)
+
+  return newInterpolationArray;
+}
  
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
