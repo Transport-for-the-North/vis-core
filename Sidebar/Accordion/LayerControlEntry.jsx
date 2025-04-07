@@ -7,6 +7,7 @@ import { ColourSchemeDropdown } from "../Selectors";
 import { SelectorLabel } from "../Selectors/SelectorLabel";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
+import { calculateMaxWidthFactor, MAP_CONSTANTS, applyWidthFactor} from "utils/map"
 
 /**
  * Styled container for the layer control entry.
@@ -131,7 +132,7 @@ export const LayerControlEntry = memo(
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
       const widthProp = getWidthProperty(layer.type);
-      currentWidth = maps[0].getPaintProperty(layer.id, widthProp);
+      currentWidth = widthProp ? maps[0].getPaintProperty(layer.id, widthProp) : null;
     }
 
     const isFeatureStateExpression =
@@ -140,14 +141,14 @@ export const LayerControlEntry = memo(
       ? currentOpacity[currentOpacity.length - 1]
       : currentOpacity;
 
-    const isFeatureStateExpression2 =
-      Array.isArray(currentWidth) && currentWidth[0] === "line";
-    const initialWidth = isFeatureStateExpression2
-      ? currentWidth[currentWidth.length - 1]
+    const isFeatureStateWidthExpression =
+      Array.isArray(currentWidth) && currentWidth[0] === "interpolate";
+    const initialWidth = isFeatureStateWidthExpression
+      ? calculateMaxWidthFactor(currentWidth[currentWidth.length - 1])
       : currentWidth;
 
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [width, setWidth] = useState(initialWidth || 7.5);
+    const [width, setWidth] = useState(initialWidth || 1);
 
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
@@ -184,19 +185,15 @@ export const LayerControlEntry = memo(
     };
 
     const handleWidthChange = (e) => {
-      const newWidth = parseFloat(e.target.value);
+      const widthFactor = parseFloat(e.target.value);
+      console.log(widthFactor)
       const WidthProp = getWidthProperty(layer.type);
       let WidthExpression;
 
-      if (isFeatureStateExpression) {
-        WidthExpression = [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "value"],
-          newWidth,
-        ];
+      if (isFeatureStateWidthExpression) {
+        WidthExpression = applyWidthFactor(currentWidth,widthFactor);
       } else {
-        WidthExpression = newWidth;
+        WidthExpression = 1;
       }
 
       maps.forEach((map) => {
@@ -204,7 +201,7 @@ export const LayerControlEntry = memo(
           map.setPaintProperty(layer.id, WidthProp, WidthExpression);
         }
       });
-      setWidth(newWidth);
+      setWidth(widthFactor);
     };
 
     return (
@@ -251,8 +248,8 @@ export const LayerControlEntry = memo(
               <WidthSlider
                 id={`width-${layer.id}`}
                 type="range"
-                min="7.5"
-                max="50"
+                min="0.5"
+                max="10"
                 step="0.1"
                 value={width}
                 onChange={handleWidthChange}
