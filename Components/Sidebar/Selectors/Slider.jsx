@@ -28,6 +28,7 @@ const SliderValue = styled.span`
  * @property {number} [filter.min] - The minimum value of the slider.
  * @property {number} [filter.max] - The maximum value of the slider.
  * @property {number} [filter.interval] - The interval between each selectable value on the slider.
+ * @property {number} [filter.defaultValue] - The default slider value (validated to be between min and max and divisible by the interval).
  * @property {Object} [filter.values] - An object containing source and values.
  * @property {string} [filter.values.source] - The source of the values.
  * @property {Array} [filter.values.values] - An array of value objects to display on the slider.
@@ -37,10 +38,30 @@ const SliderValue = styled.span`
 export const Slider = ({ filter, onChange }) => {
   const { state: filterState } = useFilterContext();
 
-  // Set the initial value
-  const initialValue = filter.values
-    ? filter.values.values[0].paramValue
-    : filter.min;
+  // Determine the initial value for the slider.
+  // If using discrete values from filter.values, use the first item's paramValue.
+  // Otherwise, if a defaultValue is provided, validate it; if invalid, fall back to filter.min.
+  const initialValue = (() => {
+    if (filter.values) {
+      return filter.values.values[0].paramValue;
+    } else {
+      const { min, max, interval, defaultValue } = filter;
+      if (defaultValue !== undefined) {
+        if (
+          defaultValue < min ||
+          defaultValue > max ||
+          ((defaultValue - min) % interval !== 0)
+        ) {
+          console.warn(
+            `defaultValue (${defaultValue}) is invalid. It should be between ${min} and ${max} and divisible by the interval (${interval}). Using ${min} instead.`
+          );
+          return min;
+        }
+        return defaultValue;
+      }
+      return min;
+    }
+  })();
 
   const [value, setValue] = useState(filterState[filter.id] || initialValue);
 
@@ -74,8 +95,8 @@ export const Slider = ({ filter, onChange }) => {
   };
 
   const handleSliderChange = (e) => {
-    const newIndex = parseInt(e.target.value, 10);
     if (filter.values) {
+      const newIndex = parseInt(e.target.value, 10);
       const newItem = filter.values.values[newIndex];
       const newValue = newItem.paramValue;
       setValue(newValue);

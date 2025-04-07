@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CalloutCardVisualisation } from './CalloutCardVisualisation';
 import { MapVisualisation } from './MapVisualisation';
 import { ScrollableContainer } from 'Components';
@@ -23,21 +23,52 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
   );
 
   const mapVisualisations = visualisationEntries.filter(
-    ([_, config]) => (config.type === 'joinDataToMap' || config.type === 'geojson')
+    ([_, config]) => config.type === 'joinDataToMap' || config.type === 'geojson'
   );
+
+  // Build a lookup for configs by name
+  const calloutCardConfigByName = Object.fromEntries(calloutCardVisualisations);
+
+  // State to manage order of cards
+  const [cardOrder, setCardOrder] = useState(
+    calloutCardVisualisations.map(([name]) => name)
+  );
+
+  // Update cardOrder when visualisationConfigs change
+  useEffect(() => {
+    const newOrder = calloutCardVisualisations.map(([name]) => name);
+    setCardOrder((prevOrder) => {
+      // Keep existing order as much as possible
+      const newPrevOrder = prevOrder.filter((name) => newOrder.includes(name));
+      const addedNames = newOrder.filter((name) => !newPrevOrder.includes(name));
+      return [...newPrevOrder, ...addedNames];
+    });
+  }, [visualisationConfigs]);
+
+  // Handler when a card is updated
+  const handleCardUpdate = (updatedName) => {
+    setCardOrder((prevOrder) => [
+      updatedName,
+      ...prevOrder.filter((name) => name !== updatedName),
+    ]);
+  };
 
   return (
     <>
-      {/* Render all calloutCard visualiations inside ScrollableContainer */}
+      {/* Render all calloutCard visualisations inside ScrollableContainer */}
       <ScrollableContainer>
-        {calloutCardVisualisations.map(([name, config]) => (
-          <CalloutCardVisualisation
-            key={name}
-            visualisationName={name}
-            cardName={config.cardName || name}
-            {...props}
-          />
-        ))}
+        {cardOrder.map((name) => {
+          const config = calloutCardConfigByName[name];
+          return (
+            <CalloutCardVisualisation
+              key={name}
+              visualisationName={name}
+              cardName={config.cardName || name}
+              onUpdate={() => handleCardUpdate(name)}
+              {...props}
+            />
+          );
+        })}
       </ScrollableContainer>
 
       {/* Render all MapVisualisations */}
