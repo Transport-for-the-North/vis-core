@@ -1,8 +1,9 @@
 import { forEach } from "lodash";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import styled from "styled-components";
 import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
+import { PageContext, useAppContext } from "contexts";
 
 // Styled components for the legend UI
 const LegendContainer = styled.div`
@@ -293,18 +294,21 @@ const interpretWidthExpression = (expression) => {
 };
 
 /**
-* DynamicLegend is a React component that renders a map legend based on the styles of map layers.
+ * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
  * item displays color and/or width swatches along with labels indicating the corresponding values.
 *
 * @component
 * @property {Object} map - The map instance from Mapbox or MapLibre.
 * @returns {JSX.Element|null} The rendered legend component or null if there are no legend items.
-*/
+ */
 export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
+  const { defaultBands } = useAppContext();
   const legendRef = useRef(null);
+  const currentPage = useContext(PageContext);
+  const pageCategory = currentPage.category || currentPage.pageName;
 
   useEffect(() => {
     if (!map) return;
@@ -339,10 +343,10 @@ export const DynamicLegend = ({ map }) => {
 
             if (legendFilter) {
               const filterParamName = legendFilter.paramName;
-              const filter = state.filters.find(
+              const filterObj = state.filters.find(
                 (filter) => filter.paramName === filterParamName
               );
-              const filterValues = filter?.values?.values || [];
+              const filterValues = filterObj?.values?.values || [];
               const defaultDisplayValue = filterValues[0]?.displayValue || title;
               const defaultLegendSubtitleText =
                 filterValues[0]?.legendSubtitleText || "";
@@ -358,15 +362,36 @@ export const DynamicLegend = ({ map }) => {
                 legendText[0]?.legendSubtitleText || "";
             }
           }
-
+          
+          // Look up custom labels from defaultBands using pageCategory
+          let customLabels = null;
+          if (visualisation && visualisation.queryParams) {
+            const legendFilter = state?.filters?.find(
+              (filter) => filter.containsLegendInfo === true
+            );
+            if (legendFilter) {
+              const filterParamName = legendFilter.paramName;
+              const metricName = visualisation.queryParams[filterParamName]?.value;
+              const defaultBandEntry = defaultBands.find(band => band.name === pageCategory);
+              if (defaultBandEntry) {
+                const metricDefinition = defaultBandEntry.metric.find(
+                  m => m.name === metricName
+                );
+                if (metricDefinition && metricDefinition.labels && metricDefinition.labels.length > 0) {
+                  customLabels = metricDefinition.labels;
+                }
+              }
+            }
+          }
+          
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;
           const trseLabel = state.layers[layer.id]?.trseLabel === true;
           const paintProps = layer.paint;
           // Interpret expressions
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
-              paintProps["circle-color"] ||
-              paintProps["fill-color"]
+            paintProps["circle-color"] ||
+            paintProps["fill-color"]
           );
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
@@ -413,7 +438,7 @@ export const DynamicLegend = ({ map }) => {
               color: convertStringToNumber(stop.value) < 0 ? negativeColor : positiveColor
             }));
           }
-
+          
           // Process legend entries
           let legendEntries = [];
           if (colorStops && colorStops.length > 0) {
@@ -423,7 +448,9 @@ export const DynamicLegend = ({ map }) => {
               const nextStop = colorStops[idx + 1];
               const widthStop = widthStops ? widthStops[idx] : null;
               let label;
-              if (trseLabel && nextStop) {
+              if (customLabels && customLabels.length === length) {
+                label = customLabels[idx];
+              } else if (trseLabel && nextStop) {
                 const startValue = stop.value;
                 const endValue = nextStop.value;
                 if (idx === 0) {
@@ -475,7 +502,7 @@ export const DynamicLegend = ({ map }) => {
               legendEntries[0].label = title;
             }
           }
-  
+          
           return {
             layerId: layer.id,
             title: displayValue,
@@ -497,8 +524,8 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [state.filters, map, state.visualisations, state.currentZoom]);
-
+  }, [state.filters, map, state.visualisations, state.currentZoom, currentPage]);
+  
   // This effect forces the container's width to update after legendItems change,
   // working around Firefox's flex-wrap column bug.
   useEffect(() => {
@@ -515,10 +542,11 @@ export const DynamicLegend = ({ map }) => {
       legendRef.current.style.width = `${newWidth}px`;
     }
   }, [legendItems]);
-
+  
   if (legendItems.length === 0) {
     return null;
   }
+  
   return (
     <LegendContainer ref={legendRef}>
       {legendItems.map((item, index) => (
@@ -534,7 +562,7 @@ export const DynamicLegend = ({ map }) => {
                   ) : item.type === "fill" ? (
                     <PolygonSwatch color={entry.color} />
                   ) : null}
-                  <LegendLabel>{item.title}</LegendLabel>
+                  <LegendLabel>{entry.label}</LegendLabel>
                 </LegendItem>
               ))
             ) : (

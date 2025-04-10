@@ -34,6 +34,8 @@ export const england = {
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
+        enforceNoColourSchemeSelector: true,
+        enforceNoClassificationMethod: true,
         customTooltip: {
           url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}`,
           htmlTemplate: severancePopup
