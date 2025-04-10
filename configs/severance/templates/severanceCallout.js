@@ -23,7 +23,7 @@
         If this area had no <span class="highlight">{barrier_name}</span> infrastructure acting as a 
         potential active travel barrier, residents in this OA would have 
         walkable access to 
-        <span class="highlight">{formatReach(perfect_reach_decile)} additional {destination_name} destinations</span> 
+        <span class="highlight">{formatReach(perfect_reach_decile)} {destination_name} destinations</span> 
         (current walkable access: <span class="highlight">{formatReach(isochrone_reach_decile)}</span>) 
       </p>
     </div>
