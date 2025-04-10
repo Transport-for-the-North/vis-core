@@ -3,6 +3,31 @@ import { termsOfUse } from "../termsOfUse";
 import glossaryData from "../glossaryData";
 import {severancePopup, severanceCallout} from '../templates/index';
 
+/*
+  Custom formatting functions for tooltips and callouts.
+*/
+const customFormattingFunctions = {
+  convertDecileNumberToString: (value) => {
+    const decileMapping = {
+      0: "-",
+      999: "-",
+    };
+    return decileMapping[value] || value;
+  },
+  formatReach: (value) => {
+    const reachMapping = {
+      999: "-",
+    };
+    // Check if the value is in the reachMapping
+    if (reachMapping.hasOwnProperty(value)) {
+      return reachMapping[value];
+    }
+
+    // Format the number with commas
+    return value.toLocaleString();
+  },
+}
+
 export const england = {
   pageName: "Severance across England",
   url: "/severance-in-england",
@@ -38,8 +63,9 @@ export const england = {
         enforceNoClassificationMethod: true,
         customTooltip: {
           url: `/api/severance/callout-data?zoneId={id}&barrierId={barrierId}&walkSpeed={walkSpeed}&destinationId={destinationId}`,
-          htmlTemplate: severancePopup
-        }
+          htmlTemplate: severancePopup,
+          customFormattingFunctions: customFormattingFunctions
+        },
       },
       {
         name: "Local Authorities",
@@ -106,9 +132,9 @@ export const england = {
         legendText: [
           {
             displayValue: "Output Areas",
-            legendSubtitleText: "Decile" 
-          }
-        ]
+            legendSubtitleText: "Decile",
+          },
+        ],
       },
       {
         name: "Severance Callout",
@@ -116,30 +142,35 @@ export const england = {
         cardName: "Output Area Summary",
         dataSource: "api",
         dataPath: "/api/severance/callout-data",
-        htmlFragment: severanceCallout
-      }
+        htmlFragment: severanceCallout,
+        customFormattingFunctions: customFormattingFunctions,
+      },
     ],
-    metadataTables: [{
-      name: "destination_list",
-      path: "/api/getgenericdataset?dataset_id=foreign_keys.destination_list"
-    },{
-      name: "barrier_list",
-      path: "/api/getgenericdataset?dataset_id=foreign_keys.barrier_list"
-    },{
-      name: "v_vis_severance_walk_speed",
-      path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_severance_walk_speed"
-    }],
+    metadataTables: [
+      {
+        name: "destination_list",
+        path: "/api/getgenericdataset?dataset_id=foreign_keys.destination_list",
+      },
+      {
+        name: "barrier_list",
+        path: "/api/getgenericdataset?dataset_id=foreign_keys.barrier_list",
+      },
+      {
+        name: "v_vis_severance_walk_speed",
+        path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_severance_walk_speed",
+      },
+    ],
     filters: [
       selectors.barrierType,
       selectors.walkSpeed,
       selectors.destinationType,
       selectors.severanceType,
       selectors.zoneId,
-      selectors.variable
+      selectors.variable,
     ],
     additionalFeatures: {
-      glossary: { 
-        dataDictionary: glossaryData
+      glossary: {
+        dataDictionary: glossaryData,
       },
     },
   },

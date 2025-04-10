@@ -6,7 +6,7 @@ import DOMPurify from 'dompurify';
 import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
 import { replacePlaceholders } from 'utils';
-import { Hovertip } from 'Components';
+import { Hovertip, WarningBox } from 'Components';
 
 import { CARD_CONSTANTS } from "defaults";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
@@ -183,9 +183,22 @@ const ToggleButton = styled.button`
 export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
+  const customFormattingFunctions = visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
 
   const { isLoading, data } = useFetchVisualisationData(visualisation);
+
+  // Do not render the card if no data is available,
+  // or if the data is an empty object,
+  // or if every value in the data dictionary is nullish.
+  let hasDataShouldRender = true;
+  if (
+    !data ||
+    Object.keys(data).length === 0 ||
+    Object.values(data).every(value => value === null || value === undefined || value === 0)
+  ) {
+    hasDataShouldRender = false;
+  }
 
   // State to hold the rendered HTML content
   const [renderedContent, setRenderedContent] = useState('');
@@ -198,7 +211,8 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       setIsVisible(true);
       const htmlWithPlaceholdersReplaced = replacePlaceholders(
         visualisation.htmlFragment,
-        data
+        data,
+        { customFunctions: customFormattingFunctions }
       );
       // Sanitize the HTML to prevent XSS attacks
       const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
@@ -266,7 +280,13 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       <ParentContainer $isVisible={isVisible}>
       <CardContainer $isVisible={isVisible}>
         <CardTitle>{cardName}</CardTitle>
-        <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
+        {hasDataShouldRender ? (
+          <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
+        ) : (
+          <CardContent>
+            <WarningBox text="No data available for selection" />
+          </CardContent>
+        )}
       </CardContainer>
       <ToggleButton
           ref={buttonRef}

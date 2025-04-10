@@ -11,7 +11,7 @@
     </div>
     <div class="card">
       <div class="label">Severance index</div>
-      <div class="value">{formatNumber(overall_decile_risk)}</div>
+      <div class="value">{convertDecileNumberToString(overall_decile_risk)}</div>
     </div>
     <div class="card">
     <div class="label">Severance risk classification</div>
@@ -22,9 +22,9 @@
       <p>
         If this area had no <span class="highlight">{barrier_name}</span> infrastructure acting as a 
         potential active travel barrier, residents in this OA would have 
-        additional walkable access to 
-        <span class="highlight">{formatNumber(perfect_reach_decile)} {destination_name} destinations</span> 
-        (current walkable access: <span class="highlight">{formatNumber(isochrone_reach_decile)}</span>) 
+        walkable access to 
+        <span class="highlight">{formatReach(perfect_reach_decile)} additional {destination_name} destinations</span> 
+        (current walkable access: <span class="highlight">{formatReach(isochrone_reach_decile)}</span>) 
       </p>
     </div>
 `;
