@@ -1,4 +1,5 @@
 import { termsOfUse } from "../termsOfUse"
+import { selectors } from "../selectorDefinitions";
 
 
 const ntemPurposeCode = {
@@ -150,5 +151,13 @@ export const hansen = {
           field: "id",
         }
       ],
+      additionalFeatures: {
+        download: {
+          filters: [
+            selectors.zoneSelector
+          ],
+          downloadPath: '/api/tina/metric-download/'
+        },
+      },
     },
 }
