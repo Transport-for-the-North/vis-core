@@ -156,7 +156,7 @@ export const hansen = {
           filters: [
             selectors.zoneSelector
           ],
-          downloadPath: '/api/tina/metric-download/'
+          downloadPath: '/api/tina/metric-download/download'
         },
       },
     },
