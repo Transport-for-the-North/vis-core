@@ -381,6 +381,26 @@ export const LayerControlEntry = memo(
             />
             <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
           </OpacityControl>)}
+          {/* Width Control (if applicable) */}
+          {isFeatureStateWidthExpression && ( 
+                <>
+                <WidthControl>
+                <ControlLabel htmlFor={`width-${layer.id}`}>
+                  Width factor
+                </ControlLabel>
+                
+                  <Slider
+                    id={`width-${layer.id}`}
+                    type="range"
+                    min="0.5"
+                    max="10"
+                    step="0.1"
+                    value={widthFactor}
+                    onChange={handleWidthFactorChange}
+                  />
+                  <SliderValue>{(widthFactor).toFixed(1)}</SliderValue>
+                </WidthControl>
+                </>)}
           {/* Color Scheme and Classification (if stylable) */}
           {layer.metadata?.isStylable && (
             <div style={{ marginTop: "1rem" }}>
@@ -404,24 +424,6 @@ export const LayerControlEntry = memo(
                   handleClassificationChange(value, layer.id)
                 }
               />}
-              {isFeatureStateWidthExpression && ( 
-              <>
-              <ControlLabel htmlFor={`width-${layer.id}`}>
-                Width factor
-              </ControlLabel>
-              <WidthControl>
-                <Slider
-                  id={`width-${layer.id}`}
-                  type="range"
-                  min="0.5"
-                  max="10"
-                  step="0.1"
-                  value={widthFactor}
-                  onChange={handleWidthFactorChange}
-                />
-                <SliderValue>{(widthFactor).toFixed(1)}</SliderValue>
-              </WidthControl>
-              </>)}
           </div>
           )}
         </CollapsibleContent>
