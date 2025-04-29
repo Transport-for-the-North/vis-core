@@ -125,14 +125,14 @@ export const LayerControlEntry = memo(
         metric.name ===
         visualisation.queryParams[selectedMetricParamName.paramName]?.value
     );
-    let currentWidth = null;
+    let currentWidthFactor = null;
     let currentOpacity = null;
 
     if (maps.length > 0 && maps[0].getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
       const widthProp = getWidthProperty(layer.type);
-      currentWidth = widthProp ? maps[0].getPaintProperty(layer.id, widthProp) : null;
+      currentWidthFactor = widthProp ? maps[0].getPaintProperty(layer.id, widthProp) : null;
     }
 
     const isFeatureStateExpression =
@@ -142,13 +142,13 @@ export const LayerControlEntry = memo(
       : currentOpacity;
 
     const isFeatureStateWidthExpression =
-      Array.isArray(currentWidth) && currentWidth[0] === "interpolate";
+      Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
     const initialWidth = isFeatureStateWidthExpression
-      ? calculateMaxWidthFactor(currentWidth[currentWidth.length - 1])
-      : currentWidth;
+      ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1])
+      : currentWidthFactor;
 
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [width, setWidth] = useState(initialWidth || 1);
+    const [widthFactor, setWidth] = useState(initialWidth || 1);
 
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
@@ -184,14 +184,14 @@ export const LayerControlEntry = memo(
       setOpacity(newOpacity);
     };
 
-    const handleWidthChange = (e) => {
+    const handleWidthFactorChange = (e) => {
       const widthFactor = parseFloat(e.target.value);
       console.log(widthFactor)
       const WidthProp = getWidthProperty(layer.type);
       let WidthExpression;
 
       if (isFeatureStateWidthExpression) {
-        WidthExpression = applyWidthFactor(currentWidth,widthFactor);
+        WidthExpression = applyWidthFactor(currentWidthFactor,widthFactor);
       } else {
         WidthExpression = 1;
       }
@@ -251,8 +251,8 @@ export const LayerControlEntry = memo(
                 min="0.5"
                 max="10"
                 step="0.1"
-                value={width}
-                onChange={handleWidthChange}
+                value={widthFactor}
+                onChange={handleWidthFactorChange}
               />
             </WidthControl>
           </>
