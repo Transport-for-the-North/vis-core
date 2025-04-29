@@ -97,14 +97,50 @@ export function replacePlaceholdersInObject(target, source) {
 }
 
 /**
-   * Replaces placeholders in the HTML fragment with actual data.
-   * Placeholders are denoted by {key}, where 'key' corresponds to a key in the data object.
-   *
-   * @param {string} htmlFragment - The HTML fragment containing placeholders.
-   * @param {Object} data - The data object containing key-value pairs.
-   * @returns {string} The HTML fragment with placeholders replaced.
-   */
-export const replacePlaceholders = (htmlFragment, data) => {
+ * Replaces placeholders in an HTML fragment with actual data values.
+ *
+ * Placeholders in the HTML fragment may appear in one of two formats:
+ *
+ * 1. Simple replacement: {key}
+ *    - This will be replaced by data[key]. If no matching key is found, the original placeholder remains.
+ *
+ * 2. Function call replacement: {functionName(argKey)}
+ *    - This allows you to pass the data value (data[argKey]) through a formatting function.
+ *    - The function is looked up in an allowed functions object (which can include custom functions).
+ *
+ * The allowed functions object is built by merging any customFunctions provided from options with default functions.
+ *
+ * @param {string} htmlFragment - The HTML content containing placeholders.
+ * @param {Object} data - An object mapping keys to values for substitution.
+ * @param {Object} [options={}] - Optional configuration settings.
+ * @param {Object} [options.customFunctions] - An object mapping function names to custom formatter functions.
+ *                                             These functions receive a single argument extracted from data.
+ * @returns {string} - The HTML string with placeholders replaced by their corresponding values or formatted values.
+ *
+ * @example
+ *
+ * const html = '<div>{formatNumber(value)}</div>';
+ * const data = { value: 1234567 };
+ * const customFns = {
+ *   formatNumber: (num) => Number(num).toLocaleString()
+ * };
+ *
+ * const result = replacePlaceholders(html, data, { customFunctions: customFns });
+ * // result: '<div>1,234,567</div>'
+ */
+export const replacePlaceholders = (htmlFragment, data, options = {}) => {
+  // Define default functions here (universal across apps)
+  const defaultFunctions = {
+    formatNumber,
+    formatOrdinal,
+  };
+
+  // Merge with custom functions if provided
+  const allowedFunctions = { 
+    ...defaultFunctions, 
+    ...(options.customFunctions || {})
+  };
+  
   // Regular expression to match placeholders with optional function calls
   return htmlFragment.replace(/{(\w+)(\(([\w\.]+)\))?}/g, (match, funcOrKey, funcArgs, argKey) => {
     // If there is no function call, replace with data[key]
@@ -122,15 +158,9 @@ export const replacePlaceholders = (htmlFragment, data) => {
       return match
     }
 
-    // Define allowed functions
-    const allowedFunctions = {
-      formatNumber,
-      formatOrdinal,
-    };
-
     // Check if the function is allowed
     const func = allowedFunctions[functionName];
-    if (func) {
+    if (func && typeof func === 'function') {
       return func(arg);
     }
 

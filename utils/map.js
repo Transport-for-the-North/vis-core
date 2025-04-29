@@ -2,6 +2,40 @@ import { roundToSignificantFigures } from "./math";
 import chroma from "chroma-js";
 
 /**
+ * Helper: Extracts the metric definition from the defaultBands.
+ * Returns an object that includes values, differenceValues, and colours for the metric,
+ * or null if nothing is found.
+ *
+ * @param {Array} defaultBands - The bands array from defaults.
+ * @param {Object} currentPage - The current app page (used to resolve the page category).
+ * @param {Object} queryParams - The URL query parameters.
+ * @param {Object} options - Additional options; for example, { trseLabel: true }.
+ * @returns {Object|null} The metric definition or null.
+ */
+export const getMetricDefinition = (
+  defaultBands,
+  currentPage,
+  queryParams,
+  options = {}
+) => {
+  const pageCategory = currentPage.category || currentPage.pageName;
+  const selectedPageBands = defaultBands?.find((band) => band.name === pageCategory);
+  let metricName = null;
+  if (options.trseLabel) {
+    metricName = "trse";
+  } else if (currentPage.config && currentPage.config.filters) {
+    const selectedMetricFilter = currentPage.config.filters.find(
+      (filter) => filter.containsLegendInfo === true
+    );
+    metricName = queryParams[selectedMetricFilter?.paramName]?.value;
+  }
+  if (selectedPageBands && metricName) {
+    return selectedPageBands.metric.find((m) => m.name === metricName) || null;
+  }
+  return null;
+};
+
+/**
  * Returns the opacity property name for a given layer type.
  * @function getOpacityProperty
  * @param {string} layerType - The type of the layer. Expected values are 'line', 'fill', or 'circle'.
@@ -361,7 +395,15 @@ export const resetPaintProperty = (style) => {
  * @param {Object} options - Additional options, e.g., { trseLabel: true }
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
-export const reclassifyData = (data, style, classificationMethod, defaultBands, currentPage, queryParams, options = {}) => {
+export const reclassifyData = (
+  data,
+  style,
+  classificationMethod,
+  defaultBands,
+  currentPage,
+  queryParams,
+  options = {}
+) => {
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -375,89 +417,59 @@ export const reclassifyData = (data, style, classificationMethod, defaultBands, 
   };
 
   function replaceZeroValues(num) {
-    if (num === 0) {
-      return 0.01
-    }
-    else {
-      return num
-    }
+    return num === 0 ? 0.01 : num;
   }
 
   function replaceZeroPointValues(num) {
-    if (num === 0.01) {
-      return 0
-    }
-    else {
-      return num
-    }
+    return num === 0.01 ? 0 : num;
   }
 
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
-    if (classificationMethod === 'd') {
-      const pageCategory = currentPage.category || 'England';
-      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
-      let metricName = null;
-      if (options.trseLabel) {
-        metricName = 'trse';
-      } else {
-        const selectedMetricFilter = currentPage.config.filters.find(filter => filter.containsLegendInfo === true);
-        const selectedMetricParamName = selectedMetricFilter?.paramName;
-        metricName = queryParams[selectedMetricParamName]?.value;
+    if (classificationMethod === "d") {
+      // Use getMetricDefinition to get the appropriate metric definition
+      const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
+      if (metric) {
+        return metric.values;
       }
-      if (selectedPageBands && metricName) {
-        const metric = selectedPageBands.metric.find(m => m.name === metricName);
-        if (metric) {
-          return metric.values;
-        }
-      }
-      classificationMethod = 'q';
+      // Fallback to quantile method if no metric definition is found
+      classificationMethod = "q";
     }
-    if (classificationMethod === 'l') {
-      values = values.map(replaceZeroValues)
+    if (classificationMethod === "l") {
+      values = values.map(replaceZeroValues);
     }
     const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
     let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
-    if (classificationMethod === 'l') {
-      roundedBins = roundedBins.map(replaceZeroPointValues)
+    if (classificationMethod === "l") {
+      roundedBins = roundedBins.map(replaceZeroPointValues);
     }
     return roundedBins;
   } else if (style.includes("categorical")) {
     return;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
-    if (classificationMethod === 'd') {
-      const pageCategory = currentPage.category || 'England';
-      const selectedPageBands = defaultBands.find(band => band.name === pageCategory);
-      let metricName = null;
-      if (options.trseLabel) {
-        metricName = 'trse';
-      } else {
-        const selectedMetricFilter = currentPage.config.filters.find(filter => filter.containsLegendInfo === true);
-        const selectedMetricParamName = selectedMetricFilter?.paramName;
-        metricName = queryParams[selectedMetricParamName]?.value;
+    if (classificationMethod === "d") {
+      // Use getMetricDefinition to get the appropriate metric definition
+      const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
+      if (metric) {
+        return !style.includes("line")
+          ? metric.differenceValues
+          : metric.differenceValues.slice(metric.differenceValues.length / 2);
       }
-      if (selectedPageBands && metricName) {
-        const metric = selectedPageBands.metric.find(m => m.name === metricName);
-        if (metric) {
-          return !style.includes("line") ? metric.differenceValues : metric.differenceValues.slice(metric.differenceValues.length / 2);
-        }
-      }
-      classificationMethod = 'q';
+      // Fallback to quantile method if no metric definition is found
+      classificationMethod = "q";
     }
-    if (classificationMethod === 'l') {
-      absValues = absValues.map(replaceZeroValues)
+    if (classificationMethod === "l") {
+      absValues = absValues.map(replaceZeroValues);
     }
     const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
-    let roundedBins = unroundedBins.map(function(ele){
-      return Math.round(ele*100)/100;
-    });
-    if (classificationMethod === 'l') {
-      absValues = absValues.map(replaceZeroValues)
+    let roundedBins = unroundedBins.map((ele) => Math.round(ele * 100) / 100);
+    if (classificationMethod === "l") {
+      absValues = absValues.map(replaceZeroValues);
     }
-    roundedBins = roundedBins.filter((value) => value !== 0)
+    roundedBins = roundedBins.filter((value) => value !== 0);
     if (style.includes("line")) return [0, ...roundedBins];
-    const negativeBins = roundedBins.slice().reverse().map(val => -val);
+    const negativeBins = roundedBins.slice().reverse().map((val) => -val);
     return [...negativeBins, 0, ...roundedBins];
   } else {
     console.log("Style not recognized");

@@ -22,7 +22,8 @@ const SearchContainer = styled.div`
  */
 export const LayerSearch = ({ map, layer }) => {
   const [selectedOption, setSelectedOption] = useState(null);
-
+  const zoomToFeaturePlaceholderText = 
+    layer.metadata?.zoomToFeaturePlaceholderText || 'Search features in this layer...';
   /**
    * Handles the change event when a feature is selected.
    * Zooms to the selected feature on the map and adds a temporary label.
@@ -116,7 +117,7 @@ export const LayerSearch = ({ map, layer }) => {
         layerPath={layer.metadata.path}
         value={selectedOption}
         onChange={handleChange}
-        placeholder={`Search features in ${layer.id}...`}
+        placeholder={zoomToFeaturePlaceholderText}
       />
     </SearchContainer>
   );

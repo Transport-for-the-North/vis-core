@@ -6,7 +6,7 @@ import DOMPurify from 'dompurify';
 import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
 import { replacePlaceholders } from 'utils';
-import { Hovertip } from 'Components';
+import { Hovertip, WarningBox } from 'Components';
 
 import { CARD_CONSTANTS } from "defaults";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
@@ -173,20 +173,32 @@ const ToggleButton = styled.button`
 
 /**
  * CalloutCardVisualisation component to display a card-like element within the map.
- * It fetches data using the useFetchVisualisationData hook, uses an htmlFragment with
- * placeholders, sanitizes the HTML, and populates the placeholders with the fetched data.
  *
  * @param {Object} props - The component props.
  * @param {string} props.visualisationName - The name of the visualisation.
  * @param {string} [props.cardName] - Optional name for the card.
+ * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
+export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
+  const customFormattingFunctions = visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
 
   const { isLoading, data } = useFetchVisualisationData(visualisation);
+
+  // Do not render the card if no data is available,
+  // or if the data is an empty object,
+  // or if every value in the data dictionary is nullish.
+  let hasDataShouldRender = true;
+  if (
+    !data ||
+    Object.keys(data).length === 0 ||
+    Object.values(data).every(value => value === null || value === undefined || value === 0)
+  ) {
+    hasDataShouldRender = false;
+  }
 
   // State to hold the rendered HTML content
   const [renderedContent, setRenderedContent] = useState('');
@@ -197,11 +209,19 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
       setIsVisible(true);
-      const htmlWithPlaceholdersReplaced = replacePlaceholders(visualisation.htmlFragment, data);
+      const htmlWithPlaceholdersReplaced = replacePlaceholders(
+        visualisation.htmlFragment,
+        data,
+        { customFunctions: customFormattingFunctions }
+      );
       // Sanitize the HTML to prevent XSS attacks
       const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
       setRenderedContent(sanitizedHtml);
-      
+
+      // Call onUpdate when new data is set
+      if (onUpdate) {
+        onUpdate();
+      }
     }
   }, [data, visualisation.htmlFragment]);
 
@@ -260,7 +280,13 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName }) => {
       <ParentContainer $isVisible={isVisible}>
       <CardContainer $isVisible={isVisible}>
         <CardTitle>{cardName}</CardTitle>
-        <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
+        {hasDataShouldRender ? (
+          <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
+        ) : (
+          <CardContent>
+            <WarningBox text="No data available for selection" />
+          </CardContent>
+        )}
       </CardContainer>
       <ToggleButton
           ref={buttonRef}

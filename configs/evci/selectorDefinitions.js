@@ -66,6 +66,25 @@ const zoneSelector = {
   defaultMode: 'draw_rectangle', // Default selection mode
 };
 
+const linkSelector = {
+  filterName: "Optional location filter",
+  type: "mapFeatureSelectWithControls",
+  paramName: "linkId",
+  target: "api",
+  actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
+    {
+      action: 'UPDATE_VISUALISED_FEATURES'
+    },
+  ],
+  visualisations: null,
+  layer: "Major Roads",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
 const siteSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
@@ -325,6 +344,40 @@ const vehicleTypeWithoutAllSelector = {
   },
 };
 
+const vehicleTypeWithBusTaxi = {
+  filterName: "Vehicle Type",
+  paramName: "modeCode",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Car",
+        paramValue: "car",
+      },
+      {
+        displayValue: "LGV",
+        paramValue: "lgv",
+      },
+      {
+        displayValue: "HGV",
+        paramValue: "hgv",
+      },
+      {
+        displayValue: "Bus",
+        paramValue: "bus",
+      },
+      {
+        displayValue: "Taxi & PHV",
+        paramValue: "phv",
+      },
+    ],
+  },
+};
+
 const vehicleTypeAllSelector = {
   filterName: "Vehicle Type",
   paramName: "modeCode",
@@ -469,6 +522,48 @@ const tfnChargingCategorySelector = {
   },
 };
 
+const tfseChargingCategorySelector = {
+  filterName: "Charging Category",
+  paramName: "chargingCategoryId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Destination",
+        paramValue: 1,
+      },
+      {
+        displayValue: "HGV Depot",
+        paramValue: 2,
+      },
+      {
+        displayValue: "Home",
+        paramValue: 3,
+      },
+      {
+        displayValue: "On-street residential charging",
+        paramValue: 4,
+      },
+      {
+        displayValue: "Workplace",
+        paramValue: 5,
+      },
+      {
+        displayValue: "Van Depot",
+        paramValue: 9,
+      },
+      {
+        displayValue: "Bus Depot",
+        paramValue: 10,
+      },
+    ],
+  },
+};
+
 const areaValueDisplaySelector = {
   filterName: "Display values as...",
   paramName: "showValuesAs",
@@ -577,14 +672,14 @@ const columnNameCPSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Installed charger power",
-        paramValue: "kw_total",
-        legendSubtitleText: "kW"
-      },
-      {
         displayValue: "Installed devices",
         paramValue: "device_count",
         legendSubtitleText: "device count"
+      },
+      {
+        displayValue: "Installed charger power",
+        paramValue: "kw_total",
+        legendSubtitleText: "kW"
       },
     ],
   },
@@ -717,14 +812,14 @@ const columnNameSelector = {
     source: "local",
     values: [
       {
-        displayValue: "Charger power",
-        paramValue: "kw_total",
-        legendSubtitleText: "kW"
-      },
-      {
         displayValue: "Stops count",
         paramValue: "stops_count",
         legendSubtitleText: "stops"
+      },
+      {
+        displayValue: "Charger power",
+        paramValue: "kw_total",
+        legendSubtitleText: "kW"
       },
     ],
   },
@@ -805,10 +900,12 @@ export const selectors = {
   tfnBehaviouralScenario: tfnBehaviouralScenarioSelector,
   vehicleType: vehicleTypeSelector,
   vehicleTypeWithoutAll: vehicleTypeWithoutAllSelector,
+  vehicleTypeWithBusTaxi: vehicleTypeWithBusTaxi,
   vehicleTypeAll: vehicleTypeAllSelector,
   fuelType: fuelTypeSelector,
   chargingCategory: chargingCategorySelector,
   tfnChargingCategory: tfnChargingCategorySelector,
+  tfseChargingCategory: tfseChargingCategorySelector,
   areaValueDisplay: areaValueDisplaySelector,
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,
@@ -822,5 +919,6 @@ export const selectors = {
   runTypeCodeFixed: runTypeCodeFixedSelector,
   runTypeCodeDynamic: runTypeCodeDynamicSelector,
   zoneSelector: zoneSelector,
-  siteSelector: siteSelector
+  siteSelector: siteSelector,
+  linkSelector: linkSelector
 };

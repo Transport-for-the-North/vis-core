@@ -273,6 +273,32 @@ const glossaryData = {
     chargingCategories: {
       title: "Charging categories",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
+      <p>There are 5 charging categories defined for cars and vans, and 2 for heavy goods vehicles:</p>
+      <p><strong>Cars and vans</strong></p>
+      <ul>
+      <li>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
+      This is typically at a 7 kW charger where a user stays for 30 - 60 minutes.</li>
+      <li>Home: Charging which occurs off-street in a driver's private garage or other private parking location. 
+      We assume the use of a 7 kW charger.</li>
+      <li>En-route rapid: Charging which occurs during a journey, similar to refuelling with petrol at a motorway service station. 
+      Chargers tend to support at least 50 kW, and sometimes 150 - 350 kW charging, allowing for short charging times. 
+      Due to lower powered chargers and lower power acceptance rates by vehicles, in the short term, 
+      charging rates are assumed to increase over time from 50 kW today to 150 kW in the future.</li>
+      <li>Public residential: Charging which occurs on-street near a driver's home location, for example while parked on a local road or in a public car park. 
+      We assume the use of a 7 kW charger.</li>
+      <li>Workplace: Charging which occurs at or near a driver's place of work. 
+      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 7 kW charger.</li>
+      </ul>
+      <p><strong>Heavy goods vehicles</strong></p>
+      <ul>
+      <li>HGV depot: Charging which occurs in the depot where the vehicle is kept overnight.</li>
+      <li>HGV en-route: Charging which occurs during a journey, similar to a truck refuelling with diesel at a motorway service area.</li>
+      </ul>`,
+      exclude: ["tfn", "tfse"],
+    },
+    tfnChargingCategories: {
+      title: "Charging categories",
+      content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
       <p>There are 6 charging categories defined for cars and vans, and 2 for heavy goods vehicles:</p>
       <p><strong>Cars and vans</strong></p>
       <ul>
@@ -300,7 +326,38 @@ const glossaryData = {
       <li>HGV depot: Charging which occurs in the depot where the vehicle is kept overnight.</li>
       <li>HGV en-route: Charging which occurs during a journey, similar to a truck refuelling with diesel at a motorway service area.</li>
       </ul>`,
-      exclude: [],
+      exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
+    },
+    tfseChargingCategories: {
+      title: "Charging categories",
+      content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
+      <p>There are 6 charging categories defined for cars and vans, 1 for buses and 2 for heavy goods vehicles:</p>
+      <p><strong>Cars and vans</strong></p>
+      <ul>
+      <li>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
+      This is typically at a 7 kW charger where a user stays for 30 - 60 minutes.</li>
+      <li>Home: Charging which occurs off-street in a driver's private garage or other private parking location. 
+      We assume the use of a 7 kW charger.</li>
+      <li>En-route rapid: Charging which occurs during a journey, similar to refuelling with petrol at a motorway service station. 
+      Chargers tend to support at least 50 kW, and sometimes 150 - 350 kW charging, allowing for short charging times. 
+      Due to lower powered chargers and lower power acceptance rates by vehicles, in the short term, 
+      charging rates are assumed to increase over time from 50 kW today to 150 kW in the future.</li>
+      <li>Public residential: Charging which occurs on-street near a driver's home location, for example while parked on a local road or in a public car park. 
+      We assume the use of a 7 kW charger.</li>
+      <li>Workplace: Charging which occurs at or near a driver's place of work. 
+      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 7 kW charger.</li>
+      <li>Van depot: Charging which occurs in the depot during the day or overnight, at a mix of AC (Alternating Current) and DC (direct Current) chargers between 7 kW and 50 kW.</li>
+      </ul>
+      <p><strong>Buses</strong></p>
+      <ul>
+      <li>Bus depot: Charging which occurs in the depot where Buses are kept overnight, where buses charge at an average power rating of 60 kW.</li>
+      </ul>
+      <p><strong>Heavy goods vehicles</strong></p>
+      <ul>
+      <li>HGV depot: Charging which occurs in the depot where the vehicle is kept overnight.</li>
+      <li>HGV en-route: Charging which occurs during a journey, similar to a truck refuelling with diesel at a motorway service area.</li>
+      </ul>`,
+      exclude: ["mc", "tfn", "eeh", "wg", "peninsula", "te"],
     },
     destination: {
       title: "Destination charging",
@@ -343,7 +400,15 @@ const glossaryData = {
       title: "Depot charging",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
       <p>HGV depot: Charging which occurs in the depot where the heavy goods vehicle is kept overnight.</p>`,
-      exclude: [],
+      exclude: ["tfse"],
+    },
+    depotTfse: {
+      title: "Depot charging",
+      content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
+      <p>HGV depot: Charging which occurs in the depot where the heavy goods vehicle is kept overnight.</p>
+      <p>Van depot: Charging which occurs in the depot during the day or overnight, at a mix of AC (Alternating Current) and DC (Direct Current) chargers between 7 kW and 50 kW.</p>
+      <p>Bus depot: Charging which occurs in the depot where buses are kept overnight, where buses charge at an average power rating of 60 kW.</p>`,
+      exclude: ["mc", "tfn", "eeh", "wg", "peninsula", "te"],
     },
     density: {
       title: "Per square kilometre (sq km density)",
@@ -429,7 +494,7 @@ const glossaryData = {
       <li>Rapid - 50kW to less than 150kW</li>
       <li>Ultra-rapid - 150kW or higher</li>
       </ul></p>`,
-      exclude: [],
+      exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
     enRouteRoad: {
       title: "En-route charging by major road",
