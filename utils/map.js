@@ -107,11 +107,6 @@ export const applyWidthFactor = (existingInterpolationArray, factor, constantOff
     }
   }
 
-  console.log(existingInterpolationArray);
-  console.log(overallFactor);
-  console.log(newInterpolationArray);
-  console.log(newLineOffsetArray);
-
   return {
     widthInterpolation: newInterpolationArray,
     lineOffsetInterpolation: newLineOffsetArray
