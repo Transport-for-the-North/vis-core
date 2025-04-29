@@ -186,21 +186,30 @@ export const LayerControlEntry = memo(
 
     const handleWidthFactorChange = (e) => {
       const widthFactor = parseFloat(e.target.value);
-      console.log(widthFactor)
-      const WidthProp = getWidthProperty(layer.type);
-      let WidthExpression;
-
+      const widthProp = getWidthProperty(layer.type);
+      let widthInterpolation, lineOffsetInterpolation, widthExpression;
+    
       if (isFeatureStateWidthExpression) {
-        WidthExpression = applyWidthFactor(currentWidthFactor,widthFactor);
+        // Apply the width factor using the applyWidthFactor function
+        const result = applyWidthFactor(currentWidth, widthFactor);
+        widthInterpolation = result.widthInterpolation;
+        lineOffsetInterpolation = result.lineOffsetInterpolation;
       } else {
-        WidthExpression = 1;
+        widthExpression = 1; // Default width expression if not using feature-state
       }
-
+    
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
-          map.setPaintProperty(layer.id, WidthProp, WidthExpression);
+          // Set the width property
+          map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
+    
+          // Set the line-offset property if applicable
+          if (widthProp.includes("line") && lineOffsetInterpolation) {
+            map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+          }
         }
       });
+    
       setWidth(widthFactor);
     };
 
