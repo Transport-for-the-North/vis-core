@@ -10,13 +10,13 @@ import { LayerControlEntry } from "./LayerControlEntry";
  * @param {Object} props - The component props.
  * @param {Function} props.handleColorChange - The function to handle color changes for the layers.
  * @param {Function} props.handleClassificationChange - The function to handle classification changes for the layers.
- * @param {Function} props.handleWidthChange -
+ * @param {Function} props.handleWidthFactorChange -
  * @returns {JSX.Element} The rendered MapLayerSection component.
  */
 export const MapLayerSection = ({
   handleColorChange,
   handleClassificationChange,
-  handleWidthChange,
+  handleWidthFactorChange,
 }) => {
   const { state } = useMapContext();
   const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
@@ -75,7 +75,7 @@ export const MapLayerSection = ({
           maps={maps}
           handleColorChange={handleColorChange}
           handleClassificationChange={handleClassificationChange}
-          handleWidthChange={handleWidthChange}
+          handleWidthFactorChange={handleWidthFactorChange}
           state={state}
         />
       ))}
