@@ -191,7 +191,7 @@ export const LayerControlEntry = memo(
     
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        const result = applyWidthFactor(currentWidth, widthFactor);
+        const result = applyWidthFactor(currentWidthFactor, widthFactor);
         widthInterpolation = result.widthInterpolation;
         lineOffsetInterpolation = result.lineOffsetInterpolation;
       } else {
@@ -252,18 +252,21 @@ export const LayerControlEntry = memo(
               classification={state.layers[layer.id]?.class_method ?? "d"}
               onChange={(value) => handleClassificationChange(value, layer.id)}
             />
-            <SelectorLabel text="Link Width" />
-            <WidthControl>
-              <WidthSlider
-                id={`width-${layer.id}`}
-                type="range"
-                min="0.5"
-                max="10"
-                step="0.1"
-                value={widthFactor}
-                onChange={handleWidthFactorChange}
-              />
-            </WidthControl>
+            {isFeatureStateWidthExpression && ( 
+              <>
+              <SelectorLabel text="Link Width" />
+              <WidthControl>
+                <WidthSlider
+                  id={`width-${layer.id}`}
+                  type="range"
+                  min="0.5"
+                  max="10"
+                  step="0.1"
+                  value={widthFactor}
+                  onChange={handleWidthFactorChange}
+                />
+              </WidthControl>
+              </>)}
           </>
         )}
       </LayerControlContainer>
