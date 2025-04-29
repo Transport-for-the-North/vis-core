@@ -12,6 +12,7 @@ import { Layer } from "./Layer";
 import {
   getSourceLayer,
   numberWithCommas,
+  replacePlaceholders
 } from "utils";
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -415,20 +416,18 @@ const Map = (props) => {
             ({ feature, layerId, featureName }) => {
             const layerConfig = state.layers[layerId];
             const customTooltip = layerConfig?.customTooltip;
-            const { url, htmlTemplate } = customTooltip;
+            const { requestUrl, htmlTemplate, customFormattingFunctions } = customTooltip;
             const featureId = feature.id;
-            const requestUrl = url.replace("{id}", featureId);
+            const requestUrlWithId = requestUrl.replace("{id}", featureId);
 
             return api.baseService
-              .get(requestUrl, { signal: controller.signal })
+              .get(requestUrlWithId, { signal: controller.signal })
               .then((responseData) => {
-                let tooltipHtml = htmlTemplate;
-                for (const key in responseData) {
-                  tooltipHtml = tooltipHtml.replace(
-                    new RegExp(`\\{${key}\\}`, "g"),
-                    responseData[key]
-                  );
-                }
+                const tooltipHtml = replacePlaceholders(
+                  htmlTemplate,
+                  responseData,
+                  { customFunctions: customFormattingFunctions }
+                )
                 return tooltipHtml;
               })
               .catch((error) => {

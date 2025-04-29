@@ -1,6 +1,11 @@
-import React, { memo, useContext, useState } from "react";
+import React, { memo, useContext, useState, useEffect } from "react";
 import styled from "styled-components";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/20/solid";
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown } from "../Selectors";
@@ -13,7 +18,11 @@ import { calculateMaxWidthFactor, MAP_CONSTANTS, applyWidthFactor} from "utils/m
  * Styled container for the layer control entry.
  */
 const LayerControlContainer = styled.div`
-  margin-bottom: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 `;
 
 /**
@@ -25,11 +34,41 @@ const LayerHeader = styled.div`
   align-items: center;
 `;
 
+
+/**
+ * Container for the left section of the header.
+ * Made clickable to toggle expansion.
+ */
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer; /* Make cursor a pointer to indicate clickability */
+`;
+
+/**
+ * Styled span for expanding/collapsing layer details.
+ */
+const ExpandCollapseToggle = styled.span`
+  display: flex;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 0.5rem;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: #555;
+  }
+`;
+
 /**
  * Styled name for the layer.
  */
 const LayerName = styled.span`
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
 `;
 
 /**
@@ -39,11 +78,23 @@ const VisibilityToggle = styled.button`
   background: transparent;
   border: none;
   cursor: pointer;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
+
+  &:focus {
+    outline: 2px solid #005fcc;
+    outline-offset: 2px;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: #555;
+  }
 `;
 
 /**
@@ -56,11 +107,44 @@ const OpacityControl = styled.div`
 `;
 
 /**
- * Styled input for the opacity slider.
+ * Styled input for the slider.
  */
-const OpacitySlider = styled.input`
+const Slider = styled.input`
   flex-grow: 1;
-  margin-right: 10px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+/**
+ * Styled label for form controls.
+ */
+const ControlLabel = styled.label`
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+`;
+
+/**
+ * Styled span for displaying the opacity value.
+ */
+const SliderValue = styled.span`
+  font-size: 0.9rem;
+  width: 36px;
+  text-align: right;
+`;
+
+/**
+ * Styled container for collapsible content with animation.
+ */
+const CollapsibleContent = styled.div`
+  overflow: hidden;
+  max-height: ${({ isExpanded }) => (isExpanded ? "1000px" : "0")};
+  opacity: ${({ isExpanded }) => (isExpanded ? "1" : "0")};
+  transition: max-height 0.3s ease, opacity 0.3s ease;
 `;
 
 /**
@@ -102,6 +186,23 @@ export const LayerControlEntry = memo(
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
+
+    // State for whether the layer details are expanded
+    const [isExpanded, setIsExpanded] = useState(() => {
+      // Retrieve the expanded state from localStorage during initial render
+      const storedState = localStorage.getItem(
+        `layer-${layer.id}-isExpanded`
+      );
+      return storedState !== null ? JSON.parse(storedState) : true;
+    });
+
+    // Update localStorage whenever isExpanded changes
+    useEffect(() => {
+      localStorage.setItem(
+        `layer-${layer.id}-isExpanded`,
+        JSON.stringify(isExpanded)
+      );
+    }, [isExpanded, layer.id]);
     const currentPage = useContext(PageContext);
     const appConfig = useContext(AppContext);
     const selectedMetricParamName = currentPage.config.filters.find(
@@ -125,6 +226,11 @@ export const LayerControlEntry = memo(
         metric.name ===
         visualisation.queryParams[selectedMetricParamName.paramName]?.value
     );
+
+    const shouldHaveOpacityControl = layer.metadata?.shouldHaveOpacityControl ?? true;
+    const enforceNoColourSchemeSelector = layer.metadata?.enforceNoColourSchemeSelector ?? false;
+    const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
+
     let currentWidthFactor = null;
     let currentOpacity = null;
 
@@ -141,12 +247,14 @@ export const LayerControlEntry = memo(
       ? currentOpacity[currentOpacity.length - 1]
       : currentOpacity;
 
+    
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1])
       : currentWidthFactor;
 
+    // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
     const [widthFactor, setWidth] = useState(initialWidth || 1);
 
@@ -184,6 +292,17 @@ export const LayerControlEntry = memo(
       setOpacity(newOpacity);
     };
 
+    /**
+     * Handle keypress events for accessibility.
+     * @param {Object} e - The event object.
+     */
+    const handleKeyPress = (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        setIsExpanded(!isExpanded);
+        e.preventDefault();
+      }
+    };
+
     const handleWidthFactorChange = (e) => {
       const widthFactor = parseFloat(e.target.value);
       const widthProp = getWidthProperty(layer.type);
@@ -216,47 +335,82 @@ export const LayerControlEntry = memo(
     return (
       <LayerControlContainer>
         <LayerHeader>
-          <LayerName>{layer.id}</LayerName>
+          {/* HeaderLeft now handles click and keypress to toggle expansion */}
+          <HeaderLeft
+            onClick={() => setIsExpanded(!isExpanded)}
+            role="button"
+            tabIndex="0"
+            aria-expanded={isExpanded}
+            onKeyDown={handleKeyPress}
+          >
+            {/* Expand/Collapse Toggle (now a span) */}
+            <ExpandCollapseToggle>
+              {isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+            </ExpandCollapseToggle>
+            {/* Layer Name */}
+            <LayerName>{layer.id}</LayerName>
+          </HeaderLeft>
+          {/* Visibility Toggle */}
           <VisibilityToggle onClick={toggleVisibility}>
-            {visibility === "visible" ? <EyeIcon /> : <EyeSlashIcon />}
+            {visibility === "visible" ? (
+              <EyeIcon aria-label="Hide layer" title="Hide layer" />
+            ) : (
+              <EyeSlashIcon aria-label="Show layer" title="Show layer" />
+            )}
           </VisibilityToggle>
         </LayerHeader>
-        {layer.metadata?.path && <LayerSearch map={maps[0]} layer={layer} />}
-        <SelectorLabel text="Opacity" />
-        <OpacityControl>
-          <OpacitySlider
-            id={`opacity-${layer.id}`}
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            value={opacity}
-            onChange={handleOpacityChange}
-          />
-        </OpacityControl>
-        {layer.metadata?.isStylable && (
-          <>
-            <ColourSchemeDropdown
-              colorStyle={colorStyle}
-              handleColorChange={handleColorChange}
-              layerName={layer.id}
+        {/* Collapsible Content with Animation */}
+        <CollapsibleContent isExpanded={isExpanded}>
+          {/* Layer Search (if applicable) */}
+          {layer.metadata?.path && (
+            <LayerSearch map={maps[0]} layer={layer} />
+          )}
+          {/* Opacity Control */}
+          {shouldHaveOpacityControl && (<OpacityControl>
+            <ControlLabel htmlFor={`opacity-${layer.id}`}>
+              Opacity
+            </ControlLabel>
+            <Slider
+              id={`opacity-${layer.id}`}
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={opacity}
+              onChange={handleOpacityChange}
             />
-            <ClassificationDropdown
-              classType={{
-                ...(hasDefaultBands && { Default: "d" }),
-                Quantile: "q",
-                Equidistant: "e",
-                Logarithmic: "l",
-                "K-Means": "k",
-              }}
-              classification={state.layers[layer.id]?.class_method ?? "d"}
-              onChange={(value) => handleClassificationChange(value, layer.id)}
-            />
-            {isFeatureStateWidthExpression && ( 
+            <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
+          </OpacityControl>)}
+          {/* Color Scheme and Classification (if stylable) */}
+          {layer.metadata?.isStylable && (
+            <div style={{ marginTop: "1rem" }}>
+              {!enforceNoColourSchemeSelector && <ColourSchemeDropdown
+                colorStyle={colorStyle}
+                handleColorChange={handleColorChange}
+                layerName={layer.id}
+              />}
+              {!enforceNoClassificationMethod && <ClassificationDropdown
+                classType={{
+                  Default: "d",
+                  Quantile: "q",
+                  Equidistant: "e",
+                  Logarithmic: "l",
+                  "K-Means": "k",
+                }}
+                classification={
+                  state.layers[layer.id]?.class_method ?? "d"
+                }
+                onChange={(value) =>
+                  handleClassificationChange(value, layer.id)
+                }
+              />}
+              {isFeatureStateWidthExpression && ( 
               <>
-              <SelectorLabel text="Link Width" />
+              <ControlLabel htmlFor={`width-${layer.id}`}>
+                Width factor
+              </ControlLabel>
               <WidthControl>
-                <WidthSlider
+                <Slider
                   id={`width-${layer.id}`}
                   type="range"
                   min="0.5"
@@ -265,10 +419,12 @@ export const LayerControlEntry = memo(
                   value={widthFactor}
                   onChange={handleWidthFactorChange}
                 />
+                <SliderValue>{(widthFactor).toFixed(1)}</SliderValue>
               </WidthControl>
               </>)}
-          </>
-        )}
+          </div>
+          )}
+        </CollapsibleContent>
       </LayerControlContainer>
     );
   }
