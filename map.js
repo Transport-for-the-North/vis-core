@@ -66,7 +66,8 @@ export const calculateMaxWidthFactor = (width) => {
 export const MAP_CONSTANTS = {
   defaultMinWidth: 1,
   defaultMaxWidth: 8.5,
-  defaultWidthFactor: 1
+  defaultWidthFactor: 1,
+  defaultOffset: 0.75
 }
 
 /**
@@ -83,38 +84,38 @@ export const MAP_CONSTANTS = {
  * @throws {Error} If the input array is not a valid interpolation expression or if the existing factors
  *                 in the interpolation are inconsistent.
  */
-export const applyWidthFactor = (existingInterpolationArray, factor) => {
+export const applyWidthFactor = (existingInterpolationArray, factor, constantOffset = MAP_CONSTANTS.defaultOffset) => {
   if (!Array.isArray(existingInterpolationArray) || existingInterpolationArray[0] !== "interpolate") {
     throw new Error("Invalid interpolation expression");
-  };
+  }
 
-  // Extract the existing widths
-  const existingMin = existingInterpolationArray[3];
+  // Extract the existing width
   const existingMax = existingInterpolationArray[existingInterpolationArray.length - 1];
 
-  // Calculate the existing factoring - this shouldbe relative to the default widths
-  const oldFactorMin = existingMin / MAP_CONSTANTS.defaultMinWidth;
+  // Calculate the existing factoring - this should be relative to the default widths
   const oldFactorMax = existingMax / MAP_CONSTANTS.defaultMaxWidth;
 
-  // Check that they're consistent before continuing
-  // if (oldFactorMax !== oldFactorMin) {
-  //   throw new Error("Inconsistent factors in the existing interpolation");
-  // }
-
   const overallFactor = factor / oldFactorMax;
-
   const newInterpolationArray = [...existingInterpolationArray];
+  const newLineOffsetArray = ["interpolate", ["linear"], ["feature-state", "valueAbs"]];
 
-  for (let i = 4; i <= newInterpolationArray.length; i += 2) {
+  for (let i = 4; i < newInterpolationArray.length; i += 2) {
     if (typeof newInterpolationArray[i] === "number") {
       newInterpolationArray[i] *= overallFactor;
+      const lineOffsetValue = -((newInterpolationArray[i] / 2) + constantOffset);
+      newLineOffsetArray.push(newInterpolationArray[i - 1], lineOffsetValue);
     }
   }
-  console.log(existingInterpolationArray)
-  console.log(overallFactor)
-  console.log(newInterpolationArray)
 
-  return newInterpolationArray;
+  console.log(existingInterpolationArray);
+  console.log(overallFactor);
+  console.log(newInterpolationArray);
+  console.log(newLineOffsetArray);
+
+  return {
+    widthInterpolation: newInterpolationArray,
+    lineOffsetInterpolation: newLineOffsetArray
+  };
 }
  
 /**
