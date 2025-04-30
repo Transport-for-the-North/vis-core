@@ -110,6 +110,25 @@ const zoneIdSelector = {
   field: "id",
 };
 
+const zoneSelector = {
+  filterName: "Optional location filter",
+  type: "mapFeatureSelectWithControls",
+  paramName: "zoneId",
+  target: "api",
+  actions: [
+    {
+      action: 'SET_SELECTED_FEATURES'
+    },
+    {
+      action: 'UPDATE_VISUALISED_FEATURES'
+    },
+  ],
+  visualisations: null,
+  layer: "Output Areas",
+  selectionModes: ['polygon', 'feature', 'draw_rectangle'], // Available selection modes
+  defaultMode: 'draw_rectangle', // Default selection mode
+};
+
 const variableSelector = {
   filterName: "variableName",
   type: "fixed",
@@ -127,11 +146,37 @@ const variableSelector = {
   },
 };
 
+const downloadParentLocalAuthoritySelector = {
+  filterName: "Download an entire local authority area...",
+  paramName: "parentZoneId",
+  target: "api",
+  actions: [
+    {
+      action: "UPDATE_PARAMETERISED_LAYER",
+      payload: {targetLayer: "Output Areas"},
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "zoneId" }
+    },
+    { 
+      action: "UPDATE_QUERY_PARAMS",
+      payload: { paramName: "parentZoneId" }
+    },
+  ],
+  visualisations: null,
+  layer: "Local Authorities",
+  type: "mapFeatureSelectAndPan",
+  forceRequired: true,
+};
+
 export const selectors = {
   barrierType: barrierTypeSelector,
   walkSpeed: walkSpeedSelector,
   destinationType: destinationTypeSelector,
   severanceType: severanceTypeSelector,
   zoneId: zoneIdSelector,
-  variable: variableSelector
+  variable: variableSelector,
+  zoneSelector: zoneSelector,
+  downloadLocalAuthority : downloadParentLocalAuthoritySelector
 };
