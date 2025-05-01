@@ -37,9 +37,10 @@ const CustomValueContainer = ({ children, ...props }) => {
  * @param {Function} props.onChange - Function to call when the selected features change.
  * @param {boolean} props.isMulti - Whether multiple selections are allowed.
  * @param {string} props.placeholder - Placeholder text for the select input.
+ * @param {boolean} props.isClearable - Whether the select input can be cleared.
  * @returns {JSX.Element} The rendered FeatureSelect component.
  */
-export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, placeholder }) => {
+export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, placeholder, isClearable = false }) => {
   const { options, isLoading, handleInputChange } = useLayerFeatureMetadata(layerPath);
   const [noOptionsMessage, setNoOptionsMessage] = useState('Start typing to search features');
 
@@ -64,6 +65,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
     <Container>
       <Select
         isMulti={isMulti}
+        isClearable={isClearable}
         options={options}
         value={value}
         onChange={onChange}
