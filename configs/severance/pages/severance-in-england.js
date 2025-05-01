@@ -174,14 +174,15 @@ export const england = {
       },
       download: {
         filters: [
-          { ...selectors.barrierType, type: 'fixed' },
+          { ...selectors.barrierType, type: 'fixed', multiSelect: false },
           { ...selectors.walkSpeed, type: 'fixed' },
           { ...selectors.destinationType, multiSelect: true, type: 'dropdown' },
           { ...selectors.severanceType, multiSelect: true, type: 'dropdown' },
-          { ...selectors.downloadLocalAuthority, type: 'mapFeatureSelect' },
+          { ...selectors.downloadLocalAuthority, type: 'mapFeatureSelect', isClearable: true },
           {...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector"}
         ],
-        downloadPath: '/api/severance/decile-data/download'
+        downloadPath: '/api/severance/decile-data/download',
+        requestMethod: 'GET',
       },
     },
   },
