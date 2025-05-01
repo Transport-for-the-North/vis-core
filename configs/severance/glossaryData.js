@@ -63,6 +63,15 @@ const glossaryData = {
     title:"Vulnerability",
     content: `<p>The set of factors that make social exclusion more likely, such as poverty, disability, poor health, and caring responsibilities. </p>`,
    },
+  download: {
+    title:"Download",
+    content: `<p>How do I view and download the results?</p>
+    <ol><p><li> Open the ‘Download data’ section by clicking the dropdown arrow.</li></p> 
+    <p><li> Search for a Local Authority if you're interested in all the data within a given Local Authority. </li></p> 
+    <p><li> Under ‘Select output areas’, you can either enter your output area code, if known, or make use of the selector tool by clicking ‘Enable Selector’ and using either ‘Pointer Select’ to select individual OA areas or ‘Rectangle Select’ to highlight a selection of OA areas to include. You can see them compile in the box. Simply re-click on the OA on the map to remove or click on the ‘x’ next to the name in the box. To remove them all, click on the larger ‘X’ to the right of the box.
+    Note: Leaving this box empty will allow you to download all the OA data within the chosen Local Authority.</li></p> 
+    <p><li> Click ‘download’. Doing this will create a downloaded excel document in the top right which will save in your downloads folder on your computer. Once downloaded, you can use the excel functions such as ‘filter’ and ‘autosum’ to support your calculations.</li></p></ol>`,
+   },
   };
   
   function getInfo(key) {
