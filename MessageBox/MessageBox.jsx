@@ -23,8 +23,8 @@ const MessageBoxContainer = styled.div`
   `}
 
   ${({ type }) => type === 'error' && css`
-    background-color: rgba(255, 182, 193, 0.9);
-    color: rgb(61, 13, 15);
+    background-color: #ffebee;
+    color: #d32f2f;
   `}
 `;
 
