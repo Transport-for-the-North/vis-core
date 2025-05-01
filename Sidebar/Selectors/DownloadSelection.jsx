@@ -12,6 +12,7 @@ import { checkSecurityRequirements } from "utils";
 import { AppContext } from "contexts";
 import { darken } from "polished";
 import { MapFeatureSelectWithControls, MapFeatureSelectAndPan, MapFeatureSelect, CheckboxSelector } from ".";
+import { ErrorBox } from "Components";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;
@@ -32,9 +33,15 @@ const DownloadButton = styled.button`
   display: flex;
   align-items: center; /* Center align items vertically */
   justify-content: center;
-
+  
   &:hover {
     background-color: ${(props) => darken(0.1, props.$bgColor)}; /* Darken the background color by 10% */
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    background-color: ${(props) => darken(0.2, props.$bgColor)};
   }
 `;
 
@@ -46,29 +53,70 @@ const Spinner = styled.div`
   height: 12px;
   animation: spin 1s linear infinite;
   margin-left: 5px;
-
+  
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
 `;
 
-export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
+export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
-
+  const [requestError, setRequestError] = useState(null);
+  const [isRequestTooLarge, setIsRequestTooLarge] = useState(false);
+  
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
-
+  
+  // Check request size whenever filterState changes (only for GET requests)
+  useEffect(() => {
+    const checkRequestSize = () => {
+      if (!filterState || Object.keys(filterState).length === 0) return;
+      
+      try {
+        // Only check size for GET requests
+        if (requestMethod === "GET") {
+          const { isValid, error } = api.downloadService.checkGetRequestSize(apiRoute, filterState);
+          setIsRequestTooLarge(!isValid);
+          setRequestError(error);
+          
+          // If request is too large, suggest using POST
+          if (!isValid) {
+            setRequestError(error);
+          }
+        } else {
+          // For POST requests, we don't need to check size
+          setIsRequestTooLarge(false);
+          setRequestError(null);
+        }
+      } catch (error) {
+        console.error("Error checking request size:", error);
+      }
+    };
+    
+    checkRequestSize();
+  }, [filterState, apiRoute, requestMethod]);
+  
   useEffect(() => {
     filters.forEach(filter => {
       filter.id = filter.paramName;
     });
-
+  
     const updatedFilters = filters.reduce((acc, item) => {
-      if (item.type.startsWith('mapFeatureSelect')) {
+      if (item.type === 'fixed') {
+        // Handle fixed selectors differently based on multiSelect property
+        if (item.multiSelect) {
+          // For multiSelect fixed selectors, use all values
+          acc[item.id] = item.values.values.map(value => value.paramValue);
+        } else {
+          // For single-value fixed selectors, use the first value
+          acc[item.id] = item.values.values.length > 0 ? item.values.values[0].paramValue : null;
+        }
+      }
+      else if (item.type.startsWith('mapFeatureSelect')) {
         acc[item.id] = null;
       } else {
         const paramValues = item.values.values.map(value => {
@@ -81,36 +129,39 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
       }
       return acc;
     }, {});
-    
     filterDispatch({ type: 'INITIALIZE_FILTERS', payload: updatedFilters });
   }, [filters, filterDispatch]);
-
+  
   const handleDownloadSelection = (filter, value) => {
     filterDispatch({
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value },
     });
   };
-
+  
   const handleDownload = async () => {
     setIsDownloading(true);
+    setRequestError(null);
+    
     try {
       await api.downloadService.downloadCsv(apiRoute, {
         queryParams: filterState,
         skipAuth: !requiresAuth,
+        method: requestMethod,
       });
       console.log('CSV downloaded successfully');
     } catch (error) {
       console.error('Error downloading CSV:', error);
+      setRequestError(error.message || "Error downloading data");
     } finally {
       setIsDownloading(false);
     }
   };
-
+  
   if (!filterState || Object.keys(filterState).length === 0) {
-    return null; 
+    return null;
   }
-
+  
   return (
     <AccordionSection title="Download data" defaultValue={false}>
       <InfoBox text={'Use the selections to toggle items on and off. See Glossary "Download" for more information.'} />
@@ -157,8 +208,8 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     value={filterState[filter.id] || filter.values.values[0].paramValue}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
-              />
-            )}
+                  />
+                )}
                 {filter.type === 'mapFeatureSelectWithControls' && (
                   <MapFeatureSelectWithControls
                     key={filter.id}
@@ -166,7 +217,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     value={filterState[filter.id]}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
-                />
+                  />
                 )}
                 {filter.type === 'mapFeatureSelectAndPan' && (
                   <MapFeatureSelectAndPan
@@ -182,15 +233,27 @@ export const DownloadSection = ({ filters, downloadPath, bgColor }) => {
                     key={filter.id}
                     filter={filter}
                     value={filterState[filter.id]}
-                    onChange={(filter, value) => handleDownloadSelection(filter, value.value)}
+                    onChange={(filter, value) => handleDownloadSelection(filter, value?.value)}
                     bgColor={bgColor}
                   />
                 )}
               </SelectorContainer>
             ))}
-          <DownloadButton onClick={handleDownload} $bgColor={bgColor}>
-            Download
-            {isDownloading && <Spinner />}
+            
+          {requestError && (
+            <ErrorBox text={requestError}/>
+          )}
+          
+          <DownloadButton 
+            onClick={handleDownload} 
+            $bgColor={bgColor}
+            disabled={isRequestTooLarge || isDownloading}
+          >
+            {isDownloading ? (
+              <>Downloading <Spinner /></>
+            ) : (
+              isRequestTooLarge ? "Request Too Large" : "Download"
+            )}
           </DownloadButton>
         </>
       ) : (
