@@ -1,7 +1,7 @@
 const zoneSelector = {
   filterName: "Select output areas",
   type: "mapFeatureSelectWithControls",
-  paramName: "zoneId",
+  paramName: "zoneIdList",
   target: "api",
   actions: [
     {
