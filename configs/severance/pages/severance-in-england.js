@@ -43,7 +43,7 @@ export const england = {
         name: "Local Authorities",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+        path: "/api/vectortiles/zones/35/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
         isHoverable: false,
