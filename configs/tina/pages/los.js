@@ -13,13 +13,13 @@ export const los = {
       layers: [
         {
           uniqueId: "nohamZoneVectorTile",
-          name: "zonelos",
+          name: "zonepti",
           type: "tile",
           source: "api",
           path: "/api/vectortiles/zones/1/{z}/{x}/{y}", // matches the path in swagger.json
           sourceLayer: "zones",
           geometryType: "polygon",
-          visualisationName: "zonelos",
+          visualisationName: "zonepti",
           isHoverable: true,
           isStylable: true,
           shouldHaveTooltipOnHover: true,
@@ -28,9 +28,9 @@ export const los = {
       ],
       visualisations: [
         {
-          name: "zonelos",
+          name: "zonepti",
           type: "joinDataToMap",
-          joinLayer: "zonelos",
+          joinLayer: "zonepti",
           style: "polygon-continuous",
           joinField: "id",
           valueField: "value",
@@ -83,6 +83,10 @@ export const los = {
               {
                 displayValue: "Bus Stop Density",
                 paramValue:"bus_stop_density"
+              },
+              {
+                displayValue: "Bus Stop Density Category",
+                paramValue:"bus_stop_density_category"
               },
               {
                 displayValue: "RTPI Count",
