@@ -71,7 +71,7 @@ export const england = {
         name: "Local Authorities",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+        path: "/api/vectortiles/zones/35/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
         isHoverable: false,
@@ -171,6 +171,18 @@ export const england = {
     additionalFeatures: {
       glossary: {
         dataDictionary: glossaryData,
+      },
+      download: {
+        filters: [
+          { ...selectors.barrierType, type: 'fixed', multiSelect: false },
+          { ...selectors.walkSpeed, type: 'fixed' },
+          { ...selectors.destinationType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.severanceType, multiSelect: true, type: 'dropdown' },
+          { ...selectors.downloadLocalAuthority, type: 'mapFeatureSelect', isClearable: true },
+          {...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector"}
+        ],
+        downloadPath: '/api/severance/decile-data/download',
+        requestMethod: 'GET',
       },
     },
   },

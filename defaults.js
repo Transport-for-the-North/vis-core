@@ -43,3 +43,11 @@ export const defaultMapColourMapper = {
   'continuous': { value: 'YlGnBu', label: 'YlGnBu' },
   'categorical': { value: 'Accent', lable: 'Accent'}
 }
+
+export const REQUEST_CONFIG = {
+  MAX_GET_REQUEST_SIZE: 8 * 1024, // 8KB
+  ERROR_MESSAGES: {
+    REQUEST_TOO_LARGE: (size) => 
+      `Your filter selection creates a request that's too large (${(size / 1024).toFixed(2)}KB). Please reduce the number of selected items or use fewer filters.`
+  }
+};

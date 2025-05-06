@@ -227,6 +227,7 @@ export const Sidebar = ({
               filters={additionalFeatures.download.filters}
               downloadPath={additionalFeatures.download.downloadPath}
               bgColor={bgColor}
+              requestMethod={additionalFeatures.download.requestMethod || 'GET'}
             />
           </FilterProvider>
         )}
