@@ -48,7 +48,7 @@ export const los = {
             { action: "UPDATE_QUERY_PARAMS" },
             { action: "UPDATE_LEGEND_TEXT" }
           ],
-          visualisations: ["zonelos"],
+          visualisations: ["zonepti"],
           type: "dropdown",
           shouldBeValidated: false,
           info: "LoS",
@@ -107,6 +107,22 @@ export const los = {
               {
                 displayValue: "PT Zone Count",
                 paramValue:"pt_zone_count"
+              },
+              {
+                displayValue: "TRSE Zone Cat",
+                paramValue:"zone_trse_cat"
+              },
+              {
+                displayValue: "Population",
+                paramValue:"zone_population"
+              },
+              {
+                displayValue: "Households",
+                paramValue:"zone_households"
+              },
+              {
+                displayValue: "% High Risk of TRSE",
+                paramValue:"pct_high_risk"
               }
             ],
           },
