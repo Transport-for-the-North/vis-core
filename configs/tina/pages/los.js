@@ -69,10 +69,6 @@ export const los = {
                 paramValue:"voc"
               },
               {
-                displayValue: "Congestion",
-                paramValue:"congestion"
-              },
-              {
                 displayValue: "Car",
                 paramValue:"car"
               },
