@@ -81,20 +81,12 @@ export const los = {
                 paramValue:"bus_stop_count"
               },
               {
-                displayValue: "Bus Stop Density",
+                displayValue: "Bus Stop Density per km\u00b2",
                 paramValue:"bus_stop_density"
               },
               {
                 displayValue: "Bus Stop Density Category",
                 paramValue:"bus_stop_density_category"
-              },
-              {
-                displayValue: "RTPI Count",
-                paramValue:"rtpi_count"
-              },
-              {
-                displayValue: "RTPI Density",
-                paramValue:"rtpi_density"
               },
               {
                 displayValue: "Car Zone Count",
