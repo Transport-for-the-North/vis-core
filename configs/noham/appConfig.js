@@ -1,4 +1,4 @@
-
+import { termsOfUse } from "./TermsOfUse";
 import { nodeCustomPaint } from "./customPaintDefinitions"
 
 const networkScenarioValues = {
@@ -270,8 +270,7 @@ export const appConfig = {
    based on scenario testing done using NoHAM.</p>`,
   background: "",
   methodology: "",
-  legalText:
-    '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the NoHAM Visualiser Tool also indicates your acceptance of this <a href="https://transportforthenorth.com/about-transport-for-the-north/transparency/" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
+  legalText: termsOfUse,
   contactText: "Please contact Luke Monaghan for any questions on this data tool.",
   contactEmail: "luke.monaghan@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
@@ -290,6 +289,7 @@ export const appConfig = {
       url: "/noham-links",
       type: "MapLayout",
       category: "Link",
+      legalText: termsOfUse,
       about: `<p>NoHAM model link data mapped to road sections; model links typically represent roads between intersections on the network. 
       Some road sections are not represented in the model as the network is a simplification. This visualisation allows for the examination of road section attributes and 
       comparisons of modelled traffic conditions in different scenarios. </p>
@@ -503,6 +503,7 @@ export const appConfig = {
       <li>Link delay – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time,</li>
       <li>Link queues – the average queue length over the average hour, in Passenger Car Units (PCU's), reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       category: "Link",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -775,6 +776,7 @@ export const appConfig = {
       <li>Link delay – the additional travel time (seconds) experienced by a vehicle beyond uncongested conditions. It is measured as the different between the congested travel time and the free-flow travel time,</li>
       <li>Link queues – the average queue length over the average hour, in Passenger Car Units (PCU's), reflecting transient (queues at red lights/junctions) and over-capacity queues where capacity at a junction is insufficient for traffic demand.</li></ul></p>`,
       category: "Link",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -1023,6 +1025,7 @@ export const appConfig = {
       It is measured as the time difference between the congested travel time and free-flow travel time. Junction delay includes time being held at red lights or waiting to turn right. </li></ul></p>
       <p>Node type key: <ul> <li>'pri' – Priority junction,</li> <li>'sig' – Signalised junction,</li> <li>'rnd' – Roundabout,</li> <li>'rnd_u' – Roundabout with U-turns allowed,</li> 
       <li>'dum' – Dummy node,</li> <li>'ext' – External node.</li></ul></p>`,
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -1164,6 +1167,7 @@ export const appConfig = {
       <p>Node type key: <ul> <li>'pri' – Priority junction,</li> <li>'sig' – Signalised junction,</li> <li>'rnd' – Roundabout,</li> <li>'rnd_u' – Roundabout with U-turns allowed,</li> 
       <li>'dum' – Dummy node,</li> <li>'ext' – External node.</li></ul></p>`,
       category: "Node",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -1375,6 +1379,7 @@ export const appConfig = {
       It is measured as the time difference between the congested travel time and free-flow travel time. Junction delay includes time being held at red lights or waiting to turn right. </li></ul></p>
       <p>Node type key: <ul> <li>'pri' – Priority junction,</li> <li>'sig' – Signalised junction,</li> <li>'rnd' – Roundabout,</li> <li>'rnd_u' – Roundabout with U-turns allowed,</li> 
       <li>'dum' – Dummy node,</li> <li>'ext' – External node.</li></ul></p>`,
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -1582,6 +1587,7 @@ export const appConfig = {
       category: "Matrix Trip Ends",
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle type and journey purpose as a choropleth. 
       NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA) within Northern England and are more aggregated externally.</p>`,
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -1707,6 +1713,7 @@ export const appConfig = {
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation allows you to select two different demand scenarios and compare the difference at NoHAM zonal level for origin or destination trips for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
       It also allows you to choose the same demand scenario but different vehicle user classes per scenario, which are split by vehicle type and journey purpose. </p>`,
       category: "Matrix Trip Ends",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -1894,6 +1901,7 @@ export const appConfig = {
       category: "Matrix Trip Ends",
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visual allows you to select two different demand scenarios and compare them side by side at NoHAM zoning level, for origin or destination trips. 
       It also allows you to choose the same demand scenario but different vehicle user classes per scenario, which are split by vehicle type and journey purpose. </p>`,
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -2088,6 +2096,7 @@ export const appConfig = {
       will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "MapLayout",
       category: "O/D Analysis",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -2254,6 +2263,7 @@ export const appConfig = {
       will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "MapLayout",
       category: "O/D Analysis",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
@@ -2500,6 +2510,7 @@ export const appConfig = {
       will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "DualMapLayout",
       category: "O/D Analysis",
+      legalText: termsOfUse,
       config: {
         layers: [
           {
