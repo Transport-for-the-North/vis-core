@@ -220,7 +220,6 @@ export const MapProvider = ({ children }) => {
           filterState[filterWithId.id] = null; // Set to null or undefined to represent no initial selection
         }
       }
-
       // Incorporate 'sides' logic
       const updatedFilters = filters.map((filter) => {
         if (filter.visualisations[0].includes('Side')) {
