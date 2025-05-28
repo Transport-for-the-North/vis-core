@@ -24,6 +24,7 @@ export const appConfig = {
   authenticationRequired: false,
   appPages: [
     pages.hansen,
+    pages.los
     //pages.tinaConnectivity,
     //pages.dataExplorer,
     //pages.pti,
