@@ -60,7 +60,7 @@ export const zoneBenefits = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Benefits'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Zone Benefits'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Zone Benefits'] },
-        { ...selectors.scenarioFilter, paramName: "scenarioId", paramColumn: "id", visualisations: ['Zone Benefits'] },
+        { ...selectors.scenarioFilter, paramName: "scenarioId", values: {...selectors.scenarioFilter.values, paramColumn: "id"}, visualisations: ['Zone Benefits'] },
         { ...selectors.timePeriod, visualisations: ['Zone Benefits'] },
         { ...selectors.userClassFilter, visualisations: ['Zone Benefits'] },
         { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Benefits'] },
