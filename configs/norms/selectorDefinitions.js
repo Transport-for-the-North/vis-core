@@ -184,6 +184,28 @@ const landuseValues = {
   ]
 }
 
+const resultZoneTypeValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "LAD 2021",
+      paramValue: 8
+    },
+    {
+      displayValue: "Combined Authority",
+      paramValue: 10,
+    },
+    {
+      displayValue: "STB 2023",
+      paramValue: 15,
+    },
+    {
+      displayValue: "GB Country",
+      paramValue: 32,
+    },
+  ],
+}
+
 const originOrDestinationValues = {
   source: "local",
   values: [
@@ -194,6 +216,20 @@ const originOrDestinationValues = {
     {
       displayValue: "Destination",
       paramValue: "destination",
+    },
+  ],
+}
+
+const normsOrAggregatedValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "Norms",
+      paramValue: "Norms"
+    },
+    {
+      displayValue: "Aggregated",
+      paramValue: "Aggregated",
     },
   ],
 }
@@ -411,6 +447,16 @@ const userClassFilter = {
     },
 }
 
+const resultZoneTypeFilter = {
+    filterName: "Zoning system",
+    paramName: "resultZoneTypeId",
+    target: "api",
+    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+    visualisations: null,
+    type: "dropdown",
+    values: resultZoneTypeValues,
+}
+
 const originOrDestinationFilter = {
     filterName: "Origin or Destination",
     paramName: "originOrDestination",
@@ -419,6 +465,16 @@ const originOrDestinationFilter = {
     visualisations: null,
     type: "toggle",
     values: originOrDestinationValues,
+}
+
+const normsOrAggregatedFilter = {
+    filterName: "Norms or Aggregated",
+    paramName: "normsOrAggregated",
+    target: "api",
+    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+    visualisations: null,
+    type: "toggle",
+    values: normsOrAggregatedValues,
 }
 
 const pairsMetricFilter = {
@@ -826,7 +882,9 @@ export const selectors = {
   timePeriod,
   metricFilter,
   userClassFilter,
+  resultZoneTypeFilter,
   originOrDestinationFilter,
+  normsOrAggregatedFilter,
   pairsMetricFilter,
   stationMapSelection,
   catchmentMetricFilter,
