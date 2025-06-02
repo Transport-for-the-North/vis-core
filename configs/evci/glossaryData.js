@@ -497,19 +497,17 @@ const glossaryData = {
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
     enRouteRoad: {
-      title: "En-route charging by major road",
-      content: `<p>Analyses the likelihood of vehicles stopping to charge during their journeys, by major road (MRN and SRN) segment.</p>
-      <p>This analysis is derived from the flows contained within TfN's Saturn traffic model:
-      The route of each journey is traced from origin to destination, junction by junction.
-      On each stage of the journey, the probability of the driver stopping to charge is calculated,
-      based on a vehicle range and battery size distribution.
-      Car, van and articulated HGV stopping distance is distributed between 130-290km, 180-310km and 290-410km
-      respectively following a normal distribution pattern.</p>
-      <p>The results across all journeys are summed for each section of road.
-      This gives an indication of expected number of vehicles stopping to charge,
-      annual en-route charging activity and annual en-route charging activity per km
-      (each road segment is a different length, this output allows the user to compare two road segments fairly)
-      in each 5 year increment from 2020 to 2050.</p>
+      title: "En-route charging by network",
+      content: `<p>Analyses the likelihood of vehicles stopping to charge during their journeys, by TfN's northern highways network segment.</p>
+      <p>This analysis is derived from the flows contained within TfN's vehicle km skim data:
+      The route of each journey is traced from origin to destination, where
+      on each stage of the journey, the probability of the driver stopping to charge is calculated,
+      based on route length, segment length and demand.
+      Car, van and articulated HGV stopping distance is distributed differently between 0-100km, 100-140km, 140-200km, 200-240km and 240km+ based on the factors above, allowing
+      increased stopping likelihood on longer routes.</p>
+      <p>The results across all journeys are summed for each section of road and en-route charging demand is distributed by OD.
+      This gives an indication of expected number of chargers required and the charging energy (kWh)
+      in each 5 year increment from 2023 to 2050.</p>
       <p>Note that under "Forecast: Annual charging demand" "En-route" enroute charging is assigned to home location.
       In contrast, this road-based analysis allocates such charging to the places it is likely to occur.</p>`,
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],

@@ -6,18 +6,18 @@ import { cpMajorRoad } from "./cpMajorRoad"
 import { cpArea } from "./cpArea"
 import { cpLocation } from "./cpLocation"
 import { co2Savings, tfnCo2Savings } from "./co2Savings"
-import { enrouteChargingDemand } from "./enrouteChargingDemand"
 import { commercialViability } from "./commercialViability"
 import { multiModalHubs } from "./multiModalHubs"
 import { offStreetParkingAccess, offStreetParkingDrivewayOnly } from "./offStreetParkingAccess"
 import { energyCapacity } from "./energyCapacity"
+import { enrouteNetworkDemand } from "./enrouteNetworkDemand"
 
 export const pages = {
     evUptake: evUptake,
     annualChargingDemand: annualChargingDemand,
     evcpRequirements: evcpRequirements,
     potentialChargingSites: potentialChargingSites,
-    enrouteChargingDemand: enrouteChargingDemand,
+    enrouteNetworkDemand: enrouteNetworkDemand,
     cpArea: cpArea,
     cpLocation: cpLocation,
     cpMajorRoad: cpMajorRoad,

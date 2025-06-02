@@ -825,6 +825,33 @@ const columnNameSelector = {
   },
 };
 
+const columnNameRapidSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Charger energy",
+        paramValue: "kwh_total",
+        legendSubtitleText: "kWh"
+      },
+      {
+        displayValue: "Units count",
+        paramValue: "units_count",
+        legendSubtitleText: "units"
+      },
+    ],
+  },
+};
+
 const stbTagSelector = {
   filterName: "STB Name",
   paramName: "stbTag",
@@ -915,6 +942,7 @@ export const selectors = {
   columnNameCVFixed: columnNameCVFixedSelector,
   columnNameMMHFixed: columnNameMMHFixedSelector,
   columnName: columnNameSelector,
+  columnNameRapid: columnNameRapidSelector,
   stbTag: stbTagSelector,
   runTypeCodeFixed: runTypeCodeFixedSelector,
   runTypeCodeDynamic: runTypeCodeDynamicSelector,
