@@ -70,7 +70,6 @@ export const zoneBenefitsDifference = {
             { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioIdDoSomething", values: {...selectors.scenarioFilter.values, paramColumn: "id"}, visualisations: ['Zone Benefits Difference'] },
             { ...selectors.resultZoneTypeFilter, filterName: "Zoning system (1 and 2)", visualisations: ['Zone Benefits Difference'] },
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Benefits Difference']},
-            { ...selectors.normsOrAggregatedFilter, filterName: "Norms or Aggregated (1 and 2)", visualisations:['Zone Benefits Difference']},
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Benefits Difference']},
             { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Benefits Difference']},
             { ...selectors.benefitsMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Zone Benefits Difference']}

@@ -459,16 +459,6 @@ const originOrDestinationFilter = {
     values: originOrDestinationValues,
 }
 
-const normsOrAggregatedFilter = {
-    filterName: "Norms or Aggregated",
-    paramName: "normsOrAggregated",
-    target: "api",
-    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-    visualisations: null,
-    type: "toggle",
-    values: normsOrAggregatedValues,
-}
-
 const pairsMetricFilter = {
     filterName: "Metric",
     paramName: "columnName",
@@ -876,7 +866,6 @@ export const selectors = {
   userClassFilter,
   resultZoneTypeFilter,
   originOrDestinationFilter,
-  normsOrAggregatedFilter,
   pairsMetricFilter,
   stationMapSelection,
   catchmentMetricFilter,
