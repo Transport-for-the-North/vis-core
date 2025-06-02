@@ -188,6 +188,10 @@ const resultZoneTypeValues = {
   source: "local",
   values: [
     {
+      displayValue: "NoRMS zones",
+      paramValue: 5
+    },
+    {
       displayValue: "LAD 2021",
       paramValue: 8
     },
@@ -216,20 +220,6 @@ const originOrDestinationValues = {
     {
       displayValue: "Destination",
       paramValue: "destination",
-    },
-  ],
-}
-
-const normsOrAggregatedValues = {
-  source: "local",
-  values: [
-    {
-      displayValue: "Norms",
-      paramValue: "Norms"
-    },
-    {
-      displayValue: "Aggregated",
-      paramValue: "Aggregated",
     },
   ],
 }
@@ -451,7 +441,9 @@ const resultZoneTypeFilter = {
     filterName: "Zoning system",
     paramName: "resultZoneTypeId",
     target: "api",
-    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+    actions: [
+      { action: "UPDATE_QUERY_PARAMS" }
+    ],
     visualisations: null,
     type: "dropdown",
     values: resultZoneTypeValues,
