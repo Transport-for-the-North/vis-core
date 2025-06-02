@@ -18,7 +18,7 @@ export const zoneBenefits = {
           name: "NoRMS Zone Benefits",
           type: "tile",
           source: "api",
-          path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+          path: "/api/vectortiles/zones/{resultZoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
           sourceLayer: "zones",
           geometryType: "polygon",
           visualisationName: "Zone Benefits",

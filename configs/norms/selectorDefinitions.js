@@ -442,7 +442,11 @@ const resultZoneTypeFilter = {
     paramName: "resultZoneTypeId",
     target: "api",
     actions: [
-      { action: "UPDATE_QUERY_PARAMS" }
+      { action: "UPDATE_QUERY_PARAMS" },
+      { 
+        action: "UPDATE_PARAMETERISED_LAYER",
+        payload: { targetLayer: "NoRMS Zone Benefits"}
+      }
     ],
     visualisations: null,
     type: "dropdown",
