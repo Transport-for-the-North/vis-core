@@ -23,12 +23,13 @@ export const appConfig = {
   logoutImage: "img/logout.png",
   authenticationRequired: false,
   appPages: [
+    pages.potential,
     pages.hansen,
     pages.los
     //pages.tinaConnectivity,
     //pages.dataExplorer,
     //pages.pti,
-    //pages.potential
+    
     
   ],
   footer: {

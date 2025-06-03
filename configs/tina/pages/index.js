@@ -3,13 +3,13 @@ import {los} from './los'
 //import { dataExplorer } from './dataExplorer'
 //import { tinaConnectivity } from "./tinaConnectivity"
 //import { pti } from "./pti"
-//import { potential } from "./potential"
+import { potential } from "./potential"
 
 export const pages = {
     hansen: hansen,
-    los: los
+    los: los,
     //dataExplorer: dataExplorer,
     //tinaConnectivity: tinaConnectivity,
     //pti: pti,
-    //potential: potential
+    potential: potential
 }
