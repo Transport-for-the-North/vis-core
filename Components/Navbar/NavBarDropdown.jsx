@@ -16,7 +16,7 @@ const DropdownMenuWrapper = styled.div`
   position: absolute;
   width: 100%;
   left: 0;
-  top: 75px;
+  top: 74px; // Accounting for nav border to prevent inactivation
   z-index: 1001;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -49,7 +49,7 @@ const DropdownMenuScroll = styled.div`
     background-color: transparent;
     border-radius: 10px;
     background-clip: padding-box;
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.05s ease-in-out;
   }
   &:hover::-webkit-scrollbar-thumb {
     background-color: darkgrey;
@@ -77,7 +77,7 @@ const DropdownContainer = styled.div`
   justify-content: space-between;
   text-decoration: none;
   border-bottom-right-radius: 20px;
-  transition: background-color 0.2s;
+  transition: background-color 0.05s;
   white-space: normal;
   overflow-wrap: break-word;
   z-index: 1000;
@@ -139,7 +139,7 @@ const dropdownItemStyles = css`
     $active || $hovered ? $bgColor : "#f9f9f9"};
   color: ${({ $active, $hovered }) =>
     $active || $hovered ? "#f9f9f9" : "#4b3e91"};
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.05s ease, color 0.05s ease;
   white-space: normal;
   &:hover {
     background-color: ${({ $bgColor }) => $bgColor};
@@ -266,6 +266,7 @@ export function RecursiveDropdownItem({
    */
   const handleMouseEnter = () => {
     setHeaderHovered(true);
+    onChildHoverChange(true); // Notify parent that this item is hovered
     if (hasChildren && itemRef.current) {
       setParentRect(itemRef.current.getBoundingClientRect());
       setSubOpen(true);
@@ -278,6 +279,7 @@ export function RecursiveDropdownItem({
    */
   const handleMouseLeave = () => {
     setHeaderHovered(false);
+    onChildHoverChange(false); // Notify parent that this item is no longer hovered
   };
 
   /**
@@ -374,7 +376,15 @@ export function NavBarDropdown({
   // or if any nested submenu item is hovered.
   const [open, setOpen] = useState(false);
   const [navChildHovered, setNavChildHovered] = useState(false);
+  const [containerHovered, setContainerHovered] = useState(false);
   const anchorRef = useRef(null);
+
+  // whenever both are false, close
+  useEffect(() => {
+    if (!containerHovered && !navChildHovered) {
+      setOpen(false);
+    }
+  }, [containerHovered, navChildHovered]);
 
   // isActive flag indicates if any item (or one of its children) matches the active URL.
   const isActive = dropdownItems.some(
@@ -385,26 +395,22 @@ export function NavBarDropdown({
   );
 
   /**
-   * Open the dropdown when the container is hovered.
+   * Unified hover handler for the main dropdown container/children.
+   * It sets the container hover state as requested.
    */
-  const handleContainerMouseEnter = () => {
-    setOpen(true);
-  };
-
-  /**
-   * Close the dropdown only when there is no nested hover activity.
-   */
-  const handleContainerMouseLeave = () => {
-    if (!navChildHovered) {
-      setOpen(false);
+  const handleHoverChange = (isHovered) => {
+    setContainerHovered(isHovered);
+    if (isHovered) {
+      // as soon as you enter either area, force it open
+      setOpen(true);
     }
   };
 
   return (
     <DropdownContainer
       ref={anchorRef}
-      onMouseEnter={handleContainerMouseEnter}
-      onMouseLeave={handleContainerMouseLeave}
+      onMouseOver={() => handleHoverChange(true)}
+      onMouseOut={() => handleHoverChange(false)}
       $bgColor={$bgColor}
       $isActive={isActive}
       $hovered={navChildHovered}
@@ -414,8 +420,8 @@ export function NavBarDropdown({
       {open && (
         <DropdownMenuWrapper>
           <DropdownMenuScroll
-            onMouseEnter={handleContainerMouseEnter}
-            onMouseLeave={handleContainerMouseLeave}
+            onMouseOver={() => handleHoverChange(true)}
+            onMouseOut={() => handleHoverChange(false)}
           >
             {dropdownItems.map((item) => (
               <RecursiveDropdownItem
