@@ -63,7 +63,7 @@ export const useFeatureStateUpdater = () => {
    * addFeaturesToMap(map, { 'fill-color': ['interpolate', ['linear'], ['feature-state', 'value'], 0, 'blue', 100, 'red'], colorStyle: 'myColorStyle' }, layers, data, 'myLayer');
    */
   const addFeaturesToMap = useCallback(
-    (map, paintProperty, layers, data, style, layerName) => {
+    (map, paintProperty, layers, data, colorStyle, layerName) => {
       // Find the specified layer in the layers object.
       const specifiedLayer = Object.values(layers).find(
         (layer) => layer.name === layerName
@@ -86,7 +86,7 @@ export const useFeatureStateUpdater = () => {
       // Update the layer's metadata with additional paint properties (e.g., colorStyle).
       layerFromMap.metadata = {
         ...layerFromMap.metadata,
-        colorStyle: paintProperty.colorStyle, // assuming paintProperty carries colorStyle information.
+        colorStyle: colorStyle, // assuming paintProperty carries colorStyle information.
       };
 
       // Update the layer's paint properties.

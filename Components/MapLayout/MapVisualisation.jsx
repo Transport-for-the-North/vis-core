@@ -228,7 +228,7 @@ export const MapVisualisation = ({
         paintProperty,
         state.layers,
         visualisationDataForMap,
-        style,
+        colorStyle,
         layer
       );
     },
@@ -281,7 +281,7 @@ export const MapVisualisation = ({
           paintProperty,
           state.layers,
           visualisationData,
-          style,
+          colorStyle,
           layerKey
         );
       }
@@ -292,6 +292,7 @@ export const MapVisualisation = ({
       addFeaturesToMap,
       visualisationData,
       layerKey,
+      colorStyle
     ]
   );
 
