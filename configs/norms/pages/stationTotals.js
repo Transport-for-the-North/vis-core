@@ -66,7 +66,7 @@ export const stationTotals = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Station Totals'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Station Totals'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Station Totals'] },
-        { ...selectors.scenarioFilter, visualisations: ['Station Totals'] },
+        { ...selectors.scenarioCodeFilter, visualisations: ['Station Totals'] },
         { ...selectors.timePeriod, visualisations: ['Station Totals'] },
         { ...selectors.metricFilter, visualisations: ['Station Totals'] },
     ],

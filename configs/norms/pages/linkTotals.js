@@ -67,7 +67,7 @@ export const linkTotals = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Link Totals'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Link Totals'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Link Totals'] },
-        { ...selectors.scenarioFilter, visualisations: ['Link Totals'] },
+        { ...selectors.scenarioCodeFilter, visualisations: ['Link Totals'] },
         { ...selectors.timePeriod, visualisations: ['Link Totals'] },
         { ...selectors.linkMetricFilter, visualisations: ['Link Totals'] }
       ],

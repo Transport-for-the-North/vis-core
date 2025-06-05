@@ -67,7 +67,7 @@ export const keyLocationZoneTotal = {
             { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Accessibility Totals'] },
             { ...selectors.scenarioFilterDemand, visualisations: ['Zone Accessibility Totals'] },
             { ...selectors.scenarioFilterYear, visualisations: ['Zone Accessibility Totals'] },
-            { ...selectors.scenarioFilter, visualisations: ['Zone Accessibility Totals'], values: {
+            { ...selectors.scenarioCodeFilter, visualisations: ['Zone Accessibility Totals'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
               displayColumn: "scenario_code",

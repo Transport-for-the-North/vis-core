@@ -78,7 +78,7 @@ export const popEmpZonePair = {
                 actions: [{ action: "UPDATE_QUERY_PARAMS" }],
                 shouldFilterOnValidation: true
             },
-            { ...selectors.scenarioFilter, visualisations: ['Landuse Accessibility Pair'], values: {
+            { ...selectors.scenarioCodeFilter, visualisations: ['Landuse Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
                 displayColumn: "scenario_code",

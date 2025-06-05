@@ -64,11 +64,11 @@ export const stationTotalsDifference = {
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Station Totals Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Station Totals Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Station Totals Difference'] },
-        { ...selectors.scenarioFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Station Totals Difference'] },
+        { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Station Totals Difference'] },
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Station Totals Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Station Totals Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Station Totals Difference'] },
-        { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Station Totals Difference'] },
+        { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Station Totals Difference'] },
         { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations: ['Station Totals Difference'] },
         { ...selectors.metricFilter, filterName: "Metric (1 and 2)", visualisations: ['Station Totals Difference'] }
     ],

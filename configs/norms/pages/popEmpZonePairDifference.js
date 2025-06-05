@@ -78,7 +78,7 @@ export const popEmpZonePairDifference = {
               actions: [{ action: "UPDATE_QUERY_PARAMS" }],
               shouldFilterOnValidation: true
             },
-            { ...selectors.scenarioFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Pair Difference'], values: {
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Pair Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
               displayColumn: "scenario_code",
@@ -92,7 +92,7 @@ export const popEmpZonePairDifference = {
               actions: [{ action: "UPDATE_QUERY_PARAMS" }],
               shouldFilterOnValidation: true
             },
-            { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Landuse Accessibility Pair Difference'], values: {
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Landuse Accessibility Pair Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
               displayColumn: "scenario_code",

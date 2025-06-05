@@ -355,7 +355,7 @@ const scenarioFilterYear = {
     },
 }
 
-const scenarioFilter = {
+const scenarioCodeFilter = {
     filterName: "Scenario",
     paramName: "scenarioCode",
     target: "api",
@@ -375,6 +375,14 @@ const scenarioFilter = {
         paramColumn: "scenario_code",
         sort: "ascending",
         exclude: ["NA"]
+    },
+}
+
+const scenarioIdFilter = { ...scenarioCodeFilter,
+    paramName: "scenarioId",
+    values: {
+        ...scenarioCodeFilter.values,
+        paramColumn: "id",
     },
 }
 
@@ -451,6 +459,26 @@ const resultZoneTypeFilter = {
     visualisations: null,
     type: "dropdown",
     values: resultZoneTypeValues,
+}
+
+const resultZoneTypeFilterFixed = {
+  filterName: "Zoning system",
+  paramName: "resultZoneTypeId",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "NoRMS Zone",
+        paramValue: 5,
+      }
+    ],
+  },
 }
 
 const originOrDestinationFilter = {
@@ -864,11 +892,13 @@ export const selectors = {
   scenarioFilterNetwork,
   scenarioFilterDemand,
   scenarioFilterYear,
-  scenarioFilter,
+  scenarioCodeFilter,
+  scenarioIdFilter,
   timePeriod,
   metricFilter,
   userClassFilter,
   resultZoneTypeFilter,
+  resultZoneTypeFilterFixed,
   originOrDestinationFilter,
   pairsMetricFilter,
   stationMapSelection,
