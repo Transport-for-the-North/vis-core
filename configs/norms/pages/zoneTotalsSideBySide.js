@@ -22,7 +22,7 @@ export const zoneTotalsSideBySide = {
           name: "NoRMS Zone Totals Dual",
           type: "tile",
           source: "api",
-          path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+          path: "/api/vectortiles/zones/{resultZoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
           sourceLayer: "zones",
           geometryType: "polygon",
           visualisationName: "Zone Totals Side-by-Side",
@@ -37,7 +37,7 @@ export const zoneTotalsSideBySide = {
         {
           name: "Zone Totals Side-by-Side",
           type: "joinDataToMap",
-          joinLayer: "NoRMS Zone Totals",
+          joinLayer: "NoRMS Zone Totals Dual",
           style: "polygon-continuous",
           joinField: "id",
           valueField: "value",
@@ -48,21 +48,29 @@ export const zoneTotalsSideBySide = {
       ],
       metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
       filters: [
-        { ...selectors.linkMetricFilter, visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}]},
+        { ...selectors.zoneMetricFilter, visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}]},
         { ...selectors.originOrDestinationFilter, visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
+        { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals Side-by-Side'],
+          actions: [
+            { 
+              action: "UPDATE_PARAMETERISED_LAYER",
+              payload: { targetLayer: "NoRMS Zone Totals Dual"}
+            },
+            { action: "UPDATE_DUAL_QUERY_PARAMS" }
+          ]  
+        },
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Zone Totals Side-by-Side'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Zone Totals Side-by-Side'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Zone Totals Side-by-Side'] },
-        { ...selectors.scenarioFilter, filterName: "Left Scenario", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
+        { ...selectors.scenarioIdFilter, filterName: "Left Scenario", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.timePeriod, filterName: "Left Time Period", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.userClassFilter, filterName: "Left User Class", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Zone Totals Side-by-Side'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Zone Totals Side-by-Side'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Zone Totals Side-by-Side'] },
-        { ...selectors.scenarioFilter, filterName: "Right Scenario", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
+        { ...selectors.scenarioIdFilter, filterName: "Right Scenario", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
         { ...selectors.timePeriod, filterName: "Right Time Period", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.userClassFilter, filterName: "Right User Class", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
-        { ...selectors.stationMapSelection, layer: "NoRMS Nodes", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]}
       ]
     }
   }

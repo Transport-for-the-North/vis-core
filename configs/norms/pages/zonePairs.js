@@ -54,7 +54,6 @@ export const zonePairs = {
             { ...selectors.scenarioFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.timePeriod, visualisations: ['Zone Pairs'] },
             { ...selectors.userClassFilter, visualisations: ['Zone Pairs'] },
-            { ...selectors.linkMetricFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.originOrDestinationFilter, visualisations: ['Zone Pairs']},
             { ...selectors.pairsMetricFilter, visualisations: ['Zone Pairs']},
             { ...selectors.zoneSelectionFilter, layer: "NoRMS Zones Pair Result", visualisations: ['Zone Pairs']}
