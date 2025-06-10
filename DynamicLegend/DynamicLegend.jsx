@@ -413,6 +413,13 @@ export const DynamicLegend = ({ map }) => {
             widthStops = interpolateWidths(colorStops, widthStops, layer.type);
           }
 
+
+          console.log(
+            "layer type:", layer.type, "---",
+            "layer color style:",layer.metadata.colorStyle, "---",
+            "colour stops:", colorStops.length
+            )
+
           if (layer.type === "line" && layer.metadata.colorStyle === "diverging" && colorStops.length === 3) {
             const negativeColor = colorStops.find(stop => stop.value === -1)?.color;
             const positiveColor = colorStops.find(stop => stop.value === 1)?.color;
