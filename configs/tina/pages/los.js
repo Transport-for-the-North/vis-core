@@ -25,6 +25,25 @@ export const los = {
           shouldHaveTooltipOnHover: true,
           shouldHaveLabel: false,
         },
+        {
+          uniqueId: "RailStationNodes",
+          name: "RailStationNodes",
+          type: "tile",
+          source: "api",
+          path: "/api/vectortiles/rail_stations_uk/{z}/{x}/{y}", // matches the path in swagger.json
+          sourceLayer: "geometry",
+          geometryType: "point",
+          //customPaint: nodeCustomPaint,
+          isHoverable: true,
+          isStylable: true,
+          shouldShowInLegend: true,
+          shouldHaveTooltipOnHover: true,
+          hoverTipShouldIncludeMetadata: true,
+          shouldHaveLabel: true,
+          labelZoomLevel: 12,
+          labelNulls: true,
+          hoverNulls: true,
+        },
       ],
       visualisations: [
         {
@@ -36,6 +55,16 @@ export const los = {
           valueField: "value",
           dataSource: "api",
           dataPath: "/api/tina/metrics",
+        },
+        {
+          name: "railnodes",
+          type: "joinDataToMap",
+          joinLayer: "RailStationNodes",
+          style: "circle-continuous",
+          joinField: "id",
+          valueField: "value",
+          dataSource: "api",
+          dataPath: "/api/tina/railstations",
         },
       ],
       metadataTables: [],
@@ -122,6 +151,49 @@ export const los = {
           //   paramColumn: "id",
           //   sort: "ascending",
           // },
+        },
+        {
+        filterName: "Rail Station Metric",
+          paramName: "columnName",
+          target: "api",
+          actions: [
+            { action: "UPDATE_QUERY_PARAMS" },
+            { action: "UPDATE_LEGEND_TEXT" }
+          ],
+          visualisations: ["railnodes"],
+          type: "dropdown",
+          shouldBeValidated: false,
+          info: "Rail",
+          containsLegendInfo: true,
+          values: {
+            source: "local",
+            values: [
+              {
+                displayValue: "Stops",                
+                paramValue: "stops",
+              },
+              {
+                displayValue: "Stops Recorded",                
+                paramValue: "stops_recorded",
+              },
+              {
+                displayValue: "Stops Recorded %",                
+                paramValue: "stops_recorded_pct",
+              },
+              {
+                displayValue: "Punctual_3mins %",                
+                paramValue: "punctual_3mins_pct",
+              },
+              {
+                displayValue: "Cancelled %",                
+                paramValue: "cancelled_pct",
+              },
+              {
+                displayValue: "Accessibility LoS",                
+                paramValue: "accessibility_los",
+              }
+            ]
+          }
         },
         
       ],

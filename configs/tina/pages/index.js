@@ -4,6 +4,7 @@ import {los} from './los'
 //import { tinaConnectivity } from "./tinaConnectivity"
 //import { pti } from "./pti"
 import { potential } from "./potential"
+import { rail } from "./rail"
 
 export const pages = {
     hansen: hansen,
@@ -11,5 +12,6 @@ export const pages = {
     //dataExplorer: dataExplorer,
     //tinaConnectivity: tinaConnectivity,
     //pti: pti,
-    potential: potential
+    potential: potential,
+    rail: rail
 }
