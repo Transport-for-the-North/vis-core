@@ -1,12 +1,12 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
-export const linkLoadings = {
-  pageName: "Link Loadings",
-  url: "/railoffer/link-loadings",
+export const timingLinks = {
+  pageName: "Timing Links",
+  url: "/railoffer/timing-links",
   type: "MapLayout",
   category: "Link",
-  about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>`,
+  about: `<p>This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -19,7 +19,7 @@ export const linkLoadings = {
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
-            visualisationName: "Link Loading Totals",
+            visualisationName: "Link Timings",
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
@@ -32,22 +32,19 @@ export const linkLoadings = {
     ],
     visualisations: [
         {
-        name: "Link Loading Totals",
+        name: "Link Timings",
         type: "joinDataToMap",
         joinLayer: "Rail Offer Links Result",
         style: "line-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/railoffer/link-loadings"
+        dataPath: "/api/railoffer/timing-link"
         }
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.loadingsMetricSelector, visualisations: ['Link Loading Totals'] },
-        { ...selectors.linkTOCSelector, visualisations: ['Link Loading Totals'] },
-        { ...selectors.railPeriodSelector, visualisations: ['Link Loading Totals'] },
-        { ...selectors.dayOfWeekSelector, visualisations: ['Link Loading Totals'] },
+        { ...selectors.timingLinkMetricSelector, visualisations: ['Link Timings'] },
     ],
     additionalFeatures: {
         glossary: { 
