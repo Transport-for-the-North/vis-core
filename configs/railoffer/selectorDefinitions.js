@@ -58,34 +58,42 @@ const dayOfWeekSelector = {
   values: {
     source: "local",
     values: [
-      {
-        displayValue: "Monday",
-        paramValue: 'Mon',
-      },
-      {
-        displayValue: "Tuesday",
-        paramValue: 'Tue',
-      },
-      {
-        displayValue: "Wednesday",
-        paramValue: 'Wed',
-      },
-      {
-        displayValue: "Thursday",
-        paramValue: 'Thu',
-      },
-      {
-        displayValue: "Friday",
-        paramValue: 'Fri',
-      },
-      {
-        displayValue: "Saturday",
-        paramValue: 'Sat',
-      },
-      {
-        displayValue: "Sunday",
-        paramValue: 'Sun',
-      }
+        {
+            displayValue: "Weekday",
+            paramValue: 'Weekday',
+        },
+        {
+            displayValue: "Weekend",
+            paramValue: 'Weekend',
+        },
+    //   {
+    //     displayValue: "Monday",
+    //     paramValue: 'Mon',
+    //   },
+    //   {
+    //     displayValue: "Tuesday",
+    //     paramValue: 'Tue',
+    //   },
+    //   {
+    //     displayValue: "Wednesday",
+    //     paramValue: 'Wed',
+    //   },
+    //   {
+    //     displayValue: "Thursday",
+    //     paramValue: 'Thu',
+    //   },
+    //   {
+    //     displayValue: "Friday",
+    //     paramValue: 'Fri',
+    //   },
+    //   {
+    //     displayValue: "Saturday",
+    //     paramValue: 'Sat',
+    //   },
+    //   {
+    //     displayValue: "Sunday",
+    //     paramValue: 'Sun',
+    //   }
     ],
   },
 };
