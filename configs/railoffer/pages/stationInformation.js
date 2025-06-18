@@ -58,10 +58,10 @@ export const stationInformation = {
     metadataTables: [],
     filters: [
         { ...selectors.stationInformationMetricSelector, visualisations: ['Node Information'] },
-        { ...selectors.nodeTOCSelector, multiSelect: true, visualisations: ['Node Information'] },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        { ...selectors.routeNameSelector, multiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
     ],
     additionalFeatures: {
