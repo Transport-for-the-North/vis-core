@@ -58,10 +58,10 @@ export const nodeNSSeC = {
     metadataTables: [],
     filters: [
         { ...selectors.stationNSSeCMetricSelector, visualisations: ['Node NS-SeC Totals'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node NS-SeC Totals'] },
-        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], filterName: "NPR Station", paramName: "nprNorth" },
-        { ...selectors.routeNameSelector, multiSelect: true, visualisations: ['Node NS-SeC Totals'] },
+        { ...selectors.nodeTOCSelector, visualisations: ['Node NS-SeC Totals'], multiSelect: true },
+        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+        // { ...selectors.routeNameSelector, multiSelect: true, visualisations: ['Node NS-SeC Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node NS-SeC Totals'] },
     ],
     additionalFeatures: {

@@ -58,10 +58,10 @@ export const nodeSocio = {
     metadataTables: [],
     filters: [
         { ...selectors.stationSocioMetricSelector, visualisations: ['Node Socio Totals'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node Socio Totals'] },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], filterName: "NPR Station", paramName: "nprNorth" },
-        { ...selectors.routeNameSelector, multiSelect: true, visualisations: ['Node Socio Totals'] },
+        { ...selectors.nodeTOCSelector, visualisations: ['Node Socio Totals'], multiSelect: true },
+        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+        // { ...selectors.routeNameSelector, multiSelect: true, visualisations: ['Node Socio Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Socio Totals'] },
     ],
     additionalFeatures: {

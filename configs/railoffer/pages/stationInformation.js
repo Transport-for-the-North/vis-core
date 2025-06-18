@@ -1,7 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
-export const s = {
+export const stationInformation = {
   pageName: "Station Information",
   url: "/railoffer/station-information",
   type: "MapLayout",
@@ -58,9 +58,9 @@ export const s = {
     metadataTables: [],
     filters: [
         { ...selectors.stationInformationMetricSelector, visualisations: ['Node Information'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node Information'] },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], filterName: "NPR Station", paramName: "nprNorth" },
+        { ...selectors.nodeTOCSelector, multiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
         { ...selectors.routeNameSelector, multiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
     ],
