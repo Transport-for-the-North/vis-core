@@ -1,5 +1,7 @@
+import { matches } from "lodash";
 import { roundToSignificantFigures } from "./math";
 import chroma from "chroma-js";
+import { normalize } from "polished";
 
 /**
  * Helper: Extracts the metric definition from the defaultBands.
@@ -163,11 +165,42 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
   let widthObject = []
   let colors = [];
   let colorObject = [];
+  // gets end of current path 
+  const path = window.location.pathname;
+  const lastSegment = path.substring(path.lastIndexOf('/') + 1);
+  // gets app name
+  const appName = process.env.REACT_APP_NAME;
+
   for (var i = 0; i < bins.length; i++) {
     colors.push(bins[i]);
     colors.push(colours[i]);
     widthObject.push(bins[i]);
-    widthObject.push((7.5/bins[bins.length-1]*bins[i]) + 1);
+    // original formula
+    // widthObject.push((7.5/bins[bins.length-1]*bins[i]) + 1);
+    let width;
+    if (appName == "noham") {
+      if (lastSegment == "link-result-difference") {
+      // gets maximum absolute value from bin
+      const maxAbs = Math.max(...bins.map(b => Math.abs(b)));
+      // normalises current value compared to max value
+      const normalized = Math.abs(bins[i]) / maxAbs;
+      // exponent (higher value deepens curve)
+      const exponent = 3;
+      const scaled = Math.pow(normalized, 1/exponent); 
+      // Ensures width is between 1 and 7.5
+      width = 1 + scaled * 7.5; 
+      }     
+      else {
+      // Original formula 
+      width = (7.5/bins[bins.length-1]*bins[i]) + 1;
+      }
+    }
+    else {
+    // Original formula 
+    width = (7.5/bins[bins.length-1]*bins[i]) + 1;
+    }
+      
+    widthObject.push(width);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
   switch (style) {
