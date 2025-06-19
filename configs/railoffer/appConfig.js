@@ -12,7 +12,7 @@ export const appConfig = {
     contactText: "Please contact Jonathan Burton for any questions on this data tool or on Transport for the North’s work supporting partners.",
     contactEmail: "jonathan.burton@transportforthenorth.com",
     logoImage: "img/tfn-logo-fullsize.png",
-    backgroundImage: "img/bsip/hero.jpg",
+    backgroundImage: "img/norms/hero.jpg",
     logoutButtonImage: "img/burgerIcon.png",
     logoutImage: "img/logout.png",
     appPages: [
