@@ -69,6 +69,7 @@ export const nodeLoadings = {
         glossary: { 
             dataDictionary: {}
         },
+        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

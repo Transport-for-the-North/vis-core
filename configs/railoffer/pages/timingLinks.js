@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const timingLinks = {
-  pageName: "Timing Links",
+  pageName: "BPLAN Timing Links",
   url: "/railoffer/timing-links",
   type: "MapLayout",
   category: "Link",
@@ -50,6 +50,7 @@ export const timingLinks = {
         glossary: { 
             dataDictionary: {}
         },
+        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

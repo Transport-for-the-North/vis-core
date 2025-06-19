@@ -2,11 +2,11 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const nodeNSSeC = {
-  pageName: "Node NS-SeC",
+  pageName: "Node Socio-Economic Classifications (NS-SeC)",
   url: "/railoffer/node-ns-sec",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the NS-SeC information for each station in the NorTMS model.</p>`,
+  about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -68,6 +68,7 @@ export const nodeNSSeC = {
         glossary: { 
             dataDictionary: {}
         },
+        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

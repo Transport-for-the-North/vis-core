@@ -103,7 +103,7 @@ const loadingsMetricSelector = {
   paramName: "columnName",
   target: "api",
   actions: [
-    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
   ],
   visualisations: null,
   containsLegendInfo: true,
@@ -140,7 +140,7 @@ const timingLinkMetricSelector = {
     paramName: "columnName",
     target: "api",
     actions: [
-        { action: "UPDATE_QUERY_PARAMS" },
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
     visualisations: null,
     containsLegendInfo: true,
@@ -792,7 +792,7 @@ const stationInformationMetricSelector = {
     paramName: "columnName",
     target: "api",
     actions: [
-        { action: "UPDATE_QUERY_PARAMS" },
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
     containsLegendInfo: true,
     visualisations: null,
@@ -810,56 +810,56 @@ const stationInformationMetricSelector = {
                 paramValue: "cycle_spaces",
                 legendSubtitleText: "Spaces"
             },
-            {
-                displayValue: "Help Points",
-                paramValue: "help_points",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Ticket Purchase - Weekdays",
-                paramValue: "ticket_weekday",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Ticket Purchase - Weekend",
-                paramValue: "ticket_weekend",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Ticket Machine",
-                paramValue: "ticket_machine",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Ticket Office",
-                paramValue: "ticket_office",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Seated Areas",
-                paramValue: "seated_area",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Ramp Access",
-                paramValue: "ramp_access",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Toilets",
-                paramValue: "national_key_toilet",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Wheelchairs Available",
-                paramValue: "wheelchair_avail",
-                legendSubtitleText: "True/False"
-            },
-            {
-                displayValue: "Car Park Free?",
-                paramValue: "carpark_free",
-                legendSubtitleText: "True/False"
-            },
+            // {
+            //     displayValue: "Help Points",
+            //     paramValue: "help_points",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Ticket Purchase - Weekdays",
+            //     paramValue: "ticket_weekday",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Ticket Purchase - Weekend",
+            //     paramValue: "ticket_weekend",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Ticket Machine",
+            //     paramValue: "ticket_machine",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Ticket Office",
+            //     paramValue: "ticket_office",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Seated Areas",
+            //     paramValue: "seated_area",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Ramp Access",
+            //     paramValue: "ramp_access",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Toilets",
+            //     paramValue: "national_key_toilet",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Wheelchairs Available",
+            //     paramValue: "wheelchair_avail",
+            //     legendSubtitleText: "True/False"
+            // },
+            // {
+            //     displayValue: "Car Park Free?",
+            //     paramValue: "carpark_free",
+            //     legendSubtitleText: "True/False"
+            // },
         ]
     }
 }
@@ -869,7 +869,7 @@ const stationNSSeCMetricSelector = {
     paramName: "columnName",
     target: "api",
     actions: [
-        { action: "UPDATE_QUERY_PARAMS" },
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
     containsLegendInfo: true,
     visualisations: null,
@@ -976,7 +976,7 @@ const stationSocioMetricSelector = {
     paramName: "columnName",
     target: "api",
     actions: [
-        { action: "UPDATE_QUERY_PARAMS" },
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
     containsLegendInfo: true,
     visualisations: null,

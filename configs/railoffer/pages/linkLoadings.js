@@ -45,7 +45,7 @@ export const linkLoadings = {
     metadataTables: [],
     filters: [
         { ...selectors.loadingsMetricSelector, visualisations: ['Link Loading Totals'] },
-        { ...selectors.linkTOCSelector, visualisations: ['Link Loading Totals'] },
+        { ...selectors.linkTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Loading Totals'] },
         { ...selectors.railPeriodSelector, visualisations: ['Link Loading Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Link Loading Totals'] },
     ],
@@ -53,6 +53,7 @@ export const linkLoadings = {
         glossary: { 
             dataDictionary: {}
         },
+        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };
