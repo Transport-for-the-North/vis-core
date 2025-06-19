@@ -3,8 +3,8 @@ import { pages } from "./pages";
 
 export const appConfig = {
     title: "TfN's Rail Information Portal Visualiser",
-    introduction: `<p>The Rail Information Portal has been developed to allow railway industry data to be shared with Transport for the North (TfN) Partners through the TfN Offer. This is to enable Partners to better use rail industry data to shape their rail work.  
-        The purpose of this platform is to collate and visualise rail data in an interactive, intuitive, and web-based format. This instance of the platform presents information that has been collated and processed by TfN, often from third-party sources, shared under Open Government Licence or other open licences.</p>
+    introduction: `<p>The Rail Information Portal has been developed to allow railway industry data to be shared with Transport for the North (TfN) Partners through the TfN Offer. This is to enable Partners to better use rail industry data to shape their rail work.</p>
+        <p>The purpose of this platform is to collate and visualise rail data in an interactive, intuitive, and web-based format. This instance of the platform presents information that has been collated and processed by TfN, often from third-party sources, shared under Open Government Licence or other open licences.</p>
         <p><b>NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.</b></p>`,
     background: "",
     methodology: "",
