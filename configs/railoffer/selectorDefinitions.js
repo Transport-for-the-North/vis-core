@@ -5,6 +5,7 @@ const linkTOCSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
+  info:'Use this dropdown to select various different links by TOC. The full name for each TOC is visible in the "About this visualisation" section.',
   visualisations: null,
   type: "dropdown",
   values: {
@@ -25,6 +26,7 @@ const railPeriodSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
+  info:'Use this dropdown to filter data by rail period. The format for rail period is year/period.',
   visualisations: null,
   type: "dropdown",
   values: {
@@ -53,6 +55,7 @@ const dayOfWeekSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
+  info:'Use this dropdown to filter data by weekday/weekend. Data is shown over the whole rail timetable for weekend and weekdays.',
   visualisations: null,
   type: "dropdown",
   values: {
@@ -105,6 +108,7 @@ const loadingsMetricSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
   ],
+  info:'Use this dropdown to select the metric that will style the map.',
   visualisations: null,
   containsLegendInfo: true,
   type: "dropdown",
@@ -142,6 +146,7 @@ const timingLinkMetricSelector = {
     actions: [
         { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
+    info:'Use this dropdown to select the metric that will style the map.',
     visualisations: null,
     containsLegendInfo: true,
     type: "dropdown",
@@ -169,6 +174,7 @@ const nodeTOCSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
+  info:'Use this dropdown to select various different stations by TOC. The full name for each TOC is visible in the "About this visualisation" section.',
   visualisations: null,
   type: "dropdown",
   values: {
@@ -218,6 +224,7 @@ const booleanSelector = {
     filterName: null,
     paramName: null,
     target: "api",
+    info:'Use this dropdown to filter data by selecting True/False values.',
     actions: [
         { action: "UPDATE_QUERY_PARAMS" },
     ],
@@ -245,6 +252,7 @@ const routeNameSelector = {
     actions: [
         { action: "UPDATE_QUERY_PARAMS" },
     ],
+    info:'Use this dropdown to filter data by the route. Stations have more than one route.',
     visualisations: null,
     mutltiSelect: true,
     type: "dropdown",
@@ -787,6 +795,74 @@ const routeNameSelector = {
     }
 }
 
+const stationInformationMetricBoolSelector = {
+    filterName: "Metric",
+    paramName: "columnName",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+    ],
+    info:'Use this dropdown to select the metric that will style the map.',
+    containsLegendInfo: true,
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            {
+                displayValue: "Help Points",
+                paramValue: "help_points",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Ticket Purchase - Weekdays",
+                paramValue: "ticket_weekday",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Ticket Purchase - Weekend",
+                paramValue: "ticket_weekend",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Ticket Machine",
+                paramValue: "ticket_machine",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Ticket Office",
+                paramValue: "ticket_office",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Seated Areas",
+                paramValue: "seated_area",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Ramp Access",
+                paramValue: "ramp_access",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Toilets",
+                paramValue: "national_key_toilet",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Wheelchairs Available",
+                paramValue: "wheelchair_avail",
+                legendSubtitleText: "True/False"
+            },
+            {
+                displayValue: "Car Park Free?",
+                paramValue: "carpark_free",
+                legendSubtitleText: "True/False"
+            },
+        ]
+    }
+}
+
 const stationInformationMetricSelector = {
     filterName: "Metric",
     paramName: "columnName",
@@ -794,6 +870,7 @@ const stationInformationMetricSelector = {
     actions: [
         { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
+    info:'Use this dropdown to select the metric that will style the map.',
     containsLegendInfo: true,
     visualisations: null,
     type: "dropdown",
@@ -871,6 +948,7 @@ const stationNSSeCMetricSelector = {
     actions: [
         { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
+    info:'Use this dropdown to select the metric that will style the map.',
     containsLegendInfo: true,
     visualisations: null,
     type: "dropdown",
@@ -978,6 +1056,7 @@ const stationSocioMetricSelector = {
     actions: [
         { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
     ],
+    info:'Use this dropdown to select the metric that will style the map.',
     containsLegendInfo: true,
     visualisations: null,
     type: "dropdown",
@@ -1029,5 +1108,6 @@ export const selectors = {
   routeNameSelector: routeNameSelector,
   stationSocioMetricSelector: stationSocioMetricSelector,
   stationNSSeCMetricSelector: stationNSSeCMetricSelector,
-  stationInformationMetricSelector: stationInformationMetricSelector
+  stationInformationMetricSelector: stationInformationMetricSelector,
+  stationInformationMetricBoolSelector: stationInformationMetricBoolSelector
 };

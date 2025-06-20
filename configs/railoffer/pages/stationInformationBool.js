@@ -1,12 +1,12 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
-export const nodeSocio = {
-  pageName: "Station Economic Activity Status",
-  url: "/railoffer/node-socio",
+export const stationInformationBool = {
+  pageName: "Station Information - Boolean",
+  url: "/railoffer/station-information-bool",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>
+  about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>
   <p><b>TOC Abbreviations:</b></p> 
   <p>NT: Northern</p>
   <p>GR: East Coast</p>
@@ -27,7 +27,6 @@ export const nodeSocio = {
             uniqueId: "RailOfferLinksVectorTile",
             name: "Network",
             type: "tile",
-
             source: "api",
             path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
@@ -45,7 +44,7 @@ export const nodeSocio = {
             path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
-            visualisationName: "Node Socio Totals",
+            visualisationName: "Node Information",
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
@@ -58,24 +57,24 @@ export const nodeSocio = {
     ],
     visualisations: [
         {
-        name: "Node Socio Totals",
+        name: "Node Information",
         type: "joinDataToMap",
         joinLayer: "Rail Offer Nodes",
-        style: "circle-continuous",
+        style: "circle-categorical",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/railoffer/socio"
+        dataPath: "/api/railoffer/node-results"
         }
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.stationSocioMetricSelector, visualisations: ['Node Socio Totals'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Socio Totals'] },
-        { ...selectors.dayOfWeekSelector, visualisations: ['Node Socio Totals'] },
+        { ...selectors.stationInformationMetricBoolSelector, visualisations: ['Node Information'] },
+        { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
     ],
     additionalFeatures: {
         glossary: { 

@@ -299,6 +299,39 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "circle-stroke-color": "#000000"
       };
     }
+    case "circle-categorical": {
+      return {
+        "circle-color": [
+          "match",
+          ["feature-state", "value"],
+          1, "#4caf50", // true/1 = green
+          0, "#f44336", // false/0 = red
+          "#bdbdbd" // default = grey
+        ],
+        "circle-stroke-width": 1,
+        "circle-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 0.65,
+        ],
+        "circle-stroke-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 0.2,
+        ],
+        "circle-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0, 2,
+          12, 4,
+          22, 8
+        ],
+        "circle-stroke-color": "#000000"
+      };
+    }
     case "point-continuous":
     case "point-diverging": {
       return {
@@ -445,7 +478,7 @@ export const reclassifyData = (
     }
     return roundedBins;
   } else if (style.includes("categorical")) {
-    return;
+    return [];
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
     if (classificationMethod === "d") {

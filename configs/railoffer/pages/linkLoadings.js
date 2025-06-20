@@ -6,7 +6,19 @@ export const linkLoadings = {
   url: "/railoffer/link-loadings",
   type: "MapLayout",
   category: "Link",
-  about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>`,
+  about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>
+  <p><b>TOC Abbreviations:</b></p> 
+  <p>NT: Northern</p>
+  <p>GR: East Coast</p>
+  <p>EM: East Midlands</p>
+  <p>VT: West Cost</p>
+  <p>ME: Merseyrail</p>
+  <p>GM: Greater Manchester</p>
+  <p>NR: Network Rail</p>
+  <p>AW: Transport for Wales</p>
+  <p>TP: Transpennine</p>
+  <p>XC: CrossCountry</p>
+  `,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {

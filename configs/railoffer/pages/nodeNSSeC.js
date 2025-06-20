@@ -2,11 +2,23 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const nodeNSSeC = {
-  pageName: "Node Socio-Economic Classifications (NS-SeC)",
+  pageName: "Station Socio-Economic Classifications (NS-SeC)",
   url: "/railoffer/node-ns-sec",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,
+  about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>
+  <p><b>TOC Abbreviations:</b></p> 
+  <p>NT: Northern</p>
+  <p>GR: East Coast</p>
+  <p>EM: East Midlands</p>
+  <p>VT: West Cost</p>
+  <p>ME: Merseyrail</p>
+  <p>GM: Greater Manchester</p>
+  <p>NR: Network Rail</p>
+  <p>AW: Transport for Wales</p>
+  <p>TP: Transpennine</p>
+  <p>XC: CrossCountry</p>
+  `,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
