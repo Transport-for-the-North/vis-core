@@ -180,6 +180,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     let width;
     if (appName == "noham") {
       if (lastSegment == "link-result-difference") {
+      console.log("using exponential formula");
       // gets maximum absolute value from bin
       const maxAbs = Math.max(...bins.map(b => Math.abs(b)));
       // normalises current value compared to max value

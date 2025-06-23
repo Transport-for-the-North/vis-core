@@ -15,12 +15,12 @@ export const bands = [
             {
                 name: "netspd_kph",
                 values: [0, 15, 32, 48, 64, 80, 96, 112, 120],
-                differenceValues: [-120, -80, -48, -15, -5, 0, 5, 15, 48, 80, 120],
+                differenceValues: [-100, -80, -48, -15, -5, 0, 5, 15, 48, 80, 100],
             },
             {
                 name: "speed_limit",
                 values: [0, 15, 32, 48, 64, 80, 96, 112, 120],
-                differenceValues: [-120, -80, -48, -15, -5, 0, 5, 15, 48, 80, 120],
+                differenceValues: [-60, -48, -15, -5, 0, 5, 15, 48, 60],
             },
             {
                 name: "total_time_secs",
