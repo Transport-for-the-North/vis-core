@@ -29,7 +29,7 @@ export const nodeSocio = {
             type: "tile",
 
             source: "api",
-            path: "/api/vectortiles/norms_links/{z}/{x}/{y}",
+            path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
             geometryType: "line",
             isHoverable: false,
@@ -42,7 +42,7 @@ export const nodeSocio = {
             name: "Rail Offer Nodes",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/norms_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/railoffer_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Node Socio Totals",
