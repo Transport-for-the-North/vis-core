@@ -57,7 +57,7 @@ const dayOfWeekSelector = {
   ],
   info:'Use this dropdown to filter data by weekday/weekend. Data is shown over the whole rail timetable for weekend and weekdays.',
   visualisations: null,
-  type: "toggle",
+  type: "dropdown",
   values: {
     source: "local",
     values: [
