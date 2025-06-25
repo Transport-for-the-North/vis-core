@@ -264,12 +264,25 @@ const inputScenariosMetadataTable = {
 
 export const appConfig = {
   title: "TfN’s Northern Highway Assignment Model (NoHAM) Visualiser",
-  introduction: `<p>The TfN’s Northern Highway Assignment Model (NoHAM) Visualiser aims to collate and visualise outputs from the Transport for the North Northern Highway Assignment Model (NoHAM), that is part of the Northern Transport Modelling System (NorTMS).
-   NorTMS is a rail and highways modelling system and is used to appraise rail and highways scheme assessments.</p> <p>The purpose of this platform is to collate and visualise highway model data in an interactive, intuitive,
-   web-based format. This instance of the platform presents information from the {insert project name or study} project. This visualisation tool builds on the modelling aspect of the work that delivers analysis
-   based on scenario testing done using NoHAM.</p>`,
-  background: "",
+  introduction: `<p>The Northern Highway Assignment Model (NoHAM) Visualiser aims to collate and visualise outputs from Transport for the North's Northern Highway Assignment Model (NoHAM), and visualise the model data in an interactive, intuitive, web-based format.</p>
+   <p>The NoHAM visualiser serves two key purposes:</p>
+   <ol><li>To help with the quality assurance of TfN's highway matrices, networks and assignments, of which we build each in-house.</li>
+   <li>To simplify the understanding and sharing of model outputs.</li></ol>`,
+  background: ``,
   methodology: "",
+  homePageFragments: [
+    {
+      content: `The visualiser currently consists of four key analysis tabs, namely:
+      <p>a) Link - Visualising link-based data from our Saturn-based highway model (NoHAM).<br>
+      b) Node - Visualising node-based data from our Saturn-based highway model (NoHAM).<br>
+      c) Matrix Trip Ends - Visualising our matrix trip ends across our zoning system, whether origin or destination trips.<br>
+      d) Origin/Destination Analysis - Given a selected zone, this creates an isochrone visual of the trips to/from that selected zone or can also be used to show the time/distance skims for that selected zone.</p>
+      <p>We also have the option to select each of the analysis tabs as a single, difference or side-by-side visual. This functionality allows greater capability in regard to understanding
+      and reporting on highway-scheme appraisal; as well as helping TfN with the quality assurance aspect.</p>`,
+      sectionTitle: "Set-Up",
+      alignment: "left"
+    }
+  ],
   legalText: termsOfUse,
   contactText: "Please contact Luke Monaghan for any questions on this data tool.",
   contactEmail: "luke.monaghan@transportforthenorth.com",
