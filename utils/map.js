@@ -166,111 +166,32 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
   let colors = [];
   let colorObject = [];
   let functionType = "";
-
+  let width = "";
   // gets end of current path 
   const path = window.location.pathname;
   const lastSegment = path.substring(path.lastIndexOf('/') + 1);
   // gets app name
   const appName = process.env.REACT_APP_NAME;
-  
-  // Below calculates the std and avg for the bins array to determine whether to use linear or root function
 
-  if (appName === "noham") {
-    if (lastSegment === "link-result-difference"){
-
-      if (bins.length > 2){
-
-          const diffs = [];
-
-          for (var i = 1; i < bins.length; i ++){
-            diffs.push(Math.abs(bins[i] - bins[i - 1]));
-          }
-
-          // Calculate average and standard deviation of differences
-          const avg = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-          const stdDev = Math.sqrt(diffs.reduce((sum, d) => sum + Math.pow(d - avg, 2), 0) / diffs.length);
-
-          // stdDev / avg to normalise stdDev relative to average diff 
-          // raise threshold to increase sensitivity for root function
-          const threshold = 0.9; 
-          if (stdDev / avg < threshold) {
-            functionType = "linear";
-          } else {
-            functionType = "root";
-          }
-      }
-    }
-  }
-
-  // Below uses either root function or linear function to calculate width based off the bin value
-  // Only currently for noham link-diff 
+  // determines whether to use linear or root function for width 
+  functionType = chooseLinearOrRootFunction(bins, appName, lastSegment);
 
   for (var i = 0; i < bins.length; i++) {
     colors.push(bins[i]);
     colors.push(colours[i]);
     widthObject.push(bins[i]);
 
-    let width;
-    if (appName === "noham") {
-      if (lastSegment === "link-result-difference") {
-        if (functionType === "root"){
-          console.log("root");
-          // normalises current value compared to max value
-          const maxAbs = Math.max(...bins.map(b => Math.abs(b)));
-          const normalized = Math.abs(bins[i]) / maxAbs;
-          // exponent (higher value deepens curve)
-          const exponent = 3;
-          const scaled = Math.pow(normalized, 1/exponent); 
-          // Ensures width is between 1 and 7.5
-          width = 1 + scaled * 7.5; 
-        } else {
-          console.log("linear");
-          // Linear formula 
-           width = (7.5/bins[bins.length-1]*bins[i]) + 1;
-        }
-      }     
-      else {
-      // Linear formula 
-      width = (7.5/bins[bins.length-1]*bins[i]) + 1;
-      }
-    }
-    else {
-    // Linear formula 
-    width = (7.5/bins[bins.length-1]*bins[i]) + 1;
-    }
-      
+    // either linear or root function used for line-width as appropriate 
+    width = calculateLineWidth(bins, functionType, bins[i]);
+
     widthObject.push(width);
     colorObject.push({ value: bins[i], color: colours[i] });
   }
 
-  // Below either uses root based scaling for offset or linear, depending on width calculation
+  // line offset expression determined and allocated to line-diverging expression 
+  // this ensures line offset is correct if root function used for line-width
   let offsetExpression;
-
-  if (functionType === "root"){
-
-    offsetExpression = [
-        "/",
-        [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "valueAbs"],
-          ...widthObject
-        ],
-        1.3
-    ];
-
-  } else {
-
-    offsetExpression = [
-        "interpolate",
-        ["linear"],
-        ["feature-state", "valueAbs"],
-        Math.min(...bins), -1,
-        Math.max(...bins), -5
-    ];
-  }
-
-  console.log(offsetExpression);
+  offsetExpression = determineLineOffsetExpression(bins, widthObject, functionType);
 
   switch (style) {
     case "polygon-diverging":
@@ -432,6 +353,94 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     default:
       return {};
   }
+}
+
+const chooseLinearOrRootFunction = (bins, appName, lastSegment) => {
+  let functionType;
+  
+  // Currently on applying root function for noham link diffs
+  if (appName === "noham" && lastSegment === "link-result-difference") {
+    if (bins.length > 1) {
+      const diffs = [];
+
+      // get differences
+      for (let i = 1; i < bins.length; i++) {
+        diffs.push(Math.abs(bins[i] - bins[i - 1]));
+      }
+
+      // calculate standard deviation 
+      const avg = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+      const stdDev = Math.sqrt(
+        diffs.reduce((sum, d) => sum + Math.pow(d - avg, 2), 0) / diffs.length
+      );
+
+      // compare normalised standard deviation to threshold to determine whether to use linear or root function  
+      const threshold = 0.9;
+      functionType = stdDev / avg < threshold ? "linear" : "root";
+    } else {
+      functionType = "";
+    }
+  } else {
+    functionType = "linear";
+  }
+  
+  return functionType;
+};
+
+const calculateLineWidth = (bins, functionType, binValue) => {
+
+  let width;
+
+  console.log(functionType);
+
+  if (functionType === "root") {
+    // get maximum value and normalise each value  
+    const maxAbs = Math.max(...bins.map(b => Math.abs(b)));
+    const normalized = Math.abs(binValue / maxAbs);
+    // exponent (higher value deepens curve)
+    const exponent = 3;
+    const scaled = Math.pow(normalized, 1 / exponent); 
+    // Ensures width is between 1 and 7.5
+    width = 1 + scaled * 7.5; 
+  } else if (functionType === "linear") {
+    // Linear formula 
+    width = (7.5 / bins[bins.length - 1]) * binValue + 1;
+  }
+  return width;
+};
+
+const determineLineOffsetExpression = (bins, widthObject, functionType) => {
+  
+  // Below either uses root based scaling for offset or linear, depending on width calculation
+  // If root function has been used for width, it mirrors this for offset and divides it by 1.3 to avoid the offset being excessive
+  // If linear has been used offsets are allocated based off linear scale 
+  let offsetExpression;
+
+  if (functionType === "root"){
+
+    offsetExpression = [
+        "/",
+        [
+          "interpolate",
+          ["linear"],
+          ["feature-state", "valueAbs"],
+          ...widthObject
+        ],
+        1.3
+    ];
+
+  } else {
+
+    offsetExpression = [
+        "interpolate",
+        ["linear"],
+        ["feature-state", "valueAbs"],
+        Math.min(...bins), -1,
+        Math.max(...bins), -5
+    ];
+  }
+
+  return offsetExpression;
 }
 
 export const resetPaintProperty = (style) => { 
