@@ -25,7 +25,8 @@ export const appConfig = {
   appPages: [
     pages.potential,
     pages.hansen,
-    pages.los
+    pages.los,
+    pages.rail
     //pages.tinaConnectivity,
     //pages.dataExplorer,
     //pages.pti,
