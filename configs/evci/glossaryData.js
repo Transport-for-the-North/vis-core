@@ -277,17 +277,17 @@ const glossaryData = {
       <p><strong>Cars and vans</strong></p>
       <ul>
       <li>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
-      This is typically at a 7 kW charger where a user stays for 30 - 60 minutes.</li>
+      This is typically at a 8 kW charger where a user stays for 30 - 60 minutes.</li>
       <li>Home: Charging which occurs off-street in a driver's private garage or other private parking location. 
-      We assume the use of a 7 kW charger.</li>
+      We assume the use of a 8 kW charger.</li>
       <li>En-route rapid: Charging which occurs during a journey, similar to refuelling with petrol at a motorway service station. 
       Chargers tend to support at least 50 kW, and sometimes 150 - 350 kW charging, allowing for short charging times. 
       Due to lower powered chargers and lower power acceptance rates by vehicles, in the short term, 
       charging rates are assumed to increase over time from 50 kW today to 150 kW in the future.</li>
       <li>Public residential: Charging which occurs on-street near a driver's home location, for example while parked on a local road or in a public car park. 
-      We assume the use of a 7 kW charger.</li>
+      We assume the use of a 8 kW charger.</li>
       <li>Workplace: Charging which occurs at or near a driver's place of work. 
-      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 7 kW charger.</li>
+      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 8 kW charger.</li>
       </ul>
       <p><strong>Heavy goods vehicles</strong></p>
       <ul>
@@ -303,17 +303,17 @@ const glossaryData = {
       <p><strong>Cars and vans</strong></p>
       <ul>
       <li>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
-      This is typically at a 7 kW charger where a user stays for 30 - 60 minutes.</li>
+      This is typically at a 8 kW charger where a user stays for 30 - 60 minutes.</li>
       <li>Home: Charging which occurs off-street in a driver's private garage or other private parking location. 
-      We assume the use of a 7 kW charger.</li>
+      We assume the use of a 8 kW charger.</li>
       <li>En-route rapid: Charging which occurs during a journey, similar to refuelling with petrol at a motorway service station. 
       Chargers tend to support at least 50 kW, and sometimes 150 - 350 kW charging, allowing for short charging times. 
       Due to lower powered chargers and lower power acceptance rates by vehicles, in the short term, 
       charging rates are assumed to increase over time from 50 kW today to 150 kW in the future.</li>
       <li>Public residential: Charging which occurs on-street near a driver's home location, for example while parked on a local road or in a public car park. 
-      We assume the use of a 7 kW charger.</li>
+      We assume the use of a 8 kW charger.</li>
       <li>Workplace: Charging which occurs at or near a driver's place of work. 
-      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 7 kW charger.</li>
+      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 8 kW charger.</li>
       <li>Local charging hub: 
       TfN defines a local charging hub as a grouped hub of charge points, typically providing a mixture of slow to fast AC chargers, 
       and a number of rapid chargers. This would support scheduled slots for overnight charging and an app to book a shorter slot for a top up if needed. 
@@ -335,18 +335,18 @@ const glossaryData = {
       <p><strong>Cars and vans</strong></p>
       <ul>
       <li>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
-      This is typically at a 7 kW charger where a user stays for 30 - 60 minutes.</li>
+      This is typically at a 8 kW charger where a user stays for 30 - 60 minutes.</li>
       <li>Home: Charging which occurs off-street in a driver's private garage or other private parking location. 
-      We assume the use of a 7 kW charger.</li>
+      We assume the use of a 8 kW charger.</li>
       <li>En-route rapid: Charging which occurs during a journey, similar to refuelling with petrol at a motorway service station. 
       Chargers tend to support at least 50 kW, and sometimes 150 - 350 kW charging, allowing for short charging times. 
       Due to lower powered chargers and lower power acceptance rates by vehicles, in the short term, 
       charging rates are assumed to increase over time from 50 kW today to 150 kW in the future.</li>
       <li>Public residential: Charging which occurs on-street near a driver's home location, for example while parked on a local road or in a public car park. 
-      We assume the use of a 7 kW charger.</li>
+      We assume the use of a 8 kW charger.</li>
       <li>Workplace: Charging which occurs at or near a driver's place of work. 
-      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 7 kW charger.</li>
-      <li>Van depot: Charging which occurs in the depot during the day or overnight, at a mix of AC (Alternating Current) and DC (direct Current) chargers between 7 kW and 50 kW.</li>
+      Only accessible to drivers who use their vehicle for commuting. We assume the use of a 8 kW charger.</li>
+      <li>Van depot: Charging which occurs in the depot during the day or overnight, at a mix of AC (Alternating Current) and DC (direct Current) chargers between 8 kW and 50 kW.</li>
       </ul>
       <p><strong>Buses</strong></p>
       <ul>
@@ -363,13 +363,13 @@ const glossaryData = {
       title: "Destination charging",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
       <p>Destination: Charging which occurs in locations such as supermarkets, gyms, etc. 
-      This is assumed to take place at a 7 kW charger where a user stays for 30 - 60 minutes.</p>`,
+      This is assumed to take place at a 8 kW charger where a user stays for 30 - 60 minutes.</p>`,
       exclude: [],
     },
     home: {
       title: "Home charging",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
-      <p>Home: Charging which occurs off-street in a driver's private garage or other private parking. We assume the use of a 7 kW charger.</p>`,
+      <p>Home: Charging which occurs off-street in a driver's private garage or other private parking. We assume the use of a 8 kW charger.</p>`,
       exclude: [],
     },
     enRoute: {
@@ -386,14 +386,14 @@ const glossaryData = {
       title: "Public residential charging",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
       <p>Public residential: Charging which occurs on-street near a driver's home location, 
-      for example while parked on a local road or in a public car park. We assume the use of a 7 kW charger.</p>`,
+      for example while parked on a local road or in a public car park. We assume the use of a 8 kW charger.</p>`,
       exclude: [],
     },
     workplace: {
       title: "Workplace charging",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
       <p>Workplace: Charging which occurs at or near a driver's place of work. Only accessible to drivers who use their vehicle for commuting. 
-      We assume the use of a 7 kW charger.</p>`,
+      We assume the use of a 8 kW charger.</p>`,
       exclude: [],
     },
     depot: {
@@ -406,7 +406,7 @@ const glossaryData = {
       title: "Depot charging",
       content: `<p>Charging categories define the different contexts in which people may charge an electric vehicle.</p>
       <p>HGV depot: Charging which occurs in the depot where the heavy goods vehicle is kept overnight.</p>
-      <p>Van depot: Charging which occurs in the depot during the day or overnight, at a mix of AC (Alternating Current) and DC (Direct Current) chargers between 7 kW and 50 kW.</p>
+      <p>Van depot: Charging which occurs in the depot during the day or overnight, at a mix of AC (Alternating Current) and DC (Direct Current) chargers between 8 kW and 50 kW.</p>
       <p>Bus depot: Charging which occurs in the depot where buses are kept overnight, where buses charge at an average power rating of 60 kW.</p>`,
       exclude: ["mc", "tfn", "eeh", "wg", "peninsula", "te"],
     },
