@@ -1,5 +1,6 @@
 import { termsOfUse } from "./TermsOfUse";
 import { nodeCustomPaint } from "./customPaintDefinitions"
+import { termsOfUse } from "./termsOfUse"
 
 const networkScenarioValues = {
   source: "local",
@@ -507,6 +508,8 @@ export const appConfig = {
       pageName: "Difference (2-1)",
       url: "/link-result-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       about: `<p>This visual allows you to select two different scenarios and compare the difference between a chosen metric for the scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
       Therefore, the user should be setting scenario 2 as the Do-Something and scenario 1 as the Do-Minimum when comparing DS-DM.</p>
       <p>Metrics include: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction,</li>
@@ -780,6 +783,8 @@ export const appConfig = {
       pageName: "Side by Side",
       url: "/link-result-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       about: `<p>This visual allows you to select two different scenarios and compare them side by side. Particularly useful for when you have new infrastructure in one scenario which is not in the other, since the difference 
       dashboard doesn’t show a comparison where there are no common links.</p>
       <p>Metrics include: <ul><li>Link distance – the length of the modelled section of road,</li><li>Number of lanes – the number of open traffic lanes by direction,</li>
@@ -1029,6 +1034,8 @@ export const appConfig = {
       url: "/node-results",
       type: "MapLayout",
       category: "Node",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       about: `<p>NoHAM model node data mapped to junctions; junctions represented are those where model links intersect. Some junctions are not represented because the model is a simplification. 
       This visualisation allows for the examination of junction attributes and the comparison of junction performance in different scenarios.  </p><p>Metrics include: <ul>
       <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation and performance of the junction.
@@ -1170,6 +1177,8 @@ export const appConfig = {
       pageName: "Difference (2-1)",
       url: "/node-result-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       about: `<p>This visual allows you to select two different scenarios and compare the difference at junctions between a chosen metric for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
       Therefore, the user should be setting scenario 2 as the Do-Something and scenario 1 as the Do-Minimum when comparing DS-DM.  </p><p>Metrics include: <ul>
       <li>Volume to capacity ratio (V/C %) – is a measure that reflects the operation and performance of the junction.
@@ -1382,6 +1391,8 @@ export const appConfig = {
       pageName: "Side by Side",
       url: "/node-results-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       category: "Node",
       about: `<p>This visual allows you to select two different scenarios and compare them side by side. Particularly useful for when you have new 
       infrastructure in one scenario which is not in the other, since the difference dashboard doesn’t show a comparison where there are no common nodes.  </p><p>Metrics include: <ul>
@@ -1597,6 +1608,8 @@ export const appConfig = {
       pageName: "Single Scenario",
       url: "/zone-results",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       category: "Matrix Trip Ends",
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation shows the total highway travel demand coming from or going to a NoHAM zone for each vehicle type and journey purpose as a choropleth. 
       NoHAM zones are based on Ordnance Survey Middle Layer Super Output Areas (MSOA) within Northern England and are more aggregated externally.</p>`,
@@ -1723,6 +1736,8 @@ export const appConfig = {
       pageName: "Difference (2-1)",
       url: "/zone-result-difference",
       type: "MapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visualisation allows you to select two different demand scenarios and compare the difference at NoHAM zonal level for origin or destination trips for the selected scenarios; calculating scenario 2 minus scenario 1 (Scen. 2 - Scen.1). 
       It also allows you to choose the same demand scenario but different vehicle user classes per scenario, which are split by vehicle type and journey purpose. </p>`,
       category: "Matrix Trip Ends",
@@ -1911,6 +1926,8 @@ export const appConfig = {
       pageName: "Side By Side",
       url: "/zone-results-dual",
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       category: "Matrix Trip Ends",
       about: `<p>NoHAM travel demand trip ends at an origin or destination level for an average hour across the time period. This visual allows you to select two different demand scenarios and compare them side by side at NoHAM zoning level, for origin or destination trips. 
       It also allows you to choose the same demand scenario but different vehicle user classes per scenario, which are split by vehicle type and journey purpose. </p>`,
@@ -2108,6 +2125,8 @@ export const appConfig = {
       <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
       will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "MapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       category: "O/D Analysis",
       legalText: termsOfUse,
       config: {
@@ -2275,6 +2294,8 @@ export const appConfig = {
       <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
       will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "MapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       category: "O/D Analysis",
       legalText: termsOfUse,
       config: {
@@ -2522,6 +2543,8 @@ export const appConfig = {
       <li>Average distance – the travel distance at an origin or destination level with respect to the select zone, selecting an origin zone
       will show the modelled travel distance (meters) to all other zones as destinations, with the travel times shown as a choropleth.</li></ul></p>`,
       type: "DualMapLayout",
+      termsOfUse: termsOfUse,
+      legalText: termsOfUse,
       category: "O/D Analysis",
       legalText: termsOfUse,
       config: {
