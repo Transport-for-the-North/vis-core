@@ -1,4 +1,3 @@
-import { termsOfUse } from "./TermsOfUse";
 import { nodeCustomPaint } from "./customPaintDefinitions"
 import { termsOfUse } from "./termsOfUse"
 
