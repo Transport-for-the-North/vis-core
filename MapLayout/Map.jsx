@@ -17,6 +17,7 @@ import {
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
+import { uniq } from "lodash";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -179,9 +180,18 @@ const Map = (props) => {
         [e.point.x + maxBufferSize, e.point.y + maxBufferSize],
       ];
 
-      let features = map.queryRenderedFeatures(bufferedPoint, {
+      let featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
         layers: hoverableLayers,
       });
+
+      let features = [];
+      
+      // Below removes duplicates from features array
+      for (let x = 0; x < featuresWithDuplicates.length; x ++) {          
+          if (!features.some(f => f.id === featuresWithDuplicates[x].id)) {
+            features.push(featuresWithDuplicates[x]);
+          } 
+      }
 
       if (features.length === 0) {
         // No features under mouse, cleanup and return
