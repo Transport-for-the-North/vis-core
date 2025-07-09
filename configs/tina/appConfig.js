@@ -5,7 +5,7 @@ import { mapStyles } from "defaults";
 export const appConfig = {
   title: "Transport Intervention Needs Assessment",
   introduction:
-    `<p> TO DO </p>`,
+    `<p> Loads of random text </p>`,
   background:
     `<p> Why? </p>`,
   methodology:
