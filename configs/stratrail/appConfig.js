@@ -112,7 +112,9 @@ export const appConfig = {
         pages.nodeNSSeC,
         pages.nodeSocio,
         pages.linkLoadings,
-        pages.timingLinks
+        pages.timingLinks,
+        pages.nodeInvestments,
+        pages.linkInvestments
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
