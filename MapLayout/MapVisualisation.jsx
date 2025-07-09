@@ -206,7 +206,6 @@ export const MapVisualisation = ({
       } else {
         colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
       }
-
       // Update the map style
       const opacityValue = document.getElementById(
         "opacity-" + layerKey
