@@ -30,6 +30,7 @@ export const linkInvestments = {
             labelNulls: false,
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
+            enforceNoClassificationMethod: true,
             customTooltip: {
                 url: "/api/railoffer/link-investment-callout/link?featureId={id}",
                 htmlTemplate: investPopupContent

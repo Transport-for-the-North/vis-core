@@ -53,6 +53,7 @@ export const stationInformation = {
             labelNulls: true,
             hoverNulls: true,
             hoverTipShouldIncludeMetadata: false,
+            enforceNoClassificationMethod: true,
         },
     ],
     visualisations: [

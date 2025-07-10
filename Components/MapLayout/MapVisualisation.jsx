@@ -254,7 +254,7 @@ export const MapVisualisation = ({
    */
   const calculateColours = useCallback((colourScheme, bins, invert = false) => {
     let colors;
-    if (bins.length > 9) {
+    if (bins.length >= 9) {
       colors = chroma.scale(colourScheme).colors(bins.length);
     } else {
       colors =
