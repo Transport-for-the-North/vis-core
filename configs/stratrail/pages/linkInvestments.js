@@ -72,6 +72,12 @@ export const linkInvestments = {
         glossary: { 
             dataDictionary: {}
         },
+        download: {
+            filters: [
+                { ...selectors.linkInvestmentThemeSelector, multiSelect: true },
+            ],
+            downloadPath: 'api/railoffer/link-investment-results/download'
+        },
         warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },

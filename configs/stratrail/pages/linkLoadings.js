@@ -65,6 +65,14 @@ export const linkLoadings = {
         glossary: { 
             dataDictionary: {}
         },
+        download: {
+            filters: [
+                { ...selectors.linkTOCSelector, multiSelect: true },
+                { ...selectors.railPeriodSelector, multiSelect: true },
+                { ...selectors.dayOfWeekSelector, multiSelect: true },
+            ],
+            downloadPath: 'api/railoffer/link-loadings/download'
+        },
         warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
