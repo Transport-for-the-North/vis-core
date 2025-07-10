@@ -1,12 +1,14 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { investPopupContent } from "../templates/investmentPopup";
+import { investmentSummary } from "../templates";
 
 export const linkInvestments = {
   pageName: "Link Investments",
   url: "/railoffer/link-investments",
   type: "MapLayout",
   category: "Investments",
-  about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>`,
+  about: `<p>This visualisation shows the current line investments in the investment pipeline.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -23,11 +25,15 @@ export const linkInvestments = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: true,
+            shouldHaveLabel: false,
             labelZoomLevel: 12,
-            labelNulls: true,
-            hoverNulls: true,
+            labelNulls: false,
+            hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
+            customTooltip: {
+                url: "/api/railoffer/link-investment-callout/link?featureId={id}",
+                htmlTemplate: investPopupContent
+            }
         },
     ],
     visualisations: [
@@ -39,12 +45,27 @@ export const linkInvestments = {
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/railoffer/investment-link-results"
-        }
+        dataPath: "/api/railoffer/investment-link-results",
+        legendText: [
+          {
+            displayValue: "Investment Status",
+            legendSubtitleText: ""
+          }
+        ]
+        },
+        {
+            name: "Investment Callout",
+            type: "calloutCard",
+            cardName: "Investment Summary",
+            dataSource: "api",
+            dataPath: "/api/railoffer/link-investment-callout/link",
+            htmlFragment: investmentSummary
+        },
     ],
     metadataTables: [],
     filters: [
         { ...selectors.linkInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Investment Results'] },
+        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Rail Offer Investment Links Result"}
     ],
     additionalFeatures: {
         glossary: { 
