@@ -88,7 +88,7 @@ export const stationInformationBool = {
                 { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
-            downloadPath: 'api/railoffer/node-results/download'
+            downloadPath: '/api/railoffer/node-results/download'
         },
         warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
