@@ -1097,6 +1097,69 @@ const stationSocioMetricSelector = {
     }
 }
 
+const nodeInvestmentThemeSelector = {
+    filterName: "Theme",
+    paramName: "theme",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the theme of the investments.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Electrification", paramValue: "Electrification" },
+            { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
+            { displayValue: "Station Improvement", paramValue: "Station Improvement" },
+            { displayValue: "Freight", paramValue: "Freight" },
+            { displayValue: "New Station", paramValue: "New Station" },
+            { displayValue: "Performance and Reliability", paramValue: "Performance and Reliability" },
+            { displayValue: "Neightbouring Development", paramValue: "Neightbouring Development" },
+            { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
+            { displayValue: "Service Development", paramValue: "Service Development" }
+        ]
+    }
+}
+
+const linkInvestmentThemeSelector = {
+    filterName: "Theme",
+    paramName: "theme",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the theme of the investments.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Electrification", paramValue: "Electrification" },
+            { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
+            { displayValue: "Station Improvement", paramValue: "Station Improvement" },
+            { displayValue: "Freight", paramValue: "Freight" },
+            { displayValue: "Performance and Reliability", paramValue: "Performance and Reliability" },
+            { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
+            { displayValue: "Service Development", paramValue: "Service Development" }
+        ]
+    }
+}
+
+const investmentFeatureSelector = {
+  filterName: "",
+  paramName: "featureId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "map",
+  layer: null,
+  field: "id",
+}
+
 export const selectors = {
   linkTOCSelector: linkTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -1109,5 +1172,8 @@ export const selectors = {
   stationSocioMetricSelector: stationSocioMetricSelector,
   stationNSSeCMetricSelector: stationNSSeCMetricSelector,
   stationInformationMetricSelector: stationInformationMetricSelector,
-  stationInformationMetricBoolSelector: stationInformationMetricBoolSelector
+  stationInformationMetricBoolSelector: stationInformationMetricBoolSelector,
+  nodeInvestmentThemeSelector: nodeInvestmentThemeSelector,
+  linkInvestmentThemeSelector: linkInvestmentThemeSelector,
+  investmentFeatureSelector: investmentFeatureSelector
 };

@@ -206,7 +206,6 @@ export const MapVisualisation = ({
       } else {
         colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
       }
-
       // Update the map style
       const opacityValue = document.getElementById(
         "opacity-" + layerKey
@@ -255,7 +254,7 @@ export const MapVisualisation = ({
    */
   const calculateColours = useCallback((colourScheme, bins, invert = false) => {
     let colors;
-    if (bins.length > 9) {
+    if (bins.length >= 9) {
       colors = chroma.scale(colourScheme).colors(bins.length);
     } else {
       colors =
