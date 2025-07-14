@@ -70,7 +70,7 @@ export function getOpacityProperty(layerType) {
  * Retrieves thr line width for givens et of bins
  * @function getWidthProperty
  * @param {string} layerType - The type of the layer. Expected values are 'line'
- * @param {Array.<chroma(number|string)>} bins -- breaks used for legend
+ * @param {(Array<number|string>)} bins -- breaks used for legend
  * @returns {Aarray} The line width property for mapbox styling
  */
  
