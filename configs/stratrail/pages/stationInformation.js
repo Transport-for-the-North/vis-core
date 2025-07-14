@@ -53,6 +53,7 @@ export const stationInformation = {
             labelNulls: true,
             hoverNulls: true,
             hoverTipShouldIncludeMetadata: false,
+            enforceNoClassificationMethod: true,
         },
     ],
     visualisations: [
@@ -73,12 +74,21 @@ export const stationInformation = {
         { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
         { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        // { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
     ],
     additionalFeatures: {
         glossary: { 
             dataDictionary: {}
+        },
+        download: {
+            filters: [
+                { ...selectors.nodeTOCSelector, multiSelect: true },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+                { ...selectors.dayOfWeekSelector, multiSelect: true },
+            ],
+            downloadPath: '/api/railoffer/node-results/download'
         },
         warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },

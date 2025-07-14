@@ -73,12 +73,21 @@ export const nodeNSSeC = {
         { ...selectors.nodeTOCSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
         { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node NS-SeC Totals'] },
+        // { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node NS-SeC Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node NS-SeC Totals'] },
     ],
     additionalFeatures: {
         glossary: { 
             dataDictionary: {}
+        },
+        download: {
+            filters: [
+                { ...selectors.nodeTOCSelector, multiSelect: true },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+                { ...selectors.dayOfWeekSelector, multiSelect: true },
+            ],
+            downloadPath: '/api/railoffer/nssec/download'
         },
         warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
