@@ -280,6 +280,31 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         offsetExpression,
 
       };
+    case "line-categorical":
+      return {
+        "line-color": [
+          "match",
+          ["feature-state", "value"],
+          ...colors,
+          "#bdbdbd" // default = grey
+        ],
+        "line-opacity": [
+          "case",
+          ["in", ["feature-state", "value"], ["literal", [null]]],
+          0,
+          opacityValue ?? 1,
+        ],
+        "line-width": 3,
+        "line-offset": [
+          "interpolate",
+          ["linear"],
+          ["to-number", ["feature-state", "valueAbs"]],
+          Math.min(...bins),
+          -1,
+          Math.max(...bins),
+          -5,
+        ],
+      };
     case "circle-continuous":
     case "circle-diverging": {
       return {
@@ -320,8 +345,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
         "circle-color": [
           "match",
           ["feature-state", "value"],
-          1, "#4caf50", // true/1 = green
-          0, "#f44336", // false/0 = red
+          ...colors,
           "#bdbdbd" // default = grey
         ],
         "circle-stroke-width": 1,
@@ -342,8 +366,8 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           ["linear"],
           ["zoom"],
           0, 2,
-          12, 4,
-          22, 8
+          6, 4,
+          12, 8
         ],
         "circle-stroke-color": "#000000"
       };
@@ -582,7 +606,8 @@ export const reclassifyData = (
     }
     return roundedBins;
   } else if (style.includes("categorical")) {
-    return [];
+    let values = [...new Set(data.map((value) => value.value))];
+    return values;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
     if (classificationMethod === "d") {
