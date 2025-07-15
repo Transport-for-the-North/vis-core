@@ -60,6 +60,7 @@ export const stationInformationBool = {
     filters: [
         { ...selectors.stationInformationMetricBoolSelector, visualisations: ['Node Information'] },
         { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
@@ -71,6 +72,7 @@ export const stationInformationBool = {
         download: {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
+                { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
                 { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
                 { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },

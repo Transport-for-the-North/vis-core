@@ -948,6 +948,42 @@ const investmentFeatureSelector = {
   field: "id",
 }
 
+const authoritySelector = {
+    filterName: "Authority",
+    paramName: "authorityCode",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the authority that stations fall under. Any stations outside of the north are labelled as "Outside Northern Authorities".',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            { displayValue: "Cheshire East", paramValue: "1" },
+            { displayValue: "Cheshire West and Chester", paramValue: "2" },
+            { displayValue: "Cumberland Council", paramValue: "3" },
+            { displayValue: "Derbyshire", paramValue: "4" },
+            { displayValue: "Greater Manchester Combined Authority", paramValue: "5" },
+            { displayValue: "Hull and East Yorkshire", paramValue: "6" },
+            { displayValue: "Lancashire County Combined Authority", paramValue: "7" },
+            { displayValue: "Lincolnshire", paramValue: "8" },
+            { displayValue: "Liverpool City Region", paramValue: "9" },
+            { displayValue: "North East Combined Authority", paramValue: "10" },
+            { displayValue: "Nottinghamshire", paramValue: "11" },
+            { displayValue: "South Yorkshire Mayoral Combined Authority", paramValue: "12" },
+            { displayValue: "Staffordshire", paramValue: "13" },
+            { displayValue: "Tees Valley Combined Authority", paramValue: "14" },
+            { displayValue: "Warrington Borough Council", paramValue: "15" },
+            { displayValue: "West Yorkshire Combined Authority", paramValue: "16" },
+            { displayValue: "Westmorland and Funess", paramValue: "17" },
+            { displayValue: "York and North Yorkshire", paramValue: "18" },
+            { displayValue: "Outside Northern Authorities", paramValue: "19" },
+        ]
+    }
+}
+
 export const selectors = {
   linkTOCSelector: linkTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -963,5 +999,6 @@ export const selectors = {
   stationInformationMetricBoolSelector: stationInformationMetricBoolSelector,
   nodeInvestmentThemeSelector: nodeInvestmentThemeSelector,
   linkInvestmentThemeSelector: linkInvestmentThemeSelector,
-  investmentFeatureSelector: investmentFeatureSelector
+  investmentFeatureSelector: investmentFeatureSelector,
+  authoritySelector: authoritySelector
 };

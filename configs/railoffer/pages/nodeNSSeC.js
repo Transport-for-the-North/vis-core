@@ -6,19 +6,7 @@ export const nodeNSSeC = {
   url: "/railoffer/node-ns-sec",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>
-  <p><b>TOC Abbreviations:</b></p> 
-  <p>NT: Northern</p>
-  <p>GR: East Coast</p>
-  <p>EM: East Midlands</p>
-  <p>VT: West Cost</p>
-  <p>ME: Merseyrail</p>
-  <p>GM: Greater Manchester</p>
-  <p>NR: Network Rail</p>
-  <p>AW: Transport for Wales</p>
-  <p>TP: Transpennine</p>
-  <p>XC: CrossCountry</p>
-  `,
+  about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -71,9 +59,9 @@ export const nodeNSSeC = {
     filters: [
         { ...selectors.stationNSSeCMetricSelector, visualisations: ['Node NS-SeC Totals'] },
         { ...selectors.nodeTOCSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        // { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node NS-SeC Totals'] },
+        { ...selectors.authoritySelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
+        { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node NS-SeC Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node NS-SeC Totals'] },
     ],
     additionalFeatures: {
@@ -83,8 +71,9 @@ export const nodeNSSeC = {
         download: {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+                { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/nssec/download'

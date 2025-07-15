@@ -6,19 +6,7 @@ export const nodeSocio = {
   url: "/railoffer/node-socio",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>
-  <p><b>TOC Abbreviations:</b></p> 
-  <p>NT: Northern</p>
-  <p>GR: East Coast</p>
-  <p>EM: East Midlands</p>
-  <p>VT: West Cost</p>
-  <p>ME: Merseyrail</p>
-  <p>GM: Greater Manchester</p>
-  <p>NR: Network Rail</p>
-  <p>AW: Transport for Wales</p>
-  <p>TP: Transpennine</p>
-  <p>XC: CrossCountry</p>
-  `,
+  about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -72,9 +60,9 @@ export const nodeSocio = {
     filters: [
         { ...selectors.stationSocioMetricSelector, visualisations: ['Node Socio Totals'] },
         { ...selectors.nodeTOCSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        // { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Socio Totals'] },
+        { ...selectors.authoritySelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
+        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Socio Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Socio Totals'] },
     ],
     additionalFeatures: {
@@ -84,8 +72,9 @@ export const nodeSocio = {
         download: {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+                { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/socio/download'
