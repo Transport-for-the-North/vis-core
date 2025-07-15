@@ -6,19 +6,7 @@ export const stationInformation = {
   url: "/railoffer/station-information-val",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>
-  <p><b>TOC Abbreviations:</b></p> 
-  <p>NT: Northern</p>
-  <p>GR: East Coast</p>
-  <p>EM: East Midlands</p>
-  <p>VT: West Cost</p>
-  <p>ME: Merseyrail</p>
-  <p>GM: Greater Manchester</p>
-  <p>NR: Network Rail</p>
-  <p>AW: Transport for Wales</p>
-  <p>TP: Transpennine</p>
-  <p>XC: CrossCountry</p>
-  `,
+  about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -72,9 +60,8 @@ export const stationInformation = {
     filters: [
         { ...selectors.stationInformationMetricSelector, visualisations: ['Node Information'] },
         { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        // { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
     ],
     additionalFeatures: {
@@ -84,8 +71,8 @@ export const stationInformation = {
         download: {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/node-results/download'
