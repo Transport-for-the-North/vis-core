@@ -1,5 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const stationInformationBool = {
   pageName: "Station Information - Boolean",
@@ -23,6 +24,19 @@ export const stationInformationBool = {
             isStylable: false,
             shouldHaveTooltipOnHover: false,
             shouldHaveLabel: false
+        },
+        {
+            uniqueId: "RailOfferCRPVectorTile",
+            name: "CRP Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            customPaint: crpLinesLayerPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldShowInLegend: true,
         },
         {
             uniqueId: "RailOfferNodeVectorTile",
