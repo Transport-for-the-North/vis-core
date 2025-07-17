@@ -34,9 +34,11 @@ export const nodeNSSeC = {
             sourceLayer: "geometry",
             geometryType: "line",
             customPaint: crpLinesLayerPaint,
-            isHoverable: false,
+            isHoverable: true,
             isStylable: false,
             shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false
         },
         {
             uniqueId: "RailOfferNodeVectorTile",

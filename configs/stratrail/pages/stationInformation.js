@@ -38,7 +38,6 @@ export const stationInformation = {
             isStylable: false,
             shouldShowInLegend: true,
             shouldHaveTooltipOnHover: true,
-            hoverTipShouldIncludeMetadata: false,
             shouldHaveLabel: false
         },
         {

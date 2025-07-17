@@ -1,5 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const nodeSocio = {
   pageName: "Station Economic Activity Status",
@@ -15,7 +16,6 @@ export const nodeSocio = {
             uniqueId: "RailOfferLinksVectorTile",
             name: "Network",
             type: "tile",
-
             source: "api",
             path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
@@ -23,6 +23,21 @@ export const nodeSocio = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false
+        },
+        {
+            uniqueId: "RailOfferCRPVectorTile",
+            name: "CRP Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            customPaint: crpLinesLayerPaint,
+            isHoverable: true,
+            isStylable: false,
+            shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
             shouldHaveLabel: false
         },
         {

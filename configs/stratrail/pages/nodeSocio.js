@@ -16,7 +16,6 @@ export const nodeSocio = {
             uniqueId: "RailOfferLinksVectorTile",
             name: "Network",
             type: "tile",
-
             source: "api",
             path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
             sourceLayer: "geometry",
@@ -35,9 +34,11 @@ export const nodeSocio = {
             sourceLayer: "geometry",
             geometryType: "line",
             customPaint: crpLinesLayerPaint,
-            isHoverable: false,
+            isHoverable: true,
             isStylable: false,
             shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false
         },
         {
             uniqueId: "RailOfferNodeVectorTile",
