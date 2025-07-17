@@ -1,5 +1,6 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const stationInformation = {
   pageName: "Station Information - Values",
@@ -22,6 +23,21 @@ export const stationInformation = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false
+        },
+        {
+            uniqueId: "RailOfferCRPVectorTile",
+            name: "CRP Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            customPaint: crpLinesLayerPaint,
+            isHoverable: true,
+            isStylable: false,
+            shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
             shouldHaveLabel: false
         },
         {
@@ -60,6 +76,7 @@ export const stationInformation = {
     filters: [
         { ...selectors.stationInformationMetricSelector, visualisations: ['Node Information'] },
         { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
+        { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
@@ -71,6 +88,7 @@ export const stationInformation = {
         download: {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
+                { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
                 { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
                 { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
