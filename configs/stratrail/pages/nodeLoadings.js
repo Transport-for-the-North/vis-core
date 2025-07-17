@@ -1,24 +1,13 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
+import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const nodeLoadings = {
   pageName: "Station Loadings",
   url: "/railoffer/node-loadings",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the loadings information for each station in the NorTMS model.</p>
-  <p><b>TOC Abbreviations:</b></p> 
-  <p>NT: Northern</p>
-  <p>GR: East Coast</p>
-  <p>EM: East Midlands</p>
-  <p>VT: West Cost</p>
-  <p>ME: Merseyrail</p>
-  <p>GM: Greater Manchester</p>
-  <p>NR: Network Rail</p>
-  <p>AW: Transport for Wales</p>
-  <p>TP: Transpennine</p>
-  <p>XC: CrossCountry</p>
-  `,
+  about: `<p>This visualisation shows the loadings information for each station in the NorTMS model.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -34,6 +23,21 @@ export const nodeLoadings = {
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false
+        },
+        {
+            uniqueId: "RailOfferCRPVectorTile",
+            name: "CRP Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
+            sourceLayer: "geometry",
+            geometryType: "line",
+            customPaint: crpLinesLayerPaint,
+            isHoverable: true,
+            isStylable: false,
+            shouldShowInLegend: true,
+            shouldHaveTooltipOnHover: true,
             shouldHaveLabel: false
         },
         {
@@ -71,9 +75,9 @@ export const nodeLoadings = {
     filters: [
         { ...selectors.loadingsMetricSelector, visualisations: ['Node Loading Totals'] },
         { ...selectors.nodeTOCSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true},
-        { ...selectors.booleanSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-        { ...selectors.booleanSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
-        // { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Loading Totals'] },
+        { ...selectors.authoritySelector, visualisations: ['Node Loading Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
+        { ...selectors.booleanSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Loading Totals'] },
         { ...selectors.railPeriodSelector, visualisations: ['Node Loading Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Loading Totals'] },
     ],
@@ -84,9 +88,10 @@ export const nodeLoadings = {
         download: {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
+                { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.railPeriodSelector, multiSelect: true },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Strategic Rail Station", paramName: "stratRailNorth" },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "NPR Station", paramName: "nprNorth" },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/node-loadings/download'
