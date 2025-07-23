@@ -91,6 +91,18 @@ export const appConfig = {
                         </p>
                     </div>
                 </div>
+                <div style="display: flex; align-items: center;">
+                    <a href="https://www.openrailwaymap.org/" target="_blank" style="text-decoration: none;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                            <b>OpenRailwayMap</b>
+                        </button>
+                    </a>
+                    <div style="margin-left: 28px;">
+                        <p>
+                            OpenRailwayMap shows electrification, track gauge and other data from the sectional appendices.
+                        </p>
+                    </div>
+                </div>
             </div>
             <hr style="margin: 24px 0 32px 0; border: none; border-top: 1px solid #ccc;" />
         `,
