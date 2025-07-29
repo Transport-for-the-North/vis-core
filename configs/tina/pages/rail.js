@@ -2,8 +2,8 @@ import { termsOfUse } from "../termsOfUse"
 import { selectors } from "../selectorDefinitions";
 
 export const rail = {
-    pageName: "Rail LoS",
-    url: "/rail-los",
+    pageName: "Rail Station Statistics",
+    url: "/rail-station-statistics",
     type: "MapLayout",
     about: "<p> </p>",
     category: null,
