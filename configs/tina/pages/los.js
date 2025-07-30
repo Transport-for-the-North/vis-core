@@ -114,18 +114,6 @@ export const los = {
                 paramValue:"bus_stop_density_category"
               },
               {
-                displayValue: "Car to Zone Count (30 Mins)",
-                paramValue:"car_zone_count"
-              },
-              {
-                displayValue: "Bus to Zone Count (30 Mins)",
-                paramValue:"bus_zone_count"
-              },
-              {
-                displayValue: "PT to Zone Count  (30 Mins)",
-                paramValue:"pt_zone_count"
-              },
-              {
                 displayValue: "TRSE Zone Cat",
                 paramValue:"zone_trse_cat"
               },
@@ -142,12 +130,20 @@ export const los = {
                 paramValue:"pct_high_risk"
               },
               {
-                displayValue: "Bus to Car Employment Access",
+                displayValue: "Bus Vs Car Jobs Access (60 mins)",
                 paramValue: "bus_car_ratio"
               },
               {
-                displayValue: "PT to Car Employment Access",
+                displayValue: "PT Vs Car Jobs Access (60 mins)",
                 paramValue: "pt_car_ratio"
+              },
+              {
+                displayValue: "Car Vs Bus Jobs Access (60 mins)",
+                paramValue: "car_bus_ratio"
+              },
+              {
+                displayValue: "Car Vs PT Jobs Access (60 mins)",
+                paramValue: "car_pt_ratio"
               },
               {
                 displayValue: "Car Employment Access",
