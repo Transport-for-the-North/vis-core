@@ -60,7 +60,7 @@ export const annualChargingDemand = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.runTypeCodeFixed, visualisations: ['Annual Charging Demand'] },
+      { ...selectors.runTypeCodeDynamic, visualisations: ['Annual Charging Demand'] },
       { ...selectors.year, visualisations: ['Annual Charging Demand'] },
       { ...selectors.administrativeBoundary, visualisations: ['Annual Charging Demand'] },
       { ...selectors.travelScenarioBase, visualisations: ['Annual Charging Demand'] },
@@ -76,7 +76,7 @@ export const annualChargingDemand = {
       },
       download: {
         filters: [
-          selectors.runTypeCodeFixed,
+          selectors.runTypeCodeDynamic,
           { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
           { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
           { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
@@ -137,52 +137,6 @@ export const tfnAnnualChargingDemand = {
         ],
         downloadPath: '/api/evci/annual-charging-demand/download'
       },
-    },
-  },
-};
-
-export const eehAnnualChargingDemand = {
-  ...annualChargingDemand,
-  about: `
-  <p>This visualisation shows the forecasted annual energy demand which EV uptake will require, for each charging category.</p>
-  <p>TfN’s methodology for the EVCI Framework can be found <a
-      href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      here</a>.</p>`,
-  config: {
-    ...annualChargingDemand.config,
-    filters: [
-      { ...selectors.runTypeCodeFixed, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.year, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.administrativeBoundary, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.travelScenarioBase, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.behaviouralScenario, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.chargingCategory, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.stbTag, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.areaValueDisplay, visualisations: ['Annual Charging Demand'] },
-      { ...selectors.zoneSelector, visualisations: ['Annual Charging Demand']}
-    ],
-    additionalFeatures: {
-      glossary: { 
-        dataDictionary: {}
-      },
-      download: {
-        filters: [
-          { ...selectors.runTypeCodeFixed, multiSelect: true, type: 'toggle' },
-          { ...selectors.year, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
-          { ...selectors.administrativeBoundary, multiSelect: true, type: 'toggle' },
-          { ...selectors.travelScenarioBase, multiSelect: true, type: 'dropdown' },
-          { ...selectors.behaviouralScenario, multiSelect: true, type: 'dropdown' },
-          { ...selectors.chargingCategory, multiSelect: true, type: 'dropdown' },
-          { ...selectors.stbTag, type: 'fixed' },
-          // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
-          { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },
-        ],
-        downloadPath: '/api/evci/annual-charging-demand/download'
-      },
-      warning: "To note- the STB EVCI Framework for the England's Economic Heartland is being updated to reflect the new unitary authority boundaries for Buckinghamshire and Northamptonshire. This will be available early in 2025. Multiple local authority zones can be selected on the tool to create a total output for these areas.",
     },
   },
 };
