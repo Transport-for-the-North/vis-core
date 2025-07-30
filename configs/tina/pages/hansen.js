@@ -21,7 +21,7 @@ const ntemPurposeCode = {
 }
 
 export const hansen = {
-    pageName: "Zone PTI",
+    pageName: "Zone-to-Zone PTI",
     url: "/pti-zone-select",
     type: "MapLayout",
     about: "<p>Click on a zone to visualise the Potential to Improve (PTI) of the surrounding zones.</p> <p>The zone you select will be the assumed through zone where an intervention is placed.</p>",
@@ -158,6 +158,7 @@ export const hansen = {
           ],
           downloadPath: '/api/tina/metric-download/download'
         },
+        warning: "NOTE: This is a proof of concept in it's current state. Functionality may not work as expected, data may not show after selecting zone."
       },
     },
 }

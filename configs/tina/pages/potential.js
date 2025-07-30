@@ -1,10 +1,10 @@
 import { termsOfUse } from "../termsOfUse"
 
 export const potential = {
-    pageName: "PTI",
-    url: "/pti",
+    pageName: "Global PTI",
+    url: "/global-pti",
     type: "MapLayout",
-    about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the number of each opportunity accessible within the given cutoff time.</p>",
+    about: "<p>Visualise the overall accessibility by bus to different opportunities within each region.</p> <p>Set a value type to visualise the decile that the PTI for each zone falls within.</p>",
     category: null,
     legalText: termsOfUse,
     termsOfUse: termsOfUse,
@@ -101,8 +101,8 @@ export const potential = {
             source: "local",
             values: [
               {
-                displayValue: "pti",                
-                paramValue: "pti",
+                displayValue: "pti decile",                
+                paramValue: "decile",
               }
             ],
           },

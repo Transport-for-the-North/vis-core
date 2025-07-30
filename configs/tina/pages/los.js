@@ -2,10 +2,10 @@ import { termsOfUse } from "../termsOfUse"
 import { selectors } from "../selectorDefinitions";
 
 export const los = {
-    pageName: "Zone LoS",
-    url: "/zone-los",
+    pageName: "Zone Statistics",
+    url: "/zone-statistics",
     type: "MapLayout",
-    about: "<p>Click on a zone to visualise the Potential to Improve (PTI) of the surrounding zones.</p> <p>The zone you select will be the assumed through zone where an intervention is placed.</p>",
+    about: "<p>Click on a zone to view various statistics about that zone.</p> <p>Various map layers can be turned on and off to view different statistics across all zones.</p> <p>You can also download statistics about specific zones of interest by using the download functionality below.</p>",
     category: null,
     legalText: termsOfUse,
     termsOfUse: termsOfUse,
@@ -86,19 +86,19 @@ export const los = {
             source: "local",
             values: [
               {
-                displayValue: "HGV",                
+                displayValue: "Heavy Goods Vehicle Total Flow Counts",                
                 paramValue: "hgv",
               },
               {
-                displayValue: "LGV",
+                displayValue: "Light Good Vehicle Total Flow Counts",
                 paramValue:"lgv"
               },
               {
-                displayValue: "VoC",
+                displayValue: "V/C",
                 paramValue:"voc"
               },
               {
-                displayValue: "Car",
+                displayValue: "Car ",
                 paramValue:"car"
               },
               {
@@ -112,18 +112,6 @@ export const los = {
               {
                 displayValue: "Bus Stop Density Category",
                 paramValue:"bus_stop_density_category"
-              },
-              {
-                displayValue: "Car Zone Count",
-                paramValue:"car_zone_count"
-              },
-              {
-                displayValue: "Bus Zone Count",
-                paramValue:"bus_zone_count"
-              },
-              {
-                displayValue: "PT Zone Count",
-                paramValue:"pt_zone_count"
               },
               {
                 displayValue: "TRSE Zone Cat",
@@ -140,6 +128,34 @@ export const los = {
               {
                 displayValue: "% High Risk of TRSE",
                 paramValue:"pct_high_risk"
+              },
+              {
+                displayValue: "Bus Vs Car Jobs Access (60 mins)",
+                paramValue: "bus_car_ratio"
+              },
+              {
+                displayValue: "PT Vs Car Jobs Access (60 mins)",
+                paramValue: "pt_car_ratio"
+              },
+              {
+                displayValue: "Car Vs Bus Jobs Access (60 mins)",
+                paramValue: "car_bus_ratio"
+              },
+              {
+                displayValue: "Car Vs PT Jobs Access (60 mins)",
+                paramValue: "car_pt_ratio"
+              },
+              {
+                displayValue: "Car Employment Access",
+                paramValue: "car_emp_60",
+              },
+              {
+                displayValue: "Bus Employment Access",
+                paramValue: "bus_emp_60",
+              },
+              {
+                displayValue: "PT Employment Access",
+                paramValue: "pt_emp_60",
               }
             ],
           },
@@ -203,7 +219,8 @@ export const los = {
             selectors.zoneSelector
           ],
           downloadPath: '/api/tina/metric-download/download'
-        },
+        }
+        
       },
     },
 }
