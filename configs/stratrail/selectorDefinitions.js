@@ -925,7 +925,7 @@ const linkInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
             { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
             { displayValue: "Station Improvement", paramValue: "Station Improvement" },
