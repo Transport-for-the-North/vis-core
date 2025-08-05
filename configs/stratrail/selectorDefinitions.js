@@ -898,14 +898,14 @@ const nodeInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
             { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
             { displayValue: "Station Improvement", paramValue: "Station Improvement" },
             { displayValue: "Freight", paramValue: "Freight" },
             { displayValue: "New Station", paramValue: "New Station" },
             { displayValue: "Performance and Reliability", paramValue: "Performance and Reliability" },
-            { displayValue: "Neightbouring Development", paramValue: "Neightbouring Development" },
+            { displayValue: "Neighbouring Development", paramValue: "Neighbouring Development" },
             { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
             { displayValue: "Service Development", paramValue: "Service Development" }
         ]
@@ -925,7 +925,7 @@ const linkInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
             { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
             { displayValue: "Station Improvement", paramValue: "Station Improvement" },
