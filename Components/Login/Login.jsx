@@ -49,16 +49,21 @@ export const Login = () => {
                     {error && <p className="error-message">{error}</p>}
                     <button type="submit">Continue</button>
                 </form>
-                <p className="Request Login">
-                    <a 
-                        href='https://forms.office.com/Pages/ResponsePage.aspx?id=HZ6K1cpNlUWp6Hk0oV80GRcTERVASNVEmqyTtKGGoIpUMFBLTVpIMlFTQjBORExHM1Q4MElMREVYRy4u'
-                        target='_blank'
-                        rel='noopener noref'
-                    > 
-                        Request a login 
-                        
-                    </a>
+                <p className="RequestLogin">
+                    <button
+                        type="submit"
+                        onClick={() => {
+                            window.open(
+                                'https://forms.office.com/Pages/ResponsePage.aspx?id=HZ6K1cpNlUWp6Hk0oV80GRcTERVASNVEmqyTtKGGoIpUMFBLTVpIMlFTQjBORExHM1Q4MElMREVYRy4u',
+                                '_blank',
+                                'noopener,noreferrer'
+                            );
+                        }}
+                    >
+                        Request Access to this App
+                    </button>
                 </p>
+
             </div>
         </div>
     );
