@@ -8,6 +8,7 @@ import { AppContext, AuthProvider } from "contexts";
 import { api } from "services";
 import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
 import { theme } from "theme";
+import NotFound from "Components/NotFoundPage/NotFoundPage";
 
 /**
  * Main application component.
@@ -96,6 +97,8 @@ function App() {
                   />
                 );
               })}
+              {/* Catch-all for undefined routes */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Dashboard>
         </AppContext.Provider>
