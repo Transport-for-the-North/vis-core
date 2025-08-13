@@ -76,7 +76,7 @@ const SecondaryButton = styled.button`
   cursor: pointer;
 `;
 
-export default function NotFound() {
+export function NotFound() {
   const appConfig = useContext(AppContext);
   const theme = useTheme();
   const navigate = useNavigate();
