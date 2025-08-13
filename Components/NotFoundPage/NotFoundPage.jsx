@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useEffect } from "react";
+import React, { useContext, useMemo, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled, { useTheme, createGlobalStyle } from "styled-components";
 import { AppContext } from "contexts";
@@ -60,7 +60,7 @@ const Actions = styled.div`
 const PrimaryLink = styled(Link)`
   padding: 0.625rem 1rem;
   border-radius: 8px;
-  background: ${({ theme }) => theme?.colors?.primary || "#0d6efd"};
+  background: ${({ theme }) => theme?.colors?.primary || "#7317de"};
   color: #fff;
   text-decoration: none;
   font-weight: 600;
@@ -86,9 +86,33 @@ export function NotFound() {
   const theme = useTheme();
   const navigate = useNavigate();
 
+  // Live countdown and "Redirecting..." state
+  const [secondsLeft, setSecondsLeft] = useState(10);
+  const [redirecting, setRedirecting] = useState(false);
+
   useEffect(() => {
-    const t = setTimeout(() => navigate("/", { replace: true }), 10000);
-    return () => clearTimeout(t);
+    let redirectTimeoutId;
+
+    const intervalId = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          setRedirecting(true);
+          // Show "Redirecting..." for 1 second, then navigate
+          redirectTimeoutId = setTimeout(
+            () => navigate("/", { replace: true }),
+            1000
+          );
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+      if (redirectTimeoutId) clearTimeout(redirectTimeoutId);
+    };
   }, [navigate]);
 
   const logoSrc = useMemo(() => {
@@ -115,8 +139,12 @@ export function NotFound() {
             />
           ) : null}
           <Title>404 - Page Not Found</Title>
-          <Subtitle>
-            We couldn’t find the page you’re looking for. You will be redirected home in 10 seconds.
+          <Subtitle role="status" aria-live="polite">
+            {redirecting
+              ? "Redirecting..."
+              : `We could not find the page you're looking for. You will be redirected home in ${secondsLeft} ${
+                  secondsLeft === 1 ? "second" : "seconds"
+                }.`}
           </Subtitle>
           <Actions>
             <PrimaryLink to="/">Go to Home</PrimaryLink>
