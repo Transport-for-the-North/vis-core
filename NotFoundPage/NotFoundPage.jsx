@@ -76,6 +76,11 @@ const SecondaryButton = styled.button`
   cursor: pointer;
 `;
 
+/**
+ * Page Not Found component.
+ * @function NotFound
+ * @returns {JSX.Element} The rendered page not found component.
+ */
 export function NotFound() {
   const appConfig = useContext(AppContext);
   const theme = useTheme();
