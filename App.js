@@ -8,7 +8,7 @@ import { AppContext, AuthProvider } from "contexts";
 import { api } from "services";
 import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
 import { theme } from "theme";
-import NotFound from "Components/NotFoundPage/NotFoundPage";
+import { NotFound } from "Components/NotFoundPage";
 
 /**
  * Main application component.
