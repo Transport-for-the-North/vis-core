@@ -184,6 +184,32 @@ const landuseValues = {
   ]
 }
 
+const resultZoneTypeValues = {
+  source: "local",
+  values: [
+    {
+      displayValue: "NoRMS zones",
+      paramValue: 5
+    },
+    {
+      displayValue: "LAD 2021",
+      paramValue: 8
+    },
+    {
+      displayValue: "Combined Authority",
+      paramValue: 10,
+    },
+    {
+      displayValue: "STB 2023",
+      paramValue: 15,
+    },
+    {
+      displayValue: "GB Country",
+      paramValue: 32,
+    },
+  ],
+}
+
 const originOrDestinationValues = {
   source: "local",
   values: [
@@ -329,7 +355,7 @@ const scenarioFilterYear = {
     },
 }
 
-const scenarioFilter = {
+const scenarioCodeFilter = {
     filterName: "Scenario",
     paramName: "scenarioCode",
     target: "api",
@@ -349,6 +375,14 @@ const scenarioFilter = {
         paramColumn: "scenario_code",
         sort: "ascending",
         exclude: ["NA"]
+    },
+}
+
+const scenarioIdFilter = { ...scenarioCodeFilter,
+    paramName: "scenarioId",
+    values: {
+        ...scenarioCodeFilter.values,
+        paramColumn: "id",
     },
 }
 
@@ -409,6 +443,42 @@ const userClassFilter = {
         sort: "ascending",
         exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
     },
+}
+
+const resultZoneTypeFilter = {
+    filterName: "Zoning system",
+    paramName: "resultZoneTypeId",
+    target: "api",
+    actions: [
+      { action: "UPDATE_QUERY_PARAMS" },
+      { 
+        action: "UPDATE_PARAMETERISED_LAYER",
+        payload: { targetLayer: "NoRMS Zone Benefits"}
+      }
+    ],
+    visualisations: null,
+    type: "dropdown",
+    values: resultZoneTypeValues,
+}
+
+const resultZoneTypeFilterFixed = {
+  filterName: "Zoning system",
+  paramName: "resultZoneTypeId",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "NoRMS Zone",
+        paramValue: 5,
+      }
+    ],
+  },
 }
 
 const originOrDestinationFilter = {
@@ -822,10 +892,13 @@ export const selectors = {
   scenarioFilterNetwork,
   scenarioFilterDemand,
   scenarioFilterYear,
-  scenarioFilter,
+  scenarioCodeFilter,
+  scenarioIdFilter,
   timePeriod,
   metricFilter,
   userClassFilter,
+  resultZoneTypeFilter,
+  resultZoneTypeFilterFixed,
   originOrDestinationFilter,
   pairsMetricFilter,
   stationMapSelection,

@@ -68,7 +68,7 @@ export const keyLocationZonePair = {
             { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Accessibility Pair'] },
             { ...selectors.scenarioFilterDemand, visualisations: ['Zone Accessibility Pair'] },
             { ...selectors.scenarioFilterYear, visualisations: ['Zone Accessibility Pair'] },
-            { ...selectors.scenarioFilter, visualisations: ['Zone Accessibility Pair'], values: {
+            { ...selectors.scenarioCodeFilter, visualisations: ['Zone Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
                 displayColumn: "scenario_code",

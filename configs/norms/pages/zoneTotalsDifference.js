@@ -22,7 +22,7 @@ export const zoneTotalsDifference = {
           name: "NoRMS Zone Totals Difference",
           type: "tile",
           source: "api",
-          path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+          path: "/api/vectortiles/zones/{resultZoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
           sourceLayer: "zones",
           geometryType: "polygon",
           visualisationName: "Zone Totals Difference",
@@ -51,15 +51,24 @@ export const zoneTotalsDifference = {
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.scenarioIdFilter, filterName: "Scenario 1", paramName: "scenarioIdDoMinimum", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.scenarioIdFilter, filterName: "Scenario 2", paramName: "scenarioIdDoSomething", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals Difference'],
+          actions: [
+            { action: "UPDATE_QUERY_PARAMS" },
+            { 
+              action: "UPDATE_PARAMETERISED_LAYER",
+              payload: { targetLayer: "NoRMS Zone Totals Difference"}
+            }
+          ]  
+        },
         { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Totals Difference']},
         { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Totals Difference']},
         { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Totals Difference']},
-        { ...selectors.linkMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Zone Totals Difference']},
+        { ...selectors.zoneMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Zone Totals Difference']},
       ]
     }
   }

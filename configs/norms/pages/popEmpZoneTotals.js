@@ -81,7 +81,7 @@ export const popEmpZoneTotals = {
               isClearable: true,
               actions: [{ action: "UPDATE_QUERY_PARAMS" }]
             },
-            { ...selectors.scenarioFilter, visualisations: ['Landuse Accessibility Totals'], values: {
+            { ...selectors.scenarioCodeFilter, visualisations: ['Landuse Accessibility Totals'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
                 displayColumn: "scenario_code",

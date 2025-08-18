@@ -67,7 +67,7 @@ export const keyLocationZoneTotalDifference = {
             { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Accessibility Totals Difference'] },
-            { ...selectors.scenarioFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Zone Accessibility Totals Difference'], values: {
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Zone Accessibility Totals Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
               displayColumn: "scenario_code",
@@ -78,7 +78,7 @@ export const keyLocationZoneTotalDifference = {
             { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Accessibility Totals Difference'] },
-            { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Zone Accessibility Totals Difference'], values: {
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Zone Accessibility Totals Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
               displayColumn: "scenario_code",

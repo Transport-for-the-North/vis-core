@@ -82,7 +82,7 @@ export const popEmpZoneTotalsDifference = {
               paramName: "scenarioYearDoMinimum",
               actions: [{ action: "UPDATE_QUERY_PARAMS" }]
             },
-            { ...selectors.scenarioFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Totals Difference'], values: {
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Totals Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
                 displayColumn: "scenario_code",
@@ -102,7 +102,7 @@ export const popEmpZoneTotalsDifference = {
               paramName: "scenarioYearDoSomething",
               actions: [{ action: "UPDATE_QUERY_PARAMS" }]
             },
-            { ...selectors.scenarioFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Landuse Accessibility Totals Difference'], values: {
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Landuse Accessibility Totals Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
               displayColumn: "scenario_code",

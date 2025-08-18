@@ -22,7 +22,7 @@ export const zoneTotals = {
           name: "NoRMS Zone Totals",
           type: "tile",
           source: "api",
-          path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+          path: "/api/vectortiles/zones/{resultZoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
           sourceLayer: "zones",
           geometryType: "polygon",
           visualisationName: "Zone Totals",
@@ -51,9 +51,18 @@ export const zoneTotals = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Totals'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Zone Totals'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Zone Totals'] },
-        { ...selectors.scenarioFilter, visualisations: ['Zone Totals'] },
+        { ...selectors.scenarioIdFilter, visualisations: ['Zone Totals'] },
         { ...selectors.timePeriod, visualisations: ['Zone Totals'] },
         { ...selectors.userClassFilter, visualisations: ['Zone Totals'] },
+        { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals'],
+          actions: [
+            { action: "UPDATE_QUERY_PARAMS" },
+            { 
+              action: "UPDATE_PARAMETERISED_LAYER",
+              payload: { targetLayer: "NoRMS Zone Totals"}
+            }
+          ]  
+        },
         { ...selectors.originOrDestinationFilter, visualisations: ['Zone Totals'] },
         { ...selectors.zoneMetricFilter, visualisations: ['Zone Totals'] },
       ]

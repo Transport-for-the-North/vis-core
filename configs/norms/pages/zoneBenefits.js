@@ -18,7 +18,7 @@ export const zoneBenefits = {
           name: "NoRMS Zone Benefits",
           type: "tile",
           source: "api",
-          path: "/api/vectortiles/zones/5/{z}/{x}/{y}", // matches the path in swagger.json
+          path: "/api/vectortiles/zones/{resultZoneTypeId}/{z}/{x}/{y}", // matches the path in swagger.json
           sourceLayer: "zones",
           geometryType: "polygon",
           visualisationName: "Zone Benefits",
@@ -34,7 +34,7 @@ export const zoneBenefits = {
           name: "Zone Benefits",
           type: "joinDataToMap",
           joinLayer: "NoRMS Zone Benefits",
-          style: "polygon-continuous",
+          style: "polygon-diverging",
           joinField: "id",
           valueField: "value",
           dataSource: "api",
@@ -60,9 +60,10 @@ export const zoneBenefits = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Benefits'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Zone Benefits'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Zone Benefits'] },
-        { ...selectors.scenarioFilter, visualisations: ['Zone Benefits'] },
+        { ...selectors.scenarioIdFilter,  visualisations: ['Zone Benefits'] },
         { ...selectors.timePeriod, visualisations: ['Zone Benefits'] },
         { ...selectors.userClassFilter, visualisations: ['Zone Benefits'] },
+        { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Benefits'] },
         { ...selectors.originOrDestinationFilter, visualisations: ['Zone Benefits'] },
         { ...selectors.benefitsMetricFilter, visualisations: ['Zone Benefits'] },
       ]

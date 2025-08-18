@@ -53,7 +53,7 @@ export const journeyTimeZoneTotals = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Journey Time Accessibility Totals'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Journey Time Accessibility Totals'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Journey Time Accessibility Totals'] },
-        { ...selectors.scenarioFilter, visualisations: ['Journey Time Accessibility Totals'], values: {
+        { ...selectors.scenarioCodeFilter, visualisations: ['Journey Time Accessibility Totals'], values: {
             source: "metadataTable",
             metadataTableName: "input_norms_scenario",
             displayColumn: "scenario_code",

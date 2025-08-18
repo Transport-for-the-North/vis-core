@@ -68,7 +68,7 @@ export const stationPairs = {
         { ...selectors.scenarioFilterNetwork, visualisations: ['Station Pairs'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Station Pairs'] },
         { ...selectors.scenarioFilterYear, visualisations: ['Station Pairs'] },
-        { ...selectors.scenarioFilter, visualisations: ['Station Pairs'] },
+        { ...selectors.scenarioCodeFilter, visualisations: ['Station Pairs'] },
         { ...selectors.timePeriod, visualisations: ['Station Pairs'] },
         { ...selectors.userClassFilter, visualisations: ['Station Pairs'] },
         { ...selectors.originOrDestinationFilter, visualisations: ['Station Pairs'] },
