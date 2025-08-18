@@ -84,7 +84,6 @@ export const StyledExternalNavLink = styled.a`
  * @returns {JSX.Element} The rendered responsive navigation links.
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
-  // console.log('Links', links);
   return (
     <NavLinksContainer>
       {links.map((link, index) => {
