@@ -203,6 +203,8 @@ const NestedDropdownMenu = styled.div`
  * @param {Object} props
  * @param {boolean} props.open - Whether the nested submenu should be visible.
  * @param {DOMRect} props.parentRect - Bounding rectangle of the parent item.
+ * @param {String} props.direction - Right or left direction for the submenu.
+ * @param {number} props.dropdownWidth - Width of the dropdown to determine placement.
  * @param {Function} props.onPortalMouseEnter - Function called when mouse enters the nested submenu.
  * @param {Function} props.onPortalMouseLeave - Function called when mouse leaves the nested submenu.
  * @param {React.ReactNode} props.children - Nested submenu items.
@@ -214,12 +216,18 @@ function NestedDropdownPortal({
   onPortalMouseEnter,
   onPortalMouseLeave,
   children,
+  dropdownWidth,
+  direction,
 }) {
   if (!open || !parentRect) return null;
 
   return ReactDOM.createPortal(
     <NestedDropdownMenu
-      left={parentRect.right}
+      left={
+        direction === "left"
+          ? parentRect.left - dropdownWidth
+          : parentRect.right
+      }
       top={parentRect.top}
       onMouseEnter={onPortalMouseEnter}
       onMouseLeave={onPortalMouseLeave}
@@ -259,6 +267,25 @@ export function RecursiveDropdownItem({
   const hasChildren = item.children && item.children.length > 0;
   // Combine header and child hover to determine overall hover styling.
   const hovered = headerHovered || childHovered;
+  const dropdownRef = useRef();
+  const [direction, setDirection] = useState("right");
+  const [dropdownWidth, setDropdownWidth] = useState(null);
+
+  // Effect to calculate the dropdown width and determine if it should open left or right.
+  // This runs whenever the submenu opens or the parent rectangle changes.
+  useEffect(() => {
+    if (subOpen && dropdownRef.current && parentRect) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      if (dropdownWidth === null || dropdownWidth !== rect.width) {
+        setDropdownWidth(rect.width);
+      }
+      const rightSpace = window.innerWidth - parentRect.right;
+      const nextDir = rightSpace < rect.width ? "left" : "right";
+      if (direction !== nextDir) {
+        setDirection(nextDir);
+      }
+    }
+  }, [subOpen, parentRect, direction, dropdownWidth]);
 
   /**
    * Called when the mouse enters the item region.
@@ -328,6 +355,8 @@ export function RecursiveDropdownItem({
         <NestedDropdownPortal
           open={subOpen}
           parentRect={parentRect}
+          dropdownWidth={dropdownWidth}
+          direction={direction}
           onPortalMouseEnter={() => {
             setChildHovered(true);
             onChildHoverChange(true);
@@ -337,16 +366,18 @@ export function RecursiveDropdownItem({
             onChildHoverChange(false);
           }}
         >
-          {item.children.map((child) => (
-            <RecursiveDropdownItem
-              key={child.pageName}
-              item={child}
-              activeLink={activeLink}
-              onClick={onClick}
-              $bgColor={$bgColor}
-              onChildHoverChange={onChildHoverChange}
-            />
-          ))}
+          <div ref={dropdownRef}>
+            {item.children.map((child) => (
+              <RecursiveDropdownItem
+                key={child.pageName}
+                item={child}
+                activeLink={activeLink}
+                onClick={onClick}
+                $bgColor={$bgColor}
+                onChildHoverChange={onChildHoverChange}
+              />
+            ))}
+          </div>
         </NestedDropdownPortal>
       )}
     </DropdownItemWrapper>
