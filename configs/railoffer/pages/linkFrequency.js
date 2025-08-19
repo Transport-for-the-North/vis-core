@@ -40,6 +40,12 @@ export const linkFrequency = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/railoffer/link-frequency",
+        legendText: [
+          {
+            displayValue: "Frequency",
+            legendSubtitleText: "Trains per hour"
+          }
+        ]
         }
     ],
     metadataTables: [],
