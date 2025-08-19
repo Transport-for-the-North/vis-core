@@ -96,9 +96,9 @@ function App() {
                     element={<WrappedPageComponent pageConfig={page} />}
                   />
                 );
-                {/* Catch-all for undefined routes */}
-                <Route path="*" element={<NotFound />} />
               })}
+              {/* Catch-all for undefined routes */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Dashboard>
         </AppContext.Provider>
