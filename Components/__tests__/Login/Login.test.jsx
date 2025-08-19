@@ -1,0 +1,99 @@
+import { render, screen, waitFor } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
+import Login from "../../Login/Login";
+import { useAuth } from "contexts/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import userEvent from "@testing-library/user-event";
+
+// Here we define which functions will be mocked.
+jest.mock("contexts/AuthProvider"); // Everything in AuthProvider
+jest.mock("react-router-dom", () => ({
+  // Only the useNavigate function of the ‘react-router-dom’ module
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: jest.fn(),
+}));
+
+describe("Login component test", () => {
+  const renderLogin = () => {
+    return render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+  };
+
+  // Success
+  it("Successful login with valid credentials", async () => {
+    // Mocks
+    const mockLoginAction = jest.fn().mockResolvedValue(); // We define what the mock returns mockLoginAction = an empty function
+    const mockNavigate = jest.fn(); // We define what the mock returns mockNavigate = an empty function
+
+    useAuth.mockReturnValue({ loginAction: mockLoginAction }); // When the useAuth function is called, the response returned is this JSON: { loginAction: mockLoginAction }
+    useNavigate.mockReturnValue(mockNavigate); // When the useNavigate function is called, the response is the defined mock: mockNavigate
+
+    renderLogin();
+
+    // Selection of different elements
+    const inputUsername = screen.getByLabelText(/User Name*/i);
+    const inputPassword = screen.getByLabelText(/Password*/i);
+    const submitButton = screen.getByRole("button", { name: /Continue/i });
+
+    // Check that the items are present
+    expect(inputUsername).toBeInTheDocument();
+    expect(inputPassword).toBeInTheDocument();
+    expect(submitButton).toBeInTheDocument();
+
+    // Enter data into the input fields
+    userEvent.type(inputUsername, "testuser");
+    userEvent.type(inputPassword, "testpassword");
+
+    // Submit the form
+    userEvent.click(submitButton);
+
+    // Check that loginAction has been called with the correct data.
+    await waitFor(() => {
+      expect(mockLoginAction).toHaveBeenCalledWith("testuser", "testpassword");
+    });
+
+    // Check that no errors are displayed.
+    expect(
+      screen.queryByText("Invalid username or password")
+    ).not.toBeInTheDocument();
+  });
+
+  // Fail
+  it("Wrong login, error message", async () => {
+    // Mocks
+    const mockLoginActionFailed = jest
+      .fn()
+      .mockRejectedValue(new Error("Login Failed"));
+    const mockNavigate = jest.fn();
+
+    useAuth.mockReturnValue({ loginAction: mockLoginActionFailed });
+    useNavigate.mockReturnValue(mockNavigate);
+
+    renderLogin();
+
+    const inputUsername = screen.getByLabelText(/User Name*/i); // Utiliser getByLabelText
+    const inputPassword = screen.getByLabelText(/Password*/i); // password n'est pas un "textbox"
+    const submitButton = screen.getByRole("button", { name: /Continue/i });
+
+    userEvent.type(inputUsername, "falseuser");
+    userEvent.type(inputPassword, "falsepassword");
+
+    userEvent.click(submitButton);
+
+    //
+    await waitFor(() => {
+      expect(mockLoginActionFailed).toHaveBeenCalledWith(
+        "falseuser",
+        "falsepassword"
+      );
+      /* When the form is submitted, we expect to see a paragraph in the DOM: ‘Invalid username or password’.
+         Given that it is the mock that will fail that is called  */
+      expect(
+        screen.getByText("Invalid username or password")
+      ).toBeInTheDocument();
+    });
+  });
+});
