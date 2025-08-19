@@ -8,6 +8,7 @@ import { AppContext, AuthProvider } from "contexts";
 import { api } from "services";
 import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
 import { theme } from "theme";
+import { NotFound } from "Components/NotFoundPage";
 
 /**
  * Main application component.
@@ -95,6 +96,8 @@ function App() {
                     element={<WrappedPageComponent pageConfig={page} />}
                   />
                 );
+                {/* Catch-all for undefined routes */}
+                <Route path="*" element={<NotFound />} />
               })}
             </Routes>
           </Dashboard>
