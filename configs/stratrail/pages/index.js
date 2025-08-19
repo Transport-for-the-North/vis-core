@@ -7,6 +7,7 @@ import { stationInformation } from "./stationInformation"
 import { stationInformationBool } from "./stationInformationBool"
 import { nodeInvestments } from "./nodeInvestments"
 import { linkInvestments } from "./linkInvestments"
+import { linkFrequency } from "./linkFrequency"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -18,4 +19,5 @@ export const pages = {
     stationInformationBool: stationInformationBool,
     nodeInvestments: nodeInvestments,
     linkInvestments: linkInvestments,
+    linkFrequency: linkFrequency
 }
