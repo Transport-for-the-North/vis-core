@@ -5,6 +5,7 @@ import { nodeNSSeC } from "./nodeNSSeC"
 import { nodeSocio } from "./nodeSocio"
 import { stationInformation } from "./stationInformation"
 import { stationInformationBool } from "./stationInformationBool"
+import { linkFrequency } from "./linkFrequency"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -13,5 +14,6 @@ export const pages = {
     nodeNSSeC: nodeNSSeC,
     nodeSocio: nodeSocio,
     stationInformation: stationInformation,
-    stationInformationBool: stationInformationBool
+    stationInformationBool: stationInformationBool,
+    linkFrequency: linkFrequency
 }
