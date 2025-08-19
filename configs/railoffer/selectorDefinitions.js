@@ -898,14 +898,14 @@ const nodeInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
             { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
             { displayValue: "Station Improvement", paramValue: "Station Improvement" },
             { displayValue: "Freight", paramValue: "Freight" },
             { displayValue: "New Station", paramValue: "New Station" },
             { displayValue: "Performance and Reliability", paramValue: "Performance and Reliability" },
-            { displayValue: "Neightbouring Development", paramValue: "Neightbouring Development" },
+            { displayValue: "Neighbouring Development", paramValue: "Neighbouring Development" },
             { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
             { displayValue: "Service Development", paramValue: "Service Development" }
         ]
@@ -925,7 +925,7 @@ const linkInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Investment Upgrade", paramValue: "Investment Upgrade" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
             { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
             { displayValue: "Station Improvement", paramValue: "Station Improvement" },
@@ -984,6 +984,27 @@ const authoritySelector = {
     }
 }
 
+const timePeriod = {
+    filterName: "Time Period",
+    paramName: "timePeriod",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the time period for the data.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            { displayValue: "AM (7-10AM)", paramValue: "AM" },
+            { displayValue: "IP (10AM-4PM)", paramValue: "IP" },
+            { displayValue: "PM (4-7PM)", paramValue: "PM" },
+            { displayValue: "OP (7PM-7AM)", paramValue: "OP" },
+        ]
+    }
+}
+
 export const selectors = {
   linkTOCSelector: linkTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -1000,5 +1021,6 @@ export const selectors = {
   nodeInvestmentThemeSelector: nodeInvestmentThemeSelector,
   linkInvestmentThemeSelector: linkInvestmentThemeSelector,
   investmentFeatureSelector: investmentFeatureSelector,
-  authoritySelector: authoritySelector
+  authoritySelector: authoritySelector,
+  timePeriod: timePeriod,
 };
