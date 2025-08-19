@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import { DynamicLegend, interpretWidthExpression, interpretColorExpression } from './DynamicLegend';
+import { DynamicLegend, interpretWidthExpression, interpretColorExpression } from '../../DynamicLegend/DynamicLegend';
 // TODO make sure the tests work ABH 2024/05/23
 
 // Mock the map object and its methods
