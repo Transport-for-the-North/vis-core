@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { PageSwitch } from "../../PageSwitch/PageSwitch";
 
-// Mocks 
+// Mocks
 jest.mock("Components", () => ({
   MapLayout: () => <div data-testid="mock-map-layout" />,
   IFrameEmbedPage: () => <div data-testid="mock-iframe-embed-page" />,
@@ -23,6 +23,10 @@ jest.mock("contexts", () => ({
 describe("PageSwitch Component", () => {
   it("pageConfig.type null", () => {
     render(<PageSwitch pageConfig={{}} />);
+    expect(screen.getByText("Nothing")).toBeInTheDocument();
+  });
+  it("pageConfig.type unknown", () => {
+    render(<PageSwitch pageConfig={{type: 'ImUnknown'}} />);
     expect(screen.getByText("Nothing")).toBeInTheDocument();
   });
 
@@ -54,7 +58,7 @@ describe("PageSwitch Component", () => {
     expect(mapProvider).toBeInTheDocument();
     expect(mapLayout).toBeInTheDocument();
   });
-    it("Case pageConfig.type = IFrameEmbed", async () => {
+  it("Case pageConfig.type = IFrameEmbed", async () => {
     render(<PageSwitch pageConfig={{ type: "IFrameEmbed" }} />);
     // screen.debug();
 
