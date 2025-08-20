@@ -45,6 +45,9 @@ export const MapProvider = ({ children }) => {
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
 
+  console.log('pageContext : ', pageContext)
+  console.log('appContext : ', appContext);
+
   // Initialize state within the provider function
   const initialState = {
     mapStyle: appContext.mapStyle || defaultMapStyle,
