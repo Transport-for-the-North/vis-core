@@ -7,6 +7,10 @@ export const investPopupContent = `
         <span class="metadata-value">{reference_id}</span>
       </div>
       <div class="metadata-item">
+        <span class="metadata-key">Scheme Code:</span>
+        <span class="metadata-value">{scheme_code}</span>
+      </div>
+      <div class="metadata-item">
         <span class="metadata-key">Programme:</span>
         <span class="metadata-value">{programme}</span>
       </div>
