@@ -6,6 +6,10 @@ export const investmentSummary = `
         <div class="value" style="font-size: 1.2em;">{reference_id}</div>
       </div>
       <div class="card">
+        <div class="label">Scheme Code</div>
+        <div class="value" style="font-size: 1.2em;">{scheme_code}</div>
+      </div>
+      <div class="card">
         <div class="label">Programme</div>
         <div class="value" style="font-size: 1.2em;">{programme}</div>
       </div>
