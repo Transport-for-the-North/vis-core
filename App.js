@@ -71,6 +71,7 @@ function App() {
 
   const isAuthRequired = appConfig.authenticationRequired ?? true;
   const HomePageWithRoleValidation = isAuthRequired ? withRoleValidation(HomePage) : HomePage;
+  const NotFoundWithRoleValidation = isAuthRequired ? withRoleValidation(NotFound) : NotFound;
 
   return (
     <div className="App">
@@ -98,7 +99,7 @@ function App() {
                 );
               })}
               {/* Catch-all for undefined routes */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<NotFoundWithRoleValidation />} />
             </Routes>
           </Dashboard>
         </AppContext.Provider>
