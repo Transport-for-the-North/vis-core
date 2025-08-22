@@ -473,7 +473,7 @@ export const DynamicLegend = ({ map }) => {
           }
           // If no legend entries or exactly one, consider this a default style scenario.
           let noStyle = false;
-          if (legendEntries.length <= 1) {
+          if (legendEntries.length < 1) {
             noStyle = true;
             if (legendEntries.length === 0) {
               const defaultColor =
