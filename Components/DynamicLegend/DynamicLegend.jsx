@@ -208,7 +208,7 @@ function interpolateWidthAtValue(widthStops, value) {
  * @returns {array|null} An array of objects with 'value' and 'color' properties representing
  *                       the color stops, or null if the expression cannot be interpreted.
 */
-const interpretColorExpression = (expression) => {
+export const interpretColorExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "string") {
     return [{ color: expression }];
@@ -266,7 +266,7 @@ const interpretColorExpression = (expression) => {
 * @param {Array|number} expression - The width expression from the map style.
 * @returns {Array|null} - An array of width stops or null if the expression is invalid.
 */
-const interpretWidthExpression = (expression) => {
+export const interpretWidthExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "number") {
     return [{ width: expression }];

@@ -25,11 +25,11 @@ describe("Login component test", () => {
   // Success
   it("Successful login with valid credentials", async () => {
     // Mocks
-    const mockLoginAction = jest.fn().mockResolvedValue(); // We define what the mock returns mockLoginAction = an empty function
-    const mockNavigate = jest.fn(); // We define what the mock returns mockNavigate = an empty function
+    const mockLoginAction = jest.fn().mockResolvedValue();
+    const mockNavigate = jest.fn();
 
-    useAuth.mockReturnValue({ loginAction: mockLoginAction }); // When the useAuth function is called, the response returned is this JSON: { loginAction: mockLoginAction }
-    useNavigate.mockReturnValue(mockNavigate); // When the useNavigate function is called, the response is the defined mock: mockNavigate
+    useAuth.mockReturnValue({ loginAction: mockLoginAction });
+    useNavigate.mockReturnValue(mockNavigate);
 
     renderLogin();
 
@@ -74,8 +74,8 @@ describe("Login component test", () => {
 
     renderLogin();
 
-    const inputUsername = screen.getByLabelText(/User Name*/i); // Utiliser getByLabelText
-    const inputPassword = screen.getByLabelText(/Password*/i); // password n'est pas un "textbox"
+    const inputUsername = screen.getByLabelText(/User Name*/i);
+    const inputPassword = screen.getByLabelText(/Password*/i);
     const submitButton = screen.getByRole("button", { name: /Continue/i });
 
     userEvent.type(inputUsername, "falseuser");
@@ -83,7 +83,6 @@ describe("Login component test", () => {
 
     userEvent.click(submitButton);
 
-    //
     await waitFor(() => {
       expect(mockLoginActionFailed).toHaveBeenCalledWith(
         "falseuser",
