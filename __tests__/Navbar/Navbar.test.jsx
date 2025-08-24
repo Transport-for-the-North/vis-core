@@ -1,3 +1,13 @@
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { Navbar } from "Components/Navbar";
+import { useWindowWidth } from "hooks/useWindowWidth";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "contexts/AuthProvider";
+import { buildNavbarLinks } from "utils";
+import { AppContext } from "contexts";
+
 jest.mock("hooks/useWindowWidth", () => ({
   useWindowWidth: jest.fn(),
 }));
@@ -19,13 +29,8 @@ jest.mock("utils", () => ({
   buildNavbarLinks: jest.fn(),
 }));
 
-// Optionnel : si tu veux isoler complètement Navbar, tu peux mocker des composants enfants.
-// Ils doivent être mockés en utilisant exactement le même identifiant que dans l'import du fichier Navbar.
-// Ici j'utilise des mocks très simples pour Logo, Button, ResponsiveNavbarLinks, LateralNavbar.
-// Ajuste les chemins si ton projet utilise des alias différents.
 jest.mock("../../Navbar/Logo", () => ({
   Logo: ({ logoImage, position, onClick }) =>
-    // affichage simple avec alt pour pouvoir le rechercher dans les tests
     require("react").createElement("img", {
       src: logoImage,
       alt: "Logo",
@@ -56,24 +61,23 @@ jest.mock("../../Navbar/LateralNavbar", () => ({
     }),
 }));
 
-// Now import (after mocks)
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { Navbar } from "Components/Navbar"; // adapte l'import si nécessaire
-import { useWindowWidth } from "hooks/useWindowWidth";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "contexts/AuthProvider";
-import { buildNavbarLinks } from "utils";
-import { AppContext } from "contexts"; // adapte le chemin si besoin
+jest.mock("maplibre-gl", () => ({
+  Map: jest.fn(() => ({
+    on: jest.fn(),
+    off: jest.fn(),
+    remove: jest.fn(),
+    addLayer: jest.fn(),
+    setStyle: jest.fn(),
+    flyTo: jest.fn(),
+  })),
+}));
 
 describe("Navbar", () => {
   const mockNavigate = jest.fn();
   const mockLogOut = jest.fn();
 
   beforeEach(() => {
-    // valeur par défaut des mocks — tu peux overrider par test
-    useWindowWidth.mockReturnValue(400); // mobile par défaut
+    useWindowWidth.mockReturnValue(400); // default mobile
     useLocation.mockReturnValue({
       pathname: "/",
       search: "",
@@ -88,14 +92,14 @@ describe("Navbar", () => {
       token: "fake_token",
       loginAction: jest.fn(),
     });
-    buildNavbarLinks.mockReturnValue([]); // pas de liens par défaut
+    buildNavbarLinks.mockReturnValue([]);
   });
 
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  it("affiche le bouton burger et le logo en mobile", () => {
+  it("displays the burger button and logo on mobile devices", () => {
     const appContext = {
       logoImage: "img/tfn-logo-fullsize.png",
       logoutButtonImage: "img/burger.png",
@@ -112,13 +116,13 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    // Le Button (burger) est rendu avec une image ayant l'alt "Burger Button Navbar"
+    // The Button (burger) is rendered with an image with the alt text ‘Burger Button Navbar’.
     expect(screen.getByAltText(/Burger Button Navbar/i)).toBeInTheDocument();
-    // Le Logo mocké a l'alt "Logo"
+    // The mocked logo has the alt text ‘Logo’.
     expect(screen.getByAltText(/Logo/i)).toBeInTheDocument();
   });
 
-  it("ne rend rien sur la route /login", () => {
+  it("does not return anything on the /login route", () => {
     useLocation.mockReturnValue({ pathname: "/login", search: "", hash: "", state: null, key: "k1" });
 
     const appContext = {
@@ -135,16 +139,15 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    // le composant retourne null -> pas de navbar dans le DOM
-    // on vérifie qu'il n'y a pas l'élément fixed (height spacer présent si Navbar rendu)
-    // ici on recherche le bouton burger et le logo : ils ne doivent pas être trouvés
+    // the component returns null -> no navbar in the DOM
+    // we check that there is no fixed element (height spacer present if Navbar rendered)
+    // here we search for the burger button and the logo: they must not be found
     expect(screen.queryByAltText(/Burger Button Navbar/i)).not.toBeInTheDocument();
     expect(screen.queryByAltText(/Logo/i)).not.toBeInTheDocument();
-    // éventuellement container.firstChild === null
   });
 
-  it("appelle logOut quand on clique sur l'icône logout et authenticationRequired=true", () => {
-    // mobile par défaut (useWindowWidth 400). On veut que StyledLogout soit rendu.
+  it("Calls logOut when the logout icon is clicked and authenticationRequired=true", () => {
+    // default mobile (useWindowWidth 400). We want StyledLogout to be rendered.
     const appContext = {
       logoImage: "img/tfn-logo-fullsize.png",
       appPages: [],
@@ -159,7 +162,7 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    // StyledLogout n'a pas d'alt dans ton composant original ; on le récupère via src
+    // The logout button is rendered with an image with the src ‘/img/logout.png’.
     const logoutImg = container.querySelector('img[src="/img/logout.png"]');
     expect(logoutImg).toBeInTheDocument();
 
@@ -167,7 +170,7 @@ describe("Navbar", () => {
     expect(mockLogOut).toHaveBeenCalled();
   });
 
-  it("affiche les liens responsives en desktop (non mobile)", () => {
+  it("displays responsive links on desktop (not mobile)", () => {
     useWindowWidth.mockReturnValue(1200); // desktop
     buildNavbarLinks.mockReturnValue([{ url: "/a", label: "A" }, { url: "/b", label: "B" }]);
 
@@ -186,7 +189,7 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    // On avait mocké ResponsiveNavbarLinks pour exposer data-testid
+    // We mocked ResponsiveNavbarLinks to expose data-testid.
     expect(screen.getByTestId("responsive-links")).toBeInTheDocument();
     expect(screen.queryByAltText(/Burger Button Navbar/i)).not.toBeInTheDocument();
   });
