@@ -10,7 +10,7 @@ import { roundToSignificantFigures } from "utils";
  * // Returns "1,234,567"
  * numberWithCommas(1234567);
  */
-function numberWithCommas(x) {
+export function numberWithCommas(x) {
   return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -82,6 +82,7 @@ const Scale = ({
       sizeScale &&
       sizeScale.map((step, index) => {
         let [value, size] = step;
+        console.log("size : ", size);
         if (typeof value === "number") {
           value = roundToSignificantFigures(value);
           if (!isCategorical && (value < binMin || value > binMax)) return null;
@@ -94,6 +95,7 @@ const Scale = ({
             className="legend-scale__step"
           >
             <span
+              data-testid={`${size}`}
               className="legend-scale__step-swatch"
               style={{
                 height: `${size * 2}px`,
