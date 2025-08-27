@@ -4,6 +4,7 @@ import Login from "../../Login/Login";
 import { useAuth } from "contexts/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
+import { Unauthorized } from "Components/Login";
 
 // Here we define which functions will be mocked.
 jest.mock("contexts/AuthProvider"); // Everything in AuthProvider
@@ -94,5 +95,13 @@ describe("Login component test", () => {
         screen.getByText("Invalid username or password")
       ).toBeInTheDocument();
     });
+  });
+});
+describe("Unauthorized component test", () => {
+  it("All items are displayed", () => {
+    render(<Unauthorized />)
+    expect(screen.getByText("Unauthorized")).toBeInTheDocument();
+    expect(screen.getByText("You are not authorised to access this app.")).toBeInTheDocument();
+    expect(screen.getByText(/If you believe this is an error/i)).toBeInTheDocument();
   });
 });
