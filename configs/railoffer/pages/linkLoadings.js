@@ -38,7 +38,7 @@ export const linkLoadings = {
             shouldHaveLabel: true,
             labelZoomLevel: 12,
             labelNulls: true,
-            hoverNulls: true,
+            hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
         },
     ],

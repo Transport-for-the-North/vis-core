@@ -22,6 +22,8 @@ export const nodeLoadings = {
             geometryType: "line",
             isHoverable: false,
             isStylable: false,
+            labelNulls: false,
+            hoverNulls: false,
             shouldHaveTooltipOnHover: false,
             shouldHaveLabel: false
         },
