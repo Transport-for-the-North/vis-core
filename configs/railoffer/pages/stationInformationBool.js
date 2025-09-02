@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const stationInformationBool = {
   pageName: "Station Information - Boolean",
-  url: "/railoffer/station-information-bool",
+  url: "/station-information-bool",
   type: "MapLayout",
   category: "Station",
   about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>`,

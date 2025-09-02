@@ -3,7 +3,7 @@ import { termsOfUse } from "../termsOfUse";
 
 export const linkFrequency = {
   pageName: "Link Frequency",
-  url: "/railoffer/link-frequency",
+  url: "/link-frequency",
   type: "MapLayout",
   category: "Link",
   about: `<p>This visualisation shows the trains per hour for each period for each link in the NorTMS 2018 model.</p>`,

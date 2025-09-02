@@ -4,9 +4,9 @@ import { investPopupContent } from "../templates/investmentPopup";
 import { investmentSummary } from "../templates";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
-export const nodeInvestments = {
-  pageName: "Node Investments",
-  url: "/railoffer/node-investments",
+export const freightNodeInvestments = {
+  pageName: "Freight Node Investments",
+  url: "/freight-node-investments",
   type: "MapLayout",
   category: "Investments",
   about: `<p>This visualisation shows the current node investments in the Investment Pipeline.</p>`,

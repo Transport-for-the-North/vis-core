@@ -6,7 +6,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const nodeInvestments = {
   pageName: "Node Investments",
-  url: "/railoffer/node-investments",
+  url: "/node-investments",
   type: "MapLayout",
   category: "Investments",
   about: `<p>This visualisation shows the current node investments in the Investment Pipeline.</p>`,

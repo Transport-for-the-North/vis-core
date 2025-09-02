@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const nodeSocio = {
   pageName: "Station Economic Activity Status",
-  url: "/railoffer/node-socio",
+  url: "/node-socio",
   type: "MapLayout",
   category: "Station",
   about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,

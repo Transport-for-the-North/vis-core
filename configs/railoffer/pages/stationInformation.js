@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const stationInformation = {
   pageName: "Station Information - Values",
-  url: "/railoffer/station-information-val",
+  url: "/station-information-val",
   type: "MapLayout",
   category: "Station",
   about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>`,
@@ -42,7 +42,7 @@ export const stationInformation = {
         },
         {
             uniqueId: "RailOfferNodeVectorTile",
-            name: "Rail Offer Nodes",
+            name: "Stations Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_nodes/{z}/{x}/{y}", // matches the path in swagger.json
@@ -64,7 +64,7 @@ export const stationInformation = {
         {
         name: "Node Information",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Nodes",
+        joinLayer: "Stations Layer",
         style: "circle-continuous",
         joinField: "id",
         valueField: "value",

@@ -3,7 +3,7 @@ import { termsOfUse } from "../termsOfUse";
 
 export const linkLoadings = {
   pageName: "Link Loadings",
-  url: "/railoffer/link-loadings",
+  url: "/link-loadings",
   type: "MapLayout",
   category: "Link",
   about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>

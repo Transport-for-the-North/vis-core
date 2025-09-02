@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const nodeNSSeC = {
   pageName: "Station Socio-Economic Classifications (NS-SeC)",
-  url: "/railoffer/node-ns-sec",
+  url: "/node-ns-sec",
   type: "MapLayout",
   category: "Station",
   about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,

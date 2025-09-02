@@ -3,7 +3,7 @@ import { termsOfUse } from "../termsOfUse";
 
 export const timingLinks = {
   pageName: "BPLAN Timing Links",
-  url: "/railoffer/timing-links",
+  url: "/timing-links",
   type: "MapLayout",
   category: "Link",
   about: `<p>This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</p>`,

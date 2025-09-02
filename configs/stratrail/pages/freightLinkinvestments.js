@@ -3,9 +3,9 @@ import { termsOfUse } from "../termsOfUse";
 import { investPopupContent } from "../templates/investmentPopup";
 import { investmentSummary } from "../templates";
 
-export const linkInvestments = {
-  pageName: "Link Investments",
-  url: "/railoffer/link-investments",
+export const freightLinkInvestments = {
+  pageName: "Freight Link Investments",
+  url: "/freight-link-investments",
   type: "MapLayout",
   category: "Investments",
   about: `<p>This visualisation shows the current line investments in the investment pipeline.</p>`,

@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 
 export const nodeLoadings = {
   pageName: "Station Loadings",
-  url: "/railoffer/node-loadings",
+  url: "/node-loadings",
   type: "MapLayout",
   category: "Station",
   about: `<p>This visualisation shows the loadings information for each station in the NorTMS model.</p>`,
