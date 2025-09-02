@@ -1,5 +1,5 @@
 import { ResponsiveNavbarLinks } from "Components/Navbar/ResponsiveNavbarLinks";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router";
 import userEvent from "@testing-library/user-event";
 
@@ -35,15 +35,17 @@ describe("ResponsiveNavbarLinks component test", () => {
       </Routes>
     </MemoryRouter>
   );
-  it("Basic use of ResponsiveNavbarLinks with a child element", () => {
+  it("Basic use of ResponsiveNavbarLinks with a child element", async () => {
     render(renderElement);
 
     // Click on child link
     const third = screen.getByText("Third");
     expect(third).toBeInTheDocument();
     userEvent.click(third);
+    await waitFor(() => {
+      expect(screen.getByText("Third1")).toBeInTheDocument();
+    })
     const childThird = screen.getByText("Third1");
-    expect(childThird).toBeInTheDocument();
     userEvent.click(childThird);
     expect(fakeOnCLick).toHaveBeenCalled();
     expect(screen.getByText("Third1")).toBeInTheDocument();
@@ -57,7 +59,7 @@ describe("ResponsiveNavbarLinks component test", () => {
     const link = external.closest("a");
     expect(link).toHaveAttribute("href", "/external");
   });
-  it("Basic use of ResponsiveNavbarLinks without external and dropdownItems", () => {
+  it("Basic use of ResponsiveNavbarLinks without external and dropdownItems", async () => {
     render(renderElement);
 
     // Click on child link
@@ -65,6 +67,8 @@ describe("ResponsiveNavbarLinks component test", () => {
     expect(second).toBeInTheDocument();
     userEvent.click(second);
     expect(fakeOnCLick).toHaveBeenCalled();
-    expect(screen.getByText("SecondPage")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("SecondPage")).toBeInTheDocument();
+    })
   });
 });
