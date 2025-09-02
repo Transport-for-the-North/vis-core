@@ -81,21 +81,27 @@ describe("HomePage test", () => {
       linkRouter();
       const cookie = screen.getByText("Cookies");
       userEvent.click(cookie);
-      expect(screen.getByText("Cookies Page")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText("Cookies Page")).toBeInTheDocument();
+      });
     });
 
     it("navigue vers Privacy Policy", async () => {
       linkRouter();
       const privacy_policy = screen.getByText("Privacy Policy");
       userEvent.click(privacy_policy);
-      expect(screen.getByText("Privacy Policy Page")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText("Privacy Policy Page")).toBeInTheDocument();
+      });
     });
 
     it("navigue vers Contact Us", async () => {
       linkRouter();
       const contact_us = screen.getByText("Contact Us");
       userEvent.click(contact_us);
-      expect(screen.getByText("Contact Us Page")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText("Contact Us Page")).toBeInTheDocument();
+      });
     });
   });
 
@@ -393,7 +399,7 @@ describe("HomePage test", () => {
           content: "foo",
           apiConfig: null,
           sectionTitle: "sectionTitle1",
-          alignment: "alignment"
+          alignment: "alignment",
         },
         {
           id: 2,
@@ -401,7 +407,7 @@ describe("HomePage test", () => {
           content: "bar",
           images: ["https://example2.1"],
           apiConfig: null,
-          sectionTitle: "sectionTitle2"
+          sectionTitle: "sectionTitle2",
         },
       ],
       //   },
@@ -413,7 +419,7 @@ describe("HomePage test", () => {
       introduction: "introduction",
       contactText: "contactText",
       contactEmail: "contactEmail",
-      legalText: "legalText"
+      legalText: "legalText",
     };
     it("test", async () => {
       render(
@@ -424,42 +430,42 @@ describe("HomePage test", () => {
         </MemoryRouter>
       );
 
-        // Title
-        expect(screen.getByText("My App Title")).toBeInTheDocument();
-        // Background img Header
-        const divElement = screen.getByTestId('background-img');
-        expect(divElement).toHaveStyle('backgroundImage: url(backgroundImage)');
-        // Introduction
-        expect(screen.getByText("introduction")).toBeInTheDocument();
-        // Fixed Sections
-        expect(screen.getByText("Background")).toBeInTheDocument();
-        expect(screen.getByText("Methodology")).toBeInTheDocument();
-        expect(screen.getByAltText("Additional Image")).toBeInTheDocument();
-        // Additional Fragments
-        // Need to await because the setFragmentsContent method im the component is Async
-        const fragment1Title = await screen.findByText("sectionTitle1");
-        const fragment2Title = await screen.findByText("sectionTitle2");
-        expect(fragment1Title).toBeInTheDocument();
-        expect(fragment2Title).toBeInTheDocument();
-        // Test dynamic class
-        expect(fragment1Title).toHaveClass("title-alignment");
-        expect(fragment2Title).toHaveClass("title-center");
-        // img source
-        const images = screen.getAllByAltText(/Image/i);
-        expect(images[1]).toHaveAttribute("src", "https://example1.1");
-        expect(images[2]).toHaveAttribute("src", "https://example1.2");
-        expect(images[0]).toHaveAttribute("src", "additionalImage");
-        const images2 = screen.getAllByAltText(/ image/i);
-        expect(images2[0]).toHaveAttribute("src", "additionalImage");
-        // contactText
-        expect(screen.getByText("contactText")).toBeInTheDocument();
-        const contactEmail = screen.getByText("Email: contactEmail")
-        expect(contactEmail).toBeInTheDocument();
-        expect(contactEmail).toHaveAttribute("href", "mailto:contactEmail");
-        // legal section
-        expect(screen.getByText("legalText")).toBeInTheDocument();
-        // footer
-        // go see the footer test
+      // Title
+      expect(screen.getByText("My App Title")).toBeInTheDocument();
+      // Background img Header
+      const divElement = screen.getByTestId("background-img");
+      expect(divElement).toHaveStyle("backgroundImage: url(backgroundImage)");
+      // Introduction
+      expect(screen.getByText("introduction")).toBeInTheDocument();
+      // Fixed Sections
+      expect(screen.getByText("Background")).toBeInTheDocument();
+      expect(screen.getByText("Methodology")).toBeInTheDocument();
+      expect(screen.getByAltText("Additional Image")).toBeInTheDocument();
+      // Additional Fragments
+      // Need to await because the setFragmentsContent method im the component is Async
+      const fragment1Title = await screen.findByText("sectionTitle1");
+      const fragment2Title = await screen.findByText("sectionTitle2");
+      expect(fragment1Title).toBeInTheDocument();
+      expect(fragment2Title).toBeInTheDocument();
+      // Test dynamic class
+      expect(fragment1Title).toHaveClass("title-alignment");
+      expect(fragment2Title).toHaveClass("title-center");
+      // img source
+      const images = screen.getAllByAltText(/Image/i);
+      expect(images[1]).toHaveAttribute("src", "https://example1.1");
+      expect(images[2]).toHaveAttribute("src", "https://example1.2");
+      expect(images[0]).toHaveAttribute("src", "additionalImage");
+      const images2 = screen.getAllByAltText(/ image/i);
+      expect(images2[0]).toHaveAttribute("src", "additionalImage");
+      // contactText
+      expect(screen.getByText("contactText")).toBeInTheDocument();
+      const contactEmail = screen.getByText("Email: contactEmail");
+      expect(contactEmail).toBeInTheDocument();
+      expect(contactEmail).toHaveAttribute("href", "mailto:contactEmail");
+      // legal section
+      expect(screen.getByText("legalText")).toBeInTheDocument();
+      // footer
+      // go see the footer test
     });
   });
 });

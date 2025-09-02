@@ -46,7 +46,7 @@ export const Dimmer = ({ dimmed, showLoader }) => {
     <>
       {showLoader ? (
         <CenteredSpinner>
-          <div className="spinner"></div>
+          <div className="spinner" role="progressbar"></div>
         </CenteredSpinner>
       ) : null}
       <Dimmed />

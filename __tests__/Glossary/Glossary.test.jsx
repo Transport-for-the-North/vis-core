@@ -1,6 +1,13 @@
 import { Glossary } from "Components/Glossary/index";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+// Mock Modal.setAppElement pour éviter les erreurs
+jest.mock('react-modal', () => {
+  const Modal = jest.requireActual('react-modal');
+  Modal.setAppElement = jest.fn();
+  return Modal;
+});
 
 describe("Glossary component test", () => {
   const glossaryData = {
@@ -17,7 +24,7 @@ describe("Glossary component test", () => {
       exclude: [],
     },
     digitallyDistributed: {
-      title: "Future Travel Scenario: Digitally Distributed",
+      title: "Future Travel Scenario",
       content: `<p>This scenario sees a future where digital and technological advances accelerate, transforming how we work, travel, and live.
       In general, we embrace these technological changes and the move towards a distributed, service-based transport system.
       Long-term climate change targets are met, but there is slow progress in the short-term due to a general preference for individualized mobility over traditional public transport.
@@ -34,51 +41,68 @@ describe("Glossary component test", () => {
         bgColor="blue"
         fontColor="red"
         location="location"
-      ></Glossary>
+      />
     );
   };
 
-  it("Show one explanation of Glossary and touch the image", () => {
-    renderGlossary();
+  it("Show one explanation of Glossary and touch the image", async () => {
+    renderGlossary();  
     expect(
       screen.getByText("Get help/explanation using the search box:")
     ).toBeInTheDocument();
-
+    
     const select = screen.getByRole("combobox");
     expect(select).toBeInTheDocument();
-
+    
     userEvent.click(select);
-    const optionSelected = screen.getByText(
-      "Future Travel Scenario: Digitally Distributed"
-    );
+    
+    // Attendre que les options apparaissent
+    const optionSelected = await screen.findByText("Future Travel Scenario");
     userEvent.click(optionSelected);
-
-    expect(
-      screen.getByText(/This scenario sees a future/i)
-    ).toBeInTheDocument();
+    
+    // Attendre que le contenu soit affiché
+    await waitFor(() => {
+      expect(screen.getByText(/This scenario sees a future/i)).toBeInTheDocument();
+    });
   });
 
-  it("Click on the image and open the modal then close it", () => {
+  it("Click on the image and open the modal then close it", async () => {
     renderGlossary();
-
+    
     const select = screen.getByRole("combobox");
     userEvent.click(select);
-    const optionSelected = screen.getByText(
-      "Future Travel Scenario: Digitally Distributed"
-    );
+    
+    // Attendre que le menu dropdown soit ouvert et que les options soient visibles
+    await waitFor(() => {
+      expect(screen.getByText("Future Travel Scenario")).toBeInTheDocument();
+    });
+    
+    const optionSelected = screen.getByText("Future Travel Scenario");
     userEvent.click(optionSelected);
-
-    const img = screen.getByAltText(
-      "Graph plotting EV stock by year, one line per scenario"
-    );
+    
+    // Attendre que le contenu soit rendu
+    await waitFor(() => {
+      expect(screen.getByText(/This scenario sees a future/i)).toBeInTheDocument();
+    });
+    
+    // L'image devrait maintenant être visible
+    const img = screen.getByAltText("Graph plotting EV stock by year, one line per scenario");
     expect(img).toBeInTheDocument();
-
+    
     userEvent.click(img);
-    expect(screen.getByAltText("Modal Content")).toBeInTheDocument();
-
-    // Close the modal
+    
+    // Attendre que le modal s'ouvre
+    await waitFor(() => {
+      expect(screen.getByAltText("Modal Content")).toBeInTheDocument();
+    });
+    
+    // Fermer le modal
     const closeButton = screen.getByText("Close");
     userEvent.click(closeButton);
-    expect(screen.queryByAltText("Modal Content")).not.toBeInTheDocument();
+    
+    // Vérifier que le modal est fermé
+    await waitFor(() => {
+      expect(screen.queryByAltText("Modal Content")).not.toBeInTheDocument();
+    });
   });
 });

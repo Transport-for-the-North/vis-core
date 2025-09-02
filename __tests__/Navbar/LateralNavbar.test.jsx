@@ -131,7 +131,7 @@ describe("LateralNavbar component test", () => {
     expect(noCategory2).toHaveAttribute("href", "/url2");
     expect(noCategory).toHaveAttribute("href", "/url");
   });
-  it.only("basic functionality test with multiple categories and an externals categories", () => {
+  it("basic functionality test with multiple categories and an externals categories", () => {
     render(
       <MemoryRouter>
         <AppContext.Provider value={mockAppContext}>
