@@ -14,6 +14,10 @@ export const investmentSummary = `
         <div class="value" style="font-size: 1.2em;">{programme}</div>
       </div>
       <div class="card">
+        <div class="label">Freight Intervention (if applicable)</div>
+        <div class="value" style="font-size: 1.2em;">{freight_intervention}</div>
+      </div>
+      <div class="card">
         <div class="label">Description</div>
         <div class="value" style="font-size: 1.2em;">{description}</div>
       </div>

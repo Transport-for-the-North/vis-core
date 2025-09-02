@@ -1005,6 +1005,42 @@ const timePeriod = {
     }
 }
 
+const nodeFreightInterventionSelector = {
+    filterName: "Freight Intervention",
+    paramName: "freightIntervention",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the freight intervention for the data.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+
+        ]
+    }
+}
+
+const linkFreightInterventionSelector = {
+    filterName: "Freight Intervention",
+    paramName: "freightIntervention",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the freight intervention for the data.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            
+        ]
+    }
+}
+
 export const selectors = {
   linkTOCSelector: linkTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -1023,4 +1059,6 @@ export const selectors = {
   investmentFeatureSelector: investmentFeatureSelector,
   authoritySelector: authoritySelector,
   timePeriod: timePeriod,
+  nodeFreightInterventionSelector: nodeFreightInterventionSelector,
+  linkFreightInterventionSelector: linkFreightInterventionSelector
 };
