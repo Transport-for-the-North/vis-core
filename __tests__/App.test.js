@@ -1,3 +1,10 @@
+jest.mock("js-cookie", () => ({
+  get: jest.fn(),
+}));
+
+jest.mock("jwt-decode", () => ({
+  jwtDecode: jest.fn(),
+}));
 jest.mock("../../configs/dev/appConfig.js", () => ({
   appConfig: {
     authenticationRequired: true,
@@ -38,6 +45,8 @@ jest.mock("../../Components", () => ({
   PageSwitch: () => <div>PageSwitch</div>,
 }));
 
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 import { render, screen, waitFor } from "@testing-library/react";
 import App from "../../App";
 import { MemoryRouter } from "react-router-dom";
@@ -67,29 +76,56 @@ describe("App Component", () => {
     });
   });
 
-  // To continue
-  it.skip("Renders the homePage where we're connected", async () => {
-    // Mock the function withRoleValidation to return the component directly
-    // JE NE PEUX PAS MOCK ICI CAR JAI UN MESSAGE DERREUR : Invalid variable access: _jsxFileName
-    // jest.doMock("../../hocs/withRoleValidation.jsx", () => ({
-    //   withRoleValidation: (Component) => {
-    //     return (props) => <Component {...props} />;
-    //   },
-    // }));
-    // jest.doMock("js-cookie", () => ({
-    //   get: jest.fn(() => "mockToken"),
-    // }));
+  it("Renders the homePage where we're connected", async () => {
+    
+    // Define the REACT_APP_NAME in "dev"
+    process.env.REACT_APP_NAME = "dev";
 
-    // jest.doMock("jwt-decode", () => ({
-    //   jwtDecode: jest.fn(() => ({
-    //     "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": [
-    //       "All_Admin",
-    //       "All_superuser_role",
-    //       "All_User",
-    //     ],
-    //   })),
-    // }));
-
+    Cookies.get.mockReturnValue("fake-jwt-token");
+    jwtDecode.mockReturnValue({
+      "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": ["dev_user", "all_user"]
+    });
+    jest.mock("../../hocs", () => ({
+      withRoleValidation: jest.fn((Component) => Component),
+      withWarning: jest.fn((Component) => Component),
+      withTermsOfUse: jest.fn((Component) => Component),
+      composeHOCs: jest.fn(
+        (...hocs) =>
+          (Component) =>
+            Component
+      ),
+    }));
+    jest.mock("../../configs/dev/bands.js", () => ({
+      bands: [{ name: "name", metric: [] }],
+    }));
+    jest.mock("../../configs/dev/appConfig.js", () => ({
+      appConfig: {
+        title: "TAME React Vis Template",
+        introduction: "Test introduction",
+        background: "",
+        methodology: "",
+        legalText: "Test legal text",
+        contactText: "Test contact",
+        contactEmail: "test@example.com",
+        logoImage: "img/test-logo.png",
+        backgroundImage: "img/test-bg.jpg",
+        logoutButtonImage: "img/test-burger.png",
+        logoutImage: "img/test-logout.png",
+        appPages: [
+          {
+            id: "page1",
+            name: "Test Page 1",
+          }
+        ],
+        authenticationRequired: false,
+        loadBands: jest.fn().mockResolvedValue([
+          {
+            name: "fallbackBand",
+            metric: ["fallbackMetric"],
+          },
+        ]),
+      },
+    }));
 
     render(
       <MemoryRouter initialEntries={["/"]}>
@@ -98,7 +134,9 @@ describe("App Component", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("HomePage")).toBeInTheDocument();
+      expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
     });
+
+    expect(screen.getByText("HomePage")).toBeInTheDocument();
   });
 });
