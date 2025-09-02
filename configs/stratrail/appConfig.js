@@ -12,6 +12,43 @@ export const appConfig = {
         {
             content: `
             <p>
+                This portal provides access to a variety of visualisations based on data retrieved from various open sources. Below are some details on how to navigate and use the platform effectively and the relative data that each page contains.
+            </p>
+            <hr style="margin: 24px 0 32px 0; border: none; border-top: 1px solid #ccc;" />
+            <ul>
+                <li><b>Navigation:</b> Use the menu to explore different visualisations available in the portal.</li>
+                <li><b>Interactivity:</b> Many visualisations are interactive. Hover over elements to show tooltips, or click elements to show more information (currently only in the investment pages).</li>
+                <li><b>Filters:</b> Use the filters provided on each page to refine the data displayed according to your interests.</li>
+                <li><b>Data Sources:</b> Each visualisation includes information about the data sources used, ensuring transparency and reliability. This is visible in the "About this visualisation" section in each map page.</li>
+                <li><b>Layer Control:</b> Toggle different layers on and off and change colour schemes in the "Map layer control" section to customize the view according to your needs.</li>
+                <li><b>Tooltips:</b> Hover over map features to see detailed information in tooltips.</li>
+                <li><b>Download Data:</b> Where available, use the download options to export data for further analysis.</li>
+            </ul>
+            <hr style="margin: 24px 0 32px 0; border: none; border-top: 1px solid #ccc;" />
+            <p>
+                Below are the list of each pages available in the portal along with a brief description of the data they contain.
+            </p>
+            <ul>
+                <li><b>Station Information - Values:</b> Car park spaces and cycle spaces at each station in the NorTMS model.</li>
+                <li><b>Station Information - Boolean:</b> True/False information, such as if the station contains help points, ticket machines, availability to buy tickets at the station, seated areas etc..</li>
+                <li><b>Station Loadings:</b> This visualisation shows the boarding and alighting summaries at each station in the NorTMS model.</li>
+                <li><b>Station Socio-Economic Classifications (NS-SeC):</b> This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
+                <li><b>Station Economic Activity Status:</b> This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
+                <li><b>Link Loadings:</b> This visualisation shows the boarding and alighting summaries for each link in the NorTMS model.</li>
+                <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</li>
+                <li><b>Node Investments:</b> This visualisation shows the current node investments in the Investment Pipeline.</li>
+                <li><b>Link Investments:</b> This visualisation shows the current link investments in the Investment Pipeline.</li>
+                <li><b>Link Frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
+                <li><b>Freight Node Investments:</b> This visualisation shows the current freight node investments in the Investment Pipeline.</li>
+                <li><b>Freight Link Investments:</b> This visualisation shows the current freight link investments in the Investment Pipeline.</li>
+            </ul>
+            `,
+            sectionTitle: "Portal Information",
+            alignment: "left"
+        },
+        {
+            content: `
+            <p>
                 Below are links to trusted external data sources that provide additional rail industry information not directly available within this platform.
             </p>
             <p>
@@ -21,7 +58,7 @@ export const appConfig = {
             <div style="display: flex; flex-direction: column; gap: 32px;">
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.networkrail.co.uk/industry-and-commercial/information-for-operators/national-electronic-sectional-appendix/" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>Infrastructure, Signalling and Electrification</b>
                         </button>
                     </a>
@@ -33,7 +70,7 @@ export const appConfig = {
                 </div>
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.networkrail.co.uk/industry-and-commercial/information-for-operators/national-electronic-sectional-appendix/" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>Freight Gauging and Terminals</b>
                         </button>
                     </a>
@@ -45,7 +82,7 @@ export const appConfig = {
                 </div>
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.railwaydata.co.uk/levelcrossings" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>Level Crossings</b>
                         </button>
                     </a>
@@ -57,7 +94,7 @@ export const appConfig = {
                 </div>
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.railwaydata.co.uk/stations/" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>Station Usage</b>
                         </button>
                     </a>
@@ -69,7 +106,7 @@ export const appConfig = {
                 </div>
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.railwaydata.co.uk/timetables" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>Timetables and Services</b>
                         </button>
                     </a>
@@ -81,7 +118,7 @@ export const appConfig = {
                 </div>
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.transportfocus.org.uk/publications/" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>Customer Satisfaction</b>
                         </button>
                     </a>
@@ -93,7 +130,7 @@ export const appConfig = {
                 </div>
                 <div style="display: flex; align-items: center;">
                     <a href="https://www.openrailwaymap.org/" target="_blank" style="text-decoration: none;">
-                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer;">
+                        <button style="width: 280px; height: 50px; font-size: 0.95rem; border: none; border-radius: 6px; cursor: pointer; background-color: #7317de; color: #fff;">
                             <b>OpenRailwayMap</b>
                         </button>
                     </a>
