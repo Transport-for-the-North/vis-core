@@ -42,7 +42,7 @@ export const stationInformation = {
         },
         {
             uniqueId: "RailOfferNodeVectorTile",
-            name: "Rail Offer Nodes",
+            name: "Stations Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_nodes/{z}/{x}/{y}", // matches the path in swagger.json
@@ -64,7 +64,7 @@ export const stationInformation = {
         {
         name: "Node Information",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Nodes",
+        joinLayer: "Stations Layer",
         style: "circle-continuous",
         joinField: "id",
         valueField: "value",
@@ -95,7 +95,6 @@ export const stationInformation = {
             ],
             downloadPath: '/api/railoffer/node-results/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

@@ -13,7 +13,7 @@ export const linkFrequency = {
     layers: [
         {
             uniqueId: "RailOfferLinksVectorTile",
-            name: "Rail Offer Links Result",
+            name: "Link Frequency Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -34,7 +34,7 @@ export const linkFrequency = {
         {
         name: "Link Frequencies",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Links Result",
+        joinLayer: "Link Frequency Layer",
         style: "line-continuous",
         joinField: "id",
         valueField: "value",
@@ -62,7 +62,6 @@ export const linkFrequency = {
             ],
             downloadPath: '/api/railoffer/link-frequency/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

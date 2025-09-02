@@ -15,7 +15,7 @@ export const linkInvestments = {
     layers: [
         {
             uniqueId: "RailOfferInvestmentLinksVectorTile",
-            name: "Rail Offer Investment Links Result",
+            name: "Link Investment Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_investment_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -41,7 +41,7 @@ export const linkInvestments = {
         {
         name: "Link Investment Results",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Investment Links Result",
+        joinLayer: "Link Investment Layer",
         style: "line-categorical",
         joinField: "id",
         valueField: "value",
@@ -66,7 +66,7 @@ export const linkInvestments = {
     metadataTables: [],
     filters: [
         { ...selectors.linkInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Investment Results'] },
-        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Rail Offer Investment Links Result"}
+        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
     ],
     additionalFeatures: {
         glossary: { 
@@ -78,7 +78,6 @@ export const linkInvestments = {
             ],
             downloadPath: '/api/railoffer/investment-link-results/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

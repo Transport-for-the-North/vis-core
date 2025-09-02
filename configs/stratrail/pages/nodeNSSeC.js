@@ -42,7 +42,7 @@ export const nodeNSSeC = {
         },
         {
             uniqueId: "RailOfferNodeVectorTile",
-            name: "Rail Offer Nodes",
+            name: "Node NS-SeC Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_nodes/{z}/{x}/{y}", // matches the path in swagger.json
@@ -63,7 +63,7 @@ export const nodeNSSeC = {
         {
         name: "Node NS-SeC Totals",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Nodes",
+        joinLayer: "Node NS-SeC Layer",
         style: "circle-continuous",
         joinField: "id",
         valueField: "value",
@@ -94,7 +94,6 @@ export const nodeNSSeC = {
             ],
             downloadPath: '/api/railoffer/nssec/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

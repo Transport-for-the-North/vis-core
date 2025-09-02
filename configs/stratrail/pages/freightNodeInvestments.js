@@ -44,7 +44,7 @@ export const nodeInvestments = {
         },
         {
             uniqueId: "RailOfferInvestmentNodeVectorTile",
-            name: "Rail Offer Investment Nodes Result",
+            name: "Node Investment Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_investment_nodes/{z}/{x}/{y}", // matches the path in swagger.json
@@ -70,7 +70,7 @@ export const nodeInvestments = {
         {
         name: "Node Freight Investment Results",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Investment Nodes Result",
+        joinLayer: "Node Investment Layer",
         style: "circle-categorical",
         joinField: "id",
         valueField: "value",
@@ -95,7 +95,7 @@ export const nodeInvestments = {
     metadataTables: [],
     filters: [
         { ...selectors.nodeFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Freight Investment Results'] },
-        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Rail Offer Investment Nodes Result"}
+        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Node Investment Layer"}
     ],
     additionalFeatures: {
         glossary: { 
@@ -107,7 +107,6 @@ export const nodeInvestments = {
             ],
             downloadPath: '/api/railoffer/freight-investment-node-results/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

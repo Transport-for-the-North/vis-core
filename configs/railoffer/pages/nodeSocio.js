@@ -42,7 +42,7 @@ export const nodeSocio = {
         },
         {
             uniqueId: "RailOfferNodeVectorTile",
-            name: "Rail Offer Nodes",
+            name: "Node Socio Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_nodes/{z}/{x}/{y}", // matches the path in swagger.json
@@ -63,7 +63,7 @@ export const nodeSocio = {
         {
         name: "Node Socio Totals",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Nodes",
+        joinLayer: "Node Socio Layer",
         style: "circle-continuous",
         joinField: "id",
         valueField: "value",
@@ -94,7 +94,6 @@ export const nodeSocio = {
             ],
             downloadPath: '/api/railoffer/socio/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

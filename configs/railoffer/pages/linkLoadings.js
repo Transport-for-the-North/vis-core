@@ -25,7 +25,7 @@ export const linkLoadings = {
     layers: [
         {
             uniqueId: "RailOfferLinksVectorTile",
-            name: "Rail Offer Links Result",
+            name: "Link Loading Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -46,7 +46,7 @@ export const linkLoadings = {
         {
         name: "Link Loading Totals",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Links Result",
+        joinLayer: "Link Loading Layer",
         style: "line-continuous",
         joinField: "id",
         valueField: "value",
@@ -73,7 +73,6 @@ export const linkLoadings = {
             ],
             downloadPath: '/api/railoffer/link-loadings/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };
