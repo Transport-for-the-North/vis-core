@@ -48,7 +48,7 @@ describe("ResponsiveNavbarLinks component test", () => {
     expect(fakeOnCLick).toHaveBeenCalled();
     expect(screen.getByText("Third1")).toBeInTheDocument();
   });
-  it.only("Basic use of ResponsiveNavbarLinks with external", () => {
+  it("Basic use of ResponsiveNavbarLinks with external", () => {
     render(renderElement);
 
     // Click on child link

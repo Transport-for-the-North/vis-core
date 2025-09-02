@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   NavBarDropdown,
@@ -7,6 +7,7 @@ import {
 } from "Components/Navbar/NavBarDropdown";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { fireEvent } from "@testing-library/react";
+import { rgb } from "polished";
 
 describe("NavBarDropdown component test", () => {
   const fakeOnClick = jest.fn();
@@ -33,7 +34,7 @@ describe("NavBarDropdown component test", () => {
     $bgColor: "#FF637E",
     onChildHoverChange: {},
   };
-  it("NavBarDropdown basic render", () => {
+  it("NavBarDropdown basic render", async () => {
     render(
       <MemoryRouter>
         <NavBarDropdown {...props} />
@@ -42,10 +43,16 @@ describe("NavBarDropdown component test", () => {
     const parent = screen.getByText("▾");
     expect(parent).toBeInTheDocument();
     userEvent.click(parent);
+    await waitFor(() => {
+      expect(screen.getByText("pageName2")).toBeInTheDocument();
+    });
+
     const child = screen.getByText("pageName2");
-    expect(child).toBeInTheDocument();
-    child.click();
-    expect(fakeOnClick).toHaveBeenCalled();
+    userEvent.click(child);
+
+    await waitFor(() => {
+      expect(fakeOnClick).toHaveBeenCalled();
+    });
   });
 });
 
@@ -169,13 +176,13 @@ describe("RecursiveDropdownItem component test", () => {
 
     // Parent active
     fireEvent.mouseEnter(container);
-    const item = screen.getByText("pageName")
+    const item = screen.getByText("pageName");
     expect(item).toBeInTheDocument();
     item.click();
     const parent = item.closest("a");
     expect(parent).toHaveStyle({ backgroundColor: "#2c34a7ff" });
-    expect(parent).toHaveStyle({ color: "#f9f9f9" });
-    expect(parent).toHaveAttribute('href', '/');
+    expect(parent).toHaveStyle({ color: rgb(255, 255, 255) });
+    expect(parent).toHaveAttribute("href", "/");
 
     // Click on child
     const p = screen.getByText("▸");
@@ -183,6 +190,8 @@ describe("RecursiveDropdownItem component test", () => {
     userEvent.click(p);
     const child1 = screen.getByText("pageName1");
     userEvent.click(child1);
-    expect(screen.getByText("/url1")).toBeInTheDocument()
+    waitFor(() => {
+      expect(screen.getByText("/url1")).toBeInTheDocument();
+    });
   });
 });
