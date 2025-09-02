@@ -101,7 +101,7 @@ const dayOfWeekSelector = {
   },
 };
 
-const loadingsMetricSelector = {
+const linkLoadingsMetricSelector = {
   filterName: "Metric",
   paramName: "columnName",
   target: "api",
@@ -133,6 +133,34 @@ const loadingsMetricSelector = {
       {
         displayValue: "Load on Departure",
         paramValue: "mean_load_on_departure",
+        legendSubtitleText: "Passengers"
+      }
+    ],
+  },
+};
+
+const nodeLoadingsMetricSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  info:'Use this dropdown to select the metric that will style the map.',
+  visualisations: null,
+  containsLegendInfo: true,
+  type: "dropdown",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Boarders",
+        paramValue: "mean_passengers_on",
+        legendSubtitleText: "Passengers"
+      },
+      {
+        displayValue: "Alighters",
+        paramValue: "mean_passengers_off",
         legendSubtitleText: "Passengers"
       }
     ],
@@ -1009,7 +1037,8 @@ export const selectors = {
   linkTOCSelector: linkTOCSelector,
   railPeriodSelector: railPeriodSelector,
   dayOfWeekSelector: dayOfWeekSelector,
-  loadingsMetricSelector: loadingsMetricSelector,
+  linkLoadingsMetricSelector: linkLoadingsMetricSelector,
+  nodeLoadingsMetricSelector: nodeLoadingsMetricSelector,
   timingLinkMetricSelector: timingLinkMetricSelector,
   nodeTOCSelector: nodeTOCSelector,
   booleanSelector: booleanSelector,

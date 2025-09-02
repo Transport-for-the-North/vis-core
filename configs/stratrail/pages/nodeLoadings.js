@@ -73,7 +73,7 @@ export const nodeLoadings = {
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.loadingsMetricSelector, visualisations: ['Node Loading Totals'] },
+        { ...selectors.nodeLoadingsMetricSelector, visualisations: ['Node Loading Totals'] },
         { ...selectors.nodeTOCSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true},
         { ...selectors.authoritySelector, visualisations: ['Node Loading Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.booleanSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
