@@ -9,7 +9,8 @@ export const freightNodeInvestments = {
   url: "/freight-node-investments",
   type: "MapLayout",
   category: "Investments",
-  about: `<p>This visualisation shows the current node investments in the Investment Pipeline.</p>`,
+  about: `<p>This visualisation shows all the freight node investment/schemes from the Freight Investment Pipeline (SRIP). Each scheme is colour coded by it's current status.</p>
+        <p>Use the filters to select the intervention type(s) you wish to see on the map. Hover over a node to view it's basic information and/or click on a node to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {

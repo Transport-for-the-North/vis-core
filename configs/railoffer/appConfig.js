@@ -18,7 +18,8 @@ export const appConfig = {
             <ul>
                 <li><b>Navigation:</b> Use the menu to explore different visualisations available in the portal.</li>
                 <li><b>Interactivity:</b> Many visualisations are interactive. Hover over elements to show tooltips, or click elements to show more information (currently only in the investment pages).</li>
-                <li><b>Filters:</b> Use the filters provided on each page to refine the data displayed according to your interests.</li>
+                <li><b>Information:</b> Each page contains an "About this visualisation" section that provides context and details about the data being presented and how it was calculated.</li>
+                <li><b>Filters:</b> Use the filters provided on each page to refine the data displayed according to your interests. Each filter contains a info button so the user can understand exactly what it is filtering.</li>
                 <li><b>Data Sources:</b> Each visualisation includes information about the data sources used, ensuring transparency and reliability. This is visible in the "About this visualisation" section in each map page.</li>
                 <li><b>Layer Control:</b> Toggle different layers on and off and change colour schemes in the "Map layer control" section to customize the view according to your needs.</li>
                 <li><b>Tooltips:</b> Hover over map features to see detailed information in tooltips.</li>

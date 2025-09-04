@@ -5,7 +5,7 @@ const linkTOCSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
-  info:'Use this dropdown to select various different links by TOC. The full name for each TOC is visible in the "About this visualisation" section.',
+  info:'Use this dropdown to filter links by train operator.',
   visualisations: null,
   type: "dropdown",
   values: {
@@ -32,18 +32,20 @@ const railPeriodSelector = {
   values: {
     source: "local",
     values: [
-      {
-        displayValue: "2025/P12",
-        paramValue: '2025/P12',
-      },
-      {
-        displayValue: "2025/P13",
-        paramValue: "2025/P13",
-      },
-      {
-        displayValue: "2026/P01",
-        paramValue: '2026/P01',
-      }
+    { displayValue: "2025/P05", paramValue: "2025/P05" },
+    { displayValue: "2025/P06", paramValue: "2025/P06" },
+    { displayValue: "2025/P07", paramValue: "2025/P07" },
+    { displayValue: "2025/P08", paramValue: "2025/P08" },
+    { displayValue: "2025/P09", paramValue: "2025/P09" },
+    { displayValue: "2025/P10", paramValue: "2025/P10" },
+    { displayValue: "2025/P11", paramValue: "2025/P11" },
+    { displayValue: "2025/P12", paramValue: "2025/P12" },
+    { displayValue: "2025/P13", paramValue: "2025/P13" },
+    { displayValue: "2026/P01", paramValue: "2026/P01" },
+    { displayValue: "2026/P02", paramValue: "2026/P02" },
+    { displayValue: "2026/P03", paramValue: "2026/P03" },
+    { displayValue: "2026/P04", paramValue: "2026/P04" },
+    { displayValue: "2026/P05", paramValue: "2026/P05" }
     ],
   },
 };
@@ -55,7 +57,7 @@ const dayOfWeekSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
-  info:'Use this dropdown to filter data by weekday/weekend. Data is shown over the whole rail timetable for weekend and weekdays.',
+  info:'Use this dropdown to filter data by weekday/weekend.',
   visualisations: null,
   type: "dropdown",
   values: {
@@ -69,34 +71,6 @@ const dayOfWeekSelector = {
             displayValue: "Weekend",
             paramValue: 'Weekend',
         },
-    //   {
-    //     displayValue: "Monday",
-    //     paramValue: 'Mon',
-    //   },
-    //   {
-    //     displayValue: "Tuesday",
-    //     paramValue: 'Tue',
-    //   },
-    //   {
-    //     displayValue: "Wednesday",
-    //     paramValue: 'Wed',
-    //   },
-    //   {
-    //     displayValue: "Thursday",
-    //     paramValue: 'Thu',
-    //   },
-    //   {
-    //     displayValue: "Friday",
-    //     paramValue: 'Fri',
-    //   },
-    //   {
-    //     displayValue: "Saturday",
-    //     paramValue: 'Sat',
-    //   },
-    //   {
-    //     displayValue: "Sunday",
-    //     paramValue: 'Sun',
-    //   }
     ],
   },
 };
@@ -202,7 +176,7 @@ const nodeTOCSelector = {
   actions: [
     { action: "UPDATE_QUERY_PARAMS" },
   ],
-  info:'Use this dropdown to select various different stations by TOC. The full name for each TOC is visible in the "About this visualisation" section.',
+  info:'Use this dropdown to filter nodes by station operator.',
   visualisations: null,
   type: "dropdown",
   values: {

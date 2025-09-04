@@ -7,17 +7,10 @@ export const linkLoadings = {
   type: "MapLayout",
   category: "Link",
   about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>
-  <p><b>TOC Abbreviations:</b></p> 
-  <p>NT: Northern</p>
-  <p>GR: East Coast</p>
-  <p>EM: East Midlands</p>
-  <p>VT: West Cost</p>
-  <p>ME: Merseyrail</p>
-  <p>GM: Greater Manchester</p>
-  <p>NR: Network Rail</p>
-  <p>AW: Transport for Wales</p>
-  <p>TP: Transpennine</p>
-  <p>XC: CrossCountry</p>
+    <p>This data is retrieved from the Rail Data Marketplace and currently only contains Northern Loadings data.</p>
+    <p>Loadings are calculated by getting boarding/alighting/load on departure/capacity values from station-station pairs for each rail period. This is then mapped to the network, therefore boarding values will only show from the first link between stations, alighters from the last, as they board/alight at a specific station. Intermediate links in this case will be zero, which will most likely be junction links as trains do not stop there.</p>
+    <p>Rail Periods are 4 week periods used in the rail industry to manage timetables and operations. There are 13 rail periods in a year, in our filters they are shown as e.g. 2025/P01 which is period 1 of the 2025 rail year.</p>
+    <p>Use the filters to select the metric, rail period, and day of week you wish to see on the map. Hover over a link to see more information about the loadings on the tooltip.</p>
   `,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,

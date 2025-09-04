@@ -6,7 +6,9 @@ export const linkFrequency = {
   url: "/link-frequency",
   type: "MapLayout",
   category: "Link",
-  about: `<p>This visualisation shows the trains per hour for each period for each link in the NorTMS 2018 model.</p>`,
+  about: `<p>This visualisation shows the number of trains per hour for each link in the NorTMS 2018 model for the specified period chosen.</p>
+  <p>For each link and selected period, frequency is the mean of the per‑hour train counts across that period (average trains per hour).</p>
+  <p>Use the time period filter to select the period you wish to see on the map. Click on a link to see more information about the frequency.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {

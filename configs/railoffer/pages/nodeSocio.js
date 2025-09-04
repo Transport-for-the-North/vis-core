@@ -7,7 +7,10 @@ export const nodeSocio = {
   url: "/node-socio",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</p>`,
+  about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model.</p>
+   <p>Economic activity status is derived from the NS-SeC (National Statistics Socio-economic Classification) data, which classifies individuals based on their occupation and employment status. The classification includes categories such as employed, unemployed, retired, student, and others.</p>
+   <p>This data has been retrieved from NOMIS, and mapped to the NorTMS stations by using a 2.5km buffer around each station to find nearby LSOAs and using the economic activity data for those area(s).</p>
+   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the economic activity on the tooltip.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -76,9 +79,8 @@ export const nodeSocio = {
         { ...selectors.stationSocioMetricSelector, visualisations: ['Node Socio Totals'] },
         { ...selectors.nodeTOCSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.authoritySelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Socio Totals'] },
-        { ...selectors.dayOfWeekSelector, visualisations: ['Node Socio Totals'] },
     ],
     additionalFeatures: {
         glossary: { 
@@ -88,9 +90,8 @@ export const nodeSocio = {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
                 { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
                 { ...selectors.routeNameSelector, multiSelect: true },
-                { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/socio/download'
         },

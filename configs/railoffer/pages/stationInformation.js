@@ -7,7 +7,9 @@ export const stationInformation = {
   url: "/station-information-val",
   type: "MapLayout",
   category: "Station",
-  about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>`,
+  about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>
+   <p>This data is retrieved from the Stations feed in the Rail Data Marketplace, and includes information which can be visualised as a value, such as car parking spaces, bicycle parking spaces etc.</p>
+   <p>Use the filters to select the metric, TOC, authority, and route name you wish to see on the map. Hover over a node to see more information about the station on the tooltip.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -77,9 +79,8 @@ export const stationInformation = {
         { ...selectors.stationInformationMetricSelector, visualisations: ['Node Information'] },
         { ...selectors.nodeTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
         { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
-        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+        { ...selectors.booleanSelector, visualisations: ['Node Information'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Information'] },
-        { ...selectors.dayOfWeekSelector, visualisations: ['Node Information'] },
     ],
     additionalFeatures: {
         glossary: { 
@@ -89,9 +90,8 @@ export const stationInformation = {
             filters: [
                 { ...selectors.nodeTOCSelector, multiSelect: true },
                 { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
-                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth" },
+                { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
                 { ...selectors.routeNameSelector, multiSelect: true },
-                { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/node-results/download'
         },

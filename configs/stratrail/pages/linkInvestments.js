@@ -8,7 +8,8 @@ export const linkInvestments = {
   url: "/link-investments",
   type: "MapLayout",
   category: "Investments",
-  about: `<p>This visualisation shows the current line investments in the investment pipeline.</p>`,
+  about: `<p>This visualisation shows all the link investment/schemes from the Investment Pipeline. Each scheme is colour coded by it's current status.</p>
+        <p>Use the filters to select the theme(s) you wish to see on the map. Hover over a link to view it's basic information and/or click on a link to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
