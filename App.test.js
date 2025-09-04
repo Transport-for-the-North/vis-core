@@ -5,7 +5,7 @@ jest.mock("js-cookie", () => ({
 jest.mock("jwt-decode", () => ({
   jwtDecode: jest.fn(),
 }));
-jest.mock("../../configs/dev/appConfig.js", () => ({
+jest.mock("./configs/dev/appConfig.js", () => ({
   appConfig: {
     authenticationRequired: true,
     appPages: [],
@@ -13,11 +13,11 @@ jest.mock("../../configs/dev/appConfig.js", () => ({
   },
 }));
 
-jest.mock("../../configs/dev/bands.js", () => ({
+jest.mock("./configs/dev/bands.js", () => ({
   bands: ["band1", "band2"],
 }));
 
-jest.mock("../../services", () => ({
+jest.mock("../src/services", () => ({
   api: {
     metadataService: {
       getSwaggerFile: jest.fn(() => Promise.resolve({ swagger: "mockSchema" })),
@@ -36,7 +36,7 @@ jest.mock("maplibre-gl", () => ({
   })),
 }));
 
-jest.mock("../../Components", () => ({
+jest.mock("./Components", () => ({
   HomePage: () => <div>HomePage</div>,
   Navbar: () => <div>Navbar</div>,
   Login: () => <div>Login</div>,
@@ -48,7 +48,7 @@ jest.mock("../../Components", () => ({
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import { render, screen, waitFor } from "@testing-library/react";
-import App from "../../App";
+import App from 'App';
 import { MemoryRouter } from "react-router-dom";
 
 process.env.REACT_APP_NAME = "dev";
@@ -85,7 +85,7 @@ describe("App Component", () => {
     jwtDecode.mockReturnValue({
       "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": ["dev_user", "all_user"]
     });
-    jest.mock("../../hocs", () => ({
+    jest.mock("./hocs", () => ({
       withRoleValidation: jest.fn((Component) => Component),
       withWarning: jest.fn((Component) => Component),
       withTermsOfUse: jest.fn((Component) => Component),
@@ -95,10 +95,10 @@ describe("App Component", () => {
             Component
       ),
     }));
-    jest.mock("../../configs/dev/bands.js", () => ({
+    jest.mock("./configs/dev/bands.js", () => ({
       bands: [{ name: "name", metric: [] }],
     }));
-    jest.mock("../../configs/dev/appConfig.js", () => ({
+    jest.mock("./configs/dev/appConfig.js", () => ({
       appConfig: {
         title: "TAME React Vis Template",
         introduction: "Test introduction",

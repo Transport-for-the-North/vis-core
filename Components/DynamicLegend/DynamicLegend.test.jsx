@@ -4,8 +4,8 @@ import {
   DynamicLegend,
   interpretWidthExpression,
   interpretColorExpression,
-} from "../../DynamicLegend/DynamicLegend";
-import { MapContext } from "../../../contexts/MapContext.jsx";
+} from ".";
+import { MapContext } from "../../contexts/MapContext";
 import { AppContext, PageContext } from "contexts";
 
 // Mock the map object and its methods

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { Logo } from "../../Navbar/Logo";
+import { Logo } from "./Logo";
 import userEvent from "@testing-library/user-event";
 
 const fakeOnClick = jest.fn();

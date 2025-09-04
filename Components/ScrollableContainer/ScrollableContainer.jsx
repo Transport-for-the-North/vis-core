@@ -30,7 +30,7 @@ const StyledScrollableContainer = styled.div`
 export const ScrollableContainer = ({ children }) => {
   return (
     <div style={{ position: 'relative' }}>
-      <StyledScrollableContainer>
+      <StyledScrollableContainer data-testid="container">
         {children}
       </StyledScrollableContainer>
     </div>
