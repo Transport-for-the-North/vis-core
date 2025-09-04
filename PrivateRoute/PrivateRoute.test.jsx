@@ -1,4 +1,4 @@
-import { PrivateRoute } from "../../PrivateRoute/PrivateRoute";
+import { PrivateRoute } from ".";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Cookies from "js-cookie";

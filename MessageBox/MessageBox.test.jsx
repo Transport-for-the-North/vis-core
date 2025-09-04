@@ -1,7 +1,4 @@
-import { InfoBox } from "../../MessageBox/MessageBox";
-import { WarningBox } from "../../MessageBox/MessageBox";
-import { ErrorBox } from "../../MessageBox/MessageBox";
-
+import { InfoBox, WarningBox, ErrorBox } from ".";
 import { render, screen } from "@testing-library/react";
 
 jest.mock("@heroicons/react/24/solid",()  => ({

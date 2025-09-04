@@ -1,6 +1,6 @@
-import { NotFound } from "../../NotFoundPage/NotFoundPage";
-import { render, screen, act, waitFor } from "@testing-library/react";
-import { AppContext } from "../../../contexts/AppContext";
+import { NotFound } from ".";
+import { render, screen, act } from "@testing-library/react";
+import { AppContext } from "../../contexts/AppContext";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 

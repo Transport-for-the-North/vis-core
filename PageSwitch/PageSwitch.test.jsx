@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { PageSwitch } from "../../PageSwitch/PageSwitch";
-
+import { PageSwitch } from ".";
 // Mocks
 jest.mock("Components", () => ({
   MapLayout: () => <div data-testid="mock-map-layout" />,

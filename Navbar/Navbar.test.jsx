@@ -29,7 +29,7 @@ jest.mock("utils", () => ({
   buildNavbarLinks: jest.fn(),
 }));
 
-jest.mock("../../Navbar/Logo", () => ({
+jest.mock("./Logo.jsx", () => ({
   Logo: ({ logoImage, position, onClick }) =>
     require("react").createElement("img", {
       src: logoImage,
@@ -38,7 +38,7 @@ jest.mock("../../Navbar/Logo", () => ({
       onClick,
     }),
 }));
-jest.mock("../../Navbar/Button", () => ({
+jest.mock("./Button.jsx", () => ({
   Button: ({ src, alt, onClick }) =>
     require("react").createElement(
       "button",
@@ -46,14 +46,14 @@ jest.mock("../../Navbar/Button", () => ({
       require("react").createElement("img", { src, alt })
     ),
 }));
-jest.mock("../../Navbar/ResponsiveNavbarLinks", () => ({
+jest.mock("./ResponsiveNavbarLinks.jsx", () => ({
   ResponsiveNavbarLinks: ({ links }) =>
     require("react").createElement("nav", {
       "data-testid": "responsive-links",
       children: `links:${links.length}`,
     }),
 }));
-jest.mock("../../Navbar/LateralNavbar", () => ({
+jest.mock("./LateralNavbar.jsx", () => ({
   LateralNavbar: ({ className }) =>
     require("react").createElement("aside", {
       "data-testid": "lateral-navbar",
