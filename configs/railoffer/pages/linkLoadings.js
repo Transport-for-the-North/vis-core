@@ -1,3 +1,4 @@
+import glossaryData from "../glossaryData";
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
@@ -56,7 +57,7 @@ export const linkLoadings = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [

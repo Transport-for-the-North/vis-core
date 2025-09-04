@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
+import glossaryData from "../glossaryData";
 
 export const nodeNSSeC = {
   pageName: "Station Socio-Economic Classifications (NS-SeC)",
@@ -96,7 +97,7 @@ export const nodeNSSeC = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [

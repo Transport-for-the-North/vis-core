@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
+import glossaryData from "../glossaryData";
 
 export const nodeSocio = {
   pageName: "Station Economic Activity Status",
@@ -84,7 +85,7 @@ export const nodeSocio = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [

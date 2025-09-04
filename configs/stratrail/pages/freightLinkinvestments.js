@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { investPopupContent } from "../templates/investmentPopup";
 import { investmentSummary } from "../templates";
+import glossaryData from "../glossaryData";
 
 export const freightLinkInvestments = {
   pageName: "Freight Link Investments",
@@ -71,7 +72,7 @@ export const freightLinkInvestments = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [

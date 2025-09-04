@@ -3,6 +3,7 @@ import { termsOfUse } from "../termsOfUse";
 import { investPopupContent } from "../templates/investmentPopup";
 import { investmentSummary } from "../templates";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
+import glossaryData from "../glossaryData";
 
 export const freightNodeInvestments = {
   pageName: "Freight Node Investments",
@@ -100,7 +101,7 @@ export const freightNodeInvestments = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [

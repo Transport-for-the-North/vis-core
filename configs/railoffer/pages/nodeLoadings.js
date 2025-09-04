@@ -1,6 +1,7 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
+import glossaryData from "../glossaryData";
 
 export const nodeLoadings = {
   pageName: "Station Loadings",
@@ -90,7 +91,7 @@ export const nodeLoadings = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [
