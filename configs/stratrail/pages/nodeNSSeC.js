@@ -10,7 +10,7 @@ export const nodeNSSeC = {
   category: "Station",
   about: `<p>This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model.<p>
    <p>NS-SeC is a classification system used in the UK to categorise individuals based on their occupation and employment status. It is often used in social research and policy analysis to understand the socio-economic characteristics of different populations.</p>
-   <p>This data has been retrieved from NOMIS, and mapped to the NorTMS stations by using a 2.5km buffer around each station to find nearby LSOAs and using the NS-SeC data for those area(s).</p>
+   <p>This data contains 2021 data and has been retrieved from NOMIS, and mapped to the NorTMS stations by using a 2.5km buffer around each station to find nearby LSOAs and using the NS-SeC data for those area(s).</p>
    <p>Socio-economic class definitions (retrieved from NOMIS) - all individuals are aged 16 years and over:</p>
    <ul>
      <li>L1, L2 and L3 — Higher managerial, administrative and professional occupations</li>

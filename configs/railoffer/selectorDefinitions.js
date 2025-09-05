@@ -269,318 +269,148 @@ const routeNameSelector = {
     values: {
         source: "local",
         values: [
-            {
-            displayValue: "Leeds-Manchester Victoria (GM)",
-            paramValue: "NT8711"
-            },
-            {
-            displayValue: "Leeds-Sheffield (via Wakefield Westgate)(SY)",
-            paramValue: "NT8107"
-            },
-            {
-            displayValue: "Manchester-Chester (via Eccles or Earlestown)",
-            paramValue: "NT3660"
-            },
-            {
-            displayValue: "Wigan-Kirkby (GM)",
-            paramValue: "NT2401"
-            },
-            {
-            displayValue: "Manchester Piccadilly-Rose Hill Marple",
-            paramValue: "NT2260"
-            },
-            {
-            displayValue: "Hull-Bridlington",
-            paramValue: "NT8388"
-            },
-            {
-            displayValue: "Bradford F Sq-Skipton",
-            paramValue: "NT8200"
-            },
-            {
-            displayValue: "Leeds-Lincoln",
-            paramValue: "NT8530"
-            },
-            {
-            displayValue: "Manchester-Chester",
-            paramValue: "NT2290"
-            },
-            {
-            displayValue: "Leeds-Sheffield (via Wakefield Westgate)(WY)",
-            paramValue: "NT8106"
-            },
-            {
-            displayValue: "Leeds-Manchester Victoria",
-            paramValue: "NT8710"
-            },
-            {
-            displayValue: "Bradford F Sq-Ilkley",
-            paramValue: "NT8216"
-            },
-            {
-            displayValue: "Liverpool - Chester",
-            paramValue: "ME3060"
-            },
-            {
-            displayValue: "PenistoneLine (SY)",
-            paramValue: "NT8037"
-            },
-            {
-            displayValue: "Manchester-Crewe (GM)",
-            paramValue: "NT2331"
-            },
-            {
-            displayValue: "London-Liverpool",
-            paramValue: "VT1090"
-            },
-            {
-            displayValue: "Sheffield-Doncaster (SY)",
-            paramValue: "NT8077"
-            },
-            {
-            displayValue: "Leeds-Knottingley",
-            paramValue: "NT8226"
-            },
-            {
-            displayValue: "West Kirkby/New Brighton",
-            paramValue: "ME3052"
-            },
-            {
-            displayValue: "Bishop Auckland/Darlington-Saltburn",
-            paramValue: "NT8010"
-            },
-            {
-            displayValue: "Leeds-Knottingley/Goole",
-            paramValue: "NT8410"
-            },
-            {
-            displayValue: "Newcastle-Liverpool",
-            paramValue: "TP7310"
-            },
-            {
-            displayValue: "Middlesbrough-Manchester Airport",
-            paramValue: "TP7340"
-            },
-            {
-            displayValue: "Preston-Ormskirk",
-            paramValue: "NT3510"
-            },
-            {
-            displayValue: "Liverpool-Cheter (M)",
-            paramValue: "NT2912"
-            },
-            {
-            displayValue: "Manchester Airport -Liverpool (M)",
-            paramValue: "NT2482"
-            },
-            {
-            displayValue: "Rochdale-Blackburn (via Manchester)",
-            paramValue: "NT2421"
-            },
-            {
-            displayValue: "Newcastle-Ashington",
-            paramValue: "NT8110"
-            },
-            {
-            displayValue: "Skipton-Leeds",
-            paramValue: "NT8700"
-            },
-            {
-            displayValue: "Lancaster-Windermere",
-            paramValue: "NT3610"
-            },
-            {
-            displayValue: "Leeds-Knottingley/Goole(WY)",
-            paramValue: "NT8416"
-            },
-            {
-            displayValue: "Manchester-Hazel Grove/Buxton",
-            paramValue: "NT2280"
-            },
-            {
-            displayValue: "Nunthorpe-Newcastle (via Hartlepool)",
-            paramValue: "NT7920"
-            },
-            {
-            displayValue: "Nunthorpe-Newcastle (via Hartlepool)(TW)",
-            paramValue: "NT7924"
-            },
-            {
-            displayValue: "Liverpool-Wigan (M)",
-            paramValue: "NT2972"
-            },
-            {
-            displayValue: "London-Hull/Skipton",
-            paramValue: "GR7030"
-            },
-            {
-            displayValue: "Sheffield-Lincoln(SY)",
-            paramValue: "NT8047"
-            },
-            {
-            displayValue: "Leeds-Selby(WY)",
-            paramValue: "NT8356"
-            },
-            {
-            displayValue: "Preston-Barrow",
-            paramValue: "NT3540"
-            },
-            {
-            displayValue: "Liverpool-Warrington (M)",
-            paramValue: "NT2992"
-            },
-            {
-            displayValue: "Knaresborough-York",
-            paramValue: "NT8300"
-            },
-            {
-            displayValue: "Manchester-Crewe (GM)",
-            paramValue: "NT2331"
-            },
-            {
-            displayValue: "London-Liverpool",
-            paramValue: "VT1090"
-            },
-            {
-            displayValue: "Sheffield-Doncaster (SY)",
-            paramValue: "NT8077"
-            },
-            {
-            displayValue: "Leeds-Knottingley",
-            paramValue: "NT8226"
-            },
-            {
-            displayValue: "Manchester-Liverpool (via Eccles or Earlestown)",
-            paramValue: "NT2980"
-            },
-            {
-            displayValue: "Liverpool - Southport",
-            paramValue: "ME3022"
-            },
-            {
-            displayValue: "Newcastle-Hexham",
-            paramValue: "NT7960"
-            },
-            {
-            displayValue: "Sheffield-Lincoln",
-            paramValue: "NT8040"
-            },
-            {
-            displayValue: "Southport-Alderley Edge",
-            paramValue: "NT2240"
-            },
-            {
-            displayValue: "Manchester Airport-Blackpool (GM)",
-            paramValue: "NT3621"
-            },
-            {
-            displayValue: "Leeds-York",
-            paramValue: "NT8370"
-            },
-            {
-            displayValue: "Sheffield-York",
-            paramValue: "NT8450"
-            },
-            {
-            displayValue: "Cumbria Coast",
-            paramValue: "NT3580"
-            },
-            {
-            displayValue: "Birmingham-Cardiff",
-            paramValue: "XC3330"
-            },
-            {
-            displayValue: "Manchester-Hazel Grove/Buxton(GM)",
-            paramValue: "NT2281"
-            },
-            {
-            displayValue: "Hull-Manchester Piccadilly",
-            paramValue: "TP7330"
-            },
-            {
-            displayValue: "Manchester Airport -Liverpool",
-            paramValue: "NT2480"
-            },
-            {
-            displayValue: "Manchester-Warrington",
-            paramValue: "NT2360"
-            },
-            {
-            displayValue: "Leeds-Nottingham",
-            paramValue: "NT8650"
-            },
-            {
-            displayValue: "Newcastle-Berwick",
-            paramValue: "NT7940"
-            },
-            {
-            displayValue: "Cleethorpes-Barton-on-Humber",
-            paramValue: "EM8330"
-            },
-            {
-            displayValue: "London-Leeds/Bradford/Harrogate",
-            paramValue: "GR7020"
-            },
-            {
-            displayValue: "Manchester Airport-Barrow/Windermere (GM)",
-            paramValue: "NT3571"
-            },
-            {
-            displayValue: "Leeds-Doncaster (WY)",
-            paramValue: "NT8246"
-            },
-            {
-            displayValue: "Leeds-Harrogate/Knaresborough",
-            paramValue: "NT8306"
-            },
-            {
-            displayValue: "Manchester-Wigan/Southport (GM)",
-            paramValue: "NT2251"
-            },
-            {
-            displayValue: "Leeds-Sheffield (via Barnsley)(WY)",
-            paramValue: "NT8026"
-            },
-            {
-            displayValue: "PenistoneLine (WY)",
-            paramValue: "NT8036"
-            },
-            {
-            displayValue: "Southport-Alderley Edge (GM)",
-            paramValue: "NT2321"
-            },
-            {
-            displayValue: "Liverpool - Chester (M)",
-            paramValue: "ME3062"
-            },
-            {
-            displayValue: "Newcastle-Carlisle",
-            paramValue: "NT7930"
-            },
-            {
-            displayValue: "Bradford F Sq-Skipton (WY)",
-            paramValue: "NT8206"
-            },
-            {
-            displayValue: "Manchester Airport-Edinburgh/Glasgow Central",
-            paramValue: "TP7300"
-            },
-            {
-            displayValue: "Liverpool-Cheter",
-            paramValue: "NT2910"
-            },
-            {
-            displayValue: "Liverpool-Wigan",
-            paramValue: "NT2970"
-            },
-            {
-            displayValue: "Wigan-Kirkby",
-            paramValue: "NT2400"
-            },
-            {
-            displayValue: "Rochdale-Clitheroe (GM)",
-            paramValue: "NT3491"
-            }
+            { displayValue: "Manchester Airport - Blackpool", paramValue: "NT3621" },
+            { displayValue: "Bradford F Sq - Skipton", paramValue: "NT8206" },
+            { displayValue: "Hull - Manchester Piccadilly", paramValue: "TP7330" },
+            { displayValue: "London - Hull/Skipton", paramValue: "GR7030" },
+            { displayValue: "Leeds - Carlisle", paramValue: "NT1510" },
+            { displayValue: "London - Wolverhampton", paramValue: "VT1000" },
+            { displayValue: "Manchester Piccadilly - Hadfield/Glossop", paramValue: "NT2301" },
+            { displayValue: "Halifax - Leeds", paramValue: "NT8686" },
+            { displayValue: "Newcastle - Ashington", paramValue: "NT8110" },
+            { displayValue: "Doncaster - Goole", paramValue: "NT8167" },
+            { displayValue: "Leeds - Knottingley/Goole", paramValue: "NT8416" },
+            { displayValue: "Leeds - Knottingley/Goole", paramValue: "NT8410" },
+            { displayValue: "Leeds - Doncaster", paramValue: "NT8247" },
+            { displayValue: "Hunts Cross - Liverpool", paramValue: "ME3012" },
+            { displayValue: "Bishop Auckland/Darlington - Saltburn", paramValue: "NT8010" },
+            { displayValue: "Manchester - Chester", paramValue: "NT2290" },
+            { displayValue: "Middlesbrough - Manchester Airport", paramValue: "TP7340" },
+            { displayValue: "Leeds - Harrogate/Knaresborough", paramValue: "NT8306" },
+            { displayValue: "Leeds - Manchester Victoria", paramValue: "NT8711" },
+            { displayValue: "Wigan - Kirkby", paramValue: "NT2400" },
+            { displayValue: "Leeds - Sheffield (via Barnsley)", paramValue: "NT8027" },
+            { displayValue: "Manchester - Wigan/Southport", paramValue: "NT2250" },
+            { displayValue: "Birmingham - South West", paramValue: "XC1840" },
+            { displayValue: "Manchester - Stoke", paramValue: "NT2311" },
+            { displayValue: "Newcastle - Liverpool", paramValue: "TP7310" },
+            { displayValue: "Leeds - Sheffield (via Barnsley)", paramValue: "NT8026" },
+            { displayValue: "Manchester - Crewe", paramValue: "NT2330" },
+            { displayValue: "Leeds - York", paramValue: "NT8370" },
+            { displayValue: "Rochdale - Clitheroe", paramValue: "NT3491" },
+            { displayValue: "Nunthorpe - Newcastle (via Hartlepool)", paramValue: "NT7920" },
+            { displayValue: "Sheffield - York", paramValue: "NT8450" },
+            { displayValue: "London - Aberdeen/Inverness", paramValue: "GR7010" },
+            { displayValue: "Leeds - York (from Blackpool)", paramValue: "NT7370" },
+            { displayValue: "Manchester Airport - Edinburgh/Glasgow Central", paramValue: "TP7300" },
+            { displayValue: "Newcastle - Saltburn", paramValue: "NT7910" },
+            { displayValue: "Birmingham - Cardiff", paramValue: "XC3330" },
+            { displayValue: "Penistone Line", paramValue: "NT8036" },
+            { displayValue: "Bradford F Sq - Ilkley", paramValue: "NT8216" },
+            { displayValue: "West Midlands", paramValue: "0000LM" },
+            { displayValue: "Liverpool - Chester", paramValue: "NT2910" },
+            { displayValue: "Liverpool - Wigan", paramValue: "NT2970" },
+            { displayValue: "Liverpool - Chester", paramValue: "ME3062" },
+            { displayValue: "Leeds - Sheffield (via Wakefield Westgate)", paramValue: "NT8106" },
+            { displayValue: "Sheffield - Lincoln", paramValue: "NT8040" },
+            { displayValue: "Hull - Sheffield", paramValue: "NT8080" },
+            { displayValue: "Cleethorpes - Barton-on-Humber", paramValue: "EM8330" },
+            { displayValue: "Birmingham - Glasgow", paramValue: "VT1140" },
+            { displayValue: "Skipton - Leeds", paramValue: "NT8700" },
+            { displayValue: "Liverpool - Kirkby", paramValue: "ME3032" },
+            { displayValue: "Manchester - Blackburn (via Rochdale)", paramValue: "NT2420" },
+            { displayValue: "Manchester - Crewe", paramValue: "NT2331" },
+            { displayValue: "Liverpool - Blackpool", paramValue: "NT2490" },
+            { displayValue: "Southport - Alderley Edge", paramValue: "NT2321" },
+            { displayValue: "Stalybridge - Liverpool", paramValue: "NT2201" },
+            { displayValue: "Birmingham - Manchester", paramValue: "XC1860" },
+            { displayValue: "Manchester - Liverpool (via Eccles or Earlestown)", paramValue: "NT2980" },
+            { displayValue: "Leeds - Manchester Victoria", paramValue: "NT8710" },
+            { displayValue: "London - Manchester", paramValue: "VT1080" },
+            { displayValue: "Lancaster - Morecambe", paramValue: "NT3520" },
+            { displayValue: "Preston - Barrow", paramValue: "NT3540" },
+            { displayValue: "Sheffield - Lincoln", paramValue: "NT8047" },
+            { displayValue: "Bradford F Sq - Skipton", paramValue: "NT8200" },
+            { displayValue: "Leeds - Bradford Forster Square", paramValue: "NT8186" },
+            { displayValue: "Manchester Piccadilly - New Mills Central/Sheffield", paramValue: "NT2261" },
+            { displayValue: "Manchester - Warrington", paramValue: "NT2360" },
+            { displayValue: "Liverpool - Ormskirk", paramValue: "ME3042" },
+            { displayValue: "Station Closed", paramValue: "Station Closed" },
+            { displayValue: "Liverpool - Southport", paramValue: "ME3022" },
+            { displayValue: "London - Leeds/Bradford/Harrogate", paramValue: "GR7020" },
+            { displayValue: "Liverpool - Warrington", paramValue: "NT2992" },
+            { displayValue: "Leeds - Skipton", paramValue: "NT8706" },
+            { displayValue: "Nunthorpe - Newcastle (via Hartlepool)", paramValue: "NT7924" },
+            { displayValue: "Manchester Airport  - Liverpool", paramValue: "NT2481" },
+            { displayValue: "Blackpool - Colne", paramValue: "NT3500" },
+            { displayValue: "Manchester Airport - Blackpool", paramValue: "NT3620" },
+            { displayValue: "Stalybridge - Southport", paramValue: "NT2241" },
+            { displayValue: "East Midlands", paramValue: "0000EM" },
+            { displayValue: "Manchester Airport - Barrow/Windermere", paramValue: "NT3571" },
+            { displayValue: "Manchester - Liverpool (via Eccles or Earlestown)", paramValue: "NT2982" },
+            { displayValue: "Liverpool - Blackpool", paramValue: "NT2492" },
+            { displayValue: "Leeds - Lancaster", paramValue: "NT8690" },
+            { displayValue: "Preston - Ormskirk", paramValue: "NT3510" },
+            { displayValue: "Birmingham - Leicester", paramValue: "XC2600" },
+            { displayValue: "Liverpool - Ormskirk", paramValue: "ME3040" },
+            { displayValue: "Scarborough - Bridlington", paramValue: "NT8389" },
+            { displayValue: "Manchester - Chester", paramValue: "NT2291" },
+            { displayValue: "Manchester Airport  - Liverpool", paramValue: "NT2480" },
+            { displayValue: "Lancaster - Windermere", paramValue: "NT3610" },
+            { displayValue: "York - Hull", paramValue: "NT8060" },
+            { displayValue: "London - Liverpool", paramValue: "VT1090" },
+            { displayValue: "Leeds - Selby", paramValue: "NT8350" },
+            { displayValue: "Sheffield - Cleethorpes", paramValue: "NT8050" },
+            { displayValue: "Wigan - Kirkby", paramValue: "NT2401" },
+            { displayValue: "Liverpool - Chester", paramValue: "ME3060" },
+            { displayValue: "Manchester - Hazel Grove/Buxton", paramValue: "NT2281" },
+            { displayValue: "Leeds - Ilkley", paramValue: "NT8196" },
+            { displayValue: "Manchester - Chester (via Eccles or Earlestown)", paramValue: "NT3660" },
+            { displayValue: "Manchester - Hazel Grove/Buxton", paramValue: "NT2280" },
+            { displayValue: "Rochdale - Blackburn (via Manchester)", paramValue: "NT2421" },
+            { displayValue: "Leeds - Huddersfield (via Bradford)", paramValue: "NT8746" },
+            { displayValue: "West Kirkby/New Brighton", paramValue: "ME3052" },
+            { displayValue: "Birmingham - Cambridge", paramValue: "XC2680" },
+            { displayValue: "Sheffield - Doncaster", paramValue: "NT8077" },
+            { displayValue: "Doncaster - Scunthorpe", paramValue: "NT8257" },
+            { displayValue: "Stockport - Stalybridge", paramValue: "NT2270" },
+            { displayValue: "Newcastle - Carlisle", paramValue: "NT7930" },
+            { displayValue: "Leeds - Manchester Victoria", paramValue: "NT8716" },
+            { displayValue: "Knaresborough - York", paramValue: "NT8300" },
+            { displayValue: "Manchester Airport - Barrow/Windermere", paramValue: "NT3570" },
+            { displayValue: "London - Hereford", paramValue: "VT1040" },
+            { displayValue: "Leeds - Sheffield (via Wakefield Westgate)", paramValue: "NT8107" },
+            { displayValue: "Manchester Airport  - Liverpool", paramValue: "NT2482" },
+            { displayValue: "Leeds - Doncaster", paramValue: "NT8246" },
+            { displayValue: "Manchester Piccadilly - Rose Hill Marple", paramValue: "NT2260" },
+            { displayValue: "Birmingham - Coast", paramValue: "XC1850" },
+            { displayValue: "Cumbria Coast", paramValue: "NT3580" },
+            { displayValue: "Liverpool - Wigan", paramValue: "NT2972" },
+            { displayValue: "Liverpool - Chester", paramValue: "NT2912" },
+            { displayValue: "Leeds - Selby", paramValue: "NT8356" },
+            { displayValue: "Penistone Line", paramValue: "NT8037" },
+            { displayValue: "Plymouth - Edinburgh (via Leeds)", paramValue: "XC1830" },
+            { displayValue: "London - Glasgow", paramValue: "VT1120" },
+            { displayValue: "Manchester - Warrington", paramValue: "NT2361" },
+            { displayValue: "Newcastle - Berwick", paramValue: "NT7940" },
+            { displayValue: "Southport - Alderley Edge", paramValue: "NT2240" },
+            { displayValue: "London - Newcastle/Edinburgh", paramValue: "GR7000" },
+            { displayValue: "Scarborough - Liverpool", paramValue: "TP7320" },
+            { displayValue: "Transport for Wales", paramValue: "0000AW" },
+            { displayValue: "Hull - Sheffield", paramValue: "NT8087" },
+            { displayValue: "Liverpool - Warrington", paramValue: "NT2990" },
+            { displayValue: "Leeds - Nottingham", paramValue: "NT8650" },
+            { displayValue: "Leeds - Lincoln", paramValue: "NT8530" },
+            { displayValue: "Rochdale - Clitheroe", paramValue: "NT3490" },
+            { displayValue: "Manchester - Wigan/Southport", paramValue: "NT2251" },
+            { displayValue: "Middlesbrough - Nunthorpe/Whitby", paramValue: "NT8000" },
+            { displayValue: "Leeds - Knottingley", paramValue: "NT8226" },
+            { displayValue: "Leeds - York", paramValue: "NT8376" },
+            { displayValue: "Manchester - Cleethorpes", paramValue: "TP8170" },
+            { displayValue: "Newcastle - Hexham", paramValue: "NT7960" },
+            { displayValue: "Manchester Piccadilly - Crewe (via Stockport and Wilmslow)", paramValue: "NT2320" },
+            { displayValue: "Manchester - Stoke", paramValue: "NT2310" },
+            { displayValue: "Hull - Bridlington", paramValue: "NT8388" }
         ]
     }
 }
