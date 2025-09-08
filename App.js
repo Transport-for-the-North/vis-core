@@ -9,12 +9,16 @@ import { api } from "services";
 import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
 import { theme } from "theme";
 import { NotFound } from "Components/NotFoundPage";
+import { helloFromCore, CoreButton } from "@transport-for-the-north/vis-core";
 
 /**
  * Main application component.
  * @function App
  * @returns {JSX.Element} The rendered application component.
  */
+
+console.log(helloFromCore());
+
 function App() {
   const [appConfig, setAppConfig] = useState(null);
 
@@ -105,6 +109,7 @@ function App() {
         </AppContext.Provider>
         </ThemeProvider>
       </AuthProvider>
+      <CoreButton>Works from Core</CoreButton>
     </div>
   );
 }
