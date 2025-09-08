@@ -1,11 +1,11 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { investPopupContent } from "../templates/investmentPopup";
-import { investmentSummary } from "../templates";
+import { freightInvestPopupContent } from "../templates/investmentPopup";
+import { freightInvestmentSummary } from "../templates";
 import glossaryData from "../glossaryData";
 
 export const freightLinkInvestments = {
-  pageName: "Freight Link Investments",
+  pageName: "Freight Link Investments (SRIP)",
   url: "/freight-link-investments",
   type: "MapLayout",
   category: "Investments",
@@ -20,7 +20,7 @@ export const freightLinkInvestments = {
             name: "Link Investment Layer",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/railoffer_investment_links/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/railoffer_freight_investment_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
             visualisationName: "Link Investment Results",
@@ -34,8 +34,8 @@ export const freightLinkInvestments = {
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
             customTooltip: {
-                url: "/api/railoffer/link-investment-callout/link?featureId={id}",
-                htmlTemplate: investPopupContent
+                url: "/api/railoffer/freight-link-investment-callout/link?featureId={id}",
+                htmlTemplate: freightInvestPopupContent
             }
         },
     ],
@@ -61,8 +61,8 @@ export const freightLinkInvestments = {
             type: "calloutCard",
             cardName: "Investment Summary",
             dataSource: "api",
-            dataPath: "/api/railoffer/link-investment-callout/link",
-            htmlFragment: investmentSummary
+            dataPath: "/api/railoffer/freight-link-investment-callout/link",
+            htmlFragment: freightInvestmentSummary
         },
     ],
     metadataTables: [],

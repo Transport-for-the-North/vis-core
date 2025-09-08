@@ -1,12 +1,12 @@
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
-import { investPopupContent } from "../templates/investmentPopup";
-import { investmentSummary } from "../templates";
+import { freightInvestPopupContent } from "../templates/investmentPopup";
+import { freightInvestmentSummary } from "../templates";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const freightNodeInvestments = {
-  pageName: "Freight Node Investments",
+  pageName: "Freight Node Investments (SRIP)",
   url: "/freight-node-investments",
   type: "MapLayout",
   category: "Investments",
@@ -29,27 +29,27 @@ export const freightNodeInvestments = {
             shouldHaveTooltipOnHover: false,
             shouldHaveLabel: false
         },
-        {
-            uniqueId: "RailOfferCRPVectorTile",
-            name: "CRP Network",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
-            sourceLayer: "geometry",
-            geometryType: "line",
-            customPaint: crpLinesLayerPaint,
-            isHoverable: true,
-            isStylable: false,
-            shouldShowInLegend: true,
-            shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false
-        },
+        // {
+        //     uniqueId: "RailOfferCRPVectorTile",
+        //     name: "CRP Network",
+        //     type: "tile",
+        //     source: "api",
+        //     path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
+        //     sourceLayer: "geometry",
+        //     geometryType: "line",
+        //     customPaint: crpLinesLayerPaint,
+        //     isHoverable: true,
+        //     isStylable: false,
+        //     shouldShowInLegend: true,
+        //     shouldHaveTooltipOnHover: true,
+        //     shouldHaveLabel: false
+        // },
         {
             uniqueId: "RailOfferInvestmentNodeVectorTile",
             name: "Node Investment Layer",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/railoffer_investment_nodes/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/railoffer_freight_investment_nodes/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "point",
             visualisationName: "Node Investment Results",
@@ -63,8 +63,8 @@ export const freightNodeInvestments = {
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
             customTooltip: {
-                url: "/api/railoffer/node-investment-callout/point?featureId={id}",
-                htmlTemplate: investPopupContent
+                url: "/api/railoffer/freight-node-investment-callout/point?featureId={id}",
+                htmlTemplate: freightInvestPopupContent
             }
         },
     ],
@@ -90,8 +90,8 @@ export const freightNodeInvestments = {
             type: "calloutCard",
             cardName: "Investment Summary",
             dataSource: "api",
-            dataPath: "/api/railoffer/node-investment-callout/point",
-            htmlFragment: investmentSummary
+            dataPath: "/api/railoffer/freight-node-investment-callout/point",
+            htmlFragment: freightInvestmentSummary
         },
     ],
     metadataTables: [],
