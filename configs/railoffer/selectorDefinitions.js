@@ -471,7 +471,7 @@ const stationInformationMetricBoolSelector = {
             },
             {
                 displayValue: "Wheelchairs Available",
-                paramValue: "wheelchair_avail",
+                paramValue: "wheelchairs_avail",
                 legendSubtitleText: "True/False"
             },
             {
