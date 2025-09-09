@@ -176,6 +176,18 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
   // determines whether to use linear or root function for width 
   functionType = chooseLinearOrRootFunction(bins, appName, lastSegment);
 
+  // If categorical, we want to order for consistency.
+  if (style.includes("categorical")) {
+    // If the only values are 0 and 1, we want to ensure 1 is first and 0 is last for consistency.
+    if (bins.length === 2 && bins.includes(0) && bins.includes(1)) {
+      bins = [1, 0];
+    } else if (bins.every(value => typeof value === 'number')) { // If all values are numbers, sort numerically.
+      bins.sort((a, b) => a - b);
+    } else {
+      bins.sort(); // Otherwise, sort alphabetically.
+    }
+  }
+
   for (var i = 0; i < bins.length; i++) {
     colors.push(bins[i]);
     colors.push(colours[i]);
