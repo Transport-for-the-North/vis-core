@@ -8,8 +8,8 @@ import { useEffect, useContext, useState } from "react";
 import { useFilterContext } from "hooks";
 import { InfoBox } from "Components";
 import { api } from "services";
-import { checkSecurityRequirements } from "utils";
-import { AppContext } from "contexts";
+import { checkSecurityRequirements, sortValues, isValidCondition, applyCondition } from "utils";
+import { AppContext, PageContext } from "contexts";
 import { darken } from "polished";
 import { MapFeatureSelectWithControls, MapFeatureSelectAndPan, MapFeatureSelect, CheckboxSelector } from ".";
 import { ErrorBox } from "Components";
@@ -60,17 +60,199 @@ const Spinner = styled.div`
   }
 `;
 
+/**
+ * Helper function to check for duplicate values in an array.
+ */
+const isDuplicateValue = (values, value) => {
+  return values.some(existingValue => 
+    existingValue.paramValue === value.paramValue &&
+    existingValue.displayValue === value.displayValue
+  );
+};
+
 export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
+  const pageContext = useContext(PageContext);
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [isRequestTooLarge, setIsRequestTooLarge] = useState(false);
+  const [processedFilters, setProcessedFilters] = useState([]);
+  const [isFiltersReady, setIsFiltersReady] = useState(false);
   
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
-  
+
+  /**
+   * Fetch and store metadata tables.
+   */
+  const fetchMetadataTables = async () => {
+    const metadataTables = {};
+    
+    // Use metadataTables from pageContext if available
+    if (pageContext?.config?.metadataTables) {
+      for (const table of pageContext.config.metadataTables) {
+        try {
+          const response = await api.baseService.get(table.path);
+          let filteredData = response;
+
+          if (table.where && Array.isArray(table.where)) {
+            for (const condition of table.where) {
+              if (isValidCondition(condition)) {
+                filteredData = applyCondition(filteredData, condition);
+              } else {
+                console.error(`Invalid condition in metadata table ${table.name}:`, condition);
+              }
+            }
+          }
+
+          metadataTables[table.name] = filteredData;
+        } catch (error) {
+          console.error(`Failed to fetch metadata table ${table.name}:`, error);
+        }
+      }
+    }
+
+    return metadataTables;
+  };
+
+  /**
+   * Initialize filters with metadata tables.
+   */
+  const initializeFilters = async (metadataTables) => {
+    const updatedFilters = [];
+    const filterState = {};
+
+    for (const filter of filters) {
+      const filterWithId = { ...filter, id: filter.paramName };
+
+      switch (filter.type) {
+        case 'map':
+        case 'slider':
+        case 'mapFeatureSelect':
+        case 'mapFeatureSelectWithControls':
+        case 'mapFeatureSelectAndPan':
+          updatedFilters.push(filterWithId);
+          break;
+        default:
+          if (filter.values) {
+            switch (filter.values.source) {
+              case 'local':
+                updatedFilters.push(filterWithId);
+                break;
+              case 'api':
+                const path = '/api/tame/mvdata';
+                const dataPath = {
+                  dataPath: pageContext.config.visualisations[0].dataPath,
+                };
+                try {
+                  const metadataFilters = await api.baseService.post(path, dataPath, { skipAuth: false });
+                  const apiFilterValues = Object.groupBy(
+                    metadataFilters,
+                    ({ field_name }) => field_name
+                  );
+                  const baseParamName = filter.paramName.includes('DoMinimum')
+                    ? filter.paramName.replace('DoMinimum', '')
+                    : filter.paramName.includes('DoSomething')
+                    ? filter.paramName.replace('DoSomething', '')
+                    : filter.paramName;
+                  filter.values.values = apiFilterValues[baseParamName][0].distinct_values.map((v) => ({
+                    displayValue: v,
+                    paramValue: v,
+                  }));
+                  updatedFilters.push(filterWithId);
+                } catch (error) {
+                  console.error('Error fetching metadata filters', error);
+                }
+                break;
+              case 'metadataTable':
+                const metadataTable = metadataTables[filter.values.metadataTableName];
+                if (metadataTable) {
+                  let uniqueValues = [];
+                  metadataTable.forEach(option => {
+                    const value = {
+                      displayValue: option[filter.values.displayColumn],
+                      paramValue: option[filter.values.paramColumn],
+                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null
+                    };
+                    if (!isDuplicateValue(uniqueValues, value)) {
+                      uniqueValues.push(value);
+                    }
+                  });
+
+                  // Apply sorting if specified
+                  if (filter.values.sort) {
+                    uniqueValues = sortValues(uniqueValues, filter.values.sort);
+                  }
+
+                  // Apply exclusion if specified
+                  if (filter.values.exclude) {
+                    uniqueValues = uniqueValues.filter(value => !filter.values.exclude.includes(value.paramValue));
+                  }
+
+                  filterWithId.values = { ...filter.values, values: uniqueValues };
+                  updatedFilters.push(filterWithId);    
+                } else {
+                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                }
+                break;
+              default:
+                console.error('Unknown filter source:', filter.values?.source);
+            }
+          } else {
+            // Handle filters without values property (like fixed filters)
+            updatedFilters.push(filterWithId);
+          }
+      }
+
+      // Initialize filter value if shouldBeBlankOnInit is not true
+      if (!filterWithId.shouldBeBlankOnInit) {
+        if (filterWithId.multiSelect && filterWithId.shouldInitialSelectAllInMultiSelect) {
+          filterState[filterWithId.id] =
+            filterWithId.defaultValue ||
+            filterWithId.min ||
+            filterWithId.values?.values?.map(item => item?.paramValue);
+        } else {
+          filterState[filterWithId.id] =
+            filterWithId.defaultValue ||
+            filterWithId.min ||
+            filterWithId.values?.values?.[0]?.paramValue;
+        }
+      } else {
+        filterState[filterWithId.id] = null;
+      }
+    }
+
+    return { updatedFilters, filterState };
+  };
+
+  // Initialize filters and metadata on component mount
+  useEffect(() => {
+    const initializeDownloadFilters = async () => {
+      try {
+        setIsFiltersReady(false);
+        
+        // Fetch metadata tables
+        const metadataTables = await fetchMetadataTables();
+        
+        // Initialize filters with metadata
+        const { updatedFilters, filterState } = await initializeFilters(metadataTables);
+        
+        setProcessedFilters(updatedFilters);
+        filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
+        setIsFiltersReady(true);
+      } catch (error) {
+        console.error('Error initializing download filters:', error);
+        setRequestError('Failed to load filter options');
+      }
+    };
+
+    if (filters && filters.length > 0) {
+      initializeDownloadFilters();
+    }
+  }, [filters, filterDispatch, pageContext]);
+
   // Check request size whenever filterState changes (only for GET requests)
   useEffect(() => {
     const checkRequestSize = () => {
@@ -82,7 +264,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
           const { isValid, error } = api.downloadService.checkGetRequestSize(apiRoute, filterState);
           setIsRequestTooLarge(!isValid);
           setRequestError(error);
-          
+
           // If request is too large, suggest using POST
           if (!isValid) {
             setRequestError(error);
@@ -97,40 +279,10 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
       }
     };
     
-    checkRequestSize();
-  }, [filterState, apiRoute, requestMethod]);
-  
-  useEffect(() => {
-    filters.forEach(filter => {
-      filter.id = filter.paramName;
-    });
-  
-    const updatedFilters = filters.reduce((acc, item) => {
-      if (item.type === 'fixed') {
-        // Handle fixed selectors differently based on multiSelect property
-        if (item.multiSelect) {
-          // For multiSelect fixed selectors, use all values
-          acc[item.id] = item.values.values.map(value => value.paramValue);
-        } else {
-          // For single-value fixed selectors, use the first value
-          acc[item.id] = item.values.values.length > 0 ? item.values.values[0].paramValue : null;
-        }
-      }
-      else if (item.type.startsWith('mapFeatureSelect')) {
-        acc[item.id] = null;
-      } else {
-        const paramValues = item.values.values.map(value => {
-          if (typeof value.paramValue === 'boolean') {
-            return false; // Default to false if paramValue is a boolean
-          }
-          return value.paramValue;
-        });
-        acc[item.id] = paramValues.length === 1 ? paramValues[0] : paramValues;
-      }
-      return acc;
-    }, {});
-    filterDispatch({ type: 'INITIALIZE_FILTERS', payload: updatedFilters });
-  }, [filters, filterDispatch]);
+    if (isFiltersReady) {
+      checkRequestSize();
+    }
+  }, [filterState, apiRoute, requestMethod, isFiltersReady]);
   
   const handleDownloadSelection = (filter, value) => {
     filterDispatch({
@@ -158,6 +310,14 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
     }
   };
   
+  if (!isFiltersReady) {
+    return (
+      <AccordionSection title="Download data" defaultValue={false}>
+        <NoDataParagraph>Loading filters...</NoDataParagraph>
+      </AccordionSection>
+    );
+  }
+
   if (!filterState || Object.keys(filterState).length === 0) {
     return null;
   }
@@ -165,9 +325,9 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
   return (
     <AccordionSection title="Download data" defaultValue={false}>
       <InfoBox text={'Use the selections to toggle items on and off. See Glossary "Download" for more information.'} />
-      {Array.isArray(filters) && filters.length > 0 ? (
+      {Array.isArray(processedFilters) && processedFilters.length > 0 ? (
         <>
-          {filters
+          {processedFilters
             .filter((filter) => filter.type !== "fixed")
             .map((filter) => (
               <SelectorContainer key={filter.id}>
@@ -188,7 +348,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
                   <Slider
                     key={filter.id}
                     filter={filter}
-                    value={filterState[filter.id] || filter.min || filter.values[0]}
+                    value={filterState[filter.id] || filter.min || filter.values?.[0]}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                   />
                 )}
@@ -196,7 +356,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
                   <Toggle
                     key={filter.id}
                     filter={filter}
-                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    value={filterState[filter.id] || filter.values?.values?.[0]?.paramValue}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
                   />
@@ -205,7 +365,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
                   <CheckboxSelector
                     key={filter.id}
                     filter={filter}
-                    value={filterState[filter.id] || filter.values.values[0].paramValue}
+                    value={filterState[filter.id] || filter.values?.values?.[0]?.paramValue}
                     onChange={(filter, value) => handleDownloadSelection(filter, value)}
                     bgColor={bgColor}
                   />
