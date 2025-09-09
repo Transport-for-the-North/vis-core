@@ -51,7 +51,7 @@ export const zonePairs = {
             { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Pairs'] },
             { ...selectors.scenarioFilterDemand, visualisations: ['Zone Pairs'] },
             { ...selectors.scenarioFilterYear, visualisations: ['Zone Pairs'] },
-            { ...selectors.scenarioFilter, visualisations: ['Zone Pairs'] },
+            { ...selectors.scenarioCodeFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.timePeriod, visualisations: ['Zone Pairs'] },
             { ...selectors.userClassFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.originOrDestinationFilter, visualisations: ['Zone Pairs']},
