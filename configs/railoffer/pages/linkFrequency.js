@@ -1,19 +1,22 @@
+import glossaryData from "../glossaryData";
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const linkFrequency = {
   pageName: "Link Frequency",
-  url: "/railoffer/link-frequency",
+  url: "/link-frequency",
   type: "MapLayout",
   category: "Link",
-  about: `<p>This visualisation shows the trains per hour for each period for each link in the NorTMS 2018 model.</p>`,
+  about: `<p>This visualisation shows the number of trains per hour for each link in the NorTMS 2018 model for the specified period chosen.</p>
+  <p>For each link and selected period, frequency is the mean of the per‑hour train counts across that period (average trains per hour).</p>
+  <p>Use the time period filter to select the period you wish to see on the map. Click on a link to see more information about the frequency.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
     layers: [
         {
             uniqueId: "RailOfferLinksVectorTile",
-            name: "Rail Offer Links Result",
+            name: "Link Frequency Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -26,7 +29,7 @@ export const linkFrequency = {
             shouldHaveLabel: true,
             labelZoomLevel: 12,
             labelNulls: true,
-            hoverNulls: true,
+            hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
         },
     ],
@@ -34,7 +37,7 @@ export const linkFrequency = {
         {
         name: "Link Frequencies",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Links Result",
+        joinLayer: "Link Frequency Layer",
         style: "line-continuous",
         joinField: "id",
         valueField: "value",
@@ -54,7 +57,7 @@ export const linkFrequency = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [
@@ -62,7 +65,6 @@ export const linkFrequency = {
             ],
             downloadPath: '/api/railoffer/link-frequency/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

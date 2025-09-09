@@ -15,5 +15,5 @@ export const pages = {
     nodeSocio: nodeSocio,
     stationInformation: stationInformation,
     stationInformationBool: stationInformationBool,
-    linkFrequency: linkFrequency
+    linkFrequency: linkFrequency,
 }
