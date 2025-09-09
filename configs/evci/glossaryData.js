@@ -60,7 +60,7 @@ const glossaryData = {
   social exclusion associated with decarbonisation of the vehicle stock.</li></ol>
   <p>Select an output to analyse. Each selection will show further options and fill the map panel with results.</p>
   <p>To get further help, type or select a topic in the top-left box.</p>`,
-      exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
+      exclude: [],
     },
     progress: {
       title: "Monitoring progress towards EV charging needs",
@@ -136,17 +136,26 @@ const glossaryData = {
       exclude: [],
     },
     digitallyDistributed: {
-      title: "Future Travel Scenario: Digitally Distributed",
-      content: `<p>This scenario sees a future where digital and technological advances accelerate, transforming how we work, travel and live. 
-      In general, we embrace these technological changes and the move towards a distributed, service-based transport system. 
-      Long-term climate change targets are met, but there is slow progress in the short-term due to a general preference for individualised mobility over traditional public transport. 
-      This scenario is led by technology, with the biggest drivers being technical advances and a willingness to embrace mobility-as-a-service and shared mobility in the long-term.</p>
-      <img src="/img/evci/dd-graph.png" alt="Graph plotting EV stock by year, one line per scenario" width="349" height="305" />`,
+      title: "Future Travel Scenario: Digitally Distributed in 2050",
+      content: `<p><i>What if society sees rapid advances in digital connectivity and uptake of new technologies across our economy?</i></p>
+      <p>This scenario sees a future where growth is stimulated by rapid advances in technology, particularly the take-up of electric and self-driving vehicles, 
+      transforming how people work, travel and live. Many people own their own electric self-driving vehicle, but there is also instant access to shared “robotaxi” 
+      services, particularly in cities. However, the convenience of self-driving cars and low regulation of outcomes has led to a decline in public transport use, 
+      exacerbating issues like inequality and congestion.</p>
+      <p>Despite less commuting, business and shopping trips, average trip lengths have increased as a result of more dispersed living locations. 
+      Road congestion has increased even though digital networks and self-driving vehicles support more efficient use of the roads, because there 
+      are now more single and even zero occupancy self-driving vehicles as vehicles drop off owners and users and then travel to waiting areas before picking them up. </p>
+      <p>In 2030, a small proportion of the vehicle fleet is hybrid (passenger) or diesel (goods) due to flexibilities in the ZEV mandate for manufacturers. 
+      The adoption of electric vehicles (EVs) has supported a significant long-term reduction in tailpipe emissions. However, there is growing focus on total carbon, 
+      including the carbon required to build vehicles and roads, which is a continuing challenge for all levels of government. There is also growing concern and 
+      challenge over the impact of transport on the environment and society more widely, which is negatively impacted by the domination of cars. </p>
+      <p>There has also been a shift to more freight on rail, as more capacity has been created by less people using public transport and road being less attractive due to congestion. </p>
+      <img src="/img/evci/dd-graph.png" alt="Graph plotting stock by year, one line per vehicle type" width="353" height="314" />`,
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
     district: {
       title: "Local authority district boundaries",
-      content: `<p>Districts use 2020 geography, 
+      content: `<p>Districts use 2023 geography, 
       <a href="https://www.ons.gov.uk/methodology/geography/ukgeographies/censusgeography" target="_blank" rel="noopener noreferrer">
       sourced from ONS</a>.</p>
       <p>The map visualisation shows approximate <i>super-generalised</i> boundaries, 
@@ -163,7 +172,7 @@ const glossaryData = {
       content: `<p>The EVCI model projects charging infrastructure needs in the 
       North of England, and estimates Distribution Network Operator (DNO) reinforcement costs needed to support the Electric Vehicle (EV) 
       charging network.</p>
-      <p>The time horizon is 2020-2050, in 5 year increments.</p>
+      <p>The time horizon is 2023, then 2025-2050, in 5 year increments.</p>
       <p>It uses elements of the TfN Analytical Framework as part of a comprehensive dataset, with the model available to use by 
       Local Authorities, DNOs, central Government, National Highways, Network Rail, and additional stakeholders.</p>
             <p>The overall objectives of TfN's EV charging infrastructure framework are to:</p>
@@ -176,18 +185,26 @@ const glossaryData = {
       exclude: [],
     },
     justAboutManaging: {
-      title: "Future Travel Scenario: Just About Managing",
-      content: `<p>This scenario sees a state of inertia, although this should not be taken as neutral. 
-      It sees a future where people do not alter their behaviours much from today, or give up certain luxuries, 
-      although there is a gradual continued trend towards virtual interaction. 
-      Economic growth continues at a moderate rate, but it is largely consumption-led and unequal, lacking agility and vulnerable to shocks. 
-      This scenario is led by markets, without much increase in political direction, with its biggest driver being economic.</p>
-      <img src="/img/evci/jam-graph.png" alt="Graph plotting EV stock by year, one line per scenario" width="353" height="314" />`,
+      title: "Future Travel Scenario: Just About Managing in 2050",
+      content: `<p><i>What if society sees a state of inertia – with economic, social and policy trends continuing into the long term? </i></p>
+      <p>Limited investment in public infrastructure and services – and an increasing reliance on a range of commercial providers to provide public 
+      services – has led to public transport service reductions, leaving a transport system which is running at capacity and is vulnerable to shocks.</p>
+      <p>Cars remain the predominant mode of travel. Car ownership remains essential, especially for those living in rural or suburban areas as a consequence 
+      of poor public transport alternatives. Despite progressive national policies, the adoption of electric vehicles (EVs) has been sluggish due to price 
+      accessibility of EVs, user mentality of re-using petrol and diesel vehicles, and access concerns regarding charging. Whilst company fleet vehicles 
+      successfully moved to electric to save costs, it has taken longer for individuals to make the switch to electric vehicles. Wealthier households have 
+      benefitted disproportionately from the affordability of EVs, compared to less affluent households.</p>
+      <p>In 2030, a significant proportion of the vehicle fleet is hybrid (passenger) or diesel (goods) due to flexibilities in the ZEV mandate for manufacturers.</p>
+      <p>Chargepoints services are provided by a range of commercial providers with variable provision, quality, reliability and pricing. 
+      The inequality of services and amenities are particularly evident across lower and higher income areas.</p>
+      <p>With limited large-scale investment in transport infrastructure there has been limited growth in freight carried by rail due 
+      to unresolved capacity constraints and low efficiency due to road congestion - but the majority of road freight travels by ZEVs (zero emission vehicles). </p>
+      <img src="/img/evci/jam-graph.png" alt="Graph plotting stock by year, one line per vehicle type" width="353" height="314" />`,
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
     msoa: {
       title: "Middle Layer Super Output Area (MSOA) boundaries",
-      content: `<p>MSOAs are a 2011 census geography, 
+      content: `<p>MSOAs are a 2021 census geography, 
       <a href="https://www.ons.gov.uk/methodology/geography/ukgeographies/censusgeography" target="_blank" rel="noopener noreferrer">
       sourced from ONS</a>.</p>
       <p>The map visualisation shows approximate <i>super-generalised</i> boundaries, 
@@ -213,25 +230,47 @@ const glossaryData = {
       <p>The outputs indicate the changes in charging demand and number of charge points across MSOAs, and en-route charging, for the 4 futures worlds described in TfN's travel scenarios.</p>`,
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
-    pioritisedPlaces: {
-      title: "Future Travel Scenario: Prioritised Places",
-      content: `<p>This scenario sees a significant shift in political and economic direction to ensure that no place is left behind. 
-      Every area, including cities, towns and rural and coastal areas, has a bespoke local economic strategy, 
-      supported by investment in local assets, specialisms and economic and social infrastructure. 
-      Community, localism and place-making across the North is applied to build a sense of local identity to improve local economies. 
-      There is a focus on work-life balance and social equity within and between places. 
-      This scenario is led by a change in priorities, with its biggest driver being the push for a fairer redistribution of economic prosperity.</p>
-      <img src="/img/evci/pp-graph.png" alt="Graph plotting EV stock by year, one line per scenario" width="366" height="322" />`,
+    liveLocal: {
+      title: "Future Travel Scenario: Live Local in 2050",
+      content: `<p><i>What if smaller cities, towns and more rural areas became the driver of a more balanced and thriving society? </i></p>
+      <p>As a result of devolution and a societal shift that places higher value on quality of life and community, smaller cities, towns, and rural and 
+      coastal areas in the North are flourishing. The emphasis on quality of life has reshaped many aspects of daily living. Work patterns have evolved, 
+      with more people embracing flexible work arrangements, allowing more time for leisure to enjoy the natural beauty of the North. Consumption habits 
+      support local business and sustainable practices. New technologies are embraced when they enhance well-being and contribute to wider sustainability goals.</p>
+      <p>National government transport policies have led to a moderate adoption of electric vehicles, of over the last decades, whilst also implementing a 
+      new mobility pricing system new road tax to charge electric vehicles for their use of roads. Sustainable local transport investments have been encouraged 
+      and funded, as well as more intra-community public transport links.</p>
+      <p>Take up of electric vehicles (EVs) has happened at a moderate pace, slowed because people have tended to hold onto their vehicles for longer; 
+      although once a sustainable second-hand market for EVs was in place take-up rates increased. There is a strong ethos for re-using materials that is 
+      evident in the strong second-hand battery market. Shorter local trips are undertaken by walking, cycling, scooting or (electric) public transport, 
+      which have led to reductions in personal car ownership and use of more (electric) shared car options. In 2030, a large proportion of the vehicle fleet 
+      is hybrid (passenger) or diesel (goods) due to flexibilities in the ZEV mandate for manufacturers.</p>
+      <p>The strategic use of local distribution hubs has reduced transportation costs of last mile freight deliveries, many of which are undertaken 
+      by small electric vehicles or by e-cargo bikes. There is also a greater emphasis on local sourcing of goods which supports the regional economy – 
+      resulting in shorter supply chains transportation distance and cost reduction, and improvement in resilience. </p>
+      <img src="/img/evci/ll-graph.png" alt="Graph plotting stock by year, one line per vehicle type" width="353" height="314" />`,
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
-    urbanZeroCarbon: {
-      title: "Future Travel Scenario: Urban Zero Carbon",
-      content: `<p>This scenario sees a significant shift in public attitudes towards action on climate change, and strong national Government response to meet it. 
-      There is a boost to economic productivity to levels consistent with the NPIER, primarily through a combination of urban agglomeration and place-making. 
-      Transport users demand and embrace publicly available transit and active travel options, 
-      as there is a blurring of the line between <i>public</i> and <i>private</i> with increasing shared mobility systems online. 
-      This scenario is led by attitudes to climate action and urban place-making, with the biggest drivers being strong Government policy and trends of urban densification.</p>
-      <img src="/img/evci/uzc-graph.png" alt="Graph plotting EV stock by year, one line per scenario" width="372" height="322" />`,
+    metropolitanMobility: {
+      title: "Future Travel Scenario: Metropolitan Mobility in 2050",
+      content: `<p><i>What if society embraces sustainable urban living to tackle climate change and meet Net Zero targets?</i></p>
+      <p>The combination of public attitudes towards climate change, devolved powers to city and combined authority leaders and strong fiscal and regulatory 
+      policies by the UK national government during the 2020s has led to growing and successful cities with high-quality public transport services and high-take-up 
+      of zero emission vehicles. New technologies have combined with public transport services to provide seamlessly connected transport services that have helped 
+      transform economic productivity and growth in cities. Tax reform of how we pay for transport has generated revenues to support transport investment more widely, 
+      with money ringfenced for public transport and active travel investment.</p>
+      <p>Cities provide a thriving environment to walk, cycle and wheel that enables easy movement and travel to and from self-driving buses, trains or shared vehicles.
+      Car ownership has declined in cities, as owning a car has become an unnecessary and undesirable. Outside of cities, mobility hubs provide digital connectivity and 
+      working spaces, as well as access to local services and public and shared transport.</p>
+      <p>In 2030, the vehicle fleet only contains a small number of hybrids (passenger) and goods vehicles have transitioned more quickly to cleaner options, 
+      regardless of flexibilities in the ZEV mandate for manufacturers. The switch to zero emission vehicles, combined with a shift towards the use of sustainable 
+      transport modes has led to significant decarbonisation across the transport sector. Transport, land-use and energy planning and systems are integrated to 
+      deliver effective and efficient clean networks. The UK has led the development of renewable energy and Carbon Capture and Storage which has proven necessary 
+      in offsetting residual transport emissions. Cars, light-goods vehicles and small heavy goods vehicles are electric powered. An increasing supply of zero carbon 
+      hydrogen is available for larger heavy-duty vehicles.</p>
+      <p>Freight is delivered to combined urban freight centres and charging / refuelling stations by zero-emission freight vehicles 
+      at a faster rate than the ZEV Mandate and, increasingly, by electrified rail.</p>
+      <img src="/img/evci/mm-graph.png" alt="Graph plotting stock by year, one line per vehicle type" width="353" height="314" />`,
       exclude: ["mc", "tfse", "eeh", "wg", "peninsula", "te"],
     },
     evcpUptake: {
@@ -541,14 +580,16 @@ const glossaryData = {
       title: "Business As Usual",
       content: `<p><ul><li>Reflects central assumptions for exogenous drivers of demand and published 'firm and funded' policies.</li>
       <li>A 'common comparator' to assesses all project and options against remains the basis of the Appraisal Summary Table</li>
-      <li>BAU BEV uptake for car: 23% 2025; 34% 2030; 40% 2040; 50% 2050</li></ul></p>`,
+      <li>BAU BEV uptake for car: 23% 2025; 34% 2030; 40% 2040; 50% 2050</li></ul></p>
+      <img src="/img/evci/bau-graph.png" alt="Graph plotting stock by year, one line per vehicle type" width="353" height="314" />`,
       exclude: [],
     },
     accelaratedEv: {
       title: "Vehicle-led Decarbonisation (Accelerated EV)",
       content: `<p><ul><li>High and fast uptake of low-cost Electric Vehicles.</li>
       <li>Uses the Core NTEM/TEMPro scenario.</li>
-      <li>AEV BEV uptake for car: 41% 2025; 72% 2030; 100% 2040</li></ul></p>`,
+      <li>AEV BEV uptake for car: 41% 2025; 72% 2030; 100% 2040</li></ul></p>
+      <img src="/img/evci/aev-graph.png" alt="Graph plotting stock by year, one line per vehicle type" width="353" height="314" />`,
       exclude: [],
     },
     highwayNetwork: {
@@ -593,6 +634,19 @@ const glossaryData = {
     chargepointOutput: {
       title: "What do the chargepoint output numbers refer to?",
       content: '<p>Please note that for current/installed chargepoints, the totals are the number of devices, whereas for the forecasted numbers these are given as chargepoint plugs.</p>'
+    },
+    fleetProjection: {
+      title: `Fleet projections`,
+      content: `<p>The forecast EV fleet is created from NoCarb's fleet model which is informed by the local historic and current fleet, forecasting of population growth
+      and car ownership from TfN's socioeconomic modelling, sales assumption for vehicle size and fuel type by scenario and announced government legislation, and age and
+      replacement rate of the vehicle fleet.</p>
+      <img src="/img/evci/fleet-graph.png" alt="Graph plotting fleet projections by scenario" width="353" height="314" />`
+    },
+    utilisation: {
+      title: `Utilisation Behaviour Data`,
+      content: `<p>The Baseline Behavioural Scenario is informed by ZapMap reporting on user engagement with the existing charging infrastructure. This includes hourly and total usage
+      profiles throughout the day of the charger and the length of users charging sessions with the different categories of charging. Each of these influences the number of 
+      chargers required to satisfy user demand and, consequently, existing behavioural data is used in future forecasts in addition to expectations in behavioural shifts.</p>`
     }
   };
   

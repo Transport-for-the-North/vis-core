@@ -9,6 +9,7 @@ import { api } from "services";
 import { withWarning, withRoleValidation, composeHOCs, withTermsOfUse } from "hocs";
 import { theme } from "theme";
 import { NotFound } from "Components/NotFoundPage";
+import { NotFound } from "Components/NotFoundPage";
 
 /**
  * Main application component.
@@ -71,6 +72,7 @@ function App() {
 
   const isAuthRequired = appConfig.authenticationRequired ?? true;
   const HomePageWithRoleValidation = isAuthRequired ? withRoleValidation(HomePage) : HomePage;
+  const NotFoundWithRoleValidation = isAuthRequired ? withRoleValidation(NotFound) : NotFound;
 
   return (
     <div className="App">
@@ -97,8 +99,6 @@ function App() {
                   />
                 );
               })}
-              {/* Catch-all for undefined routes */}
-              <Route path="*" element={<NotFound />} />
             </Routes>
           </Dashboard>
         </AppContext.Provider>

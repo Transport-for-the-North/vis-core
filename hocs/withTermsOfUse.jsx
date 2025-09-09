@@ -5,7 +5,13 @@ import { TermsOfUse } from '../Components/TermsOfUse/TermsOfUse.jsx';
 export const withTermsOfUse = (WrappedComponent) => {
   return (props) => {
     const { pageConfig } = props;
-    const userHasAcceptedTermsOfUse = Cookies.get('toc');
+    const toc = Cookies.get('toc');
+    // Normalize to boolean (handles boolean or 'true'/'false' strings)
+    const userHasAcceptedTermsOfUse =
+      typeof toc === 'boolean'
+        ? toc
+        : (typeof toc === 'string' ? toc.trim().toLowerCase() === 'true' : false);
+
 
     return (
       <>

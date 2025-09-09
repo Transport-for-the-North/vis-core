@@ -16,7 +16,7 @@ export const energyCapacity = {
   customMapZoom: "@mapZoom@",
   about: `
   <p>This visualisation shows the forecast EV charging demand (of TfN’s lowest demand scenario) vrs current electricity headroom 
-  (as per Distribution Network Operator data mapped in 2024). The energy capacity is given in MegaWatts. </p>
+  (as per Distribution Network Operator data mapped in 2025). The energy capacity is given in MegaWatts. </p>
   <p>This does not account for other demands on the grid such as housing and heating. </p>
   <ul>
   <li>Green zones – Capacity exists. No grid upgrades required at this time. </li>

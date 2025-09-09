@@ -11,6 +11,7 @@ import { commercialViability } from "./commercialViability"
 import { multiModalHubs } from "./multiModalHubs"
 import { offStreetParkingAccess, offStreetParkingDrivewayOnly } from "./offStreetParkingAccess"
 import { energyCapacity } from "./energyCapacity"
+import { pavementRoadWidth } from "./pavementRoadWidths"
 
 export const pages = {
     evUptake: evUptake,
@@ -32,11 +33,8 @@ export const pages = {
     tfnEvcpRequirements: tfnEvcpRequirements,
     tfnEvUptake: tfnEvUptake,
     tfnPotentialChargingSites: tfnPotentialChargingSites,
-    eehEvUptake: eehEvUptake,
-    eehAnnualChargingDemand: eehAnnualChargingDemand,
-    eehEvcpRequirements: eehEvcpRequirements,
-    eehPotentialChargingSites: eehPotentialChargingSites,
     tfseEvUptake: tfseEvUptake,
     tfseAnnualChargingDemand: tfseAnnualChargingDemand,
-    tfseEvcpRequirements: tfseEvcpRequirements
+    tfseEvcpRequirements: tfseEvcpRequirements,
+    pavementRoadWidth: pavementRoadWidth,
 }

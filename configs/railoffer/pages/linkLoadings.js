@@ -1,23 +1,17 @@
+import glossaryData from "../glossaryData";
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const linkLoadings = {
   pageName: "Link Loadings",
-  url: "/railoffer/link-loadings",
+  url: "/link-loadings",
   type: "MapLayout",
   category: "Link",
   about: `<p>This visualisation shows the loadings information for each link in the NorTMS model.</p>
-  <p><b>TOC Abbreviations:</b></p> 
-  <p>NT: Northern</p>
-  <p>GR: East Coast</p>
-  <p>EM: East Midlands</p>
-  <p>VT: West Cost</p>
-  <p>ME: Merseyrail</p>
-  <p>GM: Greater Manchester</p>
-  <p>NR: Network Rail</p>
-  <p>AW: Transport for Wales</p>
-  <p>TP: Transpennine</p>
-  <p>XC: CrossCountry</p>
+    <p>This data is retrieved from the Rail Data Marketplace and currently only contains Northern Loadings data.</p>
+    <p>Loadings are calculated by getting boarding/alighting/load on departure/capacity values from station-station pairs for each rail period. This is then mapped to the network, therefore boarding values will only show from the first link between stations, alighters from the last, as they board/alight at a specific station. Intermediate links in this case will be zero, which will most likely be junction links as trains do not stop there.</p>
+    <p>Rail Periods are 4 week periods used in the rail industry to manage timetables and operations. There are 13 rail periods in a year, in our filters they are shown as e.g. 2025/P01 which is period 1 of the 2025 rail year.</p>
+    <p>Use the filters to select the metric, rail period, and day of week you wish to see on the map. Hover over a link to see more information about the loadings on the tooltip.</p>
   `,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
@@ -25,7 +19,7 @@ export const linkLoadings = {
     layers: [
         {
             uniqueId: "RailOfferLinksVectorTile",
-            name: "Rail Offer Links Result",
+            name: "Link Loading Layer",
             type: "tile",
             source: "api",
             path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}", // matches the path in swagger.json
@@ -38,7 +32,7 @@ export const linkLoadings = {
             shouldHaveLabel: true,
             labelZoomLevel: 12,
             labelNulls: true,
-            hoverNulls: true,
+            hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
         },
     ],
@@ -46,7 +40,7 @@ export const linkLoadings = {
         {
         name: "Link Loading Totals",
         type: "joinDataToMap",
-        joinLayer: "Rail Offer Links Result",
+        joinLayer: "Link Loading Layer",
         style: "line-continuous",
         joinField: "id",
         valueField: "value",
@@ -56,14 +50,14 @@ export const linkLoadings = {
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.loadingsMetricSelector, visualisations: ['Link Loading Totals'] },
+        { ...selectors.linkLoadingsMetricSelector, visualisations: ['Link Loading Totals'] },
         { ...selectors.linkTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Loading Totals'] },
         { ...selectors.railPeriodSelector, visualisations: ['Link Loading Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Link Loading Totals'] },
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [
@@ -73,7 +67,6 @@ export const linkLoadings = {
             ],
             downloadPath: '/api/railoffer/link-loadings/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

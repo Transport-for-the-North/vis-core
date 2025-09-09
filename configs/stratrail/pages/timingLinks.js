@@ -1,12 +1,17 @@
+import glossaryData from "../glossaryData";
 import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const timingLinks = {
   pageName: "BPLAN Timing Links",
-  url: "/railoffer/timing-links",
+  url: "/timing-links",
   type: "MapLayout",
   category: "Link",
-  about: `<p>This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</p>`,
+  about: `<p>This visualisation shows the timing link information for each link in the NorTMS model.</p>
+  <p>This data is retrieved from the BPLAN Timing Links feed in the Rail Data Marketplace, and details the time taken to traverse a link.</p>
+  <p>The timing links are derived by taking the scheduled running time between two stations. As this is mapped to the network for more than one link between each station, the scheduled running time is calculated based on the proportion of the link distance against the total station-station distance.</p>
+  <p>The speed metric is calculated by taking the maximum speed across each link, this is not the average speed across the link.</p>
+  <p>Use the filter to select the metric you wish to see on the map. Hover over a link to see more information about the timing link on the tooltip.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   config: {
@@ -26,7 +31,7 @@ export const timingLinks = {
             shouldHaveLabel: true,
             labelZoomLevel: 12,
             labelNulls: true,
-            hoverNulls: true,
+            hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
         },
     ],
@@ -48,13 +53,12 @@ export const timingLinks = {
     ],
     additionalFeatures: {
         glossary: { 
-            dataDictionary: {}
+            dataDictionary: glossaryData
         },
         download: {
             filters: [],
             downloadPath: '/api/railoffer/timing-link/download'
         },
-        warning: "NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.",
     },
   },
 };

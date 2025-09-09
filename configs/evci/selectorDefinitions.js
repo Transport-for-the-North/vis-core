@@ -17,11 +17,11 @@ const administrativeBoundarySelector = {
     values: [
       {
         displayValue: "Local Authority",
-        paramValue: 27,
+        paramValue: 18,
       },
       {
         displayValue: "MSOA",
-        paramValue: 14,
+        paramValue: 6,
       },
     ],
   },
@@ -41,7 +41,7 @@ const administrativeBoundaryFixedSelector = {
     values: [
       {
         displayValue: "MSOA",
-        paramValue: "14",
+        paramValue: "6",
       }
     ],
   },
@@ -209,12 +209,12 @@ const travelScenarioSelectorAdditional = {
         paramValue: 4,
       },
       {
-        displayValue: "Prioritised Places",
-        paramValue: 5,
+        displayValue: "Live Local",
+        paramValue: 7,
       },
       {
-        displayValue: "Urban Zero Carbon",
-        paramValue: 6,
+        displayValue: "Metropolitan Mobility",
+        paramValue: 8,
       },
     ],
   },
@@ -889,6 +889,30 @@ const runTypeCodeDynamicSelector = {
   },
 };
 
+const infrastructureTypeSelector = {
+  filterName: "Infrastructure Type",
+  paramName: "infrastructureTypeId",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "toggle",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Pavement",
+        paramValue: "Pavement",
+      },
+      {
+        displayValue: "Road",
+        paramValue: "Road",
+      }
+    ],
+  },
+};
+
 export const selectors = {
   year: yearSelector,
   yearTriplet: yearTripletSelector,
@@ -909,6 +933,7 @@ export const selectors = {
   areaValueDisplay: areaValueDisplaySelector,
   distanceValueDisplay: distanceValueDisplaySelector,
   chargerSpeed: chargerSpeedSelector,
+  infrastructureType: infrastructureTypeSelector,
   columnNameCP: columnNameCPSelector,
   columnNameOSPA: columnNameOSPASelector,
   columnNameOSPADrivewayOnly: columnNameOSPASelectorDrivewayOnly,

@@ -32,6 +32,7 @@ export const stbConfig = [
       "enrouteChargingDemand",
       "offStreetParkingDrivewayOnly",
       "energyCapacity",
+      "pavementRoadWidth"
     ],
     termsOfUseText: "Welcome",
     termsOfUseLink:
@@ -118,10 +119,10 @@ export const stbConfig = [
     primaryFontColour: "#ffffff",
     secondaryFontColour: "#000000",
     pages: [
-      "eehEvUptake",
-      "eehEvcpRequirements",
-      "eehAnnualChargingDemand",
-      "eehPotentialChargingSites",
+      "evUptake",
+      "evcpRequirements",
+      "annualChargingDemand",
+      "potentialChargingSites",
     ],
     TermsOfUseText: "Welcome",
     TermsOfUseLink: "",
