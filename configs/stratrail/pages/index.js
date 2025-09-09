@@ -8,8 +8,8 @@ import { stationInformationBool } from "./stationInformationBool"
 import { nodeInvestments } from "./nodeInvestments"
 import { linkInvestments } from "./linkInvestments"
 import { linkFrequency } from "./linkFrequency"
-import { freightLinkInvestments } from "./freightLinkInvestments"
-import { freightNodeInvestments } from "./freightNodeInvestments"
+import { freightNodeInvestments } from "./freightNodeInvestment"
+import { freightLinkInvestments } from "./freightLinkInvestment"
 
 export const pages = {
     linkLoadings: linkLoadings,
