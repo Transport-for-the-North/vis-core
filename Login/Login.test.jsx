@@ -14,6 +14,11 @@ jest.mock("react-router-dom", () => ({
   useNavigate: jest.fn(),
 }));
 
+afterEach(() => {
+  jest.clearAllMocks();
+  jest.restoreAllMocks();
+});
+
 describe("Login component test", () => {
   const renderLogin = () => {
     return render(
@@ -99,9 +104,17 @@ describe("Login component test", () => {
 });
 describe("Unauthorized component test", () => {
   it("All items are displayed", () => {
-    render(<Unauthorized />)
+    render(
+      <BrowserRouter>
+        <Unauthorized />
+      </BrowserRouter>
+    );
     expect(screen.getByText("Unauthorized")).toBeInTheDocument();
-    expect(screen.getByText("You are not authorised to access this app.")).toBeInTheDocument();
-    expect(screen.getByText(/If you believe this is an error/i)).toBeInTheDocument();
+    expect(
+      screen.getByText("You are not authorised to access this app.")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/If you believe this is an error/i)
+    ).toBeInTheDocument();
   });
 });
