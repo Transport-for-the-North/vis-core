@@ -1930,7 +1930,101 @@ export const appConfig = {
             containsLegendInfo: true,
             values: userClassValues
           },
-        ]
+        ],
+        additionalFeatures: {
+          glossary: { 
+            dataDictionary: {}
+          },
+          download: {
+            filters: [
+              {
+                filterName: "Trip Type",
+                paramName: "columnName",
+                info: "Select whether you want to display the number of origin or destination trips assigned for each zone",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "toggle",
+                containsLegendInfo: true,
+                values: originOrDestTripValues,
+              },
+              {
+                filterName: "Delivery Programme",
+                paramName: "deliveryProgrammeName",
+                info: "Assignment delivery programme",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "delivery_programme_name",
+                  paramColumn: "delivery_programme_name",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Year",
+                paramName: "year",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "demand_year",
+                  paramColumn: "demand_year",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Demand Scenario",
+                paramName: "demandScenarioName",
+                info: "Matrix demand scenario",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "demand_scenario_name",
+                  paramColumn: "demand_scenario_name",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Time Period",
+                paramName: "timePeriodCode",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: null,
+                type: "toggle",
+                values: timePeriodValues
+              },
+              {
+                filterName: "User Class",
+                paramName: "userClassCode",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: null,
+                type: "dropdown",
+                containsLegendInfo: true,
+                values: userClassValues
+              },
+            ],
+            downloadPath: '/api/noham/matrix-demand/download',
+            requestMethod: "GET",
+          },
+        },
       }
     },
 
