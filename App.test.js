@@ -54,7 +54,7 @@ import { MemoryRouter } from "react-router-dom";
 process.env.REACT_APP_NAME = "dev";
 
 describe("App Component", () => {
-  it("Renders the login page because we're not connect", async () => {
+  it("Renders the login page because we're not connected", async () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <App />

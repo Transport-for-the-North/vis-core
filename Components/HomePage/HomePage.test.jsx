@@ -77,7 +77,7 @@ describe("HomePage test", () => {
   });
 
   describe("Footer test", () => {
-    it("navigue vers Cookies", async () => {
+    it("navigate to Cookies", async () => {
       linkRouter();
       const cookie = screen.getByText("Cookies");
       userEvent.click(cookie);
@@ -86,7 +86,7 @@ describe("HomePage test", () => {
       });
     });
 
-    it("navigue vers Privacy Policy", async () => {
+    it("navigate to Privacy Policy", async () => {
       linkRouter();
       const privacy_policy = screen.getByText("Privacy Policy");
       userEvent.click(privacy_policy);
@@ -95,7 +95,7 @@ describe("HomePage test", () => {
       });
     });
 
-    it("navigue vers Contact Us", async () => {
+    it("navigate to Contact Us", async () => {
       linkRouter();
       const contact_us = screen.getByText("Contact Us");
       userEvent.click(contact_us);

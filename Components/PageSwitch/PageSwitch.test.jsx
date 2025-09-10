@@ -31,13 +31,11 @@ describe("PageSwitch Component", () => {
 
   it("Case pageConfig.type = DualMapLayout", async () => {
     render(<PageSwitch pageConfig={{ type: "DualMapLayout" }} />);
-    // screen.debug();
 
     const pageContext = screen.getByTestId("mock-page-context");
     const filterProvider = screen.getByTestId("mock-filter-provider");
     const mapProvider = screen.getByTestId("mock-map-provider");
     const mapLayout = screen.getByTestId("mock-map-layout");
-    // const iframeembedpage = screen.getByTestId("mock-iframe-embed-page");
     expect(pageContext).toBeInTheDocument();
     expect(filterProvider).toBeInTheDocument();
     expect(mapProvider).toBeInTheDocument();
@@ -45,13 +43,11 @@ describe("PageSwitch Component", () => {
   });
   it("Case pageConfig.type = MapLayout", async () => {
     render(<PageSwitch pageConfig={{ type: "MapLayout" }} />);
-    // screen.debug();
 
     const pageContext = screen.getByTestId("mock-page-context");
     const filterProvider = screen.getByTestId("mock-filter-provider");
     const mapProvider = screen.getByTestId("mock-map-provider");
     const mapLayout = screen.getByTestId("mock-map-layout");
-    // const iframeembedpage = screen.getByTestId("mock-iframe-embed-page");
     expect(pageContext).toBeInTheDocument();
     expect(filterProvider).toBeInTheDocument();
     expect(mapProvider).toBeInTheDocument();
@@ -59,12 +55,8 @@ describe("PageSwitch Component", () => {
   });
   it("Case pageConfig.type = IFrameEmbed", async () => {
     render(<PageSwitch pageConfig={{ type: "IFrameEmbed" }} />);
-    // screen.debug();
 
     const pageContext = screen.getByTestId("mock-page-context");
-    // const filterProvider = screen.getByTestId("mock-filter-provider");
-    // const mapProvider = screen.getByTestId("mock-map-provider");
-    // const mapLayout = screen.getByTestId("mock-map-layout");
     const iframeembedpage = screen.getByTestId("mock-iframe-embed-page");
     expect(pageContext).toBeInTheDocument();
     expect(iframeembedpage).toBeInTheDocument();
