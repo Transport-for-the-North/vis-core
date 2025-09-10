@@ -109,7 +109,7 @@ describe("Unauthorized component test", () => {
         <Unauthorized />
       </BrowserRouter>
     );
-    expect(screen.getByText("Unauthorized")).toBeInTheDocument();
+    expect(screen.getByText("Unauthorised")).toBeInTheDocument();
     expect(
       screen.getByText("You are not authorised to access this app.")
     ).toBeInTheDocument();
