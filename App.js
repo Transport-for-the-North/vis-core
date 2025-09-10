@@ -98,6 +98,8 @@ function App() {
                   />
                 );
               })}
+              {/* Catch-all for undefined routes */}
+              <Route path="*" element={<NotFoundWithRoleValidation />} />
             </Routes>
           </Dashboard>
         </AppContext.Provider>
