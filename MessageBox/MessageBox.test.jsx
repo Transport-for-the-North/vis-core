@@ -18,16 +18,16 @@ describe("MessageBox test component", () => {
     expect(screen.getByText("IconWarning")).toBeInTheDocument();
   });
   it("Type error", () => {
-    render(<ErrorBox text="This is a warning message" />);
-    const el = screen.getByText("This is a warning message");
+    render(<ErrorBox text="This is an error message" />);
+    const el = screen.getByText("This is an error message");
     expect(el).toBeInTheDocument();
     expect(el).toHaveStyle("background-color: #ffebee;");
     expect(el).toHaveStyle("color: #d32f2f;");
     expect(screen.getByText("IconError")).toBeInTheDocument();
   });
   it("Type info", () => {
-    render(<InfoBox text="This is a warning message" />);
-    const el = screen.getByText("This is a warning message");
+    render(<InfoBox text="This is an info message" />);
+    const el = screen.getByText("This is an info message");
     expect(el).toBeInTheDocument();
     expect(el).toHaveStyle("background-color: rgba(0, 222, 198, 0.9);");
     expect(el).toHaveStyle("color: rgb(13, 15, 61);");

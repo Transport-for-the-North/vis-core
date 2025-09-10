@@ -56,11 +56,11 @@ describe("Glossary component test", () => {
     
     userEvent.click(select);
     
-    // Attendre que les options apparaissent
+    // Wait for the options to appear
     const optionSelected = await screen.findByText("Future Travel Scenario");
     userEvent.click(optionSelected);
     
-    // Attendre que le contenu soit affiché
+    // Wait for content to be displayed
     await waitFor(() => {
       expect(screen.getByText(/This scenario sees a future/i)).toBeInTheDocument();
     });
@@ -72,7 +72,7 @@ describe("Glossary component test", () => {
     const select = screen.getByRole("combobox");
     userEvent.click(select);
     
-    // Attendre que le menu dropdown soit ouvert et que les options soient visibles
+    // Wait until the dropdown menu is open and the options are visible
     await waitFor(() => {
       expect(screen.getByText("Future Travel Scenario")).toBeInTheDocument();
     });
@@ -80,27 +80,27 @@ describe("Glossary component test", () => {
     const optionSelected = screen.getByText("Future Travel Scenario");
     userEvent.click(optionSelected);
     
-    // Attendre que le contenu soit rendu
+    // Wait for content to be rendered
     await waitFor(() => {
       expect(screen.getByText(/This scenario sees a future/i)).toBeInTheDocument();
     });
     
-    // L'image devrait maintenant être visible
+    // The image should now be visible
     const img = screen.getByAltText("Graph plotting EV stock by year, one line per scenario");
     expect(img).toBeInTheDocument();
     
     userEvent.click(img);
     
-    // Attendre que le modal s'ouvre
+    // Wait for the modal to open
     await waitFor(() => {
       expect(screen.getByAltText("Modal Content")).toBeInTheDocument();
     });
     
-    // Fermer le modal
+    // Close the modal
     const closeButton = screen.getByText("Close");
     userEvent.click(closeButton);
     
-    // Vérifier que le modal est fermé
+    // Check that the modal is closed
     await waitFor(() => {
       expect(screen.queryByAltText("Modal Content")).not.toBeInTheDocument();
     });
