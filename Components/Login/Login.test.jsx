@@ -111,10 +111,10 @@ describe("Unauthorized component test", () => {
     );
     expect(screen.getByText("Unauthorised")).toBeInTheDocument();
     expect(
-      screen.getByText("You are not authorised to access this app.")
+      screen.getByText(/You are not authorised to access this app./)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/If you believe this is an error/i)
+      screen.getByText(/Return to login/i)
     ).toBeInTheDocument();
   });
 });
