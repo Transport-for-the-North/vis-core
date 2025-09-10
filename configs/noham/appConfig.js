@@ -1268,7 +1268,110 @@ export const appConfig = {
             visualisations: ["Node Results"],
             type: "toggle",
             values: timePeriodValues
-          }]
+          }
+        ],
+        additionalFeatures: {
+          glossary: { 
+            dataDictionary: {}
+          },
+          download: {
+            filters: [
+              {
+                filterName: "Metric",
+                paramName: "columnName",
+                info: "Metric to display",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "dropdown",
+                containsLegendInfo: true,
+                values: nodeMetricValues,
+              },
+              {
+                filterName: "Delivery Programme",
+                paramName: "deliveryProgrammeName",
+                info: "Assignment delivery programme",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "delivery_programme_name",
+                  paramColumn: "delivery_programme_name",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Year",
+                paramName: "year",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "network_year",
+                  paramColumn: "network_year",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Network Scenario Name",
+                paramName: "networkScenarioName",
+                info: "Network DM/DS",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "network_scenario_name",
+                  paramColumn: "network_scenario_name",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Demand Scenario",
+                paramName: "demandScenarioName",
+                info: "Matrix demand scenario",
+                target: "api",
+                actions: [
+                  { action: "UPDATE_QUERY_PARAMS" }
+                ],
+                visualisations: null,
+                type: "dropdown",
+                values: {
+                  source: "metadataTable",
+                  metadataTableName: "v_input_scenarios",
+                  displayColumn: "demand_scenario_name",
+                  paramColumn: "demand_scenario_name",
+                  sort: "ascending"
+                },
+              },
+              {
+                filterName: "Time Period",
+                paramName: "timePeriodCode",
+                target: "api",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                visualisations: null,
+                type: "toggle",
+                values: timePeriodValues
+              },
+            ],
+            downloadPath: '/api/noham/node-results/download',
+            requestMethod: "GET",
+          },
+        },
       },
     },
 
