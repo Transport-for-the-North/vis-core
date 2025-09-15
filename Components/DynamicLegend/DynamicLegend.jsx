@@ -438,10 +438,14 @@ export const DynamicLegend = ({ map }) => {
               color: convertStringToNumber(stop.value) < 0 ? negativeColor : positiveColor
             }));
           }
-          
+
           // Process legend entries
           let legendEntries = [];
           if (colorStops && colorStops.length > 0) {
+            if (widthStops.length == 1) {
+              // If there's only one width stop, apply it to all color stops. This should only occur with custom paint definiton (not data-driven).
+              widthStops = Array(colorStops.length).fill(widthStops[0]);
+            }
             const length = trseLabel ? colorStops.length - 1 : colorStops.length;
             for (let idx = 0; idx < length; idx++) {
               const stop = colorStops[idx];
