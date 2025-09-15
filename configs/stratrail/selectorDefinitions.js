@@ -100,11 +100,6 @@ const linkLoadingsMetricSelector = {
         legendSubtitleText: "Passengers"
       },
       {
-        displayValue: "Capacity",
-        paramValue: "mean_capacity",
-        legendSubtitleText: "Passengers"
-      },
-      {
         displayValue: "Load on Departure",
         paramValue: "mean_load_on_departure",
         legendSubtitleText: "Passengers"
