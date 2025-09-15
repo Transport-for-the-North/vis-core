@@ -11,6 +11,10 @@
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "access": "public"
+  },
   "sideEffects": false,
   "exports": {
     ".": {
