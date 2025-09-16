@@ -67,6 +67,7 @@ export const linkLoadings = {
             ],
             downloadPath: '/api/railoffer/link-loadings/download'
         },
+        warning: 'This contains currently only Northern loadings data, therefore some adjacent station-station pairs will have no data.' 
     },
   },
 };
