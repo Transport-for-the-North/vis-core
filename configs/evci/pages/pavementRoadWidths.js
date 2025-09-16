@@ -12,18 +12,21 @@ export const pavementRoadWidth = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows pavement and road width data aggregated to MSOA zoning for the region, i.e. which of the regions pavements and roads are suitable for on-street EV charging.</p>
+  <p>This visualisation shows pavement and road width data aggregated to MSOA zoning for the region.</p>
   <p>The classifications of pavement widths used in this analysis (as agreed with the EV regional group) are as follows:
   <ul><li>Red: 0 to 1.8m</li>
   <li>Amber: 1.8 to 2.4m</li>
   <li>Green: 2.4m+</li></ul></p>
+  <p>These classifications were determined by looking to account for the estimated space a chargepoint takes up e.g. 80cm, including set back from the kerb.
+  Therefore, for example, the amber criteria leaves at least 1m width after installation.</p>
   <p>The classifications of road widths used in this analysis (as agreed with the EV regional group) are as follows:
-  <ul><li>Red: 0 to 4.8m</li>
-  <li>Amber: 4.8 to 8.8m</li>
-  <li>Green: 8.8m+</li></ul></p>
+  <ul><li>Red: 0 to 6m</li>
+  <li>Amber: 6 to 8m</li>
+  <li>Green: 8m+</li></ul></p>
+  <p>These classifications were determined by using an estimated 2m for parking to allow for charging and no pavement charging. 
+  Therefore, amber means ability to park on at least one side of the road, and green is on both sides.</p>
   <p>Hovering over each MSOA defines the percentages of pavements/roads within that MSOA that fall into each of the Red Amber Green (RAG) categories. The map is coloured/shaded based
   on the green rated percentages as these MSOAs have a higher percentage of pavements/roads suitable for EV charging.</p>
-  <p>More detailed intelligence is available to TfN's partner authorities.</p>
   <p>TfN can support our local authority partners with further information behind these outputs, this can be accessed by emailing <a href=mailto:TfNOffer@transportforthenorth.com>TfNOffer@transportforthenorth.com</a>.</p>
   <p>Other users can use the contact us section on the home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN's methodology for the EVCI Framework can be found
   <a
