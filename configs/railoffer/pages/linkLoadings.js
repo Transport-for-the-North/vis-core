@@ -22,7 +22,7 @@ export const linkLoadings = {
             name: "Link Loading Layer",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}", // matches the path in swagger.json
+            path: "/api/vectortiles/railoffer_station_links/{z}/{x}/{y}", // matches the path in swagger.json
             sourceLayer: "geometry",
             geometryType: "line",
             visualisationName: "Link Loading Totals",
