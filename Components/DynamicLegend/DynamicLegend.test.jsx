@@ -47,7 +47,7 @@ describe("interpretWidthExpression", () => {
 
   it("There is a zoom in the proposals, the return value is a null array.", () => {
     const expression = ["interpolate", ["linear"], ["zoom"], 5, 1, 15, 3];
-    const result = interpretWidthExpression(expression, 3);
+    const result = interpretWidthExpression(expression);
     expect(result).toEqual([]);
   });
 
