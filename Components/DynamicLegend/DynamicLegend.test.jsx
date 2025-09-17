@@ -114,6 +114,7 @@ describe("DynamicLegend", () => {
             },
             paint: {
               "fill-color": "#00ffff",
+              "line-width": 15
             },
           },
         ],
