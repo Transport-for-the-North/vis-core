@@ -16,7 +16,7 @@ export function Button({ className, src, alt, onClick }) {
   };
 
   return (
-    <div className={`Button ${className || ""}`} onClick={handleClick}>
+    <div className={`Button ${className || ""}`} onClick={handleClick} data-testid="custom-button">
       <img
         src={`${process.env.PUBLIC_URL}${src}`}
         alt={alt}

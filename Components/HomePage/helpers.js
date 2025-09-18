@@ -55,6 +55,7 @@ export const interweaveContentWithImages = (htmlContent, images) => {
       elements.push(
         <img
           key={`img-${imageIdx}`}
+          alt={`img-${imageIdx}`}
           src={images[imageIdx]}
           style={{
             width: "100%",
@@ -121,7 +122,7 @@ export const createBlockSections = (htmlContent, images) => {
  * @param {object} replacements - An object where keys are placeholder names and values are the fetched data.
  * @returns {string} - The updated HTML content with replaced placeholders.
  */
-const replacePlaceholders = (content, replacements) => {
+export const replacePlaceholders = (content, replacements) => {
   return content.replace(
     /<span\s+([^>]*data-placeholder="([^"]+)"[^>]*)>(.*?)<\/span>/g,
     (match, attrs, placeholderName) => {

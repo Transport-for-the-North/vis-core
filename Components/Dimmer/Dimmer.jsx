@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const Dimmed = styled.div`
+const Dimmed = styled.div.attrs({ 'data-testid': 'dimmed-overlay' })`
   top: 0;
   left: 0;
   z-index: 999998;
@@ -46,7 +46,7 @@ export const Dimmer = ({ dimmed, showLoader }) => {
     <>
       {showLoader ? (
         <CenteredSpinner>
-          <div className="spinner"></div>
+          <div className="spinner" role="progressbar"></div>
         </CenteredSpinner>
       ) : null}
       <Dimmed />
