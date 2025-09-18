@@ -442,7 +442,7 @@ export const DynamicLegend = ({ map }) => {
           // Process legend entries
           let legendEntries = [];
           if (colorStops && colorStops.length > 0) {
-            if (widthStops.length == 1) {
+            if (widthStops && widthStops.length == 1) {
               // If there's only one width stop, apply it to all color stops. This should only occur with custom paint definiton (not data-driven).
               widthStops = Array(colorStops.length).fill(widthStops[0]);
             }
