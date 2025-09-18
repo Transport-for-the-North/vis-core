@@ -96,7 +96,6 @@ export const nodeLoadings = {
                 { ...selectors.nodeTOCSelector, multiSelect: true },
                 { ...selectors.authoritySelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
                 { ...selectors.booleanSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
-                { ...selectors.routeNameSelector, multiSelect: true },
                 { ...selectors.dayOfWeekSelector, multiSelect: true },
             ],
             downloadPath: '/api/railoffer/node-loadings/download'
