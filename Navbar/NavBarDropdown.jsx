@@ -210,7 +210,7 @@ const NestedDropdownMenu = styled.div`
  * @param {React.ReactNode} props.children - Nested submenu items.
  * @returns {JSX.Element|null} The portal content or null if not open.
  */
-function NestedDropdownPortal({
+export function NestedDropdownPortal({
   open,
   parentRect,
   onPortalMouseEnter,
@@ -320,6 +320,7 @@ export function RecursiveDropdownItem({
 
   return (
     <DropdownItemWrapper
+      data-testid="dropdown-item"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

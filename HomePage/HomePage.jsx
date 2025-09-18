@@ -115,6 +115,7 @@ export const HomePage = () => {
       <div className="landing">
         {/* Header Section with background image */}
         <div
+          data-testid="background-img"
           className="header-landing"
           style={{ backgroundImage: `url(${appContext.backgroundImage})` }}
         >
