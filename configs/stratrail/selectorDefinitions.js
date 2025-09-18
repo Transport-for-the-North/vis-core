@@ -1,4 +1,4 @@
-const linkTOCSelector = {
+const loadingsTOCSelector = {
   filterName: "TOC Selector",
   paramName: "toc",
   target: "api",
@@ -14,6 +14,10 @@ const linkTOCSelector = {
       {
         displayValue: "Northern",
         paramValue: 'NT',
+      },
+      {
+        displayValue: "Transpennine Express",
+        paramValue: "TP",
       }
     ],
   },
@@ -884,7 +888,7 @@ const linkFreightInterventionSelector = {
 }
 
 export const selectors = {
-  linkTOCSelector: linkTOCSelector,
+  loadingsTOCSelector: loadingsTOCSelector,
   railPeriodSelector: railPeriodSelector,
   dayOfWeekSelector: dayOfWeekSelector,
   linkLoadingsMetricSelector: linkLoadingsMetricSelector,
