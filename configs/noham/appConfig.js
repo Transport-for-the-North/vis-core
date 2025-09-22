@@ -506,19 +506,6 @@ export const appConfig = {
           download: {
             filters: [
               {
-                filterName: "Metric",
-                paramName: "columnName",
-                info: "Metric to display",
-                target: "api",
-                actions: [
-                  { action: "UPDATE_QUERY_PARAMS" }
-                ],
-                visualisations: null,
-                type: "dropdown",
-                containsLegendInfo: true,
-                values: linkMetricValues,
-              },
-              {
                 filterName: "Delivery Programme",
                 paramName: "deliveryProgrammeName",
                 info: "Assignment delivery programme",
@@ -1277,19 +1264,6 @@ export const appConfig = {
           download: {
             filters: [
               {
-                filterName: "Metric",
-                paramName: "columnName",
-                info: "Metric to display",
-                target: "api",
-                actions: [
-                  { action: "UPDATE_QUERY_PARAMS" }
-                ],
-                visualisations: null,
-                type: "dropdown",
-                containsLegendInfo: true,
-                values: nodeMetricValues,
-              },
-              {
                 filterName: "Delivery Programme",
                 paramName: "deliveryProgrammeName",
                 info: "Assignment delivery programme",
@@ -1937,19 +1911,6 @@ export const appConfig = {
           },
           download: {
             filters: [
-              {
-                filterName: "Trip Type",
-                paramName: "columnName",
-                info: "Select whether you want to display the number of origin or destination trips assigned for each zone",
-                target: "api",
-                actions: [
-                  { action: "UPDATE_QUERY_PARAMS" }
-                ],
-                visualisations: null,
-                type: "toggle",
-                containsLegendInfo: true,
-                values: originOrDestTripValues,
-              },
               {
                 filterName: "Delivery Programme",
                 paramName: "deliveryProgrammeName",
@@ -2600,19 +2561,6 @@ export const appConfig = {
                 visualisations: null,
                 type: "toggle",
                 values: originOrDestinationValues,
-              },
-              {
-                filterName: "Metric",
-                paramName: "columnName",
-                info: "Metric to display",
-                target: "api",
-                actions: [
-                  { action: "UPDATE_QUERY_PARAMS" }
-                ],
-                visualisations: null,
-                type: "dropdown",
-                containsLegendInfo: true,
-                values: pairMetricValues,
               },
               {
                 filterName: "Delivery Programme",
