@@ -152,6 +152,8 @@ export const MapLayout = () => {
         bgColor={pageContext.navbarLinkBgColour || defaultBgColour}
         additionalFeatures={pageContext.config.additionalFeatures}
         infoBoxText={layerZoomMessage}
+        downloadPath={pageContext.config.downloadPath}
+        requestMethod={pageContext.config.requestMethod}
       >
         <MapLayerSection
           handleColorChange={handleColorChange}
