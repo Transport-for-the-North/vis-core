@@ -142,6 +142,8 @@ export const Sidebar = ({
   bgColor,
   additionalFeatures,
   infoBoxText,
+  downloadPath,
+  requestMethod,
   children
 }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -218,6 +220,8 @@ export const Sidebar = ({
             filters={filters}
             onFilterChange={(filter, value) => onFilterChange(filter, value)}
             bgColor={bgColor}
+            downloadPath={downloadPath}
+            requestMethod={requestMethod || 'GET'}
           />
         )}
         {children} {/* Render additional AccordionSections passed as children */}
