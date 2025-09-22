@@ -37,7 +37,7 @@ export const stationInformation = {
             sourceLayer: "geometry",
             geometryType: "line",
             customPaint: crpLinesLayerPaint,
-            isHoverable: true,
+            isHoverable: false,
             isStylable: false,
             shouldShowInLegend: true,
             shouldHaveTooltipOnHover: true,

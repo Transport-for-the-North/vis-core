@@ -711,6 +711,17 @@ const stationSocioMetricSelector = {
     }
 }
 
+const idFeatureSelector = {
+  filterName: "",
+  paramName: "featureId",
+  target: "api",
+  actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+  visualisations: null,
+  type: "map",
+  layer: null,
+  field: "id",
+}
+
 const authoritySelector = {
     filterName: "Authority",
     paramName: "authorityCode",
@@ -783,5 +794,6 @@ export const selectors = {
   stationInformationMetricSelector: stationInformationMetricSelector,
   stationInformationMetricBoolSelector: stationInformationMetricBoolSelector,
   authoritySelector: authoritySelector,
+  idFeatureSelector: idFeatureSelector,
   timePeriod: timePeriod,
 };

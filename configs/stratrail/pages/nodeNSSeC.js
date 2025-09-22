@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
+import { nssecSummary } from "../templates";
 
 export const nodeNSSeC = {
   pageName: "Station Socio-Economic Classifications (NS-SeC)",
@@ -50,7 +51,7 @@ export const nodeNSSeC = {
             sourceLayer: "geometry",
             geometryType: "line",
             customPaint: crpLinesLayerPaint,
-            isHoverable: true,
+            isHoverable: false,
             isStylable: false,
             shouldShowInLegend: true,
             shouldHaveTooltipOnHover: true,
@@ -85,7 +86,15 @@ export const nodeNSSeC = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/railoffer/nssec"
-        }
+        },
+        {
+            name: "NSSeC Callout",
+            type: "calloutCard",
+            cardName: "NS-SeC Summary",
+            dataSource: "api",
+            dataPath: "/api/railoffer/nssec-callout/point",
+            htmlFragment: nssecSummary
+        },
     ],
     metadataTables: [],
     filters: [
@@ -94,6 +103,7 @@ export const nodeNSSeC = {
         { ...selectors.authoritySelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.booleanSelector, visualisations: ['Node NS-SeC Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node NS-SeC Totals'] },
+        { ...selectors.idFeatureSelector, visualisations: ['NSSeC Callout'], layer: "Node NS-SeC Layer"}
     ],
     additionalFeatures: {
         glossary: { 
