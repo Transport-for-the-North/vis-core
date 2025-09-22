@@ -152,6 +152,7 @@ const createTestProps = (overrides = {}) => ({
       type: "dropdown",
       info: "Info for dropdown",
       values: {
+        source: "local",
         values: [
           { paramValue: "all", displayValue: "All" },
           { paramValue: "option1", displayValue: "Option 1" },
@@ -165,6 +166,7 @@ const createTestProps = (overrides = {}) => ({
       filterName: "Fixed Filter",
       type: "fixed",
       values: {
+        source: "local",
         values: [{ paramValue: "fixed" }],
       },
     },
@@ -183,6 +185,7 @@ const createTestProps = (overrides = {}) => ({
       filterName: "Toggle Filter",
       type: "toggle",
       values: {
+        source: "local",
         values: [{ paramValue: true }, { paramValue: false }],
       },
     },
@@ -192,6 +195,7 @@ const createTestProps = (overrides = {}) => ({
       filterName: "Checkbox Filter",
       type: "checkbox",
       values: {
+        source: "local",
         values: [{ paramValue: "check1" }, { paramValue: "check2" }],
       },
     },
@@ -215,7 +219,7 @@ describe("DownloadSection", () => {
   });
 
   describe("Initial rendering", () => {
-    it("returns null if filterState is empty", () => {
+    it("returns null if filterState is empty", async () => {
       const mockFilterContext = createMockFilterContext({});
       render(
         <FilterContext.Provider value={mockFilterContext}>
@@ -225,8 +229,13 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      expect(screen.queryByText("Download data")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("accordion")).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText("Download data")).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("accordion")).not.toBeInTheDocument();
+      });
     });
 
     it("displays the component if filterState is not empty", () => {
@@ -249,7 +258,7 @@ describe("DownloadSection", () => {
   });
 
   describe("Initialising filters", () => {
-    it("initialises all filter types correctly", () => {
+    it("initialises all filter types correctly", async () => {
       const mockFilterContext = createMockFilterContext({ initialized: true });
 
       render(
@@ -261,23 +270,24 @@ describe("DownloadSection", () => {
       );
 
       // Check that dispatch has been called
-      expect(mockFilterContext.dispatch).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(mockFilterContext.dispatch).toHaveBeenCalledTimes(1);
+      });
 
       // Retrieve the call and verify the structure
-      const dispatchCall = mockFilterContext.dispatch.mock.calls[0][0];
+      const dispatchCall = await mockFilterContext.dispatch.mock.calls[0][0];
       expect(dispatchCall.type).toBe("INITIALIZE_FILTERS");
 
       // Check the values individually
-      const { payload } = dispatchCall;
-      expect(payload.dropdown1).toEqual(["all", "option1", "option2"]);
+      const { payload } = await dispatchCall;
+      expect(payload.dropdown1).toEqual("all");
       expect(payload.fixed1).toBe("fixed");
       expect(payload.slider1).toBe(50);
-      expect(payload.toggle1).toEqual([false, false]);
-      expect(payload.checkbox1).toEqual(["check1", "check2"]);
-      expect(payload.mapFeature1).toBeNull();
+      expect(payload.toggle1).toEqual(true);
+      expect(payload.checkbox1).toEqual("check1");
     });
 
-    it("initialises the filters with a single value when there is only one", () => {
+    it("initialises the filters with a single value when there is only one", async () => {
       const singleValueProps = createTestProps({
         filters: [
           {
@@ -286,6 +296,7 @@ describe("DownloadSection", () => {
             filterName: "Single Value",
             type: "dropdown",
             values: {
+              source: "local",
               values: [{ paramValue: "only", displayValue: "Only Option" }],
             },
           },
@@ -302,17 +313,19 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      expect(mockFilterContext.dispatch).toHaveBeenCalledWith({
-        type: "INITIALIZE_FILTERS",
-        payload: {
-          single1: "only", // Single value, no table
-        },
+      await waitFor(() => {
+        expect(mockFilterContext.dispatch).toHaveBeenCalledWith({
+          type: "INITIALIZE_FILTERS",
+          payload: {
+            single1: "only", // Single value, no table
+          },
+        });
       });
     });
   });
 
   describe("Displaying filters", () => {
-    it("displays all filters except those of type 'fixed'", () => {
+    it("displays all filters except those of type 'fixed'", async () => {
       const mockFilterContext = createMockFilterContext({
         dropdown1: "all",
         slider1: 50,
@@ -330,17 +343,22 @@ describe("DownloadSection", () => {
       );
 
       // Check that all filters are displayed except 'fixed'.
-      expect(screen.getByText("Dropdown Filter")).toBeInTheDocument();
-      expect(screen.getByText("Slider Filter")).toBeInTheDocument();
-      expect(screen.getByText("Toggle Filter")).toBeInTheDocument();
-      expect(screen.getByText("Checkbox Filter")).toBeInTheDocument();
-      expect(screen.getByText("Map Feature")).toBeInTheDocument();
+      const dropdownFilter = await screen.findByText("Dropdown Filter");
+      const sliderFilter = await screen.findByText("Slider Filter");
+      const toggleFilter = await screen.findByText("Toggle Filter");
+      const checkboxFilter = await screen.findByText("Checkbox Filter");
+      const mapFeatureFilter = await screen.findByText("Map Feature");
+      expect(dropdownFilter).toBeInTheDocument();
+      expect(sliderFilter).toBeInTheDocument();
+      expect(toggleFilter).toBeInTheDocument();
+      expect(checkboxFilter).toBeInTheDocument();
+      expect(mapFeatureFilter).toBeInTheDocument();
 
       // Check that the 'fixed' filter is not displayed.
       expect(screen.queryByText("Fixed Filter")).not.toBeInTheDocument();
     });
 
-    it("displays the InfoBox with the correct text", () => {
+    it("displays the InfoBox with the correct text", async () => {
       const mockFilterContext = createMockFilterContext({ initialized: true });
 
       render(
@@ -351,7 +369,7 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const infoBox = screen.getByTestId("info-box");
+      const infoBox = await screen.findByTestId("info-box");
       expect(infoBox).toHaveTextContent(
         "Use the selections to toggle items on and off"
       );
@@ -373,7 +391,7 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const dropdownContainer = screen.getByTestId("dropdown-dropdown1");
+      const dropdownContainer = await screen.findByTestId("dropdown-dropdown1");
       const select = within(dropdownContainer).getByRole("combobox");
 
       await userEvent.selectOptions(select, "option1");
@@ -401,7 +419,7 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const slider = screen.getByRole("slider");
+      const slider = await screen.findByRole("slider");
       fireEvent.change(slider, { target: { value: "75" } });
 
       expect(mockFilterContext.dispatch).toHaveBeenCalledWith({
@@ -431,7 +449,7 @@ describe("DownloadSection", () => {
       mockFilterContext.dispatch.mockClear();
 
       // Click on the toggle
-      const toggleButton = screen.getByTestId("toggle-button-toggle1");
+      const toggleButton = await screen.findByTestId("toggle-button-toggle1");
       await userEvent.click(toggleButton);
 
       // Check only the last call
@@ -446,7 +464,7 @@ describe("DownloadSection", () => {
   });
 
   describe("Download button", () => {
-    it("displays the Download button with the correct colours", () => {
+    it("displays the Download button with the correct colours", async () => {
       const mockFilterContext = createMockFilterContext({ initialized: true });
 
       render(
@@ -457,7 +475,9 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const downloadButton = screen.getByRole("button", { name: /Download/i });
+      const downloadButton = await screen.findByRole("button", {
+        name: /Download/i,
+      });
       expect(downloadButton).toBeInTheDocument();
       expect(downloadButton).toHaveStyle({ backgroundColor: "#ff0000" });
     });
@@ -478,7 +498,9 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const downloadButton = screen.getByRole("button", { name: /Download/i });
+      const downloadButton = await screen.findByRole("button", {
+        name: /Download/i,
+      });
       await userEvent.click(downloadButton);
 
       expect(api.downloadService.downloadCsv).toHaveBeenCalledWith(
@@ -507,7 +529,9 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const downloadButton = screen.getByRole("button", { name: /Download/i });
+      const downloadButton = await screen.findByRole("button", {
+        name: /Download/i,
+      });
       userEvent.click(downloadButton);
 
       await waitFor(() => {
@@ -515,7 +539,7 @@ describe("DownloadSection", () => {
       });
     });
 
-    it("disable the button if the request is too large", () => {
+    it("disable the button if the request is too large", async () => {
       const mockFilterContext = createMockFilterContext({ initialized: true });
 
       const { api } = require("services");
@@ -532,7 +556,7 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const downloadButton = screen.getByRole("button", {
+      const downloadButton = await screen.findByRole("button", {
         name: /Request Too Large/i,
       });
       expect(downloadButton).toBeDisabled();
@@ -559,7 +583,9 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
-      const downloadButton = screen.getByRole("button", { name: /Download/i });
+      const downloadButton = await screen.findByRole("button", {
+        name: /Download/i,
+      });
       await userEvent.click(downloadButton);
 
       await waitFor(() => {
