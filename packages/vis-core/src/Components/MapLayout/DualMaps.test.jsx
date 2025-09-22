@@ -1,0 +1,329 @@
+import { render, screen } from "@testing-library/react";
+import DualMaps from "./DualMaps";
+import { MapContext, FilterContext } from "contexts";
+import { useDualMaps } from "hooks";
+
+// TO CONTINUE
+
+jest.mock("./VisualisationManager", () => ({
+  VisualisationManager: ({ visualisationConfigs, map, left }) => (
+    <span>VisualisationManager: {left ? "left" : "right"}</span>
+  ),
+}));
+jest.mock("./Layer", () => ({
+  Layer: ({ layer }) => <span>Layer: {JSON.stringify(layer)}</span>,
+}));
+jest.mock("../DynamicLegend", () => ({
+  DynamicLegend: ({ map }) => <span>Dynamic Legend: {map.type}</span>,
+}));
+jest.mock("hooks", () => ({
+  ...jest.requireActual("hooks"),
+  useDualMaps: jest.fn(),
+}));
+jest.mock("maplibre-gl", () => {
+  class MockPopup {
+    constructor() {
+      this.setLngLat = jest.fn().mockReturnValue(this);
+      this.setHTML = jest.fn().mockReturnValue(this);
+      this.addTo = jest.fn().mockReturnValue(this);
+      this.remove = jest.fn();
+    }
+  }
+  return {
+    Map: jest.fn(() => ({
+      on: jest.fn(),
+      off: jest.fn(),
+      remove: jest.fn(),
+      addLayer: jest.fn(),
+      setStyle: jest.fn(),
+      flyTo: jest.fn(),
+    })),
+    Popup: MockPopup,
+  };
+});
+let mockMapContext = {
+  state: {
+    mapStyle: "default",
+    mapCentre: [0, 0],
+    mapZoom: 10,
+    layers: { first: "first", second: "second" },
+    visualisations: {
+      climate: {
+        id: "climate",
+        name: "Climate Visualisation",
+        legend: ["Low", "Medium", "High"],
+        data: [],
+        customFormattingFunctions: jest.fn(),
+        htmlFragment: "<p>ImAHtmlFragment</p>",
+        metadata: {
+          source: "NASA",
+          updated: "2025-08-27",
+        },
+      },
+      biodiversity: {
+        id: "biodiversity",
+        name: "Biodiversity Visualisation",
+        legend: ["Rare", "Common"],
+        data: [],
+        customFormattingFunctions: jest.fn(),
+        metadata: {
+          source: "UNEP",
+          updated: "2025-08-20",
+        },
+      },
+    },
+    leftVisualisations: {
+      data: {
+        data: ["dataLeft"],
+      },
+    },
+    rightVisualisations: {
+      data: {
+        data: ["dataRight"],
+      },
+    },
+    metadataTables: {},
+    metadataFilters: [],
+    filters: [],
+    map: null,
+    isMapReady: false,
+    isLoading: false,
+    pageIsReady: true,
+    selectionMode: null,
+    selectionLayer: null,
+    selectedFeatures: [],
+    isFeatureSelectActive: false,
+    visualisedFeatureIds: null,
+    currentZoom: 10,
+    colorSchemesByLayer: {
+      id: {
+        colors: ["#FF0000", "#00FF00", "#0000FF"],
+        classification: "quantile",
+        legend: ["Low", "Medium", "High"],
+      },
+    },
+  },
+  dispatch: jest.fn(),
+};
+let mockFilterContext = {
+  state: {
+    dropdown: "dropdown",
+    slider: "slider",
+    toggle: "toggle",
+    checkbox: "checkbox",
+    mapFeatureSelect: "mapFeatureSelect",
+    mapFeatureSelectWithControls: "mapFeatureSelectWithControls",
+    mapFeatureSelectAndPan: "mapFeatureSelectAndPan",
+  },
+  dispatch: jest.fn(),
+};
+
+let props = {
+  extraCopyrightText: "ImAnExtraCopyrightText",
+};
+
+const on = jest.fn();
+const off = jest.fn();
+const getCanvas = jest.fn();
+beforeEach(() => {
+  useDualMaps.mockReturnValue({
+    leftMap: { off: off, on: on, getCanvas: getCanvas, type: "left" },
+    rightMap: { off: off, on: on, type: "right" },
+    isMapStyleLoaded: "isMapStyleLoaded",
+    isMapLoaded: "isMapLoaded",
+    isMapReady: "isMapReady",
+  });
+});
+describe("DualMaps component test", () => {
+  it("Check the render with a classic use", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    // Check if there are 2 Layer with "first" and 2 Layer with "second"
+    const layersFirst = screen.getAllByText(/first/);
+    expect(layersFirst.length).toBe(2);
+    const layersSecond = screen.getAllByText(/first/);
+    expect(layersSecond.length).toBe(2);
+    // Check if there are a VisualisationManager right and left
+    expect(screen.getByText(/VisualisationManager: right/)).toBeInTheDocument();
+    expect(screen.getByText(/VisualisationManager: left/)).toBeInTheDocument();
+    // Check if the DynamicLegend is displayed
+    expect(screen.getByText(/Dynamic Legend: right/)).toBeInTheDocument();
+  });
+  it("Display the left map on the DynamicLegend component", () => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        leftVisualisations: {
+          data: {
+            data: ["dataLeft"],
+          },
+        },
+        rightVisualisations: {
+          data: {
+            data: [
+              /* Empty */
+            ],
+          },
+        },
+      },
+    };
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(screen.getByText(/Dynamic Legend: left/)).toBeInTheDocument();
+  });
+});
+
+describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNulls = true", () => {
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          first: {
+            shouldHaveTooltipOnHover: true,
+            shouldHaveTooltipOnClick: true,
+            hoverNulls: true,
+          },
+          layer1: {
+            shouldHaveTooltipOnHover: true,
+            shouldHaveTooltipOnClick: true,
+            hoverNulls: true,
+          },
+        },
+      },
+    };
+  });
+  it("Tried to throw the handleMapHover function", () => {
+    const { unmount } = render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    // On function to have been called
+    expect(on).toHaveBeenCalledWith("mousemove", expect.any(Function));
+    expect(on).toHaveBeenCalledWith(
+      "mouseleave",
+      "first",
+      expect.any(Function)
+    );
+    expect(on).toHaveBeenCalledWith(
+      "mouseenter",
+      "first",
+      expect.any(Function)
+    );
+    // off functions to be throw when the render is unmount
+    unmount();
+    // Off function to have been called
+    expect(off).toHaveBeenCalledWith("click", expect.any(Function));
+    expect(off).toHaveBeenCalledWith("mousemove", expect.any(Function));
+    expect(off).toHaveBeenCalledWith("zoomend", undefined);
+  });
+
+  it("should handle hover events on the map", () => {
+    const mockFeatures = [
+      {
+        id: 1,
+        layer: { id: "layer1", source: "source1" },
+        properties: { name: "Test Feature" },
+        state: { value: 100 },
+      },
+    ];
+    const mockLeftMap = {
+      on: jest.fn(),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue(mockFeatures),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue(true),
+    };
+    useDualMaps.mockReturnValue({
+      leftMap: mockLeftMap,
+      rightMap: { ...mockLeftMap },
+      isMapReady: true,
+    });
+
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    const mousemoveCall = mockLeftMap.on.mock.calls.find(
+      (call) => call[0] === "mousemove"
+    );
+    const handleMapHoverCallback = mousemoveCall[1];
+    // Simulate a hover event
+    const mockEvent = {
+      point: { x: 150, y: 150 },
+      lngLat: { lng: -0.1, lat: 51.5 },
+    };
+    // Call the callback
+    handleMapHoverCallback(mockEvent);
+    // Check the effects
+    expect(mockLeftMap.queryRenderedFeatures).toHaveBeenCalled();
+    expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
+  });
+
+  it("Test function getCanvas() is called", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(on).toHaveBeenCalledWith(
+      "mouseenter",
+      "layer1",
+      expect.any(Function)
+    );
+    expect(on).toHaveBeenCalledWith(
+      "mouseleave",
+      "layer1",
+      expect.any(Function)
+    );
+  });
+});
+
+describe("Test with shouldHaveLabel = true", () => {
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          first: {
+            shouldHaveLabel: true,
+          },
+          layer1: {
+            shouldHaveLabel: true,
+          },
+        },
+      },
+    };
+  });
+  it("Test handleZoom function is called", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+  });
+});
