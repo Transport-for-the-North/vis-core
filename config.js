@@ -99,14 +99,18 @@ export function replacePlaceholdersInObject(target, source) {
 /**
  * Replaces placeholders in an HTML fragment with actual data values.
  *
- * Placeholders in the HTML fragment may appear in one of two formats:
+ * Placeholders in the HTML fragment may appear in one of three formats:
  *
  * 1. Simple replacement: {key}
  *    - This will be replaced by data[key]. If no matching key is found, the original placeholder remains.
  *
- * 2. Function call replacement: {functionName(argKey)}
+ * 2. Function call replacement (parentheses): {functionName(argKey)}
  *    - This allows you to pass the data value (data[argKey]) through a formatting function.
  *    - The function is looked up in an allowed functions object (which can include custom functions).
+ *
+ * 3. Function call replacement (colon): {functionName:argKey}
+ *    - Alternative syntax for function calls, useful for simpler templates.
+ *    - Functions with 2+ parameters receive (value, data), functions with 1 parameter receive just (value).
  *
  * The allowed functions object is built by merging any customFunctions provided from options with default functions.
  *
@@ -114,19 +118,20 @@ export function replacePlaceholdersInObject(target, source) {
  * @param {Object} data - An object mapping keys to values for substitution.
  * @param {Object} [options={}] - Optional configuration settings.
  * @param {Object} [options.customFunctions] - An object mapping function names to custom formatter functions.
- *                                             These functions receive a single argument extracted from data.
+ *                                             These functions receive arguments based on their parameter count.
  * @returns {string} - The HTML string with placeholders replaced by their corresponding values or formatted values.
  *
  * @example
  *
- * const html = '<div>{formatNumber(value)}</div>';
- * const data = { value: 1234567 };
+ * const html = '<div>{formatNumber(value)} and {percent:l1_l2_l3}</div>';
+ * const data = { value: 1234567, l1_l2_l3: 50, total: 100 };
  * const customFns = {
- *   formatNumber: (num) => Number(num).toLocaleString()
+ *   formatNumber: (num) => Number(num).toLocaleString(),
+ *   percent: (val, data) => ((val / data.total) * 100).toFixed(1) + '%'
  * };
  *
  * const result = replacePlaceholders(html, data, { customFunctions: customFns });
- * // result: '<div>1,234,567</div>'
+ * // result: '<div>1,234,567 and 50.0%</div>'
  */
 export const replacePlaceholders = (htmlFragment, data, options = {}) => {
   // Define default functions here (universal across apps)
@@ -141,33 +146,70 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
     ...(options.customFunctions || {})
   };
   
-  // Regular expression to match placeholders with optional function calls
-  return htmlFragment.replace(/{(\w+)(\(([\w\.]+)\))?}/g, (match, funcOrKey, funcArgs, argKey) => {
-    // If there is no function call, replace with data[key]
-    if (!funcArgs) {
-      const value = data[funcOrKey];
-      return value !== undefined ? value : match;
-    }
+  let result = htmlFragment;
 
-    // If there is a function call, process it
-    const functionName = funcOrKey;
+  // Step 1: Handle colon syntax {functionName:argKey}
+  result = result.replace(/\{(\w+):([a-zA-Z0-9_]+)\}/g, (match, functionName, argKey) => {
     const arg = data[argKey];
-
+    
     // If arg is undefined, return the original placeholder
     if (arg === undefined) {
-      return match
+      return match;
     }
 
     // Check if the function is allowed
     const func = allowedFunctions[functionName];
     if (func && typeof func === 'function') {
-      return func(arg);
+      try {
+        // Check function parameter count to determine how to call it
+        if (func.length >= 2) {
+          // Functions with 2+ parameters get both value and full data object
+          return func(arg, data);
+        } else {
+          // Functions with 1 parameter get just the value
+          return func(arg);
+        }
+      } catch (error) {
+        console.warn(`Error applying function ${functionName}:`, error);
+        return String(arg);
+      }
     }
-
 
     // If function is not allowed, return the original placeholder
     return match;
   });
+
+  // Step 2: Handle parentheses syntax {functionName(argKey)} (existing functionality)
+  result = result.replace(/\{(\w+)\(([a-zA-Z0-9_.]+)\)\}/g, (match, functionName, argKey) => {
+    const arg = data[argKey];
+
+    // If arg is undefined, return the original placeholder
+    if (arg === undefined) {
+      return match;
+    }
+
+    // Check if the function is allowed
+    const func = allowedFunctions[functionName];
+    if (func && typeof func === 'function') {
+      try {
+        return func(arg);
+      } catch (error) {
+        console.warn(`Error applying function ${functionName}:`, error);
+        return String(arg);
+      }
+    }
+
+    // If function is not allowed, return the original placeholder
+    return match;
+  });
+
+  // Step 3: Handle simple replacement {key} (existing functionality)
+  result = result.replace(/\{([a-zA-Z0-9_]+)\}/g, (match, key) => {
+    const value = data[key];
+    return value !== undefined ? value : match;
+  });
+
+  return result;
 };
 
 /**
