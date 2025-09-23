@@ -3,8 +3,10 @@ import styled from "styled-components";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/solid";
+import { CARD_CONSTANTS } from "defaults";
+const { PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
+  CARD_CONSTANTS;
 
 /**
  * Scrollable container
@@ -61,34 +63,21 @@ const FullscreenContainer = styled.div`
  */
 const BackButton = styled.button`
   position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 40px;
-  height: 40px;
+  top: ${PADDING}px;
+  left: ${PADDING}px;
+  width: ${TOGGLE_BUTTON_WIDTH}px;
+  height: ${TOGGLE_BUTTON_HEIGHT}px;
+  z-index: 1001;
+  background-color: #7317de;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s;
-  z-index: 10;
-
-  svg {
-    width: 24px;
-    height: 24px;
-    color: #666;
-  }
-
-  &:hover {
-    background-color: #f5f5f5;
-    border-color: #ccc;
-
-    svg {
-      color: #333;
-    }
-  }
+  transition: right 0.3s ease-in-out;
 `;
 
 /**
@@ -313,7 +302,7 @@ export const FullScreenCalloutCardVisualisation = ({
     <FullscreenContainer>
       {/* Back button */}
       <BackButton onClick={onClose} aria-label="Fermer">
-        <XMarkIcon />
+        <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
       </BackButton>
 
       <ContentWrapper>
