@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
-import { nssecSummary } from "../templates";
+import { nssecBarSummary, nssecPieSummary, nssecScatterSummary, nssecTableSummary } from "../templates";
 
 export const nodeNSSeC = {
   pageName: "Station Socio-Economic Classifications (NS-SeC)",
@@ -93,7 +93,20 @@ export const nodeNSSeC = {
             cardName: "NS-SeC Summary",
             dataSource: "api",
             dataPath: "/api/railoffer/nssec-callout/point",
-            htmlFragment: nssecSummary
+            htmlFragment: nssecBarSummary + nssecTableSummary + nssecPieSummary + nssecScatterSummary,
+            customFormattingFunctions: {
+                commify: (v) => {
+                const n = Number(v ?? 0);
+                return Number.isFinite(n) ? n.toLocaleString('en-GB') : String(v ?? '');
+                },
+                percent: (value, data) => {
+                const total = (data?.l1_l2_l3 || 0) + (data?.l4_l5_l6 || 0) + (data?.l7 || 0) + 
+                            (data?.l8_l9 || 0) + (data?.l10_l11 || 0) + (data?.l12 || 0) + 
+                            (data?.l13 || 0) + (data?.l14_1_l14_2 || 0) + (data?.l15 || 0);
+                const num = Number(value ?? 0);
+                return total > 0 ? ((num / total) * 100).toFixed(1) + '%' : '0.0%';
+                }
+            }
         },
     ],
     metadataTables: [],
