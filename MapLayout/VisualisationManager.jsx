@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CalloutCardVisualisation } from './CalloutCardVisualisation';
+import { CalloutCardVisualisation } from './CalloutCards/CalloutCardVisualisation';
 import { MapVisualisation } from './MapVisualisation';
 import { ScrollableContainer } from 'Components';
 
