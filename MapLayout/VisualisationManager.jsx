@@ -18,28 +18,28 @@ import { FullScreenCalloutCardVisualisation } from "./CalloutCards/FullScreenCal
 export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props }) => {
   
   /* Simulate a fullcard in the config */
-  visualisationConfigs = {
-    ...visualisationConfigs,
-    fullcard1: {
-      type: 'fullScreenCalloutCard',
-    cardName: 'Project Info',
-    title: 'New Transport Project',
-    content: '<p>Details about the new project...</p>',
-    includeCarouselNavigation: true,
-    possibleCarouselNavData: [
-      {key: "key1", value: "value1"},
-      {key: "key2", value: "value2"},
-      {key: "key3", value: "value3"},
-      {key: "key4", value: "value4"},
-    ]
-    },
-  // smallCard2: {
-  //   type: 'smallCalloutCard',
+  // visualisationConfigs = {
+  //   ...visualisationConfigs,
+  //   fullcard1: {
+  //     type: 'fullScreenCalloutCard',
   //   cardName: 'Project Info',
-  //   includeCarouselNavigation: false,
-  //   possibleCarouselNavData: []
+  //   title: 'New Transport Project',
+  //   content: '<p>Details about the new project...</p>',
+  //   includeCarouselNavigation: true,
+  //   possibleCarouselNavData: [
+  //     {key: "key1", value: "value1"},
+  //     {key: "key2", value: "value2"},
+  //     {key: "key3", value: "value3"},
+  //     {key: "key4", value: "value4"},
+  //   ]
+  //   },
+  // // smallCard2: {
+  // //   type: 'smallCalloutCard',
+  // //   cardName: 'Project Info',
+  // //   includeCarouselNavigation: false,
+  // //   possibleCarouselNavData: []
+  // // }
   // }
-  }
 
   // Convert visualisationConfigs object to an array of entries
   const visualisationEntries = Object.entries(visualisationConfigs);
@@ -103,7 +103,7 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
       );
       return [...newPrevOrder, ...addedNames];
     });
-  }, [visualisationConfigs, smallCalloutCardVisualisations]);
+  }, [visualisationConfigs]);
 
   // Handler when a card is updated
   const handleCardUpdate = (updatedName) => {

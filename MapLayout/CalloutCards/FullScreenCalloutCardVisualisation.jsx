@@ -270,21 +270,14 @@ export const FullScreenCalloutCardVisualisation = ({
   includeCarouselNavigation,
   possibleCarouselNavData,
 }) => {
-  // props is load
-  const [isTitleVisible, setIsTitleVisible] = useState(false);
-  const [isContentVisible, setIsContentVisible] = useState(false);
-  const [isIncludeCarouselNavigation, setIsIncludeCarouselNavigation] =
-    useState(false);
   // index
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    if (content) setIsContentVisible(true);
-    if (title) setIsTitleVisible(true);
-    if (includeCarouselNavigation && possibleCarouselNavData)
-      setIsIncludeCarouselNavigation(true);
-  }, [content, title, includeCarouselNavigation, possibleCarouselNavData]);
+  // props is load
+  const isContentVisible = !!content;
+  const isTitleVisible = !!title;
+  const isIncludeCarouselNavigation =
+    !!includeCarouselNavigation && !!possibleCarouselNavData;
 
   const handlePrevious = () => {
     setCurrentIndex(currentIndex - 1);
