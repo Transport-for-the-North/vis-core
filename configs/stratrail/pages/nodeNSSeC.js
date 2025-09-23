@@ -93,7 +93,7 @@ export const nodeNSSeC = {
             cardName: "NS-SeC Summary",
             dataSource: "api",
             dataPath: "/api/railoffer/nssec-callout/point",
-            htmlFragment: nssecBarSummary + nssecTableSummary + nssecPieSummary + nssecScatterSummary,
+            htmlFragment: nssecBarSummary + nssecTableSummary,
             customFormattingFunctions: {
                 commify: (v) => {
                 const n = Number(v ?? 0);
