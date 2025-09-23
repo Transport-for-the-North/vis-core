@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CalloutCardVisualisation } from './CalloutCards/CalloutCardVisualisation';
 import { MapVisualisation } from './MapVisualisation';
 import { ScrollableContainer } from 'Components';
+import { FullScreenCalloutCardVisualisation } from "./CalloutCards/FullScreenCalloutCardVisualisation";
 
 
 /**
@@ -15,12 +16,41 @@ import { ScrollableContainer } from 'Components';
  * @returns {JSX.Element|null} The rendered visualization components.
  */
 export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props }) => {
+  
+  /* Simulate a fullcard in the config */
+  visualisationConfigs = {
+    ...visualisationConfigs,
+    fullcard1: {
+      type: 'fullScreenCalloutCard',
+    cardName: 'Project Info',
+    title: 'New Transport Project',
+    content: '<p>Details about the new project...</p>',
+    includeCarouselNavigation: true,
+    possibleCarouselNavData: [
+      {key: "key1", value: "value1"},
+      {key: "key2", value: "value2"},
+      {key: "key3", value: "value3"},
+      {key: "key4", value: "value4"},
+    ]
+    },
+  // smallCard2: {
+  //   type: 'smallCalloutCard',
+  //   cardName: 'Project Info',
+  //   includeCarouselNavigation: false,
+  //   possibleCarouselNavData: []
+  // }
+  }
+
   // Convert visualisationConfigs object to an array of entries
   const visualisationEntries = Object.entries(visualisationConfigs);
-
   // Separate visualizations by type
-  const calloutCardVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === 'calloutCard'
+  // Small card
+  const smallCalloutCardVisualisations = visualisationEntries.filter(
+    ([_, config]) => config.type === "smallCalloutCard"
+  );
+  // FullScreen card
+  const fullScreenCalloutCardVisualisations = visualisationEntries.filter(
+    ([_, config]) => config.type === "fullScreenCalloutCard"
   );
 
   const mapVisualisations = visualisationEntries.filter(
@@ -28,11 +58,19 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
   );
 
   // Build a lookup for configs by name
-  const calloutCardConfigByName = Object.fromEntries(calloutCardVisualisations);
+  const smallCalloutCardConfigByName = Object.fromEntries(
+    smallCalloutCardVisualisations
+  );
+  const fullScreenCalloutCardConfigByName = Object.fromEntries(
+    fullScreenCalloutCardVisualisations
+  );
 
   // State to manage order of cards
-  const [cardOrder, setCardOrder] = useState(
-    calloutCardVisualisations.map(([name]) => name)
+  const [smallCardOrder, setSmallCardOrder] = useState(
+    smallCalloutCardVisualisations.map(([name]) => name)
+  );
+  const [fullScreenCardOrder, setFullScreenCardOrder] = useState(
+    fullScreenCalloutCardVisualisations.map(([name]) => name)
   );
 
   const visibleMapRef = useRef({});
@@ -56,18 +94,20 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
 
   // Update cardOrder when visualisationConfigs change
   useEffect(() => {
-    const newOrder = calloutCardVisualisations.map(([name]) => name);
-    setCardOrder((prevOrder) => {
+    const newOrder = smallCalloutCardVisualisations.map(([name]) => name);
+    setSmallCardOrder((prevOrder) => {
       // Keep existing order as much as possible
       const newPrevOrder = prevOrder.filter((name) => newOrder.includes(name));
-      const addedNames = newOrder.filter((name) => !newPrevOrder.includes(name));
+      const addedNames = newOrder.filter(
+        (name) => !newPrevOrder.includes(name)
+      );
       return [...newPrevOrder, ...addedNames];
     });
-  }, [visualisationConfigs]);
+  }, [visualisationConfigs, smallCalloutCardVisualisations]);
 
   // Handler when a card is updated
   const handleCardUpdate = (updatedName) => {
-    setCardOrder((prevOrder) => [
+    setSmallCardOrder((prevOrder) => [
       updatedName,
       ...prevOrder.filter((name) => name !== updatedName),
     ]);
@@ -77,8 +117,9 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
     <>
       {/* Render all calloutCard visualisations inside ScrollableContainer */}
       <ScrollableContainer showOnMobile={showOnMobile} hideCardHandleOnMobile>
-        {cardOrder.map((name) => {
-          const config = calloutCardConfigByName[name];
+        {/* Small */}
+        {smallCardOrder.map((name) => {
+          const config = smallCalloutCardConfigByName[name];
           return (
             <CalloutCardVisualisation
               key={name}
@@ -87,6 +128,18 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
               onUpdate={() => handleCardUpdate(name)}
               onVisibilityChange={(v) => handleCardVisibility(name, v)}
               {...props}
+            />
+          );
+        })}
+        {/* Full screen */}
+        {fullScreenCardOrder.map((name) => {
+          const config = fullScreenCalloutCardConfigByName[name];
+          return (
+            <FullScreenCalloutCardVisualisation
+              content={config.content}
+              title={config.title}
+              includeCarouselNavigation={config.includeCarouselNavigation}
+              possibleCarouselNavData={config.possibleCarouselNavData}
             />
           );
         })}
