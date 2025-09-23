@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { CARD_CONSTANTS } from "defaults";
-const { PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
-  CARD_CONSTANTS;
+const { PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } = CARD_CONSTANTS;
 
 /**
  * Scrollable container
@@ -20,17 +16,17 @@ const ContentWrapper = styled.div`
   &::-webkit-scrollbar {
     width: 12px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 6px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 6px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
@@ -273,7 +269,6 @@ export const FullScreenCalloutCardVisualisation = ({
   title,
   includeCarouselNavigation,
   possibleCarouselNavData,
-  onClose,
 }) => {
   // props is load
   const [isTitleVisible, setIsTitleVisible] = useState(false);
@@ -282,6 +277,7 @@ export const FullScreenCalloutCardVisualisation = ({
     useState(false);
   // index
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     if (content) setIsContentVisible(true);
@@ -298,11 +294,18 @@ export const FullScreenCalloutCardVisualisation = ({
     /* Fetch date here */
   };
 
-  return (
+  /**
+   * Toggles the visibility of the card.
+   */
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
+  return isVisible ? (
     <FullscreenContainer>
       {/* Back button */}
-      <BackButton onClick={onClose} aria-label="Fermer">
-        <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+      <BackButton onClick={toggleVisibility} aria-label="Fermer">
+        <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
       </BackButton>
 
       <ContentWrapper>
@@ -357,5 +360,5 @@ export const FullScreenCalloutCardVisualisation = ({
         </NavigationBar>
       )}
     </FullscreenContainer>
-  );
+  ) : null;
 };
