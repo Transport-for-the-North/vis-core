@@ -30,6 +30,7 @@ export const appConfig = {
                 Below are the list of each pages available in the portal along with a brief description of the data they contain.
             </p>
             <ul>
+                <li><b>Performance Dashboard:</b> This visualisation shows key performance indicators for Northern and Transpennine Express services.</li>
                 <li><b>Station Information - Values:</b> Car park spaces and cycle spaces at each station in the NorTMS model.</li>
                 <li><b>Station Information - Boolean:</b> True/False information, such as if the station contains help points, ticket machines, availability to buy tickets at the station, seated areas etc..</li>
                 <li><b>Station Loadings:</b> This visualisation shows the boarding and alighting summaries at each station in the NorTMS model.</li>
@@ -159,7 +160,8 @@ export const appConfig = {
         pages.nodeSocio,
         pages.linkLoadings,
         pages.timingLinks,
-        pages.linkFrequency
+        pages.linkFrequency,
+        pages.performanceBi
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",

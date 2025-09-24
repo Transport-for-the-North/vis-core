@@ -10,6 +10,7 @@ import { linkInvestments } from "./linkInvestments"
 import { linkFrequency } from "./linkFrequency"
 import { freightNodeInvestments } from "./freightNodeInvestment"
 import { freightLinkInvestments } from "./freightLinkInvestment"
+import { performanceBi } from "./performanceBi"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -24,4 +25,5 @@ export const pages = {
     linkFrequency: linkFrequency,
     freightLinkInvestments: freightLinkInvestments,
     freightNodeInvestments: freightNodeInvestments,
+    performanceBi: performanceBi
 }

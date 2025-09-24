@@ -6,6 +6,7 @@ import { nodeSocio } from "./nodeSocio"
 import { stationInformation } from "./stationInformation"
 import { stationInformationBool } from "./stationInformationBool"
 import { linkFrequency } from "./linkFrequency"
+import { performanceBi } from "./performanceBi"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -16,4 +17,5 @@ export const pages = {
     stationInformation: stationInformation,
     stationInformationBool: stationInformationBool,
     linkFrequency: linkFrequency,
+    performanceBi: performanceBi
 }
