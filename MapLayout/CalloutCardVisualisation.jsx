@@ -204,24 +204,23 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
   const [renderedContent, setRenderedContent] = useState('');
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const contentRef = useRef(null); // NEW
 
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
       setIsVisible(true);
-      const htmlWithPlaceholdersReplaced = replacePlaceholders(
+
+      // 1) Replace simple placeholders (existing util)
+      let html = replacePlaceholders(
         visualisation.htmlFragment,
         data,
         { customFunctions: customFormattingFunctions }
       );
-      // Sanitize the HTML to prevent XSS attacks
-      const sanitizedHtml = DOMPurify.sanitize(htmlWithPlaceholdersReplaced);
-      setRenderedContent(sanitizedHtml);
 
-      // Call onUpdate when new data is set
-      if (onUpdate) {
-        onUpdate();
-      }
+      const sanitizedHtml = DOMPurify.sanitize(html);
+      setRenderedContent(sanitizedHtml);
+      if (onUpdate) onUpdate();
     }
   }, [data, visualisation.htmlFragment]);
 
@@ -278,37 +277,37 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
   return (
     <>
       <ParentContainer $isVisible={isVisible}>
-      <CardContainer $isVisible={isVisible}>
-        <CardTitle>{cardName}</CardTitle>
-        {hasDataShouldRender ? (
-          <CardContent dangerouslySetInnerHTML={{ __html: renderedContent }} />
-        ) : (
-          <CardContent>
-            <WarningBox text="No data available for selection" />
-          </CardContent>
-        )}
-      </CardContainer>
-      <ToggleButton
+        <CardContainer $isVisible={isVisible}>
+          <CardTitle>{cardName}</CardTitle>
+          {hasDataShouldRender ? (
+            // Attach ref so we can toggle sections after HTML is injected
+            <CardContent ref={contentRef} dangerouslySetInnerHTML={{ __html: renderedContent }} />
+          ) : (
+            <CardContent>
+              <WarningBox text="No data available for selection" />
+            </CardContent>
+          )}
+        </CardContainer>
+        <ToggleButton
           ref={buttonRef}
           $isVisible={isVisible}
           onClick={toggleVisibility}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-        {isVisible ? (
-          <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
-        ) : (
-          <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
-        )}
-      </ToggleButton>
-      <Hovertip
-        isVisible={isHovered}
-        displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
-        side="left"
-        refElement={buttonRef}
-        offset={5}
-        
-      />
+          {isVisible ? (
+            <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+          ) : (
+            <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
+          )}
+        </ToggleButton>
+        <Hovertip
+          isVisible={isHovered}
+          displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
+          side="left"
+          refElement={buttonRef}
+          offset={5}
+        />
       </ParentContainer>
     </>
   );
