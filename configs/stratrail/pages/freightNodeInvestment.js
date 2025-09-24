@@ -38,7 +38,7 @@ export const freightNodeInvestments = {
         //     sourceLayer: "geometry",
         //     geometryType: "line",
         //     customPaint: crpLinesLayerPaint,
-        //     isHoverable: true,
+        //     isHoverable: false,
         //     isStylable: false,
         //     shouldShowInLegend: true,
         //     shouldHaveTooltipOnHover: true,
@@ -97,7 +97,7 @@ export const freightNodeInvestments = {
     metadataTables: [],
     filters: [
         { ...selectors.nodeFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Freight Investment Results'] },
-        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Node Investment Layer"}
+        { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Node Investment Layer"}
     ],
     additionalFeatures: {
         glossary: { 

@@ -68,7 +68,7 @@ export const linkInvestments = {
     metadataTables: [],
     filters: [
         { ...selectors.linkInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Investment Results'] },
-        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
+        { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
     ],
     additionalFeatures: {
         glossary: { 

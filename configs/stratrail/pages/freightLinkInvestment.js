@@ -68,7 +68,7 @@ export const freightLinkInvestments = {
     metadataTables: [],
     filters: [
         { ...selectors.linkFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Freight Investment Results'] },
-        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
+        { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
     ],
     additionalFeatures: {
         glossary: { 

@@ -763,7 +763,7 @@ const linkInvestmentThemeSelector = {
     }
 }
 
-const investmentFeatureSelector = {
+const idFeatureSelector = {
   filterName: "",
   paramName: "featureId",
   target: "api",
@@ -903,7 +903,7 @@ export const selectors = {
   stationInformationMetricBoolSelector: stationInformationMetricBoolSelector,
   nodeInvestmentThemeSelector: nodeInvestmentThemeSelector,
   linkInvestmentThemeSelector: linkInvestmentThemeSelector,
-  investmentFeatureSelector: investmentFeatureSelector,
+  idFeatureSelector: idFeatureSelector,
   authoritySelector: authoritySelector,
   timePeriod: timePeriod,
   nodeFreightInterventionSelector: nodeFreightInterventionSelector,

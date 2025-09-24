@@ -29,21 +29,21 @@ export const nodeInvestments = {
             shouldHaveTooltipOnHover: false,
             shouldHaveLabel: false
         },
-        {
-            uniqueId: "RailOfferCRPVectorTile",
-            name: "CRP Network",
-            type: "tile",
-            source: "api",
-            path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
-            sourceLayer: "geometry",
-            geometryType: "line",
-            customPaint: crpLinesLayerPaint,
-            isHoverable: true,
-            isStylable: false,
-            shouldShowInLegend: true,
-            shouldHaveTooltipOnHover: true,
-            shouldHaveLabel: false
-        },
+        // {
+        //     uniqueId: "RailOfferCRPVectorTile",
+        //     name: "CRP Network",
+        //     type: "tile",
+        //     source: "api",
+        //     path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
+        //     sourceLayer: "geometry",
+        //     geometryType: "line",
+        //     customPaint: crpLinesLayerPaint,
+        //     isHoverable: false,
+        //     isStylable: false,
+        //     shouldShowInLegend: true,
+        //     shouldHaveTooltipOnHover: true,
+        //     shouldHaveLabel: false
+        // },
         {
             uniqueId: "RailOfferInvestmentNodeVectorTile",
             name: "Node Investment Layer",
@@ -97,7 +97,7 @@ export const nodeInvestments = {
     metadataTables: [],
     filters: [
         { ...selectors.nodeInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Investment Results'] },
-        { ...selectors.investmentFeatureSelector, visualisations: ['Investment Callout'], layer: "Node Investment Layer"}
+        { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Node Investment Layer"}
     ],
     additionalFeatures: {
         glossary: { 

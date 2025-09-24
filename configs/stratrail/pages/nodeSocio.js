@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
+import { socioBarSummary, socioTableSummary } from "../templates";
 
 export const nodeSocio = {
   pageName: "Station Economic Activity Status",
@@ -38,7 +39,7 @@ export const nodeSocio = {
             sourceLayer: "geometry",
             geometryType: "line",
             customPaint: crpLinesLayerPaint,
-            isHoverable: true,
+            isHoverable: false,
             isStylable: false,
             shouldShowInLegend: true,
             shouldHaveTooltipOnHover: true,
@@ -73,7 +74,29 @@ export const nodeSocio = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/railoffer/socio"
-        }
+        },
+        {
+            name: "Socio Callout",
+            type: "calloutCard",
+            cardName: "Socio Summary",
+            dataSource: "api",
+            dataPath: "/api/railoffer/socio-callout/point",
+            htmlFragment: socioBarSummary + socioTableSummary,
+            customFormattingFunctions: {
+                commify: (v) => {
+                const n = Number(v ?? 0);
+                return Number.isFinite(n) ? n.toLocaleString('en-GB') : String(v ?? '');
+                },
+                percent: (value, data) => {
+                // For socio data, use the correct field names
+                const total = (data?.economically_active_exc_students || 0) + 
+                            (data?.economically_active_inc_student || 0) + 
+                            (data?.economically_inactive || 0);
+                const num = Number(value ?? 0);
+                return total > 0 ? ((num / total) * 100).toFixed(1) + '%' : '0.0%';
+                }
+            }
+        },
     ],
     metadataTables: [],
     filters: [
@@ -82,6 +105,7 @@ export const nodeSocio = {
         { ...selectors.authoritySelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.booleanSelector, visualisations: ['Node Socio Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Socio Totals'] },
+        { ...selectors.idFeatureSelector, visualisations: ['Socio Callout'], layer: "Node Socio Layer"}
     ],
     additionalFeatures: {
         glossary: { 
