@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { CARD_CONSTANTS } from "defaults";
+import { Hovertip } from "Components/Hovertip";
+import { replacePlaceholders } from "utils";
 const { PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } = CARD_CONSTANTS;
 
 /**
@@ -52,6 +54,9 @@ const FullscreenContainer = styled.div`
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 2%;
+  transition: opacity 0.3s, transform 0.7s;
+  transform: ${({ $isVisible }) =>
+    $isVisible ? "translateX(0)" : "translateX(110%)"};
 `;
 
 /**
@@ -119,45 +124,6 @@ const NavigationButton = styled.button`
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
-  }
-`;
-
-const TooltipWrapper = styled.div`
-  position: relative;
-  display: inline-flex;
-`;
-
-const Tooltip = styled.span`
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  pointer-events: none;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: #333;
-  }
-`;
-
-const NavigationButtonWithTooltip = styled(NavigationButton)`
-  &:hover + ${Tooltip} {
-    opacity: 1;
-    visibility: visible;
   }
 `;
 
@@ -264,94 +230,115 @@ const CardContent = styled.div`
   }
 `;
 
+/* 
+  Placer l'image et placer un peu le texte par rapport
+*/
+
 export const FullScreenCalloutCardVisualisation = ({
-  content,
-  title,
+  data,
   includeCarouselNavigation,
   possibleCarouselNavData,
+  // toggleVisibility,
 }) => {
-  // index
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
-  // props is load
-  const isContentVisible = !!content;
-  const isTitleVisible = !!title;
-  const isIncludeCarouselNavigation =
-    !!includeCarouselNavigation && !!possibleCarouselNavData;
+  const handleToggle = () => setIsVisible((v) => !v);
+  const [currentScenario, setCurrentScenario] = useState(data[0]);
+  const [content, setContent] = useState(null);
+  // next and previous buttons
+  const previousButtonRef = React.useRef(null);
+  const [previousButtonRefIsHovered, setPreviousButtonRefIsHovered] =
+    useState(false);
+  const nextButtonRef = React.useRef(null);
+  const [nextButtonRefIsHovered, setNextButtonRefIsHovered] = useState(false);
+  const currentIndex = data.findIndex(
+    (item) => item.scenario_id === currentScenario.scenario_id
+  );
 
+  // content to show
+  useEffect(() => {
+    if (currentScenario) {
+      const newContent = replacePlaceholders(
+        currentScenario.text_with_placeholders,
+        currentScenario.values
+      );
+      setContent(newContent);
+    }
+  }, [currentScenario]);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setCurrentScenario(data[0]);
+    }
+  }, [data]);
+
+  // Navigation for the carousel
   const handlePrevious = () => {
-    setCurrentIndex(currentIndex - 1);
+    if (currentIndex > 0) {
+      setCurrentScenario(data[currentIndex - 1]);
+    }
   };
   const handleNext = () => {
-    setCurrentIndex(currentIndex + 1);
-    /* Fetch date here */
+    if (currentIndex < data.length - 1) {
+      setCurrentScenario(data[currentIndex + 1]);
+    }
   };
 
-  /**
-   * Toggles the visibility of the card.
-   */
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
-
-  return isVisible ? (
-    <FullscreenContainer>
-      {/* Back button */}
-      <BackButton onClick={toggleVisibility} aria-label="Fermer">
+  return (
+    <FullscreenContainer $isVisible={isVisible}>
+      {/* Close button */}
+      <BackButton onClick={handleToggle} aria-label="Close">
         <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
       </BackButton>
 
       <ContentWrapper>
         {/* Title */}
-        {isTitleVisible ? (
-          <CardTitle>{title}</CardTitle>
-        ) : (
-          <CardTitle>Loading...</CardTitle>
-        )}
+        <CardTitle>{currentScenario.label || "Card"}</CardTitle>
 
         {/* Content */}
-        {isContentVisible ? (
-          <CardContent
-            dangerouslySetInnerHTML={{ __html: content }}
-          ></CardContent>
-        ) : (
-          <CardContent>
-            <h3>Loading...</h3>
-          </CardContent>
-        )}
+        <CardContent dangerouslySetInnerHTML={{ __html: content }} />
       </ContentWrapper>
 
       {/* Navigation */}
-      {isIncludeCarouselNavigation && (
+      {includeCarouselNavigation && (
         <NavigationBar>
-          <TooltipWrapper>
-            <NavigationButtonWithTooltip
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-            >
-              <ChevronLeftIcon />
-            </NavigationButtonWithTooltip>
-            {currentIndex > 0 && (
-              <Tooltip>
-                {possibleCarouselNavData[currentIndex - 1].value}
-              </Tooltip>
-            )}
-          </TooltipWrapper>
-          <TooltipWrapper>
-            <NavigationButtonWithTooltip
-              onClick={handleNext}
-              disabled={currentIndex === possibleCarouselNavData.length - 1}
-            >
-              <ChevronRightIcon />
-            </NavigationButtonWithTooltip>
-            {currentIndex < possibleCarouselNavData.length - 1 && (
-              <Tooltip>
-                {possibleCarouselNavData[currentIndex + 1].value}
-              </Tooltip>
-            )}
-          </TooltipWrapper>
+          <NavigationButton
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            ref={previousButtonRef}
+            onMouseEnter={() => setPreviousButtonRefIsHovered(true)}
+            onMouseLeave={() => setPreviousButtonRefIsHovered(false)}
+          >
+            <ChevronLeftIcon />
+          </NavigationButton>
+          {currentIndex > 0 && (
+            <Hovertip
+              isVisible={previousButtonRefIsHovered}
+              displayText={possibleCarouselNavData[currentIndex - 1].value}
+              side="right"
+              refElement={previousButtonRef}
+              offset={3}
+            />
+          )}
+          <NavigationButton
+            onClick={handleNext}
+            disabled={currentIndex === possibleCarouselNavData.length - 1}
+            ref={nextButtonRef}
+            onMouseEnter={() => setNextButtonRefIsHovered(true)}
+            onMouseLeave={() => setNextButtonRefIsHovered(false)}
+          >
+            <ChevronRightIcon />
+          </NavigationButton>
+          {currentIndex < possibleCarouselNavData.length - 1 && (
+            <Hovertip
+              isVisible={nextButtonRefIsHovered}
+              displayText={possibleCarouselNavData[currentIndex + 1].value}
+              side="left"
+              refElement={nextButtonRef}
+              offset={3}
+            />
+          )}
         </NavigationBar>
       )}
     </FullscreenContainer>
-  ) : null;
+  );
 };
