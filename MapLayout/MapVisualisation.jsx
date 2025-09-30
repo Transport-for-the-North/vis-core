@@ -370,7 +370,6 @@ export const MapVisualisation = ({
           ) {
             resetMapStyle(resolvedStyle);
           } else {
-            console.log(visualisation);
             reclassifyAndStyleMap(
               map,
               dataToClassify,
