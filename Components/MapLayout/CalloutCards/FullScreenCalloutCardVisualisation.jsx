@@ -82,6 +82,54 @@ const BackButton = styled.button`
 `;
 
 /**
+ * Image, texte, title wrapper
+ */
+const TitleImageTextWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10%;
+  gap: 2rem;
+`;
+
+/**
+ * Title and text container
+ */
+const TitleTextContainer = styled.div`
+  display: flex;
+  max-width: 50%;
+  flex-direction: column;
+`;
+
+/**
+ * Image container
+ */
+const ImageContainer = styled.div`
+  display: flex;
+  max-width: 50%;
+`;
+
+/**
+ * Image placeholder
+ */
+const Image = styled.img`
+  max-width: 500px;
+  width: 70%;
+  height: auto;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+`;
+
+/**
+ * Title
+ */
+const Title = styled.p`
+  font-size: clamp(2rem, 5vw, 4rem);
+`;
+
+/**
  * Navigation bar
  */
 const NavigationBar = styled.div`
@@ -115,7 +163,7 @@ const NavigationButton = styled.button`
   cursor: pointer;
   transition: background-color 0.3s;
 
-  /* Style pour l'icône */
+  /* Style for the icon */
   svg {
     width: 24px;
     height: 24px;
@@ -230,15 +278,10 @@ const CardContent = styled.div`
   }
 `;
 
-/* 
-  Placer l'image et placer un peu le texte par rapport
-*/
-
 export const FullScreenCalloutCardVisualisation = ({
   data,
   includeCarouselNavigation,
   possibleCarouselNavData,
-  // toggleVisibility,
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const handleToggle = () => setIsVisible((v) => !v);
@@ -253,6 +296,7 @@ export const FullScreenCalloutCardVisualisation = ({
   const currentIndex = data.findIndex(
     (item) => item.scenario_id === currentScenario.scenario_id
   );
+  const [imgUrl, setImgUrl] = useState(null);
 
   // content to show
   useEffect(() => {
@@ -262,6 +306,27 @@ export const FullScreenCalloutCardVisualisation = ({
         currentScenario.values
       );
       setContent(newContent);
+      setImgUrl(null);
+      if (currentScenario.image) {
+        if (currentScenario.image instanceof Blob) {
+          // Blob (binary)
+          const url = URL.createObjectURL(currentScenario.image);
+          setImgUrl(url);
+        } else if (currentScenario.image instanceof ArrayBuffer) {
+          // ArrayBuffer (binary)
+          const blob = new Blob([currentScenario.image], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          setImgUrl(url);
+        } else if (currentScenario.image instanceof Uint8Array) {
+          // Uint8Array (binary)
+          const blob = new Blob([currentScenario.image], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          setImgUrl(url);
+        } else if (typeof currentScenario.image === "string") {
+          // It is a URL
+          setImgUrl(currentScenario.image);
+        }
+      }
     }
   }, [currentScenario]);
 
@@ -295,7 +360,26 @@ export const FullScreenCalloutCardVisualisation = ({
         <CardTitle>{currentScenario.label || "Card"}</CardTitle>
 
         {/* Content */}
-        <CardContent dangerouslySetInnerHTML={{ __html: content }} />
+        <TitleImageTextWrapper>
+          <TitleTextContainer>
+            <Title style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>
+              {currentScenario.label || "Card"}
+            </Title>
+            <CardContent dangerouslySetInnerHTML={{ __html: content }} />
+          </TitleTextContainer>
+          <ImageContainer>
+            {imgUrl ? (
+              <Image
+                src={imgUrl}
+                onError={() => {
+                  setImgUrl(null);
+                }}
+              />
+            ) : (
+              <Image src={"https://placehold.co/600x400?text=No+image!"} />
+            )}
+          </ImageContainer>
+        </TitleImageTextWrapper>
       </ContentWrapper>
 
       {/* Navigation */}
