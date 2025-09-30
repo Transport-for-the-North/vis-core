@@ -409,7 +409,7 @@ const routeNameSelector = {
     }
 }
 
-const stationInformationMetricBoolSelector = {
+const stationInformationMetricSelector = {
     filterName: "Metric",
     paramName: "columnName",
     target: "api",
@@ -423,6 +423,16 @@ const stationInformationMetricBoolSelector = {
     values: {
         source: "local",
         values: [
+            {
+                displayValue: "Car Park Spaces",
+                paramValue: "carpark_spaces",
+                legendSubtitleText: "Spaces"
+            },
+            {
+                displayValue: "Cycle Spaces",
+                paramValue: "cycle_spaces",
+                legendSubtitleText: "Spaces"
+            },
             {
                 displayValue: "Help Points",
                 paramValue: "help_points",
@@ -465,7 +475,7 @@ const stationInformationMetricBoolSelector = {
             },
             {
                 displayValue: "Wheelchairs Available",
-                paramValue: "wheelchairs_avail",
+                paramValue: "wheelchair_avail",
                 legendSubtitleText: "True/False"
             },
             {
@@ -473,84 +483,6 @@ const stationInformationMetricBoolSelector = {
                 paramValue: "carpark_free",
                 legendSubtitleText: "True/False"
             },
-        ]
-    }
-}
-
-const stationInformationMetricSelector = {
-    filterName: "Metric",
-    paramName: "columnName",
-    target: "api",
-    actions: [
-        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
-    ],
-    info:'Use this dropdown to select the metric that will style the map.',
-    containsLegendInfo: true,
-    visualisations: null,
-    type: "dropdown",
-    values: {
-        source: "local",
-        values: [
-            {
-                displayValue: "Car Park Spaces",
-                paramValue: "carpark_spaces",
-                legendSubtitleText: "Spaces"
-            },
-            {
-                displayValue: "Cycle Spaces",
-                paramValue: "cycle_spaces",
-                legendSubtitleText: "Spaces"
-            },
-            // {
-            //     displayValue: "Help Points",
-            //     paramValue: "help_points",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Ticket Purchase - Weekdays",
-            //     paramValue: "ticket_weekday",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Ticket Purchase - Weekend",
-            //     paramValue: "ticket_weekend",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Ticket Machine",
-            //     paramValue: "ticket_machine",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Ticket Office",
-            //     paramValue: "ticket_office",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Seated Areas",
-            //     paramValue: "seated_area",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Ramp Access",
-            //     paramValue: "ramp_access",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Toilets",
-            //     paramValue: "national_key_toilet",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Wheelchairs Available",
-            //     paramValue: "wheelchair_avail",
-            //     legendSubtitleText: "True/False"
-            // },
-            // {
-            //     displayValue: "Car Park Free?",
-            //     paramValue: "carpark_free",
-            //     legendSubtitleText: "True/False"
-            // },
         ]
     }
 }
@@ -792,7 +724,6 @@ export const selectors = {
   stationSocioMetricSelector: stationSocioMetricSelector,
   stationNSSeCMetricSelector: stationNSSeCMetricSelector,
   stationInformationMetricSelector: stationInformationMetricSelector,
-  stationInformationMetricBoolSelector: stationInformationMetricBoolSelector,
   authoritySelector: authoritySelector,
   idFeatureSelector: idFeatureSelector,
   timePeriod: timePeriod,

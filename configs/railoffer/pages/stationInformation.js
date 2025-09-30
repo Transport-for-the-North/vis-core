@@ -4,8 +4,8 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const stationInformation = {
-  pageName: "Station Information - Values",
-  url: "/station-information-val",
+  pageName: "Station Information",
+  url: "/station-information",
   type: "MapLayout",
   category: "Station",
   about: `<p>This visualisation shows the station information for each station in the NorTMS model.</p>
@@ -68,7 +68,8 @@ export const stationInformation = {
         name: "Node Information",
         type: "joinDataToMap",
         joinLayer: "Stations Layer",
-        style: "circle-continuous",
+        style: "circle",
+        dynamicStyling: true,
         joinField: "id",
         valueField: "value",
         dataSource: "api",
