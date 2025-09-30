@@ -230,6 +230,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               onClick={handleDownload} 
               $bgColor={bgColor}
               disabled={isRequestTooLarge || isDownloading}
+              data-clarity-label="download-data-button"
             >
               {isDownloading ? (
                 <>Downloading <Spinner /></>
