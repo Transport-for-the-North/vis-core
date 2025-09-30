@@ -1,5 +1,5 @@
 import colorbrewer from "colorbrewer";
-import { useCallback, useEffect, useRef, useContext, useMemo } from "react";
+import { useCallback, useEffect, useRef, useContext, useMemo, useState } from "react";
 import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
@@ -10,11 +10,13 @@ import {
   reclassifyGeoJSONData,
   resetPaintProperty,
   hasAnyGeometryNotNull,
-  getMetricDefinition
+  getMetricDefinition,
+  resolveDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
+import { api } from "services";
 
 /**
  * MapVisualisation component responsible for rendering visualizations on a map.
@@ -51,7 +53,34 @@ export const MapVisualisation = ({
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
 
-  const colorStyle = visualisation?.style?.split("-")[1];
+    // State for tracking resolved dynamic styles
+  const [resolvedStyle, setResolvedStyle] = useState(visualisation?.style);
+  const [isResolvingStyle, setIsResolvingStyle] = useState(false);
+
+  // Effect to resolve dynamic styling when visualisation configuration changes
+  useEffect(() => {
+    const resolveStyleAsync = async () => {
+      if (visualisation?.dynamicStyling && visualisation.style && !visualisation.style.includes('-')) {
+        setIsResolvingStyle(true);
+        try {
+          const newResolvedStyle = await resolveDynamicStyle(visualisation, api);
+          setResolvedStyle(newResolvedStyle);
+        } catch (error) {
+          console.warn('Failed to resolve dynamic style:', error);
+          setResolvedStyle(visualisation.style);
+        } finally {
+          setIsResolvingStyle(false);
+        }
+      } else {
+        setResolvedStyle(visualisation?.style);
+      }
+    };
+
+    resolveStyleAsync();
+  }, [visualisation?.style, visualisation?.dynamicStyling, JSON.stringify(visualisation?.queryParams)]);
+
+  // Use resolved style for color determination
+  const colorStyle = resolvedStyle?.split("-")[1];
 
   // Determine the layer key based on the visualisation type
   const layerKey =
@@ -215,7 +244,7 @@ export const MapVisualisation = ({
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
-        visualisation.style,
+        resolvedStyle,
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65,
         widthValue ? parseFloat(widthValue) : 7.5
@@ -233,7 +262,7 @@ export const MapVisualisation = ({
     },
     [
       JSON.stringify(state.layers),
-      visualisation.style,
+      resolvedStyle,
       appContext,
       visualisation.queryParams,
       layerColorScheme,
@@ -319,7 +348,7 @@ export const MapVisualisation = ({
       colorHasChanged ||
       classificationHasChanged;
 
-    if (!needUpdate) return;
+    if (!needUpdate || !resolvedStyle || isResolvingStyle) return;
 
     // Update the refs to the current data
     prevCombinedDataRef.current = combinedData;
@@ -339,13 +368,14 @@ export const MapVisualisation = ({
             Array.isArray(dataToVisualize) &&
             dataToVisualize.length === 0
           ) {
-            resetMapStyle(visualisation.style);
+            resetMapStyle(resolvedStyle);
           } else {
+            console.log(visualisation);
             reclassifyAndStyleMap(
               map,
               dataToClassify,
               dataToVisualize,
-              visualisation.style,
+              resolvedStyle,
               classificationMethod,
               layerName
             );
@@ -357,10 +387,10 @@ export const MapVisualisation = ({
           if (parsedDataToVisualize) {
             reclassifyAndStyleGeoJSONMap(
               JSON.parse(parsedDataToVisualize),
-              visualisation.style
+              resolvedStyle
             );
           } else {
-            resetMapStyle(visualisation.style);
+            resetMapStyle(resolvedStyle);
           }
           break;
         }
@@ -391,7 +421,8 @@ export const MapVisualisation = ({
     layerColorScheme,
     classificationMethod,
     resetMapStyle,
-    visualisation.style,
+    resolvedStyle,
+    isResolvingStyle,
     visualisation.type,
     visualisationName,
     // reclassifyAndStyleMap,
