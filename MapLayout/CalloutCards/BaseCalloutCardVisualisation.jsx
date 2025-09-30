@@ -43,10 +43,10 @@ export const BaseCalloutCardVisualisation = ({
             ],
           ],
         },
-        image: "https://img-scenari1",
+        image: "https://www.w3schools.com/howto/img_avatar.png",
         label: "Huddersfield College",
         text_with_placeholders:
-          "The student lives <strong>{distance}</strong> kilometres from the school. The journey takes <strong>{duration}</strong> minutes.",
+          "Lorem ipsum dolor sit amet, <strong>{distance}</strong> consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         values: {
           distance: 2,
           duration: 30,
@@ -71,7 +71,7 @@ export const BaseCalloutCardVisualisation = ({
             ],
           ],
         },
-        image: "https://img-scenario2",
+        image: "https://www.w3schools.com/howto/img_avatar2.png",
         label: "Scenario Baseline",
         text_with_placeholders:
           "For this scenario, the distance is <strong>{distance}</strong> kilometres and the journey time is <strong>{duration}</strong> minutes.",
@@ -99,7 +99,7 @@ export const BaseCalloutCardVisualisation = ({
             ],
           ],
         },
-        image: "https://img-scenario3",
+        image: "https://fail",
         label: "Optimistic Future",
         text_with_placeholders:
           "In the optimistic future, the student travels <strong>{distance}</strong> kilometres in just <strong>{duration}</strong> minutes.",
