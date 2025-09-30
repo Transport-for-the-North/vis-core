@@ -408,7 +408,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
             onClick={handleDownload} 
             $bgColor={bgColor}
             disabled={isRequestTooLarge || isDownloading}
-            name='download-data-button'
+            data-clarity-label='download-data-button'
           >
             {isDownloading ? (
               <>Downloading <Spinner /></>
