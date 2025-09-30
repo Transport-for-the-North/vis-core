@@ -138,7 +138,7 @@ export const resolveDynamicStyle = async (visualisation, apiService) => {
     );
 
     const resolvedStyle = determineDynamicStyle(dataSample, baseStyle);
-    console.log(`Dynamic styling resolved: ${visualisation.style} -> ${resolvedStyle}`);
+    // console.log(`Dynamic styling resolved: ${visualisation.style} -> ${resolvedStyle}`);
     return resolvedStyle;
   } catch (error) {
     console.warn('Failed to resolve dynamic style, using original:', error);
