@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CalloutCardVisualisation } from './CalloutCards/CalloutCardVisualisation';
-import { MapVisualisation } from './MapVisualisation';
-import { ScrollableContainer } from 'Components';
-import { FullScreenCalloutCardVisualisation } from "./CalloutCards/FullScreenCalloutCardVisualisation";
+import { MapVisualisation } from "./MapVisualisation";
+import { ScrollableContainer } from "Components";
+import { BaseCalloutCardVisualisation } from "./CalloutCards/BaseCalloutCardVisualisation";
 
 
 /**
@@ -15,62 +14,30 @@ import { FullScreenCalloutCardVisualisation } from "./CalloutCards/FullScreenCal
  * @param {Object} props.maps - The Maplibre JS map instances for left and right maps.
  * @returns {JSX.Element|null} The rendered visualization components.
  */
-export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props }) => {
-  
-  /* Simulate a fullcard in the config */
-  // visualisationConfigs = {
-  //   ...visualisationConfigs,
-  //   fullcard1: {
-  //     type: 'fullScreenCalloutCard',
-  //   cardName: 'Project Info',
-  //   title: 'New Transport Project',
-  //   content: '<p>Details about the new project...</p>',
-  //   includeCarouselNavigation: true,
-  //   possibleCarouselNavData: [
-  //     {key: "key1", value: "value1"},
-  //     {key: "key2", value: "value2"},
-  //     {key: "key3", value: "value3"},
-  //     {key: "key4", value: "value4"},
-  //   ]
-  //   },
-  // // smallCard2: {
-  // //   type: 'smallCalloutCard',
-  // //   cardName: 'Project Info',
-  // //   includeCarouselNavigation: false,
-  // //   possibleCarouselNavData: []
-  // // }
-  // }
-
+export const VisualisationManager = ({
+  visualisationConfigs,
+  map,
+  maps,
+  ...props
+}) => {
   // Convert visualisationConfigs object to an array of entries
   const visualisationEntries = Object.entries(visualisationConfigs);
   // Separate visualizations by type
-  // Small card
-  const smallCalloutCardVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === "smallCalloutCard"
-  );
-  // FullScreen card
-  const fullScreenCalloutCardVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === "fullScreenCalloutCard"
+  const calloutCardVisualisations = visualisationEntries.filter(
+    ([_, config]) => config.type === "calloutCard"
   );
 
   const mapVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === 'joinDataToMap' || config.type === 'geojson'
+    ([_, config]) =>
+      config.type === "joinDataToMap" || config.type === "geojson"
   );
 
   // Build a lookup for configs by name
-  const smallCalloutCardConfigByName = Object.fromEntries(
-    smallCalloutCardVisualisations
-  );
-  const fullScreenCalloutCardConfigByName = Object.fromEntries(
-    fullScreenCalloutCardVisualisations
-  );
+  const calloutCardConfigByName = Object.fromEntries(calloutCardVisualisations);
 
   // State to manage order of cards
-  const [smallCardOrder, setSmallCardOrder] = useState(
-    smallCalloutCardVisualisations.map(([name]) => name)
-  );
-  const [fullScreenCardOrder, setFullScreenCardOrder] = useState(
-    fullScreenCalloutCardVisualisations.map(([name]) => name)
+  const [cardOrder, setCardOrder] = useState(
+    calloutCardVisualisations.map(([name]) => name)
   );
 
   const visibleMapRef = useRef({});
@@ -94,8 +61,8 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
 
   // Update cardOrder when visualisationConfigs change
   useEffect(() => {
-    const newOrder = smallCalloutCardVisualisations.map(([name]) => name);
-    setSmallCardOrder((prevOrder) => {
+    const newOrder = calloutCardVisualisations.map(([name]) => name);
+    setCardOrder((prevOrder) => {
       // Keep existing order as much as possible
       const newPrevOrder = prevOrder.filter((name) => newOrder.includes(name));
       const addedNames = newOrder.filter(
@@ -107,7 +74,7 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
 
   // Handler when a card is updated
   const handleCardUpdate = (updatedName) => {
-    setSmallCardOrder((prevOrder) => [
+    setCardOrder((prevOrder) => [
       updatedName,
       ...prevOrder.filter((name) => name !== updatedName),
     ]);
@@ -117,29 +84,15 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
     <>
       {/* Render all calloutCard visualisations inside ScrollableContainer */}
       <ScrollableContainer showOnMobile={showOnMobile} hideCardHandleOnMobile>
-        {/* Small */}
-        {smallCardOrder.map((name) => {
-          const config = smallCalloutCardConfigByName[name];
+        {cardOrder.map((name) => {
+          const config = calloutCardConfigByName[name];
           return (
-            <CalloutCardVisualisation
+            <BaseCalloutCardVisualisation
+              type={config.cardType || "small"}
               key={name}
               visualisationName={name}
               cardName={config.cardName || name}
               onUpdate={() => handleCardUpdate(name)}
-              onVisibilityChange={(v) => handleCardVisibility(name, v)}
-              {...props}
-            />
-          );
-        })}
-        {/* Full screen */}
-        {fullScreenCardOrder.map((name) => {
-          const config = fullScreenCalloutCardConfigByName[name];
-          return (
-            <FullScreenCalloutCardVisualisation
-              content={config.content}
-              title={config.title}
-              includeCarouselNavigation={config.includeCarouselNavigation}
-              possibleCarouselNavData={config.possibleCarouselNavData}
             />
           );
         })}
