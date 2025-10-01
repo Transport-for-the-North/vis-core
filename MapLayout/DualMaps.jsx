@@ -17,9 +17,41 @@ import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from './Layer'
 import "./MapLayout.css";
 
+const Wrap = styled.div`
+  display: flex;
+  height: 100%;
+  width: 100%;
+  @media ${props => props.theme.mq.mobile} {
+    flex-direction: column;
+    height: auto; /* let content dictate height */
+  }
+`;
+
 const StyledMapContainer = styled.div`
+  position: relative;
   width: 50%;
   height: 100%;
+  overflow: hidden;
+
+  /* make the map fill the slot */
+  .maplibregl-map {
+    position: absolute;
+    inset: 0;
+  }
+
+  @media ${props => props.theme.mq.mobile} {
+    width: 100%;
+    height: 100%;    /* <-- give it real height so the map isn't 0px tall */
+
+    & .maplibregl-map,
+    & .maplibregl-map canvas {
+      position: absolute;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+  }
 `;
 
 /**
@@ -751,8 +783,32 @@ const DualMaps = (props) => {
     };
   }, [isMapReady, maps, handleMapClick]);
 
+  useEffect(() => {
+  if (!leftMap || !rightMap) return;
+
+  const roLeft = new ResizeObserver(() => leftMap.resize());
+  const roRight = new ResizeObserver(() => rightMap.resize());
+
+  if (leftMapContainerRef.current) roLeft.observe(leftMapContainerRef.current);
+  if (rightMapContainerRef.current) roRight.observe(rightMapContainerRef.current);
+
+  // Also force a resize when the media query flips
+  const mq = window.matchMedia('(max-width: 900px)');
+  const onChange = () => {
+    leftMap.resize();
+    rightMap.resize();
+  };
+  mq.addEventListener('change', onChange);
+
+  return () => {
+    roLeft.disconnect();
+    roRight.disconnect();
+    mq.removeEventListener('change', onChange);
+  };
+}, [leftMap, rightMap]);
+
   return (
-    <>
+    <Wrap>
       <StyledMapContainer ref={leftMapContainerRef}>
         {Object.values(state.layers).map((layer) => (
           <Layer key={layer.name} layer={layer} />
@@ -787,7 +843,7 @@ const DualMaps = (props) => {
             <DynamicLegend map={maps.right} />
           ))}
       </StyledMapContainer>
-    </>
+    </Wrap>
   );
 };
 

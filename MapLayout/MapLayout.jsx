@@ -12,12 +12,37 @@ import { actionTypes } from "reducers";
 const LayoutContainer = styled.div`
   display: flex;
   height: calc(100vh - 75px);
+  @media ${props => props.theme.mq.mobile} {
+   flex-direction: column;   /* stack Sidebar above Map */
+   height: auto;             /* let content dictate height */
+  }
 `;
 
 const MapContainer = styled.div`
   flex: 1;
   position: relative;
   display: flex;
+  @media ${props => props.theme.mq.mobile} {
+   flex: 0 0 auto;
+   min-height: 60vh; /* ensure minimum height on mobile */}
+`;
+
+const MobileCardsSlot = styled.div`
+  display: none;  
+  @media ${props => props.theme.mq.mobile} {
+    display: block;
+    width: 100%;
+    }
+`;
+
+const MobileLegendSlot = styled.section`
+  display: none;
+
+  @media ${props => props.theme.mq.mobile} {
+    display: block;
+    width: 100%;
+    box-sizing: border-box
+  }
 `;
 
 /**
@@ -160,6 +185,10 @@ export const MapLayout = () => {
           handleClassificationChange={handleClassificationChange}
         />
       </Sidebar>
+
+      {/* Mobile-only: where summary cards will be portaled into */}
+      <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
+
       {pageContext.type === "MapLayout" && (
         <MapContainer>
           <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
@@ -170,6 +199,7 @@ export const MapLayout = () => {
           <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
         </MapContainer>
       )}
+      <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
     </LayoutContainer>
   );
 };

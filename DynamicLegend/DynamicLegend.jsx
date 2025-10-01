@@ -4,7 +4,35 @@ import styled from "styled-components";
 import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 import { PageContext, useAppContext } from "contexts";
+import { createPortal } from 'react-dom';
 import { buildLegendRadius } from "utils/map";
+
+/**
+ * useIsMobile
+ *
+ * Returns a boolean that tracks whether the viewport is currently at or below
+ * a mobile breakpoint (≤ 900px). It reads the width on mount and updates on
+ * window resize.
+ *
+ * - Guards all direct `window` access.
+ * - Cleans up the resize listener on unmount.
+ * - Keep the 900px value in sync with your theme’s `mq.mobile` if you change it.
+ *
+ * @returns {boolean} isMobile - `true` when `window.innerWidth <= 900`, else `false`.
+ */
+
+const useIsMobile = () => {
+  const [m, setM] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 900 : false));
+  useEffect(() => {
+    const onResize = () => setM(window.innerWidth <= 900);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return m;
+};
+
+const MOBILE_Q = '(max-width: 900px)';
+const mobileMQ = (p) => p.theme?.mq?.mobile || MOBILE_Q;
 
 // Styled components for the legend UI
 const LegendContainer = styled.div`
@@ -60,6 +88,29 @@ const LegendContainer = styled.div`
       scrollbar-color: darkgrey transparent; /* Color when hovered */
     }
   }
+
+  
+  @media ${mobileMQ} {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 10px;
+  }
+
+  ${({ $outside }) => $outside && `
+    position: static;
+    display: block;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    box-shadow: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.95);
+    margin: 8px 0 0;
+    padding: 12px 16px;
+  `}
 `;
 
 const LegendItemContainer = styled.div`
@@ -71,6 +122,13 @@ const LegendItemContainer = styled.div`
 const LegendGroup = styled.div`
   width: max-content;
   min-width: 0;
+  @media ${mobileMQ} {
+    border: 1px solid #ccc;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
 `;
 
 const LegendTitle = styled.div`
@@ -304,13 +362,13 @@ export const interpretWidthExpression = (expression) => {
 * @returns {JSX.Element|null} The rendered legend component or null if there are no legend items.
  */
 export const DynamicLegend = ({ map }) => {
+  const isMobile = useIsMobile();
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
   const { defaultBands } = useAppContext();
   const legendRef = useRef(null);
   const currentPage = useContext(PageContext);
   const pageCategory = currentPage.category || currentPage.pageName;
-
   useEffect(() => {
     if (!map) return;
 
@@ -545,26 +603,33 @@ export const DynamicLegend = ({ map }) => {
   // This effect forces the container's width to update after legendItems change,
   // working around Firefox's flex-wrap column bug.
   useEffect(() => {
-    if (legendRef.current) {
-      // Reset width so container can shrink-wrap its content naturally.
-      legendRef.current.style.width = "auto";
-      
-      // Calculate the scrollbar width:
-      // offsetWidth includes scrollbar, clientWidth does not.
-      const scrollbarWidth = legendRef.current.offsetWidth - legendRef.current.clientWidth;
-      
-      // Get the container's natural content width plus the scrollbar width.
-      const newWidth = legendRef.current.scrollWidth + scrollbarWidth;
-      legendRef.current.style.width = `${newWidth}px`;
+    if (!legendRef.current) return;
+
+    // Mobile/tablet: let CSS make it full width; do nothing else
+    if (isMobile) {
+      legendRef.current.style.removeProperty('width');
+      return;
     }
-  }, [legendItems]);
+    // Reset width so container can shrink-wrap its content naturally.
+    legendRef.current.style.width = "auto";
+      
+    // Calculate the scrollbar width:
+    // offsetWidth includes scrollbar, clientWidth does not.
+    const scrollbarWidth = legendRef.current.offsetWidth - legendRef.current.clientWidth;
+      
+    // Get the container's natural content width plus the scrollbar width.
+    const newWidth = legendRef.current.scrollWidth + scrollbarWidth;
+    legendRef.current.style.width = `${newWidth}px`;
+  }, [legendItems, isMobile]);
+  
+  // If there are no legend items, render nothing.
   
   if (legendItems.length === 0) {
     return null;
   }
   
-  return (
-    <LegendContainer ref={legendRef}>
+  const content = (
+    <LegendContainer ref={legendRef} $outside={isMobile}>
       {legendItems.map((item, index) => (
         <LegendGroup key={item.layerId}>
           <LegendItemContainer>
@@ -614,4 +679,11 @@ export const DynamicLegend = ({ map }) => {
       ))}
     </LegendContainer>
   );
+
+  if (isMobile) {
+    const slot = typeof document !== 'undefined' && document.getElementById('mobile-legend-slot');
+    if (slot) return createPortal(content, slot);
+  }
+
+  return content;
 };
