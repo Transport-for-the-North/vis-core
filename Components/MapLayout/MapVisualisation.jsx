@@ -11,12 +11,11 @@ import {
   resetPaintProperty,
   hasAnyGeometryNotNull,
   getMetricDefinition,
-  resolveDynamicStyle
+  determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
-import { api } from "services";
 
 /**
  * MapVisualisation component responsible for rendering visualizations on a map.
@@ -57,30 +56,8 @@ export const MapVisualisation = ({
   const [resolvedStyle, setResolvedStyle] = useState(visualisation?.style);
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
 
-  // Effect to resolve dynamic styling when visualisation configuration changes
-  useEffect(() => {
-    const resolveStyleAsync = async () => {
-      if (visualisation?.dynamicStyling && visualisation.style && !visualisation.style.includes('-')) {
-        setIsResolvingStyle(true);
-        try {
-          const newResolvedStyle = await resolveDynamicStyle(visualisation, api);
-          setResolvedStyle(newResolvedStyle);
-        } catch (error) {
-          console.warn('Failed to resolve dynamic style:', error);
-          setResolvedStyle(visualisation.style);
-        } finally {
-          setIsResolvingStyle(false);
-        }
-      } else {
-        setResolvedStyle(visualisation?.style);
-      }
-    };
-
-    resolveStyleAsync();
-  }, [visualisation?.style, visualisation?.dynamicStyling, JSON.stringify(visualisation?.queryParams)]);
-
   // Use resolved style for color determination
-  const colorStyle = resolvedStyle?.split("-")[1];
+  const colorStyle = resolvedStyle?.split("-")[1] || 'continuous'; // Default fallback
 
   // Determine the layer key based on the visualisation type
   const layerKey =
@@ -107,6 +84,31 @@ export const MapVisualisation = ({
     error,
     dataWasReturnedButFiltered
   } = useFetchVisualisationData(visualisation, map, layerKey, shouldFilterDataToViewport);
+
+  // Effect to resolve dynamic styling when visualisation data is available
+  useEffect(() => {
+    if (visualisation?.dynamicStyling && visualisation.style && !visualisation.style.includes('-')) {
+      if (visualisationData && visualisationData.length > 0) {
+        setIsResolvingStyle(true);
+        try {
+          // Use the already fetched data to determine dynamic style
+          const newResolvedStyle = determineDynamicStyle(visualisationData, visualisation.style);
+          setResolvedStyle(newResolvedStyle);
+        } catch (error) {
+          setResolvedStyle(`${visualisation.style}-continuous`); // Fallback to continuous
+        } finally {
+          setIsResolvingStyle(false);
+        }
+      } else {
+        // While waiting for data, use a temporary style to prevent errors
+        setResolvedStyle(`${visualisation.style}-continuous`);
+        setIsResolvingStyle(true);
+      }
+    } else if (!visualisation?.dynamicStyling) {
+      setResolvedStyle(visualisation?.style);
+      setIsResolvingStyle(false);
+    }
+  }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData]);
 
   // Handle loading state
   useEffect(() => {
@@ -214,11 +216,11 @@ export const MapVisualisation = ({
       );
 
       // Determine the current color scheme
-      const currentColor = colorSchemes[colorStyle].some(
+      const currentColor = (colorSchemes[colorStyle] && colorSchemes[colorStyle].some(
         (e) => e === layerColorScheme.value
-      )
+      ))
         ? layerColorScheme.value
-        : defaultMapColourMapper[colorStyle].value;
+        : defaultMapColourMapper[colorStyle]?.value || defaultMapColourMapper['continuous'].value;
 
       // Calculate the color palette based on the classification
       const invertColorScheme =
@@ -348,7 +350,7 @@ export const MapVisualisation = ({
       colorHasChanged ||
       classificationHasChanged;
 
-    if (!needUpdate || !resolvedStyle || isResolvingStyle) return;
+    if (!needUpdate || !resolvedStyle || isResolvingStyle || !colorStyle) return;
 
     // Update the refs to the current data
     prevCombinedDataRef.current = combinedData;
