@@ -86,25 +86,51 @@ export function getOpacityProperty(layerType) {
       widthProp = "line-width";
       break;
     }
+    case "circle": {
+      widthProp = "circle-radius";
+      break;
+    }
   }
   return widthProp;
 }
-
-export const calculateMaxWidthFactor = (width) => {
-  if (typeof width !== 'number') {
-    throw new Error("Invalid maximum width value");
-  }
-
-  const factor = width / MAP_CONSTANTS.defaultMaxWidth;
-  return factor;
-};
 
 export const MAP_CONSTANTS = {
   defaultMinWidth: 1,
   defaultMaxWidth: 8.5,
   defaultWidthFactor: 1,
-  defaultOffset: 0.75
+  defaultOffset: 0.75,
+
+  //circle constants
+  defaultMinRadius: 2,
+  defaultMaxRadius: 25
 }
+
+export const buildLegendRadius = (bins) => {
+  const min = MAP_CONSTANTS.defaultMinRadius;  
+  const max = MAP_CONSTANTS.defaultMaxRadius;  
+  const minBin = Math.min(...bins);
+  const maxBin = Math.max(...bins);
+
+  return bins.map((v) => {
+    if (maxBin === minBin) return (min + max) / 2; // all same value
+    const t = (v - minBin) / (maxBin - minBin);    // 0..1
+    return min + t * (max - min);                  // baseline radius
+  });
+};
+
+const getBaselineMaxForProp = (paintProp) =>
+  paintProp && paintProp.includes("line")
+    ? MAP_CONSTANTS.defaultMaxWidth
+    : MAP_CONSTANTS.defaultMaxRadius;
+
+export const calculateMaxWidthFactor = (width, paintProp) => {
+  if (typeof width !== 'number') {
+    throw new Error("Invalid maximum width value");
+  }
+
+  const baseline = getBaselineMaxForProp(paintProp);
+  return width / baseline;
+};
 
 /**
  * Adjusts an existing interpolation array by applying a width factor.
@@ -120,26 +146,31 @@ export const MAP_CONSTANTS = {
  * @throws {Error} If the input array is not a valid interpolation expression or if the existing factors
  *                 in the interpolation are inconsistent.
  */
-export const applyWidthFactor = (existingInterpolationArray, factor, constantOffset = MAP_CONSTANTS.defaultOffset) => {
+export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, constantOffset = MAP_CONSTANTS.defaultOffset) => {
   if (!Array.isArray(existingInterpolationArray) || existingInterpolationArray[0] !== "interpolate") {
     throw new Error("Invalid interpolation expression");
   }
 
   // Extract the existing width
+   const baseline = getBaselineMaxForProp(paintProp);
   const existingMax = existingInterpolationArray[existingInterpolationArray.length - 1];
 
   // Calculate the existing factoring - this should be relative to the default widths
-  const oldFactorMax = existingMax / MAP_CONSTANTS.defaultMaxWidth;
+  const oldFactorMax = existingMax / baseline;
 
   const overallFactor = factor / oldFactorMax;
   const newInterpolationArray = [...existingInterpolationArray];
-  const newLineOffsetArray = ["interpolate", ["linear"], ["feature-state", "valueAbs"]];
+  const newLineOffsetArray = paintProp.includes("line")
+    ? ["interpolate", ["linear"], ["feature-state", "valueAbs"]]
+    : null;
 
   for (let i = 4; i < newInterpolationArray.length; i += 2) {
     if (typeof newInterpolationArray[i] === "number") {
       newInterpolationArray[i] *= overallFactor;
-      const lineOffsetValue = -((newInterpolationArray[i] / 2) + constantOffset);
-      newLineOffsetArray.push(newInterpolationArray[i - 1], lineOffsetValue);
+      if (newLineOffsetArray) {
+        const lineOffsetValue = -((newInterpolationArray[i] / 2) + constantOffset);
+        newLineOffsetArray.push(newInterpolationArray[i - 1], lineOffsetValue);
+      }
     }
   }
 

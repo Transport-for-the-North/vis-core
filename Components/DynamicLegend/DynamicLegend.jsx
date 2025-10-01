@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 import { PageContext, useAppContext } from "contexts";
+import { buildLegendRadius } from "utils/map";
 
 // Styled components for the legend UI
 const LegendContainer = styled.div`
@@ -403,6 +404,17 @@ export const DynamicLegend = ({ map }) => {
             if (widthStops) {
               widthStops = widthStops.slice().reverse();
             }
+          }
+          if (layer.type === "circle" && colorStops && colorStops.length > 0) {
+            // Use the legend’s bins (from color stops) to compute baseline radii (e.g., 2..25)
+            const bins = colorStops.map((s) => convertStringToNumber(s.value));
+            const radius = buildLegendRadius(bins);
+
+            // DynamicLegend expects width = rendered diameter for circles
+            widthStops = bins.map((v, i) => ({
+              value: numberWithCommas(v),
+              width: radius[i] * 2,
+            }));
           }
           if (
             layer.type === "circle" &&

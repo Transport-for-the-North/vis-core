@@ -62,17 +62,22 @@ function removeRecurringDecimals(number) {
 }
 
 export function numberWithCommas(x) {
-  // Check if it contains a decimal.
-  if (x.toString().indexOf('.') === -1) {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+  // guard against null/undefined
+  if (x === null || x === undefined) return "";
+
+  const s = String(x);
+
+  // no decimal → just thousands separators
+  if (s.indexOf(".") === -1) {
+    return s.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   }
-  // Regex to remove excessive zeros.
-  x = removeExcessiveZeros(x)
-  // Regex to truncate recurring decimals.
-  x = removeRecurringDecimals(x)
-  x = x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-    return x
-  }
+
+  // keep existing trimming logic, but use the local string
+  let cleaned = removeExcessiveZeros(s);
+  cleaned = removeRecurringDecimals(cleaned);
+
+  return String(cleaned).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+}
 
 const numberFormatter = new Intl.NumberFormat('en-GB', {
   minimumFractionDigits: 0,

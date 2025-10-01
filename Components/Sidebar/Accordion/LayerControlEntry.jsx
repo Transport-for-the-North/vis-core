@@ -230,6 +230,7 @@ export const LayerControlEntry = memo(
     const shouldHaveOpacityControl = layer.metadata?.shouldHaveOpacityControl ?? true;
     const enforceNoColourSchemeSelector = layer.metadata?.enforceNoColourSchemeSelector ?? false;
     const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
+    const widthProp = getWidthProperty(layer.type);
 
     let currentWidthFactor = null;
     let currentOpacity = null;
@@ -237,7 +238,6 @@ export const LayerControlEntry = memo(
     if (maps.length > 0 && maps[0].getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
-      const widthProp = getWidthProperty(layer.type);
       currentWidthFactor = widthProp ? maps[0].getPaintProperty(layer.id, widthProp) : null;
     }
 
@@ -251,7 +251,7 @@ export const LayerControlEntry = memo(
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
     const initialWidth = isFeatureStateWidthExpression
-      ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1])
+      ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
       : currentWidthFactor;
 
     // State for opacity of the layer
@@ -305,12 +305,11 @@ export const LayerControlEntry = memo(
 
     const handleWidthFactorChange = (e) => {
       const widthFactor = parseFloat(e.target.value);
-      const widthProp = getWidthProperty(layer.type);
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
     
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        const result = applyWidthFactor(currentWidthFactor, widthFactor);
+        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
         widthInterpolation = result.widthInterpolation;
         lineOffsetInterpolation = result.lineOffsetInterpolation;
       } else {
