@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CalloutCardVisualisation } from './CalloutCardVisualisation';
 import { MapVisualisation } from './MapVisualisation';
 import { ScrollableContainer } from 'Components';
+
 
 /**
  * VisualisationManager component that renders the appropriate visualizations
@@ -34,6 +35,25 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
     calloutCardVisualisations.map(([name]) => name)
   );
 
+  const visibleMapRef = useRef({});
+  const [visibleCount, setVisibleCount] = useState(0);
+  
+/**
+ * Track visibility for a single card and refresh the aggregate count.
+ * @name handleCardVisibility
+ * @function
+ * @global
+ * @param {string} name - The visualisation/card identifier.
+ * @param {boolean} isVisible - Whether the card is currently visible.
+ */
+  const handleCardVisibility = (name, isVisible) => {
+    const next = { ...visibleMapRef.current, [name]: !!isVisible };
+    visibleMapRef.current = next;
+    setVisibleCount(Object.values(next).filter(Boolean).length);
+  };
+
+  const showOnMobile = visibleCount > 0;
+
   // Update cardOrder when visualisationConfigs change
   useEffect(() => {
     const newOrder = calloutCardVisualisations.map(([name]) => name);
@@ -56,7 +76,7 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
   return (
     <>
       {/* Render all calloutCard visualisations inside ScrollableContainer */}
-      <ScrollableContainer>
+      <ScrollableContainer showOnMobile={showOnMobile} hideCardHandleOnMobile>
         {cardOrder.map((name) => {
           const config = calloutCardConfigByName[name];
           return (
@@ -65,6 +85,7 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
               visualisationName={name}
               cardName={config.cardName || name}
               onUpdate={() => handleCardUpdate(name)}
+              onVisibilityChange={(v) => handleCardVisibility(name, v)}
               {...props}
             />
           );

@@ -52,6 +52,13 @@ body, html, .maplibregl-map {
   color: #61dafb;
 }
 
+/* @media (max-width: 900px) {
+  .maplibregl-ctrl-bottom-right,
+  .maplibregl-ctrl-attrib {
+    display: none !important;
+  }
+} */
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

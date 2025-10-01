@@ -22,6 +22,9 @@ import { uniq } from "lodash";
 const StyledMapContainer = styled.div`
   width: 100%;
   height: calc(100vh - 75px);
+  @media ${props => props.theme.mq.mobile} {
+   height: auto;             /* let content dictate height */
+  }
 `;
 
 /**
@@ -49,6 +52,37 @@ const Map = (props) => {
   const prevSelectedFeatures = useRef({});
 
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
+
+  // Single feature picker for map clicks
+  const pickFeatureAtPoint = useCallback(
+    (point) => {
+      if (!map) return null;
+
+      const filterLayers = memoizedFilters
+        .filter((f) => f.type === "map")
+        .map((f) => f.layer)
+        .filter((id) => map.getLayer(id));
+
+      if (filterLayers.length) {
+        const hits = map.queryRenderedFeatures(point, { layers: filterLayers });
+        if (hits.length) return hits[0]; // top-most feature on a filter layer
+      }
+
+      const otherLayers = Object.keys(state.layers).filter(
+        (id) =>
+          (state.layers[id].shouldHaveTooltipOnClick ||
+            state.layers[id].shouldHaveTooltipOnHover) &&
+          map.getLayer(id)
+      );
+      if (otherLayers.length) {
+        const hits = map.queryRenderedFeatures(point, { layers: otherLayers });
+        if (hits.length) return hits[0];
+      }
+
+      return null;
+    },
+    [map, memoizedFilters, state.layers]
+  );
 
   // **Draw control logic
   useEffect(() => {
@@ -145,52 +179,62 @@ const Map = (props) => {
    * @param {Object} e - The event object containing information about the hover event.
    */
   const handleMapHover = useCallback(
-    (e) => {
+    (e, forcedFeatures = null) => {
       if (!map || !e.point) return;
 
       // Get layers that have shouldHaveTooltipOnHover set to true and are available on the map
-      const hoverableLayers = Object.keys(state.layers).filter(
-        (layerId) =>
-          state.layers[layerId].shouldHaveTooltipOnHover && map.getLayer(layerId)
-      );
-
-      if (hoverableLayers.length === 0) {
-        // Clean up if no hoverable layers
-        if (hoverInfoRef.current.popup) {
-          hoverInfoRef.current.popup.remove();
-          hoverInfoRef.current.popup = null;
-        }
-        // Clear hover state for previously hovered features
-        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
-          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
-        });
-        prevHoveredFeaturesRef.current = [];
-        return;
-      }
-
-      // Determine the maximum bufferSize among the layers
-      const maxBufferSize = Math.max(
-        ...hoverableLayers.map(
-          (layerId) => state.layers[layerId].bufferSize ?? 0
-        )
-      );
-
-      const bufferedPoint = [
-        [e.point.x - maxBufferSize, e.point.y - maxBufferSize],
-        [e.point.x + maxBufferSize, e.point.y + maxBufferSize],
-      ];
-
-      let featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
-        layers: hoverableLayers,
+      // Treat click-tooltips as hover-tooltips on touch devices
+      const isTouchonMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none), (pointer: coarse)').matches;
+      
+      const hoverableLayers = Object.keys(state.layers).filter((layerId) => {
+        const cfg = state.layers[layerId];
+        const showOnTouch = isTouchonMobile && cfg.shouldHaveTooltipOnClick;
+        return (cfg.shouldHaveTooltipOnHover || showOnTouch) && map.getLayer(layerId);
       });
 
       let features = [];
-      
-      // Below removes duplicates from features array
-      for (let x = 0; x < featuresWithDuplicates.length; x ++) {          
-          if (!features.some(f => f.id === featuresWithDuplicates[x].id)) {
-            features.push(featuresWithDuplicates[x]);
-          } 
+      if (forcedFeatures && forcedFeatures.length) {
+        features = forcedFeatures;
+      } else {
+        if (hoverableLayers.length === 0) {
+          // Clean up if no hoverable layers
+          if (hoverInfoRef.current.popup) {
+            hoverInfoRef.current.popup.remove();
+            hoverInfoRef.current.popup = null;
+          }
+          // Clear hover state for previously hovered features
+          prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+            map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+          });
+          prevHoveredFeaturesRef.current = [];
+          return;
+        }
+
+        // Determine the maximum bufferSize among the layers
+         const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+         const dpr = window.devicePixelRatio || 1;
+         // On touch devices, used a minimum buffer to account for finger size
+         const minTapBufferPx = isTouch ? Math.round(6 * dpr) : 0;
+          const maxBufferSize = Math.max(
+           minTapBufferPx,
+            ...hoverableLayers.map((layerId) => state.layers[layerId].bufferSize ?? 0)
+         );
+          const bufferedPoint = [
+           [e.point.x - maxBufferSize, e.point.y - maxBufferSize],
+           [e.point.x + maxBufferSize, e.point.y + maxBufferSize],
+         ];
+          const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
+           layers: hoverableLayers,
+         });
+          if (isTouchonMobile) {
+           features = featuresWithDuplicates.length ? [featuresWithDuplicates[0]] : [];
+         } else {      
+           // Below removes duplicates from features array
+           const seen = new Set();
+           for (const f of featuresWithDuplicates) {
+             if (!seen.has(f.id)) { seen.add(f.id); features.push(f); }
+           }
+       }
       }
 
       if (features.length === 0) {
@@ -406,6 +450,7 @@ const Map = (props) => {
           className: "custom-popup",
           closeButton: false,
           closeOnClick: false,
+          closeOnMove: false,
         })
           .setLngLat(coordinates)
           .setHTML(aggregatedHtml)
@@ -502,7 +547,7 @@ const Map = (props) => {
       const description = `<p>${feature[0].properties.name ?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
           feature[0].state.value ?? 0
         }</p>`;
-      const newPopup = new maplibregl.Popup()
+      const newPopup = new maplibregl.Popup({ closeOnClick: false })
         .setLngLat(coordinates)
         .setHTML(description)
         .addTo(map);
@@ -605,6 +650,7 @@ const Map = (props) => {
   // **Set up click and zoom handlers**
   useEffect(() => {
     if (!map) return;
+    const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
     Object.keys(state.layers).forEach((layerId) => {
       if (state.layers[layerId].shouldHaveLabel) {
@@ -620,7 +666,7 @@ const Map = (props) => {
         }
         listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
       }
-      if (state.layers[layerId].shouldHaveTooltipOnClick) {
+      if (!isTouch && state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
         const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
         map.on("click", clickCallback);
@@ -766,49 +812,121 @@ const Map = (props) => {
   );
 
   // **Create map hover handler**
+  // **Create map hover/tap handler (single source of truth)**
   useEffect(() => {
     if (!map) return;
 
-    // Set up the hover event listener
-    const hoverCallback = (e) => handleMapHover(e);
-    map.on("mousemove", hoverCallback);
+    const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
-    // Set up the mouseleave event listener to clean up
-    const mouseLeaveCallback = () => {
-      if (hoverInfoRef.current.popup) {
-        hoverInfoRef.current.popup.remove();
-        hoverInfoRef.current.popup = null;
+    if (!isTouch) {
+      // ----- DESKTOP: normal hover -----
+      const hoverCallback = (e) => handleMapHover(e);
+      map.on("mousemove", hoverCallback);
+
+      const mouseLeaveCallback = () => {
+        if (hoverInfoRef.current.popup) {
+          hoverInfoRef.current.popup.remove();
+          hoverInfoRef.current.popup = null;
+        }
+        if (hoverInfoRef.current.abortController) {
+          hoverInfoRef.current.abortController.abort();
+          hoverInfoRef.current.abortController = null;
+        }
+        if (hoverInfoRef.current.timeoutId) {
+          clearTimeout(hoverInfoRef.current.timeoutId);
+          hoverInfoRef.current.timeoutId = null;
+        }
+        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+        });
+        prevHoveredFeaturesRef.current = [];
+      };
+      map.getCanvas().addEventListener("mouseleave", mouseLeaveCallback);
+
+      listenerCallbackRef.current.hoverCallback = hoverCallback;
+      listenerCallbackRef.current.mouseLeaveCallback = mouseLeaveCallback;
+
+      return () => {
+        if (listenerCallbackRef.current.hoverCallback) {
+          map.off("mousemove", listenerCallbackRef.current.hoverCallback);
+        }
+        if (listenerCallbackRef.current.mouseLeaveCallback) {
+          map.getCanvas().removeEventListener("mouseleave", listenerCallbackRef.current.mouseLeaveCallback);
+        }
+      };
+    }
+
+    // ----- MOBILE/TABLET: tap behavior -----
+    const onTap = (e) => {
+      const filterLayers = memoizedFilters.filter(f => f.type === 'map').map(f => f.layer).filter(id => map.getLayer(id));
+      // Layers that own click behaviour
+      const calloutLayers = Object.keys(state.layers).filter(id => state.layers[id].shouldHaveTooltipOnClick && map.getLayer(id));
+
+      const clickableLayers = Array.from(new Set([...calloutLayers, ...filterLayers]));
+
+      let picked = null;
+
+      if (filterLayers.length) {
+        const hits = map.queryRenderedFeatures(e.point, { layers: filterLayers });
+        if (hits && hits.length) picked = hits[0];
       }
-      if (hoverInfoRef.current.abortController) {
-        hoverInfoRef.current.abortController.abort();
-        hoverInfoRef.current.abortController = null;
+      if (!picked && clickableLayers.length) {
+        const hits = map.queryRenderedFeatures(e.point, { layers: clickableLayers });
+        if (hits && hits.length) picked = hits[0];
       }
-      if (hoverInfoRef.current.timeoutId) {
-        clearTimeout(hoverInfoRef.current.timeoutId);
-        hoverInfoRef.current.timeoutId = null;
+
+      //If we hit something, update Callout + show popup for that same feature
+      if (picked) {
+        handleMapClick(e);
+        setTimeout(() => handleMapHover(e, [picked]), 0);
+        return;
       }
-      // Reset previous hovered features and clear hover state
-      prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
-        map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
-      });
-      prevHoveredFeaturesRef.current = [];
+        // clear on empty tap
+        if (hoverInfoRef.current.popup) {
+          hoverInfoRef.current.popup.remove();
+          hoverInfoRef.current.popup = null;
+        }
+        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+        });
+        prevHoveredFeaturesRef.current = [];
     };
-    map.getCanvas().addEventListener("mouseleave", mouseLeaveCallback);
 
-    // Store the callbacks to clean up later
-    listenerCallbackRef.current.hoverCallback = hoverCallback;
-    listenerCallbackRef.current.mouseLeaveCallback = mouseLeaveCallback;
+    map.on('click', onTap);
+    map.on('touchend', onTap);
 
     return () => {
-      if (listenerCallbackRef.current.hoverCallback) {
-        map.off("mousemove", listenerCallbackRef.current.hoverCallback);
-      }
-      if (listenerCallbackRef.current.mouseLeaveCallback) {
-        map.getCanvas().removeEventListener(
-          "mouseleave",
-          listenerCallbackRef.current.mouseLeaveCallback
-        );
-      }
+      map.off('click', onTap);
+      map.off('touchend', onTap);
+    };
+  }, [map, handleMapHover, handleMapClick, state.layers, memoizedFilters]);
+
+
+  // Fallback for touch devices that do support hover
+  useEffect(() => {
+    if (!map) return;
+
+    const isTouchDeviceForTooltipFallback =
+      ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+    if (!isTouchDeviceForTooltipFallback) return;
+
+    const onTouchEndShowTooltip = (te) => {
+      const t = te.changedTouches && te.changedTouches[0];
+      if (!t) return;
+
+      const rect = map.getCanvas().getBoundingClientRect();
+      const point = { x: t.clientX - rect.left, y: t.clientY - rect.top };
+      const lngLat = map.unproject(point);
+
+      // reuse your existing hover logic to build/show the popup
+      handleMapHover({ point, lngLat });
+    };
+
+    map.getCanvas().addEventListener('touchend', onTouchEndShowTooltip, { passive: true });
+
+    return () => {
+      map.getCanvas().removeEventListener('touchend', onTouchEndShowTooltip);
     };
   }, [map, handleMapHover]);
 

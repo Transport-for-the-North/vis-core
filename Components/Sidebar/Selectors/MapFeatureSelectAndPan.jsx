@@ -40,19 +40,29 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
    *
    * @param {Object} option - The selected option from the dropdown.
    */
-  const handleSelectionChange = async (filter, options) => {
-    if (options.value) {
-      const { bounds, centroid } = await api.geodataService.getFeatureGeometry(layerPath, options.value);
-  
-      // Dispatch the updated action
-      mapDispatch({
-        type: actionTypes.SET_BOUNDS_AND_CENTROID,
-        payload: { bounds, centroid },
-      });
-      
-      onChange(filter, options.value);
-
+  const handleSelectionChange = async (filter, option) => {
+    // Clear action: react-select passes null
+    if (!option) {
+      onChange?.(filter, null);        // tell parent it was cleared
+      return;
     }
+
+    // Single-select safety
+    const id = option.value;
+    if (!id) {
+      onChange?.(filter, null);
+      return;
+    }
+
+    const { bounds, centroid } =
+      await api.geodataService.getFeatureGeometry(layerPath, id);
+
+    mapDispatch({
+      type: actionTypes.SET_BOUNDS_AND_CENTROID,
+      payload: { bounds, centroid },
+    });
+
+    onChange?.(filter, id);
   };
 
   return (

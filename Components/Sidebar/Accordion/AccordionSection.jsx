@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styled from 'styled-components';
 
-const AccordionHeader = styled.div`
+export const AccordionHeader = styled.div`
   cursor: pointer;
   padding: 10px;
   background-color: #f0f0f0;
@@ -14,12 +14,12 @@ const AccordionHeader = styled.div`
   transition: background-color 0.3s ease;
 `;
 
-const AccordionIcon = styled.span`
+export const AccordionIcon = styled.span`
   display: inline-block;
   width: 10px;
   height: 10px;
-  border-right: 2px solid #333;
-  border-bottom: 2px solid #333;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
   transform: ${({ $isOpen }) => ($isOpen ? 'rotate(45deg)' : 'rotate(-45deg)')};
   transition: transform 0.3s ease;
 `;

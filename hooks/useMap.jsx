@@ -55,20 +55,77 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
           setIsMapLoaded(true);
         });
 
-      mapInstance.addControl(
-        new maplibregl.NavigationControl(),
-        "bottom-left"
-      );
-      
-      mapInstance.addControl(
-        new maplibregl.AttributionControl({
-          compact: true,
-          customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}${extraCopyrightText ? ` | ${extraCopyrightText}` : ''}`
-        }),
-        "bottom-right"
-      );
+      const nav = new maplibregl.NavigationControl({ showZoom: true, showCompass: true });
+      const attrib = new maplibregl.AttributionControl({
+        compact: true,
+        customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}${extraCopyrightText ? ` | ${extraCopyrightText}` : ''}`
+      });
+      const mql = window.matchMedia('(max-width: 900px)');
+      const updateNavOffset = () => {
+        const attrEl = attrib?._container;
+        const navEl  = nav?._container;
+        if (!attrEl || !navEl) return;
+
+        const h = Math.ceil(attrEl.getBoundingClientRect().height); // current pill height
+        // pushed nav up by pill height + small gap + safe-area
+        navEl.style.marginBottom = `calc(${h + 20}px + env(safe-area-inset-bottom))`;
+        // small horizontal breathing room
+        navEl.style.marginRight = '6px';
+        navEl.style.marginLeft  = '6px';
+      };
+
+      const placeNav = (isMobile) => {
+        try { mapInstance.removeControl(nav); } catch {}
+        try { mapInstance.removeControl(attrib); } catch {}
+
+        mapInstance.addControl(nav, 'bottom-left');
+        mapInstance.addControl(attrib, 'bottom-right');
+      };
+
+      // initial placement + listen for breakpoint changes
+      placeNav(mql.matches);
+      requestAnimationFrame(updateNavOffset);
+      const onMqChange = (e) => {
+        placeNav(e.matches);
+        requestAnimationFrame(updateNavOffset);
+      };
+      if (mql.addEventListener) mql.addEventListener('change', onMqChange);
+      else mql.addListener(onMqChange); // Safari
+
+      let ro;
+      if ('ResizeObserver' in window && attrib?._container) {
+        ro = new ResizeObserver(() => updateNavOffset());
+        ro.observe(attrib._container);
+      }
+      // also recompute on viewport changes
+      window.addEventListener('resize', updateNavOffset);
+      window.addEventListener('orientationchange', updateNavOffset);
+
+      // keep refs for cleanup
+      mapInstance.__nav = nav;
+      mapInstance.__navMql = mql;
+      mapInstance.__navOnChange = onMqChange;
 
       mapInstance.resize();
+
+      // Adjust map interactions for mobile devices
+      if (mql.matches) {
+        mapInstance.scrollZoom.disable();      // prevent single-finger zoom
+        mapInstance.dragPan.disable();         // prevent single-finger pan
+        mapInstance.doubleClickZoom.disable();
+        mapInstance.boxZoom.disable();
+        mapInstance.keyboard.disable();
+
+        // keep two-finger zoom/pan
+        mapInstance.touchZoomRotate.enable();
+        mapInstance.touchZoomRotate.disableRotation(); // optional
+      }
+
+      if (mql?.removeEventListener) mql.removeEventListener('change', onMqChange);
+
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', updateNavOffset);
+      window.removeEventListener('orientationchange', updateNavOffset);
 
       setMap(mapInstance);
     };

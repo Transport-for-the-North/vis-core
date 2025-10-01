@@ -181,16 +181,16 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
       {showControls && (
         <SelectionModeContainer>
           <EnableSelectButton
-            enabled={isFeatureSelectActive}
+            $enabled={isFeatureSelectActive}
             onClick={toggleSelectEnabled}
             $bgColor={props.bgColor}
           >
             {isFeatureSelectActive ? 'Disable Selector' : 'Enable Selector'}
           </EnableSelectButton>
 
-          <StyledToggle enabled={isFeatureSelectActive}>
+          <StyledToggle $enabled={isFeatureSelectActive}>
             <ModeButton
-              selected={selectionMode === 'feature'}
+              $selected={selectionMode === 'feature'}
               onClick={() => handleSelectionModeChange('feature')}
               disabled={!isFeatureSelectActive}
               $bgColor={props.bgColor}
@@ -199,7 +199,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
               Pointer Select
             </ModeButton>
             <ModeButton
-              selected={selectionMode === 'rectangle'}
+              $selected={selectionMode === 'rectangle'}
               onClick={() => handleSelectionModeChange('rectangle')}
               disabled={!isFeatureSelectActive}
               $bgColor={props.bgColor}

@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
-import { darken } from "polished"
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { AccordionSection, TextSection } from "./Accordion";
+import { darken } from "polished";
+import { AccordionSection, TextSection, AccordionIcon } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
 import { Hovertip, InfoBox } from 'Components';
 import { DownloadSection } from "./Selectors/DownloadSelection";
 import { FilterProvider } from "contexts";
 import { getScrollbarWidth } from "utils";
+import { MobileBar, SideIcon } from "../MobileBar/MobileBar";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
@@ -34,13 +34,30 @@ const SidebarContainer = styled.div`
   overflow-y: scroll;
   overflow-x: hidden;
   text-align: left;
+  border-radius: 10px;
+  transition: left 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Desktop: fixed sidebar */
   position: fixed;
   left: ${({ $isVisible }) => ($isVisible ? '10px' : '-470px')};
   top: 85px;
   z-index: 1000;
-  border-radius: 10px;
-  transition: left 0.3s ease-in-out;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Mobile/tablet: static sidebar */
+  @media ${props => props.theme.mq.mobile} {
+    position: static;
+    left: auto;
+    top: auto;
+    max-width: 100%;
+    width: 100%;
+    max-haight: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+    z-index: 1001;
+    display: ${({ $isVisible }) => ($isVisible ? 'block' : 'none')};
+  }
 
   /* Custom Scrollbar Styles for non-Firefox browsers */
   ${({ $isFirefox }) => !$isFirefox && `
@@ -96,6 +113,10 @@ const ToggleButton = styled.button`
     left: 10px;
   `}
 
+  @media ${props => props.theme.mq.mobile} {
+    display: none; /* Hide on mobile */
+  }
+
   @media (max-width: 460px) {
     left: auto;
     right: 10px;
@@ -110,6 +131,7 @@ const ToggleButton = styled.button`
   /* Touch interaction improvements */
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation; /* Prevent zoom on touch */
+
 
   /* Conditional hover for non-touch devices */
   @media (hover: hover) and (pointer: fine) {
@@ -146,7 +168,9 @@ export const Sidebar = ({
   requestMethod,
   children
 }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const initialMobile = typeof window !== 'undefined' ? window.innerWidth <= 900 : false; //detect if the viewport is ≤ 900px on first render.
+  const [isVisible, setIsVisible] = useState(!initialMobile); //Defaults to open on desktop (!initialMobile) and closed on mobile.
+  const [isMobile, setIsMobile] = useState(initialMobile); //tracks whether we’re currently in a mobile width (used to hide tooltips, switch icons, etc.)
   const [isHovered, setIsHovered] = useState(false);
   const [scrollbarWidth, setScrollbarWidth] = useState(0);
   const [isFirefox, setIsFirefox] = useState(false);
@@ -161,6 +185,18 @@ export const Sidebar = ({
       const width = getScrollbarWidth('thin');
       setScrollbarWidth(width);
     }
+  }, []);
+
+  //Keeps isMobile in sync as the window changes size.
+  useEffect(() => {
+    const onResize = () => {
+      const mobile = window.innerWidth <= 900;
+      setIsMobile(mobile);
+      if (!mobile) setIsVisible(true);     // always visible on desktop
+    };
+    window.addEventListener('resize', onResize);
+    onResize();
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   useEffect(() => {
@@ -187,6 +223,11 @@ export const Sidebar = ({
 
   return (
     <>
+      {/* Mobile full-width toggle */}
+      <MobileBar $bgColor={bgColor} onClick={toggleSidebar}>
+        <span>Filters</span>
+        <AccordionIcon $isOpen={isVisible} />
+      </MobileBar>
       <SidebarContainer $isVisible={isVisible} $scrollbarWidth={scrollbarWidth} $isFirefox={isFirefox}>
         <SidebarHeader>
           {pageName || "Visualisation Framework"}
@@ -200,15 +241,21 @@ export const Sidebar = ({
           onMouseLeave={() => setIsHovered(false)}
           $bgColor={bgColor}
         >
-          {isVisible ? <ChevronLeftIcon style={{ width: '20px', height: '20px' }} /> : <ChevronRightIcon style={{ width: '20px', height: '20px' }} />}
+          {isMobile ? (
+            <AccordionIcon $isOpen={isVisible} />
+          ) : (
+            <SideIcon $isOpen={isVisible} />
+          )}
         </ToggleButton>
-        <Hovertip
-          isVisible={isHovered}
-          displayText={isVisible ? "Collapse Sidebar" : "Expand Sidebar"}
-          side="right"
-          refElement={toggleButtonRef}
-          alignVertical={true}
-        />
+        {!isMobile && (
+          <Hovertip
+            isVisible={isHovered}
+            displayText={isVisible ? "Collapse Sidebar" : "Expand Sidebar"}
+            side="right"
+            refElement={toggleButtonRef}
+            alignVertical={true}
+          />
+        )}
         <TextSection title="About this visualisation" text={aboutVisualisationText} />
         {additionalFeatures?.glossary && (
           <AccordionSection title="Glossary">

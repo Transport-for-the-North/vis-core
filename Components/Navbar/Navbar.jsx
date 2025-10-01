@@ -19,7 +19,7 @@ const StyledNavbar = styled.nav`
   width: 100%;
   box-sizing: border-box;
   height: 75px;
-  z-index: 1001;
+  z-index: 10005;
   border-bottom: 1px solid #e0e0e0;
   position: fixed;
   top: 0;

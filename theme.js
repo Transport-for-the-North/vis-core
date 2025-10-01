@@ -14,5 +14,18 @@ export const theme = {
   activeNavDropdownText: "#4b3e91", // Text colour for active dropdown items.
   boxShadow: "0px 3px 5px gray", // Shadow for the top navbar.  
   borderRadius: "5px", // A common border radius to apply.
-  logoutButtonWidth: "75%" // Width for the logout icon.
+  logoutButtonWidth: "75%", // Width for the logout icon.
+  // Breakpoints (single source of truth)
+  breakpoints: {
+    mobile: 900,
+    tablet: 1200,
+    desktop: 1440,
+  },
+
+  // Ready-to-use media query strings
+  mq: {
+    mobile: "(max-width: 900px)",
+    tablet: "(max-width: 1200px)",
+    desktopUp: "(min-width: 1201px)",
+  },
 };

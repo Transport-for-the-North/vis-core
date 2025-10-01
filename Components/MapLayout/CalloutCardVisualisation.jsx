@@ -22,6 +22,9 @@ const ParentContainer = styled.div`
   align-items: flex-start;
   width: ${({ $isVisible }) => ($isVisible ? `${CARD_WIDTH + PADDING * 2}px` : `${TOGGLE_BUTTON_WIDTH + PADDING}px`)};
   transition: width 0.3s ease-in-out;
+  @media ${props => props.theme.mq.mobile} {
+    width: 100%;
+  }
 `;
 
 /**
@@ -43,6 +46,11 @@ const CardContainer = styled.div`
   flex-shrink: 0;
   flex-grow: 0;
   height: ${({ $isVisible }) => ($isVisible ? 'auto' : `${PADDING * 2}px`)};
+  @media ${props => props.theme.mq.mobile} {
+    width: 100%;
+    box-shadow: none;
+    flex-shrink: 1;
+  }
 `;
 
 /**
@@ -55,6 +63,10 @@ const CardTitle = styled.h2`
   margin-top: 5px;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
+  @media ${props => props.theme.mq.mobile} {
+    font-size: 1.5em;
+    text-align: left;
+  }
 `;
 
 /**
@@ -67,6 +79,9 @@ const CardContent = styled.div`
     font-size: 1.5em;
     color: #4b3e91;
     margin-bottom: 0.5em;
+    @media ${props => props.theme.mq.mobile} {
+      font-size: 1.2em;
+    }
   }
 
   p {
@@ -180,7 +195,7 @@ const ToggleButton = styled.button`
  * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate }) => {
+export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate, hideHandleOnMobile = false, onVisibilityChange, }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
   const customFormattingFunctions = visualisation.customFormattingFunctions || {};
@@ -200,10 +215,21 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
     hasDataShouldRender = false;
   }
 
+  const actuallyVisible = !isLoading && hasDataShouldRender;
+
+  useEffect(() => {
+    if (onVisibilityChange) onVisibilityChange(actuallyVisible);
+    return () => { 
+      if (onVisibilityChange) onVisibilityChange(false); 
+    };
+  }, [actuallyVisible, onVisibilityChange]);
+
+
   // State to hold the rendered HTML content
   const [renderedContent, setRenderedContent] = useState('');
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const showHandle = !hideHandleOnMobile;
   const contentRef = useRef(null); // NEW
 
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
@@ -224,6 +250,10 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
     }
   }, [data, visualisation.htmlFragment]);
 
+  useEffect(() => {
+   if (hideHandleOnMobile) setIsVisible(true);
+  }, [hideHandleOnMobile]);
+
   /**
    * Toggles the visibility of the card.
    */
@@ -243,34 +273,42 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
             <h3>Loading...</h3>
           </CardContent>
         </CardContainer>
-        <ToggleButton
-          ref={buttonRef}
-          $isVisible={isVisible}
-          onClick={toggleVisibility}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {isVisible ? (
-            <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
-          ) : (
-            <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
-          )}
-        </ToggleButton>
-        <Hovertip
-          isVisible={isHovered}
-          displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
-          side="left"
-          refElement={buttonRef}
-          offset={5}
-        />
+        {showHandle && (
+          <>
+            <ToggleButton
+              ref={buttonRef}
+              $isVisible={isVisible}
+              onClick={toggleVisibility}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {isVisible ? (
+                <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+              ) : (
+                <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
+              )}
+            </ToggleButton>
+            <Hovertip
+              isVisible={isHovered}
+              displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
+              side="left"
+              refElement={buttonRef}
+              offset={5}
+            />
+          </>
+        )}
         </ParentContainer>
       </>
     );
   }
 
   // If there is no data to display, don't render the card
-  if (!data || Object.keys(data).length === 0) {
-    return null; // Don't render the card if there's no data
+  // if (!data || Object.keys(data).length === 0) {
+  //   return null; // Don't render the card if there's no data
+  // }
+
+  if (!hasDataShouldRender) {
+    return null;
   }
 
   // Render the card with dynamic content
@@ -288,26 +326,30 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
             </CardContent>
           )}
         </CardContainer>
-        <ToggleButton
-          ref={buttonRef}
-          $isVisible={isVisible}
-          onClick={toggleVisibility}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {isVisible ? (
-            <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
-          ) : (
-            <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
-          )}
-        </ToggleButton>
-        <Hovertip
-          isVisible={isHovered}
-          displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
-          side="left"
-          refElement={buttonRef}
-          offset={5}
-        />
+      {showHandle && (
+        <>
+            <ToggleButton
+              ref={buttonRef}
+              $isVisible={isVisible}
+              onClick={toggleVisibility}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {isVisible ? (
+                <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+              ) : (
+                <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
+              )}
+            </ToggleButton>
+            <Hovertip
+              isVisible={isHovered}
+              displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
+              side="left"
+              refElement={buttonRef}
+              offset={5}
+                />
+        </>
+      )}
       </ParentContainer>
     </>
   );

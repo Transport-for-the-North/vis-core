@@ -92,6 +92,21 @@ export const useDualMaps = (
       );
       rightMapInstance.resize();
 
+      const isMobile = window.matchMedia('(max-width: 900px)').matches;
+      if (isMobile) {
+        [leftMapInstance, rightMapInstance].forEach(map => {
+          map.scrollZoom.disable();      // prevent single-finger zoom
+          map.dragPan.disable();         // prevent single-finger pan
+          map.doubleClickZoom.disable();
+          map.boxZoom.disable();
+          map.keyboard.disable();
+
+          // keep two-finger zoom/pan (nice mobile UX)
+          map.touchZoomRotate.enable();
+          map.touchZoomRotate.disableRotation(); // optional
+        });
+      }
+
       // Synchronize the two maps
       syncMaps(leftMapInstance, rightMapInstance);
 

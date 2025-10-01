@@ -19,7 +19,7 @@ const LateralNavbarContainerStyled = styled.div`
   background: ${({ theme }) => theme.navbarBg || "#f8f9fa"};
   border-right: 1px solid #e0e0e0;
   transition: left 0.3s ease;
-  z-index: 1001;
+  z-index: 1005;
   overflow-y: auto;
 `;
 
