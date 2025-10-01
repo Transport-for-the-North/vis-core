@@ -90,14 +90,18 @@ export const MapVisualisation = ({
     if (visualisation?.dynamicStyling && visualisation.style && !visualisation.style.includes('-')) {
       if (visualisationData && visualisationData.length > 0) {
         setIsResolvingStyle(true);
+        dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_LOADING }); // Show dynamic styling indicator
         try {
           // Use the already fetched data to determine dynamic style
           const newResolvedStyle = determineDynamicStyle(visualisationData, visualisation.style);
           setResolvedStyle(newResolvedStyle);
+          console.log(`Dynamic styling resolved from existing data: ${visualisation.style} -> ${newResolvedStyle}`);
         } catch (error) {
+          console.warn('Failed to resolve dynamic style from data:', error);
           setResolvedStyle(`${visualisation.style}-continuous`); // Fallback to continuous
         } finally {
           setIsResolvingStyle(false);
+          dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_FINISHED }); // Hide dynamic styling indicator
         }
       } else {
         // While waiting for data, use a temporary style to prevent errors
@@ -108,7 +112,7 @@ export const MapVisualisation = ({
       setResolvedStyle(visualisation?.style);
       setIsResolvingStyle(false);
     }
-  }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData]);
+  }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, dispatch]);
 
   // Handle loading state
   useEffect(() => {
