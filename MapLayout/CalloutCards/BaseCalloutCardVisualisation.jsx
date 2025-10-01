@@ -99,7 +99,7 @@ export const BaseCalloutCardVisualisation = ({
             ],
           ],
         },
-        image: "https://fail",
+        // Without image
         label: "Optimistic Future",
         text_with_placeholders:
           "In the optimistic future, the student travels <strong>{distance}</strong> kilometres in just <strong>{duration}</strong> minutes.",
