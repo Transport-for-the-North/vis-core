@@ -1,5 +1,5 @@
 import colorbrewer from "colorbrewer";
-import { useCallback, useEffect, useRef, useContext, useMemo } from "react";
+import { useCallback, useEffect, useRef, useContext, useMemo, useState } from "react";
 import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
@@ -10,7 +10,8 @@ import {
   reclassifyGeoJSONData,
   resetPaintProperty,
   hasAnyGeometryNotNull,
-  getMetricDefinition
+  getMetricDefinition,
+  determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
@@ -51,7 +52,14 @@ export const MapVisualisation = ({
       ? state.leftVisualisations[visualisationName]
       : state.rightVisualisations[visualisationName];
 
-  const colorStyle = visualisation?.style?.split("-")[1];
+    // State for tracking resolved dynamic styles
+  const [resolvedStyle, setResolvedStyle] = useState(visualisation?.style);
+  const [isResolvingStyle, setIsResolvingStyle] = useState(false);
+
+  // Use resolved style for color determination - memoized to react to resolvedStyle changes
+  const colorStyle = useMemo(() => {
+    return resolvedStyle?.split("-")[1] || 'continuous'; // Default fallback
+  }, [resolvedStyle]);
 
   // Determine the layer key based on the visualisation type
   const layerKey =
@@ -78,6 +86,35 @@ export const MapVisualisation = ({
     error,
     dataWasReturnedButFiltered
   } = useFetchVisualisationData(visualisation, map, layerKey, shouldFilterDataToViewport);
+
+  // Effect to resolve dynamic styling when visualisation data is available
+  useEffect(() => {
+    if (visualisation?.dynamicStyling && visualisation.style && !visualisation.style.includes('-')) {
+      if (visualisationData && visualisationData.length > 0) {
+        setIsResolvingStyle(true);
+        dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_LOADING }); // Show dynamic styling indicator
+        try {
+          // Use the already fetched data to determine dynamic style
+          const newResolvedStyle = determineDynamicStyle(visualisationData, visualisation.style);
+          setResolvedStyle(newResolvedStyle);
+          console.log(`Dynamic styling resolved from existing data: ${visualisation.style} -> ${newResolvedStyle}`);
+        } catch (error) {
+          console.warn('Failed to resolve dynamic style from data:', error);
+          setResolvedStyle(`${visualisation.style}-continuous`); // Fallback to continuous
+        } finally {
+          setIsResolvingStyle(false);
+          dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_FINISHED }); // Hide dynamic styling indicator
+        }
+      } else {
+        // While waiting for data, use a temporary style to prevent errors
+        setResolvedStyle(`${visualisation.style}-continuous`);
+        setIsResolvingStyle(true);
+      }
+    } else if (!visualisation?.dynamicStyling) {
+      setResolvedStyle(visualisation?.style);
+      setIsResolvingStyle(false);
+    }
+  }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, dispatch]);
 
   // Handle loading state
   useEffect(() => {
@@ -185,11 +222,11 @@ export const MapVisualisation = ({
       );
 
       // Determine the current color scheme
-      const currentColor = colorSchemes[colorStyle].some(
+      const currentColor = (colorSchemes[colorStyle] && colorSchemes[colorStyle].some(
         (e) => e === layerColorScheme.value
-      )
+      ))
         ? layerColorScheme.value
-        : defaultMapColourMapper[colorStyle].value;
+        : defaultMapColourMapper[colorStyle]?.value || defaultMapColourMapper['continuous'].value;
 
       // Calculate the color palette based on the classification
       const invertColorScheme =
@@ -215,7 +252,7 @@ export const MapVisualisation = ({
       )?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
-        visualisation.style,
+        resolvedStyle,
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65,
         widthValue ? parseFloat(widthValue) : 7.5
@@ -233,7 +270,7 @@ export const MapVisualisation = ({
     },
     [
       JSON.stringify(state.layers),
-      visualisation.style,
+      resolvedStyle,
       appContext,
       visualisation.queryParams,
       layerColorScheme,
@@ -319,7 +356,7 @@ export const MapVisualisation = ({
       colorHasChanged ||
       classificationHasChanged;
 
-    if (!needUpdate) return;
+    if (!needUpdate || !resolvedStyle || isResolvingStyle || !colorStyle) return;
 
     // Update the refs to the current data
     prevCombinedDataRef.current = combinedData;
@@ -339,13 +376,13 @@ export const MapVisualisation = ({
             Array.isArray(dataToVisualize) &&
             dataToVisualize.length === 0
           ) {
-            resetMapStyle(visualisation.style);
+            resetMapStyle(resolvedStyle);
           } else {
             reclassifyAndStyleMap(
               map,
               dataToClassify,
               dataToVisualize,
-              visualisation.style,
+              resolvedStyle,
               classificationMethod,
               layerName
             );
@@ -357,10 +394,10 @@ export const MapVisualisation = ({
           if (parsedDataToVisualize) {
             reclassifyAndStyleGeoJSONMap(
               JSON.parse(parsedDataToVisualize),
-              visualisation.style
+              resolvedStyle
             );
           } else {
-            resetMapStyle(visualisation.style);
+            resetMapStyle(resolvedStyle);
           }
           break;
         }
@@ -391,7 +428,8 @@ export const MapVisualisation = ({
     layerColorScheme,
     classificationMethod,
     resetMapStyle,
-    visualisation.style,
+    resolvedStyle,
+    isResolvingStyle,
     visualisation.type,
     visualisationName,
     // reclassifyAndStyleMap,

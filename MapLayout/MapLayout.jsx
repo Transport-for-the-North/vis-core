@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Dimmer, MapLayerSection, Sidebar } from "Components";
+import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
@@ -60,6 +60,7 @@ export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const isLoading = state.isLoading;
+  const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
@@ -168,6 +169,7 @@ export const MapLayout = () => {
   return (
     <LayoutContainer>
       <Dimmer dimmed={isLoading} showLoader={true} />
+      <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
