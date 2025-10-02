@@ -33,6 +33,7 @@ export const timingLinks = {
             labelNulls: true,
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
+            defaultOpacity: 0.95, // Custom default opacity for this layer
         },
     ],
     visualisations: [
