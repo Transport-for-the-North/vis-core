@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState, useEffect } from "react";
+import React, { memo, useContext, useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import {
   EyeIcon,
@@ -219,7 +219,10 @@ export const LayerControlEntry = memo(
         ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
         : state.visualisations[Object.keys(state.visualisations)[0]];
 
-    const colorStyle = visualisation?.style?.split("-")[1] || "continuous";
+    const colorStyle = useMemo(() => {
+      // Use the resolved colorStyle from layer metadata if available, otherwise derive from visualization style
+      return layer.metadata?.colorStyle || visualisation?.style?.split("-")[1] || "continuous";
+    }, [layer.metadata?.colorStyle, visualisation?.style]);
 
     const hasDefaultBands = selectedPageBands?.metric.find(
       (metric) =>

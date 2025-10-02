@@ -302,6 +302,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
+      window.clarity('set', 'download_data_clicked', true);
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");
@@ -408,7 +409,6 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
             onClick={handleDownload} 
             $bgColor={bgColor}
             disabled={isRequestTooLarge || isDownloading}
-            name='download-data-button'
           >
             {isDownloading ? (
               <>Downloading <Spinner /></>

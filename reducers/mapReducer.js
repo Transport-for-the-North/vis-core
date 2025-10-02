@@ -38,6 +38,8 @@ export const actionTypes = {
   JOIN_DATA: "JOIN_DATA",
   SET_IS_LOADING: "SET_IS_LOADING",
   SET_LOADING_FINISHED: "SET_LOADING_FINISHED",
+  SET_DYNAMIC_STYLING_LOADING: "SET_DYNAMIC_STYLING_LOADING",
+  SET_DYNAMIC_STYLING_FINISHED: "SET_DYNAMIC_STYLING_FINISHED",
   UPDATE_LEGEND_TEXT: "UPDATE_LEGEND_TEXT",
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
   UPDATE_METADATA_FILTER: "UPDATE_METADATA_FILTER",
@@ -421,6 +423,12 @@ export const mapReducer = (state, action) => {
     }
     case actionTypes.SET_LOADING_FINISHED: {
       return { ...state, isLoading: false };
+    }
+    case actionTypes.SET_DYNAMIC_STYLING_LOADING: {
+      return { ...state, isDynamicStylingLoading: true };
+    }
+    case actionTypes.SET_DYNAMIC_STYLING_FINISHED: {
+      return { ...state, isDynamicStylingLoading: false };
     }
     case actionTypes.UPDATE_LEGEND_TEXT: {
       const visualisationNames = action.payload.filter.visualisations;

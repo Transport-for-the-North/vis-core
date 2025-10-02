@@ -31,8 +31,7 @@ export const appConfig = {
             </p>
             <ul>
                 <li><b>Performance Dashboard:</b> This visualisation shows key performance indicators for Northern and Transpennine Express services.</li>
-                <li><b>Station Information - Values:</b> Car park spaces and cycle spaces at each station in the NorTMS model.</li>
-                <li><b>Station Information - Boolean:</b> True/False information, such as if the station contains help points, ticket machines, availability to buy tickets at the station, seated areas etc..</li>
+                <li><b>Station Information:</b> Various station information such as True/False statistics, such as if the station contains help points, ticket machines etc. Also contains numerical data such as car park spaces and cycle spaces at each station in the NorTMS model.</li>
                 <li><b>Station Loadings:</b> This visualisation shows the boarding and alighting summaries at each station in the NorTMS model.</li>
                 <li><b>Station Socio-Economic Classifications (NS-SeC):</b> This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
                 <li><b>Station Economic Activity Status:</b> This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
@@ -154,7 +153,6 @@ export const appConfig = {
     logoutImage: "img/logout.png",
     appPages: [
         pages.stationInformation,
-        pages.stationInformationBool,
         pages.nodeLoadings,
         pages.nodeNSSeC,
         pages.nodeSocio,

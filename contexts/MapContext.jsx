@@ -64,6 +64,7 @@ export const MapProvider = ({ children }) => {
     map: null,
     isMapReady: false,
     isLoading: true,
+    isDynamicStylingLoading: false,
     pageIsReady: false,
     selectionMode: null,
     selectionLayer: null,
