@@ -53,6 +53,8 @@ const Map = (props) => {
 
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
 
+  const lastTouchTimeRef = useRef(0);
+
   // Single feature picker for map clicks
   const pickFeatureAtPoint = useCallback(
     (point) => {
@@ -811,8 +813,7 @@ const Map = (props) => {
     [isMapReady, map, memoizedFilters, dispatch, filterDispatch]
   );
 
-  // **Create map hover handler**
-  // **Create map hover/tap handler (single source of truth)**
+  // **Create map hover/tap handler **
   useEffect(() => {
     if (!map) return;
 
@@ -858,38 +859,45 @@ const Map = (props) => {
 
     // ----- MOBILE/TABLET: tap behavior -----
     const onTap = (e) => {
-      const filterLayers = memoizedFilters.filter(f => f.type === 'map').map(f => f.layer).filter(id => map.getLayer(id));
-      // Layers that own click behaviour
-      const calloutLayers = Object.keys(state.layers).filter(id => state.layers[id].shouldHaveTooltipOnClick && map.getLayer(id));
+      const now = Date.now();
+      const isTouch =
+        e.type === 'touchend' ||
+        (e.originalEvent && ('changedTouches' in e.originalEvent || 'touches' in e.originalEvent));
 
-      const clickableLayers = Array.from(new Set([...calloutLayers, ...filterLayers]));
-
-      let picked = null;
-
-      if (filterLayers.length) {
-        const hits = map.queryRenderedFeatures(e.point, { layers: filterLayers });
-        if (hits && hits.length) picked = hits[0];
+      // Prevent handling mouse event if a touch event was recently processed
+      if (!isTouch && now - lastTouchTimeRef.current < 350) {
+        return; 
       }
-      if (!picked && clickableLayers.length) {
-        const hits = map.queryRenderedFeatures(e.point, { layers: clickableLayers });
-        if (hits && hits.length) picked = hits[0];
+      if (isTouch) {
+        lastTouchTimeRef.current = now;
       }
 
-      //If we hit something, update Callout + show popup for that same feature
+      // Pick the exact feature at the tap point 
+      let point = e.point;
+      if (!point && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]) {
+        const t = e.originalEvent.changedTouches[0];
+        const rect = map.getCanvas().getBoundingClientRect();
+        point = { x: t.clientX - rect.left, y: t.clientY - rect.top };
+      }
+      const picked = point ? pickFeatureAtPoint(point) : null;
+
       if (picked) {
-        handleMapClick(e);
-        setTimeout(() => handleMapHover(e, [picked]), 0);
+        if (isTouch) {
+          const evtForClick = { ...e, point }; // ensure .point exists for handleMapClick
+          handleMapClick(evtForClick);
+        }
+        setTimeout(() => handleMapHover({ ...e, point }, [picked]), 0);
         return;
       }
-        // clear on empty tap
-        if (hoverInfoRef.current.popup) {
-          hoverInfoRef.current.popup.remove();
-          hoverInfoRef.current.popup = null;
-        }
-        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
-          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
-        });
-        prevHoveredFeaturesRef.current = [];
+      // clear on empty tap
+      if (hoverInfoRef.current.popup) {
+        hoverInfoRef.current.popup.remove();
+        hoverInfoRef.current.popup = null;
+      }
+      prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+        map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+      });
+      prevHoveredFeaturesRef.current = [];
     };
 
     map.on('click', onTap);
@@ -906,28 +914,21 @@ const Map = (props) => {
   useEffect(() => {
     if (!map) return;
 
-    const isTouchDeviceForTooltipFallback =
-      ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-
-    if (!isTouchDeviceForTooltipFallback) return;
+    const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    const hasHover = window.matchMedia('(hover: hover)').matches;
+    if (!(isTouch && hasHover)) return; // run only on hover-capable touch devices
 
     const onTouchEndShowTooltip = (te) => {
       const t = te.changedTouches && te.changedTouches[0];
       if (!t) return;
-
       const rect = map.getCanvas().getBoundingClientRect();
       const point = { x: t.clientX - rect.left, y: t.clientY - rect.top };
       const lngLat = map.unproject(point);
-
-      // reuse your existing hover logic to build/show the popup
       handleMapHover({ point, lngLat });
     };
 
     map.getCanvas().addEventListener('touchend', onTouchEndShowTooltip, { passive: true });
-
-    return () => {
-      map.getCanvas().removeEventListener('touchend', onTouchEndShowTooltip);
-    };
+    return () => map.getCanvas().removeEventListener('touchend', onTouchEndShowTooltip);
   }, [map, handleMapHover]);
 
   // Run once to set the state of the map
