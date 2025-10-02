@@ -56,8 +56,10 @@ export const MapVisualisation = ({
   const [resolvedStyle, setResolvedStyle] = useState(visualisation?.style);
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
 
-  // Use resolved style for color determination
-  const colorStyle = resolvedStyle?.split("-")[1] || 'continuous'; // Default fallback
+  // Use resolved style for color determination - memoized to react to resolvedStyle changes
+  const colorStyle = useMemo(() => {
+    return resolvedStyle?.split("-")[1] || 'continuous'; // Default fallback
+  }, [resolvedStyle]);
 
   // Determine the layer key based on the visualisation type
   const layerKey =

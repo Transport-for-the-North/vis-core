@@ -100,6 +100,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
+      window.clarity('set', 'download_data_clicked', true);
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");
@@ -230,7 +231,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               onClick={handleDownload} 
               $bgColor={bgColor}
               disabled={isRequestTooLarge || isDownloading}
-              data-clarity-label="download-data-button"
             >
               {isDownloading ? (
                 <>Downloading <Spinner /></>
