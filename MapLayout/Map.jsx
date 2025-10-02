@@ -253,8 +253,47 @@ const Map = (props) => {
         return;
       }
 
-      // Collect current hovered features
-      const currentHoveredFeatures = features.map((feature) => ({
+      // Check if any layer has shouldHaveHoverOnlyOnData enabled to determine if filtering is needed
+      const needsFiltering = features.some((feature) => {
+        const layerId = feature.layer.id;
+        const layerConfig = state.layers[layerId];
+        return layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+      });
+
+      // Only filter if necessary, otherwise use original features for performance
+      let filteredFeatures = features;
+      if (needsFiltering) {
+        filteredFeatures = features.filter((feature) => {
+          const layerId = feature.layer.id;
+          const layerConfig = state.layers[layerId];
+          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+          const featureValue = feature.state.value;
+          
+          // If shouldHaveHoverOnlyOnData is enabled, only include features with data
+          if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
+            return false; // Exclude this feature as it has no data
+          }
+          
+          return true; // Include this feature
+        });
+
+        // If after filtering we have no features, cleanup and return
+        if (filteredFeatures.length === 0) {
+          if (hoverInfoRef.current.popup) {
+            hoverInfoRef.current.popup.remove();
+            hoverInfoRef.current.popup = null;
+          }
+          // Clear hover state for previously hovered features
+          prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+            map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+          });
+          prevHoveredFeaturesRef.current = [];
+          return;
+        }
+      }
+
+      // Collect current hovered features (using filtered features)
+      const currentHoveredFeatures = filteredFeatures.map((feature) => ({
         layerId: feature.layer.id,
         featureId: feature.id,
         source: feature.layer.source,
@@ -353,12 +392,13 @@ const Map = (props) => {
       let descriptions = [];
       const apiRequests = [];
 
-      features.forEach((feature) => {
+      filteredFeatures.forEach((feature) => {
         const layerId = feature.layer.id;
         const layerConfig = state.layers[layerId];
         const customTooltip = layerConfig?.customTooltip;
         const hoverNulls = layerConfig.hoverNulls ?? true;
         const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
+        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
         const featureValue = feature.state.value;
         if (
@@ -366,6 +406,14 @@ const Map = (props) => {
           (featureValue === null || featureValue === undefined)
         ) {
           return; // Skip this feature
+        }
+
+        // If shouldHaveHoverOnlyOnData is enabled, only show hover for features with data
+        if (
+          shouldHaveHoverOnlyOnData &&
+          (featureValue === null || featureValue === undefined)
+        ) {
+          return; // Skip this feature as it has no data
         }
 
         const featureName = feature.properties.name || "";
