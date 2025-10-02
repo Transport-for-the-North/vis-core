@@ -1,5 +1,5 @@
 import { nodeCustomPaint } from "./customPaintDefinitions"
-import { termsOfUse } from "./TermsOfUse"
+import { termsOfUse } from "./termsOfUse"
 
 const networkScenarioValues = {
   source: "local",
