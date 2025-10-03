@@ -179,43 +179,33 @@ const DualMaps = (props) => {
           return;
         }
 
-        // Check if any layer has shouldHaveHoverOnlyOnData enabled to determine if filtering is needed
-        const needsFiltering = features.some((feature) => {
+        // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
+        const filteredFeatures = features.filter((feature) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
-          return layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+          const featureValue = feature.state.value;
+          
+          // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
+          if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
+            return false; // Exclude this feature as it has no data
+          }
+          
+          return true; // Include this feature
         });
 
-        // Only filter if necessary, otherwise use original features for performance
-        let filteredFeatures = features;
-        if (needsFiltering) {
-          filteredFeatures = features.filter((feature) => {
-            const layerId = feature.layer.id;
-            const layerConfig = state.layers[layerId];
-            const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
-            const featureValue = feature.state.value;
-            
-            // If shouldHaveHoverOnlyOnData is enabled, only include features with data
-            if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
-              return false; // Exclude this feature as it has no data
-            }
-            
-            return true; // Include this feature
-          });
-
-          // If after filtering we have no features, cleanup and return
-          if (filteredFeatures.length === 0) {
-            if (hoverInfoRef.current[side]?.popup) {
-              hoverInfoRef.current[side].popup.remove();
-              hoverInfoRef.current[side].popup = null;
-            }
-            // Clear hover state for previously hovered features
-            prevHoveredFeaturesRef.current[side].forEach(({ source, sourceLayer, featureId }) => {
-              map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
-            });
-            prevHoveredFeaturesRef.current[side] = [];
-            return;
+        // If after filtering we have no features, cleanup and return
+        if (filteredFeatures.length === 0) {
+          if (hoverInfoRef.current[side]?.popup) {
+            hoverInfoRef.current[side].popup.remove();
+            hoverInfoRef.current[side].popup = null;
           }
+          // Clear hover state for previously hovered features
+          prevHoveredFeaturesRef.current[side].forEach(({ source, sourceLayer, featureId }) => {
+            map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+          });
+          prevHoveredFeaturesRef.current[side] = [];
+          return;
         }
 
         // Collect current hovered features for this map side (using filtered features)
