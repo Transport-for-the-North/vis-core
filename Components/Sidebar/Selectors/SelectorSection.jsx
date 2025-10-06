@@ -100,7 +100,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
-      window.clarity('set', 'download_data_clicked', true);
+      // window.clarity('set', 'download_data_clicked', true);
+      window.clarity('event', 'download_data_clicked');
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");
