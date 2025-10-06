@@ -302,7 +302,11 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
-      window.clarity('set', 'download_data_clicked', true);
+      
+      // Try both set and event methods
+      // window.clarity('set', 'download_data_clicked', 'true');
+      window.clarity('event', 'download_data_clicked');
+      console.log('Clarity events sent');
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");
