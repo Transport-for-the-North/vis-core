@@ -323,14 +323,6 @@ const DualMaps = (props) => {
             return; // Skip this feature
           }
 
-          // If shouldHaveHoverOnlyOnData is enabled, only show hover for features with data
-          if (
-            shouldHaveHoverOnlyOnData &&
-            (featureValue === null || featureValue === undefined)
-          ) {
-            return; // Skip this feature as it has no data
-          }
-
           const featureName = feature.properties.name || "";
           const featureValueDisplay =
             featureValue !== undefined && featureValue !== null
