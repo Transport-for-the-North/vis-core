@@ -27,14 +27,15 @@ export const baseAppConfig = {
   methodology: "",
   legalText:
     '<p>For our terms of use, please see the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" target="_blank">Open Government Licence</a>. Use of the STB EVCI Framework Tool also indicates your acceptance of this <a href="https://www.transportforthenorth.com/wp-content/uploads/Final-version-Disclaimer-and-Appropriate-Use-EVCI-13082024-1.pdf" target="_blank">Disclaimer and Appropriate Use Statement</a>.</p>',
-  homePageFragments: {
-    stbContact: {
+  homePageFragments: [
+    {
+  // stbContact: {
       sectionTitle: 'Partners',
       content: '',
       alignment: 'center',
       backgroundColor: 'white',
     },
-  },
+  ],
   mapStyle: mapStyles.geoapifyPositron,
   logoImage: null,
   logoPosition: 'right',
@@ -54,7 +55,8 @@ export const baseAppConfig = {
 export function generateAppConfig(stbConfig, baseAppConfig) {
   const appConfig = { ...baseAppConfig };
 
-  appConfig.homePageFragments.stbContact.content = `
+  //appConfig.homePageFragments.stbContact.content = `
+  appConfig.homePageFragments[0].content = `
     <div class="contactsList">
       ${generateContactHTML(stbConfig)}
     </div>
