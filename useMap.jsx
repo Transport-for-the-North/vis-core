@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { defaultMapStyle } from "defaults";
 import { defaultMapCentre } from "defaults";
@@ -19,14 +19,41 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
   const [isMapStyleLoaded, setIsMapStyleLoaded] = useState(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const isMapReady = isMapLoaded && isMapStyleLoaded;
+  const belowBarRef = useRef(null);
 
   useEffect(() => {
     /**
      * Initializes the MapLibre map instance.
      */
     const initializeMap = () => {
+      const mql = window.matchMedia('(max-width: 900px)');
+      const isMobile = mql.matches;
+
+      const container = mapContainerRef.current;
+      if (!container) return;
+
+      let stack = container.parentElement;
+
+      if (isMobile) {
+        if (!stack || !stack.classList.contains('map-stack')) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'map-stack';
+          const parent = container.parentElement;
+          parent.insertBefore(wrapper, container); 
+          wrapper.appendChild(container);            
+          stack = wrapper;
+        }
+
+        // map needs an explicit height on mobile
+        if (!container.style.height) {
+          container.style.height = '56vh';
+          container.style.minHeight = '320px';
+        }
+        container.style.width = '100%';
+      }
+
       const mapInstance = new maplibregl.Map({
-        container: mapContainerRef.current,
+        container,
         style: mapStyle || defaultMapStyle,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
@@ -57,36 +84,56 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
 
       const nav = new maplibregl.NavigationControl({ showZoom: true, showCompass: true });
       const attrib = new maplibregl.AttributionControl({
-        compact: true,
+        compact: false,
         customAttribution: `Contains OS data © Crown copyright and database right ${new Date().getFullYear()}${extraCopyrightText ? ` | ${extraCopyrightText}` : ''}`
       });
-      const mql = window.matchMedia('(max-width: 900px)');
-      const updateNavOffset = () => {
-        const attrEl = attrib?._container;
-        const navEl  = nav?._container;
-        if (!attrEl || !navEl) return;
 
-        const h = Math.ceil(attrEl.getBoundingClientRect().height); // current pill height
-        // pushed nav up by pill height + small gap + safe-area
-        navEl.style.marginBottom = `calc(${h + 20}px + env(safe-area-inset-bottom))`;
-        // small horizontal breathing room
+      mapInstance.addControl(nav, 'bottom-left');
+      mapInstance.addControl(attrib, 'bottom-right');
+      attrib._container.classList.add('app-attrib');
+
+      let belowBar = belowBarRef.current;
+      if (isMobile) {
+        if (!belowBar || !belowBar.isConnected) {
+          const existing = stack?.querySelector?.('.map-attrib-bar-mobile');
+          belowBar = existing || document.createElement('div');
+          if (!existing) {
+            belowBar.className = 'map-attrib-bar-mobile';
+            (stack || container.parentElement).appendChild(belowBar); // immediately under the map
+          }
+          belowBarRef.current = belowBar;
+        }
+
+        const syncAttrib = () => {
+          const inner = attrib?._container?.querySelector('.maplibregl-ctrl-attrib-inner');
+          belowBar.innerHTML = inner?.innerHTML || '';
+        };
+        ['load', 'styledata', 'sourcedata'].forEach(ev => mapInstance.on(ev, syncAttrib));
+        syncAttrib();
+
+        // after moving/creating wrapper, ensure MapLibre recalculates size
+        requestAnimationFrame(() => mapInstance.resize());
+      }
+
+      const updateNavOffset = () => {
+        const navEl = nav?._container;
+        if (!navEl) return;
+
+        if (mql.matches) {
+          // attribution overlay is hidden on mobile, so just a small gap
+          navEl.style.marginBottom = 'calc(8px + env(safe-area-inset-bottom))';
+        } else {
+          const pill = attrib?._container;
+          const h = pill ? Math.ceil(pill.getBoundingClientRect().height) : 0;
+          navEl.style.marginBottom = `calc(${h + 20}px + env(safe-area-inset-bottom))`;
+        }
         navEl.style.marginRight = '6px';
         navEl.style.marginLeft  = '6px';
       };
 
-      const placeNav = (isMobile) => {
-        try { mapInstance.removeControl(nav); } catch {}
-        try { mapInstance.removeControl(attrib); } catch {}
-
-        mapInstance.addControl(nav, 'bottom-left');
-        mapInstance.addControl(attrib, 'bottom-right');
-      };
-
       // initial placement + listen for breakpoint changes
-      placeNav(mql.matches);
       requestAnimationFrame(updateNavOffset);
       const onMqChange = (e) => {
-        placeNav(e.matches);
         requestAnimationFrame(updateNavOffset);
       };
       if (mql.addEventListener) mql.addEventListener('change', onMqChange);
