@@ -352,6 +352,14 @@ export const interpretWidthExpression = (expression) => {
   return null;
 };
 
+const isRenderableEntry = (e) => {
+  if (!e) return false;
+  const hasLabel = e.label != null && String(e.label).trim() !== '';
+  const hasKnownSwatch = ['circle', 'line', 'fill'].includes(e.type);
+  const hasSize = e.type === 'fill' ? true : Number(e.width) > 0;
+  return hasLabel || (hasKnownSwatch && hasSize);
+};
+
 /**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
@@ -576,18 +584,26 @@ export const DynamicLegend = ({ map }) => {
               legendEntries[0].label = title;
             }
           }
+
+          const filteredEntries = (legendEntries || []).filter(isRenderableEntry);
+
+          // If nothing would render, skip this group entirely
+          if (filteredEntries.length === 0) {
+            return null;
+          }
           
           return {
             layerId: layer.id,
             title: displayValue,
             subtitle: legendSubtitleText,
-            legendEntries,
+            legendEntries: filteredEntries,
             trseLabel,
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
           };
-        });
+        })
+        .filter(Boolean);
       setLegendItems(items);
     };
   
@@ -649,7 +665,7 @@ export const DynamicLegend = ({ map }) => {
             ) : (
               <>
                 <LegendTitle>{item.title}</LegendTitle>
-                <LegendSubtitle>{item.subtitle}</LegendSubtitle>
+                {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
                 {item.legendEntries.map((entry, idx) => (
                   <LegendItem key={idx}>
                     {entry.type === "circle" ? (
