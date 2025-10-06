@@ -144,6 +144,7 @@ export const england = {
       selectors.ptFeatureType,
     ],
     additionalFeatures: {
+      mobileWarning: "Please open the filter for more information on how to use this map.",
       glossary: { 
         dataDictionary: glossaryData
       },

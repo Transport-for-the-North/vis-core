@@ -169,6 +169,7 @@ export const england = {
       selectors.variable,
     ],
     additionalFeatures: {
+      mobileWarning: "Please open the filter for more information on how to use this map.",
       glossary: {
         dataDictionary: glossaryData,
       },

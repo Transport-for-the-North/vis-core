@@ -64,8 +64,9 @@ const CardTitle = styled.h2`
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
   @media ${props => props.theme.mq.mobile} {
-    font-size: 1.5em;
+    font-size: 1.2em;
     text-align: left;
+    margin: 0;
   }
 `;
 
@@ -127,15 +128,15 @@ const CardContent = styled.div`
     font-weight: bold;
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     .card {
       flex: 1 0 45%;
     }
-  }
-
-  @media (max-width: 500px) {
-    .card {
-      flex: 1 0 90%;
+    .card .value {
+      font-size: 1.5em;
+    }
+    .card .label {
+      font-size: 0.8em;
     }
   }
 
