@@ -11,6 +11,11 @@ import {
   getSourceLayer,
   numberWithCommas,
   replacePlaceholders,
+  buildDefaultTooltip,
+  buildLoadingTooltip,
+  buildErrorTooltip,
+  insertCustomIntoDefault,
+  resolveTooltipRequestUrl,
 } from "utils";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
@@ -276,8 +281,9 @@ const DualMaps = (props) => {
           hoverInfoRef.current[side].timeoutId = null;
         }
 
-        let descriptions = [];
-        const apiRequests = [];
+  let descriptions = [];
+  const apiRequests = [];
+  const requestIndexByDescriptionIndex = {};
 
         // Process each feature for immediate tooltip or API-based tooltip
         features.forEach((feature) => {
@@ -306,22 +312,11 @@ const DualMaps = (props) => {
 
           if (!customTooltip) {
             // Immediate data tooltip
-            if (featureName && featureValue !== undefined && featureValue !== null) {
-              description = `
-                    <div class="popup-content">
-                      <p class="feature-name">${featureName}</p>
-                      <hr class="divider">
-                      <div class="metadata-item">
-                        <span class="metadata-key">Value:</span>
-                        <span class="metadata-value">${featureValueDisplay} ${legendText}</span>
-                      </div>
-                    </div>`;
-            } else if (featureName) {
-              description = `
-                <div class="popup-content">
-                  <p class="feature-name">${featureName}</p>
-                </div>`;
-            }
+            description = buildDefaultTooltip({
+              featureName,
+              featureValueDisplay,
+              legendText,
+            });
 
             // Inject additional metadata if enabled
             if (description && shouldIncludeMetadata) {
@@ -338,8 +333,6 @@ const DualMaps = (props) => {
                     </div>`;
                 });
                 metadataDescription += '</div>';
-            
-                // Get the index of the last closing </div> to ensure we are appending the metadata inside .popup-content
                 const lastDivIndex = description.lastIndexOf("</div>");
                 if (lastDivIndex !== -1) {
                   description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
@@ -351,16 +344,53 @@ const DualMaps = (props) => {
               descriptions.push(description);
             }
           } else {
-            // Custom tooltip requiring API call – add a placeholder
-            description = `
-                <div class="popup-content">
-                  <p class="feature-name">${featureName}</p>
-                  <p>Loading data...</p>
-                </div>`;
-            descriptions.push(description);
+            // Custom tooltip present; check if we should join with default tooltip
+            const joinToDefault = !!customTooltip.joinToDefaultTooltip;
 
-            // Prepare the API request
-            apiRequests.push({ feature, layerId, featureName });
+            if (joinToDefault) {
+              // Build default description first
+              description = buildDefaultTooltip({
+                featureName,
+                featureValueDisplay,
+                legendText,
+              });
+
+              // Inject additional metadata if enabled
+              if (description && shouldIncludeMetadata) {
+                const metadataKeys = Object.keys(feature.properties).filter(
+                  (key) => !["id", "name", "value"].includes(key)
+                );
+                if (metadataKeys.length > 0) {
+                  let metadataDescription = '<div class="metadata-section">';
+                  metadataKeys.forEach((key) => {
+                    metadataDescription += `
+                    <div class="metadata-item">
+                      <span class="metadata-key">${key}:</span>
+                      <span class="metadata-value">${feature.properties[key]}</span>
+                    </div>`;
+                  });
+                  metadataDescription += '</div>';
+                  const lastDivIndex = description.lastIndexOf("</div>");
+                  if (lastDivIndex !== -1) {
+                    description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
+                  }
+                }
+              }
+
+              const descIndex = descriptions.length;
+              descriptions.push(description || "");
+              const requestIndex = apiRequests.length;
+              apiRequests.push({ feature, layerId, featureName, joinToDefault: true });
+              requestIndexByDescriptionIndex[descIndex] = requestIndex;
+            } else {
+              // Placeholder which will be replaced by custom HTML later
+              description = buildLoadingTooltip(featureName);
+              const descIndex = descriptions.length;
+              descriptions.push(description);
+              const requestIndex = apiRequests.length;
+              apiRequests.push({ feature, layerId, featureName, joinToDefault: false });
+              requestIndexByDescriptionIndex[descIndex] = requestIndex;
+            }
           }
         });
 
@@ -391,12 +421,12 @@ const DualMaps = (props) => {
               ({ feature, layerId, featureName }) => {
                 const layerConfig = state.layers[layerId];
                 const customTooltip = layerConfig?.customTooltip;
-                const { url, htmlTemplate, customFormattingFunctions } = customTooltip;
+                const { htmlTemplate, customFormattingFunctions } = customTooltip;
                 const featureId = feature.id;
-                const requestUrl = url.replace("{id}", featureId);
+                const requestUrlResolved = resolveTooltipRequestUrl(customTooltip, featureId);
 
                 return api.baseService
-                  .get(requestUrl, { signal: controller.signal })
+                  .get(requestUrlResolved, { signal: controller.signal })
                   .then((responseData) => {
                     const tooltipHtml = replacePlaceholders(
                       htmlTemplate,
@@ -410,11 +440,7 @@ const DualMaps = (props) => {
                       console.error("Failed to fetch tooltip data:", error);
                     }
                     // Return a placeholder tooltip HTML on error
-                    return `
-                          <div class="popup-content">
-                            <p class="feature-name">${featureName}</p>
-                            <p>Data unavailable.</p>
-                          </div>`;
+                    return buildErrorTooltip(featureName);
                   });
               }
             );
@@ -424,14 +450,24 @@ const DualMaps = (props) => {
                 hoverEventIdRef.current === currentHoverEventId &&
                 hoverInfoRef.current[side]?.popup
               ) {
-                // Update popup content by combining any existing non-loading descriptions with the fetched results
-                const existingDescriptions = descriptions.filter(
-                  (desc) => !desc.includes("Loading data...")
-                );
-                const newDescriptions = existingDescriptions.concat(results);
-                const aggregatedHtml = newDescriptions.join(
-                  '<hr class="thick-divider">'
-                );
+                // Merge results into the appropriate positions
+                const combinedDescriptions = [];
+                for (let i = 0; i < descriptions.length; i++) {
+                  const requestIdx = requestIndexByDescriptionIndex[i];
+                  if (requestIdx === undefined) {
+                    combinedDescriptions.push(descriptions[i]);
+                  } else {
+                    const req = apiRequests[requestIdx];
+                    const resultHtml = results[requestIdx];
+                    if (req.joinToDefault) {
+                      const base = descriptions[i] || "";
+                      combinedDescriptions.push(insertCustomIntoDefault(base, resultHtml));
+                    } else {
+                      combinedDescriptions.push(resultHtml);
+                    }
+                  }
+                }
+                const aggregatedHtml = combinedDescriptions.join('<hr class="thick-divider">');
                 hoverInfoRef.current[side].popup.setHTML(aggregatedHtml);
               }
             });
