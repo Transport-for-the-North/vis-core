@@ -456,6 +456,12 @@ export const DynamicLegend = ({ map }) => {
             paintProps["line-width"] || paintProps["circle-radius"]
           );
 
+          // Determine whether current style is categorical. For categorical we should not scale circle sizes.
+          const colorStyle = layer.metadata?.colorStyle;
+          const isCategorical =
+            colorStyle === "categorical" ||
+            (colorStops && colorStops.some((s) => isNaN(convertStringToNumber(s.value))));
+
           // Invert color and width stops if necessary
           if (invertColorScheme && colorStops) {
             colorStops = colorStops.slice().reverse();
@@ -463,7 +469,10 @@ export const DynamicLegend = ({ map }) => {
               widthStops = widthStops.slice().reverse();
             }
           }
-          if (layer.type === "circle" && colorStops && colorStops.length > 0) {
+          // For categorical circle styles, keep a uniform diameter (do not scale by bins)
+          if (layer.type === "circle" && isCategorical) {
+            widthStops = null; // allow default diameter to apply uniformly
+          } else if (layer.type === "circle" && colorStops && colorStops.length > 0) {
             // Use the legend’s bins (from color stops) to compute baseline radii (e.g., 2..25)
             const bins = colorStops.map((s) => convertStringToNumber(s.value));
             const radius = buildLegendRadius(bins);
