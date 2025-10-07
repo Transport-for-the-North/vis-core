@@ -24,6 +24,13 @@
     max-width: calc(100vw - 60px);
   }  
 
+  .maplibregl-ctrl.maplibregl-ctrl-attrib {
+    padding: 0 10px;
+    margin: 5px;
+    background: #fff;
+    border-radius: 10px;
+}
+
   ::-webkit-scrollbar {
     height: 4px;             
     width: 4px;
@@ -108,4 +115,29 @@
   .metadata-value {
     text-align: right;
     flex-grow: 1;
+  }
+
+  .map-stack { display: flex; flex-direction: column; }
+
+  @media (max-width: 900px) {
+    .maplibregl-ctrl-bottom-right > .maplibregl-ctrl-attrib.app-attrib { display:none!important; }
+
+    .map-stack > .map-attrib-bar-mobile {
+      display: block;
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.95);
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: normal; 
+      flex: 0 0 auto;     
+      align-self: stretch;
+      box-sizing: border-box;
+    }
+  }
+
+  /* Desktop/tablet: keep overlay, hide below-map bar in the slot */
+  @media (min-width: 901px) {
+    .map-stack > .map-attrib-bar-mobile { display: none; }
   }

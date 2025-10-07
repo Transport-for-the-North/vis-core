@@ -41,11 +41,19 @@ export const withWarning = (WrappedComponent) => {
     const [isVisible, setIsVisible] = useState(true);
     const [dynamicMessage, setDynamicMessage] = useState(null);
 
+    const [isMobile, setIsMobile] = useState(() =>
+      typeof window !== 'undefined'
+        ? window.matchMedia('(max-width: 900px)').matches
+        : false
+    );
+    const [dynamicMessageMobile, setDynamicMessageMobile] = useState(null);
+
     const handleClose = () => {
       setIsVisible(false);
     };
 
     useEffect(() => {
+      if (isMobile) return; 
       const fetchData = async () => {
         const dynamicWarningConfig = pageConfig.config?.additionalFeatures?.dynamicWarning;
         if (dynamicWarningConfig && dynamicWarningConfig.url && dynamicWarningConfig.template) {
@@ -74,9 +82,56 @@ export const withWarning = (WrappedComponent) => {
       fetchData();
     }, [pageConfig]);
 
-    const staticWarning = pageConfig.config?.additionalFeatures?.warning;
-    const warningMessage = dynamicMessage || staticWarning;
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      const mql = window.matchMedia('(max-width: 900px)');
+      const onChange = (e) => setIsMobile(e.matches);
 
+      setIsMobile(mql.matches);
+
+      if (mql.addEventListener) mql.addEventListener('change', onChange);
+      else mql.addListener(onChange); // Safari
+
+      return () => {
+        if (mql.removeEventListener) mql.removeEventListener('change', onChange);
+        else mql.removeListener(onChange);
+      };
+    }, []);
+
+    useEffect(() => {
+      // only attempt mobile-specific fetch on mobile
+      if (!isMobile) return;
+
+      const cfg = pageConfig?.config?.additionalFeatures?.dynamicWarningMobile;
+      if (!(cfg && cfg.url && cfg.template)) return;
+
+      const controller = new AbortController();
+
+      (async () => {
+        try {
+          const response = await api.baseService.get(cfg.url, { signal: controller.signal });
+          const payload = response?.data ?? response;
+          // simple {key} replacement from payload
+          const msg = cfg.template.replace(/{(\w+)}/g, (_, key) =>
+            payload && payload[key] != null ? String(payload[key]) : ''
+          );
+          setDynamicMessageMobile(msg);
+        } catch (error) {
+          if (error.name !== 'AbortError') console.error('Error fetching mobile dynamic warning:', error);
+        }
+      })();
+
+      return () => controller.abort();
+    }, [pageConfig, isMobile]);
+
+
+    const staticWarning = pageConfig?.config?.additionalFeatures?.warning;
+    const staticWarningMobile = pageConfig?.config?.additionalFeatures?.mobileWarning; // optional
+
+    const warningMessage = isMobile
+      ? (dynamicMessageMobile || staticWarningMobile || staticWarning)
+      : (dynamicMessage || staticWarning);
+      
     return (
       <>
         {warningMessage && isVisible && (
