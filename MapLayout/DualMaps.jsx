@@ -786,6 +786,20 @@ const DualMaps = (props) => {
   useEffect(() => {
   if (!leftMap || !rightMap) return;
 
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  if (isTouch) {
+    [leftMap, rightMap].forEach(m => {
+      m.dragPan.enable();
+      m.touchZoomRotate.enable();
+      m.touchZoomRotate.disableRotation();
+      m.scrollZoom.disable();
+      m.doubleClickZoom.disable();
+      m.boxZoom.disable();
+      m.keyboard.disable();
+    });
+   }
+
   const roLeft = new ResizeObserver(() => leftMap.resize());
   const roRight = new ResizeObserver(() => rightMap.resize());
 

@@ -188,9 +188,6 @@ export const MapLayout = () => {
         />
       </Sidebar>
 
-      {/* Mobile-only: where summary cards will be portaled into */}
-      <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
-
       {pageContext.type === "MapLayout" && (
         <MapContainer>
           <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
@@ -201,6 +198,10 @@ export const MapLayout = () => {
           <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
         </MapContainer>
       )}
+
+      {/* Mobile-only: where summary cards will be portaled into */}
+      <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
+      
       <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
     </LayoutContainer>
   );
