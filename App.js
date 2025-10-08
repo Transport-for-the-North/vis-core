@@ -102,11 +102,11 @@ function App() {
         type: "calloutCard",
         cardType: "fullscreen",
       },
-      smallCard1: {
-        type: "calloutCard",
-        cardType: "small",
-        cardName: "cardName",
-      },
+      // smallCard1: {
+      //   type: "calloutCard",
+      //   cardType: "small",
+      //   cardName: "cardName",
+      // },
     },   
   };
 

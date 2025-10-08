@@ -88,7 +88,7 @@ const TitleImageTextWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 10%;
+  margin-top: 5%;
   gap: 2rem;
 `;
 
@@ -278,76 +278,157 @@ const CardContent = styled.div`
   }
 `;
 
+/**
+ * FullScreenCalloutCardVisualisation - Full-screen display component with carousel navigation
+ * 
+ * Displays scenario data in full-screen mode with carousel navigation.
+ * Handles automatic prefetching of upcoming scenarios for smooth navigation.
+ * Supports multiple image formats (Blob, ArrayBuffer, Uint8Array, URL).
+ * 
+ * @component
+ * @param {Object} props - The component props
+ * @param {Array<Object>} props.data - List of scenarios to display
+ * @param {number} props.data[].scenario_id - Unique scenario identifier
+ * @param {string} props.data[].label - Scenario label
+ * @param {number} [props.data[].programme_id] - Programme identifier
+ * @param {Object} [props.data[].point_geom] - GeoJSON Point geometry
+ * @param {string} props.data[].point_geom.type - Geometry type (e.g., "Point")
+ * @param {Array<number>} props.data[].point_geom.coordinates - [longitude, latitude]
+ * @param {Object} [props.data[].polygon_geom] - GeoJSON Polygon geometry
+ * @param {string} props.data[].polygon_geom.type - Geometry type (e.g., "Polygon")
+ * @param {Array<Array<Array<number>>>} props.data[].polygon_geom.coordinates - Polygon coordinates
+ * @param {string} [props.data[].text_with_placeholders] - Text with placeholders to replace (e.g., "{distance}")
+ * @param {Object} [props.data[].values] - Values to replace placeholders with
+ * @param {string|Blob|ArrayBuffer|Uint8Array} [props.data[].image] - Scenario image (URL or binary data)
+ * @param {boolean} props.includeCarouselNavigation - Enable/disable carousel navigation
+ * @param {Array<{key: number, value: string}>} props.possibleCarouselNavData - Data for navigation tooltips
+ * @param {Function} props.handleNextFetch - Callback to load upcoming scenarios
+ * 
+ * @example
+ * const scenariosData = [
+ *   {
+ *     scenario_id: 12,
+ *     programme_id: 0,
+ *     label: "Huddersfield College",
+ *     point_geom: {
+ *       type: "Point",
+ *       coordinates: [-1.553621, 53.79969]
+ *     },
+ *     polygon_geom: {
+ *       type: "Polygon",
+ *       coordinates: [[[-1.554, 53.799], [-1.552, 53.799], ...]]
+ *     },
+ *     text_with_placeholders: "Distance: <strong>{distance}</strong> km",
+ *     values: { distance: 2, duration: 30 },
+ *     image: "https://example.com/image.png"
+ *   }
+ * ];
+ * 
+ * @returns {JSX.Element|null} The full-screen component or null if no current scenario
+ */
 export const FullScreenCalloutCardVisualisation = ({
   data,
   includeCarouselNavigation,
   possibleCarouselNavData,
+  handleNextFetch,
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const handleToggle = () => setIsVisible((v) => !v);
-  const [currentScenario, setCurrentScenario] = useState(data[0]);
+  const [currentScenarioId, setCurrentScenarioId] = useState(data[0]?.scenario_id);
   const [content, setContent] = useState(null);
+  
   // next and previous buttons
   const previousButtonRef = React.useRef(null);
-  const [previousButtonRefIsHovered, setPreviousButtonRefIsHovered] =
-    useState(false);
+  const [previousButtonRefIsHovered, setPreviousButtonRefIsHovered] = useState(false);
   const nextButtonRef = React.useRef(null);
   const [nextButtonRefIsHovered, setNextButtonRefIsHovered] = useState(false);
-  const currentIndex = data.findIndex(
-    (item) => item.scenario_id === currentScenario.scenario_id
-  );
+  
+  // Find currentScenario from the ID in data (always up to date) 
+  const currentScenario = data.find(item => item.scenario_id === currentScenarioId);
+  const currentIndex = data.findIndex(item => item.scenario_id === currentScenarioId);
+  
   const [imgUrl, setImgUrl] = useState(null);
-
-  // content to show
+  
+/**
+ * Updates content and image when the current scenario changes
+ * 
+ * Handles different image formats:
+ * - Blob: converted to object URL
+ * - ArrayBuffer: converted to Blob then object URL
+ * - Uint8Array: converted to Blob then object URL
+ * - String: used directly as URL
+ */
   useEffect(() => {
-    if (currentScenario) {
-      const newContent = replacePlaceholders(
-        currentScenario.text_with_placeholders,
-        currentScenario.values
-      );
-      setContent(newContent);
-      setImgUrl(null);
-      if (currentScenario.image) {
-        if (currentScenario.image instanceof Blob) {
-          // Blob (binary)
-          const url = URL.createObjectURL(currentScenario.image);
-          setImgUrl(url);
-        } else if (currentScenario.image instanceof ArrayBuffer) {
-          // ArrayBuffer (binary)
-          const blob = new Blob([currentScenario.image], { type: "image/png" });
-          const url = URL.createObjectURL(blob);
-          setImgUrl(url);
-        } else if (currentScenario.image instanceof Uint8Array) {
-          // Uint8Array (binary)
-          const blob = new Blob([currentScenario.image], { type: "image/png" });
-          const url = URL.createObjectURL(blob);
-          setImgUrl(url);
-        } else if (typeof currentScenario.image === "string") {
-          // It is a URL
-          setImgUrl(currentScenario.image);
-        }
+    if (!currentScenario) {
+      return;
+    }
+    
+    if (!currentScenario.text_with_placeholders || !currentScenario.values) {
+      return;
+    }
+    
+    const newContent = replacePlaceholders(
+      currentScenario.text_with_placeholders,
+      currentScenario.values
+    );
+    setContent(newContent);
+    setImgUrl(null);
+    
+    if (currentScenario.image) {
+      if (currentScenario.image instanceof Blob) {
+        const url = URL.createObjectURL(currentScenario.image);
+        setImgUrl(url);
+      } else if (currentScenario.image instanceof ArrayBuffer) {
+        const blob = new Blob([currentScenario.image], { type: "image/png" });
+        const url = URL.createObjectURL(blob);
+        setImgUrl(url);
+      } else if (currentScenario.image instanceof Uint8Array) {
+        const blob = new Blob([currentScenario.image], { type: "image/png" });
+        const url = URL.createObjectURL(blob);
+        setImgUrl(url);
+      } else if (typeof currentScenario.image === "string") {
+        setImgUrl(currentScenario.image);
       }
     }
-  }, [currentScenario]);
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setCurrentScenario(data[0]);
-    }
-  }, [data]);
-
-  // Navigation for the carousel
+  }, [currentScenario, data]);
+  
+/**
+ * Navigates to the previous scenario in the carousel
+ */
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      setCurrentScenario(data[currentIndex - 1]);
+      setCurrentScenarioId(data[currentIndex - 1].scenario_id);
     }
   };
+  
+/**
+ * Navigates to the next scenario and triggers prefetch if needed
+ * 
+ * Prefetch logic:
+ * - Fetches scenario at +2 position if incomplete
+ * - Falls back to +1 position if no +2 exists
+ */
   const handleNext = () => {
+    // When object +2 does not have text_with_placeholders and exists in data
+    if (!data[currentIndex + 2]?.text_with_placeholders && data[currentIndex + 2]) {
+      handleNextFetch(data[currentIndex + 2].scenario_id);
+    } 
+    // When there is no +2 scenario but there is a +1 that does not have any data
+    else if (!data[currentIndex + 1]?.text_with_placeholders && data[currentIndex + 1]) {
+      handleNextFetch(data[currentIndex + 1].scenario_id);
+    }
+    
+    // Move to the next object
     if (currentIndex < data.length - 1) {
-      setCurrentScenario(data[currentIndex + 1]);
+      setCurrentScenarioId(data[currentIndex + 1].scenario_id);
     }
   };
-
+  
+  // Check that currentScenario exists before rendering
+  if (!currentScenario) {
+    return null;
+  }
+  
   return (
     <FullscreenContainer $isVisible={isVisible}>
       {/* Close button */}
@@ -374,6 +455,7 @@ export const FullScreenCalloutCardVisualisation = ({
                 onError={() => {
                   setImgUrl(null);
                 }}
+                alt={currentScenario.label || "Scenario image"}
               />
             ) : (
               <Image src={"https://placehold.co/600x400?text=No+image!"} />
@@ -391,6 +473,7 @@ export const FullScreenCalloutCardVisualisation = ({
             ref={previousButtonRef}
             onMouseEnter={() => setPreviousButtonRefIsHovered(true)}
             onMouseLeave={() => setPreviousButtonRefIsHovered(false)}
+            aria-label="Previous scenario"
           >
             <ChevronLeftIcon />
           </NavigationButton>
@@ -409,6 +492,7 @@ export const FullScreenCalloutCardVisualisation = ({
             ref={nextButtonRef}
             onMouseEnter={() => setNextButtonRefIsHovered(true)}
             onMouseLeave={() => setNextButtonRefIsHovered(false)}
+            aria-label="Next scenario"
           >
             <ChevronRightIcon />
           </NavigationButton>
