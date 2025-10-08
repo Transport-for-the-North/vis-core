@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["react", "react-dom"],          // <-- ensure React/DOM JSX types are loaded
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // <-- ensure DOM types are loaded
+    "declaration": false,
+    "outDir": "dist",
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "allowJs": true,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "src/global.d.ts"],
+  "exclude": ["dist", "node_modules"]
+}

@@ -1,0 +1,80 @@
+{
+  "name": "@transport-for-the-north/vis-core",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./Components": {
+      "types": "./dist/Components.d.ts",
+      "import": "./dist/Components.js",
+      "require": "./dist/Components.cjs"
+    },
+    "./contexts": {
+      "types": "./dist/contexts.d.ts",
+      "import": "./dist/contexts.js",
+      "require": "./dist/contexts.cjs"
+    },
+    "./hocs": {
+      "types": "./dist/hocs.d.ts",
+      "import": "./dist/hocs.js",
+      "require": "./dist/hocs.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.js",
+      "require": "./dist/hooks.cjs"
+    },
+    "./layouts": {
+      "types": "./dist/layouts.d.ts",
+      "import": "./dist/layouts.js",
+      "require": "./dist/layouts.cjs"
+    },
+    "./reducers": {
+      "types": "./dist/reducers.d.ts",
+      "import": "./dist/reducers.js",
+      "require": "./dist/reducers.cjs"
+    },
+    "./services": {
+      "types": "./dist/services.d.ts",
+      "import": "./dist/services.js",
+      "require": "./dist/services.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "require": "./dist/utils.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5.9.2",
+    "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.2.0",
+    "vitest": "^1.5.0"
+  }
+}
