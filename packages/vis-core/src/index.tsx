@@ -1,3 +1,14 @@
+// packages/vis-core/src/index.ts
+export * as Components from './Components';
+export * as contexts from './contexts';
+export * as hocs from './hocs';
+export * as hooks from './hooks';
+export * as layouts from './layouts';
+export * as reducers from './reducers';
+export * as services from './services';
+export * as utils from './utils';
+
+
 // tiny sanity export
 export const helloFromCore = () => "Hello from vis-core";
 
