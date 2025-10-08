@@ -38,6 +38,7 @@ export const appConfig = {
                 <li><b>Link Loadings:</b> This visualisation shows the boarding and alighting summaries for each link in the NorTMS model.</li>
                 <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</li>
                 <li><b>Link Frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
+                <li><b>Transport-Related Social Exclusion (TRSE):</b> This page links to the Transport-Related Social Exclusion (TRSE) tool, which provides insights into social exclusion related to transport for local authorities, combined authorities and the whole of England.</li>
             </ul>
             `,
             sectionTitle: "Portal Information",
@@ -160,6 +161,14 @@ export const appConfig = {
         pages.timingLinks,
         pages.linkFrequency,
         pages.performanceBi
+    ],
+    externalLinks: [
+        {
+        category: null,
+        external: true,
+        label: "Transport-Related Social Exclusion (TRSE)",
+        url: "https://trse.transportforthenorth.com/",
+        },
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
