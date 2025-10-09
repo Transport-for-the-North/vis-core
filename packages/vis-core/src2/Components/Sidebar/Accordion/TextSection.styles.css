@@ -1,6 +1,0 @@
-.inset-text-area {
-    background-color: var(--inset-text-area-background-colour, #e6e6e6);
-    color: var(--inset-text-area-font-color, black);
-    padding: 10px;
-    border-radius: 4px;
-  }
