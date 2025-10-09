@@ -67,10 +67,11 @@
   "peerDependencies": {
     "@mapbox/mapbox-gl-draw": "^1",
     "@turf/turf": "^7.2.0",
+    "chroma-js": "^3.1.2",
+    "polished": "^4.3.1",
     "mapbox-gl": "^x",
     "react": "^18 || ^19",
-    "react-dom": "^18 || ^19",
-    "chroma-js": "^3.1.2"
+    "react-dom": "^18 || ^19"
   },
   "devDependencies": {
     "@turf/turf": "^7.2.0",
@@ -79,6 +80,7 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^5.0.4",
     "chroma-js": "^3.1.2",
+    "polished": "^4.3.1",
     "typescript": "^5.9.2",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^4.2.0",
