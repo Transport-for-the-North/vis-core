@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useMapContext } from "hooks";
+import { useMapContext } from "./useMapContext";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import * as turf from "@turf/turf";
-import { getSourceLayer } from "utils";
+import { getSourceLayer } from "../utils/map";
 
 /**
  * Custom hook that enables feature selection on the map based on the current selection mode.
