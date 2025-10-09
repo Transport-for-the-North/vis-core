@@ -1,4 +1,4 @@
-import { updateUrlParameters } from "utils";
+import { updateUrlParameters } from "../utils/api";
 
 // This function finds the first colourValue present in the state.filters in order to deduce the
 // starting map colour.
