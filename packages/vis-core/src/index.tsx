@@ -8,6 +8,8 @@ export * as reducers from './reducers';
 export * as services from './services';
 export * as utils from './utils';
 
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+
 
 // tiny sanity export
 export const helloFromCore = () => "Hello from vis-core";
