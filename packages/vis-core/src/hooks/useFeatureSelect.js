@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useMapContext } from "./useMapContext";
-import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+//import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import * as turf from "@turf/turf";
 import { getSourceLayer } from "../utils/map";
 

@@ -65,10 +65,13 @@
     "test": "vitest run"
   },
   "peerDependencies": {
+    "@mapbox/mapbox-gl-draw": "^1",
+    "mapbox-gl": "^x",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   },
   "devDependencies": {
+    "@types/node": "^24.7.0",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^5.0.4",
