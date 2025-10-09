@@ -10,6 +10,10 @@ import { linkFrequency } from "./linkFrequency"
 import { freightNodeInvestments } from "./freightNodeInvestment"
 import { freightLinkInvestments } from "./freightLinkInvestment"
 import { performanceBi } from "./performanceBi"
+import { nodeCarOrVan } from "./nodeCarOrVan"
+import { nodeHouseholdDeprivation } from "./nodeHouseholdDeprivation"
+import { nodeWorkTravelDistance } from "./nodeWorkTravelDistance"
+import { nodeWorkTravelMethod } from "./nodeWorkTravelMethod"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -23,5 +27,9 @@ export const pages = {
     linkFrequency: linkFrequency,
     freightLinkInvestments: freightLinkInvestments,
     freightNodeInvestments: freightNodeInvestments,
-    performanceBi: performanceBi
+    performanceBi: performanceBi,
+    nodeCarOrVan: nodeCarOrVan,
+    nodeHouseholdDeprivation: nodeHouseholdDeprivation,
+    nodeWorkTravelDistance: nodeWorkTravelDistance,
+    nodeWorkTravelMethod: nodeWorkTravelMethod
 }
