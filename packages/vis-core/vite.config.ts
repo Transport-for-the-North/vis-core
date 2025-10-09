@@ -32,7 +32,7 @@ export default defineConfig({
         `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime", 'react-router-dom', '@mapbox/mapbox-gl-draw', 'mapbox-gl', '@turf/turf', 'chroma-js'],
+      external: ["react", "react-dom", "react/jsx-runtime", 'react-router-dom', '@mapbox/mapbox-gl-draw', 'mapbox-gl', '@turf/turf', 'chroma-js', "polished"],
       output: {
         globals: { react: "React", "react-dom": "ReactDOM" }
       }
