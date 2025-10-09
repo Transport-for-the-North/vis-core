@@ -65,16 +65,18 @@
     "test": "vitest run"
   },
   "peerDependencies": {
+    "@auth0/auth0-react": "^2.6.0",
     "@mapbox/mapbox-gl-draw": "^1",
     "@turf/turf": "^7.2.0",
     "chroma-js": "^3.1.2",
+    "js-cookie": "^3.0.5",
     "mapbox-gl": "^x",
     "polished": "^4.3.1",
-    "js-cookie": "^3.0.5",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   },
   "devDependencies": {
+    "@auth0/auth0-react": "^2.6.0",
     "@turf/turf": "^7.2.0",
     "@types/node": "^24.7.0",
     "@types/react": "^18.3.26",
