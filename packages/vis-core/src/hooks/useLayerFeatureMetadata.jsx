@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import debounce from 'lodash.debounce';
-import { api } from 'services';
+import { api } from '../services';
 
 /**
  * Custom hook to fetch and cache layer feature metadata.
