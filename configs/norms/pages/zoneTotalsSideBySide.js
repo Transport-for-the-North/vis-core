@@ -59,16 +59,16 @@ export const zoneTotalsSideBySide = {
             { action: "UPDATE_DUAL_QUERY_PARAMS" }
           ]  
         },
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Zone Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Zone Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Zone Totals Side-by-Side'] },
         { ...selectors.scenarioIdFilter, filterName: "Left Scenario", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Zone Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Zone Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Zone Totals Side-by-Side'] },*/
         { ...selectors.timePeriod, filterName: "Left Time Period", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.userClassFilter, filterName: "Left User Class", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Zone Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Zone Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Zone Totals Side-by-Side'] },
         { ...selectors.scenarioIdFilter, filterName: "Right Scenario", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Zone Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Zone Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Zone Totals Side-by-Side'] },*/
         { ...selectors.timePeriod, filterName: "Right Time Period", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.userClassFilter, filterName: "Right User Class", visualisations: ['Zone Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
       ]

@@ -48,10 +48,10 @@ export const zoneTotals = {
       ],
       metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Totals'] },
-        { ...selectors.scenarioFilterDemand, visualisations: ['Zone Totals'] },
-        { ...selectors.scenarioFilterYear, visualisations: ['Zone Totals'] },
         { ...selectors.scenarioIdFilter, visualisations: ['Zone Totals'] },
+        /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Zone Totals'] },
+        { ...selectors.scenarioFilterDemand, visualisations: ['Zone Totals'] },
+        { ...selectors.scenarioFilterYear, visualisations: ['Zone Totals'] },*/
         { ...selectors.timePeriod, visualisations: ['Zone Totals'] },
         { ...selectors.userClassFilter, visualisations: ['Zone Totals'] },
         { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals'],

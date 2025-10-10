@@ -72,12 +72,6 @@ export const popEmpZonePair = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, visualisations: ['Landuse Accessibility Pair'] },
-            { ...selectors.scenarioFilterDemand, visualisations: ['Landuse Accessibility Pair'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Landuse Accessibility Pair'], paramName: "scenarioYear",
-                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-                shouldFilterOnValidation: true
-            },
             { ...selectors.scenarioCodeFilter, visualisations: ['Landuse Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -87,6 +81,12 @@ export const popEmpZonePair = {
                 exclude: [0]
               }
             },
+            /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Landuse Accessibility Pair'] },
+            { ...selectors.scenarioFilterDemand, visualisations: ['Landuse Accessibility Pair'] },
+            { ...selectors.scenarioFilterYear, visualisations: ['Landuse Accessibility Pair'], paramName: "scenarioYear",
+                actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+                shouldFilterOnValidation: true
+            },*/
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Pair'],
               shouldBeBlankOnInit: true,
               shouldFilterOnValidation: false,

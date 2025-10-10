@@ -66,14 +66,14 @@ export const linkTotalsDifference = {
       ],
       metadataTables: [ metadataTables.inputNormsScenarioMetadataTable ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Link Totals Difference'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Link Totals Difference'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Link Totals Difference'] },
         { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Link Totals Difference'] },
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Link Totals Difference'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Link Totals Difference'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Link Totals Difference'] },
+       /* { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Link Totals Difference'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Link Totals Difference'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Link Totals Difference'] },*/
         { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Link Totals Difference'] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Link Totals Difference'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Link Totals Difference'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Link Totals Difference'] },*/
         { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Link Totals Difference']},
         { ...selectors.linkMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Link Totals Difference']},
       ],

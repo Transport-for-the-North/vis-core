@@ -72,12 +72,6 @@ export const popEmpZonePairDifference = {
           metadataTables.userClassMetadataTable
         ],
         filters: [ 
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Landuse Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Landuse Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Landuse Accessibility Pair Difference'] , paramName: "scenarioYearDoMinimum",
-              actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-              shouldFilterOnValidation: true
-            },
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Pair Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
@@ -85,13 +79,7 @@ export const popEmpZonePairDifference = {
               paramColumn: "scenario_code",
               sort: "ascending",
               exclude: [0]
-            }},
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Landuse Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Landuse Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Landuse Accessibility Pair Difference'] , paramName: "scenarioYearDoSomething",
-              actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-              shouldFilterOnValidation: true
-            },
+              }},
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Landuse Accessibility Pair Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
@@ -99,7 +87,19 @@ export const popEmpZonePairDifference = {
               paramColumn: "scenario_code",
               sort: "ascending",
               exclude: [0]
-            }},
+              }},
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Landuse Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Landuse Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Landuse Accessibility Pair Difference'] , paramName: "scenarioYearDoMinimum",
+              actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+              shouldFilterOnValidation: true
+            },
+            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Landuse Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Landuse Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Landuse Accessibility Pair Difference'] , paramName: "scenarioYearDoSomething",
+              actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+              shouldFilterOnValidation: true
+            },*/
             { ...selectors.landuseFilter, filterName: "Landuse (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
             { ...selectors.landuseSegFilter, filterName: "Landuse Segment 1 (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference'],},
             { ...selectors.landuseSegFilter, filterName: "Landuse Segment 2 (1 and 2)", paramName: "landuseSegment2", visualisations: ['Landuse Accessibility Pair Difference'], values: {

@@ -65,9 +65,6 @@ export const keyLocationZonePairDifference = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Accessibility Pair Difference'] },
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Zone Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -77,9 +74,9 @@ export const keyLocationZonePairDifference = {
                 exclude: [0]
               }
             },
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Accessibility Pair Difference'] },
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Accessibility Pair Difference'] },*/
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Zone Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -89,6 +86,9 @@ export const keyLocationZonePairDifference = {
                 exclude: [0]
               }
             },
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Accessibility Pair Difference'] },*/
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Accessibility Pair Difference']},
             { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Zone Accessibility Pair Difference'], paramName: "userClassId",
                 shouldBeBlankOnInit: true,

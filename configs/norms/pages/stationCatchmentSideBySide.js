@@ -101,10 +101,10 @@ export const stationCatchmentSideBySide = {
           paramName: "directionId"
         },
         { ...selectors.catchmentMetricFilter, visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}]},
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Station Catchment Side-by-Side'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Station Catchment Side-by-Side'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Station Catchment Side-by-Side'] },
         { ...selectors.scenarioCodeFilter, filterName: "Left Scenario", visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Station Catchment Side-by-Side'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Station Catchment Side-by-Side'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Station Catchment Side-by-Side'] },*/
         { ...selectors.timePeriod, filterName: "Left Time Period", visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.userClassFilter, filterName: "Left User Class", visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }], values: {
             source: "metadataTable",
@@ -114,10 +114,10 @@ export const stationCatchmentSideBySide = {
             sort: "ascending",
             exclude: [123, 456, 789]
         }},
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Station Catchment Side-by-Side'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Station Catchment Side-by-Side'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Station Catchment Side-by-Side'] },
         { ...selectors.scenarioCodeFilter, filterName: "Right Scenario", visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Station Catchment Side-by-Side'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Station Catchment Side-by-Side'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Station Catchment Side-by-Side'] },*/
         { ...selectors.timePeriod, filterName: "Right Time Period", visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.userClassFilter, filterName: "Right User Class", visualisations: ['Station Catchment Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }], values: {
             source: "metadataTable",

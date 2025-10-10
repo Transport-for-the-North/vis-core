@@ -60,14 +60,14 @@ export const zoneBenefitsDifference = {
           }, metadataTables.userClassMetadataTable],
         filters: [
             { ...selectors.benefitsScenariosFilter, visualisations: ["Zone Benefits Difference"]},
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Benefits Difference'] },
-            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Benefits Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Benefits Difference'] },
             { ...selectors.scenarioIdFilter, filterName: "Scenario 1", paramName: "scenarioIdDoMinimum", visualisations: ['Zone Benefits Difference'] },
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Benefits Difference'] },
-            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Benefits Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Benefits Difference'] },
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Benefits Difference'] },
+            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Benefits Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Benefits Difference'] },*/
             { ...selectors.scenarioIdFilter, filterName: "Scenario 2", paramName: "scenarioIdDoSomething", visualisations: ['Zone Benefits Difference'] },
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Benefits Difference'] },
+            { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Benefits Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Benefits Difference'] },*/
             { ...selectors.resultZoneTypeFilter, filterName: "Zoning system (1 and 2)", visualisations: ['Zone Benefits Difference'] },
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Benefits Difference']},
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Benefits Difference']},

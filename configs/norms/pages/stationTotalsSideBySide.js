@@ -61,15 +61,15 @@ export const stationTotalsSideBySide = {
     ],
     metadataTables: [ metadataTables.inputNormsScenarioMetadataTable ],
     filters: [
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Station Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Station Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Station Totals Side-by-Side'] },
         { ...selectors.scenarioCodeFilter, filterName: "Left Scenario", visualisations: ['Station Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Left by Network", visualisations: ['Station Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Left by Demand Scenario", visualisations: ['Station Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Left by Year", visualisations: ['Station Totals Side-by-Side'] },*/
         { ...selectors.timePeriod, filterName: "Left Time Period", visualisations: ['Station Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Station Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Station Totals Side-by-Side'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Station Totals Side-by-Side'] },
         { ...selectors.scenarioCodeFilter, filterName: "Right Scenario", visualisations: ['Station Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }]},
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario Right by Network", visualisations: ['Station Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario Right by Demand Scenario", visualisations: ['Station Totals Side-by-Side'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario Right by Year", visualisations: ['Station Totals Side-by-Side'] },*/
         { ...selectors.timePeriod, filterName: "Right Time Period", visualisations: ['Station Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }] },
         { ...selectors.metricFilter, visualisations: ['Station Totals Side-by-Side'], actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }, {action: "UPDATE_LEGEND_TEXT"}] }
     ],

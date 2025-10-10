@@ -48,14 +48,14 @@ export const zoneTotalsDifference = {
       ],
       metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioIdFilter, filterName: "Scenario 1", paramName: "scenarioIdDoMinimum", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Totals Difference'] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Zone Totals Difference'] },*/
         { ...selectors.scenarioIdFilter, filterName: "Scenario 2", paramName: "scenarioIdDoSomething", visualisations: ['Zone Totals Difference'] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Totals Difference'] },*/
         { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals Difference'],
           actions: [
             { action: "UPDATE_QUERY_PARAMS" },

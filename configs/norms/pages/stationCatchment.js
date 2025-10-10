@@ -80,10 +80,10 @@ export const stationCatchment = {
     ],
     metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
     filters: [
-        { ...selectors.scenarioFilterNetwork, visualisations: ['Station Catchment'] },
+      { ...selectors.scenarioCodeFilter, visualisations: ['Station Catchment'] },
+        /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Station Catchment'] },
         { ...selectors.scenarioFilterDemand, visualisations: ['Station Catchment'] },
-        { ...selectors.scenarioFilterYear, visualisations: ['Station Catchment'] },
-        { ...selectors.scenarioCodeFilter, visualisations: ['Station Catchment'] },
+        { ...selectors.scenarioFilterYear, visualisations: ['Station Catchment'] },*/
         { ...selectors.timePeriod, visualisations: ['Station Catchment'] },
         { ...selectors.userClassFilter, visualisations: ['Station Catchment'], values: {
             source: "metadataTable",

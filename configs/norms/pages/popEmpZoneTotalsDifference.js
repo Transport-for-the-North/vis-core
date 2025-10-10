@@ -71,7 +71,16 @@ export const popEmpZoneTotalsDifference = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Landuse Accessibility Totals Difference'] },
+            { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Totals Difference'], values: {
+                source: "metadataTable",
+                metadataTableName: "input_norms_scenario",
+                displayColumn: "scenario_code",
+                paramColumn: "scenario_code",
+                sort: "ascending",
+                exclude: [0]
+              }
+            },
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Landuse Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Landuse Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Landuse Accessibility Totals Difference'],
               shouldBeBlankOnInit: true,
@@ -81,15 +90,6 @@ export const popEmpZoneTotalsDifference = {
               isClearable: true,
               paramName: "scenarioYearDoMinimum",
               actions: [{ action: "UPDATE_QUERY_PARAMS" }]
-            },
-            { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Landuse Accessibility Totals Difference'], values: {
-                source: "metadataTable",
-                metadataTableName: "input_norms_scenario",
-                displayColumn: "scenario_code",
-                paramColumn: "scenario_code",
-                sort: "ascending",
-                exclude: [0]
-              }
             },
             { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Landuse Accessibility Totals Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Landuse Accessibility Totals Difference'] },
@@ -101,7 +101,7 @@ export const popEmpZoneTotalsDifference = {
               isClearable: true,
               paramName: "scenarioYearDoSomething",
               actions: [{ action: "UPDATE_QUERY_PARAMS" }]
-            },
+            },*/
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Landuse Accessibility Totals Difference'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",

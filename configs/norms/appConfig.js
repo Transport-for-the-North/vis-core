@@ -11,8 +11,8 @@ export const appConfig = {
   methodology: "",
   legalText:
      termsOfUse,
-  contactText: "Please contact Matteo Gravellu for any questions on this data tool.",
-  contactEmail: "matteo.gravellu@transportforthenorth.com",
+  contactText: "Please contact Gregory Webster for any questions on this data tool.",
+  contactEmail: "Gregory.Webster@transportforthenorth.com",
   logoImage: "img/tfn-logo-fullsize.png",
   backgroundImage: "img/norms/hero.jpg",
   logoutButtonImage: "img/burgerIcon.png",
