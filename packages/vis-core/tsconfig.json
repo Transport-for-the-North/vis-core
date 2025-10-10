@@ -17,7 +17,18 @@
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "src",
+    "paths": {
+      "Components/*": ["Components/*"],
+      "contexts/*":   ["contexts/*"],
+      "hooks/*":      ["hooks/*"],
+      "services/*":   ["services/*"],
+      "hocs/*":       ["hocs/*"],
+      "layouts/*":    ["layouts/*"],
+      "reducers/*":   ["reducers/*"],
+      "utils/*":      ["utils/*"]
+    }
   },
   "include": ["src/**/*", "src/global.d.ts"],
   "exclude": ["dist", "node_modules"]
