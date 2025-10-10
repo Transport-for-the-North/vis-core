@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import DualMaps from "./DualMaps";
 import { MapContext, FilterContext } from "contexts";
 import { useDualMaps } from "hooks";
@@ -41,6 +41,15 @@ jest.mock("maplibre-gl", () => {
     Popup: MockPopup,
   };
 });
+jest.mock("services", () => ({
+  ...jest.requireActual("services"),
+  api: {
+    baseService: {
+      get: jest.fn(),
+    },
+  },
+}));
+import { api } from "services";
 let mockMapContext = {
   state: {
     mapStyle: "default",
@@ -125,10 +134,17 @@ let props = {
 const on = jest.fn();
 const off = jest.fn();
 const getCanvas = jest.fn();
+const getLayer = jest.fn(true);
 beforeEach(() => {
   useDualMaps.mockReturnValue({
-    leftMap: { off: off, on: on, getCanvas: getCanvas, type: "left" },
-    rightMap: { off: off, on: on, type: "right" },
+    leftMap: {
+      off: off,
+      on: on,
+      getCanvas: getCanvas,
+      getLayer: getLayer,
+      type: "left",
+    },
+    rightMap: { off: off, on: on, getLayer: getLayer, type: "right" },
     isMapStyleLoaded: "isMapStyleLoaded",
     isMapLoaded: "isMapLoaded",
     isMapReady: "isMapReady",
@@ -325,5 +341,199 @@ describe("Test with shouldHaveLabel = true", () => {
         </MapContext.Provider>
       </FilterContext.Provider>
     );
+  });
+});
+
+describe("Tests when apiRequest is not null", () => {
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          first: {
+            // shouldHaveLabel: true,
+            customTooltip: true,
+            shouldHaveTooltipOnHover: true,
+          },
+          layer1: {
+            shouldHaveLabel: true,
+            customTooltip: true,
+            shouldHaveTooltipOnHover: true,
+          },
+          id: {
+            hoverNulls: false,
+            customTooltip: {
+              url: "/url-{id}",
+              htmlTemplate: "<p>paragraph</p>",
+              customFormattingFunctions: "customFormattingFunctions",
+            },
+          },
+        },
+      },
+    };
+
+    api.baseService.get.mockResolvedValue(true);
+
+    const on = jest.fn((event, callback) => {
+      if (event === "mousemove") {
+        callback({
+          lngLat: { lng: 0, lat: 0 },
+          point: { x: 100, y: 100 },
+        });
+      }
+    });
+    const off = jest.fn();
+    const getCanvas = jest.fn();
+    const getLayer = jest.fn();
+    const project = jest.fn();
+    const setFeatureState = jest.fn();
+    const queryRenderedFeatures = jest.fn();
+    getLayer.mockReturnValue(true);
+    project.mockReturnValue(true);
+    queryRenderedFeatures.mockReturnValue([
+      {
+        layer: { id: "id", "source-layer": "sourceLayer", source: "source" },
+        id: "id",
+        state: { value: "value" },
+        properties: { name: "name" },
+      },
+    ]);
+    useDualMaps.mockReturnValue({
+      leftMap: {
+        off: off,
+        on: on,
+        getCanvas: getCanvas,
+        getLayer: getLayer,
+        project: project,
+        queryRenderedFeatures: queryRenderedFeatures,
+        setFeatureState: setFeatureState,
+        type: "left",
+      },
+      rightMap: {
+        off: off,
+        on: on,
+        getLayer: getLayer,
+        project: project,
+        queryRenderedFeatures: queryRenderedFeatures,
+        setFeatureState: setFeatureState,
+        type: "right",
+      },
+      isMapStyleLoaded: "isMapStyleLoaded",
+      isMapLoaded: "isMapLoaded",
+      isMapReady: "isMapReady",
+    });
+
+    // fake timer for mock setTimeout
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+  it("Basic test", async () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    await waitFor(() => {
+      expect(api.baseService.get).toHaveBeenCalledWith(
+        "/url-id",
+        expect.objectContaining({
+          signal: expect.any(AbortSignal),
+        })
+      );
+    });
+  });
+});
+
+describe.only("Tests when features is null", () => {
+  let setFeatureState;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          id: {
+            hoverNulls: false,
+            shouldHaveTooltipOnHover: true,
+            customTooltip: {
+              url: "/url-{id}",
+              htmlTemplate: "<p>paragraph</p>",
+              customFormattingFunctions: {},
+            },
+          },
+        },
+      },
+    };
+
+    api.baseService.get.mockResolvedValue(true);
+
+    const on = jest.fn((event, callback) => {
+      if (event === "mousemove") {
+        callback({
+          lngLat: { lng: 0, lat: 0 },
+          point: { x: 100, y: 100 },
+        });
+      }
+    });
+    const off = jest.fn();
+    const getCanvas = jest.fn();
+    const getLayer = jest.fn().mockReturnValue(true);
+    const project = jest.fn().mockReturnValue(true);
+    const queryRenderedFeatures = jest.fn().mockReturnValue([]);
+    
+    setFeatureState = jest.fn();
+
+    useDualMaps.mockReturnValue({
+      leftMap: {
+        off,
+        on,
+        getCanvas,
+        getLayer,
+        project,
+        queryRenderedFeatures,
+        setFeatureState,
+        type: "left",
+      },
+      rightMap: {
+        off,
+        on,
+        getLayer,
+        project,
+        queryRenderedFeatures,
+        setFeatureState,
+        type: "right",
+      },
+      isMapStyleLoaded: true,
+      isMapLoaded: true,
+      isMapReady: true,
+    });
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
+  // TO CONTINUE
+  it("should call setFeatureState when features is empty", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <DualMaps {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    // expect(setFeatureState).toHaveBeenCalled();
   });
 });
