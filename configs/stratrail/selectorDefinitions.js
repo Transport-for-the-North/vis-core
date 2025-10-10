@@ -976,37 +976,37 @@ const stationWorkTravelDistanceMetricSelector = {
             },
             {
                 displayValue: "2km-5km",
-                paramValue: "2km_5km",
+                paramValue: "km_2_to_5",
                 legendSubtitleText: "Individuals"
             },
             {
                 displayValue: "5km-10km",
-                paramValue: "5km_10km",
+                paramValue: "km_5_to_10",
                 legendSubtitleText: "Individuals"
             },
             {
                 displayValue: "10km-20km",
-                paramValue: "10km_20km",
+                paramValue: "km_10_to_20",
                 legendSubtitleText: "Individuals"
             },
             {
                 displayValue: "20km-30km",
-                paramValue: "20km_30km",
+                paramValue: "km_20_to_30",
                 legendSubtitleText: "Individuals"
             },
             {
                 displayValue: "30km-40km",
-                paramValue: "30km_40km",
+                paramValue: "km_30_to_40",
                 legendSubtitleText: "Individuals"
             },
             {
                 displayValue: "40km-60km",
-                paramValue: "40km_60km",
+                paramValue: "km_40_to_60",
                 legendSubtitleText: "Individuals"
             },
             {
                 displayValue: "60km+",
-                paramValue: "60km_plus",
+                paramValue: "km_60_plus",
                 legendSubtitleText: "Individuals"
             },
             {
