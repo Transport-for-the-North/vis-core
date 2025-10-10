@@ -1,4 +1,4 @@
-import { updateUrlParameters } from "utils";
+import { updateUrlParameters, normaliseParamValue } from "utils";
 
 // This function finds the first colourValue present in the state.filters in order to deduce the
 // starting map colour.
@@ -15,6 +15,40 @@ const findFirstColourValue = (filters) => {
   return null;
 };
 
+/**
+ * Updates a params map (queryParams or pathParams) across a set of visualisations.
+ *
+ * @param {Object} visualisationsMap - The visualisations state slice (e.g., state.visualisations).
+ * @param {string[]} visualisationNames - Names of visualisations to update.
+ * @param {string} fieldName - The field to update ("queryParams" or "pathParams").
+ * @param {string} paramName - The parameter name to update.
+ * @param {string|number|Array} newParamValue - The value to set for the parameter.
+ * @returns {Object} A new, updated visualisations map with param changes applied.
+ */
+function updateParamMap(visualisationsMap, visualisationNames, fieldName, paramName, newParamValue) {
+  const updatedVisualisations = { ...visualisationsMap };
+  visualisationNames.forEach((visName) => {
+    const vis = updatedVisualisations[visName];
+    if (!vis) return;
+
+    const currentParams = vis[fieldName] || {};
+    const isRequired = currentParams[paramName]?.required || false;
+
+    updatedVisualisations[visName] = {
+      ...vis,
+      [fieldName]: {
+        ...currentParams,
+        [paramName]: {
+          value: newParamValue,
+          required: isRequired,
+        },
+      },
+    };
+  });
+
+  return updatedVisualisations;
+}
+
 // TODO delineate actionTypes into separate namespaces
 export const actionTypes = {
   UPDATE_MAP_CENTRE: "UPDATE_MAP_CENTRE",
@@ -30,6 +64,8 @@ export const actionTypes = {
   UPDATE_LAYER_PAINT: "UPDATE_LAYER_PAINT",
   ADD_VISUALISATION: "ADD_VISUALISATION",
   UPDATE_QUERY_PARAMS: "UPDATE_QUERY_PARAMS",
+  UPDATE_PATH_PARAMS: "UPDATE_PATH_PARAMS",
+  UPDATE_DUAL_PATH_PARAMS: "UPDATE_DUAL_PATH_PARAMS",
   UPDATE_DUAL_QUERY_PARAMS: "UPDATE_DUAL_QUERY_PARAMS",
   UPDATE_ALL_DATA: "UPDATE_ALL_DATA",
   SET_DATA_REQUESTED: "SET_DATA_REQUESTED",
@@ -243,35 +279,82 @@ export const mapReducer = (state, action) => {
       };
     }
 
+    case actionTypes.UPDATE_PATH_PARAMS: {
+      const visualisationNames = action.payload.filter.visualisations;
+      const paramName = action.payload.paramName || action.payload.filter.paramName;
+      const joinStyle = action.payload.joinStyle || action.payload.filter?.joinStyle || "slash";
+      const newParamValue = normaliseParamValue(action.payload.value, joinStyle);
+
+      const updatedVisualisations = updateParamMap(
+        state.visualisations,
+        visualisationNames,
+        "pathParams",
+        paramName,
+        newParamValue
+      );
+
+      return {
+        ...state,
+        visualisations: updatedVisualisations,
+      };
+    }
+
+    case actionTypes.UPDATE_DUAL_PATH_PARAMS: {
+      const visualisationNames = action.payload.filter.visualisations;
+      const paramName = action.payload.paramName || action.payload.filter.paramName;
+      const joinStyle = action.payload.joinStyle || action.payload.filter?.joinStyle || "slash";
+      const newParamValue = normaliseParamValue(action.payload.value, joinStyle);
+
+      // Prepare the target(s) based on sides
+      const targets = (() => {
+        switch (action.payload.sides) {
+          case "left":
+            return [{ ...state.leftVisualisations }];
+          case "right":
+            return [{ ...state.rightVisualisations }];
+          case "both":
+            return [{ ...state.leftVisualisations }, { ...state.rightVisualisations }];
+          default:
+            return [{ ...state.leftVisualisations }];
+        }
+      })();
+
+      // Apply updates to each target pane
+      const updatedTargets = targets.map((visMap) =>
+        updateParamMap(visMap, visualisationNames, "pathParams", paramName, newParamValue)
+      );
+
+      // Return updated state matching requested sides
+      switch (action.payload.sides) {
+        case "left":
+          return { ...state, leftVisualisations: updatedTargets[0] };
+        case "right":
+          return { ...state, rightVisualisations: updatedTargets[0] };
+        case "both":
+          return {
+            ...state,
+            leftVisualisations: updatedTargets[0],
+            rightVisualisations: updatedTargets[1],
+          };
+        default:
+          return { ...state, leftVisualisations: updatedTargets[0] };
+      }
+    }
+
     case actionTypes.UPDATE_QUERY_PARAMS: {
       const visualisationNames = action.payload.filter.visualisations;
       const paramName = action.payload.paramName || action.payload.filter.paramName;
-      let newParamValue = action.payload.value;
 
-      // If newParamValue is an array, convert it to a comma-delimited string
-      if (Array.isArray(newParamValue)) {
-        newParamValue = newParamValue.join(",");
-      }
+      // For query params, use comma-delimited arrays by default
+      const newParamValue = normaliseParamValue(action.payload.value, "comma");
 
-      // Create a new visualisations object with updated query params for each visualisation
-      const updatedVisualisations = { ...state.visualisations };
-      visualisationNames.forEach((visName) => {
-        if (updatedVisualisations[visName]) {
-          const currentQueryParams = updatedVisualisations[visName].queryParams;
-          const isRequired = currentQueryParams[paramName]?.required || false;
-
-          updatedVisualisations[visName] = {
-            ...updatedVisualisations[visName],
-            queryParams: {
-              ...currentQueryParams,
-              [paramName]: {
-                value: newParamValue,
-                required: isRequired,
-              },
-            },
-          };
-        }
-      });
+      const updatedVisualisations = updateParamMap(
+        state.visualisations,
+        visualisationNames,
+        "queryParams",
+        paramName,
+        newParamValue
+      );
 
       return {
         ...state,
@@ -281,56 +364,44 @@ export const mapReducer = (state, action) => {
 
     case actionTypes.UPDATE_DUAL_QUERY_PARAMS: {
       const visualisationNames = action.payload.filter.visualisations;
-      const paramName = action.payload.filter.paramName;
-      const newParamValue = action.payload.value;
-          const updatedVisualisations = (() => {
+      const paramName = action.payload.paramName || action.payload.filter.paramName;
+
+      // For query params, use comma-delimited arrays by default
+      const newParamValue = normaliseParamValue(action.payload.value, "comma");
+
+      // Prepare the target(s) based on sides
+      const targets = (() => {
         switch (action.payload.sides) {
           case "left":
             return [{ ...state.leftVisualisations }];
           case "right":
             return [{ ...state.rightVisualisations }];
           case "both":
-            return [
-              { ...state.leftVisualisations },
-              { ...state.rightVisualisations },
-            ];
+            return [{ ...state.leftVisualisations }, { ...state.rightVisualisations }];
           default:
             return [{ ...state.leftVisualisations }];
         }
       })();
 
-      updatedVisualisations.forEach((updatedVisualisation) => {
-        visualisationNames.forEach((visName) => {
-          if (updatedVisualisation[visName]) {
-            const currentQueryParams = updatedVisualisation[visName].queryParams;
-            const isRequired = currentQueryParams[paramName]?.required || false;
+      // Apply updates to each target pane
+      const updatedTargets = targets.map((visMap) =>
+        updateParamMap(visMap, visualisationNames, "queryParams", paramName, newParamValue)
+      );
 
-            updatedVisualisation[visName] = {
-              ...updatedVisualisation[visName],
-              queryParams: {
-                ...currentQueryParams,
-                [paramName]: {
-                  value: newParamValue,
-                  required: isRequired,
-                },
-              },
-            };
-          }
-        });
-      });
+      // Return updated state matching requested sides
       switch (action.payload.sides) {
         case "left":
-          return { ...state, leftVisualisations: updatedVisualisations[0] };
+          return { ...state, leftVisualisations: updatedTargets[0] };
         case "right":
-          return { ...state, rightVisualisations: updatedVisualisations[0] };
+          return { ...state, rightVisualisations: updatedTargets[0] };
         case "both":
           return {
             ...state,
-            leftVisualisations: updatedVisualisations[0],
-            rightVisualisations: updatedVisualisations[1],
+            leftVisualisations: updatedTargets[0],
+            rightVisualisations: updatedTargets[1],
           };
         default:
-          return { ...state, leftVisualisations: updatedVisualisations[0] };
+          return { ...state, leftVisualisations: updatedTargets[0] };
       }
     }
 

@@ -11,7 +11,8 @@ import {
   isValidCondition,
   applyCondition,
   parseStringToArray,
-  isParamNameForceRequired
+  getGetParameters,
+  buildParamsMap
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
@@ -300,25 +301,25 @@ export const MapProvider = ({ children }) => {
       const visualisationConfig = pageContext.config.visualisations;
       const apiSchema = appContext.apiSchema;
       visualisationConfig.forEach((visConfig) => {
-        const queryParams = {};
         const apiRoute = visConfig.dataPath;
-        const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+
+        // Collect all GET parameters (path-level + operation-level)
+        const apiParameters = getGetParameters(apiSchema, apiRoute);
+
+        // Build query and path params maps
+        const queryParams = buildParamsMap(apiParameters, 'query', pageContext.config.filters);
+        const pathParams = buildParamsMap(apiParameters, 'path', pageContext.config.filters);
+
         const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
-      
-        apiParameters.forEach((param) => {
-          if (param.in === 'query') {
-            queryParams[param.name] = {
-              value: null,
-              required: param.required || isParamNameForceRequired(pageContext.config.filters, param.name) || false, // Use the 'required' property from the schema, default to false
-            };
-          }
-        });
-      
-        // If no parameters are marked as required, set all to required
-        const hasRequiredParams = apiParameters.some(param => param.required);
+
+        // If no parameters are marked as required in the schema, set all to required
+        const hasRequiredParams = apiParameters.some((param) => param.required);
         if (!hasRequiredParams) {
           Object.keys(queryParams).forEach((key) => {
             queryParams[key].required = true;
+          });
+          Object.keys(pathParams).forEach((key) => {
+            pathParams[key].required = true;
           });
         }
       
@@ -326,6 +327,7 @@ export const MapProvider = ({ children }) => {
           ...visConfig,
           dataPath: apiRoute,
           queryParams,
+          pathParams,
           data: [],
           paintProperty: {},
           requiresAuth,
