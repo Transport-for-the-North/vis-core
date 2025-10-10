@@ -35,13 +35,24 @@ export default defineConfig({
       external: ["react", "react-dom", "react/jsx-runtime", 'react-router-dom', '@mapbox/mapbox-gl-draw', 
         'mapbox-gl', '@turf/turf', 'chroma-js', "polished", "js-cookie", "@auth0/auth0-react", "lodash.debounce",
         "@heroicons/react", "leaflet", "lz-string", "jwt-decode", "html-react-parser", "dompurify", "colorbrewer",
-        "@ookla/mapbox-gl-draw-rectangle", "@mapcomponents/react-maplibre",
-        "dotenv", "g",
+        "@ookla/mapbox-gl-draw-rectangle", "@mapcomponents/react-maplibre"
       ],
       output: {
         globals: { react: "React", "react-dom": "ReactDOM" }
       }
     },
     sourcemap: true
-  }
+  },
+  resolve: {
+    alias: {
+      Components: path.resolve(__dirname, "src/Components"),
+      contexts:   path.resolve(__dirname, "src/contexts"),
+      hooks:      path.resolve(__dirname, "src/hooks"),
+      services:   path.resolve(__dirname, "src/services"),
+      hocs:       path.resolve(__dirname, "src/hocs"),
+      layouts:    path.resolve(__dirname, "src/layouts"),
+      reducers:   path.resolve(__dirname, "src/reducers"),
+      utils:      path.resolve(__dirname, "src/utils"),
+    },
+  },
 });
