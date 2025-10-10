@@ -149,7 +149,7 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
   let result = htmlFragment;
 
   // Step 1: Handle colon syntax {functionName:argKey}
-  result = result.replace(/\{(\w+):([a-zA-Z0-9_]+)\}/g, (match, functionName, argKey) => {
+  result = result.replace(/\{(\w+):([a-zA-Z0-9_.]+)\}/g, (match, functionName, argKey) => {
     const arg = data[argKey];
     
     // If arg is undefined, return the original placeholder
@@ -192,7 +192,14 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
     const func = allowedFunctions[functionName];
     if (func && typeof func === 'function') {
       try {
-        return func(arg);
+        // Check function parameter count to determine how to call it
+        if (func.length >= 2) {
+          // Functions with 2+ parameters get both value and full data object
+          return func(arg, data);
+        } else {
+          // Functions with 1 parameter get just the value
+          return func(arg);
+        }
       } catch (error) {
         console.warn(`Error applying function ${functionName}:`, error);
         return String(arg);
