@@ -356,7 +356,7 @@ const scenarioFilterYear = {
 }
 
 const scenarioCodeFilter = {
-    filterName: "Scenario (Run_ID)",
+    filterName: "Scenario (Year, Network, Demand)",
     paramName: "scenarioCode",
     target: "api",
     actions: [{ action: "UPDATE_QUERY_PARAMS" }],
