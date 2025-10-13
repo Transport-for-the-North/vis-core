@@ -819,6 +819,378 @@ const linkFreightInterventionSelector = {
     }
 }
 
+const stationCarOrVanMetricSelector = {
+    filterName: "Metric",
+    paramName: "columnName",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+    ],
+    info:'Use this dropdown to select the metric that will style the map.',
+    containsLegendInfo: true,
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            {
+                displayValue: "No Car or Van",
+                paramValue: "no_car_or_van",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "One Car or Van",
+                paramValue: "one_car_or_van",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Two Car or Van",
+                paramValue: "two_car_or_van",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Three or More Car or Van",
+                paramValue: "three_or_more_car_or_van",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "No Car or Van (%)",
+                paramValue: "percent_no_car_or_van",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "One Car or Van (%)",
+                paramValue: "percent_one_car_or_van",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Two Car or Van (%)",
+                paramValue: "percent_two_car_or_van",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Three or More Car or Van (%)",
+                paramValue: "percent_three_or_more_car_or_van",
+                legendSubtitleText: "% of Individuals"
+            }
+        ]
+    }
+}
+
+const stationDeprivationMetricSelector = {
+    filterName: "Metric",
+    paramName: "columnName",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+    ],
+    info:'Use this dropdown to select the metric that will style the map.',
+    containsLegendInfo: true,
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            {
+                displayValue: "Not Deprived",
+                paramValue: "not_deprived",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Deprived One Dimension",
+                paramValue: "deprived_one_dimension",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Deprived Two Dimensions",
+                paramValue: "deprived_two_dimensions",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Deprived Three Dimensions",
+                paramValue: "deprived_three_dimensions",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Deprived Four Dimensions",
+                paramValue: "deprived_four_dimensions",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Not Deprived (%)",
+                paramValue: "percent_not_deprived",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Deprived One Dimension (%)",
+                paramValue: "percent_deprived_one_dimension",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Deprived Two Dimensions (%)",
+                paramValue: "percent_deprived_two_dimensions",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Deprived Three Dimensions (%)",
+                paramValue: "percent_deprived_three_dimensions",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Deprived Four Dimensions (%)",
+                paramValue: "percent_deprived_four_dimensions",
+                legendSubtitleText: "% of Individuals"
+            }
+        ]
+    }
+}
+
+const stationWorkTravelDistanceMetricSelector = {
+    filterName: "Metric",
+    paramName: "columnName",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+    ],
+    info:'Use this dropdown to select the metric that will style the map.',
+    containsLegendInfo: true,
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            {
+                displayValue: "Work from Home",
+                paramValue: "work_from_home",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "No Fixed Place or Outside UK",
+                paramValue: "no_fixed_place_or_outside_uk",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Less than 2km",
+                paramValue: "less_than_2km",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "2km-5km",
+                paramValue: "km_2_to_5",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "5km-10km",
+                paramValue: "km_5_to_10",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "10km-20km",
+                paramValue: "km_10_to_20",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "20km-30km",
+                paramValue: "km_20_to_30",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "30km-40km",
+                paramValue: "km_30_to_40",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "40km-60km",
+                paramValue: "km_40_to_60",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "60km+",
+                paramValue: "km_60_plus",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Work from Home (%)",
+                paramValue: "percent_work_from_home",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "No Fixed Place or Outside UK (%)",
+                paramValue: "percent_no_fixed_place_or_outside_uk",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Less than 2km (%)",
+                paramValue: "percent_less_than_2_km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "2km-5km (%)",
+                paramValue: "percent_2km_5km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "5km-10km (%)",
+                paramValue: "percent_5km_10km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "10km-20km (%)",
+                paramValue: "percent_10km_20km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "20km-30km (%)",
+                paramValue: "percent_20km_30km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "30km-40km (%)",
+                paramValue: "percent_30km_40km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "40km-60km (%)",
+                paramValue: "percent_40km_60km",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "60km+ (%)",
+                paramValue: "percent_60km_plus",
+                legendSubtitleText: "% of Individuals"
+            }
+        ]
+    }
+}
+
+const stationWorkTravelMethodMetricSelector = {
+    filterName: "Metric",
+    paramName: "columnName",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+    ],
+    info:'Use this dropdown to select the metric that will style the map.',
+    containsLegendInfo: true,
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            {
+                displayValue: "Train",
+                paramValue: "train",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Bus or Coach",
+                paramValue: "bus_or_coach",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Underground Metro Light Rail Tram",
+                paramValue: "underground_metro_light_rail_tram",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Taxi",
+                paramValue: "taxi",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Motorcycle Scooter or Moped",
+                paramValue: "motorcycle_scooter_or_moped",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Driving Car or Van",
+                paramValue: "driving_car_or_van",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Passenger Car or Van",
+                paramValue: "passenger_car_or_van",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Bicycle",
+                paramValue: "bicycle",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "On Foot",
+                paramValue: "on_foot",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Work from Home",
+                paramValue: "work_from_home",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Other",
+                paramValue: "other",
+                legendSubtitleText: "Individuals"
+            },
+            {
+                displayValue: "Train (%)",
+                paramValue: "percent_train",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Bus or Coach (%)",
+                paramValue: "percent_bus_or_coach",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Underground Metro Light Rail Tram (%)",
+                paramValue: "percent_underground_metro_light_rail_tram",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Taxi (%)",
+                paramValue: "percent_taxi",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Motorcycle Scooter or Moped (%)",
+                paramValue: "percent_motorcycle_scooter_or_moped",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Driving Car or Van (%)",
+                paramValue: "percent_driving_car_or_van",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Passenger Car or Van (%)",
+                paramValue: "percent_passenger_car_or_van",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Bicycle (%)",
+                paramValue: "percent_bicycle",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "On Foot (%)",
+                paramValue: "percent_on_foot",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Work from Home (%)",
+                paramValue: "percent_work_from_home",
+                legendSubtitleText: "% of Individuals"
+            },
+            {
+                displayValue: "Other (%)",
+                paramValue: "percent_other",
+                legendSubtitleText: "% of Individuals"
+            }
+        ]
+    }
+}
+
 export const selectors = {
   loadingsTOCSelector: loadingsTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -838,5 +1210,9 @@ export const selectors = {
   authoritySelector: authoritySelector,
   timePeriod: timePeriod,
   nodeFreightInterventionSelector: nodeFreightInterventionSelector,
-  linkFreightInterventionSelector: linkFreightInterventionSelector
+  linkFreightInterventionSelector: linkFreightInterventionSelector,
+  stationCarOrVanMetricSelector: stationCarOrVanMetricSelector,
+  stationDeprivationMetricSelector: stationDeprivationMetricSelector,
+  stationWorkTravelDistanceMetricSelector: stationWorkTravelDistanceMetricSelector,
+  stationWorkTravelMethodMetricSelector: stationWorkTravelMethodMetricSelector
 };

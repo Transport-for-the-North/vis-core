@@ -6,6 +6,10 @@ import { nodeSocio } from "./nodeSocio"
 import { stationInformation } from "./stationInformation"
 import { linkFrequency } from "./linkFrequency"
 import { performanceBi } from "./performanceBi"
+import { nodeCarOrVan } from "./nodeCarOrVan"
+import { nodeHouseholdDeprivation } from "./nodeHouseholdDeprivation"
+import { nodeWorkTravelDistance } from "./nodeWorkTravelDistance"
+import { nodeWorkTravelMethod } from "./nodeWorkTravelMethod"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -15,5 +19,9 @@ export const pages = {
     nodeSocio: nodeSocio,
     stationInformation: stationInformation,
     linkFrequency: linkFrequency,
-    performanceBi: performanceBi
+    performanceBi: performanceBi,
+    nodeCarOrVan: nodeCarOrVan,
+    nodeHouseholdDeprivation: nodeHouseholdDeprivation,
+    nodeWorkTravelDistance: nodeWorkTravelDistance,
+    nodeWorkTravelMethod: nodeWorkTravelMethod
 }
