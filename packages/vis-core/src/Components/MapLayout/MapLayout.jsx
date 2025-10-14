@@ -4,7 +4,7 @@ import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Componen
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
-import { defaultBgColour } from "defaults";
+import { defaultBgColour } from "../defaults";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
 import { actionTypes } from "reducers";

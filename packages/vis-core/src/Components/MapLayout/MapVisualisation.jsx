@@ -15,7 +15,7 @@ import {
 } from "utils";
 import chroma from "chroma-js";
 import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
-import { defaultMapColourMapper } from "defaults";
+import { defaultMapColourMapper } from "../defaults";
 
 /**
  * MapVisualisation component responsible for rendering visualizations on a map.
