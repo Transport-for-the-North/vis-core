@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
 import { syncMaps } from "utils";
-import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "../defaults";
+import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "defaults";
 
 /**
  * Custom hook to manage two synchronized MapLibre maps.
