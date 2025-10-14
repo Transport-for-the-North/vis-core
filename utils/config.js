@@ -149,7 +149,7 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
   let result = htmlFragment;
 
   // Step 1: Handle colon syntax {functionName:argKey}
-  result = result.replace(/\{(\w+):([a-zA-Z0-9_]+)\}/g, (match, functionName, argKey) => {
+  result = result.replace(/\{(\w+):([a-zA-Z0-9_.]+)\}/g, (match, functionName, argKey) => {
     const arg = data[argKey];
     
     // If arg is undefined, return the original placeholder
@@ -192,7 +192,14 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
     const func = allowedFunctions[functionName];
     if (func && typeof func === 'function') {
       try {
-        return func(arg);
+        // Check function parameter count to determine how to call it
+        if (func.length >= 2) {
+          // Functions with 2+ parameters get both value and full data object
+          return func(arg, data);
+        } else {
+          // Functions with 1 parameter get just the value
+          return func(arg);
+        }
       } catch (error) {
         console.warn(`Error applying function ${functionName}:`, error);
         return String(arg);
@@ -279,6 +286,40 @@ export function filterGlossaryData(glossaryData, excludeList) {
 export function isParamNameForceRequired(filters, targetParamName) {
   const filter = filters.find(f => f.paramName === targetParamName);
   return filter ? filter.forceRequired === true : false;
+}
+
+
+/**
+ * Build a params map for a given parameter location ("query" or "path") from OpenAPI parameter definitions.
+ *
+ * - Path params are set required by default (per OpenAPI spec), but we still honor 'required' and
+ *   any "force required" logic from filters.
+ * - Query params use the schema's 'required' flag, optionally overridden by your filter rules.
+ * - Default values from the parameter schema are used when present; otherwise null.
+ *
+ * @param {Array<Object>} parameters - Array of OpenAPI parameter definitions.
+ * @param {"query"|"path"} location - The parameter location to extract.
+ * @param {Object} filters - Page filters (used by isParamNameForceRequired to optionally force required).
+ * @returns {Object<string, {value:any, required:boolean}>} - A params map suitable for your visualisation state.
+ */
+export function buildParamsMap(parameters, location, filters) {
+  const map = {};
+  parameters.forEach((param) => {
+    if (param.in !== location) return;
+
+    const forcedRequired = isParamNameForceRequired(filters, param.name);
+    // Per OpenAPI, path params must be required; we keep that behavior but still allow explicit config.
+    const required =
+      location === 'path' ? true : Boolean(param.required || forcedRequired);
+
+    const defaultValue = param?.schema?.default ?? null;
+
+    map[param.name] = {
+      value: defaultValue,
+      required,
+    };
+  });
+  return map;
 }
 
 // Function to detect if the OS is Windows 10 or lower
