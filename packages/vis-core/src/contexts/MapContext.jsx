@@ -13,7 +13,7 @@ import {
   parseStringToArray,
   isParamNameForceRequired
 } from "utils";
-import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "../defaults";
+import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
 import { api } from "services";
 

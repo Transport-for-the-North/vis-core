@@ -1,7 +1,7 @@
 import { create, update } from "lodash";
 import BaseService from "./Base";
 import Cookies from "js-cookie";
-import { REQUEST_CONFIG } from "../defaults";
+import { REQUEST_CONFIG } from "defaults";
 
 function createQueryString(queryParams) {
     /**
