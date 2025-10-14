@@ -27,7 +27,8 @@
       "hocs/*":       ["hocs/*"],
       "layouts/*":    ["layouts/*"],
       "reducers/*":   ["reducers/*"],
-      "utils/*":      ["utils/*"]
+      "utils/*":      ["utils/*"],
+      "defaults": ["defaults"]
     }
   },
   "include": ["src/**/*", "src/global.d.ts"],
