@@ -1,6 +1,7 @@
 import { render, screen, act } from "@testing-library/react";
 import { FilterContext, MapContext } from "contexts";
 import { useMap } from "hooks";
+import { api } from "services";
 
 jest.mock("maplibre-gl", () => {
   class Popup {
@@ -53,6 +54,14 @@ jest.mock("./VisualisationManager", () => ({
 jest.mock("components", () => ({
   ...jest.requireActual("components"),
   DynamicLegend: () => <div>DynamicLegend</div>,
+}));
+jest.mock("services", () => ({
+  ...jest.requireActual("services"),
+  api: {
+    baseService: {
+      get: jest.fn(),
+    },
+  },
 }));
 let mockMapContext = {
   state: {
@@ -162,6 +171,10 @@ const getLayer = jest.fn();
 const queryRenderedFeatures = jest.fn();
 const setFilter = jest.fn();
 const setFeatureState = jest.fn();
+const getZoom = jest.fn();
+const querySourceFeatures = jest.fn();
+const addLayer = jest.fn();
+const setLayoutProperty = jest.fn();
 // const addEventListener = jest.fn();
 
 beforeEach(() => {
@@ -182,6 +195,10 @@ beforeEach(() => {
       queryRenderedFeatures,
       setFilter,
       setFeatureState,
+      getZoom,
+      querySourceFeatures,
+      addLayer,
+      setLayoutProperty,
     },
     isMapReady: true,
   });
@@ -279,13 +296,17 @@ describe("Hooks tests", () => {
     const { map, isMapReady } = useMap.mock.results[0].value;
     expect(map).toEqual({
       addControl,
+      addLayer,
       on,
       getCanvas,
       off,
       getLayer,
+      getZoom,
       queryRenderedFeatures,
+      querySourceFeatures,
       setFilter,
       setFeatureState,
+      setLayoutProperty,
     });
     expect(isMapReady).toBe(true);
     expect(screen.getByText("DynamicLegend")).toBeInTheDocument();
@@ -377,14 +398,32 @@ describe("handleMapHover is called or not", () => {
 });
 
 describe("Tests of handleMapHover function", () => {
+  let setTimeoutSpy;
   mockMapContext = {
     ...mockMapContext,
     state: {
       ...mockMapContext.state,
       visualisedFeatureIds: { first: { value: 10 }, second: { value: 15 } },
+      layers: {
+        ...mockMapContext.state.layers,
+        id: {
+          ...mockMapContext.state.layers.id,
+          hoverTipShouldIncludeMetadata: true,
+        },
+      },
     },
   };
   beforeEach(() => {
+    jest.useFakeTimers();
+    setTimeoutSpy = jest.spyOn(global, "setTimeout");
+    api.baseService.get.mockResolvedValue({
+      data: "test data",
+      someField: "value",
+    });
+    global.AbortController = jest.fn(() => ({
+      signal: "signalMocked",
+      abort: jest.fn(),
+    }));
     getLayer.mockReturnValue(true);
     queryRenderedFeatures.mockReturnValue([
       {
@@ -397,7 +436,7 @@ describe("Tests of handleMapHover function", () => {
         state: {
           value: 15,
         },
-        properties: { name: "name" },
+        properties: { name: "name", data: "data" },
       },
     ]);
     on.mockImplementation((event, callback) => {
@@ -422,6 +461,10 @@ describe("Tests of handleMapHover function", () => {
       },
       isMapReady: true,
     });
+  });
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
   });
   it("Test without e.point", () => {
     on.mockImplementation((event, callback) => {
@@ -477,42 +520,6 @@ describe("Tests of handleMapHover function", () => {
     };
     const maplibregl = require("maplibre-gl").default;
 
-   render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <Map {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
-    );
-
-    const mouseMoveCallback = on.mock.calls.find(
-      call => call[0] === "mousemove"
-    )[1];
-
-    act(() => {
-      mouseMoveCallback({
-        point: { x: 100, y: 200 },
-        lngLat: { lng: 2.3522, lat: 48.8566 }
-      });
-    });
-
-    expect(queryRenderedFeatures).toHaveBeenCalledWith(
-      [[100, 200], [100, 200]],
-      expect.objectContaining({ layers: ["first", "second", "id"] })
-    );
-
-    expect(setFeatureState).toHaveBeenCalledWith(
-      { source: "source", id: "id", sourceLayer: "source-layer" },
-      { hover: true }
-    );
-  });
-});
-
-describe("fetchData function", () => {
-
-  /* 419 - 477 */
-
-  it("Test", () => {
     render(
       <FilterContext.Provider value={mockFilterContext}>
         <MapContext.Provider value={mockMapContext}>
@@ -521,6 +528,352 @@ describe("fetchData function", () => {
       </FilterContext.Provider>
     );
 
+    const mouseMoveCallback = on.mock.calls.find(
+      (call) => call[0] === "mousemove"
+    )[1];
 
+    act(() => {
+      mouseMoveCallback({
+        point: { x: 100, y: 200 },
+        lngLat: { lng: 2.3522, lat: 48.8566 },
+      });
+    });
+
+    expect(queryRenderedFeatures).toHaveBeenCalledWith(
+      [
+        [100, 200],
+        [100, 200],
+      ],
+      expect.objectContaining({ layers: ["first", "second", "id"] })
+    );
+
+    expect(setFeatureState).toHaveBeenCalledWith(
+      { source: "source", id: "id", sourceLayer: "source-layer" },
+      { hover: true }
+    );
+  });
+
+  it("Function with customTooltip", () => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          ...mockMapContext.state.layers,
+          id: {
+            ...mockMapContext.state.layers.id,
+            customTooltip: {
+              requestUrl: "/{id}-requestUrl",
+              htmlTemplate: "<p>htmlTemplate</p>",
+              customFormattingFunctions: "customFormattingFunctions",
+            },
+          },
+        },
+      },
+    };
+
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(setTimeoutSpy).toHaveBeenCalled();
+
+    // Advance time to pass setTimeout and lauch fetchData()
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    // get is called with a good url and signal
+    expect(api.baseService.get).toHaveBeenCalledWith("/id-requestUrl", {
+      signal: "signalMocked",
+    });
+  });
+
+  it("should display 'Data unavailable' when API fails", async () => {
+    mockMapContext.state.layers = {
+      id: {
+        hoverTipShouldIncludeMetadata: true,
+        shouldHaveTooltipOnHover: true,
+        customTooltip: {
+          requestUrl: "/{id}-requestUrl",
+          htmlTemplate: "<p>htmlTemplate</p>",
+          customFormattingFunctions: {},
+        },
+      },
+    };
+
+    const apiError = new Error("Network error");
+    api.baseService.get = jest.fn().mockRejectedValue(apiError);
+
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+    let capturedPopup = null;
+    const OriginalPopup = require("maplibre-gl").default.Popup;
+    const PopupSpy = jest.fn(function (options) {
+      const instance = new OriginalPopup(options);
+      capturedPopup = instance;
+      return instance;
+    });
+    require("maplibre-gl").default.Popup = PopupSpy;
+
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    const mouseMoveCallback = on.mock.calls.find(
+      (call) => call[0] === "mousemove"
+    )[1];
+
+    act(() => {
+      mouseMoveCallback({
+        point: { x: 100, y: 200 },
+        lngLat: { lng: 0, lat: 0 },
+      });
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Failed to fetch tooltip data:",
+      apiError
+    );
+
+    expect(capturedPopup.html).toContain("popup-content");
+    expect(capturedPopup.html).toContain("feature-name");
+    expect(capturedPopup.html).toContain("name");
+    expect(capturedPopup.html).toContain("Data unavailable.");
+
+    expect(capturedPopup.html).toMatch(
+      /<div class="popup-content">[\s\S]*<p class="feature-name">name<\/p>[\s\S]*<p>Data unavailable\.<\/p>[\s\S]*<\/div>/
+    );
+
+    consoleErrorSpy.mockRestore();
+  });
+});
+
+describe("handleLayerClick function test", () => {
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          ...mockMapContext.state.layers,
+          id: {
+            ...mockMapContext.state.layers.id,
+            shouldHaveTooltipOnClick: true,
+          },
+        },
+      },
+    };
+    on.mockImplementation((event, callback) => {
+      if (event === "click") {
+        const mockParams = {
+          point: { x: 100, y: 200 },
+          lngLat: { lng: 2.3522, lat: 48.8566 },
+        };
+        callback(mockParams);
+      }
+    });
+    queryRenderedFeatures.mockReturnValue([
+      {
+        id: 1,
+        layer: {
+          id: "id",
+          source: "source",
+          "source-layer": "source-layer",
+        },
+        state: {
+          value: 15,
+        },
+        properties: {
+          name: "name",
+          id: "test-id",
+          data: "data",
+        },
+      },
+    ]);
+  });
+
+  it("queryRenderedFeatures is called with the great parameters", () => {
+    let capturedPopup = null;
+
+    const PopupSpy = jest.fn(function (options) {
+      const instance = {
+        options,
+        coords: null,
+        html: null,
+        map: null,
+        setLngLat: function (coords) {
+          this.coords = coords;
+          return this;
+        },
+        setHTML: function (html) {
+          this.html = html;
+          return this;
+        },
+        addTo: function (map) {
+          this.map = map;
+          return this;
+        },
+        remove: function () {
+          return this;
+        },
+      };
+      capturedPopup = instance;
+      return instance;
+    });
+
+    require("maplibre-gl").default.Popup = PopupSpy;
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(queryRenderedFeatures).toHaveBeenCalledWith(
+      [
+        [100, 200],
+        [100, 200],
+      ],
+      { layers: ["id"] }
+    );
+  });
+
+  it("should call setLngLat, setHTML and addTo on popup", () => {
+    let capturedPopup = null;
+
+    const PopupSpy = jest.fn(function (options) {
+      const instance = {
+        options,
+        coords: null,
+        html: null,
+        map: null,
+        setLngLat: function (coords) {
+          this.coords = coords;
+          return this;
+        },
+        setHTML: function (html) {
+          this.html = html;
+          return this;
+        },
+        addTo: function (map) {
+          this.map = map;
+          return this;
+        },
+        remove: function () {
+          return this;
+        },
+      };
+      capturedPopup = instance;
+      return instance;
+    });
+
+    require("maplibre-gl").default.Popup = PopupSpy;
+
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(capturedPopup).not.toBeNull();
+
+    expect(capturedPopup.coords).toEqual({
+      lng: 2.3522,
+      lat: 48.8566,
+    });
+
+    expect(capturedPopup.html).toContain("name");
+    expect(capturedPopup.html).toContain("Id: test-id");
+    expect(capturedPopup.html).toContain("Value: 15");
+
+    expect(capturedPopup.map).toBeDefined();
+  });
+});
+
+// 546 - 597
+describe("handleZoom function tests", () => {
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          ...mockMapContext.state.layers,
+          id: {
+            ...mockMapContext.state.layers.id,
+            shouldHaveLabel: true,
+          },
+        },
+      },
+    };
+    on.mockImplementation((event, callback) => {
+      if (event === "zoomend") {
+        const mockParams = {
+          point: { x: 100, y: 200 },
+          lngLat: { lng: 2.3522, lat: 48.8566 },
+        };
+        callback(mockParams);
+      }
+    });
+    querySourceFeatures.mockReturnValue([
+      { geometry: { type: "firstType" } },
+      { geometry: { type: "secondType" } },
+    ]);
+    getZoom.mockReturnValue(10); // 10 < 12
+    getLayer.mockReturnValue("getLayer returned value");
+  });
+  it("Test when mapZoomLevel <= labelZoomLevel", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(mockMapContext.dispatch).toHaveBeenCalledWith({
+      type: "STORE_CURRENT_ZOOM",
+      payload: 10,
+    });
+    expect(getLayer).toHaveBeenCalledWith("id-label");
+    expect(setLayoutProperty).toHaveBeenCalledWith(
+      "id-label",
+      "visibility",
+      "none"
+    );
+  });
+
+  it("Test when !mapZoomLevel <= labelZoomLevel", () => {
+
+    // to continue
+
+    getZoom.mockReturnValue(14); // 14 > 12
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    // expect(querySourceFeatures).toHaveBeenCalled();
   });
 });
