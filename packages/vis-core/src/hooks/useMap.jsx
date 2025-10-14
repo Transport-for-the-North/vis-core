@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
-import { defaultMapStyle } from "defaults";
-import { defaultMapCentre } from "defaults";
-import { defaultMapZoom } from "defaults";
+import { defaultMapStyle } from "../defaults";
+import { defaultMapCentre } from "../defaults";
+import { defaultMapZoom } from "../defaults";
 
 /**
  * Custom hook to initialize and manage a MapLibre map.
