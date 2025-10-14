@@ -53,7 +53,7 @@ export default defineConfig({
       layouts:    path.resolve(__dirname, "src/layouts"),
       reducers:   path.resolve(__dirname, "src/reducers"),
       utils:      path.resolve(__dirname, "src/utils"),
-      defaults: path.resolve(__dirname, "src/defaults"),
+      defaults: path.resolve(__dirname, "src/defaults.js"),
     },
   },
 });
