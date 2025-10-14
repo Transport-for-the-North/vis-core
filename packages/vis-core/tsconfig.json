@@ -28,7 +28,7 @@
       "layouts/*":    ["layouts/*"],
       "reducers/*":   ["reducers/*"],
       "utils/*":      ["utils/*"],
-      "defaults": ["defaults"]
+      "defaults":     ["defaults.js"]
     }
   },
   "include": ["src/**/*", "src/global.d.ts"],
