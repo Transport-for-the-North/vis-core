@@ -66,17 +66,21 @@ const NoDataParagraph = styled.p``;
  * @property {Function} onFilterChange - The function called when a filter value changes.
  * @returns {JSX.Element} The rendered SelectorSection component.
  */
-export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, requestMethod = 'GET' }) => {
+export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, downloadShapefilePath, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
   const { state: mapState } = useMapContext();
   const { state: filterState } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isShapefileDownloading, setIsShapefileDownloading] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [isRequestTooLarge, setIsRequestTooLarge] = useState(false);
 
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
+
+  const apiRouteShapefile = downloadShapefilePath;
+  const requiresAuthShapefile = checkSecurityRequirements(apiSchema, apiRouteShapefile);
 
   const handleFilterChange = (filter, value) => {
     onFilterChange(filter, value);
@@ -107,6 +111,33 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       setRequestError(error.message || "Error downloading data");
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleShapefileDownload = async () => {
+    setIsShapefileDownloading(true);
+    setRequestError(null);
+
+    const queryParams = {};
+    filters.forEach(filter => {
+      if (filter.type !== 'fixed') {
+        queryParams[filter.paramName] = filterState[filter.id];
+      }
+    });
+    
+    try {
+      await api.downloadService.downloadCsv(apiRouteShapefile, {
+        queryParams: queryParams,
+        skipAuth: !requiresAuthShapefile,
+        method: requestMethod,
+      });
+      console.log('Shapefile downloaded successfully');
+      window.clarity('event', 'download_shapefile_clicked');
+    } catch (error) {
+      console.error('Error downloading Shapefile:', error);
+      setRequestError(error.message || "Error downloading Shapefile");
+    } finally {
+      setIsShapefileDownloading(false);
     }
   };
 
@@ -237,6 +268,19 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                 <>Downloading <Spinner /></>
               ) : (
                 isRequestTooLarge ? "Request Too Large" : "Download"
+              )}
+            </DownloadButton>
+          )}
+          {downloadShapefilePath && (
+            <DownloadButton 
+              onClick={handleShapefileDownload} 
+              $bgColor={bgColor}
+              disabled={isRequestTooLarge || isShapefileDownloading}
+            >
+              {isShapefileDownloading ? (
+                <>Downloading Shapefile <Spinner /></>
+              ) : (
+                isRequestTooLarge ? "Request Too Large" : "Download Shapefile"
               )}
             </DownloadButton>
           )}
