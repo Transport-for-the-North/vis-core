@@ -9,10 +9,9 @@ import {
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown } from "../Selectors";
-import { SelectorLabel } from "../Selectors/SelectorLabel";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
-import { calculateMaxWidthFactor, MAP_CONSTANTS, applyWidthFactor} from "utils/map"
+import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression} from "utils/map"
 
 /**
  * Styled container for the layer control entry.
@@ -274,22 +273,12 @@ export const LayerControlEntry = memo(
     const handleOpacityChange = (e) => {
       const newOpacity = parseFloat(e.target.value);
       const opacityProp = getOpacityProperty(layer.type);
-      let opacityExpression;
-
-      if (isFeatureStateExpression) {
-        opacityExpression = [
-          "case",
-          ["in", ["feature-state", "value"], ["literal", [0, null]]],
-          0,
-          newOpacity,
-        ];
-      } else {
-        opacityExpression = newOpacity;
-      }
 
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
-          map.setPaintProperty(layer.id, opacityProp, opacityExpression);
+          const currentExpr = map.getPaintProperty(layer.id, opacityProp);
+          const updatedExpr = updateOpacityExpression(currentExpr, newOpacity);
+          map.setPaintProperty(layer.id, opacityProp, updatedExpr);
         }
       });
       setOpacity(newOpacity);
