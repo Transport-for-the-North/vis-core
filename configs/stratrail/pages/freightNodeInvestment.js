@@ -2,33 +2,69 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { freightInvestPopupContent } from "../templates/investmentPopup";
 import { freightInvestmentSummary } from "../templates";
-import { crpLinesLayerPaint } from "../customPaintDefinitions";
+import { crpLinesLayerPaint, invisiblePolygonCustomPaint, parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const freightNodeInvestments = {
-  pageName: "Freight Node Investments (SRIP)",
+  pageName: "Freight Node Investments (FRIP)",
   url: "/freight-node-investments",
   type: "MapLayout",
   category: "Investments",
-  about: `<p>This visualisation shows all the freight node investment/schemes from the Freight Investment Pipeline (SRIP). Each scheme is colour coded by it's current status.</p>
+  about: `<p>This visualisation shows all the freight node investment/schemes from the Freight Investment Pipeline (FRIP). Each scheme is colour coded by it's current status.</p>
         <p>Use the filters to select the intervention type(s) you wish to see on the map. Hover over a node to view it's basic information and/or click on a node to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
         {
-            uniqueId: "RailOfferLinksVectorTile",
-            name: "Network",
+            name: "Local Authorities",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
-            sourceLayer: "geometry",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
             geometryType: "line",
+            customPaint: parentAuthorityBoundaryCustomPaint,
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
+            hoverTipShouldIncludeMetadata: false
         },
+        {
+          name: "hide_Local Authorities",
+          type: "tile",
+          source: "api",
+          path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+          sourceLayer: "zones",
+          geometryType: "polygon",
+          customPaint: invisiblePolygonCustomPaint,
+          isHoverable: false,
+          isStylable: false,
+          shouldHaveTooltipOnHover: true,
+          shouldHaveLabel: false,
+          labelZoomLevel: 12,
+          labelNulls: false,
+          hoverNulls: true,
+          hoverTipShouldIncludeMetadata: false,
+        },
+        // {
+        //     uniqueId: "RailOfferLinksVectorTile",
+        //     name: "Network",
+        //     type: "tile",
+        //     source: "api",
+        //     path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
+        //     sourceLayer: "geometry",
+        //     geometryType: "line",
+        //     isHoverable: false,
+        //     isStylable: false,
+        //     shouldHaveTooltipOnHover: false,
+        //     shouldHaveLabel: false
+        // },
         // {
         //     uniqueId: "RailOfferCRPVectorTile",
         //     name: "CRP Network",
@@ -65,7 +101,8 @@ export const freightNodeInvestments = {
             customTooltip: {
                 url: "/api/railoffer/freight-node-investment-callout/point?featureId={id}",
                 htmlTemplate: freightInvestPopupContent
-            }
+            },
+            defaultOpacity: 1
         },
     ],
     visualisations: [

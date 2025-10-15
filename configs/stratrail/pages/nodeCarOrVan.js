@@ -14,6 +14,8 @@ export const nodeCarOrVan = {
    <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the car or van availability on the tooltip.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
         {

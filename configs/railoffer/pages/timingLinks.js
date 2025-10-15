@@ -14,6 +14,8 @@ export const timingLinks = {
   <p>Use the filter to select the metric you wish to see on the map. Hover over a link to see more information about the timing link on the tooltip.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
         {
