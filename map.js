@@ -94,6 +94,8 @@ export function getOpacityProperty(layerType) {
       widthProp = "circle-radius";
       break;
     }
+    default:
+      console.warn(`Unable to get width property name for layerType ${layerType}`);
   }
   return widthProp;
 }
@@ -171,6 +173,35 @@ export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, 
   };
 }
  
+/**
+ * Safely updates an existing opacity expression by replacing only the default/fallback
+ * value with the newOpacity, preserving the rest of the expression.
+ *
+ * Handles common expression types where the final argument is a default/fallback:
+ * - case
+ * - match
+ * - coalesce
+ *
+ * For non-expression or unsupported types, returns the numeric newOpacity.
+ *
+ * @param {any} existingExpr - The current paint property value (could be a number or expression array).
+ * @param {number} newOpacity - The new opacity value to apply.
+ * @returns {any} - The updated expression/value to set on the layer.
+ */
+export const updateOpacityExpression = (existingExpr, newOpacity) => {
+  if (Array.isArray(existingExpr)) {
+    const op = existingExpr[0];
+    if (op === "case" || op === "match" || op === "coalesce") {
+      const updated = existingExpr.slice(0, existingExpr.length - 1);
+      updated.push(newOpacity);
+      return updated;
+    }
+  }
+  // Fallback: just set numeric opacity
+  return newOpacity;
+};
+
+
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
  * This function is designed to create paint properties for various map features such as polygons, lines, circles, and points.
