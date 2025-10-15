@@ -74,7 +74,6 @@ export const freightLinkInvestments = {
                 url: "/api/railoffer/freight-link-investment-callout/link?featureId={id}",
                 htmlTemplate: freightInvestPopupContent
             },
-            defaultOpacity: 1,
         },
     ],
     visualisations: [

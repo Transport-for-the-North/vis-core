@@ -102,7 +102,6 @@ export const freightNodeInvestments = {
                 url: "/api/railoffer/freight-node-investment-callout/point?featureId={id}",
                 htmlTemplate: freightInvestPopupContent
             },
-            defaultOpacity: 1
         },
     ],
     visualisations: [
