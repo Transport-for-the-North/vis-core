@@ -79,20 +79,21 @@ const IconWrapper = styled.span`
 export const Toggle = ({ filter, onChange, bgColor }) => {
   const { state: filterState } = useFilterContext();
   const [selectedButtons, setSelectedButtons] = useState(
-    filterState[filter.id] || (filter.multiSelect ? [] : filter.values.values[0].paramValue)
+    filter.multiSelect ? (Array.isArray(filterState[filter.id]) ? filterState[filter.id] : []) : (filterState[filter.id] ?? filter.values.values[0].paramValue)
   );
 
   useEffect(() => {
-    setSelectedButtons(filterState[filter.id] || (filter.multiSelect ? [] : filter.values.values[0].paramValue));
+    setSelectedButtons(filter.multiSelect ? (Array.isArray(filterState[filter.id]) ? filterState[filter.id] : []) : (filterState[filter.id] ?? filter.values.values[0].paramValue));
   }, [filter.id, filter.multiSelect, filter.values.values]);
 
   const handleToggleChange = (newSelectedValue) => {
     if (filter.multiSelect) {
+      const current = Array.isArray(selectedButtons) ? selectedButtons : [];
       let newSelectedButtons;
-      if (selectedButtons.includes(newSelectedValue)) {
-        newSelectedButtons = selectedButtons.filter(value => value !== newSelectedValue);
+      if (current.includes(newSelectedValue)) {
+        newSelectedButtons = current.filter(value => value !== newSelectedValue);
       } else {
-        newSelectedButtons = [...selectedButtons, newSelectedValue];
+        newSelectedButtons = [...current, newSelectedValue];
       }
       onChange(filter, newSelectedButtons);
       setSelectedButtons(newSelectedButtons);
@@ -104,7 +105,8 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
 
   const handleToggleAll = () => {
     let newSelectedButtons;
-    if (selectedButtons.length === filter.values.values.length) {
+    const current = Array.isArray(selectedButtons) ? selectedButtons : [];
+    if (current.length === filter.values.values.length) {
       newSelectedButtons = [];
     } else {
       newSelectedButtons = filter.values.values.map(option => option.paramValue);
@@ -123,7 +125,7 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
             key={option.paramValue}
             value={option.paramValue}
             onClick={() => handleToggleChange(option.paramValue)}
-            $isSelected={filter.multiSelect ? selectedButtons.includes(option.paramValue) : selectedButtons === option.paramValue}
+            $isSelected={filter.multiSelect ? (Array.isArray(selectedButtons) && selectedButtons.includes(option.paramValue)) : selectedButtons === option.paramValue}
             size={options.length}
             index={index}
             $bgColor={bgColor}
@@ -140,7 +142,7 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
       {filter.multiSelect && (
         <ToggleAllButton
           onClick={handleToggleAll}
-          $isSelected={selectedButtons.length === filter.values.values.length}
+          $isSelected={Array.isArray(selectedButtons) && selectedButtons.length === filter.values.values.length}
           $bgColor={bgColor}
         >
           Toggle All
