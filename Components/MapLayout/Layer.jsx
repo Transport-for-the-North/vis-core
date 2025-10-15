@@ -1,10 +1,11 @@
-import { useEffect, useContext  } from "react";
+import { useEffect, useContext, useRef } from "react";
 import { api } from "services";
 import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle, getOpacityProperty } from "utils";
 import { useMapContext} from "hooks";
 import { FilterContext } from "contexts";
 import { actionTypes } from "reducers";
 import { DEFAULT_LAYER_OPACITY } from "defaults";
+import { loadImagesFromTileFeatures } from "utils/imageLoader";
 
 /**
  * Layer component that adds a layer to the map(s) and handles its lifecycle.
@@ -34,6 +35,7 @@ export const Layer = ({ layer }) => {
   // Access filters from FilterContext
   const filterContext = useContext(FilterContext);
   const filters = filterContext?.state || {};
+  const loadingRef = useRef(false);
 
   useEffect(() => {
     // Determine the maps to operate on
@@ -48,6 +50,12 @@ export const Layer = ({ layer }) => {
       targetMaps.forEach((mapInstance) => {
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
+        }
+        if (mapInstance.getLayer(`${layer.name}-symbols`)) {
+          mapInstance.removeLayer(`${layer.name}-symbols`);
+        }
+        if (mapInstance.getLayer(`${layer.name}-symbols-hover`)) {
+          mapInstance.removeLayer(`${layer.name}-symbols-hover`);
         }
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);
@@ -71,6 +79,7 @@ export const Layer = ({ layer }) => {
           id: layer.name,
           maxzoom: layer.maxZoom || 24,
           minzoom: layer.minZoom || 0,
+          bufferSize: layer.bufferSize
         };
         layerConfig.paint = layer.customPaint || layerConfig.paint;
 
@@ -84,7 +93,7 @@ export const Layer = ({ layer }) => {
 
         const layerLayout = {};
         layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
-        layerConfig.layout = layerLayout;
+        layerConfig.layout = {...layerConfig.layout, ...layerLayout };
         layerConfig.metadata = {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
@@ -144,10 +153,33 @@ export const Layer = ({ layer }) => {
             metadata: {
               ...layerConfig.metadata,
               isStylable: layer.isStylable ?? false,
-              bufferSize: layer.geometryType === "line" ? 7 : null,
+              bufferSize: layer.bufferSize,
               defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
             },
           });
+
+          // Set up image loading for image-marker layers
+          if (layer.customRenderer === "image-marker") {
+            const handleSourceData = (e) => {
+              if (e.sourceId === layer.name && 
+                  e.isSourceLoaded && 
+                  !loadingRef.current) {
+                loadingRef.current = true;
+                
+                loadImagesFromTileFeatures(mapInstance, layer)
+                  .then(() => {
+                  })
+                  .catch((error) => {
+                    console.error(`Error loading images for ${layer.name}:`, error);
+                  })
+                  .finally(() => {
+                    loadingRef.current = false;
+                  });
+              }
+            };
+            
+            mapInstance.on('sourcedata', handleSourceData);
+          }
 
           // Add the hover layer if the layer is hoverable
           if (layer.isHoverable) {
@@ -181,6 +213,12 @@ export const Layer = ({ layer }) => {
       targetMaps.forEach((mapInstance) => {
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
+        }
+        if (mapInstance.getLayer(`${layer.name}-symbols`)) {
+          mapInstance.removeLayer(`${layer.name}-symbols`);
+        }
+        if (mapInstance.getLayer(`${layer.name}-symbols-hover`)) {
+          mapInstance.removeLayer(`${layer.name}-symbols-hover`);
         }
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);

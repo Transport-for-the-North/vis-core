@@ -59,6 +59,10 @@ export function getOpacityProperty(layerType) {
       opacityProp = "circle-opacity";
       break;
     }
+    case "symbol": {
+      opacityProp = "icon-opacity";
+      break;
+    }
     default:
       throw new Error(`Invalid layer type ${layerType}`);
   }
@@ -727,26 +731,47 @@ export const getLayerStyle = (geometryType) => {
           "line-opacity": 0.8,
         },
       };
-      case "point":
-        return {
-          id: "",
-          type: "circle",
-          source: "",
-          paint: {
-            "circle-radius": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0, 2,
-              12, 8,
-              22, 15
-            ],
-            "circle-color": "#1E90FF",
-            "circle-stroke-color": "#FFFFFF",
-            "circle-stroke-width": 2,
-            "circle-opacity": 0.85
-          },
-        };
+    case "point":
+      return {
+        id: "",
+        type: "circle",
+        source: "",
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            0, 2,
+            12, 8,
+            22, 15
+          ],
+          "circle-color": "#1E90FF",
+          "circle-stroke-color": "#FFFFFF",
+          "circle-stroke-width": 2,
+          "circle-opacity": 0.85
+        },
+      };
+
+    case "symbol":
+      return {
+        id: "",
+        type: "symbol",
+        source: "",
+        layout: {
+          "icon-image": ["get", "icon_name"],
+          "icon-size": 1,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true
+        },
+        paint: {
+          "icon-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            0,
+            1
+          ]
+        }
+      }
     default:
       return {};
   }
@@ -829,6 +854,27 @@ export const getHoverLayerStyle = (geometryType) => {
           "circle-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
         }
       };
+    case "symbol":
+      return {
+        id: "",
+        type: "symbol",
+        source: "",
+        "source-layer": "",
+        layout: {
+          "icon-image": ["concat", ["get", "icon_name"], "-hover"],
+          "icon-size": 1.2,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true
+        },
+        paint: {
+          "icon-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            1,
+            0
+          ]
+        }
+      }
     default:
       return {};
   }
@@ -880,9 +926,22 @@ export const getSelectedLayerStyle = (layerType) => {
       return {
         id: "",
         type: "symbol",
+        source: "",
+        "source-layer": "",
+        layout: {
+          "icon-image": ["concat", ["get", "icon_name"], "-select"],
+          "icon-size": 1.2,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true
+        },
         paint: {
-          // Adjust text or icon properties as needed
-          "text-color": [
+          "icon-opacity": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            1,
+            0
+          ],
+           "text-color": [
             "case",
             ["boolean", ["feature-state", "selected"], false],
             "#f00",
