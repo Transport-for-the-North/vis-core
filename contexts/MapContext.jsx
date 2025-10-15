@@ -12,7 +12,8 @@ import {
   applyCondition,
   parseStringToArray,
   getGetParameters,
-  buildParamsMap
+  buildParamsMap,
+  getDefaultLayerBufferSize
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
@@ -254,7 +255,7 @@ export const MapProvider = ({ children }) => {
         (layer) => !hasRouteParameterOrQuery(layer.path)
       );
       nonParameterisedLayers.forEach((layer) => {
-        const bufferSize = layer.geometryType === 'line' ? 7 : 0;
+        const bufferSize = getDefaultLayerBufferSize(layer.geometryType, layer?.bufferSize);
         dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: { ...layer, bufferSize } } });
       });
 
@@ -264,7 +265,7 @@ export const MapProvider = ({ children }) => {
       );
       
       parameterisedLayers.forEach((layer) => {
-        const bufferSize = layer.geometryType === 'line' ? 7 : 0;
+        const bufferSize = getDefaultLayerBufferSize(layer.geometryType, layer?.bufferSize);
       
         // Extract parameters and their values from the layer path
         const allParamsWithValues = extractParamsWithValues(layer.path);

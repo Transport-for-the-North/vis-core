@@ -993,3 +993,13 @@ export function hasAnyGeometryNotNull(featureCollection) {
   // Use the 'some' method to check for at least one non-null geometry
   return featureCollection.features.some(feature => !!feature.geometry);
 }
+
+/**
+ * Returns the provided bufferSize if set; otherwise 7 for 'line' geometry, else 0.
+ * @param {string} geometryType - Layer geometry type (e.g., 'line', 'point', 'polygon').
+ * @param {*} bufferSize - Existing buffer size; used if not null/undefined.
+ * @returns {*} Resolved buffer size.
+ */
+export function getDefaultLayerBufferSize(geometryType, bufferSize) {
+  return bufferSize != null ? bufferSize : (geometryType === 'line' ? 7 : 0);
+}
