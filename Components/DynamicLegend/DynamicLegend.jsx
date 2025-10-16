@@ -545,7 +545,7 @@ export const DynamicLegend = ({ map }) => {
               }
               legendEntries.push({
                 color: stop.color,
-                width: widthStop ? widthStop.width : null,
+                width: widthStop ? widthStop.width: isMobile ? null : (layer.type === "circle" ? (typeof paintProps["circle-radius"] === "number"? paintProps["circle-radius"] * 2 : 10): (layer.type === "line" ? 2 : 10)),
                 label,
                 type: layer.type,
               });
