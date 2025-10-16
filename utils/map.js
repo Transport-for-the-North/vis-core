@@ -105,19 +105,6 @@ export const MAP_CONSTANTS = {
   defaultMaxRadius: 25
 }
 
-export const buildLegendRadius = (bins) => {
-  const min = MAP_CONSTANTS.defaultMinRadius;  
-  const max = MAP_CONSTANTS.defaultMaxRadius;  
-  const minBin = Math.min(...bins);
-  const maxBin = Math.max(...bins);
-
-  return bins.map((v) => {
-    if (maxBin === minBin) return (min + max) / 2; // all same value
-    const t = (v - minBin) / (maxBin - minBin);    // 0..1
-    return min + t * (max - min);                  // baseline radius
-  });
-};
-
 const getBaselineMaxForProp = (paintProp) =>
   paintProp && paintProp.includes("line")
     ? MAP_CONSTANTS.defaultMaxWidth
