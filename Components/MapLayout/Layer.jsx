@@ -1,9 +1,10 @@
 import { useEffect, useContext  } from "react";
 import { api } from "services";
-import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle } from "utils";
+import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle, getOpacityProperty } from "utils";
 import { useMapContext} from "hooks";
 import { FilterContext } from "contexts";
 import { actionTypes } from "reducers";
+import { DEFAULT_LAYER_OPACITY } from "defaults";
 
 /**
  * Layer component that adds a layer to the map(s) and handles its lifecycle.
@@ -73,6 +74,14 @@ export const Layer = ({ layer }) => {
         };
         layerConfig.paint = layer.customPaint || layerConfig.paint;
 
+        // Apply defaultOpacity to the layer's paint properties if specified
+        if (layer.defaultOpacity) {
+          const opacityProp = getOpacityProperty(layerConfig.type);
+          if (layerConfig.paint && opacityProp) {
+            layerConfig.paint[opacityProp] = layer.defaultOpacity;
+          }
+        }
+
         const layerLayout = {};
         layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
         layerConfig.layout = layerLayout;
@@ -85,6 +94,7 @@ export const Layer = ({ layer }) => {
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false, // colour scheme selector should appear if stylable, unless this is enforced
           enforceNoClassificationMethod: layer.enforceNoClassificationMethod ?? false, // classification method selector should appear if stylable, unless this is enforced
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
+          defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
         };
 
         // Handle GeoJSON layer type
@@ -118,6 +128,15 @@ export const Layer = ({ layer }) => {
           sourceConfig.tiles = [url];
           sourceConfig.promoteId = "id";
           mapInstance.addSource(layer.name, sourceConfig);
+          
+          // Apply defaultOpacity to tile layer paint properties if specified
+          if (layer.defaultOpacity) {
+            const opacityProp = getOpacityProperty(layerConfig.type);
+            if (layerConfig.paint && opacityProp) {
+              layerConfig.paint[opacityProp] = layer.defaultOpacity;
+            }
+          }
+          
           mapInstance.addLayer({
             ...layerConfig,
             source: layer.name,
@@ -126,6 +145,7 @@ export const Layer = ({ layer }) => {
               ...layerConfig.metadata,
               isStylable: layer.isStylable ?? false,
               bufferSize: layer.geometryType === "line" ? 7 : null,
+              defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
             },
           });
 

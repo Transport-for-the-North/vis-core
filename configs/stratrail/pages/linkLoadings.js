@@ -30,11 +30,13 @@ export const linkLoadings = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveHoverOnlyOnData: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
             labelNulls: true,
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
+            defaultOpacity: 0.95, // Custom default opacity for this layer
         },
     ],
     visualisations: [
