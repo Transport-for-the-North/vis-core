@@ -5,7 +5,6 @@ import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
-import { buildLegendRadius } from "utils/map";
 
 /**
  * useIsMobile
@@ -480,17 +479,7 @@ export const DynamicLegend = ({ map }) => {
           // For categorical circle styles, keep a uniform diameter (do not scale by bins)
           if (layer.type === "circle" && isCategorical) {
             widthStops = null; // allow default diameter to apply uniformly
-          } else if (layer.type === "circle" && colorStops && colorStops.length > 0) {
-            // Use the legend’s bins (from color stops) to compute baseline radii (e.g., 2..25)
-            const bins = colorStops.map((s) => convertStringToNumber(s.value));
-            const radius = buildLegendRadius(bins);
-
-            // DynamicLegend expects width = rendered diameter for circles
-            widthStops = bins.map((v, i) => ({
-              value: numberWithCommas(v),
-              width: radius[i] * 2,
-            }));
-          }
+          } 
           if (
             layer.type === "circle" &&
             colorStops &&
