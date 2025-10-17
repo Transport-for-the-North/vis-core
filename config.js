@@ -357,3 +357,47 @@ export const getScrollbarWidth = (scrollbarWidthProp) => {
 
   return scrollbarWidth;
 };
+
+
+/**
+ * Apply one or multiple "where" conditions to a dataset (array of row objects).
+ *
+ * @param {Array<Object>} rows - The input dataset rows.
+ * @param {Object|Array<Object>} where - A single condition or an array of conditions.
+ * @returns {Array<Object>} - Rows that pass all conditions.
+ *
+ * Condition shape:
+ *   {
+ *     column: string,
+ *     values: any | any[],
+ *     operator?: 'in' | 'notIn' | 'equals'
+ *   }
+ */
+export const applyWhereConditions = (rows, where) => {
+  const conditions = Array.isArray(where) ? where : [where];
+
+  return rows.filter((row) => {
+    // AND all conditions
+    return conditions.every((cond) => {
+      if (!cond || !cond.column) return true; // ignore malformed condition
+
+      const operator = cond.operator || 'in';
+      const rowValue = row[cond.column];
+
+      // Normalize condition values to an array for 'in'/'notIn', and a single value for 'equals'
+      const rawValues = cond.values;
+      const valuesArray = Array.isArray(rawValues) ? rawValues : [rawValues];
+      const equalsValue = Array.isArray(rawValues) ? rawValues[0] : rawValues;
+
+      switch (operator) {
+        case 'equals':
+          return rowValue === equalsValue;
+        case 'notIn':
+          return !valuesArray.includes(rowValue);
+        case 'in':
+        default:
+          return valuesArray.includes(rowValue);
+      }
+    });
+  });
+};
