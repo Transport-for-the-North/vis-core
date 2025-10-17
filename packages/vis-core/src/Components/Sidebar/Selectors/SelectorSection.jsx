@@ -115,7 +115,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
 
-  const appName = process.env.REACT_APP_NAME;
+  const appName = import.meta.env.VITE_APP_NAME;
   const currentPage = appContext.appPages.find(
     (page) => page.url === window.location.pathname
   );
