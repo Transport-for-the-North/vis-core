@@ -7,6 +7,7 @@ jest.mock("maplibre-gl", () => {
   class Popup {
     constructor(options) {
       this.options = options;
+      this.remove = jest.fn(() => this);
     }
     setLngLat(coords) {
       this.coords = coords;
@@ -20,8 +21,21 @@ jest.mock("maplibre-gl", () => {
       this.map = map;
       return this;
     }
-    remove() {
+  }
+
+  class LngLatBounds {
+    constructor() {
+      this.bounds = [];
+    }
+    extend(coord) {
+      this.bounds.push(coord);
       return this;
+    }
+    getNorthEast() {
+      return { lng: 1, lat: 1 };
+    }
+    getSouthWest() {
+      return { lng: -1, lat: -1 };
     }
   }
 
@@ -29,6 +43,7 @@ jest.mock("maplibre-gl", () => {
     __esModule: true,
     default: {
       Popup: Popup,
+      LngLatBounds: LngLatBounds,
       Map: jest.fn(() => ({
         on: jest.fn(),
         off: jest.fn(),
@@ -38,10 +53,35 @@ jest.mock("maplibre-gl", () => {
         flyTo: jest.fn(),
       })),
     },
+    Popup: Popup,
+    LngLatBounds: LngLatBounds,
   };
 });
 
+import maplibregl from "maplibre-gl";
 import Map from "./Map";
+
+const OriginalPopupClass = (() => {
+  class Popup {
+    constructor(options) {
+      this.options = options;
+      this.remove = jest.fn(() => this);
+    }
+    setLngLat(coords) {
+      this.coords = coords;
+      return this;
+    }
+    setHTML(html) {
+      this.html = html;
+      return this;
+    }
+    addTo(map) {
+      this.map = map;
+      return this;
+    }
+  }
+  return Popup;
+})();
 
 jest.mock("hooks", () => ({
   ...jest.requireActual("hooks"),
@@ -175,9 +215,21 @@ const getZoom = jest.fn();
 const querySourceFeatures = jest.fn();
 const addLayer = jest.fn();
 const setLayoutProperty = jest.fn();
+const fitBounds = jest.fn();
+const panTo = jest.fn();
 // const addEventListener = jest.fn();
 
 beforeEach(() => {
+  jest.clearAllMocks();
+
+  maplibregl.Popup = OriginalPopupClass;
+  if (!maplibregl.default) {
+    maplibregl.default = {};
+  }
+  maplibregl.default.Popup = OriginalPopupClass;
+
+  on.mockReset();
+  on.mockImplementation(() => {});
   getCanvas.mockReturnValue({
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
@@ -199,6 +251,8 @@ beforeEach(() => {
       querySourceFeatures,
       addLayer,
       setLayoutProperty,
+      fitBounds,
+      panTo,
     },
     isMapReady: true,
   });
@@ -297,7 +351,9 @@ describe("Hooks tests", () => {
     expect(map).toEqual({
       addControl,
       addLayer,
+      fitBounds,
       on,
+      panTo,
       getCanvas,
       off,
       getLayer,
@@ -399,21 +455,22 @@ describe("handleMapHover is called or not", () => {
 
 describe("Tests of handleMapHover function", () => {
   let setTimeoutSpy;
-  mockMapContext = {
-    ...mockMapContext,
-    state: {
-      ...mockMapContext.state,
-      visualisedFeatureIds: { first: { value: 10 }, second: { value: 15 } },
-      layers: {
-        ...mockMapContext.state.layers,
-        id: {
-          ...mockMapContext.state.layers.id,
-          hoverTipShouldIncludeMetadata: true,
+
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        visualisedFeatureIds: { first: { value: 10 }, second: { value: 15 } },
+        layers: {
+          ...mockMapContext.state.layers,
+          id: {
+            ...mockMapContext.state.layers.id,
+            hoverTipShouldIncludeMetadata: true,
+          },
         },
       },
-    },
-  };
-  beforeEach(() => {
+    };
     jest.useFakeTimers();
     setTimeoutSpy = jest.spyOn(global, "setTimeout");
     api.baseService.get.mockResolvedValue({
@@ -518,7 +575,6 @@ describe("Tests of handleMapHover function", () => {
         },
       },
     };
-    const maplibregl = require("maplibre-gl").default;
 
     render(
       <FilterContext.Provider value={mockFilterContext}>
@@ -663,6 +719,16 @@ describe("Tests of handleMapHover function", () => {
 
     consoleErrorSpy.mockRestore();
   });
+  it("features.length === 0", () => {
+    queryRenderedFeatures.mockReturnValue([]);
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+  });
 });
 
 describe("handleLayerClick function test", () => {
@@ -710,8 +776,6 @@ describe("handleLayerClick function test", () => {
   });
 
   it("queryRenderedFeatures is called with the great parameters", () => {
-    let capturedPopup = null;
-
     const PopupSpy = jest.fn(function (options) {
       const instance = {
         options,
@@ -809,7 +873,6 @@ describe("handleLayerClick function test", () => {
   });
 });
 
-// 546 - 597
 describe("handleZoom function tests", () => {
   beforeEach(() => {
     mockMapContext = {
@@ -862,10 +925,7 @@ describe("handleZoom function tests", () => {
     );
   });
 
-  it("Test when !mapZoomLevel <= labelZoomLevel", () => {
-
-    // to continue
-
+  it("Test when map.getLayer", () => {
     getZoom.mockReturnValue(14); // 14 > 12
     render(
       <FilterContext.Provider value={mockFilterContext}>
@@ -874,6 +934,216 @@ describe("handleZoom function tests", () => {
         </MapContext.Provider>
       </FilterContext.Provider>
     );
-    // expect(querySourceFeatures).toHaveBeenCalled();
+    expect(setLayoutProperty).toHaveBeenCalledWith(
+      "id-label",
+      "visibility",
+      "visible"
+    );
+  });
+  it("Test when !map.getLayer", () => {
+    getLayer.mockReturnValue(null);
+    getZoom.mockReturnValue(14); // 14 > 12
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(querySourceFeatures).toHaveBeenCalledWith("id", {
+      sourceLayer: undefined,
+    });
+    expect(addLayer).toHaveBeenCalledWith({
+      id: "id-label",
+      type: "symbol",
+      source: "id",
+      "source-layer": undefined,
+      layout: {
+        "text-field": ["get", "name"],
+        "text-size": 14,
+        "text-anchor": "center",
+        "text-offset": [0, 1.5],
+        "text-allow-overlap": false,
+        "symbol-placement": "point",
+        "symbol-spacing": 250,
+      },
+      paint: {
+        "text-color": "#000000",
+        "text-halo-color": "#ffffff",
+        "text-halo-width": 2.5,
+        "text-opacity": ["case", expect.any(Array), 0, 1],
+      },
+    });
+  });
+});
+
+describe("Pan and centre map", () => {
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        mapBoundsAndCentroid: {
+          centroid: {
+            coordinates: [5, 10],
+          },
+          bounds: {
+            coordinates: [["un", "deux"], 10],
+          },
+        },
+      },
+    };
+  });
+
+  it("Classic test", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(fitBounds).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bounds: ["un", "deux", [9, 19], [11, 21]],
+      }),
+      { padding: 80, duration: 0 }
+    );
+    expect(panTo).toHaveBeenCalledWith([5, 10]);
+  });
+  it("Test when !bounds", () => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        mapBoundsAndCentroid: {
+          centroid: {
+            coordinates: [5, 10],
+          },
+        },
+      },
+    };
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+    expect(panTo).toHaveBeenCalledWith([5, 10]);
+  });
+});
+
+describe("mouseLeaveCallback function test", () => {
+  let canvasMock;
+
+  beforeEach(() => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        visualisedFeatureIds: {
+          first: {
+            value: 10,
+          },
+        },
+        layers: {
+          ...mockMapContext.state.layers,
+          id: {
+            ...mockMapContext.state.layers.id,
+            hoverNulls: true,
+          },
+        },
+      },
+    };
+
+    jest.useFakeTimers();
+
+    // need to create a popup to test it
+    queryRenderedFeatures.mockReturnValue([
+      {
+        id: 123,
+        layer: {
+          id: "id",
+          source: "test-source",
+          "source-layer": "test-source-layer",
+        },
+        properties: {
+          name: "Test Feature",
+        },
+        state: {
+          value: 10,
+        },
+      },
+    ]);
+    getLayer.mockReturnValue(true);
+    canvasMock = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      style: { cursor: "pointer" },
+    };
+    getCanvas.mockReturnValue(canvasMock);
+    on.mockImplementation((event, callback) => {
+      if (event === "mousemove") {
+        const mockParams = {
+          point: { x: 100, y: 200 },
+          lngLat: { lng: 2.3522, lat: 48.8566 },
+        };
+        callback(mockParams);
+      }
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
+
+  it("should trigger mouseLeaveCallback", async () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    const mouseLeaveCall = canvasMock.addEventListener.mock.calls.find(
+      (call) => call[0] === "mouseleave"
+    );
+
+    expect(mouseLeaveCall).toBeDefined();
+    const mouseLeaveCallback = mouseLeaveCall[1];
+
+    await act(async () => {
+      mouseLeaveCallback();
+    });
+  });
+  it("prevHoveredFeaturesRef.current is not empty", async () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <Map {...props} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    const mousemoveCallback = on.mock.calls.find(
+      (call) => call[0] === "mousemove"
+    )?.[1];
+
+    expect(mousemoveCallback).toBeDefined();
+
+    await act(async () => {
+      mousemoveCallback({
+        point: { x: 100, y: 200 },
+        lngLat: { lng: 2.3522, lat: 48.8566 },
+      });
+    });
+
+    expect(setFeatureState).toHaveBeenCalledWith(
+      { source: "test-source", id: 123, sourceLayer: "test-source-layer" },
+      { hover: true }
+    );
   });
 });
