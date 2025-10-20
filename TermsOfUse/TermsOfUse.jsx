@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Cookies from 'js-cookie';
 
@@ -65,11 +65,30 @@ const StyledBox = styled.div`
   }
 `;
 
+// If the Clarity snippet loaded, this will either invoke immediately
+// or queue the command (the snippet defines a queueing function).
+function setClarityConsent(granted) {
+  if (typeof window !== "undefined" && window.clarity) {
+    window.clarity("consentv2", {
+      ad_Storage: granted ? "granted" : "denied",
+      analytics_Storage: granted ? "granted" : "denied",
+    });
+  }
+}
+
 export const TermsOfUse = ({ htmlText }) => {
   const [isVisible, setIsVisible] = useState(true);
 
+  // On first render, read the cookie and set both the modal and Clarity’s consent state
+  useEffect(() => {
+    const consent = Cookies.get("toc") === "true";
+    setIsVisible(!consent);
+    setClarityConsent(consent);   // keep Clarity in sync on load
+  }, []);
+
   const handleAccept = () => {
-    Cookies.set('toc', true, { expires: 3, secure: true, sameSite: 'Lax' }); // Set the cookie to true when accepted
+    Cookies.set('toc', true, { expires: 3, secure: true, sameSite: 'Lax', path: "/" }); // Set the cookie to true when accepted
+    setClarityConsent(true);   // Tell Clarity immediately
     setIsVisible(false);
   };
 
