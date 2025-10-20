@@ -53,9 +53,9 @@ const LegendContainer = styled.div`
   border-radius: 10px;
   z-index: 10;
   min-width: 0;
-  max-height: 35vh;
+  max-height: none;
   max-width: 80vw;
-  overflow: auto;
+  overflow: visible;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
   font-size: medium;
