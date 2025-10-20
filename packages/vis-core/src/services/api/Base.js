@@ -10,9 +10,9 @@ class BaseService {
    */
   constructor(config = { pathPrefix: "" }) {
     const postFix = config?.pathPostfix ?? "";
-    switch (process.env.REACT_APP_PROD_OR_DEV) {
+    switch (import.meta.env.VITE_PROD_OR_DEV) {
       case "production":
-        this._apiBaseUrl = process.env.REACT_APP_API_BASE_DOMAIN.trim();
+        this._apiBaseUrl = import.meta.env.VITE_API_BASE_DOMAIN?.trim() || '';
         if (
           this._apiBaseUrl.length > 0 &&
           this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
@@ -22,8 +22,8 @@ class BaseService {
         break;
 
       case "development":
-        if (process.env.REACT_APP_API_BASE_DOMAIN_DEV) {
-          this._apiBaseUrl = process.env.REACT_APP_API_BASE_DOMAIN_DEV.trim();
+        if (import.meta.env.VITE_API_BASE_DOMAIN_DEV) {
+          this._apiBaseUrl = import.meta.env.VITE_API_BASE_DOMAIN_DEV.trim();
           if (
             this._apiBaseUrl.length > 0 &&
             this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"

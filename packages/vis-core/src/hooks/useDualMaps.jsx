@@ -48,7 +48,7 @@ export const useDualMaps = (
         transformRequest: (url, resourceType) => {
           if (resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
             url = new URL(url);
-            if (!url.searchParams.has('key')) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
+            if (!url.searchParams.has('key')) url.searchParams.append('key', import.meta.env.VITE_MAP_API_TOKEN);
             if (!url.searchParams.has('srs')) url.searchParams.append('srs', 3857);
             return {
               url: new Request(url).url
