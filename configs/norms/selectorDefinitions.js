@@ -598,7 +598,7 @@ const linkMetricFilter = {
       {
         displayValue: "Total Seat Capacity",
         paramValue: "Total Seat Capacity",
-        legendSubtitleText: "Capacity",
+        legendSubtitleText: "Seats",
       },
       {
         displayValue: "Total Seat Load Factor",
@@ -609,6 +609,18 @@ const linkMetricFilter = {
         displayValue: "Trains per hour",
         paramValue: "Trains per hour",
         legendSubtitleText: "tph",
+      },
+      {
+        displayValue: "Passengers Over Seating Capacity",
+        paramValue: "Passengers Over Seating Capacity",
+        legendSubtitleText: "Passengers",
+        colourValkue: { value: "OrRd", label: "OrRd" },
+      },
+      {
+        displayValue: "Excess Seating",
+        paramValue: "Excess Seating",
+        legendSubtitleText: "Seats",
+        colourValue: { value: "OrRd", label: "OrRd" },
       },
     ]
   },
