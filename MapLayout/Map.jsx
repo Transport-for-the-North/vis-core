@@ -48,6 +48,31 @@ const Map = (props) => {
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
   
+  /**
+   * Generates HTML for metadata section of tooltips
+   * @param {Object} properties - Feature properties object
+   * @returns {string} HTML string for metadata section
+   */
+  const generateMetadataHtml = useCallback((properties) => {
+    const metadataKeys = Object.keys(properties).filter(
+      (key) => !["id", "name", "value"].includes(key)
+    );
+    if (metadataKeys.length === 0) {
+      return "";
+    }
+    
+    let metadataDescription = '<div class="metadata-section">';
+    metadataKeys.forEach((key) => {
+      metadataDescription += `
+        <div class="metadata-item">
+          <span class="metadata-key">${key}:</span>
+          <span class="metadata-value">${properties[key]}</span>
+        </div>`;
+    });
+    metadataDescription += '</div>';
+    return metadataDescription;
+  }, []);
+  
   // Refs to manage hover state
   const hoverEventIdRef = useRef(0);
   const hoverInfoRef = useRef({});
@@ -396,20 +421,9 @@ const Map = (props) => {
           });
 
           // Inject additional metadata if available and enabled
-            if (description && shouldIncludeMetadata) {
-            const metadataKeys = Object.keys(feature.properties).filter(
-              (key) => !["id", "name", "value"].includes(key)
-            );
-            if (metadataKeys.length > 0) {
-              let metadataDescription = '<div class="metadata-section">';
-              metadataKeys.forEach((key) => {
-                metadataDescription += `
-                  <div class="metadata-item">
-                    <span class="metadata-key">${key}:</span>
-                    <span class="metadata-value">${feature.properties[key]}</span>
-                  </div>`;
-              });
-              metadataDescription += '</div>';
+          if (description && shouldIncludeMetadata) {
+            const metadataDescription = generateMetadataHtml(feature.properties);
+            if (metadataDescription) {
               const lastDivIndex = description.lastIndexOf("</div>");
               if (lastDivIndex !== -1) {
                 description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
@@ -433,19 +447,8 @@ const Map = (props) => {
 
             // Inject additional metadata if available and enabled
             if (description && shouldIncludeMetadata) {
-              const metadataKeys = Object.keys(feature.properties).filter(
-                (key) => !["id", "name", "value"].includes(key)
-              );
-              if (metadataKeys.length > 0) {
-                let metadataDescription = '<div class="metadata-section">';
-                metadataKeys.forEach((key) => {
-                  metadataDescription += `
-                  <div class="metadata-item">
-                    <span class="metadata-key">${key}:</span>
-                    <span class="metadata-value">${feature.properties[key]}</span>
-                  </div>`;
-                });
-                metadataDescription += '</div>';
+              const metadataDescription = generateMetadataHtml(feature.properties);
+              if (metadataDescription) {
                 const lastDivIndex = description.lastIndexOf("</div>");
                 if (lastDivIndex !== -1) {
                   description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
@@ -498,7 +501,7 @@ const Map = (props) => {
           hoverInfoRef.current.abortController = controller;
 
           const fetchPromises = apiRequests.map(
-            ({ feature, layerId, featureName }) => {
+            ({ feature, layerId, featureName, joinToDefault }) => {
             const layerConfig = state.layers[layerId];
             const customTooltip = layerConfig?.customTooltip;
             const { htmlTemplate, customFormattingFunctions } = customTooltip;
@@ -519,8 +522,8 @@ const Map = (props) => {
                 if (error.name !== "AbortError") {
                   console.error("Failed to fetch tooltip data:", error);
                 }
-                // Return placeholder
-                return buildErrorTooltip(featureName);
+                // Return placeholder - don't show feature name if joinToDefault to avoid duplication
+                return buildErrorTooltip(joinToDefault ? "" : featureName);
               });
             }
           );
