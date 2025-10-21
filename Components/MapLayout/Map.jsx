@@ -522,8 +522,12 @@ const Map = (props) => {
                 if (error.name !== "AbortError") {
                   console.error("Failed to fetch tooltip data:", error);
                 }
-                // Return placeholder - don't show feature name if joinToDefault to avoid duplication
-                return buildErrorTooltip(joinToDefault ? "" : featureName);
+                // Return placeholder - for joinToDefault, return plain text to be inserted
+                if (joinToDefault) {
+                  return "<p>Data unavailable.</p>";
+                } else {
+                  return buildErrorTooltip(featureName);
+                }
               });
             }
           );
