@@ -1,7 +1,5 @@
-import { matches } from "lodash";
 import { roundToSignificantFigures } from "./math";
 import chroma from "chroma-js";
-import { normalize } from "polished";
 
 /**
  * Helper: Extracts the metric definition from the defaultBands.
@@ -43,7 +41,7 @@ export const getMetricDefinition = (
  * @param {string} layerType - The type of the layer. Expected values are 'line', 'fill', or 'circle'.
  * @returns {string} The corresponding opacity property name.
  * @throws Will throw an error if the layer type is invalid.
- */ 
+ */
 export function getOpacityProperty(layerType) {
   let opacityProp;
   switch (layerType) {
@@ -57,6 +55,10 @@ export function getOpacityProperty(layerType) {
     }
     case "circle": {
       opacityProp = "circle-opacity";
+      break;
+    }
+    case "symbol": {
+      opacityProp = "icon-opacity";
       break;
     }
     default:
@@ -73,8 +75,8 @@ export function getOpacityProperty(layerType) {
  * @param {(Array<number|string>)} bins -- breaks used for legend
  * @returns {Aarray} The line width property for mapbox styling
  */
- 
- export function getWidthProperty(layerType) {
+
+export function getWidthProperty(layerType) {
   // let widthObject = [];
   // for (let i = 0; i < bins.length; i++) {
   //   widthObject.push(bins[i]);
@@ -90,6 +92,8 @@ export function getOpacityProperty(layerType) {
       widthProp = "circle-radius";
       break;
     }
+    default:
+      console.warn(`Unable to get width property name for layerType ${layerType}`);
   }
   return widthProp;
 }
@@ -104,6 +108,19 @@ export const MAP_CONSTANTS = {
   defaultMinRadius: 2,
   defaultMaxRadius: 25
 }
+
+export const buildLegendRadius = (bins) => {
+  const min = MAP_CONSTANTS.defaultMinRadius;
+  const max = MAP_CONSTANTS.defaultMaxRadius;
+  const minBin = Math.min(...bins);
+  const maxBin = Math.max(...bins);
+
+  return bins.map((v) => {
+    if (maxBin === minBin) return (min + max) / 2; // all same value
+    const t = (v - minBin) / (maxBin - minBin);    // 0..1
+    return min + t * (max - min);                  // baseline radius
+  });
+};
 
 const getBaselineMaxForProp = (paintProp) =>
   paintProp && paintProp.includes("line")
@@ -139,7 +156,7 @@ export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, 
   }
 
   // Extract the existing width
-   const baseline = getBaselineMaxForProp(paintProp);
+  const baseline = getBaselineMaxForProp(paintProp);
   const existingMax = existingInterpolationArray[existingInterpolationArray.length - 1];
 
   // Calculate the existing factoring - this should be relative to the default widths
@@ -166,7 +183,36 @@ export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, 
     lineOffsetInterpolation: newLineOffsetArray
   };
 }
- 
+
+/**
+ * Safely updates an existing opacity expression by replacing only the default/fallback
+ * value with the newOpacity, preserving the rest of the expression.
+ *
+ * Handles common expression types where the final argument is a default/fallback:
+ * - case
+ * - match
+ * - coalesce
+ *
+ * For non-expression or unsupported types, returns the numeric newOpacity.
+ *
+ * @param {any} existingExpr - The current paint property value (could be a number or expression array).
+ * @param {number} newOpacity - The new opacity value to apply.
+ * @returns {any} - The updated expression/value to set on the layer.
+ */
+export const updateOpacityExpression = (existingExpr, newOpacity) => {
+  if (Array.isArray(existingExpr)) {
+    const op = existingExpr[0];
+    if (op === "case" || op === "match" || op === "coalesce") {
+      const updated = existingExpr.slice(0, existingExpr.length - 1);
+      updated.push(newOpacity);
+      return updated;
+    }
+  }
+  // Fallback: just set numeric opacity
+  return newOpacity;
+};
+
+
 /**
  * Generates a Mapbox GL paint property object based on the provided parameters.
  * This function is designed to create paint properties for various map features such as polygons, lines, circles, and points.
@@ -225,7 +271,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
 
   switch (style) {
     case "polygon-diverging":
-    case "polygon-continuous" : {
+    case "polygon-continuous": {
       return {
         "fill-color": [
           "interpolate",
@@ -274,14 +320,14 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           0,
           opacityValue ?? 1,
         ],
-        
+
         "line-offset": [
           "interpolate",
           ["linear"],
           ["feature-state", "valueAbs"],
           Math.min(...bins), -1,
           Math.max(...bins), -5
-         ]
+        ]
       };
     case "line-diverging":
       return {
@@ -306,8 +352,8 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           opacityValue ?? 1,
         ],
 
-        "line-offset": 
-        offsetExpression,
+        "line-offset":
+          offsetExpression,
 
       };
     case "line-categorical":
@@ -338,7 +384,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     case "circle-continuous":
     case "circle-diverging": {
       return {
-        "circle-color": 
+        "circle-color":
           ["interpolate", ["linear"], ["feature-state", "value"], ...colors],
         "circle-stroke-width": [
           "case",
@@ -358,15 +404,15 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           0,
           opacityValue ?? 0.2,
         ],
-        "circle-radius": 
+        "circle-radius":
           ["interpolate",
-          ["linear"],
-          ["to-number", ["feature-state", "valueAbs"]],
-          0,
-          2, // Line width starts at 1 at the value of 0
-          Math.max(...bins),
-          25,
-        ],
+            ["linear"],
+            ["to-number", ["feature-state", "valueAbs"]],
+            0,
+            2, // Line width starts at 1 at the value of 0
+            Math.max(...bins),
+            25,
+          ],
         "circle-stroke-color": "#000000"
       };
     }
@@ -444,7 +490,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
 
 const chooseLinearOrRootFunction = (bins, appName, lastSegment) => {
   let functionType;
-  
+
   // Currently on applying root function for noham link diffs
   if (appName === "noham" && lastSegment === "link-result-difference") {
     if (bins.length > 1) {
@@ -470,7 +516,7 @@ const chooseLinearOrRootFunction = (bins, appName, lastSegment) => {
   } else {
     functionType = "linear";
   }
-  
+
   return functionType;
 };
 
@@ -486,9 +532,9 @@ const calculateLineWidth = (bins, functionType, binValue) => {
     const normalized = Math.abs(binValue / maxAbs);
     // exponent (higher value deepens curve)
     const exponent = 3;
-    const scaled = Math.pow(normalized, 1 / exponent); 
+    const scaled = Math.pow(normalized, 1 / exponent);
     // Ensures width is between 1 and 7.5
-    width = 1 + scaled * 7.5; 
+    width = 1 + scaled * 7.5;
   } else if (functionType === "linear") {
     // Linear formula 
     width = (7.5 / bins[bins.length - 1]) * binValue + 1;
@@ -497,41 +543,41 @@ const calculateLineWidth = (bins, functionType, binValue) => {
 };
 
 const determineLineOffsetExpression = (bins, widthObject, functionType) => {
-  
+
   // Below either uses root based scaling for offset or linear, depending on width calculation
   // If root function has been used for width, it mirrors this for offset and divides it by 1.3 to avoid the offset being excessive
   // If linear has been used offsets are allocated based off linear scale 
   let offsetExpression;
 
-  if (functionType === "root"){
+  if (functionType === "root") {
 
     offsetExpression = [
-        "/",
-        [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "valueAbs"],
-          ...widthObject
-        ],
-        1.3
+      "/",
+      [
+        "interpolate",
+        ["linear"],
+        ["feature-state", "valueAbs"],
+        ...widthObject
+      ],
+      1.3
     ];
 
   } else {
 
     offsetExpression = [
-        "interpolate",
-        ["linear"],
-        ["feature-state", "valueAbs"],
-        Math.min(...bins), -1,
-        Math.max(...bins), -5
+      "interpolate",
+      ["linear"],
+      ["feature-state", "valueAbs"],
+      Math.min(...bins), -1,
+      Math.max(...bins), -5
     ];
   }
 
   return offsetExpression;
 }
 
-export const resetPaintProperty = (style) => { 
-  switch (style) { 
+export const resetPaintProperty = (style) => {
+  switch (style) {
     case "polygon-diverging":
     case "polygon-continuous":
     case "polygon-categorical":
@@ -727,26 +773,47 @@ export const getLayerStyle = (geometryType) => {
           "line-opacity": 0.8,
         },
       };
-      case "point":
-        return {
-          id: "",
-          type: "circle",
-          source: "",
-          paint: {
-            "circle-radius": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0, 2,
-              12, 8,
-              22, 15
-            ],
-            "circle-color": "#1E90FF",
-            "circle-stroke-color": "#FFFFFF",
-            "circle-stroke-width": 2,
-            "circle-opacity": 0.85
-          },
-        };
+    case "point":
+      return {
+        id: "",
+        type: "circle",
+        source: "",
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            0, 2,
+            12, 8,
+            22, 15
+          ],
+          "circle-color": "#1E90FF",
+          "circle-stroke-color": "#FFFFFF",
+          "circle-stroke-width": 2,
+          "circle-opacity": 0.85
+        },
+      };
+
+    case "symbol":
+      return {
+        id: "",
+        type: "symbol",
+        source: "",
+        layout: {
+          "icon-image": ["get", "icon_name"],
+          "icon-size": 1,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true
+        },
+        paint: {
+          "icon-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            0,
+            1
+          ]
+        }
+      }
     default:
       return {};
   }
@@ -829,6 +896,27 @@ export const getHoverLayerStyle = (geometryType) => {
           "circle-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
         }
       };
+    case "symbol":
+      return {
+        id: "",
+        type: "symbol",
+        source: "",
+        "source-layer": "",
+        layout: {
+          "icon-image": ["concat", ["get", "icon_name"], "-hover"],
+          "icon-size": 1.2,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true
+        },
+        paint: {
+          "icon-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            1,
+            0
+          ]
+        }
+      }
     default:
       return {};
   }
@@ -880,8 +968,21 @@ export const getSelectedLayerStyle = (layerType) => {
       return {
         id: "",
         type: "symbol",
+        source: "",
+        "source-layer": "",
+        layout: {
+          "icon-image": ["concat", ["get", "icon_name"], "-select"],
+          "icon-size": 1.2,
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true
+        },
         paint: {
-          // Adjust text or icon properties as needed
+          "icon-opacity": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            1,
+            0
+          ],
           "text-color": [
             "case",
             ["boolean", ["feature-state", "selected"], false],
@@ -901,7 +1002,7 @@ export const getSelectedLayerStyle = (layerType) => {
       // Handle point layers
       return {
         id: "",
-        type: "circle", 
+        type: "circle",
         paint: {
           "circle-radius": [
             "interpolate",
@@ -919,7 +1020,7 @@ export const getSelectedLayerStyle = (layerType) => {
           ],
           "circle-opacity": 0.75,
           "circle-stroke-width": 2,
-          "circle-stroke-color":  [
+          "circle-stroke-color": [
             "case",
             ["==", ["feature-state", "selected"], true],
             "black",
@@ -947,13 +1048,13 @@ export const getSourceLayer = (map, layerId) => {
 };
 
 
- /**
-   * Checks whether all the features in a GeoJSON feature collection have non-null geometries.
-   *
-   * @param {Object} featureCollection - The GeoJSON feature collection to check.
-   * @returns {boolean} True if all features have non-null geometries; otherwise, false.
-   */
- export function checkGeometryNotNull(featureCollection) {
+/**
+  * Checks whether all the features in a GeoJSON feature collection have non-null geometries.
+  *
+  * @param {Object} featureCollection - The GeoJSON feature collection to check.
+  * @returns {boolean} True if all features have non-null geometries; otherwise, false.
+  */
+export function checkGeometryNotNull(featureCollection) {
   // Check if the feature collection is provided
   if (
     !featureCollection ||
@@ -992,4 +1093,14 @@ export function hasAnyGeometryNotNull(featureCollection) {
 
   // Use the 'some' method to check for at least one non-null geometry
   return featureCollection.features.some(feature => !!feature.geometry);
+}
+
+/**
+ * Returns the provided bufferSize if set; otherwise 7 for 'line' geometry, else 0.
+ * @param {string} geometryType - Layer geometry type (e.g., 'line', 'point', 'polygon').
+ * @param {*} bufferSize - Existing buffer size; used if not null/undefined.
+ * @returns {*} Resolved buffer size.
+ */
+export function getDefaultLayerBufferSize(geometryType, bufferSize) {
+  return bufferSize != null ? bufferSize : (geometryType === 'line' ? 7 : 0);
 }

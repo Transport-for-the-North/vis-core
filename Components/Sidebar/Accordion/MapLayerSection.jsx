@@ -29,7 +29,8 @@ export const MapLayerSection = ({
         (layer) =>
           (layer.type === "fill" ||
             layer.type === "line" ||
-            layer.type === "circle") &&
+            layer.type === "circle" ||
+            layer.type === "symbol") &&
             layer.source !== "default" &&
             !layer.id.endsWith("-hover") &&
             !layer.id.endsWith("-select") &&
