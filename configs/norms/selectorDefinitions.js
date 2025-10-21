@@ -397,6 +397,18 @@ const timePeriod =  {
     values: timePeriodCodeValues,
 }
 
+const timePeriodTwo =  {
+    filterName: "Time Period Two",
+    paramName: "timePeriodCodeTwo",
+    target: "api",
+    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+    visualisations: null,
+    info:"Select the desired time period.",
+    type: "toggle",
+    values: timePeriodCodeValues,
+}
+
+
 const metricFilter = {
     filterName: "Metric",
     paramName: "propertyName",
@@ -895,6 +907,7 @@ export const selectors = {
   scenarioCodeFilter,
   scenarioIdFilter,
   timePeriod,
+  timePeriodTwo,
   metricFilter,
   userClassFilter,
   resultZoneTypeFilter,

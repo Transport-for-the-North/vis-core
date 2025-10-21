@@ -74,7 +74,8 @@ export const linkTotalsDifference = {
         /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Link Totals Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Link Totals Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Link Totals Difference'] },*/
-        { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Link Totals Difference']},
+        { ...selectors.timePeriod, filterName: "Time Period 1", visualisations:['Link Totals Difference']},
+        { ...selectors.timePeriodTwo, filterName: "Time Period 2", visualisations:['Link Totals Difference']},
         { ...selectors.linkMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Link Totals Difference']},
       ],
     },
