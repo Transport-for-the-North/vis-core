@@ -91,6 +91,31 @@ const DualMaps = (props) => {
   const prevHoveredFeaturesRef = useRef({ left: [], right: [] });
 
   /**
+   * Generates HTML for metadata section of tooltips
+   * @param {Object} properties - Feature properties object
+   * @returns {string} HTML string for metadata section
+   */
+  const generateMetadataHtml = useCallback((properties) => {
+    const metadataKeys = Object.keys(properties).filter(
+      (key) => !["id", "name", "value"].includes(key)
+    );
+    if (metadataKeys.length === 0) {
+      return "";
+    }
+    
+    let metadataDescription = '<div class="metadata-section">';
+    metadataKeys.forEach((key) => {
+      metadataDescription += `
+        <div class="metadata-item">
+          <span class="metadata-key">${key}:</span>
+          <span class="metadata-value">${properties[key]}</span>
+        </div>`;
+    });
+    metadataDescription += '</div>';
+    return metadataDescription;
+  }, []);
+
+  /**
    * Handles hover events on the map and displays a popup with information about hovered features.
    * When a feature is hovered on either map, the hover tooltip appears on both maps.
    * The hover tooltip on each map corresponds with the features and their state on that map.
@@ -320,19 +345,8 @@ const DualMaps = (props) => {
 
             // Inject additional metadata if enabled
             if (description && shouldIncludeMetadata) {
-              const metadataKeys = Object.keys(feature.properties).filter(
-                (key) => !["id", "name", "value"].includes(key)
-              );
-              if (metadataKeys.length > 0) {
-                let metadataDescription = '<div class="metadata-section">';
-                metadataKeys.forEach((key) => {
-                  metadataDescription += `
-                    <div class="metadata-item">
-                      <span class="metadata-key">${key}:</span>
-                      <span class="metadata-value">${feature.properties[key]}</span>
-                    </div>`;
-                });
-                metadataDescription += '</div>';
+              const metadataDescription = generateMetadataHtml(feature.properties);
+              if (metadataDescription) {
                 const lastDivIndex = description.lastIndexOf("</div>");
                 if (lastDivIndex !== -1) {
                   description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
@@ -357,19 +371,8 @@ const DualMaps = (props) => {
 
               // Inject additional metadata if enabled
               if (description && shouldIncludeMetadata) {
-                const metadataKeys = Object.keys(feature.properties).filter(
-                  (key) => !["id", "name", "value"].includes(key)
-                );
-                if (metadataKeys.length > 0) {
-                  let metadataDescription = '<div class="metadata-section">';
-                  metadataKeys.forEach((key) => {
-                    metadataDescription += `
-                    <div class="metadata-item">
-                      <span class="metadata-key">${key}:</span>
-                      <span class="metadata-value">${feature.properties[key]}</span>
-                    </div>`;
-                  });
-                  metadataDescription += '</div>';
+                const metadataDescription = generateMetadataHtml(feature.properties);
+                if (metadataDescription) {
                   const lastDivIndex = description.lastIndexOf("</div>");
                   if (lastDivIndex !== -1) {
                     description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
@@ -418,7 +421,7 @@ const DualMaps = (props) => {
             hoverInfoRef.current[side].abortController = controller;
 
             const fetchPromises = apiRequests.map(
-              ({ feature, layerId, featureName }) => {
+              ({ feature, layerId, featureName, joinToDefault }) => {
                 const layerConfig = state.layers[layerId];
                 const customTooltip = layerConfig?.customTooltip;
                 const { htmlTemplate, customFormattingFunctions } = customTooltip;
@@ -439,8 +442,8 @@ const DualMaps = (props) => {
                     if (error.name !== "AbortError") {
                       console.error("Failed to fetch tooltip data:", error);
                     }
-                    // Return a placeholder tooltip HTML on error
-                    return buildErrorTooltip(featureName);
+                    // Return placeholder - don't show feature name if joinToDefault to avoid duplication
+                    return buildErrorTooltip(joinToDefault ? "" : featureName);
                   });
               }
             );
