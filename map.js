@@ -200,6 +200,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
   let width = "";
   // gets end of current path 
   const path = window.location.pathname;
+  
   const lastSegment = path.substring(path.lastIndexOf('/') + 1);
   // gets app name
   const appName = process.env.REACT_APP_NAME;
