@@ -253,6 +253,8 @@ export const LayerControlEntry = memo(
     
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
+      const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
+      const showWidth = isFeatureStateWidthExpression;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
       : currentWidthFactor;
@@ -307,7 +309,9 @@ export const LayerControlEntry = memo(
     };
 
     const handleWidthFactorChange = (e) => {
-      const widthFactor = parseFloat(e.target.value);
+      const raw = parseFloat(e.target.value);
+      const cap = isNodeLayer ? 2.5 : 10;
+      const widthFactor = Math.max(0.5, Math.min(cap, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
     
       if (isFeatureStateWidthExpression) {
@@ -384,25 +388,21 @@ export const LayerControlEntry = memo(
             <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
           </OpacityControl>)}
           {/* Width Control (if applicable) */}
-          {isFeatureStateWidthExpression && ( 
-                <>
-                <WidthControl>
-                <ControlLabel htmlFor={`width-${layer.id}`}>
-                  Width factor
-                </ControlLabel>
-                
-                  <Slider
-                    id={`width-${layer.id}`}
-                    type="range"
-                    min="0.5"
-                    max="10"
-                    step="0.1"
-                    value={widthFactor}
-                    onChange={handleWidthFactorChange}
-                  />
-                  <SliderValue>{(widthFactor).toFixed(1)}</SliderValue>
-                </WidthControl>
-                </>)}
+          {showWidth && (
+            <WidthControl>
+              <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
+              <Slider
+                id={`width-${layer.id}`}
+                type="range"
+                min="0.5"
+                max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
+                step="0.1"
+                value={widthFactor}
+                onChange={handleWidthFactorChange}
+              />
+              <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
+            </WidthControl>
+          )}
           {/* Color Scheme and Classification (if stylable) */}
           {layer.metadata?.isStylable && (
             <div style={{ marginTop: "1rem" }}>
