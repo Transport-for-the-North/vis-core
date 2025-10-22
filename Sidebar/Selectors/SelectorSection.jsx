@@ -265,9 +265,9 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               disabled={isRequestTooLarge || isDownloading}
             >
               {isDownloading ? (
-                <>Downloading <Spinner /></>
+                <>Downloading CSV<Spinner /></>
               ) : (
-                isRequestTooLarge ? "Request Too Large" : "Download"
+                isRequestTooLarge ? "Request Too Large" : "Download CSV"
               )}
             </DownloadButton>
           )}
@@ -278,7 +278,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               disabled={isRequestTooLarge || isShapefileDownloading}
             >
               {isShapefileDownloading ? (
-                <>Downloading Shapefile <Spinner /></>
+                <>Downloading Shapefile<Spinner /></>
               ) : (
                 isRequestTooLarge ? "Request Too Large" : "Download Shapefile"
               )}
