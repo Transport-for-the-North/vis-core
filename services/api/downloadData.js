@@ -170,8 +170,15 @@ export class DownloadService extends BaseService {
     }
     
     const blob = await response.blob();
+
+  // Assign file name based on url
+    let filename = null;
+    if (url.includes("shapefile")) {
+      filename = "downloads.zip";
+    } else {
+      filename = "downloads.csv";
+    }
     // Extract filename from Content-Disposition header, if available
-    let filename = "download.csv"; // Default filename
     const disposition = response.headers.get("Content-Disposition");
     if (disposition && disposition.indexOf("attachment") !== -1) {
       const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
