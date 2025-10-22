@@ -128,7 +128,7 @@ export const HomePage = () => {
         {appContext.introduction && (
           <section className="introduction container-content">
             <h2>About</h2>
-            <p className="container-intro">{parse(appContext.introduction)}</p>
+            <div className="container-intro">{parse(appContext.introduction)}</div>
           </section>
         )}
 

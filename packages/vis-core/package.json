@@ -1,6 +1,6 @@
 {
   "name": "@transport-for-the-north/vis-core",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": false,
   "type": "module",
   "main": "dist/index.cjs",
@@ -74,7 +74,8 @@
     "mapbox-gl": "^x",
     "polished": "^4.3.1",
     "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react-dom": "^18 || ^19",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@auth0/auth0-react": "^2.6.0",
