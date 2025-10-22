@@ -614,13 +614,11 @@ const linkMetricFilter = {
         displayValue: "Passengers Over Seating Capacity",
         paramValue: "Passengers Over Seating Capacity",
         legendSubtitleText: "Passengers",
-        colourValkue: { value: "OrRd", label: "OrRd" },
       },
       {
         displayValue: "Excess Seating",
         paramValue: "Excess Seating",
         legendSubtitleText: "Seats",
-        colourValue: { value: "OrRd", label: "OrRd" },
       },
     ]
   },
