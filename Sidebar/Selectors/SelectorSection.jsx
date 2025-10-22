@@ -14,6 +14,11 @@ import { api } from "services";
 import { darken } from "polished";
 import { checkSecurityRequirements } from "utils";
 
+const ButtonRow = styled.div`
+  display: flex;
+  gap: 10px; /* Adds space between the buttons */
+`;
+
 const DownloadButton = styled.button`
   cursor: pointer;
   padding: 10px 5px; /* Increased padding for a larger button */
@@ -21,7 +26,6 @@ const DownloadButton = styled.button`
   color: white;
   border-radius: 8px;
   border: 0.25px solid;
-  margin-right: 10px; /* Changed to margin-right to position it on the left */
   width: 50%;
   font-family: "Hanken Grotesk", sans-serif;
   display: flex;
@@ -258,32 +262,34 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                 )}
               </SelectorContainer>
           ))}
-          {downloadPath && (
-            <DownloadButton 
-              onClick={handleDownload} 
-              $bgColor={bgColor}
-              disabled={isRequestTooLarge || isDownloading}
-            >
-              {isDownloading ? (
-                <>Downloading CSV<Spinner /></>
-              ) : (
-                isRequestTooLarge ? "Request Too Large" : "Download CSV"
-              )}
-            </DownloadButton>
-          )}
-          {downloadShapefilePath && (
-            <DownloadButton 
-              onClick={handleShapefileDownload} 
-              $bgColor={bgColor}
-              disabled={isRequestTooLarge || isShapefileDownloading}
-            >
-              {isShapefileDownloading ? (
-                <>Downloading Shapefile<Spinner /></>
-              ) : (
-                isRequestTooLarge ? "Request Too Large" : "Download Shapefile"
-              )}
-            </DownloadButton>
-          )}
+          <ButtonRow>
+            {downloadPath && (
+              <DownloadButton 
+                onClick={handleDownload} 
+                $bgColor={bgColor}
+                disabled={isRequestTooLarge || isDownloading}
+              >
+                {isDownloading ? (
+                  <>Downloading CSV<Spinner /></>
+                ) : (
+                  isRequestTooLarge ? "Request Too Large" : "Download CSV"
+                )}
+              </DownloadButton>
+            )}
+            {downloadShapefilePath && (
+              <DownloadButton 
+                onClick={handleShapefileDownload} 
+                $bgColor={bgColor}
+                disabled={isRequestTooLarge || isShapefileDownloading}
+              >
+                {isShapefileDownloading ? (
+                  <>Downloading Shapefile<Spinner /></>
+                ) : (
+                  isRequestTooLarge ? "Request Too Large" : "Download Shapefile"
+                )}
+              </DownloadButton>
+            )}
+          </ButtonRow>
         </>
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
