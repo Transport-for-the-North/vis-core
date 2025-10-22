@@ -96,7 +96,7 @@ export const BaseCalloutCardVisualisation = ({
           ],
         },
         label: "Pessimistic Future",
-        image: "https://www.w3schools.com/howto/img_avatar.png",
+        image_url: "https://www.w3schools.com/howto/img_avatar.png",
         text_with_placeholders:
           "On update - Pessimistic Future with <strong>{distance}</strong> km",
         values: {
@@ -124,7 +124,7 @@ export const BaseCalloutCardVisualisation = ({
           ],
         },
         label: "Another Future",
-        image: "https://www.w3schools.com/howto/img_avatar2.png",
+        image_url: "https://www.w3schools.com/howto/img_avatar2.png",
         text_with_placeholders:
           "Another Future - Distance: <strong>{distance}</strong> km, Duration: <strong>{duration}</strong> min",
         values: {
