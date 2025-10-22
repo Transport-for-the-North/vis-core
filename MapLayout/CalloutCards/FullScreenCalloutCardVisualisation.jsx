@@ -82,6 +82,27 @@ const BackButton = styled.button`
 `;
 
 /**
+ * Open button
+ */
+const OpenButton = styled.button`
+  position: fixed;
+  top: 90px; // Below the navbar
+  right: 20px;
+  z-index: 2000;
+  width: ${TOGGLE_BUTTON_WIDTH}px;
+  height: ${TOGGLE_BUTTON_HEIGHT}px;
+  background-color: #7317de;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+/**
  * Image, texte, title wrapper
  */
 const TitleImageTextWrapper = styled.div`
@@ -280,11 +301,11 @@ const CardContent = styled.div`
 
 /**
  * FullScreenCalloutCardVisualisation - Full-screen display component with carousel navigation
- * 
+ *
  * Displays scenario data in full-screen mode with carousel navigation.
  * Handles automatic prefetching of upcoming scenarios for smooth navigation.
  * Supports multiple image formats (Blob, ArrayBuffer, Uint8Array, URL).
- * 
+ *
  * @component
  * @param {Object} props - The component props
  * @param {Array<Object>} props.data - List of scenarios to display
@@ -303,7 +324,7 @@ const CardContent = styled.div`
  * @param {boolean} props.includeCarouselNavigation - Enable/disable carousel navigation
  * @param {Array<{key: number, value: string}>} props.possibleCarouselNavData - Data for navigation tooltips
  * @param {Function} props.handleNextFetch - Callback to load upcoming scenarios
- * 
+ *
  * @example
  * const scenariosData = [
  *   {
@@ -323,7 +344,7 @@ const CardContent = styled.div`
  *     image: "https://example.com/image.png"
  *   }
  * ];
- * 
+ *
  * @returns {JSX.Element|null} The full-screen component or null if no current scenario
  */
 export const FullScreenCalloutCardVisualisation = ({
@@ -332,181 +353,226 @@ export const FullScreenCalloutCardVisualisation = ({
   possibleCarouselNavData,
   handleNextFetch,
 }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const handleToggle = () => setIsVisible((v) => !v);
-  const [currentScenarioId, setCurrentScenarioId] = useState(data[0]?.scenario_id);
+  const [currentScenarioId, setCurrentScenarioId] = useState(
+    data[0]?.scenario_id
+  );
   const [content, setContent] = useState(null);
-  
+
   // next and previous buttons
   const previousButtonRef = React.useRef(null);
-  const [previousButtonRefIsHovered, setPreviousButtonRefIsHovered] = useState(false);
+  const [previousButtonRefIsHovered, setPreviousButtonRefIsHovered] =
+    useState(false);
   const nextButtonRef = React.useRef(null);
   const [nextButtonRefIsHovered, setNextButtonRefIsHovered] = useState(false);
-  
-  // Find currentScenario from the ID in data (always up to date) 
-  const currentScenario = data.find(item => item.scenario_id === currentScenarioId);
-  const currentIndex = data.findIndex(item => item.scenario_id === currentScenarioId);
-  
+
+  // Find currentScenario from the ID in data (always up to date)
+  let currentScenario = data;
+  let currentIndex;
+  if (
+    possibleCarouselNavData.length > 0 &&
+    includeCarouselNavigation === true
+  ) {
+    currentScenario = data.find(
+      (item) => item.scenario_id === currentScenarioId
+    );
+    currentIndex = data.findIndex(
+      (item) => item.scenario_id === currentScenarioId
+    );
+  }
+
   const [imgUrl, setImgUrl] = useState(null);
-  
-/**
- * Updates content and image when the current scenario changes
- * 
- * Handles different image formats:
- * - Blob: converted to object URL
- * - ArrayBuffer: converted to Blob then object URL
- * - Uint8Array: converted to Blob then object URL
- * - String: used directly as URL
- */
+
+  /**
+   * Updates content and image when the current scenario changes
+   *
+   * Handles different image formats:
+   * - Blob: converted to object URL
+   * - ArrayBuffer: converted to Blob then object URL
+   * - Uint8Array: converted to Blob then object URL
+   * - String: used directly as URL
+   */
   useEffect(() => {
     if (!currentScenario) {
       return;
     }
-    
+
     if (!currentScenario.text_with_placeholders || !currentScenario.values) {
       return;
     }
-    
+
     const newContent = replacePlaceholders(
       currentScenario.text_with_placeholders,
       currentScenario.values
     );
     setContent(newContent);
     setImgUrl(null);
-    
-    if (currentScenario.image) {
-      if (currentScenario.image instanceof Blob) {
-        const url = URL.createObjectURL(currentScenario.image);
+
+    if (currentScenario.image_url) {
+      if (currentScenario.image_url instanceof Blob) {
+        const url = URL.createObjectURL(currentScenario.image_url);
         setImgUrl(url);
-      } else if (currentScenario.image instanceof ArrayBuffer) {
-        const blob = new Blob([currentScenario.image], { type: "image/png" });
+      } else if (currentScenario.image_url instanceof ArrayBuffer) {
+        const blob = new Blob([currentScenario.image_url], {
+          type: "image/png",
+        });
         const url = URL.createObjectURL(blob);
         setImgUrl(url);
-      } else if (currentScenario.image instanceof Uint8Array) {
-        const blob = new Blob([currentScenario.image], { type: "image/png" });
+      } else if (currentScenario.image_url instanceof Uint8Array) {
+        const blob = new Blob([currentScenario.image_url], {
+          type: "image/png",
+        });
         const url = URL.createObjectURL(blob);
         setImgUrl(url);
-      } else if (typeof currentScenario.image === "string") {
-        setImgUrl(currentScenario.image);
+      } else if (typeof currentScenario.image_url === "string") {
+        setImgUrl(currentScenario.image_url);
       }
     }
   }, [currentScenario, data]);
-  
-/**
- * Navigates to the previous scenario in the carousel
- */
+
+  /**
+   * Opens the card with animation when you click on an image
+   */
+  useEffect(() => {
+    let timeout;
+    if (!isVisible) {
+      timeout = setTimeout(() => setIsVisible(true), 30);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentScenarioId]);
+
+  /**
+   * Navigates to the previous scenario in the carousel
+   */
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentScenarioId(data[currentIndex - 1].scenario_id);
     }
   };
-  
-/**
- * Navigates to the next scenario and triggers prefetch if needed
- * 
- * Prefetch logic:
- * - Fetches scenario at +2 position if incomplete
- * - Falls back to +1 position if no +2 exists
- */
+
+  /**
+   * Navigates to the next scenario and triggers prefetch if needed
+   *
+   * Prefetch logic:
+   * - Fetches scenario at +2 position if incomplete
+   * - Falls back to +1 position if no +2 exists
+   */
   const handleNext = () => {
     // When object +2 does not have text_with_placeholders and exists in data
-    if (!data[currentIndex + 2]?.text_with_placeholders && data[currentIndex + 2]) {
+    if (
+      !data[currentIndex + 2]?.text_with_placeholders &&
+      data[currentIndex + 2]
+    ) {
       handleNextFetch(data[currentIndex + 2].scenario_id);
-    } 
+    }
     // When there is no +2 scenario but there is a +1 that does not have any data
-    else if (!data[currentIndex + 1]?.text_with_placeholders && data[currentIndex + 1]) {
+    else if (
+      !data[currentIndex + 1]?.text_with_placeholders &&
+      data[currentIndex + 1]
+    ) {
       handleNextFetch(data[currentIndex + 1].scenario_id);
     }
-    
+
     // Move to the next object
     if (currentIndex < data.length - 1) {
       setCurrentScenarioId(data[currentIndex + 1].scenario_id);
     }
   };
-  
+
   // Check that currentScenario exists before rendering
   if (!currentScenario) {
     return null;
   }
-  
+
   return (
-    <FullscreenContainer $isVisible={isVisible}>
-      {/* Close button */}
-      <BackButton onClick={handleToggle} aria-label="Close">
-        <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
-      </BackButton>
-
-      <ContentWrapper>
-        {/* Title */}
-        <CardTitle>{currentScenario.label || "Card"}</CardTitle>
-
-        {/* Content */}
-        <TitleImageTextWrapper>
-          <TitleTextContainer>
-            <Title style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>
-              {currentScenario.label || "Card"}
-            </Title>
-            <CardContent dangerouslySetInnerHTML={{ __html: content }} />
-          </TitleTextContainer>
-          <ImageContainer>
-            {imgUrl ? (
-              <Image
-                src={imgUrl}
-                onError={() => {
-                  setImgUrl(null);
-                }}
-                alt={currentScenario.label || "Scenario image"}
-              />
-            ) : (
-              <Image src={"https://placehold.co/600x400?text=No+image!"} />
-            )}
-          </ImageContainer>
-        </TitleImageTextWrapper>
-      </ContentWrapper>
-
-      {/* Navigation */}
-      {includeCarouselNavigation && (
-        <NavigationBar>
-          <NavigationButton
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            ref={previousButtonRef}
-            onMouseEnter={() => setPreviousButtonRefIsHovered(true)}
-            onMouseLeave={() => setPreviousButtonRefIsHovered(false)}
-            aria-label="Previous scenario"
-          >
-            <ChevronLeftIcon />
-          </NavigationButton>
-          {currentIndex > 0 && (
-            <Hovertip
-              isVisible={previousButtonRefIsHovered}
-              displayText={possibleCarouselNavData[currentIndex - 1].value}
-              side="right"
-              refElement={previousButtonRef}
-              offset={3}
-            />
-          )}
-          <NavigationButton
-            onClick={handleNext}
-            disabled={currentIndex === possibleCarouselNavData.length - 1}
-            ref={nextButtonRef}
-            onMouseEnter={() => setNextButtonRefIsHovered(true)}
-            onMouseLeave={() => setNextButtonRefIsHovered(false)}
-            aria-label="Next scenario"
-          >
-            <ChevronRightIcon />
-          </NavigationButton>
-          {currentIndex < possibleCarouselNavData.length - 1 && (
-            <Hovertip
-              isVisible={nextButtonRefIsHovered}
-              displayText={possibleCarouselNavData[currentIndex + 1].value}
-              side="left"
-              refElement={nextButtonRef}
-              offset={3}
-            />
-          )}
-        </NavigationBar>
+    <>
+      {!isVisible && (
+        <OpenButton onClick={handleToggle} aria-label="Open card">
+          <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
+        </OpenButton>
       )}
-    </FullscreenContainer>
+      <FullscreenContainer $isVisible={isVisible}>
+        {/* Close button */}
+        {isVisible && (
+          <BackButton onClick={handleToggle} aria-label="Close card">
+            <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
+          </BackButton>
+        )}
+
+        {isVisible && (
+          <ContentWrapper>
+            {/* Title */}
+            <CardTitle>{currentScenario.label || "Card"}</CardTitle>
+
+            {/* Content */}
+            <TitleImageTextWrapper>
+              <TitleTextContainer>
+                <Title style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>
+                  {currentScenario.label || "Card"}
+                </Title>
+                <CardContent dangerouslySetInnerHTML={{ __html: content }} />
+              </TitleTextContainer>
+              <ImageContainer>
+                {imgUrl ? (
+                  <Image
+                    src={imgUrl}
+                    onError={() => {
+                      setImgUrl(null);
+                    }}
+                    alt={currentScenario.label || "Scenario image"}
+                  />
+                ) : (
+                  <Image src={"https://placehold.co/600x400?text=No+image!"} />
+                )}
+              </ImageContainer>
+            </TitleImageTextWrapper>
+          </ContentWrapper>
+        )}
+        {/* Navigation */}
+        {isVisible && includeCarouselNavigation && (
+          <NavigationBar>
+            <NavigationButton
+              onClick={handlePrevious}
+              disabled={currentIndex === 0}
+              ref={previousButtonRef}
+              onMouseEnter={() => setPreviousButtonRefIsHovered(true)}
+              onMouseLeave={() => setPreviousButtonRefIsHovered(false)}
+              aria-label="Previous scenario"
+            >
+              <ChevronLeftIcon />
+            </NavigationButton>
+            {currentIndex > 0 && (
+              <Hovertip
+                isVisible={previousButtonRefIsHovered}
+                displayText={possibleCarouselNavData[currentIndex - 1].value}
+                side="right"
+                refElement={previousButtonRef}
+                offset={3}
+              />
+            )}
+            <NavigationButton
+              onClick={handleNext}
+              disabled={currentIndex === possibleCarouselNavData.length - 1}
+              ref={nextButtonRef}
+              onMouseEnter={() => setNextButtonRefIsHovered(true)}
+              onMouseLeave={() => setNextButtonRefIsHovered(false)}
+              aria-label="Next scenario"
+            >
+              <ChevronRightIcon />
+            </NavigationButton>
+            {currentIndex < possibleCarouselNavData.length - 1 && (
+              <Hovertip
+                isVisible={nextButtonRefIsHovered}
+                displayText={possibleCarouselNavData[currentIndex + 1].value}
+                side="left"
+                refElement={nextButtonRef}
+                offset={3}
+              />
+            )}
+          </NavigationBar>
+        )}
+      </FullscreenContainer>
+    </>
   );
 };
