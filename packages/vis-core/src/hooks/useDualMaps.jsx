@@ -60,9 +60,9 @@ export const useDualMaps = (
       const leftMapInstance = new maplibregl.Map({
         container: leftMapContainerRef.current,
         ...commonOptions,
-      })
-        .on("style.load", () => setIsMapStyleLoaded(true))
-        .on("load", () => {
+      });
+      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      leftMapInstance.on("load", () => {
           setIsMapLoaded(true);
         });
       leftMapInstance.addControl(
@@ -74,9 +74,9 @@ export const useDualMaps = (
       const rightMapInstance = new maplibregl.Map({
         container: rightMapContainerRef.current,
         ...commonOptions,
-      })
-        .on("style.load", () => setIsMapStyleLoaded(true))
-        .on("load", () => {
+      });
+      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      rightMapInstance.on("load", () => {
           setIsMapLoaded(true);
         });
       rightMapInstance.addControl(
