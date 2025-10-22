@@ -107,10 +107,12 @@ const OpenButton = styled.button`
  */
 const TitleImageTextWrapper = styled.div`
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   margin-top: 5%;
   gap: 2rem;
+  min-height: 350px;
+  max-height: 350px;
 `;
 
 /**
@@ -118,8 +120,13 @@ const TitleImageTextWrapper = styled.div`
  */
 const TitleTextContainer = styled.div`
   display: flex;
-  max-width: 50%;
   flex-direction: column;
+  width: 50%;
+  justify-content: center;
+  @media (max-width: 900px) {
+    width: 90%;
+    align-items: center;
+  }
 `;
 
 /**
@@ -127,20 +134,25 @@ const TitleTextContainer = styled.div`
  */
 const ImageContainer = styled.div`
   display: flex;
-  max-width: 50%;
+  width: 50%;
+  min-height: 350px;
+  max-height: 350px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 `;
 
 /**
  * Image placeholder
  */
 const Image = styled.img`
-  max-width: 500px;
-  width: 70%;
-  height: auto;
-  aspect-ratio: 1/1;
+  width: clamp(120px, 30vw, 350px);
+  height: clamp(120px, 30vw, 350px);
   object-fit: cover;
   border-radius: 50%;
   display: block;
+  max-width: 100%;
+  max-height: 100%;
 `;
 
 /**
@@ -148,6 +160,9 @@ const Image = styled.img`
  */
 const Title = styled.p`
   font-size: clamp(2rem, 5vw, 4rem);
+  text-align: center;
+  white-space: normal;
+  line-height: 1;
 `;
 
 /**
@@ -212,7 +227,9 @@ const CardTitle = styled.h2`
  * Styled component for the card content.
  */
 const CardContent = styled.div`
+  transition: opacity 0.3s;
   text-align: left;
+  font-size: 1.5em;
 
   h2 {
     font-size: 1.5em;
