@@ -1,5 +1,5 @@
 export const mapStyles = {
-  geoapifyPositron: `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${import.meta.env.VITE_MAP_API_TOKEN}`,
+  geoapifyPositron: `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${import.meta.env.VITE_APP_MAP_API_TOKEN}`,
 
   osMapsApiRaster: {
     version: 8,
@@ -8,7 +8,7 @@ export const mapStyles = {
       "raster-tiles": {
         type: "raster",
         tiles: [
-          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAP_API_TOKEN}`,
+          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${import.meta.env.VITE_APP_MAP_API_TOKEN}`,
         ],
         tileSize: 256,
       },
