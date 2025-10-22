@@ -114,7 +114,7 @@ export class DownloadService extends BaseService {
     }
   
   /**
-   * Downloads a csv from the specified path with query parameters.
+   * Downloads a CSV file or a Shapefile ZIP archive from the specified path with query parameters.
    *
    * @param {string} [subPath=""] - The sub-path for the file request.
    * @param {Object} [options={}] - Additional options, including query parameters and headers.
@@ -125,7 +125,7 @@ export class DownloadService extends BaseService {
    * @returns {Promise<void>} Resolves when the download is initiated.
    * @throws {Error} If the GET request exceeds the maximum size limit.
    */
-  async downloadCsv(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {}, method: "GET" }) {
+  async downloadFile(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {}, method: "GET" }) {
     console.log(options?.queryParams);
     const queryParams = updateQueryParams(options?.queryParams);
     const method = options.method?.toUpperCase() || "GET";

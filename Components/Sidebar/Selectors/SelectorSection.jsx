@@ -98,7 +98,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     });
     
     try {
-      await api.downloadService.downloadCsv(apiRoute, {
+      await api.downloadService.downloadFile(apiRoute, {
         queryParams: queryParams,
         skipAuth: !requiresAuth,
         method: requestMethod,
@@ -126,7 +126,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     });
     
     try {
-      await api.downloadService.downloadCsv(apiRouteShapefile, {
+      await api.downloadService.downloadFile(apiRouteShapefile, {
         queryParams: queryParams,
         skipAuth: !requiresAuthShapefile,
         method: requestMethod,
