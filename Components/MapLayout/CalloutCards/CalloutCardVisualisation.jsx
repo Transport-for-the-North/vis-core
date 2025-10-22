@@ -238,7 +238,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       // 1) Replace simple placeholders (existing util)
       let html = replacePlaceholders(
         visualisation.htmlFragment,
-        data,
+        data.data,
         { customFunctions: customFormattingFunctions }
       );
 
