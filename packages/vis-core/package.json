@@ -1,6 +1,6 @@
 {
   "name": "@transport-for-the-north/vis-core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": false,
   "type": "module",
   "main": "dist/index.cjs",
@@ -11,7 +11,7 @@
     "README.md",
     "LICENSE"
   ],
-  "sideEffects": false,
+  "sideEffects": ["**/*.css"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
