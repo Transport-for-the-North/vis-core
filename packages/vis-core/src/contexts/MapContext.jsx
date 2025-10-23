@@ -47,7 +47,7 @@ export const MapProvider = ({ children }) => {
 
   // Initialize state within the provider function
   const initialState = {
-    mapStyle: appContext.mapStyle || defaultMapStyle,
+    mapStyle: appContext.mapStyle || defaultMapStyle(),
     mapCentre: pageContext.customMapCentre
       ? parseStringToArray(pageContext.customMapCentre)
       : defaultMapCentre,
