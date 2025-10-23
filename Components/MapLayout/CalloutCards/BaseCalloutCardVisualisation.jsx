@@ -41,19 +41,22 @@ export const BaseCalloutCardVisualisation = ({
    * Uses mock data for development, will use real API response in production
    */
   useEffect(() => {
-    setData(response.data);
-    setIsLoading(response.isLoading);
-  }, [response]);
+    if(!response.data) return;
 
-  let includeCarouselNavigation;
-  let possibleCarouselNavData = [];
-  if (type === "fullscreen") {
-    includeCarouselNavigation = data && data.length > 1;
-    if (includeCarouselNavigation)
-      possibleCarouselNavData = data
-        ? data.map((item) => ({ key: item.scenario_id, value: item.label }))
-        : [];
-  }
+    const updatedData = {
+      data: {
+        ...response.data,
+            nav_next_id: 3,
+            nav_prev_id: 1,
+            nav_next_label: "Next!",
+            nav_prev_label: "Previous!"
+      },
+      isLoading: response.isLoading,
+    }
+
+    setData(updatedData.data);
+    setIsLoading(updatedData.isLoading);
+  }, [response]);
 
   /**
    * Toggles the visibility of the card
@@ -71,88 +74,7 @@ export const BaseCalloutCardVisualisation = ({
    * @param {number} scenarioId - The ID of the scenario to fetch and update
    */
   const onUpdateData = (scenarioId) => {
-    // Fetch with a list of scenario ??
-    // real
-    // const { isLoading: isLoadingLocal, data: dataLocal } = useFetchVisualisationData(scenarioId);
-    // mock
-    const mockDataMap = {
-      15: {
-        programme_id: 2,
-        scenario_id: 15,
-        point_geom: {
-          type: "Point",
-          coordinates: [-1.57, 53.805],
-        },
-        polygon_geom: {
-          type: "Polygon",
-          coordinates: [
-            [
-              [-1.571, 53.804],
-              [-1.569, 53.804],
-              [-1.569, 53.806],
-              [-1.571, 53.806],
-              [-1.571, 53.804],
-            ],
-          ],
-        },
-        label: "Pessimistic Future",
-        image_url: "https://www.w3schools.com/howto/img_avatar.png",
-        text_with_placeholders:
-          "On update - Pessimistic Future with <strong>{distance}</strong> km",
-        values: {
-          distance: 5,
-          duration: 20,
-        },
-      },
-      16: {
-        programme_id: 3,
-        scenario_id: 16,
-        point_geom: {
-          type: "Point",
-          coordinates: [-1.58, 53.81],
-        },
-        polygon_geom: {
-          type: "Polygon",
-          coordinates: [
-            [
-              [-1.581, 53.809],
-              [-1.579, 53.809],
-              [-1.579, 53.811],
-              [-1.581, 53.811],
-              [-1.581, 53.809],
-            ],
-          ],
-        },
-        label: "Another Future",
-        image_url: "https://www.w3schools.com/howto/img_avatar2.png",
-        text_with_placeholders:
-          "Another Future - Distance: <strong>{distance}</strong> km, Duration: <strong>{duration}</strong> min",
-        values: {
-          distance: 8,
-          duration: 35,
-        },
-      },
-    };
-
-    const fetchedScenario = mockDataMap[scenarioId];
-
-    // Replace the scenario in the data array
-    const updatedData = data.map((item) =>
-      item.scenario_id === scenarioId ? fetchedScenario : item
-    );
-
-    // Update carousel navigation data
-    includeCarouselNavigation = updatedData && updatedData.length > 1;
-    possibleCarouselNavData = updatedData
-      ? updatedData.map((item) => ({
-          key: item.scenario_id,
-          value: item.label,
-        }))
-      : [];
-
-    // Update state with new data
-    setData(updatedData);
-    setIsLoading(false);
+    
   };
 
   if (isLoading || !data || !isVisible) return null;
@@ -160,10 +82,8 @@ export const BaseCalloutCardVisualisation = ({
   return type === "fullscreen" ? (
     <FullScreenCalloutCardVisualisation
       data={data}
-      isLoading={isLoading}
-      includeCarouselNavigation={includeCarouselNavigation}
-      possibleCarouselNavData={possibleCarouselNavData}
-      toggleVisibility={toggleVisibility}
+      // isLoading={isLoading}
+      // toggleVisibility={toggleVisibility}
       handleNextFetch={(scenarioIdsList) => {
         onUpdateData(scenarioIdsList);
       }}
