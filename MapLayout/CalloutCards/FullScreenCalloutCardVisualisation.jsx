@@ -320,62 +320,53 @@ const CardContent = styled.div`
  * FullScreenCalloutCardVisualisation - Full-screen display component with carousel navigation
  *
  * Displays scenario data in full-screen mode with carousel navigation.
- * Handles automatic prefetching of upcoming scenarios for smooth navigation.
+ * Prefetches the previous or next location's data when hovering over the navigation buttons for smooth and instant transitions.
  * Supports multiple image formats (Blob, ArrayBuffer, Uint8Array, URL).
  *
  * @component
  * @param {Object} props - The component props
- * @param {Array<Object>} props.data - List of scenarios to display
- * @param {number} props.data[].scenario_id - Unique scenario identifier
- * @param {string} props.data[].label - Scenario label
- * @param {number} [props.data[].programme_id] - Programme identifier
- * @param {Object} [props.data[].point_geom] - GeoJSON Point geometry
- * @param {string} props.data[].point_geom.type - Geometry type (e.g., "Point")
- * @param {Array<number>} props.data[].point_geom.coordinates - [longitude, latitude]
- * @param {Object} [props.data[].polygon_geom] - GeoJSON Polygon geometry
- * @param {string} props.data[].polygon_geom.type - Geometry type (e.g., "Polygon")
- * @param {Array<Array<Array<number>>>} props.data[].polygon_geom.coordinates - Polygon coordinates
- * @param {string} [props.data[].text_with_placeholders] - Text with placeholders to replace (e.g., "{distance}")
- * @param {Object} [props.data[].values] - Values to replace placeholders with
- * @param {string|Blob|ArrayBuffer|Uint8Array} [props.data[].image] - Scenario image (URL or binary data)
- * @param {boolean} props.includeCarouselNavigation - Enable/disable carousel navigation
- * @param {Array<{key: number, value: string}>} props.possibleCarouselNavData - Data for navigation tooltips
- * @param {Function} props.handleNextFetch - Callback to load upcoming scenarios
+ * @param {Object} props.data - Data for the current location/scenario
+ * @param {string} props.data.image_url - URL or binary of the image to display for this location
+ * @param {string} props.data.label - Human-readable label for the location
+ * @param {number} props.data.location_id - Unique identifier for the location
+ * @param {number|null} props.data.nav_next_id - ID of the next location in the scenario (null if last)
+ * @param {string|null} props.data.nav_next_label - Label of the next location (for navigation button, null if last)
+ * @param {number|null} props.data.nav_prev_id - ID of the previous location in the scenario (null if first)
+ * @param {string|null} props.data.nav_prev_label - Label of the previous location (for navigation button, null if first)
+ * @param {number} props.data.programme_id - Programme identifier
+ * @param {number} props.data.scenario_id - Identifier of the scenario this location belongs to
+ * @param {string} props.data.text_with_placeholders - Text with placeholders to be replaced (e.g., "{distance}")
+ * @param {Object} props.data.values - Values to replace placeholders with (e.g., {distance: 3, duration: 40})
+ * @param {Function} props.handleNextFetch - Callback to load or prefetch the next/previous location
  *
  * @example
- * const scenariosData = [
- *   {
- *     scenario_id: 12,
- *     programme_id: 0,
- *     label: "Huddersfield College",
- *     point_geom: {
- *       type: "Point",
- *       coordinates: [-1.553621, 53.79969]
- *     },
- *     polygon_geom: {
- *       type: "Polygon",
- *       coordinates: [[[-1.554, 53.799], [-1.552, 53.799], ...]]
- *     },
- *     text_with_placeholders: "Distance: <strong>{distance}</strong> km",
- *     values: { distance: 2, duration: 30 },
- *     image: "https://example.com/image.png"
- *   }
- * ];
+ * const data = {
+ *   image_url: "https://www.w3schools.com/howto/img_avatar2.png",
+ *   label: "Huddersfield College",
+ *   location_id: 2,
+ *   nav_next_id: null,
+ *   nav_next_label: null,
+ *   nav_prev_id: null,
+ *   nav_prev_label: null,
+ *   programme_id: 0,
+ *   scenario_id: 0,
+ *   text_with_placeholders: "For this scenario, the distance is <strong>{distance}</strong> km and the journey time is <strong>{duration}</strong> minutes.",
+ *   values: {distance: 3, duration: 40},
+ *   values_json: "{}"
+ * };
  *
  * @returns {JSX.Element|null} The full-screen component or null if no current scenario
  */
 export const FullScreenCalloutCardVisualisation = ({
   data,
-  includeCarouselNavigation,
-  possibleCarouselNavData,
   handleNextFetch,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const handleToggle = () => setIsVisible((v) => !v);
-  const [currentScenarioId, setCurrentScenarioId] = useState(
-    data[0]?.scenario_id
-  );
+
+  // the content that will be rendered
   const [content, setContent] = useState(null);
+  const [imgUrl, setImgUrl] = useState(null);
 
   // next and previous buttons
   const previousButtonRef = React.useRef(null);
@@ -383,23 +374,6 @@ export const FullScreenCalloutCardVisualisation = ({
     useState(false);
   const nextButtonRef = React.useRef(null);
   const [nextButtonRefIsHovered, setNextButtonRefIsHovered] = useState(false);
-
-  // Find currentScenario from the ID in data (always up to date)
-  let currentScenario = data;
-  let currentIndex;
-  if (
-    possibleCarouselNavData.length > 0 &&
-    includeCarouselNavigation === true
-  ) {
-    currentScenario = data.find(
-      (item) => item.scenario_id === currentScenarioId
-    );
-    currentIndex = data.findIndex(
-      (item) => item.scenario_id === currentScenarioId
-    );
-  }
-
-  const [imgUrl, setImgUrl] = useState(null);
 
   /**
    * Updates content and image when the current scenario changes
@@ -411,42 +385,34 @@ export const FullScreenCalloutCardVisualisation = ({
    * - String: used directly as URL
    */
   useEffect(() => {
-    if (!currentScenario) {
-      return;
-    }
-
-    if (!currentScenario.text_with_placeholders || !currentScenario.values) {
-      return;
-    }
-
     const newContent = replacePlaceholders(
-      currentScenario.text_with_placeholders,
-      currentScenario.values
+      data.text_with_placeholders,
+      data.values
     );
     setContent(newContent);
     setImgUrl(null);
 
-    if (currentScenario.image_url) {
-      if (currentScenario.image_url instanceof Blob) {
-        const url = URL.createObjectURL(currentScenario.image_url);
+    if (data.image_url) {
+      if (data.image_url instanceof Blob) {
+        const url = URL.createObjectURL(data.image_url);
         setImgUrl(url);
-      } else if (currentScenario.image_url instanceof ArrayBuffer) {
-        const blob = new Blob([currentScenario.image_url], {
+      } else if (data.image_url instanceof ArrayBuffer) {
+        const blob = new Blob([data.image_url], {
           type: "image/png",
         });
         const url = URL.createObjectURL(blob);
         setImgUrl(url);
-      } else if (currentScenario.image_url instanceof Uint8Array) {
-        const blob = new Blob([currentScenario.image_url], {
+      } else if (data.image_url instanceof Uint8Array) {
+        const blob = new Blob([data.image_url], {
           type: "image/png",
         });
         const url = URL.createObjectURL(blob);
         setImgUrl(url);
-      } else if (typeof currentScenario.image_url === "string") {
-        setImgUrl(currentScenario.image_url);
+      } else if (typeof data.image_url === "string") {
+        setImgUrl(data.image_url);
       }
     }
-  }, [currentScenario, data]);
+  }, [data]);
 
   /**
    * Opens the card with animation when you click on an image
@@ -457,48 +423,20 @@ export const FullScreenCalloutCardVisualisation = ({
       timeout = setTimeout(() => setIsVisible(true), 30);
       return () => clearTimeout(timeout);
     }
-  }, [currentScenarioId]);
+  }, [data.label]);
 
   /**
    * Navigates to the previous scenario in the carousel
    */
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentScenarioId(data[currentIndex - 1].scenario_id);
-    }
-  };
+  const handlePrevious = () => {};
 
   /**
    * Navigates to the next scenario and triggers prefetch if needed
-   *
-   * Prefetch logic:
-   * - Fetches scenario at +2 position if incomplete
-   * - Falls back to +1 position if no +2 exists
    */
-  const handleNext = () => {
-    // When object +2 does not have text_with_placeholders and exists in data
-    if (
-      !data[currentIndex + 2]?.text_with_placeholders &&
-      data[currentIndex + 2]
-    ) {
-      handleNextFetch(data[currentIndex + 2].scenario_id);
-    }
-    // When there is no +2 scenario but there is a +1 that does not have any data
-    else if (
-      !data[currentIndex + 1]?.text_with_placeholders &&
-      data[currentIndex + 1]
-    ) {
-      handleNextFetch(data[currentIndex + 1].scenario_id);
-    }
+  const handleNext = () => {};
 
-    // Move to the next object
-    if (currentIndex < data.length - 1) {
-      setCurrentScenarioId(data[currentIndex + 1].scenario_id);
-    }
-  };
-
-  // Check that currentScenario exists before rendering
-  if (!currentScenario) {
+  // Check that data exists before rendering
+  if (!data) {
     return null;
   }
 
@@ -520,13 +458,13 @@ export const FullScreenCalloutCardVisualisation = ({
         {isVisible && (
           <ContentWrapper>
             {/* Title */}
-            <CardTitle>{currentScenario.label || "Card"}</CardTitle>
+            <CardTitle>{data.label || "Card"}</CardTitle>
 
             {/* Content */}
             <TitleImageTextWrapper>
               <TitleTextContainer>
                 <Title style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>
-                  {currentScenario.label || "Card"}
+                  {data.label || "Card"}
                 </Title>
                 <CardContent dangerouslySetInnerHTML={{ __html: content }} />
               </TitleTextContainer>
@@ -537,7 +475,7 @@ export const FullScreenCalloutCardVisualisation = ({
                     onError={() => {
                       setImgUrl(null);
                     }}
-                    alt={currentScenario.label || "Scenario image"}
+                    alt={data.label || "Scenario image"}
                   />
                 ) : (
                   <Image src={"https://placehold.co/600x400?text=No+image!"} />
@@ -547,11 +485,11 @@ export const FullScreenCalloutCardVisualisation = ({
           </ContentWrapper>
         )}
         {/* Navigation */}
-        {isVisible && includeCarouselNavigation && (
+        {isVisible && (data.nav_next_id || data.nav_prev_id) && (
           <NavigationBar>
             <NavigationButton
               onClick={handlePrevious}
-              disabled={currentIndex === 0}
+              disabled={data.nav_prev_id === null}
               ref={previousButtonRef}
               onMouseEnter={() => setPreviousButtonRefIsHovered(true)}
               onMouseLeave={() => setPreviousButtonRefIsHovered(false)}
@@ -559,18 +497,16 @@ export const FullScreenCalloutCardVisualisation = ({
             >
               <ChevronLeftIcon />
             </NavigationButton>
-            {currentIndex > 0 && (
-              <Hovertip
-                isVisible={previousButtonRefIsHovered}
-                displayText={possibleCarouselNavData[currentIndex - 1].value}
-                side="right"
-                refElement={previousButtonRef}
-                offset={3}
-              />
-            )}
+            <Hovertip
+              isVisible={previousButtonRefIsHovered}
+              displayText={data.nav_prev_label}
+              side="right"
+              refElement={previousButtonRef}
+              offset={3}
+            />
             <NavigationButton
               onClick={handleNext}
-              disabled={currentIndex === possibleCarouselNavData.length - 1}
+              disabled={data.nav_next_id === null}
               ref={nextButtonRef}
               onMouseEnter={() => setNextButtonRefIsHovered(true)}
               onMouseLeave={() => setNextButtonRefIsHovered(false)}
@@ -578,15 +514,13 @@ export const FullScreenCalloutCardVisualisation = ({
             >
               <ChevronRightIcon />
             </NavigationButton>
-            {currentIndex < possibleCarouselNavData.length - 1 && (
-              <Hovertip
-                isVisible={nextButtonRefIsHovered}
-                displayText={possibleCarouselNavData[currentIndex + 1].value}
-                side="left"
-                refElement={nextButtonRef}
-                offset={3}
-              />
-            )}
+            <Hovertip
+              isVisible={nextButtonRefIsHovered}
+              displayText={data.nav_next_label}
+              side="left"
+              refElement={nextButtonRef}
+              offset={3}
+            />
           </NavigationBar>
         )}
       </FullscreenContainer>
