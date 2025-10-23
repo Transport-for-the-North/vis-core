@@ -40,7 +40,7 @@ export const appConfig = {
                 <li><b>Station Travel to Work Distance:</b> This visualisation shows the distance people travel from home to workplace for areas near each station, categorised from working at home to 60km+ distances, using 2021 Census data.</li>
                 <li><b>Station Work Method of Travel:</b> This visualisation shows the main methods of transport used for the longest part of usual journeys to work, including all transport modes from walking to train travel, using 2021 Census data.</li>
                 <li><b>Link Loadings:</b> This visualisation shows the boarding and alighting summaries for each link in the NorTMS model.</li>
-                <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</li>
+                <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in our TIPLOC-TIPLOC network.</li>
                 <li><b>Node Investments:</b> This visualisation shows the current node investments in the Investment Pipeline (SRIP).</li>
                 <li><b>Link Investments:</b> This visualisation shows the current link investments in the Investment Pipeline (SRIP).</li>
                 <li><b>Link Frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
