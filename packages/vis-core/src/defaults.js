@@ -1,14 +1,22 @@
-export const mapStyles = {
-  geoapifyPositron: `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${import.meta.env.VITE_APP_MAP_API_TOKEN}`,
+let mapApiToken = '';
 
-  osMapsApiRaster: {
+export const setMapApiToken = (token) => {
+  mapApiToken = token;
+};
+
+export const getMapApiToken = () => mapApiToken;
+
+export const mapStyles = {
+  geoapifyPositron: () => `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${mapApiToken}`,
+
+  osMapsApiRaster: () => ({
     version: 8,
     glyphs: "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
     sources: {
       "raster-tiles": {
         type: "raster",
         tiles: [
-          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${import.meta.env.VITE_APP_MAP_API_TOKEN}`,
+          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${mapApiToken}`,
         ],
         tileSize: 256,
       },
@@ -20,13 +28,15 @@ export const mapStyles = {
         source: "raster-tiles",
       },
     ],
-  },
+  }),
 
   osVectorTileApiOpenGreyscale:
     "https://raw.githubusercontent.com/Transport-for-the-North/OS-Vector-Tile-API-Stylesheets/refs/heads/main/OS_VTS_3857_Open_Light.json",
 };
 
-export const defaultMapStyle = mapStyles.geoapifyPositron;
+export const getDefaultMapStyle = () => mapStyles.geoapifyPositron();
+// Replace the direct export with a function
+export const defaultMapStyle = getDefaultMapStyle;
 export const defaultMapCentre = [-2.2, 54.2];
 export const defaultMapZoom = 7.5;
 
