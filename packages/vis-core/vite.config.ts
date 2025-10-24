@@ -14,7 +14,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    cssCodeSplit: true,  
+    cssCodeSplit: false,  
     lib: {
       entry: {
         index:     path.resolve(__dirname, 'src/index.tsx'),
