@@ -337,7 +337,8 @@ const CardContent = styled.div`
  * @param {number} props.data.scenario_id - Identifier of the scenario this location belongs to
  * @param {string} props.data.text_with_placeholders - Text with placeholders to be replaced (e.g., "{distance}")
  * @param {Object} props.data.values - Values to replace placeholders with (e.g., {distance: 3, duration: 40})
- * @param {Function} props.handleNextFetch - Callback to load or prefetch the next/previous location
+ * @param {Function} props.handleUpdatedData - Callback to load or prefetch the next/previous location
+ * @param {Function} props.handleChange - Callback to switch to the next/previous location already prefetched
  *
  * @example
  * const data = {
@@ -359,9 +360,10 @@ const CardContent = styled.div`
  */
 export const FullScreenCalloutCardVisualisation = ({
   data,
-  handleNextFetch,
+  handleUpdatedData,
+  handleChange,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const handleToggle = () => setIsVisible((v) => !v);
 
   // the content that will be rendered
@@ -413,27 +415,6 @@ export const FullScreenCalloutCardVisualisation = ({
       }
     }
   }, [data]);
-
-  /**
-   * Opens the card with animation when you click on an image
-   */
-  useEffect(() => {
-    let timeout;
-    if (!isVisible) {
-      timeout = setTimeout(() => setIsVisible(true), 30);
-      return () => clearTimeout(timeout);
-    }
-  }, [data.label]);
-
-  /**
-   * Navigates to the previous scenario in the carousel
-   */
-  const handlePrevious = () => {};
-
-  /**
-   * Navigates to the next scenario and triggers prefetch if needed
-   */
-  const handleNext = () => {};
 
   // Check that data exists before rendering
   if (!data) {
@@ -488,12 +469,13 @@ export const FullScreenCalloutCardVisualisation = ({
         {isVisible && (data.nav_next_id || data.nav_prev_id) && (
           <NavigationBar>
             <NavigationButton
-              onClick={handlePrevious}
+              onClick={() => handleChange("previous")}
               disabled={data.nav_prev_id === null}
               ref={previousButtonRef}
               onMouseEnter={() => setPreviousButtonRefIsHovered(true)}
               onMouseLeave={() => setPreviousButtonRefIsHovered(false)}
               aria-label="Previous scenario"
+              isHovered={handleUpdatedData(data.nav_prev_id, "previous")}
             >
               <ChevronLeftIcon />
             </NavigationButton>
@@ -505,11 +487,12 @@ export const FullScreenCalloutCardVisualisation = ({
               offset={3}
             />
             <NavigationButton
-              onClick={handleNext}
+              onClick={() => handleChange("next")}
               disabled={data.nav_next_id === null}
               ref={nextButtonRef}
               onMouseEnter={() => setNextButtonRefIsHovered(true)}
               onMouseLeave={() => setNextButtonRefIsHovered(false)}
+              isHovered={handleUpdatedData(data.nav_next_id, "next")}
               aria-label="Next scenario"
             >
               <ChevronRightIcon />
