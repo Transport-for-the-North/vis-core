@@ -3,12 +3,14 @@ import { FullScreenCalloutCardVisualisation } from "./FullScreenCalloutCardVisua
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { useFetchVisualisationData } from "hooks";
 import { MapContext } from "contexts";
+import { actionTypes } from "reducers";
+import { api } from "services";
 
 /**
  * BaseCalloutCardVisualisation - Base component for displaying callout cards
  *
  * Renders either a small callout card or a full-screen carousel visualization
- * based on the type prop. Handles data fetching and dynamic updates for scenarios.
+ * based on the type prop. Handles data fetching, prefetching, and dynamic updates for scenarios.
  * Supports both real API calls and mock data for development.
  *
  * @component
@@ -27,36 +29,44 @@ export const BaseCalloutCardVisualisation = ({
   onUpdate,
 }) => {
   const [isVisible, setIsVisible] = useState(true);
-  const { state } = useContext(MapContext);
+  const { state, dispatch } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
 
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [nextData, setNextData] = useState(null);
+  const [prevData, setPrevData] = useState(null);
+
+  const [isTransition, setIsTransition] = useState(false);
+
   // ========== Data Fetching ==========
   const response = useFetchVisualisationData(visualisation);
 
   /**
-   * Initializes data based on card type
-   * Uses mock data for development, will use real API response in production
+   * Synchronizes the displayed data with the fetched data,
+   * except when we are in a transition (showing prefetched data).
    */
   useEffect(() => {
-    if(!response.data) return;
-
-    const updatedData = {
-      data: {
-        ...response.data,
-            nav_next_id: 3,
-            nav_prev_id: 1,
-            nav_next_label: "Next!",
-            nav_prev_label: "Previous!"
-      },
-      isLoading: response.isLoading,
+    if (!isTransition && response.data) {
+      setData(response.data);
+      setIsLoading(response.isLoading);
     }
+  }, [response, isTransition]);
 
-    setData(updatedData.data);
-    setIsLoading(updatedData.isLoading);
-  }, [response]);
+  /**
+   * Ends the transition state when the fetched data matches the displayed data.
+   * This allows the hook to resume control of the displayed data.
+   */
+  useEffect(() => {
+    if (
+      isTransition &&
+      response.data &&
+      response.data.location_id === data?.location_id
+    ) {
+      setIsTransition(false);
+    }
+  }, [response.data, isTransition, data]);
 
   /**
    * Toggles the visibility of the card
@@ -66,15 +76,107 @@ export const BaseCalloutCardVisualisation = ({
   };
 
   /**
-   * Updates scenario data when fetching new scenarios
+   * Prefetches data for the next or previous location.
+   * This is called on hover of the navigation buttons.
    *
-   * Replaces the scenario in the data array with newly fetched data.
-   * In production, this will call the real API endpoint.
-   *
-   * @param {number} scenarioId - The ID of the scenario to fetch and update
+   * @param {number} locationId - The ID of the location to prefetch
+   * @param {'next'|'previous'} mode - Direction of navigation
    */
-  const onUpdateData = (scenarioId) => {
-    
+  const onUpdateData = async (locationId, mode) => {
+    if (
+      !locationId ||
+      (mode === "next" && nextData) ||
+      (mode === "previous" && prevData)
+    )
+      return;
+
+    const nextVisu = {
+      ...visualisation,
+      pathParams: {
+        id: {
+          ...visualisation.pathParams.id,
+          value: locationId,
+        },
+      },
+    };
+    const dataUpdated = await prefetch(nextVisu);
+    if (dataUpdated && mode === "next") setNextData(dataUpdated);
+    if (dataUpdated && mode === "previous") setPrevData(dataUpdated);
+  };
+
+  /**
+   * Converts a params map (queryParams/pathParams) to a simple key-value object.
+   * Used for API calls.
+   *
+   * @param {Object} paramsMap - Map of param definitions
+   * @returns {Object} - Plain object of key/value pairs
+   */
+  const toSimpleParamsMap = (paramsMap = {}) => {
+    return Object.fromEntries(
+      Object.entries(paramsMap)
+        .filter(([, { value }]) => value !== null && value !== undefined)
+        .map(([key, { value }]) => [key, value])
+    );
+  };
+
+  /**
+   * Fetches data for a given visualisation config (used for prefetching).
+   *
+   * @param {Object} nextVisu - Visualisation config for the location to fetch
+   * @returns {Promise<Object>} - The fetched data
+   */
+  async function prefetch(nextVisu, mode) {
+    const response = await api.baseService.get(nextVisu.dataPath, {
+      pathParams: toSimpleParamsMap(nextVisu.pathParams),
+      queryParams: toSimpleParamsMap(nextVisu.queryParams),
+      skipAuth: !nextVisu.requiresAuth,
+    });
+    return response;
+  }
+
+  /**
+   * Handles navigation to the next or previous location in the carousel.
+   * Displays the prefetched data instantly, sets transition state,
+   * and updates the global state to trigger a refetch for consistency.
+   *
+   * @param {'next'|'previous'} mode - Direction of navigation
+   */
+  const change = (mode) => {
+    console.log("sens : ", mode);
+    switch (mode) {
+      case "next":
+        setData(nextData);
+        setIsTransition(true);
+        dispatch({
+          type: actionTypes.UPDATE_PATH_PARAMS,
+          payload: {
+            filter: {
+              visualisations: ["Detailed Information"],
+              paramName: "id",
+            },
+            value: nextData.location_id,
+          },
+        });
+        break;
+      case "previous":
+        setData(prevData);
+        setIsTransition(true);
+        dispatch({
+          type: actionTypes.UPDATE_PATH_PARAMS,
+          payload: {
+            filter: {
+              visualisations: ["Detailed Information"],
+              paramName: "id",
+            },
+            value: prevData.location_id,
+          },
+        });
+        break;
+      default:
+        break;
+    }
+    setNextData(null);
+    setPrevData(null);
   };
 
   if (isLoading || !data || !isVisible) return null;
@@ -82,11 +184,10 @@ export const BaseCalloutCardVisualisation = ({
   return type === "fullscreen" ? (
     <FullScreenCalloutCardVisualisation
       data={data}
-      // isLoading={isLoading}
-      // toggleVisibility={toggleVisibility}
-      handleNextFetch={(scenarioIdsList) => {
-        onUpdateData(scenarioIdsList);
+      handleUpdatedData={(locationId, mode) => {
+        onUpdateData(locationId, mode);
       }}
+      handleChange={(mode) => change(mode)}
     />
   ) : (
     <CalloutCardVisualisation
