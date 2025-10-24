@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "defaults"; 
 
 class BaseService {
   /**
@@ -10,9 +11,9 @@ class BaseService {
    */
   constructor(config = { pathPrefix: "" }) {
     const postFix = config?.pathPostfix ?? "";
-    switch (import.meta.env.VITE_PROD_OR_DEV) {
+    switch (getProdOrDev()) {
       case "production":
-        this._apiBaseUrl = import.meta.env.VITE_API_BASE_DOMAIN?.trim() || '';
+        this._apiBaseUrl = (getApiBaseDomain() || '').trim();
         if (
           this._apiBaseUrl.length > 0 &&
           this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
@@ -22,8 +23,8 @@ class BaseService {
         break;
 
       case "development":
-        if (import.meta.env.VITE_API_BASE_DOMAIN_DEV) {
-          this._apiBaseUrl = import.meta.env.VITE_API_BASE_DOMAIN_DEV.trim();
+        if (getApiBaseDomainDev()) {
+          this._apiBaseUrl = getApiBaseDomainDev().trim();
           if (
             this._apiBaseUrl.length > 0 &&
             this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
