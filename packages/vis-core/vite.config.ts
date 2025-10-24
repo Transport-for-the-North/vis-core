@@ -14,6 +14,7 @@ export default defineConfig({
     }),
   ],
   build: {
+    cssCodeSplit: true,  
     lib: {
       entry: {
         index:     path.resolve(__dirname, 'src/index.tsx'),
@@ -38,7 +39,9 @@ export default defineConfig({
         "@ookla/mapbox-gl-draw-rectangle", "@mapcomponents/react-maplibre", "styled-components"
       ],
       output: {
-        globals: { react: "React", "react-dom": "ReactDOM" }
+        globals: { react: "React", "react-dom": "ReactDOM" },
+        assetFileNames: (asset) =>
+          asset.name?.endsWith('.css') ? '[name][extname]' : 'assets/[name][extname]'
       }
     },
     sourcemap: true
