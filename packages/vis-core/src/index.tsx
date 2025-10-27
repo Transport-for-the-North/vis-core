@@ -10,7 +10,7 @@ export * as utils from './utils';
 
 export {
   setMapApiToken, getMapApiToken, setProdOrDev, getProdOrDev, setApiBaseDomain, getApiBaseDomain, setApiBaseDomainDev, getApiBaseDomainDev,
-} from './defaults';
+} from './runtime';
 
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
