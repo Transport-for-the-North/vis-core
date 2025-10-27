@@ -11,33 +11,15 @@ class BaseService {
    */
   constructor(config = { pathPrefix: "" }) {
     const postFix = config?.pathPostfix ?? "";
-    switch (getProdOrDev()) {
-      case "production":
-        this._apiBaseUrl = (getApiBaseDomain() || '').trim();
-        if (
-          this._apiBaseUrl.length > 0 &&
-          this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
-        ) {
-          this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
-        }
-        break;
-
-      case "development":
-        if (getApiBaseDomainDev()) {
-          this._apiBaseUrl = getApiBaseDomainDev().trim();
-          if (
-            this._apiBaseUrl.length > 0 &&
-            this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
-          ) {
-            this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
-          }
-        } else {
-          this._apiBaseUrl = `https://localhost:7127`;
-        }
-        break;
-
-      default:
-        this._apiBaseUrl = `https://localhost:7127`;
+    const mode = (getProdOrDev() || "").toLowerCase();
+    const rawBase = mode === "production" ? (getApiBaseDomain() || "") : (getApiBaseDomainDev() || "");
+    this._apiBaseUrl = rawBase.trim().replace(/\/+$/, "");
+    if (!this._apiBaseUrl) {
+      throw new Error(
+        `API base URL is not set. Provide ${
+          mode === "production" ? "VITE_API_BASE_DOMAIN" : "VITE_API_BASE_DOMAIN_DEV"
+        } (full URL incl. protocol, e.g. http://localhost:7177).`
+      );
     }
     this._apiBaseUrl = `${this._apiBaseUrl}${postFix}`;
     this._pathPrefix = config?.pathPrefix ?? "";
