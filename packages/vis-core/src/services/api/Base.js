@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../../defaults"; 
+import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../.."; 
 
 class BaseService {
   /**
@@ -11,15 +11,33 @@ class BaseService {
    */
   constructor(config = { pathPrefix: "" }) {
     const postFix = config?.pathPostfix ?? "";
-    const mode = (getProdOrDev() || "").toLowerCase();
-    const rawBase = mode === "production" ? (getApiBaseDomain() || "") : (getApiBaseDomainDev() || "");
-    this._apiBaseUrl = rawBase.trim().replace(/\/+$/, "");
-    if (!this._apiBaseUrl) {
-      throw new Error(
-        `API base URL is not set. Provide ${
-          mode === "production" ? "VITE_API_BASE_DOMAIN" : "VITE_API_BASE_DOMAIN_DEV"
-        } (full URL incl. protocol, e.g. http://localhost:7177).`
-      );
+    switch (getProdOrDev()) {
+      case "production":
+        this._apiBaseUrl = (getApiBaseDomain() || '').trim();
+        if (
+          this._apiBaseUrl.length > 0 &&
+          this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
+        ) {
+          this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
+        }
+        break;
+
+      case "development":
+        if (getApiBaseDomainDev()) {
+          this._apiBaseUrl = getApiBaseDomainDev().trim();
+          if (
+            this._apiBaseUrl.length > 0 &&
+            this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
+          ) {
+            this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
+          }
+        } else {
+          this._apiBaseUrl = `https://localhost:7127`;
+        }
+        break;
+
+      default:
+        this._apiBaseUrl = `https://localhost:7127`;
     }
     this._apiBaseUrl = `${this._apiBaseUrl}${postFix}`;
     this._pathPrefix = config?.pathPrefix ?? "";
