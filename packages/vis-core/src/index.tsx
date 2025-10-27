@@ -1,4 +1,8 @@
 // packages/vis-core/src/index.ts
+export * from './defaults';
+export {
+  setMapApiToken, getMapApiToken, setProdOrDev, getProdOrDev, setApiBaseDomain, getApiBaseDomain, setApiBaseDomainDev, getApiBaseDomainDev,
+} from './runtime';
 export * as Components from './Components';
 export * as contexts from './contexts';
 export * as hocs from './hocs';
@@ -7,10 +11,6 @@ export * as layouts from './layouts';
 export * as reducers from './reducers';
 export * as services from './services';
 export * as utils from './utils';
-
-export {
-  setMapApiToken, getMapApiToken, setProdOrDev, getProdOrDev, setApiBaseDomain, getApiBaseDomain, setApiBaseDomainDev, getApiBaseDomainDev,
-} from './runtime';
 
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 

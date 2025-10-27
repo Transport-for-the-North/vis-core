@@ -1,6 +1,6 @@
 {
   "name": "@transport-for-the-north/vis-core",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": false,
   "type": "module",
   "main": "dist/index.cjs",
@@ -20,6 +20,16 @@
       "require": "./dist/index.cjs"
     },
     "./style.css": "./dist/style.css",
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js",
+      "require": "./dist/runtime.cjs"
+    },
+    "./defaults": {
+      "types": "./dist/defaults.d.ts",
+      "import": "./dist/defaults.js",
+      "require": "./dist/defaults.cjs"
+    },
     "./Components": {
       "types": "./dist/Components.d.ts",
       "import": "./dist/Components.js",
