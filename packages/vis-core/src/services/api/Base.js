@@ -17,6 +17,11 @@ class BaseService {
       ? String(config.pathPostfix)
       : "";
 
+    console.log('[BaseService] mode:', getProdOrDev());
+    console.log('[BaseService] apiBaseDomain:', getApiBaseDomain());
+    console.log('[BaseService] apiBaseDomainDev:', getApiBaseDomainDev());
+    console.log('[BaseService] caller postFix:', postFix, 'pathPrefix:', config?.pathPrefix);
+
     switch (mode) {
       case "production":
         this._apiBaseUrl = (getApiBaseDomain() || '').trim();
