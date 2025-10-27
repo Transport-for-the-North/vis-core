@@ -8,7 +8,9 @@ export * as reducers from './reducers';
 export * as services from './services';
 export * as utils from './utils';
 
-export { setMapApiToken, setProdOrDev, setApiBaseDomain, setApiBaseDomainDev } from './defaults';
+export {
+  setMapApiToken, getMapApiToken, setProdOrDev, getProdOrDev, setApiBaseDomain, getApiBaseDomain, setApiBaseDomainDev, getApiBaseDomainDev,
+} from './defaults';
 
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
