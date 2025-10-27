@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../.."; 
+import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../../defaults"; 
 
 class BaseService {
   /**
