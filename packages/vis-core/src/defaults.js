@@ -1,30 +1,6 @@
-let mapApiToken = '';
-
-export const setMapApiToken = (token) => {
-  mapApiToken = token;
-};
-
-export const getMapApiToken = () => mapApiToken;
-
-// ---- add runtime env/config state ----
-let runtimeEnv = {
-  prodOrDev: import.meta.env.VITE_PROD_OR_DEV ?? '',
-  apiBaseDomain: import.meta.env.VITE_API_BASE_DOMAIN ?? '',
-  apiBaseDomainDev: import.meta.env.VITE_API_BASE_DOMAIN_DEV ?? '',
-};
-
-export const setProdOrDev = (val) => { runtimeEnv.prodOrDev = val ?? ''; };
-export const getProdOrDev = () => runtimeEnv.prodOrDev;
-
-export const setApiBaseDomain = (val) => { runtimeEnv.apiBaseDomain = val ?? ''; };
-export const getApiBaseDomain = () => runtimeEnv.apiBaseDomain;
-
-export const setApiBaseDomainDev = (val) => { runtimeEnv.apiBaseDomainDev = val ?? ''; };
-export const getApiBaseDomainDev = () => runtimeEnv.apiBaseDomainDev;
-// ---- end runtime env/config state ----
-
+import { getMapApiToken } from './runtime'; 
 export const mapStyles = {
-  geoapifyPositron: () => `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${mapApiToken}`,
+  geoapifyPositron: () => `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${getMapApiToken}`,
 
   osMapsApiRaster: () => ({
     version: 8,
@@ -33,7 +9,7 @@ export const mapStyles = {
       "raster-tiles": {
         type: "raster",
         tiles: [
-          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${mapApiToken}`,
+          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${getMapApiToken}`,
         ],
         tileSize: 256,
       },

@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../../defaults"; 
+import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../../runtime"; 
 
 class BaseService {
   /**
@@ -10,27 +10,21 @@ class BaseService {
    * @property {string} [config.pathPostfix] - The postfix to be added to the path.
    */
   constructor(config = { pathPrefix: "" }) {
-    const postFix = config?.pathPostfix ?? "";
-    switch (getProdOrDev()) {
+    // normalize mode once
+    const mode = (getProdOrDev() || "").toLowerCase();
+    // treat postfix only as a path segment (never a port like ":7127")
+    const postFix = config?.pathPostfix && !String(config.pathPostfix).startsWith(":")
+      ? String(config.pathPostfix)
+      : "";
+
+    switch (mode) {
       case "production":
         this._apiBaseUrl = (getApiBaseDomain() || '').trim();
-        if (
-          this._apiBaseUrl.length > 0 &&
-          this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
-        ) {
-          this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
-        }
         break;
 
       case "development":
         if (getApiBaseDomainDev()) {
-          this._apiBaseUrl = getApiBaseDomainDev().trim();
-          if (
-            this._apiBaseUrl.length > 0 &&
-            this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
-          ) {
-            this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
-          }
+          this._apiBaseUrl = getApiBaseDomainDev().trim()
         } else {
           this._apiBaseUrl = `https://localhost:7127`;
         }
@@ -39,6 +33,7 @@ class BaseService {
       default:
         this._apiBaseUrl = `https://localhost:7127`;
     }
+    if (this._apiBaseUrl.endsWith("/")) this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
     this._apiBaseUrl = `${this._apiBaseUrl}${postFix}`;
     this._pathPrefix = config?.pathPrefix ?? "";
   }
