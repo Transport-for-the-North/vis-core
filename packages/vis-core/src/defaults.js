@@ -1,6 +1,6 @@
 import { getMapApiToken } from './runtime'; 
 export const mapStyles = {
-  geoapifyPositron: () => `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${getMapApiToken}`,
+  geoapifyPositron: () => `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${getMapApiToken()}`,
 
   osMapsApiRaster: () => ({
     version: 8,
@@ -9,7 +9,7 @@ export const mapStyles = {
       "raster-tiles": {
         type: "raster",
         tiles: [
-          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${getMapApiToken}`,
+          `https://api.os.uk/maps/raster/v1/zxy/Light_3857/{z}/{x}/{y}.png?key=${getMapApiToken()}`,
         ],
         tileSize: 256,
       },
