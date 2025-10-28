@@ -20,6 +20,7 @@ export const VisualisationManager = ({
   maps,
   ...props
 }) => {
+  const sidebarIsOpen = props.sidebarIsOpen
   // Convert visualisationConfigs object to an array of entries
   const visualisationEntries = Object.entries(visualisationConfigs);
   // Separate visualizations by type
@@ -93,6 +94,7 @@ export const VisualisationManager = ({
               visualisationName={name}
               cardName={config.cardName || name}
               onUpdate={() => handleCardUpdate(name)}
+              sidebarIsOpen={sidebarIsOpen}
             />
           );
         })}
