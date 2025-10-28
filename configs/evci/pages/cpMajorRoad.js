@@ -68,16 +68,6 @@ export const cpMajorRoad = {
       glossary: { 
         dataDictionary: {}
       },
-      download: {
-        filters: [
-          { ...selectors.chargerSpeed, multiSelect: true, shouldBeBlankOnInit: false, type: 'dropdown' },
-          { ...selectors.columnNameCP, multiSelect: false, type: 'toggle' },
-          { ...selectors.stbTag, type: 'fixed' },
-          { ...selectors.distanceValueDisplay, multiSelect: true, type: 'dropdown' },
-          { ...selectors.linkSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], layer: "Roads", filterName: "Optional location selector"},
-        ],
-        downloadPath: '/api/evci/cp-major-road/download'
-      }
     },
   },
 };
