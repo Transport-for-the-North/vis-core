@@ -10,37 +10,13 @@ class BaseService {
    * @property {string} [config.pathPostfix] - The postfix to be added to the path.
    */
   constructor(config = { pathPrefix: "" }) {
-    // normalize mode once
-    const mode = (getProdOrDev() || "").toLowerCase();
-    // treat postfix only as a path segment (never a port like ":7127")
-    const postFix = config?.pathPostfix && !String(config.pathPostfix).startsWith(":")
+    const postFix =
+    config?.pathPostfix && !String(config.pathPostfix).startsWith(":")
       ? String(config.pathPostfix)
       : "";
-
-    console.log('[BaseService] mode:', getProdOrDev());
-    console.log('[BaseService] apiBaseDomain:', getApiBaseDomain());
-    console.log('[BaseService] apiBaseDomainDev:', getApiBaseDomainDev());
-    console.log('[BaseService] caller postFix:', postFix, 'pathPrefix:', config?.pathPrefix);
-
-    switch (mode) {
-      case "production":
-        this._apiBaseUrl = (getApiBaseDomain() || '').trim();
-        break;
-
-      case "development":
-        if (getApiBaseDomainDev()) {
-          this._apiBaseUrl = getApiBaseDomainDev().trim()
-        } else {
-          this._apiBaseUrl = `https://localhost:7127`;
-        }
-        break;
-
-      default:
-        this._apiBaseUrl = `https://localhost:7127`;
-    }
-    if (this._apiBaseUrl.endsWith("/")) this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
-    this._apiBaseUrl = `${this._apiBaseUrl}${postFix}`;
+    
     this._pathPrefix = config?.pathPrefix ?? "";
+    this._postFix = postFix;
   }
 
   /**
@@ -49,9 +25,19 @@ class BaseService {
    * @returns {string} The full URL.
    */
   _buildUrl(path) {
-    let url = this._apiBaseUrl;
+    const mode = (getProdOrDev() || "").toLowerCase();
+
+    let base =
+      mode === "production"
+        ? (getApiBaseDomain() || "")
+        : (getApiBaseDomainDev() || "https://localhost:7127");
+
+    base = base.replace(/\/+$/, ""); // strip trailing slash
+
+    let url = `${base}${this._postFix || ""}`;
     if (this._pathPrefix) url += `/${this._pathPrefix}`;
-    url += `${path}`;
+    url += `/${String(path || "").replace(/^\/+/, "")}`;
+
     return url;
   }
 
