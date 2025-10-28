@@ -45,10 +45,9 @@ const FullscreenContainer = styled.div`
   top: 85px; /* Navbar height */
   left: ${({ $sidebarIsOpen }) => $sidebarIsOpen ? "470px" : "70px"}; /* Side panel width (450px) + Sidebar border (10px) + distance between elements (10px) */
   right: 10px;
-  bottom: 10px;
+  bottom: 30px;
   background-color: white;
   display: flex;
-  z-index: 999;
   flex-direction: column;
   overflow: hidden;
   border-radius: 8px;
