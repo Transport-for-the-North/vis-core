@@ -43,7 +43,7 @@ const ContentWrapper = styled.div`
 const FullscreenContainer = styled.div`
   position: fixed;
   top: 85px; /* Navbar height */
-  left: 10px;
+  left: ${({ $sidebarIsOpen }) => $sidebarIsOpen ? "470px" : "70px"}; /* Side panel width (450px) + Sidebar border (10px) + distance between elements (10px) */
   right: 10px;
   bottom: 10px;
   background-color: white;
@@ -54,7 +54,7 @@ const FullscreenContainer = styled.div`
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 2%;
-  transition: opacity 0.3s, transform 0.7s;
+  transition: left 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s, transform 0.7s;
   transform: ${({ $isVisible }) =>
     $isVisible ? "translateX(0)" : "translateX(110%)"};
 `;
@@ -362,7 +362,9 @@ export const FullScreenCalloutCardVisualisation = ({
   data,
   handleUpdatedData,
   handleChange,
+  ...props
 }) => {
+  const sidebarIsOpen = props.sidebarIsOpen
   const [isVisible, setIsVisible] = useState(true);
   const handleToggle = () => setIsVisible((v) => !v);
 
@@ -428,7 +430,7 @@ export const FullScreenCalloutCardVisualisation = ({
           <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
         </OpenButton>
       )}
-      <FullscreenContainer $isVisible={isVisible}>
+      <FullscreenContainer $isVisible={isVisible} $sidebarIsOpen={sidebarIsOpen}>
         {/* Close button */}
         {isVisible && (
           <BackButton onClick={handleToggle} aria-label="Close card">

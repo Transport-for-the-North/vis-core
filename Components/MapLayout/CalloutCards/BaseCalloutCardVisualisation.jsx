@@ -27,7 +27,9 @@ export const BaseCalloutCardVisualisation = ({
   visualisationName,
   cardName,
   onUpdate,
+  ...props
 }) => {
+  const sidebarIsOpen = props.sidebarIsOpen
   const [isVisible, setIsVisible] = useState(true);
   const { state, dispatch } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
@@ -188,6 +190,7 @@ export const BaseCalloutCardVisualisation = ({
         onUpdateData(locationId, mode);
       }}
       handleChange={(mode) => change(mode)}
+      sidebarIsOpen={sidebarIsOpen}
     />
   ) : (
     <CalloutCardVisualisation
