@@ -262,13 +262,24 @@ export const LayerControlEntry = memo(
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
     const [widthFactor, setWidth] = useState(initialWidth || 1);
 
+    /**
+     * Toggle both the layer and its label layer visibility across all maps.
+     *
+     * This flips the local `visibility` state and applies the same visibility to
+     * the base layer and its "-label" companion (if present) so they remain in sync.
+     */
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
+      const ids = [layer.id, `${layer.id}-label`];
+
       maps.forEach((map) => {
-        if (map.getLayer(layer.id)) {
-          map.setLayoutProperty(layer.id, "visibility", newVisibility);
-        }
+        ids.forEach((id) => {
+          if (map.getLayer(id)) {
+            map.setLayoutProperty(id, "visibility", newVisibility);
+          }
+        });
       });
+
       setVisibility(newVisibility);
     };
 
