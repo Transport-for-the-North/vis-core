@@ -236,7 +236,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               {isDownloading ? (
                 <>Downloading <Spinner /></>
               ) : (
-                isRequestTooLarge ? "Request Too Large" : "Download"
+                isRequestTooLarge ? "Request Too Large" : "Download as CSV"
               )}
             </DownloadButton>
           )}
