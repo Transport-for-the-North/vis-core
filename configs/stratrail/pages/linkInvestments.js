@@ -3,9 +3,10 @@ import { termsOfUse } from "../termsOfUse";
 import { investPopupContent } from "../templates/investmentPopup";
 import { investmentSummary } from "../templates";
 import glossaryData from "../glossaryData";
+import { parentAuthorityBoundaryCustomPaint, invisiblePolygonCustomPaint } from "../customPaintDefinitions";
 
 export const linkInvestments = {
-  pageName: "Link Investments",
+  pageName: "Link Investments (SRIP)",
   url: "/link-investments",
   type: "MapLayout",
   category: "Investments",
@@ -13,8 +14,44 @@ export const linkInvestments = {
         <p>Use the filters to select the theme(s) you wish to see on the map. Hover over a link to view it's basic information and/or click on a link to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
+        {
+            name: "Local Authorities",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
+            geometryType: "line",
+            customPaint: parentAuthorityBoundaryCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
+            hoverTipShouldIncludeMetadata: false
+        },
+        {
+            name: "hide_Local Authorities",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            customPaint: invisiblePolygonCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: true,
+            hoverTipShouldIncludeMetadata: false,
+        },
         {
             uniqueId: "RailOfferInvestmentLinksVectorTile",
             name: "Link Investment Layer",

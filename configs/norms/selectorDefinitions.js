@@ -397,6 +397,18 @@ const timePeriod =  {
     values: timePeriodCodeValues,
 }
 
+const timePeriodTwo =  {
+    filterName: "Time Period Two",
+    paramName: "timePeriodCodeTwo",
+    target: "api",
+    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+    visualisations: null,
+    info:"Select the desired time period.",
+    type: "toggle",
+    values: timePeriodCodeValues,
+}
+
+
 const metricFilter = {
     filterName: "Metric",
     paramName: "propertyName",
@@ -598,7 +610,7 @@ const linkMetricFilter = {
       {
         displayValue: "Total Seat Capacity",
         paramValue: "Total Seat Capacity",
-        legendSubtitleText: "Capacity",
+        legendSubtitleText: "Seats",
       },
       {
         displayValue: "Total Seat Load Factor",
@@ -609,6 +621,16 @@ const linkMetricFilter = {
         displayValue: "Trains per hour",
         paramValue: "Trains per hour",
         legendSubtitleText: "tph",
+      },
+      {
+        displayValue: "Passengers Over Seating Capacity",
+        paramValue: "Passengers Over Seating Capacity",
+        legendSubtitleText: "Passengers",
+      },
+      {
+        displayValue: "Excess Seating",
+        paramValue: "Excess Seating",
+        legendSubtitleText: "Seats",
       },
     ]
   },
@@ -895,6 +917,7 @@ export const selectors = {
   scenarioCodeFilter,
   scenarioIdFilter,
   timePeriod,
+  timePeriodTwo,
   metricFilter,
   userClassFilter,
   resultZoneTypeFilter,

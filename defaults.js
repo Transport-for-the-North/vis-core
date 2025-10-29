@@ -51,3 +51,6 @@ export const REQUEST_CONFIG = {
       `Your filter selection creates a request that's too large (${(size / 1024).toFixed(2)}KB). Please reduce the number of selected items or use fewer filters.`
   }
 };
+
+// Default opacity used for map layers when not explicitly provided via config
+export const DEFAULT_LAYER_OPACITY = 0.65;

@@ -3,18 +3,55 @@ import { termsOfUse } from "../termsOfUse";
 import { freightInvestPopupContent } from "../templates/investmentPopup";
 import { freightInvestmentSummary } from "../templates";
 import glossaryData from "../glossaryData";
+import { invisiblePolygonCustomPaint, parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions";
 
 export const freightLinkInvestments = {
-  pageName: "Freight Link Investments (SRIP)",
+  pageName: "Freight Link Investments (FRIP)",
   url: "/freight-link-investments",
   type: "MapLayout",
   category: "Investments",
-  about: `<p>This visualisation shows all the freight link investment/schemes from the Freight Investment Pipeline (SRIP). Each scheme is colour coded by it's current status.</p>
+  about: `<p>This visualisation shows all the freight link investment/schemes from the Freight Investment Pipeline (FRIP). Each scheme is colour coded by it's current status.</p>
         <p>Use the filters to select the intervention type(s) you wish to see on the map. Hover over a link to view it's basic information and/or click on a link to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
+        {
+            name: "Local Authorities",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
+            geometryType: "line",
+            customPaint: parentAuthorityBoundaryCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: false,
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
+            hoverTipShouldIncludeMetadata: false
+        },
+        {
+            name: "hide_Local Authorities",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            customPaint: invisiblePolygonCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: true,
+            hoverTipShouldIncludeMetadata: false,
+        },
         {
             uniqueId: "RailOfferInvestmentLinksVectorTile",
             name: "Link Investment Layer",
@@ -36,7 +73,7 @@ export const freightLinkInvestments = {
             customTooltip: {
                 url: "/api/railoffer/freight-link-investment-callout/link?featureId={id}",
                 htmlTemplate: freightInvestPopupContent
-            }
+            },
         },
     ],
     visualisations: [

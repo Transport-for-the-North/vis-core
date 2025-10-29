@@ -15,6 +15,29 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const isDev = process.env.REACT_APP_NAME === 'dev';
 
+console.log("[Clarity] REACT_APP_CLARITY_ID =", process.env.REACT_APP_CLARITY_ID);
+
+(function loadClarity() {
+  const id = process.env.REACT_APP_CLARITY_ID;
+  if (!id) { console.warn("Missing REACT_APP_CLARITY_ID"); return; }
+
+  // define queue immediately
+  window.clarity = window.clarity || function(){ (window.clarity.q = window.clarity.q || []).push(arguments); };
+
+  // default deny
+  window.clarity("consentv2", { ad_Storage:"denied", analytics_Storage:"denied" });
+
+  // grant if returning user
+  const consentGiven = document.cookie.split("; ").find(s => s.startsWith("toc="))?.split("=")[1] === "true";
+  if (consentGiven) window.clarity("consentv2", { ad_Storage:"granted", analytics_Storage:"granted" });
+
+  // inject clarity.js
+  const s = document.createElement("script");
+  s.async = true;
+  s.src = "https://www.clarity.ms/tag/" + id;
+  (document.head || document.documentElement).appendChild(s);
+})();
+
 root.render(
   <Router>
     {isDev ? (
