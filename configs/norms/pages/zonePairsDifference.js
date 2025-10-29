@@ -60,7 +60,8 @@ export const zonePairsDifference = {
             { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Pairs Difference'] },*/
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Pairs Difference']},
             { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Pairs Difference']},
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Pairs Difference']},
+            { ...selectors.timePeriod, filterName: "Time Period 1", visualisations:['Zone Pairs Difference']},
+            { ...selectors.timePeriodTwo, filterName: "Time Period 2", visualisations:['Zone Pairs Difference']},
             { ...selectors.pairsMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Zone Pairs Difference']},
             { ...selectors.zoneSelectionFilter, layer: "NoRMS Zones Pair Result Difference", visualisations: ['Zone Pairs Difference']}
         ]

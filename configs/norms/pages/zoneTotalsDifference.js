@@ -67,7 +67,8 @@ export const zoneTotalsDifference = {
         },
         { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Zone Totals Difference']},
         { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Zone Totals Difference']},
-        { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Zone Totals Difference']},
+        { ...selectors.timePeriod, filterName: "Time Period 1", visualisations:['Zone Totals Difference']},
+        { ...selectors.timePeriodTwo, filterName: "Time Period 2", visualisations:['Zone Totals Difference']},
         { ...selectors.zoneMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Zone Totals Difference']},
       ]
     }

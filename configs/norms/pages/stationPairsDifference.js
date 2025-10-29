@@ -75,7 +75,8 @@ export const stationPairsDifference = {
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Station Pairs Difference'] },*/
         { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Station Pairs Difference']},
         { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Station Pairs Difference']},
-        { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Station Pairs Difference']},
+        { ...selectors.timePeriod, filterName: "Time Period 1", visualisations:['Station Pairs Difference']},
+        { ...selectors.timePeriodTwo, filterName: "Time Period 2", visualisations:['Station Pairs Difference']},
         { ...selectors.pairsMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Station Pairs Difference']},
         { ...selectors.stationMapSelection, layer: "NoRMS Station Pair Result Difference", visualisations:['Station Pairs Difference']},
     ]

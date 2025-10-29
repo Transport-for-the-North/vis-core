@@ -116,7 +116,8 @@ export const stationCatchmentDifference = {
             sort: "ascending",
             exclude: [123, 456, 789]
           }},
-        { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Station Catchment Difference']},
+        { ...selectors.timePeriod, filterName: "Time Period 1", visualisations:['Station Catchment Difference']},
+        { ...selectors.timePeriodTwo, filterName: "Time Period 2", visualisations:['Station Catchment Difference']},
         { ...selectors.catchmentMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Station Catchment Difference']},
         { ...selectors.stationMapSelection, layer: "NoRMS Nodes", visualisations:['Station Catchment Difference']},
       ],
