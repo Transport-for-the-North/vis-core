@@ -11,7 +11,7 @@ export const nodeCarOrVan = {
   about: `<p>This visualisation shows the availability of cars and vans for households near each station in the NorTMS model.</p>
    <p>Car or van availability data shows the number of cars or vans available to households in the area. This includes categories such as no cars or vans available, one car or van available, two cars or vans available, and three or more cars or vans available.</p>
    <p>This data contains 2021 Census data and has been retrieved from NOMIS, and mapped to the NorTMS stations by using a 2.5km buffer around each station to find nearby LSOAs and using the car or van availability data for those area(s).</p>
-   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the car or van availability on the tooltip.</p>`,
+   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the car or van availability on the tooltip or select a station to show graphs/tables on the statistics.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   customMapZoom: 7,
@@ -75,7 +75,40 @@ export const nodeCarOrVan = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/railoffer/car-or-van"
-        }
+        },
+        {
+            name: "Car or Van Callout",
+            type: "calloutCard",
+            cardName: "Car or Van Availability Summary",
+            dataSource: "api",
+            dataPath: "/api/railoffer/car-or-van-callout/point",
+            cardTitle: "Car or van availability distribution for {name}",
+            charts: [
+                {
+                    type: 'bar',
+                    title: 'Bar chart (max‑scaled). Hover bars for values.',
+                    columns: [
+                        { key: 'no_car_or_van', label: 'No cars/vans' },
+                        { key: 'one_car_or_van', label: '1 car/van' },
+                        { key: 'two_car_or_van', label: '2 cars/vans' },
+                        { key: 'three_or_more_car_or_van', label: '3+ cars/vans' }
+                    ],
+                    barColor: '#4b3e91',
+                    height: 220
+                },
+                {
+                    type: 'table',
+                    title: 'Table of values and percentages of values.',
+                    tableMetricName: 'Car/van availability',
+                    columns: [
+                        { key: 'no_car_or_van', label: 'No cars/vans' },
+                        { key: 'one_car_or_van', label: '1 car/van' },
+                        { key: 'two_car_or_van', label: '2 cars/vans' },
+                        { key: 'three_or_more_car_or_van', label: '3+ cars/vans' }
+                    ]
+                }
+            ],
+        },
     ],
     metadataTables: [],
     filters: [
@@ -84,7 +117,7 @@ export const nodeCarOrVan = {
         { ...selectors.authoritySelector, visualisations: ['Node Car or Van Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.booleanSelector, visualisations: ['Node Car or Van Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Car or Van Totals'] },
-        // { ...selectors.idFeatureSelector, visualisations: ['Car or Van Callout'], layer: "Node Car or Van Layer"}
+        { ...selectors.idFeatureSelector, visualisations: ['Car or Van Callout'], layer: "Node Car or Van Layer"}
     ],
     additionalFeatures: {
         glossary: { 

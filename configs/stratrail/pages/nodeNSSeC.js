@@ -2,7 +2,6 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
-import { nssecBarSummary, nssecPieSummary, nssecScatterSummary, nssecTableSummary } from "../templates";
 
 export const nodeNSSeC = {
   pageName: "Station Socio-Economic Classifications (NS-SeC)",
@@ -24,7 +23,7 @@ export const nodeNSSeC = {
      <li>L14.1 and L14.2 — Never worked and long-term unemployed</li>
      <li>L15 — Full-time students</li>
    </ul>
-   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the NS-SeC on the tooltip.</p>`,
+   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the NS-SeC on the tooltip or select a station to show graphs/tables on the statistics.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   customMapZoom: 7,
@@ -95,20 +94,43 @@ export const nodeNSSeC = {
             cardName: "NS-SeC Summary",
             dataSource: "api",
             dataPath: "/api/railoffer/nssec-callout/point",
-            htmlFragment: nssecBarSummary + nssecTableSummary,
-            customFormattingFunctions: {
-                commify: (v) => {
-                const n = Number(v ?? 0);
-                return Number.isFinite(n) ? n.toLocaleString('en-GB') : String(v ?? '');
+            cardTitle: "NS-SeC distribution for {name}",
+            // New: declarative charts. You can use one or many. Supported now: bar, pie, table.
+            charts: [
+                {
+                    type: 'bar',
+                    title: 'Bar chart (max‑scaled). Hover bars for values.',
+                    columns: [
+                        { key: 'l1_l2_l3', label: 'L1–L3' },
+                        { key: 'l4_l5_l6', label: 'L4–L6' },
+                        { key: 'l7', label: 'L7' },
+                        { key: 'l8_l9', label: 'L8–L9' },
+                        { key: 'l10_l11', label: 'L10–L11' },
+                        { key: 'l12', label: 'L12' },
+                        { key: 'l13', label: 'L13' },
+                        { key: 'l14_1_l14_2', label: 'L14' },
+                        { key: 'l15', label: 'L15' }
+                    ],
+                    barColor: '#4b3e91',
+                    height: 220
                 },
-                percent: (value, data) => {
-                const total = (data?.l1_l2_l3 || 0) + (data?.l4_l5_l6 || 0) + (data?.l7 || 0) + 
-                            (data?.l8_l9 || 0) + (data?.l10_l11 || 0) + (data?.l12 || 0) + 
-                            (data?.l13 || 0) + (data?.l14_1_l14_2 || 0) + (data?.l15 || 0);
-                const num = Number(value ?? 0);
-                return total > 0 ? ((num / total) * 100).toFixed(1) + '%' : '0.0%';
+                {
+                    type: 'table',
+                    title: 'Table of values and percentages of values.',
+                    tableMetricName: 'NS-SeC classification',
+                    columns: [
+                        { key: 'l1_l2_l3', label: 'L1–L3: Higher managerial/professional' },
+                        { key: 'l4_l5_l6', label: 'L4–L6: Lower managerial/professional' },
+                        { key: 'l7', label: 'L7: Intermediate occupations' },
+                        { key: 'l8_l9', label: 'L8–L9: Small employers/own account' },
+                        { key: 'l10_l11', label: 'L10–L11: Lower supervisory/technical' },
+                        { key: 'l12', label: 'L12: Semi-routine occupations' },
+                        { key: 'l13', label: 'L13: Routine occupations' },
+                        { key: 'l14_1_l14_2', label: 'L14: Never worked/long-term unemployed' },
+                        { key: 'l15', label: 'L15: Full-time students' }
+                    ]
                 }
-            }
+            ],
         },
     ],
     metadataTables: [],

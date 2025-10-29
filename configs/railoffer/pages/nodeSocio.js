@@ -2,7 +2,6 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
-import { socioBarSummary, socioTableSummary } from "../templates";
 
 export const nodeSocio = {
   pageName: "Station Economic Activity Status",
@@ -12,7 +11,7 @@ export const nodeSocio = {
   about: `<p>This visualisation shows the economic activity information for each station in the NorTMS model.</p>
    <p>Economic activity status is derived from the NS-SeC (National Statistics Socio-economic Classification) data, which classifies individuals based on their occupation and employment status. The classification includes categories such as employed, unemployed, retired, student, and others.</p>
    <p>This data contains 2021 data and has been retrieved from NOMIS, and mapped to the NorTMS stations by using a 2.5km buffer around each station to find nearby LSOAs and using the economic activity data for those area(s).</p>
-   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the economic activity on the tooltip.</p>`,
+   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the economic activity on the tooltip or select a station to show graphs/tables on the statistics.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   customMapZoom: 7,
@@ -83,21 +82,30 @@ export const nodeSocio = {
             cardName: "Socio Summary",
             dataSource: "api",
             dataPath: "/api/railoffer/socio-callout/point",
-            htmlFragment: socioBarSummary + socioTableSummary,
-            customFormattingFunctions: {
-                commify: (v) => {
-                const n = Number(v ?? 0);
-                return Number.isFinite(n) ? n.toLocaleString('en-GB') : String(v ?? '');
+            cardTitle: "Economic activity distribution for {name}",
+            charts: [
+                {
+                    type: 'bar',
+                    title: 'Economic activity (bar). Hover bars for values.',
+                    barColor: '#4b3e91',
+                    height: 220,
+                    columns: [
+                        { key: 'economically_active_exc_students', label: 'Active (excl. students)' },
+                        { key: 'economically_active_inc_student', label: 'Active (incl. students)' },
+                        { key: 'economically_inactive', label: 'Economically inactive' }
+                    ]
                 },
-                percent: (value, data) => {
-                // For socio data, use the correct field names
-                const total = (data?.economically_active_exc_students || 0) + 
-                            (data?.economically_active_inc_student || 0) + 
-                            (data?.economically_inactive || 0);
-                const num = Number(value ?? 0);
-                return total > 0 ? ((num / total) * 100).toFixed(1) + '%' : '0.0%';
+                {
+                    type: 'table',
+                    title: 'Table of values and percentages of values.',
+                    tableMetricName: 'Economic activity status',
+                    columns: [
+                        { key: 'economically_active_exc_students', label: 'Economically active (excl. students)' },
+                        { key: 'economically_active_inc_student', label: 'Economically active (incl. students)' },
+                        { key: 'economically_inactive', label: 'Economically inactive' }
+                    ]
                 }
-            }
+            ]
         },
     ],
     metadataTables: [],
