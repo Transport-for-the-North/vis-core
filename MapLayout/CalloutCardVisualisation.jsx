@@ -6,7 +6,7 @@ import DOMPurify from 'dompurify';
 import { MapContext } from 'contexts';
 import { useFetchVisualisationData } from 'hooks';
 import { replacePlaceholders } from 'utils';
-import { Hovertip, WarningBox } from 'Components';
+import { Hovertip, WarningBox, ChartRenderer } from 'Components';
 
 import { CARD_CONSTANTS } from "defaults";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
@@ -232,24 +232,39 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
   const [isHovered, setIsHovered] = useState(false);
   const showHandle = !hideHandleOnMobile;
   const contentRef = useRef(null); // NEW
+  const [dynamicCardTitle, setDynamicCardTitle] = useState('');
 
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
       setIsVisible(true);
-
-      // 1) Replace simple placeholders (existing util)
       let html = replacePlaceholders(
         visualisation.htmlFragment,
         data,
         { customFunctions: customFormattingFunctions }
       );
-
       const sanitizedHtml = DOMPurify.sanitize(html);
       setRenderedContent(sanitizedHtml);
       if (onUpdate) onUpdate();
+    } else {
+      setRenderedContent('');
     }
   }, [data, visualisation.htmlFragment]);
+
+  // Compute dynamic card title for charts (if configured)
+  useEffect(() => {
+    if (data && visualisation.cardTitle) {
+      const title = replacePlaceholders(
+        String(visualisation.cardTitle),
+        data,
+        { customFunctions: customFormattingFunctions }
+      );
+      // Render as plain text to avoid HTML injection in the title
+      setDynamicCardTitle(DOMPurify.sanitize(title, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }));
+    } else {
+      setDynamicCardTitle('');
+    }
+  }, [data, visualisation.cardTitle]);
 
   useEffect(() => {
    if (hideHandleOnMobile) setIsVisible(true);
@@ -318,13 +333,25 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       <ParentContainer $isVisible={isVisible}>
         <CardContainer $isVisible={isVisible}>
           <CardTitle>{cardName}</CardTitle>
-          {hasDataShouldRender ? (
-            // Attach ref so we can toggle sections after HTML is injected
-            <CardContent ref={contentRef} dangerouslySetInnerHTML={{ __html: renderedContent }} />
-          ) : (
+          {!hasDataShouldRender ? (
             <CardContent>
               <WarningBox text="No data available for selection" />
             </CardContent>
+          ) : (
+            <>
+              {/* Render charts if provided */}
+              {Array.isArray(visualisation.charts) && visualisation.charts.length > 0 && (
+                <CardContent>
+                  {/* Optional dynamic title for charts, controlled by visualisation.cardTitle */}
+                  {dynamicCardTitle ? <h2>{dynamicCardTitle}</h2> : null}
+                  <ChartRenderer charts={visualisation.charts} data={data} formatters={customFormattingFunctions} barHeight={225} />
+                </CardContent>
+              )}
+              {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}
+              {renderedContent && (
+                <CardContent ref={contentRef} dangerouslySetInnerHTML={{ __html: renderedContent }} />
+              )}
+            </>
           )}
         </CardContainer>
       {showHandle && (
