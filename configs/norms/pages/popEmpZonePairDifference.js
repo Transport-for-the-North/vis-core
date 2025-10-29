@@ -100,9 +100,9 @@ export const popEmpZonePairDifference = {
               actions: [{ action: "UPDATE_QUERY_PARAMS" }],
               shouldFilterOnValidation: true
             },*/
-            { ...selectors.landuseFilter, filterName: "Landuse (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
-            { ...selectors.landuseSegFilter, filterName: "Landuse Segment 1 (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference'],},
-            { ...selectors.landuseSegFilter, filterName: "Landuse Segment 2 (1 and 2)", paramName: "landuseSegment2", visualisations: ['Landuse Accessibility Pair Difference'], values: {
+            { ...selectors.landuseFilter, filterName: "Landuse (Scenarios 1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
+            { ...selectors.landuseSegFilter, filterName: "Landuse Segment 1 (Scenarios 1 and 2)", visualisations: ['Landuse Accessibility Pair Difference'],},
+            { ...selectors.landuseSegFilter, filterName: "Landuse Segment 2 (Scenarios 1 and 2)", paramName: "landuseSegment2", visualisations: ['Landuse Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "landuse_segment_list",
                 displayColumn: "segment2",
@@ -112,10 +112,10 @@ export const popEmpZonePairDifference = {
                 }, 
                 shouldFilterOnValidation: true,
             },
-            { ...selectors.landuseRefFilter, filterName: "Landuse Reference (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
-            { ...selectors.landuseExogFilter, filterName: "Landuse Exog (1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
-            { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Landuse Accessibility Pair Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Landuse Accessibility Pair Difference'], paramName: "userClassId",
+            { ...selectors.landuseRefFilter, filterName: "Landuse Reference (Scenarios 1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
+            { ...selectors.landuseExogFilter, filterName: "Landuse Exog (Scenarios 1 and 2)", visualisations: ['Landuse Accessibility Pair Difference']},
+            { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (Scenarios 1 and 2)", visualisations:['Landuse Accessibility Pair Difference']},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (Scenarios 1 and 2)", visualisations:['Landuse Accessibility Pair Difference'], paramName: "userClassId",
                 shouldBeBlankOnInit: true,
                 shouldFilterOnValidation: false,
                 shouldBeValidated: false,
@@ -123,7 +123,7 @@ export const popEmpZonePairDifference = {
                 multiSelect: true,
                 isClearable: true,
             },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Landuse Accessibility Pair Difference'], paramName: "userClassId",
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (Scenarios 1 and 2)", visualisations:['Landuse Accessibility Pair Difference'], paramName: "userClassId",
                 values: {
                     source: "metadataTable",
                     metadataTableName: "norms_userclass_list",
@@ -139,7 +139,7 @@ export const popEmpZonePairDifference = {
                   multiSelect: true,
                   isClearable: true,
             },
-            { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Landuse Accessibility Pair Difference'], values: {
+            { ...selectors.userClassFilter, filterName: "User Class (Scenarios 1 and 2)", visualisations:['Landuse Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -155,12 +155,12 @@ export const popEmpZonePairDifference = {
               shouldInitialSelectAllInMultiSelect: true,
               isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Landuse Accessibility Pair Difference'],
+            { ...selectors.timePeriod, filterName: "Time Period (Scenarios 1 and 2)", visualisations:['Landuse Accessibility Pair Difference'],
               shouldBeBlankOnInit: false,
               multiSelect: true,
               isClearable: true,
             },
-            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (1 and 2)", visualisations: ["Landuse Accessibility Pair Difference"]},
+            { ...selectors.thresholdValueFilter, filterName: "Threshold Value (Scenarios 1 and 2)", visualisations: ["Landuse Accessibility Pair Difference"]},
             { ...selectors.zoneSelectionFilter , layer: "NoRMS Landuse Accessibility Pair Difference", visualisations: ["Landuse Accessibility Pair Difference"]}
         ]
       }
