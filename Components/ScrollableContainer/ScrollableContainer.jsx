@@ -107,7 +107,7 @@ const StyledScrollableContainer = styled.div`
             </MobileBar>
           )}
 
-          <StyledScrollableContainer $open={open} $hidden={hidden} data-testid="container">
+          <StyledScrollableContainer $open={open} $hidden={hidden} data-testid="container" className="selectable-text">
             {React.Children.map(children, (child) =>
               hideCardHandleOnMobile && React.isValidElement(child)
                 ? React.cloneElement(child, { hideHandleOnMobile: true })
@@ -128,7 +128,7 @@ const StyledScrollableContainer = styled.div`
             </MobileBar>
           )}
 
-          <StyledScrollableContainer $open={isMobile ? open : true} $hidden={hidden} data-testid="container">
+          <StyledScrollableContainer $open={isMobile ? open : true} $hidden={hidden} data-testid="container" className="selectable-text">
             {React.Children.map(children, child =>
               hideCardHandleOnMobile && isMobile && React.isValidElement(child)
                 ? React.cloneElement(child, { hideHandleOnMobile: true })

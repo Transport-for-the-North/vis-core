@@ -52,6 +52,13 @@ body, html, .maplibregl-map {
   color: #61dafb;
 }
 
+.selectable-text {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
 /* @media (max-width: 900px) {
   .maplibregl-ctrl-bottom-right,
   .maplibregl-ctrl-attrib {

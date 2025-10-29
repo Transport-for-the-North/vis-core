@@ -112,7 +112,7 @@ export const HomePage = () => {
 
   return (
     <>
-      <div className="landing">
+      <div className="landing selectable-text">
         {/* Header Section with background image */}
         <div
           data-testid="background-img"
