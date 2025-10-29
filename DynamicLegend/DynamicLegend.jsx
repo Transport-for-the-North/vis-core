@@ -5,7 +5,6 @@ import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
-import { buildLegendRadius } from "utils/map";
 
 /**
  * useIsMobile
@@ -54,9 +53,9 @@ const LegendContainer = styled.div`
   border-radius: 10px;
   z-index: 10;
   min-width: 0;
-  max-height: 35vh;
+  max-height: none;
   max-width: 80vw;
-  overflow: auto;
+  overflow: visible;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
   font-size: medium;
@@ -480,17 +479,7 @@ export const DynamicLegend = ({ map }) => {
           // For categorical circle styles, keep a uniform diameter (do not scale by bins)
           if (layer.type === "circle" && isCategorical) {
             widthStops = null; // allow default diameter to apply uniformly
-          } else if (layer.type === "circle" && colorStops && colorStops.length > 0) {
-            // Use the legend’s bins (from color stops) to compute baseline radii (e.g., 2..25)
-            const bins = colorStops.map((s) => convertStringToNumber(s.value));
-            const radius = buildLegendRadius(bins);
-
-            // DynamicLegend expects width = rendered diameter for circles
-            widthStops = bins.map((v, i) => ({
-              value: numberWithCommas(v),
-              width: radius[i] * 2,
-            }));
-          }
+          } 
           if (
             layer.type === "circle" &&
             colorStops &&
@@ -556,7 +545,7 @@ export const DynamicLegend = ({ map }) => {
               }
               legendEntries.push({
                 color: stop.color,
-                width: widthStop ? widthStop.width : null,
+                width: widthStop ? widthStop.width: isMobile ? null : (layer.type === "circle" ? (typeof paintProps["circle-radius"] === "number"? paintProps["circle-radius"] * 2 : 10): (layer.type === "line" ? 2 : 10)),
                 label,
                 type: layer.type,
               });

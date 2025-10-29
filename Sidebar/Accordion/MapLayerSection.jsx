@@ -29,10 +29,12 @@ export const MapLayerSection = ({
         (layer) =>
           (layer.type === "fill" ||
             layer.type === "line" ||
-            layer.type === "circle") &&
+            layer.type === "circle" ||
+            layer.type === "symbol") &&
             layer.source !== "default" &&
             !layer.id.endsWith("-hover") &&
             !layer.id.endsWith("-select") &&
+            !layer.id.endsWith("-label") &&
             layer.id !== "selected-feature-layer" &&
             !layer.id.startsWith("hide_") &&
             !layer.id.startsWith("gl-draw")
