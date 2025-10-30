@@ -190,7 +190,9 @@ export const MapProvider = ({ children }) => {
                     const value = {
                       displayValue: option[filter.values.displayColumn],
                       paramValue: option[filter.values.paramColumn],
-                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null
+                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null,
+                      infoOnHover: option[filter.values?.infoOnHoverColumn] ?? null,
+                      infoBelowOnChange: option[filter.values?.infoBelowOnChangeColumn] ?? null,
                     };
                     if (!isDuplicateValue(uniqueValues, value)) {
                       uniqueValues.push(value);
