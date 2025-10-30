@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
@@ -42,6 +42,7 @@ const Map = (props) => {
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
+  const sidebarIsOpen = props.sidebarIsOpen
   
   // Refs to manage hover state
   const hoverEventIdRef = useRef(0);
@@ -1083,6 +1084,7 @@ const Map = (props) => {
         visualisationConfigs={state.visualisations}
         map={map}
         maps={null}
+        sidebarIsOpen={sidebarIsOpen}
       />}
       {isMapReady && <DynamicLegend map={map} />}
     </StyledMapContainer>

@@ -4,7 +4,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import DOMPurify from 'dompurify';
 
 import { MapContext } from 'contexts';
-import { useFetchVisualisationData } from 'hooks';
 import { replacePlaceholders } from 'utils';
 import { Hovertip, WarningBox, ChartRenderer } from 'Components';
 
@@ -196,13 +195,11 @@ const ToggleButton = styled.button`
  * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate, hideHandleOnMobile = false, onVisibilityChange, }) => {
+export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate, data, isLoading, hideHandleOnMobile = false, onVisibilityChange }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
   const customFormattingFunctions = visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
-
-  const { isLoading, data } = useFetchVisualisationData(visualisation);
 
   // Do not render the card if no data is available,
   // or if the data is an empty object,
@@ -240,7 +237,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       setIsVisible(true);
       let html = replacePlaceholders(
         visualisation.htmlFragment,
-        data,
+        data.data,
         { customFunctions: customFormattingFunctions }
       );
       const sanitizedHtml = DOMPurify.sanitize(html);
@@ -249,7 +246,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
     } else {
       setRenderedContent('');
     }
-  }, [data, visualisation.htmlFragment]);
+  }, [visualisation.htmlFragment]);
 
   // Compute dynamic card title for charts (if configured)
   useEffect(() => {
