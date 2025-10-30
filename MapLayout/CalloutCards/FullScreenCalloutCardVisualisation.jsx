@@ -43,9 +43,12 @@ const ContentWrapper = styled.div`
 const FullscreenContainer = styled.div`
   position: fixed;
   top: 85px; /* Navbar height */
-  left: ${({ $sidebarIsOpen }) => $sidebarIsOpen ? "470px" : "70px"}; /* Side panel width (450px) + Sidebar border (10px) + distance between elements (10px) */
+  left: ${({ $sidebarIsOpen }) =>
+    $sidebarIsOpen
+      ? "470px"
+      : "70px"}; /* Side panel width (450px) + Sidebar border (10px) + distance between elements (10px) */
   right: 10px;
-  bottom: 30px;
+  bottom: 32px;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -53,7 +56,7 @@ const FullscreenContainer = styled.div`
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 2%;
-  transition: left 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s, transform 0.7s;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out;
   transform: ${({ $isVisible }) =>
     $isVisible ? "translateX(0)" : "translateX(110%)"};
 `;
@@ -363,7 +366,7 @@ export const FullScreenCalloutCardVisualisation = ({
   handleChange,
   ...props
 }) => {
-  const sidebarIsOpen = props.sidebarIsOpen
+  const sidebarIsOpen = props.sidebarIsOpen;
   const [isVisible, setIsVisible] = useState(true);
   const handleToggle = () => setIsVisible((v) => !v);
 
@@ -429,7 +432,10 @@ export const FullScreenCalloutCardVisualisation = ({
           <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
         </OpenButton>
       )}
-      <FullscreenContainer $isVisible={isVisible} $sidebarIsOpen={sidebarIsOpen}>
+      <FullscreenContainer
+        $isVisible={isVisible}
+        $sidebarIsOpen={sidebarIsOpen}
+      >
         {/* Close button */}
         {isVisible && (
           <BackButton onClick={handleToggle} aria-label="Close card">
