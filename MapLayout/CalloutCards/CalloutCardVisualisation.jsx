@@ -341,7 +341,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
                 <CardContent>
                   {/* Optional dynamic title for charts, controlled by visualisation.cardTitle */}
                   {dynamicCardTitle ? <h2>{dynamicCardTitle}</h2> : null}
-                  <ChartRenderer charts={visualisation.charts} data={data} formatters={customFormattingFunctions} barHeight={225} />
+                  <ChartRenderer charts={visualisation.charts} data={data.data} formatters={customFormattingFunctions} barHeight={225} />
                 </CardContent>
               )}
               {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}
