@@ -253,7 +253,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
     if (data && visualisation.cardTitle) {
       const title = replacePlaceholders(
         String(visualisation.cardTitle),
-        data,
+        data.data,
         { customFunctions: customFormattingFunctions }
       );
       // Render as plain text to avoid HTML injection in the title
