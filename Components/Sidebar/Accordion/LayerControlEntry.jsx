@@ -406,7 +406,11 @@ export const LayerControlEntry = memo(
           {/* Color Scheme and Classification (if stylable) */}
           {layer.metadata?.isStylable && (
             <div style={{ marginTop: "1rem" }}>
-              {!enforceNoColourSchemeSelector && <ColourSchemeDropdown
+              {!enforceNoColourSchemeSelector && 
+              !((visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
+                visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Passengers Over Seating Capacity") &&
+              (currentPage.pageName === "Link Totals" || currentPage.pageName === "Link Totals Side-by-Side")) &&
+              <ColourSchemeDropdown
                 colorStyle={colorStyle}
                 handleColorChange={handleColorChange}
                 layerName={layer.id}

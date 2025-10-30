@@ -48,7 +48,7 @@ export const linkTotalsDifference = {
           shouldHaveLabel: true,
           labelZoomLevel: 9,
           labelNulls: false,
-          hoverNulls: false
+          hoverNulls: false,
         },
       ],
       visualisations: [
