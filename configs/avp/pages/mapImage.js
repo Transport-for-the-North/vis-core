@@ -32,6 +32,7 @@ export const mapImage = {
             {
                 name: "Detailed Information",
                 type: "calloutCard",
+                cardType: "fullscreen",
                 cardName: "",
                 dataSource: "api",
                 dataPath: "/api/avp/pca/locations/{id}",
