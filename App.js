@@ -21,8 +21,6 @@ import {
 } from "hocs";
 import { theme } from "theme";
 import { NotFound } from "Components/NotFoundPage";
-import { VisualisationManager } from "Components/MapLayout/VisualisationManager";
-import { MapContext } from "contexts";
 
 /**
  * Main application component.
@@ -96,20 +94,6 @@ function App() {
     ? withRoleValidation(NotFound)
     : NotFound;
 
-  const propsVisualisationManager = {
-    visualisationConfigs: {
-      fullscreen1: {
-        type: "calloutCard",
-        cardType: "fullscreen",
-      },
-      // smallCard1: {
-      //   type: "calloutCard",
-      //   cardType: "small",
-      //   cardName: "cardName",
-      // },
-    },   
-  };
-
   return (
     <div className="App">
       <AuthProvider>
@@ -118,39 +102,6 @@ function App() {
             <Navbar />
             <Dashboard>
               <Routes>
-                {/* Test route */}
-                <Route
-                  path="/test"
-                  element={
-                    <MapContext.Provider
-                      value={{
-                        state: {
-                          visualisations: {
-                            smallCard1: {
-                              htmlFragment:
-                                "<p>temperature1: {temperature}</p><p>humidity1: {humidity}</p>",
-                            },
-                            smallCard2: {
-                              htmlFragment:
-                                "<p>temperature2: {temperature}</p><p>humidity2: {humidity}</p>",
-                            },
-                            fullscreen1: {
-                              htmlFragment:
-                                "<p>temperature1: {temperature}</p><p>humidity1: {humidity}</p>",
-                            },
-                            fullscreen2: {
-                              htmlFragment:
-                                "<p>temperature2: {temperature}</p><p>humidity2: {humidity}</p>",
-                            },
-                          },
-                        },
-                      }}
-                    >
-                      <VisualisationManager {...propsVisualisationManager} />
-                    </MapContext.Provider>
-                  }
-                />
-                {/* End of test route */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route path="/" element={<HomePageWithRoleValidation />} />
