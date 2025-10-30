@@ -167,7 +167,8 @@ export const Sidebar = ({
   downloadPath,
   downloadShapefilePath,
   requestMethod,
-  children
+  children,
+  setIsOpen
 }) => {
   const initialMobile = typeof window !== 'undefined' ? window.innerWidth <= 900 : false; //detect if the viewport is ≤ 900px on first render.
   const [isVisible, setIsVisible] = useState(!initialMobile); //Defaults to open on desktop (!initialMobile) and closed on mobile.
@@ -187,6 +188,10 @@ export const Sidebar = ({
       setScrollbarWidth(width);
     }
   }, []);
+
+  useEffect(() => {
+    setIsOpen(isVisible)
+  }, [isVisible]);
 
   //Keeps isMobile in sync as the window changes size.
   useEffect(() => {
