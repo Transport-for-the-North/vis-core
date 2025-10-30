@@ -296,7 +296,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
     setRequestError(null);
     
     try {
-      await api.downloadService.downloadFile(apiRoute, {
+      await api.downloadService.downloadCsv(apiRoute, {
         queryParams: filterState,
         skipAuth: !requiresAuth,
         method: requestMethod,

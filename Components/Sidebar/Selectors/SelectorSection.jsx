@@ -14,11 +14,6 @@ import { api } from "services";
 import { darken } from "polished";
 import { checkSecurityRequirements } from "utils";
 
-const ButtonRow = styled.div`
-  display: flex;
-  gap: 10px; /* Adds space between the buttons */
-`;
-
 const DownloadButton = styled.button`
   cursor: pointer;
   padding: 10px 5px; /* Increased padding for a larger button */
@@ -26,6 +21,7 @@ const DownloadButton = styled.button`
   color: white;
   border-radius: 8px;
   border: 0.25px solid;
+  margin-right: 10px; /* Changed to margin-right to position it on the left */
   width: 50%;
   font-family: "Hanken Grotesk", sans-serif;
   display: flex;
@@ -70,21 +66,17 @@ const NoDataParagraph = styled.p``;
  * @property {Function} onFilterChange - The function called when a filter value changes.
  * @returns {JSX.Element} The rendered SelectorSection component.
  */
-export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, downloadShapefilePath, requestMethod = 'GET' }) => {
+export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
   const { state: mapState } = useMapContext();
   const { state: filterState } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isShapefileDownloading, setIsShapefileDownloading] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [isRequestTooLarge, setIsRequestTooLarge] = useState(false);
 
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
-
-  const apiRouteShapefile = downloadShapefilePath;
-  const requiresAuthShapefile = checkSecurityRequirements(apiSchema, apiRouteShapefile);
 
   const handleFilterChange = (filter, value) => {
     onFilterChange(filter, value);
@@ -102,7 +94,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     });
     
     try {
-      await api.downloadService.downloadFile(apiRoute, {
+      await api.downloadService.downloadCsv(apiRoute, {
         queryParams: queryParams,
         skipAuth: !requiresAuth,
         method: requestMethod,
@@ -115,33 +107,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       setRequestError(error.message || "Error downloading data");
     } finally {
       setIsDownloading(false);
-    }
-  };
-
-  const handleShapefileDownload = async () => {
-    setIsShapefileDownloading(true);
-    setRequestError(null);
-
-    const queryParams = {};
-    filters.forEach(filter => {
-      if (filter.type !== 'fixed') {
-        queryParams[filter.paramName] = filterState[filter.id];
-      }
-    });
-    
-    try {
-      await api.downloadService.downloadFile(apiRouteShapefile, {
-        queryParams: queryParams,
-        skipAuth: !requiresAuthShapefile,
-        method: requestMethod,
-      });
-      console.log('Shapefile downloaded successfully');
-      window.clarity('event', 'download_shapefile_clicked');
-    } catch (error) {
-      console.error('Error downloading Shapefile:', error);
-      setRequestError(error.message || "Error downloading Shapefile");
-    } finally {
-      setIsShapefileDownloading(false);
     }
   };
 
@@ -262,34 +227,19 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                 )}
               </SelectorContainer>
           ))}
-          <ButtonRow>
-            {downloadPath && (
-              <DownloadButton 
-                onClick={handleDownload} 
-                $bgColor={bgColor}
-                disabled={isRequestTooLarge || isDownloading}
-              >
-                {isDownloading ? (
-                  <>Downloading CSV<Spinner /></>
-                ) : (
-                  isRequestTooLarge ? "Request Too Large" : "Download CSV"
-                )}
-              </DownloadButton>
-            )}
-            {downloadShapefilePath && (
-              <DownloadButton 
-                onClick={handleShapefileDownload} 
-                $bgColor={bgColor}
-                disabled={isRequestTooLarge || isShapefileDownloading}
-              >
-                {isShapefileDownloading ? (
-                  <>Downloading Shapefile<Spinner /></>
-                ) : (
-                  isRequestTooLarge ? "Request Too Large" : "Download Shapefile"
-                )}
-              </DownloadButton>
-            )}
-          </ButtonRow>
+          {downloadPath && (
+            <DownloadButton 
+              onClick={handleDownload} 
+              $bgColor={bgColor}
+              disabled={isRequestTooLarge || isDownloading}
+            >
+              {isDownloading ? (
+                <>Downloading <Spinner /></>
+              ) : (
+                isRequestTooLarge ? "Request Too Large" : "Download as CSV"
+              )}
+            </DownloadButton>
+          )}
         </>
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>

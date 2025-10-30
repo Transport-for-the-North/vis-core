@@ -500,7 +500,6 @@ export const appConfig = {
           },
         ],
         downloadPath: "/api/noham/link-results/download",
-        downloadShapefilePath: "/api/noham/link-results/download/shapefile",
         requestMethod: "GET"
       },
     },
@@ -1172,7 +1171,6 @@ export const appConfig = {
           }
         ],
         downloadPath: "/api/noham/node-results/download",
-        downloadShapefilePath: "/api/noham/node-results/download/shapefile",
         requestMethod: "GET",
       },
     },
@@ -1734,7 +1732,6 @@ export const appConfig = {
           },
         ],
         downloadPath: "/api/noham/matrix-demand/download",
-        downloadShapefilePath: "/api/noham/matrix-demand/download/shapefile",
         requestMethod: "GET",
       }
     },
@@ -2287,7 +2284,6 @@ export const appConfig = {
           },
         ],
         downloadPath: "/api/noham/zonal-pair-results/download",
-        downloadShapefilePath: "/api/noham/zonal-pair-results/download/shapefile",
         requestMethod: "GET",
       },
     },
