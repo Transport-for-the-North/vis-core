@@ -17,7 +17,7 @@ export const nodeHouseholdDeprivation = {
      <li><strong>Housing:</strong> A household is classified as deprived in the housing dimension if the household's accommodation is either overcrowded, in a shared dwelling, or has no central heating.</li>
    </ul>
    <p>This data contains 2021 Census data and has been retrieved from NOMIS, and mapped to the NorTMS stations by using a 2.5km buffer around each station to find nearby LSOAs and using the household deprivation data for those area(s).</p>
-   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the household deprivation on the tooltip.</p>`,
+   <p>Use the filters to select the metric, TOC, authority and route name you wish to see on the map. Hover over a node to see more information about the household deprivation on the tooltip or select a station to show graphs/tables on the statistics.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   customMapZoom: 7,
@@ -81,7 +81,42 @@ export const nodeHouseholdDeprivation = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/railoffer/deprivation"
-        }
+        },
+        {
+            name: "Household Deprivation Callout",
+            type: "calloutCard",
+            cardName: "Household Deprivation Summary",
+            dataSource: "api",
+            dataPath: "/api/railoffer/deprivation-callout/point",
+            cardTitle: "Household deprivation distribution for {name}",
+            charts: [
+                {
+                    type: 'bar',
+                    title: 'Bar chart (max‑scaled). Hover bars for values.',
+                    columns: [
+                        { key: 'not_deprived', label: 'Not deprived' },
+                        { key: 'deprived_one_dimension', label: 'Deprived in 1 dimension' },
+                        { key: 'deprived_two_dimensions', label: 'Deprived in 2 dimensions' },
+                        { key: 'deprived_three_dimensions', label: 'Deprived in 3 dimensions' },
+                        { key: 'deprived_four_dimensions', label: 'Deprived in 4 dimensions' }
+                    ],
+                    barColor: '#4b3e91',
+                    height: 220
+                },
+                {
+                    type: 'table',
+                    title: 'Table of values and percentages of values.',
+                    tableMetricName: 'Deprivation level',
+                    columns: [
+                        { key: 'not_deprived', label: 'Not deprived' },
+                        { key: 'deprived_one_dimension', label: 'Deprived in 1 dimension' },
+                        { key: 'deprived_two_dimensions', label: 'Deprived in 2 dimensions' },
+                        { key: 'deprived_three_dimensions', label: 'Deprived in 3 dimensions' },
+                        { key: 'deprived_four_dimensions', label: 'Deprived in 4 dimensions' }
+                    ]
+                }
+            ],
+        },
     ],
     metadataTables: [],
     filters: [
@@ -90,7 +125,7 @@ export const nodeHouseholdDeprivation = {
         { ...selectors.authoritySelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
         { ...selectors.booleanSelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
         { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Deprivation Totals'] },
-        // { ...selectors.idFeatureSelector, visualisations: ['Deprivation Callout'], layer: "Node Deprivation Layer"}
+        { ...selectors.idFeatureSelector, visualisations: ['Household Deprivation Callout'], layer: "Node Deprivation Layer"}
     ],
     additionalFeatures: {
         glossary: { 
