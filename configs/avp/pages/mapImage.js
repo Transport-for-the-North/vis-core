@@ -57,7 +57,7 @@ export const mapImage = {
                 field: "id",
             },
             {
-                filterName: "DoMin Run",
+                filterName: "DoMin Run (Year, Scenario, Demand, NoRMS Catalog)",
                 paramName: "runCodeDoMin",
                 target: "api",
                 actions: [
@@ -75,8 +75,10 @@ export const mapImage = {
                 values: {
                     source: "metadataTable",
                     metadataTableName: "v_vis_avp_programmes_run_info",
-                    displayColumn: "nortms_run_id",
+                    displayColumn: "nortms_run_id_display",
                     paramColumn: "nortms_run_id",
+                    infoOnHoverColumn: "network_desc",
+                    infoBelowOnChangeColumn: "network_desc",
                     sort: "ascending",
                     where: [
                         {
@@ -98,7 +100,7 @@ export const mapImage = {
                 },
             },
             {
-                filterName: "DoSom Network Scenario",
+                filterName: "DoSom Run (Year, Scenario, Demand, NoRMS Catalog)",
                 paramName: "runCodeDoSom",
                 target: "api",
                 actions: [
@@ -116,7 +118,7 @@ export const mapImage = {
                 values: {
                     source: "metadataTable",
                     metadataTableName: "v_vis_avp_programmes_run_info",
-                    displayColumn: "nortms_run_id",
+                    displayColumn: "nortms_run_id_display",
                     paramColumn: "nortms_run_id",
                     sort: "ascending",
                     where: [
