@@ -237,7 +237,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       setIsVisible(true);
       let html = replacePlaceholders(
         visualisation.htmlFragment,
-        data.data,
+        data,
         { customFunctions: customFormattingFunctions }
       );
       const sanitizedHtml = DOMPurify.sanitize(html);
@@ -253,7 +253,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
     if (data && visualisation.cardTitle) {
       const title = replacePlaceholders(
         String(visualisation.cardTitle),
-        data.data,
+        data,
         { customFunctions: customFormattingFunctions }
       );
       // Render as plain text to avoid HTML injection in the title
@@ -341,7 +341,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
                 <CardContent>
                   {/* Optional dynamic title for charts, controlled by visualisation.cardTitle */}
                   {dynamicCardTitle ? <h2>{dynamicCardTitle}</h2> : null}
-                  <ChartRenderer charts={visualisation.charts} data={data.data} formatters={customFormattingFunctions} barHeight={225} />
+                  <ChartRenderer charts={visualisation.charts} data={data} formatters={customFormattingFunctions} barHeight={225} />
                 </CardContent>
               )}
               {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}

@@ -197,7 +197,7 @@ export const BaseCalloutCardVisualisation = ({
       visualisationName={visualisationName}
       cardName={cardName}
       onUpdate={onUpdate}
-      data={{ data: data, isLoading: isLoading }}
+      data={data}
       isLoading={isLoading}
       toggleVisibility={toggleVisibility}
     />
