@@ -310,8 +310,9 @@ export const LayerControlEntry = memo(
 
     const handleWidthFactorChange = (e) => {
       const raw = parseFloat(e.target.value);
-      const cap = isNodeLayer ? 2.5 : 10;
-      const widthFactor = Math.max(0.5, Math.min(cap, raw));
+      const min = isNodeLayer ? 0.1 : 0.5;
+      const max = isNodeLayer ? 2.5 : 10;
+      const widthFactor = Math.max(min, Math.min(max, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
     
       if (isFeatureStateWidthExpression) {
@@ -394,7 +395,7 @@ export const LayerControlEntry = memo(
               <Slider
                 id={`width-${layer.id}`}
                 type="range"
-                min="0.5"
+                min={isNodeLayer ? 0.1 : 0.5}
                 max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
                 step="0.1"
                 value={widthFactor}
