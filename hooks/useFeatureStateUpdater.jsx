@@ -73,9 +73,6 @@ export const useFeatureStateUpdater = () => {
       if (
         !specifiedLayer ||
         !map.getLayer(specifiedLayer.name) ||
-        // !specifiedLayer.isStylable ||
-        // !data ||
-        // !data.length > 0
         !specifiedLayer.isStylable
       ) {
         return;
