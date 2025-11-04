@@ -73,9 +73,7 @@ export const useFeatureStateUpdater = () => {
       if (
         !specifiedLayer ||
         !map.getLayer(specifiedLayer.name) ||
-        !specifiedLayer.isStylable ||
-        !data ||
-        !data.length > 0
+        !specifiedLayer.isStylable
       ) {
         return;
       }
@@ -89,20 +87,23 @@ export const useFeatureStateUpdater = () => {
         colorStyle: colorStyle, // assuming paintProperty carries colorStyle information.
       };
 
-      // Update the layer's paint properties.
+      // Update the layer's paint properties.Even if there is no data so that it resets.
       // If transitions are defined (e.g., 'fill-color-transition'), they will animate state changes smoothly.
       Object.entries(paintProperty).forEach(([key, value]) => {
         map.setPaintProperty(specifiedLayer.name, key, value);
       });
 
+
+
       // Create a Set of new feature IDs from the provided data.
+      const safeData = Array.isArray(data) ? data : []; // Ensure data is an array.
       const newIDs = new Set(data.map((row) => Number(row.id)));
 
       // Retrieve the previous set of feature IDs for this layer from the ref, or initialize as an empty Set.
       const prevIDs = layerStatesRef.current[specifiedLayer.name] || new Set();
 
       // For each row in the new data, update the feature state with the new values.
-      data.forEach((row) => {
+      safeData.forEach((row) => {
         const id = Number(row.id);
         map.setFeatureState(
           {

@@ -244,6 +244,11 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
       )}
+
+      {/* Display a warning message if no data is available */}
+      {dataRequested && noDataAvailable && (
+        <WarningBox text={noDataMessage} />
+      )}
     </AccordionSection>
   );
 };
