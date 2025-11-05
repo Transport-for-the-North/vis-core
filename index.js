@@ -1,4 +1,4 @@
-export * from './api'
+export * from './apiParams'
 export * from './config'
 export * from './map'
 export * from './math'
