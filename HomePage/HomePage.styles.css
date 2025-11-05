@@ -140,6 +140,12 @@
   border: 1px solid;
   border-radius: 25px;
   padding: 0.5rem 1rem;
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .contact:hover {
@@ -280,5 +286,44 @@
 
   .stb-logo {
     max-width: 150px;
+  }
+}
+
+/* --- Mobile and Tablet sizes --- */
+@media (max-width: 900px) {
+  .contacts {
+    margin: 0;
+  }
+
+  .legalText {
+    padding: 0 10vw 0rem 10vw;
+  }
+
+  .introduction h2 {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-section > div > div {
+    flex-wrap: wrap;
+  }
+
+  .container-section > div > div > a {
+    flex: 0 0 100%;
+    width: 100%;
+    display: block;     
+  }
+
+  .container-section > div > div > a > button {
+    width: 100% !important;
+    display: block;
+  }
+
+  .container-section > div > div > div {
+    margin-left: 0 !important;
+  }
+  .container-section > div > div > div > p {
+    margin: 10px 0 0;
   }
 }

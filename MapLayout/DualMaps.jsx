@@ -210,8 +210,37 @@ const DualMaps = (props) => {
           return;
         }
 
-        // Collect current hovered features for this map side
-        const currentHoveredFeatures = features.map((feature) => ({
+        // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
+        const filteredFeatures = features.filter((feature) => {
+          const layerId = feature.layer.id;
+          const layerConfig = state.layers[layerId];
+          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+          const featureValue = feature.state.value;
+          
+          // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
+          if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
+            return false; // Exclude this feature as it has no data
+          }
+          
+          return true; // Include this feature
+        });
+
+        // If after filtering we have no features, cleanup and return
+        if (filteredFeatures.length === 0) {
+          if (hoverInfoRef.current[side]?.popup) {
+            hoverInfoRef.current[side].popup.remove();
+            hoverInfoRef.current[side].popup = null;
+          }
+          // Clear hover state for previously hovered features
+          prevHoveredFeaturesRef.current[side].forEach(({ source, sourceLayer, featureId }) => {
+            map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+          });
+          prevHoveredFeaturesRef.current[side] = [];
+          return;
+        }
+
+        // Collect current hovered features for this map side (using filtered features)
+        const currentHoveredFeatures = filteredFeatures.map((feature) => ({
           layerId: feature.layer.id,
           featureId: feature.id,
           source: feature.layer.source,
@@ -311,14 +340,15 @@ const DualMaps = (props) => {
   const apiRequests = [];
   const requestIndexByDescriptionIndex = {};
 
-        // Process each feature for immediate tooltip or API-based tooltip
-        features.forEach((feature) => {
+        // Process each feature for immediate tooltip or API-based tooltip (using filtered features)
+        filteredFeatures.forEach((feature) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const customTooltip = layerConfig?.customTooltip;
           const hoverNulls = layerConfig.hoverNulls ?? true;
           // Check if additional metadata should be appended
           const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
+          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
           const featureValue = feature.state.value;
           if (!hoverNulls && (featureValue === null || featureValue === undefined)) {
@@ -834,6 +864,20 @@ const DualMaps = (props) => {
 
   useEffect(() => {
   if (!leftMap || !rightMap) return;
+
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  if (isTouch) {
+    [leftMap, rightMap].forEach(m => {
+      m.dragPan.enable();
+      m.touchZoomRotate.enable();
+      m.touchZoomRotate.disableRotation();
+      m.scrollZoom.disable();
+      m.doubleClickZoom.disable();
+      m.boxZoom.disable();
+      m.keyboard.disable();
+    });
+   }
 
   const roLeft = new ResizeObserver(() => leftMap.resize());
   const roRight = new ResizeObserver(() => rightMap.resize());
