@@ -9,8 +9,8 @@ export const linkTotalsDifferenceBetweenDifferences = {
     legalText: termsOfUse,
     //termsOfUse: termsOfUse,
     about: `
-    <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing differences between four Scenarios. To do so, adjust four of the Scenarios, one Time Periods and one Metric.</p>
-    <p>The calculation does (4-3) - (2-1) which finds the difference between scenarios 4 and 3, then deducts the difference between scenarios 2 and 1</p>
+    <p>The Rail Network included in the model is displayed by default and no selection is required. This visual can be used in comparing the differences between four Scenarios. To do so, adjust four of the Scenarios, one Time Period and one Metric.</p>
+    <p>The calculation does (4-3) - (2-1) which finds the difference between scenarios 4 and 3, then deducts the difference between scenarios 2 and 1.</p>
     <p>Time period passengers are time period totals of the selected option, “All” option is a sum of the given periods.</p>
     <p>Metrics are aggregated by number of passengers, capacities (both Crush and Seat) and trains per hour.</p>
     `, //to be added
