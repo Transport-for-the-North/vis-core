@@ -6,6 +6,7 @@ import { keyLocationZoneTotal } from "./keyLocationZoneTotal"
 import { keyLocationZoneTotalDifference } from "./keyLocationZoneTotalDifference"
 import { linkTotals } from "./linkTotals"
 import { linkTotalsDifference } from "./linkTotalsDifference"
+import { linkTotalsDifferenceBetweenDifferences } from "./linkTotalsDifferenceBetweenDifferences"
 import { linkTotalsSideBySide } from "./linkTotalsSideBySide"
 import { popEmpZonePair } from "./popEmpZonePair"
 import { popEmpZonePairDifference } from "./popEmpZonePairDifference"
@@ -40,6 +41,7 @@ export const pages = {
     keyLocationZoneTotalDifference: keyLocationZoneTotalDifference,
     linkTotals: linkTotals,
     linkTotalsDifference: linkTotalsDifference,
+    linkTotalsDifferenceBetweenDifferences: linkTotalsDifferenceBetweenDifferences,
     linkTotalsSideBySide: linkTotalsSideBySide,
     popEmpZonePair: popEmpZonePair,
     popEmpZonePairDifference: popEmpZonePairDifference,

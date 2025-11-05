@@ -70,10 +70,10 @@ export const zoneBenefitsDifference = {
             /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Benefits Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Benefits Difference'] },
             { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Benefits Difference'] },*/
-            { ...selectors.resultZoneTypeFilter, filterName: "Zoning system (Scenarios 1 and 2)", visualisations: ['Zone Benefits Difference'] },
             { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (Scenarios 1 and 2)", visualisations:['Zone Benefits Difference']},
             { ...selectors.userClassFilter, filterName: "User Class (Scenarios 1 and 2)", visualisations:['Zone Benefits Difference']},
-            { ...selectors.benefitsMetricFilter, filterName: "Metric (Scenarios 1 and 2)", visualisations:['Zone Benefits Difference']}
+            { ...selectors.benefitsMetricFilter, filterName: "Metric (Scenarios 1 and 2)", visualisations:['Zone Benefits Difference']},
+            { ...selectors.resultZoneTypeFilter, filterName: "Zoning system (Scenarios 1 and 2)", visualisations: ['Zone Benefits Difference'] },
         ]
       }
     }

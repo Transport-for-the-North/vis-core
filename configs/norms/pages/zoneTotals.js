@@ -54,7 +54,9 @@ export const zoneTotals = {
         { ...selectors.scenarioFilterYear, visualisations: ['Zone Totals'] },*/
         { ...selectors.timePeriod, visualisations: ['Zone Totals'] },
         { ...selectors.userClassFilter, visualisations: ['Zone Totals'] },
-        { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals'],
+        { ...selectors.originOrDestinationFilter, visualisations: ['Zone Totals'] },
+        { ...selectors.zoneMetricFilter, visualisations: ['Zone Totals'] },
+         { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals'],
           actions: [
             { action: "UPDATE_QUERY_PARAMS" },
             { 
@@ -62,9 +64,7 @@ export const zoneTotals = {
               payload: { targetLayer: "NoRMS Zone Totals"}
             }
           ]  
-        },
-        { ...selectors.originOrDestinationFilter, visualisations: ['Zone Totals'] },
-        { ...selectors.zoneMetricFilter, visualisations: ['Zone Totals'] },
+        }
       ]
     }
   }

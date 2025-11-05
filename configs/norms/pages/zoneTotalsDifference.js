@@ -58,6 +58,9 @@ export const zoneTotalsDifference = {
         /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Zone Totals Difference'] },
         { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Zone Totals Difference'] },*/
+        { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (Scenarios 1 and 2)", visualisations:['Zone Totals Difference']},
+        { ...selectors.userClassFilter, filterName: "User Class (Scenarios 1 and 2)", visualisations:['Zone Totals Difference']},
+        { ...selectors.zoneMetricFilter, filterName: "Metric (Scenarios 1 and 2)", visualisations:['Zone Totals Difference']},
         { ...selectors.resultZoneTypeFilter, visualisations: ['Zone Totals Difference'],
           actions: [
             { action: "UPDATE_QUERY_PARAMS" },
@@ -66,10 +69,7 @@ export const zoneTotalsDifference = {
               payload: { targetLayer: "NoRMS Zone Totals Difference"}
             }
           ]  
-        },
-        { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (Scenarios 1 and 2)", visualisations:['Zone Totals Difference']},
-        { ...selectors.userClassFilter, filterName: "User Class (Scenarios 1 and 2)", visualisations:['Zone Totals Difference']},
-        { ...selectors.zoneMetricFilter, filterName: "Metric (Scenarios 1 and 2)", visualisations:['Zone Totals Difference']},
+        }
       ]
     }
   }

@@ -35,6 +35,7 @@ export const appConfig = {
     pages.stationCatchmentSideBySide,
     pages.linkTotals,
     pages.linkTotalsDifference,
+    pages.linkTotalsDifferenceBetweenDifferences,
     pages.linkTotalsSideBySide,
     pages.zoneTotals,
     pages.zoneTotalsDifference,
