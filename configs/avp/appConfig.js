@@ -26,7 +26,8 @@ export const appConfig = {
     logoutImage: "img/logout.png",
     appPages: [
         pages.mapImage,
-        pages.nac
+        pages.nac,
+        pages.pba
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
