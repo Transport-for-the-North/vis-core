@@ -14,13 +14,13 @@ const timePeriodCodeValues = {
         paramValue: "ip",
       },
       {
-        displayValue: "OP",
-        paramValue: "op",
-      },
-      {
         displayValue: "PM",
         paramValue: "pm",
       },
+      {
+        displayValue: "OP",
+        paramValue: "op",
+      }
     ]
   }
 
@@ -356,7 +356,7 @@ const scenarioFilterYear = {
 }
 
 const scenarioCodeFilter = {
-    filterName: "Scenario",
+    filterName: "Scenario (Year, Network, Demand)",
     paramName: "scenarioCode",
     target: "api",
     actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -371,7 +371,7 @@ const scenarioCodeFilter = {
     values: {
         source: "metadataTable",
         metadataTableName: "input_norms_scenario",
-        displayColumn: "scenario_code",
+        displayColumn: "vis_description",
         paramColumn: "scenario_code",
         sort: "ascending",
         exclude: ["NA"]
@@ -396,6 +396,18 @@ const timePeriod =  {
     type: "toggle",
     values: timePeriodCodeValues,
 }
+
+const timePeriodTwo =  {
+    filterName: "Time Period Two",
+    paramName: "timePeriodCodeTwo",
+    target: "api",
+    actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+    visualisations: null,
+    info:"Select the desired time period.",
+    type: "toggle",
+    values: timePeriodCodeValues,
+}
+
 
 const metricFilter = {
     filterName: "Metric",
@@ -440,7 +452,7 @@ const userClassFilter = {
         metadataTableName: "norms_userclass_list",
         displayColumn: "name",
         paramColumn: "id",
-        sort: "ascending",
+        sort: "descending",
         exclude: [1, 2, 3, 4, 5, 6, 7, 8, 9]
     },
 }
@@ -551,16 +563,16 @@ const catchmentMetricFilter = {
     values: {
         source: "local",
         values: [
-        { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
-        { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
-        { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
-        { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
-        { paramValue: "gen_cost_total", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" },
         { paramValue: "demand_walk", displayValue: "Demand Walk", legendSubtitleText: "Demand" },
         { paramValue: "demand_car", displayValue: "Demand Car", legendSubtitleText: "Demand" },
         { paramValue: "demand_bus", displayValue: "Demand Bus", legendSubtitleText: "Demand" },
         { paramValue: "demand_lrt", displayValue: "Demand LRT", legendSubtitleText: "Demand" },
-        { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" }
+        { paramValue: "demand_total", displayValue: "Demand Total", legendSubtitleText: "Demand" },
+        { paramValue: "gen_cost_car", displayValue: "Generalised Cost Car", legendSubtitleText: "Cost" },
+        { paramValue: "gen_cost_walk", displayValue: "Generalised Cost Walk", legendSubtitleText: "Cost" },
+        { paramValue: "gen_cost_bus", displayValue: "Generalised Cost Bus", legendSubtitleText: "Cost" },
+        { paramValue: "gen_cost_lrt", displayValue: "Generalised Cost LRT", legendSubtitleText: "Cost" },
+        { paramValue: "gen_cost_total", displayValue: "Generalised Cost Total", legendSubtitleText: "Cost" }
         ]
     },
 }
@@ -598,7 +610,7 @@ const linkMetricFilter = {
       {
         displayValue: "Total Seat Capacity",
         paramValue: "Total Seat Capacity",
-        legendSubtitleText: "Capacity",
+        legendSubtitleText: "Seats",
       },
       {
         displayValue: "Total Seat Load Factor",
@@ -608,7 +620,17 @@ const linkMetricFilter = {
       {
         displayValue: "Trains per hour",
         paramValue: "Trains per hour",
-        legendSubtitleText: "units",
+        legendSubtitleText: "tph",
+      },
+      {
+        displayValue: "Passengers Over Seating Capacity",
+        paramValue: "Passengers Over Seating Capacity",
+        legendSubtitleText: "Passengers",
+      },
+      {
+        displayValue: "Excess Seating",
+        paramValue: "Excess Seating",
+        legendSubtitleText: "Seats",
       },
     ]
   },
@@ -630,14 +652,14 @@ const zoneMetricFilter = {
     source: "local",
     values: [
       {
-        displayValue: 'Revenue',
-        paramValue: 'revenue',
-        legendSubtitleText: "£",
-      },
-      {
         displayValue: 'Demand',
         paramValue: 'demand',
         legendSubtitleText: "Passengers",
+      },
+      {
+        displayValue: 'Revenue',
+        paramValue: 'revenue',
+        legendSubtitleText: "£",
       },
     ],
   },
@@ -895,6 +917,7 @@ export const selectors = {
   scenarioCodeFilter,
   scenarioIdFilter,
   timePeriod,
+  timePeriodTwo,
   metricFilter,
   userClassFilter,
   resultZoneTypeFilter,

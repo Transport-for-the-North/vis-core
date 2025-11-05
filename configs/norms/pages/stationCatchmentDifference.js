@@ -82,15 +82,17 @@ export const stationCatchmentDifference = {
       ],
       metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Station Catchment Difference'] },
         { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Station Catchment Difference'] },
+        { ...selectors.timePeriod, filterName: "Time Period Scenario 1", visualisations:['Station Catchment Difference']},
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Station Catchment Difference'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Station Catchment Difference'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Station Catchment Difference'] },*/
         { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Station Catchment Difference'] },
-        { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Station Catchment Difference'],
+        { ...selectors.timePeriodTwo, filterName: "Time Period Scenario 2", visualisations:['Station Catchment Difference']},
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Station Catchment Difference'] },
+        { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Station Catchment Difference'] },
+        { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Station Catchment Difference'] },*/
+        { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (Scenarios 1 and 2)", visualisations:['Station Catchment Difference'],
             values: {
               source: "local",
               values: [
@@ -108,7 +110,7 @@ export const stationCatchmentDifference = {
           },
           paramName: "directionId"
         },
-        { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Station Catchment Difference'], values: {
+        { ...selectors.userClassFilter, filterName: "User Class (Scenarios 1 and 2)", visualisations:['Station Catchment Difference'], values: {
             source: "metadataTable",
             metadataTableName: "norms_userclass_list",
             displayColumn: "name",
@@ -116,8 +118,7 @@ export const stationCatchmentDifference = {
             sort: "ascending",
             exclude: [123, 456, 789]
           }},
-        { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Station Catchment Difference']},
-        { ...selectors.catchmentMetricFilter, filterName: "Metric (1 and 2)", visualisations:['Station Catchment Difference']},
+        { ...selectors.catchmentMetricFilter, filterName: "Metric (Scenarios 1 and 2)", visualisations:['Station Catchment Difference']},
         { ...selectors.stationMapSelection, layer: "NoRMS Nodes", visualisations:['Station Catchment Difference']},
       ],
     },

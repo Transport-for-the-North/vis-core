@@ -5,7 +5,6 @@ import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext } from "hooks";
 import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
-import { buildLegendRadius } from "utils/map";
 
 /**
  * useIsMobile
@@ -54,9 +53,9 @@ const LegendContainer = styled.div`
   border-radius: 10px;
   z-index: 10;
   min-width: 0;
-  max-height: 35vh;
+  max-height: none;
   max-width: 80vw;
-  overflow: auto;
+  overflow: visible;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   font-family: "Hanken Grotesk", sans-serif;
   font-size: medium;
@@ -352,6 +351,14 @@ export const interpretWidthExpression = (expression) => {
   return null;
 };
 
+const isRenderableEntry = (e) => {
+  if (!e) return false;
+  const hasLabel = e.label != null && String(e.label).trim() !== '';
+  const hasKnownSwatch = ['circle', 'line', 'fill'].includes(e.type);
+  const hasSize = e.type === 'fill' ? true : Number(e.width) > 0;
+  return hasLabel || (hasKnownSwatch && hasSize);
+};
+
 /**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
@@ -456,6 +463,12 @@ export const DynamicLegend = ({ map }) => {
             paintProps["line-width"] || paintProps["circle-radius"]
           );
 
+          // Determine whether current style is categorical. For categorical we should not scale circle sizes.
+          const colorStyle = layer.metadata?.colorStyle;
+          const isCategorical =
+            colorStyle === "categorical" ||
+            (colorStops && colorStops.some((s) => isNaN(convertStringToNumber(s.value))));
+
           // Invert color and width stops if necessary
           if (invertColorScheme && colorStops) {
             colorStops = colorStops.slice().reverse();
@@ -463,17 +476,10 @@ export const DynamicLegend = ({ map }) => {
               widthStops = widthStops.slice().reverse();
             }
           }
-          if (layer.type === "circle" && colorStops && colorStops.length > 0) {
-            // Use the legend’s bins (from color stops) to compute baseline radii (e.g., 2..25)
-            const bins = colorStops.map((s) => convertStringToNumber(s.value));
-            const radius = buildLegendRadius(bins);
-
-            // DynamicLegend expects width = rendered diameter for circles
-            widthStops = bins.map((v, i) => ({
-              value: numberWithCommas(v),
-              width: radius[i] * 2,
-            }));
-          }
+          // For categorical circle styles, keep a uniform diameter (do not scale by bins)
+          if (layer.type === "circle" && isCategorical) {
+            widthStops = null; // allow default diameter to apply uniformly
+          } 
           if (
             layer.type === "circle" &&
             colorStops &&
@@ -539,7 +545,7 @@ export const DynamicLegend = ({ map }) => {
               }
               legendEntries.push({
                 color: stop.color,
-                width: widthStop ? widthStop.width : null,
+                width: widthStop ? widthStop.width: isMobile ? null : (layer.type === "circle" ? (typeof paintProps["circle-radius"] === "number"? paintProps["circle-radius"] * 2 : 10): (layer.type === "line" ? 2 : 10)),
                 label,
                 type: layer.type,
               });
@@ -576,18 +582,26 @@ export const DynamicLegend = ({ map }) => {
               legendEntries[0].label = title;
             }
           }
+
+          const filteredEntries = (legendEntries || []).filter(isRenderableEntry);
+
+          // If nothing would render, skip this group entirely
+          if (filteredEntries.length === 0) {
+            return null;
+          }
           
           return {
             layerId: layer.id,
             title: displayValue,
             subtitle: legendSubtitleText,
-            legendEntries,
+            legendEntries: filteredEntries,
             trseLabel,
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
           };
-        });
+        })
+        .filter(Boolean);
       setLegendItems(items);
     };
   
@@ -649,7 +663,7 @@ export const DynamicLegend = ({ map }) => {
             ) : (
               <>
                 <LegendTitle>{item.title}</LegendTitle>
-                <LegendSubtitle>{item.subtitle}</LegendSubtitle>
+                {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
                 {item.legendEntries.map((entry, idx) => (
                   <LegendItem key={idx}>
                     {entry.type === "circle" ? (

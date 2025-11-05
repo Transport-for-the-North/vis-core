@@ -100,7 +100,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
-      window.clarity('set', 'download_data_clicked', true);
+      // window.clarity('set', 'download_data_clicked', true);
+      window.clarity('event', 'download_data_clicked');
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");
@@ -235,13 +236,18 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               {isDownloading ? (
                 <>Downloading <Spinner /></>
               ) : (
-                isRequestTooLarge ? "Request Too Large" : "Download"
+                isRequestTooLarge ? "Request Too Large" : "Download as CSV"
               )}
             </DownloadButton>
           )}
         </>
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
+      )}
+
+      {/* Display a warning message if no data is available */}
+      {dataRequested && noDataAvailable && (
+        <WarningBox text={noDataMessage} />
       )}
     </AccordionSection>
   );

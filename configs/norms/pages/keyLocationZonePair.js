@@ -65,9 +65,6 @@ export const keyLocationZonePair = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Accessibility Pair'] },
-            { ...selectors.scenarioFilterDemand, visualisations: ['Zone Accessibility Pair'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Zone Accessibility Pair'] },
             { ...selectors.scenarioCodeFilter, visualisations: ['Zone Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -77,6 +74,9 @@ export const keyLocationZonePair = {
                 exclude: [0]
               }
             },
+            /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Zone Accessibility Pair'] },
+            { ...selectors.scenarioFilterDemand, visualisations: ['Zone Accessibility Pair'] },
+            { ...selectors.scenarioFilterYear, visualisations: ['Zone Accessibility Pair'] },*/
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Pair'],
                 shouldBeBlankOnInit: true,
                 shouldFilterOnValidation: false,

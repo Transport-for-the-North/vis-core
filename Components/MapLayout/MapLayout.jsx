@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
@@ -65,6 +65,7 @@ export const MapLayout = () => {
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -181,6 +182,7 @@ export const MapLayout = () => {
         infoBoxText={layerZoomMessage}
         downloadPath={pageContext.config.downloadPath}
         requestMethod={pageContext.config.requestMethod}
+        setIsOpen={setSidebarIsOpen}
       >
         <MapLayerSection
           handleColorChange={handleColorChange}
@@ -188,12 +190,9 @@ export const MapLayout = () => {
         />
       </Sidebar>
 
-      {/* Mobile-only: where summary cards will be portaled into */}
-      <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
-
       {pageContext.type === "MapLayout" && (
         <MapContainer>
-          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
+          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} sidebarIsOpen={sidebarIsOpen}/>
         </MapContainer>
       )}
       {pageContext.type === "DualMapLayout" && (
@@ -201,6 +200,10 @@ export const MapLayout = () => {
           <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
         </MapContainer>
       )}
+
+      {/* Mobile-only: where summary cards will be portaled into */}
+      <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
+      
       <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
     </LayoutContainer>
   );

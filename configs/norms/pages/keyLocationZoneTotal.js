@@ -64,9 +64,6 @@ export const keyLocationZoneTotal = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Accessibility Totals'] },
-            { ...selectors.scenarioFilterDemand, visualisations: ['Zone Accessibility Totals'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Zone Accessibility Totals'] },
             { ...selectors.scenarioCodeFilter, visualisations: ['Zone Accessibility Totals'], values: {
               source: "metadataTable",
               metadataTableName: "input_norms_scenario",
@@ -75,6 +72,9 @@ export const keyLocationZoneTotal = {
               sort: "ascending",
               exclude: [0]
             }},
+            /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Zone Accessibility Totals'] },
+            { ...selectors.scenarioFilterDemand, visualisations: ['Zone Accessibility Totals'] },
+            { ...selectors.scenarioFilterYear, visualisations: ['Zone Accessibility Totals'] },*/
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Zone Accessibility Totals'],
                 shouldBeBlankOnInit: true,
                 shouldFilterOnValidation: false,

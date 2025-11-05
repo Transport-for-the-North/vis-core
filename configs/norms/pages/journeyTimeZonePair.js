@@ -69,9 +69,9 @@ export const journeyTimeZonePair = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, visualisations: ['Journey Time Accessibility Pair'] },
+            /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Journey Time Accessibility Pair'] },
             { ...selectors.scenarioFilterDemand, visualisations: ['Journey Time Accessibility Pair'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Journey Time Accessibility Pair'] },
+            { ...selectors.scenarioFilterYear, visualisations: ['Journey Time Accessibility Pair'] },*/
             { ...selectors.scenarioCodeFilter, visualisations: ['Journey Time Accessibility Pair'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",

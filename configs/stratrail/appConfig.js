@@ -35,13 +35,17 @@ export const appConfig = {
                 <li><b>Station Loadings:</b> This visualisation shows the boarding and alighting summaries at each station in the NorTMS model.</li>
                 <li><b>Station Socio-Economic Classifications (NS-SeC):</b> This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
                 <li><b>Station Economic Activity Status:</b> This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
+                <li><b>Station Car or Van Availability:</b> This visualisation shows the availability of cars and vans for households near each station, based on 2021 Census data mapped using a 2.5km buffer around stations.</li>
+                <li><b>Station Household Deprivation:</b> This visualisation shows household deprivation indicators across four dimensions (education, employment, health, and housing) for areas near each station, using 2021 Census data.</li>
+                <li><b>Station Travel to Work Distance:</b> This visualisation shows the distance people travel from home to workplace for areas near each station, categorised from working at home to 60km+ distances, using 2021 Census data.</li>
+                <li><b>Station Work Method of Travel:</b> This visualisation shows the main methods of transport used for the longest part of usual journeys to work, including all transport modes from walking to train travel, using 2021 Census data.</li>
                 <li><b>Link Loadings:</b> This visualisation shows the boarding and alighting summaries for each link in the NorTMS model.</li>
-                <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in the NorTMS model.</li>
-                <li><b>Node Investments:</b> This visualisation shows the current node investments in the Investment Pipeline.</li>
-                <li><b>Link Investments:</b> This visualisation shows the current link investments in the Investment Pipeline.</li>
+                <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in our TIPLOC-TIPLOC network.</li>
+                <li><b>Node Investments:</b> This visualisation shows the current node investments in the Investment Pipeline (SRIP).</li>
+                <li><b>Link Investments:</b> This visualisation shows the current link investments in the Investment Pipeline (SRIP).</li>
                 <li><b>Link Frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
-                <li><b>Freight Node Investments:</b> This visualisation shows the current freight node investments in the Investment Pipeline.</li>
-                <li><b>Freight Link Investments:</b> This visualisation shows the current freight link investments in the Investment Pipeline.</li>
+                <li><b>Freight Node Investments:</b> This visualisation shows the current freight node investments in the Freight Investment Pipeline (FRIP).</li>
+                <li><b>Freight Link Investments:</b> This visualisation shows the current freight link investments in the Freight Investment Pipeline (FRIP).</li>
             </ul>
             `,
             sectionTitle: "Portal Information",
@@ -160,6 +164,10 @@ export const appConfig = {
         pages.nodeLoadings,
         pages.nodeNSSeC,
         pages.nodeSocio,
+        pages.nodeCarOrVan,
+        pages.nodeHouseholdDeprivation,
+        pages.nodeWorkTravelDistance,
+        pages.nodeWorkTravelMethod,
         pages.linkLoadings,
         pages.timingLinks,
         pages.nodeInvestments,

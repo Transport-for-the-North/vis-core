@@ -12,6 +12,8 @@ export const linkFrequency = {
   <p>Use the time period filter to select the period you wish to see on the map. Click on a link to see more information about the frequency.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
         {
@@ -31,6 +33,7 @@ export const linkFrequency = {
             labelNulls: true,
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
+            defaultOpacity: 0.95, // Custom default opacity for this layer
         },
     ],
     visualisations: [

@@ -413,6 +413,7 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -435,6 +436,7 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -458,6 +460,7 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -481,6 +484,7 @@ export const appConfig = {
             visualisations: ["Link"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -616,6 +620,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -632,6 +637,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -649,6 +655,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -666,6 +673,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -692,6 +700,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -714,6 +723,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -737,6 +747,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -760,6 +771,7 @@ export const appConfig = {
             visualisations: ["Link Difference"],
             type: "dropdown",
             isClearable: true,
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -889,6 +901,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -904,6 +917,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -920,6 +934,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -936,6 +951,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -961,6 +977,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -976,6 +993,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -992,6 +1010,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1008,6 +1027,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Link Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1105,6 +1125,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1120,6 +1141,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1136,6 +1158,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1152,6 +1175,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1252,6 +1276,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1267,6 +1292,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1283,6 +1309,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1299,6 +1326,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1324,6 +1352,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1339,6 +1368,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1355,6 +1385,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1371,6 +1402,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Node Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1466,6 +1498,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1481,6 +1514,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1497,6 +1531,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1513,6 +1548,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1538,6 +1574,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1553,6 +1590,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1569,6 +1607,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1585,6 +1624,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Node Results Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1672,6 +1712,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1687,6 +1728,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1703,6 +1745,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Results"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1801,6 +1844,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1816,6 +1860,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1832,6 +1877,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1867,6 +1913,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1882,6 +1929,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1898,6 +1946,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Zone Result Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -1991,6 +2040,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2006,6 +2056,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2056,6 +2107,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2071,6 +2123,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2087,6 +2140,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Zone Results Side-By-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2209,6 +2263,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2224,6 +2279,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2240,6 +2296,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2256,6 +2313,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2380,6 +2438,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2395,6 +2454,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2411,6 +2471,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2427,6 +2488,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2461,6 +2523,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2476,6 +2539,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2492,6 +2556,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2508,6 +2573,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_QUERY_PARAMS" }],
             visualisations: ["Matrix Difference"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2629,6 +2695,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2660,6 +2727,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2676,6 +2744,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2710,6 +2779,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2725,6 +2795,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2741,6 +2812,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",
@@ -2757,6 +2829,7 @@ export const appConfig = {
             actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
             visualisations: ["Matrix Side-by-Side"],
             type: "dropdown",
+            shouldBeValidated: true,
             values: {
               source: "metadataTable",
               metadataTableName: "v_input_scenarios",

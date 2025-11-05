@@ -69,9 +69,9 @@ export const journeyTimeZonePairDifference = {
         metadataTables.userClassMetadataTable
       ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Journey Time Accessibility Pair Difference'] },
+        /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 1 by Network", visualisations: ['Journey Time Accessibility Pair Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 1 by Demand Scenario", visualisations: ['Journey Time Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Journey Time Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 1 by Year", visualisations: ['Journey Time Accessibility Pair Difference'] },*/
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 1", paramName: "scenarioCodeDoMinimum", visualisations: ['Journey Time Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -81,9 +81,9 @@ export const journeyTimeZonePairDifference = {
                 exclude: [0]
               }
             },
-            { ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Journey Time Accessibility Pair Difference'] },
+            /*{ ...selectors.scenarioFilterNetwork, filterName: "Filter Scenario 2 by Network", visualisations: ['Journey Time Accessibility Pair Difference'] },
             { ...selectors.scenarioFilterDemand, filterName: "Filter Scenario 2 by Demand Scenario", visualisations: ['Journey Time Accessibility Pair Difference'] },
-            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Journey Time Accessibility Pair Difference'] },
+            { ...selectors.scenarioFilterYear, filterName: "Filter Scenario 2 by Year", visualisations: ['Journey Time Accessibility Pair Difference'] },*/
             { ...selectors.scenarioCodeFilter, filterName: "Scenario 2", paramName: "scenarioCodeDoSomething", visualisations: ['Journey Time Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -93,8 +93,8 @@ export const journeyTimeZonePairDifference = {
                 exclude: [0]
               }
             },
-            { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference']},
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",
+            { ...selectors.originOrDestinationFilter, filterName: "Origin or Destination (Scenarios 1 and 2)", visualisations:['Journey Time Accessibility Pair Difference']},
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Segment (Scenarios 1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",
                 shouldBeBlankOnInit: true,
                 shouldFilterOnValidation: false,
                 shouldBeValidated: false,
@@ -102,7 +102,7 @@ export const journeyTimeZonePairDifference = {
                 multiSelect: true,
                 isClearable: true,
             },
-            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",
+            { ...selectors.segmentUserClassFilter, filterName: "Filter User Class by Car Availability (Scenarios 1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], paramName: "userClassId",
                 values: {
                     source: "metadataTable",
                     metadataTableName: "norms_userclass_list",
@@ -118,7 +118,7 @@ export const journeyTimeZonePairDifference = {
                 multiSelect: true,
                 isClearable: true,
             },
-            { ...selectors.userClassFilter, filterName: "User Class (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], values: {
+            { ...selectors.userClassFilter, filterName: "User Class (Scenarios 1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'], values: {
                 source: "metadataTable",
                 metadataTableName: "norms_userclass_list",
                 displayColumn: "name",
@@ -134,7 +134,7 @@ export const journeyTimeZonePairDifference = {
               shouldInitialSelectAllInMultiSelect: true,
               isClearable: true,
             },
-            { ...selectors.timePeriod, filterName: "Time Period (1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'],
+            { ...selectors.timePeriod, filterName: "Time Period (Scenarios 1 and 2)", visualisations:['Journey Time Accessibility Pair Difference'],
               shouldBeBlankOnInit: false,
               multiSelect: true,
               isClearable: true,

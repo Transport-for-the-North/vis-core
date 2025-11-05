@@ -2,11 +2,11 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { investPopupContent } from "../templates/investmentPopup";
 import { investmentSummary } from "../templates";
-import { crpLinesLayerPaint } from "../customPaintDefinitions";
+import { crpLinesLayerPaint, parentAuthorityBoundaryCustomPaint, invisiblePolygonCustomPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const nodeInvestments = {
-  pageName: "Node Investments",
+  pageName: "Node Investments (SRIP)",
   url: "/node-investments",
   type: "MapLayout",
   category: "Investments",
@@ -14,21 +14,57 @@ export const nodeInvestments = {
         <p>Use the filters to select the theme(s) you wish to see on the map. Hover over a node to view it's basic information and/or click on a node to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
+  customMapZoom: 7,
+  customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
         {
-            uniqueId: "RailOfferLinksVectorTile",
-            name: "Network",
+            name: "Local Authorities",
             type: "tile",
             source: "api",
-            path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
-            sourceLayer: "geometry",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
             geometryType: "line",
+            customPaint: parentAuthorityBoundaryCustomPaint,
             isHoverable: false,
             isStylable: false,
             shouldHaveTooltipOnHover: false,
-            shouldHaveLabel: false
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: false,
+            hoverTipShouldIncludeMetadata: false
         },
+        {
+            name: "hide_Local Authorities",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/zones/29/{z}/{x}/{y}",
+            sourceLayer: "zones",
+            geometryType: "polygon",
+            customPaint: invisiblePolygonCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldHaveTooltipOnHover: true,
+            shouldHaveLabel: false,
+            labelZoomLevel: 12,
+            labelNulls: false,
+            hoverNulls: true,
+            hoverTipShouldIncludeMetadata: false,
+        },
+        // {
+        //     uniqueId: "RailOfferLinksVectorTile",
+        //     name: "Network",
+        //     type: "tile",
+        //     source: "api",
+        //     path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
+        //     sourceLayer: "geometry",
+        //     geometryType: "line",
+        //     isHoverable: false,
+        //     isStylable: false,
+        //     shouldHaveTooltipOnHover: false,
+        //     shouldHaveLabel: false
+        // },
         // {
         //     uniqueId: "RailOfferCRPVectorTile",
         //     name: "CRP Network",

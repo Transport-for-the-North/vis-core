@@ -54,7 +54,7 @@ export const AccordionSection = ({ title, children, defaultValue }) => {
         {title}
         <AccordionIcon $isOpen={isOpen} />
       </AccordionHeader>
-      <AccordionContent $isOpen={isOpen}>
+      <AccordionContent $isOpen={isOpen} className="selectable-text">
         {isOpen && children}
       </AccordionContent>
     </>

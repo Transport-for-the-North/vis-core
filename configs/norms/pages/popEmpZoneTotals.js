@@ -71,16 +71,6 @@ export const popEmpZoneTotals = {
           metadataTables.userClassMetadataTable
         ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, visualisations: ['Landuse Accessibility Totals'] },
-            { ...selectors.scenarioFilterDemand, visualisations: ['Landuse Accessibility Totals'] },
-            { ...selectors.scenarioFilterYear, paramName: "scenarioYear", visualisations: ['Landuse Accessibility Totals'],
-              shouldBeBlankOnInit: true,
-              shouldFilterOnValidation: true,
-              shouldFilterOthers: true,
-              multiSelect: false,
-              isClearable: true,
-              actions: [{ action: "UPDATE_QUERY_PARAMS" }]
-            },
             { ...selectors.scenarioCodeFilter, visualisations: ['Landuse Accessibility Totals'], values: {
                 source: "metadataTable",
                 metadataTableName: "input_norms_scenario",
@@ -90,6 +80,16 @@ export const popEmpZoneTotals = {
                 exclude: [0]
               }
             },
+            /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Landuse Accessibility Totals'] },
+            { ...selectors.scenarioFilterDemand, visualisations: ['Landuse Accessibility Totals'] },
+            { ...selectors.scenarioFilterYear, paramName: "scenarioYear", visualisations: ['Landuse Accessibility Totals'],
+              shouldBeBlankOnInit: true,
+              shouldFilterOnValidation: true,
+              shouldFilterOthers: true,
+              multiSelect: false,
+              isClearable: true,
+              actions: [{ action: "UPDATE_QUERY_PARAMS" }]
+            },*/
             { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Landuse Accessibility Totals'],
                 shouldBeBlankOnInit: true,
                 shouldFilterOnValidation: false,

@@ -31,7 +31,19 @@ export const bands = [
                 name: "Trains per hour",
                 values: [0, 1, 3, 5, 10, 20, 50, 100],
                 differenceValues: [-100, -50, -25, 0, 25, 50, 100],
-            }
+            },
+            {
+                name: "Passengers Over Seating Capacity",
+                values: [0,100, 250, 500, 1000, 2000, 5000, 7000 ],
+                differenceValues: [-7000, -5000, -2000, -500, -100, 0, 100, 500, 2000, 5000, 7000],
+                colours: ["#FFE5E5","#FFB3B3","#FF8080","#FF4D4D","#FF1A1A","#CC0000","#990000","#660000"]
+            },
+            {
+                name: "Excess Seating",
+                values: [0,2000, 10000, 30000, 70000, 140000],
+                differenceValues: [-140000, -70000, -30000, -10000, 0, 10000, 30000, 70000, 140000],
+                colours: ["#8bd58a","#5ec963","#3fb14b","#2b8b37","#186326","#0c3c17"]
+            },
         ]
     }, 
     {

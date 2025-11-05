@@ -29,3 +29,13 @@ export const crpLinesLayerPaint = {
     "line-width": 4,
     "line-opacity": 0.3
 };
+
+export const invisiblePolygonCustomPaint = {
+  "fill-opacity": 0,
+};
+
+export const parentAuthorityBoundaryCustomPaint = {
+  "line-color": "#808080",
+  "line-width": 0.75,
+  "line-opacity": 0.65
+};

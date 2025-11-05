@@ -64,10 +64,10 @@ export const linkTotals = {
       ],
       metadataTables: [ metadataTables.inputNormsScenarioMetadataTable ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, visualisations: ['Link Totals'] },
-        { ...selectors.scenarioFilterDemand, visualisations: ['Link Totals'] },
-        { ...selectors.scenarioFilterYear, visualisations: ['Link Totals'] },
         { ...selectors.scenarioCodeFilter, visualisations: ['Link Totals'] },
+        /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Link Totals'] },
+        { ...selectors.scenarioFilterDemand, visualisations: ['Link Totals'] },
+        { ...selectors.scenarioFilterYear, visualisations: ['Link Totals'] },*/
         { ...selectors.timePeriod, visualisations: ['Link Totals'] },
         { ...selectors.linkMetricFilter, visualisations: ['Link Totals'] }
       ],

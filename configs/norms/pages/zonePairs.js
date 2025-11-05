@@ -8,11 +8,12 @@ export const zonePairs = {
       type: "MapLayout",
       //termsOfUse: termsOfUse,
       legalText: termsOfUse,
-      aabout:`
-      <p>Visualise the distribution patterns of Demand, Generalised Cost and Generalised Journey Time of a zone by selecting it on the map. Further, adjust time period, direction and desired metric. </p>
-      <p>Time period metrics are time period totals of the selected option, “All” option is a sum of the given periods. </p>
-      <p>The User Class refers to the journey purpose of the trip, choose between travelling for commuting, employers’ business or other purposes. </p>
-      <p>Direction toggle allows to switch between the zone used as pivot in the distribution of the metric as an origin or destination. </p>
+      about:`
+      <p>Visualise the distribution pattern of a given metric for a scenario, by selecting the desired zone on the map. Metrics included in the functionality are: Demand,
+      Generalised Cost and Generalised Journey Time, Further, adjust Time Period, User Class and Direction as desired.</p>
+      <p>Time Period metrics are time period totals of the selected option, the "All" option is a sum of the given periods and represents an average 24 hour weekday.</p>
+      <p>The User Class refers to the journey purpose of the trip. Choose between travelling for commuting, employers' business or other purposes.</p>
+      <p>The Origin or Destination toggle switches between trips to and trips from the selected zone.</p>
       `,
       category: "Zone",
       subCategory: "Zone Pairs",
@@ -48,10 +49,10 @@ export const zonePairs = {
         ],
         metadataTables: [ metadataTables.inputNormsScenarioMetadataTable, metadataTables.userClassMetadataTable ],
         filters: [
-            { ...selectors.scenarioFilterNetwork, visualisations: ['Zone Pairs'] },
-            { ...selectors.scenarioFilterDemand, visualisations: ['Zone Pairs'] },
-            { ...selectors.scenarioFilterYear, visualisations: ['Zone Pairs'] },
             { ...selectors.scenarioCodeFilter, visualisations: ['Zone Pairs'] },
+            /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Zone Pairs'] },
+            { ...selectors.scenarioFilterDemand, visualisations: ['Zone Pairs'] },
+            { ...selectors.scenarioFilterYear, visualisations: ['Zone Pairs'] },*/
             { ...selectors.timePeriod, visualisations: ['Zone Pairs'] },
             { ...selectors.userClassFilter, visualisations: ['Zone Pairs'] },
             { ...selectors.originOrDestinationFilter, visualisations: ['Zone Pairs']},

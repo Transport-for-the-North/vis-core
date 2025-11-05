@@ -11,7 +11,10 @@ import {
   isValidCondition,
   applyCondition,
   parseStringToArray,
-  isParamNameForceRequired
+  getGetParameters,
+  buildParamsMap,
+  getDefaultLayerBufferSize,
+  applyWhereConditions
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
@@ -127,9 +130,11 @@ export const MapProvider = ({ children }) => {
       const filters = [];
       const filterState = {};
       const paramNameToUuidMap = {};
+
       for (const filter of pageContext.config.filters) {
         const filterWithId = { ...filter, id: uuidv4() }; // Add unique ID to each filter
         paramNameToUuidMap[filter.paramName] = filterWithId.id; // Add mapping from paramName to UUID
+
         switch (filter.type) {
           case 'map':
           case 'slider':
@@ -138,11 +143,13 @@ export const MapProvider = ({ children }) => {
           case 'mapFeatureSelectAndPan':
             filters.push(filterWithId);
             break;
+
           default:
             switch (filter.values.source) {
               case 'local':
                 filters.push(filterWithId);
                 break;
+
               case 'api':
                 const path = '/api/tame/mvdata';
                 const dataPath = {
@@ -168,15 +175,24 @@ export const MapProvider = ({ children }) => {
                   console.error('Error fetching metadata filters', error);
                 }
                 break;
+
               case 'metadataTable':
                 const metadataTable = metadataTables[filter.values.metadataTableName];
                 if (metadataTable) {
+                  // NEW: apply "where" clause to restrict rows before building values
+                  let rows = metadataTable;
+                  if (filter.values.where) {
+                    rows = applyWhereConditions(metadataTable, filter.values.where);
+                  }
+
                   let uniqueValues = [];
-                  metadataTable.forEach(option => {
+                  rows.forEach(option => {
                     const value = {
                       displayValue: option[filter.values.displayColumn],
                       paramValue: option[filter.values.paramColumn],
-                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null
+                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null,
+                      infoOnHover: option[filter.values?.infoOnHoverColumn] ?? null,
+                      infoBelowOnChange: option[filter.values?.infoBelowOnChangeColumn] ?? null,
                     };
                     if (!isDuplicateValue(uniqueValues, value)) {
                       uniqueValues.push(value);
@@ -194,11 +210,12 @@ export const MapProvider = ({ children }) => {
                   }
 
                   filter.values.values = uniqueValues;
-                  filters.push(filterWithId);    
+                  filters.push(filterWithId);
                 } else {
                   console.error(`Metadata table ${filter.values.metadataTableName} not found`);
                 }
                 break;
+
               default:
                 console.error('Unknown filter source:', filter.values.source);
             }
@@ -206,12 +223,12 @@ export const MapProvider = ({ children }) => {
 
         // Initialize filter value if shouldBeBlankOnInit is not true
         if (!filterWithId.shouldBeBlankOnInit) {
-          if (filterWithId.multiSelect && filterWithId.shouldInitialSelectAllInMultiSelect){
+          if (filterWithId.multiSelect && filterWithId.shouldInitialSelectAllInMultiSelect) {
             filterState[filterWithId.id] =
               filterWithId.defaultValue ||
               filterWithId.min ||
-              filterWithId.values?.values?.map(item => item?.paramValue);}
-          else {
+              filterWithId.values?.values?.map(item => item?.paramValue);
+          } else {
             filterState[filterWithId.id] =
               filterWithId.defaultValue ||
               filterWithId.min ||
@@ -221,6 +238,7 @@ export const MapProvider = ({ children }) => {
           filterState[filterWithId.id] = null; // Set to null or undefined to represent no initial selection
         }
       }
+
       // Incorporate 'sides' logic
       const updatedFilters = filters.map((filter) => {
         if (filter.visualisations[0].includes('Side')) {
@@ -253,7 +271,7 @@ export const MapProvider = ({ children }) => {
         (layer) => !hasRouteParameterOrQuery(layer.path)
       );
       nonParameterisedLayers.forEach((layer) => {
-        const bufferSize = layer.geometryType === 'line' ? 7 : 0;
+        const bufferSize = getDefaultLayerBufferSize(layer.geometryType, layer?.bufferSize);
         dispatch({ type: actionTypes.ADD_LAYER, payload: { [layer.name]: { ...layer, bufferSize } } });
       });
 
@@ -263,7 +281,7 @@ export const MapProvider = ({ children }) => {
       );
       
       parameterisedLayers.forEach((layer) => {
-        const bufferSize = layer.geometryType === 'line' ? 7 : 0;
+        const bufferSize = getDefaultLayerBufferSize(layer.geometryType, layer?.bufferSize);
       
         // Extract parameters and their values from the layer path
         const allParamsWithValues = extractParamsWithValues(layer.path);
@@ -300,25 +318,25 @@ export const MapProvider = ({ children }) => {
       const visualisationConfig = pageContext.config.visualisations;
       const apiSchema = appContext.apiSchema;
       visualisationConfig.forEach((visConfig) => {
-        const queryParams = {};
         const apiRoute = visConfig.dataPath;
-        const apiParameters = apiSchema.paths[apiRoute]?.get?.parameters || [];
+
+        // Collect all GET parameters (path-level + operation-level)
+        const apiParameters = getGetParameters(apiSchema, apiRoute);
+
+        // Build query and path params maps
+        const queryParams = buildParamsMap(apiParameters, 'query', pageContext.config.filters);
+        const pathParams = buildParamsMap(apiParameters, 'path', pageContext.config.filters);
+
         const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
-      
-        apiParameters.forEach((param) => {
-          if (param.in === 'query') {
-            queryParams[param.name] = {
-              value: null,
-              required: param.required || isParamNameForceRequired(pageContext.config.filters, param.name) || false, // Use the 'required' property from the schema, default to false
-            };
-          }
-        });
-      
-        // If no parameters are marked as required, set all to required
-        const hasRequiredParams = apiParameters.some(param => param.required);
+
+        // If no parameters are marked as required in the schema, set all to required
+        const hasRequiredParams = apiParameters.some((param) => param.required);
         if (!hasRequiredParams) {
           Object.keys(queryParams).forEach((key) => {
             queryParams[key].required = true;
+          });
+          Object.keys(pathParams).forEach((key) => {
+            pathParams[key].required = true;
           });
         }
       
@@ -326,6 +344,7 @@ export const MapProvider = ({ children }) => {
           ...visConfig,
           dataPath: apiRoute,
           queryParams,
+          pathParams,
           data: [],
           paintProperty: {},
           requiresAuth,

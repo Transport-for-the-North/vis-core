@@ -50,18 +50,18 @@ export const journeyTimeZoneTotals = {
         metadataTables.userClassMetadataTable
       ],
       filters: [
-        { ...selectors.scenarioFilterNetwork, visualisations: ['Journey Time Accessibility Totals'] },
-        { ...selectors.scenarioFilterDemand, visualisations: ['Journey Time Accessibility Totals'] },
-        { ...selectors.scenarioFilterYear, visualisations: ['Journey Time Accessibility Totals'] },
         { ...selectors.scenarioCodeFilter, visualisations: ['Journey Time Accessibility Totals'], values: {
-            source: "metadataTable",
-            metadataTableName: "input_norms_scenario",
-            displayColumn: "scenario_code",
-            paramColumn: "scenario_code",
-            sort: "ascending",
-            exclude: [0]
-            }
+          source: "metadataTable",
+          metadataTableName: "input_norms_scenario",
+          displayColumn: "scenario_code",
+          paramColumn: "scenario_code",
+          sort: "ascending",
+          exclude: [0]
+          }
         },
+        /*{ ...selectors.scenarioFilterNetwork, visualisations: ['Journey Time Accessibility Totals'] },
+        { ...selectors.scenarioFilterDemand, visualisations: ['Journey Time Accessibility Totals'] },
+        { ...selectors.scenarioFilterYear, visualisations: ['Journey Time Accessibility Totals'] },*/
         { ...selectors.segmentUserClassFilter, paramName: "userClassIds", visualisations: ['Journey Time Accessibility Totals'], 
             shouldBeBlankOnInit: true,
             shouldFilterOnValidation: false,
