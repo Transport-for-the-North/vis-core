@@ -14,6 +14,7 @@ import {
   buildDefaultTooltip,
   buildLoadingTooltip,
   buildErrorTooltip,
+  buildLoadingSection,
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
 } from "utils";
@@ -378,6 +379,11 @@ const DualMaps = (props) => {
                     description = description.slice(0, lastDivIndex) + metadataDescription + description.slice(lastDivIndex);
                   }
                 }
+              }
+
+              // Insert loading section in the middle (between title and value) to show that custom data is being loaded
+              if (description) {
+                description = insertCustomIntoDefault(description, buildLoadingSection());
               }
 
               const descIndex = descriptions.length;
