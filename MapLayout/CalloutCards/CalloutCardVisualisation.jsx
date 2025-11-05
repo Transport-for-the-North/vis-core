@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
-import styled from 'styled-components';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-import DOMPurify from 'dompurify';
+import React, { useEffect, useState, useContext, useRef } from "react";
+import styled from "styled-components";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import DOMPurify from "dompurify";
 
-import { MapContext } from 'contexts';
-import { replacePlaceholders } from 'utils';
-import { Hovertip, WarningBox, ChartRenderer } from 'Components';
+import { MapContext } from "contexts";
+import { replacePlaceholders } from "utils";
+import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
@@ -19,9 +19,12 @@ const ParentContainer = styled.div`
   position: relative;
   display: flex;
   align-items: flex-start;
-  width: ${({ $isVisible }) => ($isVisible ? `${CARD_WIDTH + PADDING * 2}px` : `${TOGGLE_BUTTON_WIDTH + PADDING}px`)};
+  width: ${({ $isVisible }) =>
+    $isVisible
+      ? `${CARD_WIDTH + PADDING * 2}px`
+      : `${TOGGLE_BUTTON_WIDTH + PADDING}px`};
   transition: width 0.3s ease-in-out;
-  @media ${props => props.theme.mq.mobile} {
+  @media ${(props) => props.theme.mq.mobile} {
     width: 100%;
   }
 `;
@@ -38,14 +41,14 @@ const CardContainer = styled.div`
   padding: ${PADDING}px;
   z-index: 1000;
   transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
-  transform: translateX(${({ $isVisible }) => ($isVisible ? '0' : `100%`)});
+  transform: translateX(${({ $isVisible }) => ($isVisible ? "0" : `100%`)});
   overflow: hidden; /* Prevent content overflow */
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   flex-grow: 0;
-  height: ${({ $isVisible }) => ($isVisible ? 'auto' : `${PADDING * 2}px`)};
-  @media ${props => props.theme.mq.mobile} {
+  height: ${({ $isVisible }) => ($isVisible ? "auto" : `${PADDING * 2}px`)};
+  @media ${(props) => props.theme.mq.mobile} {
     width: 100%;
     box-shadow: none;
     flex-shrink: 1;
@@ -62,7 +65,7 @@ const CardTitle = styled.h2`
   margin-top: 5px;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
-  @media ${props => props.theme.mq.mobile} {
+  @media ${(props) => props.theme.mq.mobile} {
     font-size: 1.2em;
     text-align: left;
     margin: 0;
@@ -79,7 +82,7 @@ const CardContent = styled.div`
     font-size: 1.5em;
     color: #4b3e91;
     margin-bottom: 0.5em;
-    @media ${props => props.theme.mq.mobile} {
+    @media ${(props) => props.theme.mq.mobile} {
       font-size: 1.2em;
     }
   }
@@ -113,6 +116,30 @@ const CardContent = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: left;
   }
+  .card.small {
+    width: auto;
+    padding: 0.5em;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 0 0px;
+    justify-content: center;
+  }
+
+  .row.small {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 0 0px;
+    justify-content: center;
+  }
 
   .card .label {
     font-size: 1em;
@@ -125,6 +152,9 @@ const CardContent = styled.div`
     font-size: 2em;
     color: #4b3e91;
     font-weight: bold;
+  }
+  .card .value.small {
+    font-size: 1em;
   }
 
   @media (max-width: 900px) {
@@ -185,7 +215,6 @@ const ToggleButton = styled.button`
   transition: right 0.3s ease-in-out;
 `;
 
-
 /**
  * CalloutCardVisualisation component to display a card-like element within the map.
  *
@@ -195,10 +224,19 @@ const ToggleButton = styled.button`
  * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate, data, isLoading, hideHandleOnMobile = false, onVisibilityChange }) => {
+export const CalloutCardVisualisation = ({
+  visualisationName,
+  cardName,
+  onUpdate,
+  data,
+  isLoading,
+  hideHandleOnMobile = false,
+  onVisibilityChange,
+}) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
-  const customFormattingFunctions = visualisation.customFormattingFunctions || {};
+  const customFormattingFunctions =
+    visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
 
   // Do not render the card if no data is available,
@@ -208,7 +246,9 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
   if (
     !data ||
     Object.keys(data).length === 0 ||
-    Object.values(data).every(value => value === null || value === undefined || value === 0)
+    Object.values(data).every(
+      (value) => value === null || value === undefined || value === 0
+    )
   ) {
     hasDataShouldRender = false;
   }
@@ -217,19 +257,18 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
 
   useEffect(() => {
     if (onVisibilityChange) onVisibilityChange(actuallyVisible);
-    return () => { 
-      if (onVisibilityChange) onVisibilityChange(false); 
+    return () => {
+      if (onVisibilityChange) onVisibilityChange(false);
     };
   }, [actuallyVisible, onVisibilityChange]);
 
-
   // State to hold the rendered HTML content
-  const [renderedContent, setRenderedContent] = useState('');
+  const [renderedContent, setRenderedContent] = useState("");
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const showHandle = !hideHandleOnMobile;
   const contentRef = useRef(null); // NEW
-  const [dynamicCardTitle, setDynamicCardTitle] = useState('');
+  const [dynamicCardTitle, setDynamicCardTitle] = useState("");
 
   // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
   useEffect(() => {
@@ -244,7 +283,7 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
       setRenderedContent(sanitizedHtml);
       if (onUpdate) onUpdate();
     } else {
-      setRenderedContent('');
+      setRenderedContent("");
     }
   }, [visualisation.htmlFragment]);
 
@@ -257,14 +296,16 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
         { customFunctions: customFormattingFunctions }
       );
       // Render as plain text to avoid HTML injection in the title
-      setDynamicCardTitle(DOMPurify.sanitize(title, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }));
+      setDynamicCardTitle(
+        DOMPurify.sanitize(title, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
+      );
     } else {
-      setDynamicCardTitle('');
+      setDynamicCardTitle("");
     }
   }, [data, visualisation.cardTitle]);
 
   useEffect(() => {
-   if (hideHandleOnMobile) setIsVisible(true);
+    if (hideHandleOnMobile) setIsVisible(true);
   }, [hideHandleOnMobile]);
 
   /**
@@ -280,36 +321,40 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
     return (
       <>
         <ParentContainer $isVisible={isVisible}>
-        <CardContainer $isVisible={isVisible}>
-          <CardTitle>Loading...</CardTitle>
-          <CardContent>
-            <h3>Loading...</h3>
-          </CardContent>
-        </CardContainer>
-        {showHandle && (
-          <>
-            <ToggleButton
-              ref={buttonRef}
-              $isVisible={isVisible}
-              onClick={toggleVisibility}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {isVisible ? (
-                <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
-              ) : (
-                <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
-              )}
-            </ToggleButton>
-            <Hovertip
-              isVisible={isHovered}
-              displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
-              side="left"
-              refElement={buttonRef}
-              offset={5}
-            />
-          </>
-        )}
+          <CardContainer $isVisible={isVisible}>
+            <CardTitle>Loading...</CardTitle>
+            <CardContent>
+              <h3>Loading...</h3>
+            </CardContent>
+          </CardContainer>
+          {showHandle && (
+            <>
+              <ToggleButton
+                ref={buttonRef}
+                $isVisible={isVisible}
+                onClick={toggleVisibility}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                {isVisible ? (
+                  <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
+                ) : (
+                  <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
+                )}
+              </ToggleButton>
+              <Hovertip
+                isVisible={isHovered}
+                displayText={
+                  isVisible
+                    ? `Hide ${cardName || "Card"}`
+                    : `Show ${cardName || "Card"}`
+                }
+                side="left"
+                refElement={buttonRef}
+                offset={5}
+              />
+            </>
+          )}
         </ParentContainer>
       </>
     );
@@ -322,6 +367,85 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
 
   if (!hasDataShouldRender) {
     return null;
+  }
+
+  if (visualisation.layout && visualisation.layout.length > 0) {
+    return (
+      <ParentContainer $isVisible={isVisible}>
+        <CardContainer $isVisible={isVisible}>
+          <CardTitle>{cardName}</CardTitle>
+          {!hasDataShouldRender ? (
+            <CardContent>
+              <WarningBox text="No data available for selection" />
+            </CardContent>
+          ) : (
+            <>
+              {visualisation.layout.map((item, idx) => {
+                if (item.type === "html") {
+                  console.log("data : ", data.data);
+                  const html = replacePlaceholders(
+                    item.fragment,
+                    data, // Here you replace with the data object
+                    { customFunctions: customFormattingFunctions }
+                  );
+                  return (
+                    <CardContent
+                      key={idx}
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(html),
+                      }}
+                    />
+                  );
+                } else {
+                  const chartConfig =
+                    item.chartIndex !== undefined
+                      ? visualisation.charts[item.chartIndex]
+                      : item.chartConfig || item;
+                  return (
+                    <CardContent key={idx}>
+                      <ChartRenderer
+                        charts={[chartConfig]}
+                        data={data.data}
+                        formatters={customFormattingFunctions}
+                        barHeight={225}
+                      />
+                    </CardContent>
+                  );
+                }
+              })}
+            </>
+          )}
+        </CardContainer>
+        {showHandle && (
+          <>
+            <ToggleButton
+              ref={buttonRef}
+              $isVisible={isVisible}
+              onClick={toggleVisibility}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {isVisible ? (
+                <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
+              ) : (
+                <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
+              )}
+            </ToggleButton>
+            <Hovertip
+              isVisible={isHovered}
+              displayText={
+                isVisible
+                  ? `Hide ${cardName || "Card"}`
+                  : `Show ${cardName || "Card"}`
+              }
+              side="left"
+              refElement={buttonRef}
+              offset={5}
+            />
+          </>
+        )}
+      </ParentContainer>
+    );
   }
 
   // Render the card with dynamic content
@@ -346,13 +470,16 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
               )}
               {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}
               {renderedContent && (
-                <CardContent ref={contentRef} dangerouslySetInnerHTML={{ __html: renderedContent }} />
+                <CardContent
+                  ref={contentRef}
+                  dangerouslySetInnerHTML={{ __html: renderedContent }}
+                />
               )}
             </>
           )}
         </CardContainer>
-      {showHandle && (
-        <>
+        {showHandle && (
+          <>
             <ToggleButton
               ref={buttonRef}
               $isVisible={isVisible}
@@ -361,20 +488,24 @@ export const CalloutCardVisualisation = ({ visualisationName, cardName, onUpdate
               onMouseLeave={() => setIsHovered(false)}
             >
               {isVisible ? (
-                <ChevronRightIcon style={{ width: '20px', height: '20px' }} />
+                <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
               ) : (
-                <ChevronLeftIcon style={{ width: '20px', height: '20px' }} />
+                <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
               )}
             </ToggleButton>
             <Hovertip
               isVisible={isHovered}
-              displayText={isVisible ? `Hide ${cardName || 'Card'}` : `Show ${cardName || 'Card'}`}
+              displayText={
+                isVisible
+                  ? `Hide ${cardName || "Card"}`
+                  : `Show ${cardName || "Card"}`
+              }
               side="left"
               refElement={buttonRef}
               offset={5}
-                />
-        </>
-      )}
+            />
+          </>
+        )}
       </ParentContainer>
     </>
   );
