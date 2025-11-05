@@ -60,6 +60,22 @@ const SelectorContainer = styled.div`
 
 const NoDataParagraph = styled.p``;
 
+const StickyWarningBox = styled.div`
+  position: -webkit-sticky; /* Safari support */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.5);
+  margin: -15px -20px 10px -20px;
+  padding: 15px 20px 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% + 40px);
+  box-sizing: border-box;
+`;
+
 /**
  * Renders a section containing filter selectors for filtering and data selection.
  * @property {Object[]} filters - An array of filter objects containing information about the filters to be rendered.
@@ -136,7 +152,10 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {/* Display a warning message if no data is available - sticky at top */}
       {dataRequested && noDataAvailable && (
-        <WarningBox text={noDataMessage} isSticky={true} />
+
+        <StickyWarningBox>
+          <WarningBox text={noDataMessage} />
+        </StickyWarningBox>
       )}
       
       {isDiffPage && <InfoBox text={diffPageMessage} />}
