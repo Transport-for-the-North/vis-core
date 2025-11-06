@@ -97,7 +97,7 @@ export const useFeatureStateUpdater = () => {
 
       // Create a Set of new feature IDs from the provided data.
       const safeData = Array.isArray(data) ? data : []; // Ensure data is an array.
-      const newIDs = new Set(data.map((row) => Number(row.id)));
+      const newIDs = new Set(safeData.map((row) => Number(row.id)));
 
       // Retrieve the previous set of feature IDs for this layer from the ref, or initialize as an empty Set.
       const prevIDs = layerStatesRef.current[specifiedLayer.name] || new Set();
