@@ -134,6 +134,11 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
+      {/* Display a warning message if no data is available - sticky at top */}
+      {dataRequested && noDataAvailable && (
+        <WarningBox text={noDataMessage} isSticky={true} />
+      )}
+      
       {isDiffPage && <InfoBox text={diffPageMessage} />}
       {isTrsePage && <InfoBox text={trsePageMessage} />}
 
@@ -141,11 +146,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       {mapFilters.map((filter) => (
         <InfoBox key={filter.id} text={filter.filterName} />
       ))}
-
-      {/* Display a warning message if no data is available */}
-      {dataRequested && noDataAvailable && (
-        <WarningBox text={noDataMessage} />
-      )}
 
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
@@ -243,11 +243,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         </>
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
-      )}
-
-      {/* Display a warning message if no data is available */}
-      {dataRequested && noDataAvailable && (
-        <WarningBox text={noDataMessage} />
       )}
     </AccordionSection>
   );
