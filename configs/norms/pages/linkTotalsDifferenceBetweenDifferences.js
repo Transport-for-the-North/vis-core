@@ -3,7 +3,7 @@ import { termsOfUse } from "../termsOfUse";
 import { metadataTables } from '../metadataTables';
 
 export const linkTotalsDifferenceBetweenDifferences = {
-    pageName: "Link Totals Difference (4-3) - (2-1)",
+    pageName: "Link Totals Differences ((4-3) - (2-1))",
     url: "/norms-link-result-difference-between-differences",
     type: "MapLayout",
     legalText: termsOfUse,
