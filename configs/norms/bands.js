@@ -34,9 +34,9 @@ export const bands = [
             },
             {
                 name: "Passengers Over Seating Capacity",
-                values: [0,100, 250, 500, 1000, 2000, 5000, 7000 ],
-                differenceValues: [-7000, -5000, -2000, -500, -100, 0, 100, 500, 2000, 5000, 7000],
-                colours: ["#FFE5E5","#FFB3B3","#FF8080","#FF4D4D","#FF1A1A","#CC0000","#990000","#660000"]
+                values: [0, 100, 500, 1000, 2000, 7000 ],
+                differenceValues: [-7000, -2000, -500, -100, 0, 100, 500, 2000, 7000],
+                colours: ["#FF8080","#FF4D4D","#FF1A1A","#CC0000","#990000","#660000"]
             },
             {
                 name: "Excess Seating",
