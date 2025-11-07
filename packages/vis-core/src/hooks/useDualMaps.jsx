@@ -33,7 +33,7 @@ export const useDualMaps = (
      */
     const initializeDualMap = () => {
       const commonOptions = {
-        style: mapStyle || defaultMapStyle(),
+        style: mapStyle || defaultMapStyle,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         // maxZoom: 16,
@@ -48,7 +48,7 @@ export const useDualMaps = (
         transformRequest: (url, resourceType) => {
           if (resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
             url = new URL(url);
-            if (!url.searchParams.has('key')) url.searchParams.append('key', getMapApiToken());
+            if (!url.searchParams.has('key')) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
             if (!url.searchParams.has('srs')) url.searchParams.append('srs', 3857);
             return {
               url: new Request(url).url
@@ -60,9 +60,9 @@ export const useDualMaps = (
       const leftMapInstance = new maplibregl.Map({
         container: leftMapContainerRef.current,
         ...commonOptions,
-      });
-      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
-      leftMapInstance.on("load", () => {
+      })
+        .on("style.load", () => setIsMapStyleLoaded(true))
+        .on("load", () => {
           setIsMapLoaded(true);
         });
       leftMapInstance.addControl(
@@ -74,9 +74,9 @@ export const useDualMaps = (
       const rightMapInstance = new maplibregl.Map({
         container: rightMapContainerRef.current,
         ...commonOptions,
-      });
-      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
-      rightMapInstance.on("load", () => {
+      })
+        .on("style.load", () => setIsMapStyleLoaded(true))
+        .on("load", () => {
           setIsMapLoaded(true);
         });
       rightMapInstance.addControl(
