@@ -3,6 +3,7 @@ import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { MapContext } from "contexts";
 import userEvent from "@testing-library/user-event";
 import { useFetchVisualisationData } from "hooks";
+import { ThemeProvider } from "styled-components";
 
 jest.mock("@heroicons/react/24/solid", () => ({
   ChevronRightIcon: (props) => <span>ChevronRight</span>,
@@ -28,28 +29,15 @@ let mockMapContext = {
     mapZoom: 10,
     layers: {},
     visualisations: {
-      climate: {
-        id: "climate",
-        name: "Climate Visualisation",
-        legend: ["Low", "Medium", "High"],
-        data: [],
-        customFormattingFunctions: jest.fn(),
-        htmlFragment: "<p>ImAHtmlFragment</p>",
-        metadata: {
-          source: "NASA",
-          updated: "2025-08-27",
-        },
-      },
-      biodiversity: {
-        id: "biodiversity",
-        name: "Biodiversity Visualisation",
-        legend: ["Rare", "Common"],
-        data: [],
-        customFormattingFunctions: jest.fn(),
-        metadata: {
-          source: "UNEP",
-          updated: "2025-08-20",
-        },
+      test: {
+        name: "Detailed Information",
+        type: "calloutCard",
+        cardType: "fullscreen",
+        cardName: "",
+        dataSource: "api",
+        dataPath: "/api/avp/pca/locations/{id}",
+        htmlFragment:
+          "<p>{programme_id}-{label}-{location_id}-{text_with_placeholders}</p>",
       },
     },
     metadataTables: {},
@@ -76,30 +64,39 @@ let mockMapContext = {
   dispatch: jest.fn(),
 };
 
+const theme = {
+  mq: { mpbile: false },
+};
+
 let props = {
-  visualisationName: "climate",
   cardName: "cardName",
   onUpdate: jest.fn(),
+  data: {
+    programme_id: 1,
+    label: "label",
+    location_id: "location_id",
+    text_with_placeholders: "text_with_placeholders",
+  },
+  isLoading: false,
+  visualisationName: "test",
 };
 describe("Tests when useFetchVisualisationData return valid values", () => {
-  beforeEach(() => {
-    useFetchVisualisationData.mockReturnValue({
-      isLoading: false, // Not loading
-      data: { visualisation: "visualisation" }, // Valid data
-    });
-  });
   afterEach(() => {
     jest.clearAllMocks();
   });
   it("Test the render of the html fragment, and the click on the toggle button", async () => {
     render(
-      <MapContext.Provider value={mockMapContext}>
-        <CalloutCardVisualisation {...props} />
-      </MapContext.Provider>
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} />
+        </MapContext.Provider>
+      </ThemeProvider>
     );
     expect(screen.getByText("cardName")).toBeInTheDocument();
     // Html fragment
-    const htmlFragment = screen.getByText("ImAHtmlFragment");
+    const htmlFragment = screen.getByText(
+      "1-label-location_id-text_with_placeholders"
+    );
     expect(htmlFragment).toBeInTheDocument();
     expect(htmlFragment.tagName).toBe("P"); // To be a <p/> element
     // check the button
@@ -112,9 +109,11 @@ describe("Tests when useFetchVisualisationData return valid values", () => {
 
   it("Function onUpdate have been called", () => {
     render(
-      <MapContext.Provider value={mockMapContext}>
-        <CalloutCardVisualisation {...props} />
-      </MapContext.Provider>
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} />
+        </MapContext.Provider>
+      </ThemeProvider>
     );
     // customFormattingFunctions function to have been called
     expect(props.onUpdate).toHaveBeenCalled();
@@ -122,20 +121,20 @@ describe("Tests when useFetchVisualisationData return valid values", () => {
 });
 
 describe("Tests when useFetchVisualisationData return isLoading", () => {
-  beforeEach(() => {
-    useFetchVisualisationData.mockReturnValue({
-      isLoading: true, // Loading
-      data: { visualisation: "visualisation" }, // Unvalid data
-    });
-  });
+  const propsWithLoading = {
+    ...props,
+    isLoading: true
+  }
   afterEach(() => {
     jest.clearAllMocks();
   });
   it("Check the isLoading texts", () => {
     render(
-      <MapContext.Provider value={mockMapContext}>
-        <CalloutCardVisualisation {...props} />
-      </MapContext.Provider>
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...propsWithLoading} />
+        </MapContext.Provider>
+      </ThemeProvider>
     );
     const textsIsLoading = screen.getAllByText("Loading...");
     const h2Element = textsIsLoading.find((el) => el.tagName === "H2");
@@ -145,9 +144,11 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
   });
   it("Click on the toggle button", async () => {
     render(
-      <MapContext.Provider value={mockMapContext}>
-        <CalloutCardVisualisation {...props} />
-      </MapContext.Provider>
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} />
+        </MapContext.Provider>
+      </ThemeProvider>
     );
     expect(screen.getByText("ChevronRight")).toBeInTheDocument();
     const toggleButton = screen.getByRole("button");
@@ -157,20 +158,22 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
 });
 
 describe("Tests when isLoading is false and without data", () => {
-  beforeEach(() => {
-    useFetchVisualisationData.mockReturnValue({
-      isLoading: false, // Not loading
-      data: undefined, // Undefined data
-    });
-  });
+  const propsEmpty = {
+    ...props,
+    data: undefined,
+    isLoading: undefined,
+    visualisationName: "test"
+  }
   afterEach(() => {
     jest.clearAllMocks();
   });
   it("Check the empty returned", () => {
     const { container } = render(
-      <MapContext.Provider value={mockMapContext}>
-        <CalloutCardVisualisation {...props} />
-      </MapContext.Provider>
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...propsEmpty} />
+        </MapContext.Provider>
+      </ThemeProvider>
     );
     expect(container).toBeEmptyDOMElement();
   });
