@@ -149,7 +149,7 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
   let result = htmlFragment;
 
   // Step 1: Handle colon syntax {functionName:argKey}
-  result = result.replace(/\{(\w+):([a-zA-Z0-9_]+)\}/g, (match, functionName, argKey) => {
+  result = result.replace(/\{(\w+):([a-zA-Z0-9_.]+)\}/g, (match, functionName, argKey) => {
     const arg = data[argKey];
     
     // If arg is undefined, return the original placeholder
@@ -192,7 +192,14 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
     const func = allowedFunctions[functionName];
     if (func && typeof func === 'function') {
       try {
-        return func(arg);
+        // Check function parameter count to determine how to call it
+        if (func.length >= 2) {
+          // Functions with 2+ parameters get both value and full data object
+          return func(arg, data);
+        } else {
+          // Functions with 1 parameter get just the value
+          return func(arg);
+        }
       } catch (error) {
         console.warn(`Error applying function ${functionName}:`, error);
         return String(arg);
@@ -281,6 +288,40 @@ export function isParamNameForceRequired(filters, targetParamName) {
   return filter ? filter.forceRequired === true : false;
 }
 
+
+/**
+ * Build a params map for a given parameter location ("query" or "path") from OpenAPI parameter definitions.
+ *
+ * - Path params are set required by default (per OpenAPI spec), but we still honor 'required' and
+ *   any "force required" logic from filters.
+ * - Query params use the schema's 'required' flag, optionally overridden by your filter rules.
+ * - Default values from the parameter schema are used when present; otherwise null.
+ *
+ * @param {Array<Object>} parameters - Array of OpenAPI parameter definitions.
+ * @param {"query"|"path"} location - The parameter location to extract.
+ * @param {Object} filters - Page filters (used by isParamNameForceRequired to optionally force required).
+ * @returns {Object<string, {value:any, required:boolean}>} - A params map suitable for your visualisation state.
+ */
+export function buildParamsMap(parameters, location, filters) {
+  const map = {};
+  parameters.forEach((param) => {
+    if (param.in !== location) return;
+
+    const forcedRequired = isParamNameForceRequired(filters, param.name);
+    // Per OpenAPI, path params must be required; we keep that behavior but still allow explicit config.
+    const required =
+      location === 'path' ? true : Boolean(param.required || forcedRequired);
+
+    const defaultValue = param?.schema?.default ?? null;
+
+    map[param.name] = {
+      value: defaultValue,
+      required,
+    };
+  });
+  return map;
+}
+
 // Function to detect if the OS is Windows 10 or lower
 export function isWindows10OrLower() {
   const { userAgent } = navigator;
@@ -315,4 +356,48 @@ export const getScrollbarWidth = (scrollbarWidthProp) => {
   outer.parentNode.removeChild(outer);
 
   return scrollbarWidth;
+};
+
+
+/**
+ * Apply one or multiple "where" conditions to a dataset (array of row objects).
+ *
+ * @param {Array<Object>} rows - The input dataset rows.
+ * @param {Object|Array<Object>} where - A single condition or an array of conditions.
+ * @returns {Array<Object>} - Rows that pass all conditions.
+ *
+ * Condition shape:
+ *   {
+ *     column: string,
+ *     values: any | any[],
+ *     operator?: 'in' | 'notIn' | 'equals'
+ *   }
+ */
+export const applyWhereConditions = (rows, where) => {
+  const conditions = Array.isArray(where) ? where : [where];
+
+  return rows.filter((row) => {
+    // AND all conditions
+    return conditions.every((cond) => {
+      if (!cond || !cond.column) return true; // ignore malformed condition
+
+      const operator = cond.operator || 'in';
+      const rowValue = row[cond.column];
+
+      // Normalize condition values to an array for 'in'/'notIn', and a single value for 'equals'
+      const rawValues = cond.values;
+      const valuesArray = Array.isArray(rawValues) ? rawValues : [rawValues];
+      const equalsValue = Array.isArray(rawValues) ? rawValues[0] : rawValues;
+
+      switch (operator) {
+        case 'equals':
+          return rowValue === equalsValue;
+        case 'notIn':
+          return !valuesArray.includes(rowValue);
+        case 'in':
+        default:
+          return valuesArray.includes(rowValue);
+      }
+    });
+  });
 };

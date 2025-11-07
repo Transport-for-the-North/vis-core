@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
@@ -42,6 +42,7 @@ const Map = (props) => {
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
+  const sidebarIsOpen = props.sidebarIsOpen
   
   // Refs to manage hover state
   const hoverEventIdRef = useRef(0);
@@ -253,8 +254,37 @@ const Map = (props) => {
         return;
       }
 
-      // Collect current hovered features
-      const currentHoveredFeatures = features.map((feature) => ({
+      // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
+      const filteredFeatures = features.filter((feature) => {
+        const layerId = feature.layer.id;
+        const layerConfig = state.layers[layerId];
+        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+        const featureValue = feature.state.value;
+        
+        // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
+        if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
+          return false; // Exclude this feature as it has no data
+        }
+        
+        return true; // Include this feature
+      });
+
+      // If after filtering we have no features, cleanup and return
+      if (filteredFeatures.length === 0) {
+        if (hoverInfoRef.current.popup) {
+          hoverInfoRef.current.popup.remove();
+          hoverInfoRef.current.popup = null;
+        }
+        // Clear hover state for previously hovered features
+        prevHoveredFeaturesRef.current.forEach(({ source, sourceLayer, featureId }) => {
+          map.setFeatureState({ source, id: featureId, sourceLayer }, { hover: false });
+        });
+        prevHoveredFeaturesRef.current = [];
+        return;
+      }
+
+      // Collect current hovered features (using filtered features)
+      const currentHoveredFeatures = filteredFeatures.map((feature) => ({
         layerId: feature.layer.id,
         featureId: feature.id,
         source: feature.layer.source,
@@ -353,12 +383,13 @@ const Map = (props) => {
       let descriptions = [];
       const apiRequests = [];
 
-      features.forEach((feature) => {
+      filteredFeatures.forEach((feature) => {
         const layerId = feature.layer.id;
         const layerConfig = state.layers[layerId];
         const customTooltip = layerConfig?.customTooltip;
         const hoverNulls = layerConfig.hoverNulls ?? true;
         const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
+        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
         const featureValue = feature.state.value;
         if (
@@ -366,6 +397,14 @@ const Map = (props) => {
           (featureValue === null || featureValue === undefined)
         ) {
           return; // Skip this feature
+        }
+
+        // If shouldHaveHoverOnlyOnData is enabled, only show hover for features with data
+        if (
+          shouldHaveHoverOnlyOnData &&
+          (featureValue === null || featureValue === undefined)
+        ) {
+          return; // Skip this feature as it has no data
         }
 
         const featureName = feature.properties.name || "";
@@ -1045,6 +1084,7 @@ const Map = (props) => {
         visualisationConfigs={state.visualisations}
         map={map}
         maps={null}
+        sidebarIsOpen={sidebarIsOpen}
       />}
       {isMapReady && <DynamicLegend map={map} />}
     </StyledMapContainer>

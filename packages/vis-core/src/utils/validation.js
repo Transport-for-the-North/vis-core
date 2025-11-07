@@ -73,7 +73,7 @@ export function updateFilterValidity(state, filterState) {
 
     // Create a new filters array with updated isValid values
     const updatedFilters = state.filters.map(filter => {
-        if (filter.values && filter.values.metadataTableName) {
+        if (filter.values && filter.values.metadataTableName && filter.shouldBeValidated) {
             const updatedValues = filter.values.values.map(value => ({
                 ...value,
                 isValid: validValuesMap[filter.id].has(value.paramValue),

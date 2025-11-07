@@ -1,42 +1,53 @@
 /**
  * Checks if the given path contains route parameters.
+ * Supports both "{param}" and ":param" styles, excluding tile placeholders {z}/{x}/{y}.
  * @function hasRouteParameter
  * @param {string} path - The path to check for route parameters.
  * @returns {boolean} True if the path contains route parameters, otherwise false.
  */
 export const hasRouteParameter = (path) => {
-  // Check if the path contains at least one "{parameter}" other than "{z}/{x}/{y}"
-  const parameterPattern = /\{(?![zyx]\})[^{}]+\}/; // Matches any parameter that is not {z}, {x}, or {y}
-  return parameterPattern.test(path);
+  const curlyPattern = /\{(?![zyx]\})[^{}]+\}/; // exclude {z}, {x}, {y}
+  const colonPattern = /\/:(?![zyx]\b)[A-Za-z0-9_]+/; // exclude :z, :x, :y
+  return curlyPattern.test(path) || colonPattern.test(path);
 };
 
 /**
  * Checks if the given path contains route parameters or query parameters.
+ * Supports both "{param}" and ":param" styles for route placeholders.
  * @function hasRouteParameterOrQuery
  * @param {string} path - The path to check for route or query parameters.
  * @returns {boolean} True if the path contains route or query parameters, otherwise false.
  */
 export const hasRouteParameterOrQuery = (path) => {
   // Check if the path contains at least one "{parameter}" other than "{z}/{x}/{y}"
-  const routeParameterPattern = /\{(?![zyx]\})[^{}]+\}/; // Matches any route parameter that is not {z}, {x}, or {y}
-
+  const routeParameterPatternCurly = /\{(?![zyx]\})[^{}]+\}/;
+  const routeParameterPatternColon = /\/:(?![zyx]\b)[A-Za-z0-9_]+/;
+  
   // Check if the path contains query parameters, indicated by a "?" followed by "key=value" pairs
   const queryParameterPattern = /\?.+=.+/; // Matches the presence of query parameters
-
   // Return true if either route parameters or query parameters are found
-  return routeParameterPattern.test(path) || queryParameterPattern.test(path);
+  return (
+    routeParameterPatternCurly.test(path) ||
+    routeParameterPatternColon.test(path) ||
+    queryParameterPattern.test(path)
+  );
 };
 
 /**
  * Replaces a route parameter in the given path with a new value.
+ * Encodes the value and supports both "{param}" and ":param" styles.
  * @function replaceRouteParameter
  * @param {string} path - The path containing the parameter to replace.
  * @param {string} paramName - The name of the parameter to replace.
- * @param {string} paramValue - The new value to replace the parameter with.
+ * @param {string|number} paramValue - The new value to replace the parameter with.
  * @returns {string} The path with the parameter replaced by the new value.
  */
-export const replaceRouteParameter = (path, paramName, paramValue) =>
-  path.replace(`{${paramName}}`, paramValue);
+export const replaceRouteParameter = (path, paramName, paramValue) => {
+  const encoded = encodeURIComponent(String(paramValue));
+  return path
+    .replace(new RegExp(`\\{${paramName}\\}`, "g"), encoded)
+    .replace(new RegExp(`/:${paramName}(?=/|$)`, "g"), `/${encoded}`);
+};
 
 /**
  * Checks if the specified API route in the given API schema has security requirements.
@@ -73,6 +84,61 @@ export const checkSecurityRequirements = (apiSchema, apiRoute) => {
 };
 
 /**
+ * Normalises a parameter value:
+ * - Arrays can be joined according to a style ("comma" for query, "slash" for path).
+ * - Non-arrays are returned as-is.
+ * @param {any} value - The raw value to normalize.
+ * @param {"comma"|"slash"} [joinStyle="comma"] - How to join array values.
+ * @returns {string|number} The normalized value.
+ */
+export const normaliseParamValue = (value, joinStyle = "comma") => {
+  if (Array.isArray(value)) {
+    const delimiter = joinStyle === "slash" ? "/" : ",";
+    return value.join(delimiter);
+  }
+  return value;
+};
+
+/**
+ * Applies path parameters to a template path by replacing placeholders with provided values.
+ * Supports two placeholder styles:
+ * - RFC style: /resource/{id}
+ * - Express style: /resource/:id
+ *
+ * Values are URL-encoded. Array values are joined based on arrayStyle.
+ *
+ * @param {string} templatePath - The path that may contain placeholders.
+ * @param {Object} [pathParams={}] - A map of placeholder name to value.
+ * @param {Object} [opts] - Options controlling replacement behavior.
+ * @param {boolean} [opts.allowMissing=false] - If false, throws when a placeholder is missing in pathParams.
+ * @param {"comma"|"slash"} [opts.arrayStyle="slash"] - How to join array values in a single placeholder.
+ * @returns {string} The path with placeholders replaced.
+ * @throws {Error} If a placeholder is missing and allowMissing is false.
+ */
+export const applyPathParams = (
+  templatePath,
+  pathParams = {},
+  opts = { allowMissing: false, arrayStyle: "slash" }
+) => {
+  const { allowMissing = false, arrayStyle = "slash" } = opts;
+
+  const placeholderRegex = /:([A-Za-z0-9_]+)|\{([A-Za-z0-9_]+)\}/g;
+
+  return templatePath.replace(placeholderRegex, (match, expressName, rfcName) => {
+    const name = expressName || rfcName;
+    const rawVal = pathParams[name];
+
+    if (rawVal === undefined || rawVal === null) {
+      if (allowMissing) return match;
+      throw new Error(`Missing path param "${name}" for path "${templatePath}"`);
+    }
+
+    const normalized = normaliseParamValue(rawVal, arrayStyle);
+    return encodeURIComponent(String(normalized));
+  });
+};
+
+/**
  * Updates a URL based on a template by merging route values from the current URL with
  * new values provided via params. Query parameters are updated only if every route
  * placeholder is fulfilled—except for the excluded ones ("x", "y", and "z"), which
@@ -84,11 +150,14 @@ export const checkSecurityRequirements = (apiSchema, apiRoute) => {
  * @param {string} template - A URL template.
  *   E.g. "/api/vectortiles/noham_nodes/{z}/{x}/{y}?network_scenario_name={networkScenarioName}&network_year={year}&demand_scenario_name={demandScenarioName}&demand_year={year}&time_period_code={timePeriodCode}"
  * @param {string} current - The current URL (path + query).
- * @param {Object} params - New parameter values that override existing ones.
+ * @param {Object} params - New parameter values that override existing ones (applies to both path and query placeholders).
+ * @param {Object} [opts] - Options controlling replacement behavior.
+ * @param {"comma"|"slash"} [opts.pathArrayStyle="slash"] - Join style for array-valued path params.
  * @returns {string} - The updated URL.
  */
-export const updateUrlParameters = (template, current, params) => {
+export const updateUrlParameters = (template, current, params, opts = { pathArrayStyle: "slash" }) => {
   const excluded = new Set(["x", "y", "z"]);
+  const { pathArrayStyle = "comma" } = opts;
 
   // Split the current URL into path and query components.
   const [currentPath, currentQuery = ""] = current.split("?");
@@ -97,7 +166,7 @@ export const updateUrlParameters = (template, current, params) => {
 
   // --- Process the path portion ---
 
-  // Extract all placeholder names from the unencoded template path.
+  // Extract all placeholder names from the unencoded template path (curly-brace style only).
   const paramNames = [];
   templatePath.replace(/\{([^}]+)\}/g, (_, name) => {
     paramNames.push(name);
@@ -117,26 +186,25 @@ export const updateUrlParameters = (template, current, params) => {
 
   // Create a "resolved" mapping using new params or fallback to values extracted from currentRoute.
   const resolved = {};
-  paramNames.forEach(name => {
+  paramNames.forEach((name) => {
     if (Object.prototype.hasOwnProperty.call(params, name)) {
       resolved[name] = params[name];
-    } else if (currentRoute.hasOwnProperty(name)) {
+    } else if (Object.prototype.hasOwnProperty.call(currentRoute, name)) {
       resolved[name] = currentRoute[name];
     }
   });
 
   // Determine if any non-excluded placeholders remain unresolved by using the original list.
   const hasUnresolvedNonExcluded = paramNames.some(
-    name => !(name in resolved) && !excluded.has(name)
+    (name) => !(name in resolved) && !excluded.has(name)
   );
 
-  // Replace placeholders in the template path.
-  // Resolved values are encoded, while unresolved ones remain as "{name}".
-  let updatedPath = templatePath.replace(/\{([^}]+)\}/g, (_, name) =>
-    resolved.hasOwnProperty(name)
-      ? encodeURIComponent(String(resolved[name]))
-      : `{${name}}`
-  );
+  // Replace placeholders in the template path using applyPathParams.
+  // Resolved values are encoded, while unresolved ones remain as "{name}"
+  const updatedPath = applyPathParams(templatePath, resolved, {
+    allowMissing: true,
+    arrayStyle: pathArrayStyle,
+  });
 
   // --- Process the query portion ---
 
@@ -152,7 +220,8 @@ export const updateUrlParameters = (template, current, params) => {
       for (const [key, value] of templateQueryParams.entries()) {
         const newVal = value.replace(/\{([^}]+)\}/g, (_, pName) => {
           if (Object.prototype.hasOwnProperty.call(params, pName)) {
-            return params[pName];
+            const normalised = normaliseParamValue(params[pName], "comma");
+            return String(normalised);
           } else if (currentQueryParams.has(key)) {
             return currentQueryParams.get(key);
           }
@@ -179,14 +248,15 @@ export const updateUrlParameters = (template, current, params) => {
 };
 
 /**
- * Extracts route parameters enclosed in curly braces from the given URL path.
+ * Extracts route parameters enclosed in curly braces, and also supports ":param" style.
  *
  * @param {string} url - The URL or path from which to extract route parameters.
- * @returns {string[]} An array of route parameter names without curly braces.
+ * @returns {string[]} An array of route parameter names without curly braces or colons.
  */
 export function extractRouteParams(url) {
-  const matches = [...url.matchAll(/\{([^}]+)\}/g)];
-  return matches.map((match) => match[1]);
+  const curlyMatches = [...url.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
+  const colonMatches = [...url.matchAll(/\/:([A-Za-z0-9_]+)/g)].map((m) => m[1]);
+  return [...curlyMatches, ...colonMatches];
 }
 
 /**
@@ -197,8 +267,7 @@ export function extractRouteParams(url) {
  */
 export function extractQueryParams(url) {
   const queryParams = [];
-  const queryStringStart = url.indexOf('?');
-
+  const queryStringStart = url.indexOf("?");
   if (queryStringStart !== -1) {
     const queryString = url.substring(queryStringStart + 1);
     const urlSearchParams = new URLSearchParams(queryString);
@@ -234,9 +303,9 @@ export function extractAllParams(url) {
  *                   The keys are parameter names, and the values are the parameter values or undefined if not specified.
  */
 export function extractParamsWithValues(layerPath) {
-  const [pathPart, queryPart] = layerPath.split('?');
+  const [pathPart, queryPart] = layerPath.split("?");
 
-  // Extract route parameters from the path
+  // Extract route parameters from the path (curly-style with optional default values)
   const routeParamRegex = /{([^}]+)}/g;
   let match;
   const routeParams = {};
@@ -247,25 +316,31 @@ export function extractParamsWithValues(layerPath) {
     let paramValue;
 
     // Check if parameter includes a default value, e.g., {param=defaultValue}
-    if (param.includes('=')) {
-      [paramName, paramValue] = param.split('=');
+    if (param.includes("=")) {
+      [paramName, paramValue] = param.split("=");
     }
 
     routeParams[paramName] = paramValue; // Value may be undefined
   }
 
+  // Also support :param (no default support)
+  for (const m of pathPart.matchAll(/\/:([A-Za-z0-9_]+)/g)) {
+    const name = m[1];
+    // If it already exists from curly parsing, keep that value; otherwise set undefined
+    if (!(name in routeParams)) {
+      routeParams[name] = undefined;
+    }
+  }
+
   // Extract query parameters
   const queryParams = {};
   if (queryPart) {
-    const params = queryPart.split('&');
+    const params = queryPart.split("&");
     params.forEach((param) => {
-      const [key, value] = param.split('=');
-      if (
-        value.includes('{') &&
-        value.includes('}')
-      ) {
+      const [key, value = ""] = param.split("=");
+      if (value.includes("{") && value.includes("}")) {
         // It's a parameter placeholder in the query, e.g., ?param={paramName}
-        const paramName = value.replace(/{|}/g, '');
+        const paramName = value.replace(/{|}/g, "");
         queryParams[paramName] = undefined;
       } else {
         queryParams[key] = value;
@@ -274,6 +349,47 @@ export function extractParamsWithValues(layerPath) {
   }
 
   return { ...routeParams, ...queryParams };
+}
+
+/**
+ * Extracts parameters and their values from a layer path, separated into path and query maps.
+ *
+ * @param {string} layerPath - The path of the layer which may contain route and query parameters.
+ * @returns {{pathParams: Object, queryParams: Object}} Separate maps for path and query parameters.
+ */
+export function extractParamsWithValuesSeparated(layerPath) {
+  const [pathPart, queryPart] = layerPath.split("?");
+
+  // Route params from curly with defaults
+  const pathParams = {};
+  for (const m of pathPart.matchAll(/\{([^}]+)\}/g)) {
+    const raw = m[1];
+    if (raw.includes("=")) {
+      const [name, value] = raw.split("=");
+      pathParams[name] = value;
+    } else {
+      pathParams[raw] = undefined;
+    }
+  }
+  // Add :param without defaults
+  for (const m of pathPart.matchAll(/\/:([A-Za-z0-9_]+)/g)) {
+    const name = m[1];
+    if (!(name in pathParams)) pathParams[name] = undefined;
+  }
+
+  const queryParams = {};
+  if (queryPart) {
+    const urlSearchParams = new URLSearchParams(queryPart);
+    for (const [key, value] of urlSearchParams.entries()) {
+      if (/\{[^}]+\}/.test(value)) {
+        queryParams[value.replace(/{|}/g, "")] = undefined;
+      } else {
+        queryParams[key] = value;
+      }
+    }
+  }
+
+  return { pathParams, queryParams };
 }
 
 /**
@@ -295,7 +411,7 @@ export function processParameters(allParamsWithValues, filters, excludedParams) 
   const missingParams = [];
 
   Object.entries(allParamsWithValues).forEach(([paramName, paramValue]) => {
-    if (paramValue !== '' && paramValue !== undefined) {
+    if (paramValue !== "" && paramValue !== undefined) {
       // Use the value specified in the layer.path
       params[paramName] = paramValue;
     } else {
@@ -314,4 +430,32 @@ export function processParameters(allParamsWithValues, filters, excludedParams) 
   });
 
   return { params, missingParams };
+}
+
+/**
+ * Merge GET parameters from both path-level and operation-level definitions in the OpenAPI schema.
+ *
+ * OpenAPI allows parameters to be defined at the path-item level (e.g., /users/{id})
+ * and/or at the operation level (e.g., GET /users/{id}). This helper collects and
+ * deduplicates them by (in, name).
+ *
+ * @param {Object} apiSchema - The OpenAPI schema object.
+ * @param {string} apiRoute - The path key in the schema (e.g., "/users/{id}").
+ * @returns {Array<Object>} - Array of parameter objects for the GET operation.
+ */
+export function getGetParameters(apiSchema, apiRoute) {
+  const pathItem = apiSchema.paths?.[apiRoute] || {};
+  const pathLevelParams = Array.isArray(pathItem.parameters) ? pathItem.parameters : [];
+  const op = pathItem.get || {};
+  const opLevelParams = Array.isArray(op.parameters) ? op.parameters : [];
+
+  const all = [...pathLevelParams, ...opLevelParams];
+  const seen = new Set();
+
+  return all.filter((p) => {
+    const key = `${p.in}:${p.name}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

@@ -25,7 +25,7 @@ export const AccordionIcon = styled.span`
 `;
 
 const AccordionContent = styled.div`
-  overflow: hidden;
+  overflow: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
   transition: max-height 0.3s ease, padding 0.3s ease;
   padding: ${({ $isOpen }) => ($isOpen ? '15px' : '0')} 20px;
   background-color: #fff;
@@ -54,7 +54,7 @@ export const AccordionSection = ({ title, children, defaultValue }) => {
         {title}
         <AccordionIcon $isOpen={isOpen} />
       </AccordionHeader>
-      <AccordionContent $isOpen={isOpen}>
+      <AccordionContent $isOpen={isOpen} className="selectable-text">
         {isOpen && children}
       </AccordionContent>
     </>

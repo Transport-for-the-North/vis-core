@@ -9,10 +9,9 @@ import {
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown } from "../Selectors";
-import { SelectorLabel } from "../Selectors/SelectorLabel";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
-import { calculateMaxWidthFactor, MAP_CONSTANTS, applyWidthFactor} from "utils/map"
+import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression} from "utils/map"
 
 /**
  * Styled container for the layer control entry.
@@ -253,6 +252,8 @@ export const LayerControlEntry = memo(
     
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
+      const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
+      const showWidth = isFeatureStateWidthExpression;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
       : currentWidthFactor;
@@ -261,35 +262,36 @@ export const LayerControlEntry = memo(
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
     const [widthFactor, setWidth] = useState(initialWidth || 1);
 
+    /**
+     * Toggle both the layer and its label layer visibility across all maps.
+     *
+     * This flips the local `visibility` state and applies the same visibility to
+     * the base layer and its "-label" companion (if present) so they remain in sync.
+     */
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
+      const ids = [layer.id, `${layer.id}-label`];
+
       maps.forEach((map) => {
-        if (map.getLayer(layer.id)) {
-          map.setLayoutProperty(layer.id, "visibility", newVisibility);
-        }
+        ids.forEach((id) => {
+          if (map.getLayer(id)) {
+            map.setLayoutProperty(id, "visibility", newVisibility);
+          }
+        });
       });
+
       setVisibility(newVisibility);
     };
 
     const handleOpacityChange = (e) => {
       const newOpacity = parseFloat(e.target.value);
       const opacityProp = getOpacityProperty(layer.type);
-      let opacityExpression;
-
-      if (isFeatureStateExpression) {
-        opacityExpression = [
-          "case",
-          ["in", ["feature-state", "value"], ["literal", [0, null]]],
-          0,
-          newOpacity,
-        ];
-      } else {
-        opacityExpression = newOpacity;
-      }
 
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
-          map.setPaintProperty(layer.id, opacityProp, opacityExpression);
+          const currentExpr = map.getPaintProperty(layer.id, opacityProp);
+          const updatedExpr = updateOpacityExpression(currentExpr, newOpacity);
+          map.setPaintProperty(layer.id, opacityProp, updatedExpr);
         }
       });
       setOpacity(newOpacity);
@@ -307,7 +309,10 @@ export const LayerControlEntry = memo(
     };
 
     const handleWidthFactorChange = (e) => {
-      const widthFactor = parseFloat(e.target.value);
+      const raw = parseFloat(e.target.value);
+      const min = isNodeLayer ? 0.1 : 0.5;
+      const max = isNodeLayer ? 2.5 : 10;
+      const widthFactor = Math.max(min, Math.min(max, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
     
       if (isFeatureStateWidthExpression) {
@@ -384,29 +389,29 @@ export const LayerControlEntry = memo(
             <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
           </OpacityControl>)}
           {/* Width Control (if applicable) */}
-          {isFeatureStateWidthExpression && ( 
-                <>
-                <WidthControl>
-                <ControlLabel htmlFor={`width-${layer.id}`}>
-                  Width factor
-                </ControlLabel>
-                
-                  <Slider
-                    id={`width-${layer.id}`}
-                    type="range"
-                    min="0.5"
-                    max="10"
-                    step="0.1"
-                    value={widthFactor}
-                    onChange={handleWidthFactorChange}
-                  />
-                  <SliderValue>{(widthFactor).toFixed(1)}</SliderValue>
-                </WidthControl>
-                </>)}
+          {showWidth && (
+            <WidthControl>
+              <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
+              <Slider
+                id={`width-${layer.id}`}
+                type="range"
+                min={isNodeLayer ? 0.1 : 0.5}
+                max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
+                step="0.1"
+                value={widthFactor}
+                onChange={handleWidthFactorChange}
+              />
+              <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
+            </WidthControl>
+          )}
           {/* Color Scheme and Classification (if stylable) */}
           {layer.metadata?.isStylable && (
             <div style={{ marginTop: "1rem" }}>
-              {!enforceNoColourSchemeSelector && <ColourSchemeDropdown
+              {!enforceNoColourSchemeSelector && 
+              !((visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
+                visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Passengers Over Seating Capacity") &&
+              (currentPage.pageName === "Link Totals" || currentPage.pageName === "Link Totals Side-by-Side")) &&
+              <ColourSchemeDropdown
                 colorStyle={colorStyle}
                 handleColorChange={handleColorChange}
                 layerName={layer.id}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CalloutCardVisualisation } from './CalloutCardVisualisation';
-import { MapVisualisation } from './MapVisualisation';
-import { ScrollableContainer } from 'Components';
+import { MapVisualisation } from "./MapVisualisation";
+import { ScrollableContainer } from "Components";
+import { BaseCalloutCardVisualisation } from "./CalloutCards/BaseCalloutCardVisualisation";
 
 
 /**
@@ -14,17 +14,23 @@ import { ScrollableContainer } from 'Components';
  * @param {Object} props.maps - The Maplibre JS map instances for left and right maps.
  * @returns {JSX.Element|null} The rendered visualization components.
  */
-export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props }) => {
+export const VisualisationManager = ({
+  visualisationConfigs,
+  map,
+  maps,
+  ...props
+}) => {
+  const sidebarIsOpen = props.sidebarIsOpen
   // Convert visualisationConfigs object to an array of entries
   const visualisationEntries = Object.entries(visualisationConfigs);
-
   // Separate visualizations by type
   const calloutCardVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === 'calloutCard'
+    ([_, config]) => config.type === "calloutCard"
   );
 
   const mapVisualisations = visualisationEntries.filter(
-    ([_, config]) => config.type === 'joinDataToMap' || config.type === 'geojson'
+    ([_, config]) =>
+      config.type === "joinDataToMap" || config.type === "geojson"
   );
 
   // Build a lookup for configs by name
@@ -60,7 +66,9 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
     setCardOrder((prevOrder) => {
       // Keep existing order as much as possible
       const newPrevOrder = prevOrder.filter((name) => newOrder.includes(name));
-      const addedNames = newOrder.filter((name) => !newPrevOrder.includes(name));
+      const addedNames = newOrder.filter(
+        (name) => !newPrevOrder.includes(name)
+      );
       return [...newPrevOrder, ...addedNames];
     });
   }, [visualisationConfigs]);
@@ -80,13 +88,13 @@ export const VisualisationManager = ({ visualisationConfigs, map, maps, ...props
         {cardOrder.map((name) => {
           const config = calloutCardConfigByName[name];
           return (
-            <CalloutCardVisualisation
+            <BaseCalloutCardVisualisation
+              type={config.cardType || "small"}
               key={name}
               visualisationName={name}
               cardName={config.cardName || name}
               onUpdate={() => handleCardUpdate(name)}
-              onVisibilityChange={(v) => handleCardVisibility(name, v)}
-              {...props}
+              sidebarIsOpen={sidebarIsOpen}
             />
           );
         })}

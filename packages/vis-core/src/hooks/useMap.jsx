@@ -54,7 +54,7 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
 
       const mapInstance = new maplibregl.Map({
         container,
-        style: mapStyle || defaultMapStyle(),
+        style: mapStyle || defaultMapStyle,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         // maxZoom: 15,
@@ -69,18 +69,18 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         transformRequest: (url, resourceType) => {
           if( resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
               url = new URL(url);
-              if(! url.searchParams.has('key') ) url.searchParams.append('key', getMapApiToken());
+              if(! url.searchParams.has('key') ) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
               if(! url.searchParams.has('srs') ) url.searchParams.append('srs', 3857);
               return {
                   url: new Request(url).url
               }
           }
       }
-      });
-      mapInstance.on("style.load", () => setIsMapStyleLoaded(true));
-      mapInstance.on("load", () => {
-        setIsMapLoaded(true);
-      });
+      })
+        .on("style.load", () => setIsMapStyleLoaded(true))
+        .on("load", () => {
+          setIsMapLoaded(true);
+        });
 
       const nav = new maplibregl.NavigationControl({ showZoom: true, showCompass: true });
       const attrib = new maplibregl.AttributionControl({

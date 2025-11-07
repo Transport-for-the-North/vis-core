@@ -3,10 +3,6 @@ import { useNavigate  } from 'react-router-dom';
 import { Auth0Provider } from '@auth0/auth0-react';
 
 /**
- * @deprecated This Auth0 provider is no longer used in the vis-core package.
- * The package now uses a custom JWT-based authentication system via AuthProvider.jsx
- * This file is kept for reference but should not be used in new implementations.
- * 
  * Auth0ProviderWithHistory component that integrates Auth0 with React Router's history.
  * This component wraps the Auth0Provider from the Auth0 React SDK and configures it to use
  * React Router's history for navigation after authentication.
@@ -16,10 +12,8 @@ import { Auth0Provider } from '@auth0/auth0-react';
  * @returns {JSX.Element} The Auth0Provider component wrapping the children with authentication context.
  */
 export const Auth0ProviderWithHistory = ({ children }) => {
-  console.warn('Auth0ProviderWithHistory is deprecated. Use AuthProvider instead.');
-  
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN;
-  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+  const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+  const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
 
   const navigate = useNavigate();
 

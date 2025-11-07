@@ -22,78 +22,127 @@ const filterDataToViewport = (data, map, mapLayerId) => {
 };
 
 /**
- * Custom hook to fetch data for a visualisation and (optionally) filter that data 
+ * Helper: Converts a visualisation params map (queryParams/pathParams) to a plain
+ * { key: value } object suitable for API calls. Excludes null/undefined values.
+ *
+ * @param {Object<string, {value:any, required?:boolean}>} paramsMap - Map of param definitions.
+ * @returns {Object} - A plain object of key/value pairs for the API.
+ */
+const toSimpleParamsMap = (paramsMap = {}) => {
+  return Object.fromEntries(
+    Object.entries(paramsMap)
+      .filter(([, { value }]) => value !== null && value !== undefined)
+      .map(([key, { value }]) => [key, value])
+  );
+};
+
+/**
+ * Helper: Checks whether all required params in a map have a non-null/undefined value.
+ *
+ * @param {Object<string, {value:any, required?:boolean}>} paramsMap - Map of param definitions.
+ * @returns {boolean} - True if every required param is satisfied; false otherwise.
+ */
+const areAllRequiredParamsPresent = (paramsMap = {}) => {
+  return Object.values(paramsMap).every(
+    (param) => !param.required || (param.required && param.value !== null && param.value !== undefined)
+  );
+};
+
+/**
+ * Custom hook to fetch data for a visualisation and (optionally) filter that data
  * to only include records visible in the map viewport.
  *
- * @param {Object} visualisation - The visualisation object containing details like dataPath and queryParams.
- * @param {string} visualisation.dataPath - The API endpoint to fetch data from.
- * @param {Object} visualisation.queryParams - The query parameters to include in the API request.
+ * Supports both queryParams and pathParams. For pathParams, any placeholders
+ * in visualisation.dataPath (e.g., /resource/:id or /resource/{id}) will be
+ * substituted by BaseService using the provided pathParams values.
+ *
+ * @param {Object} visualisation - The visualisation object containing details like dataPath, queryParams, and pathParams.
+ * @param {string} visualisation.dataPath - The API endpoint to fetch data from (may contain path placeholders).
+ * @param {Object} visualisation.queryParams - The query parameters to include in the API request (shape: {key: {value, required}}).
+ * @param {Object} [visualisation.pathParams] - The path parameters to include in the API request (shape: {key: {value, required}}).
  * @param {boolean} visualisation.requiresAuth - Indicates if the request requires authentication.
  * @param {string} visualisation.name - The name of the visualisation.
  * @param {Object} [map] - (Optional) The map instance used for filtering by viewport.
  * @param {string} [mapLayerId] - (Optional) The map layer ID that contains the rendered features.
+ * @param {boolean} [shouldFilterDataToViewport=false] - Whether to filter the returned data against the visible map viewport.
  *
  * @returns {Object} - An object containing the loading state and fetched data.
  * @property {boolean} isLoading - Indicates if the data is currently being fetched.
  * @property {Array|Object|null} data - The (possibly filtered) data fetched for the visualisation.
+ * @property {boolean} dataWasReturnedButFiltered - True when raw data exists but filtering produced an empty set.
  */
-export const useFetchVisualisationData = (visualisation, map, mapLayerId, shouldFilterDataToViewport = false) => {
+export const useFetchVisualisationData = (
+  visualisation,
+  map,
+  mapLayerId,
+  shouldFilterDataToViewport = false
+) => {
   const [isLoading, setLoading] = useState(false);
   const [rawData, setRawData] = useState(null);
   // filteredData is the viewport‑filtered version of the data.
   const [filteredData, setFilteredData] = useState(null);
-  const prevQueryParamsRef = useRef();
+
+  // Track previous combined params (query + path) to avoid refetching unnecessarily.
+  const prevParamsRef = useRef();
 
   // Debounced function to fetch data from the API.
-  const fetchDataForVisualisation = debounce(async (visualisation) => {
-    if (visualisation && visualisation.queryParams) {
-      setLoading(true);
-      const { dataPath: path, queryParams, requiresAuth, name: visualisationName } = visualisation;
+  const fetchDataForVisualisation = debounce(async (vis) => {
+    if (!vis) return;
 
-        // Transform queryParams to a simple object of param: value, only including those with a set value
-      const queryParamsForApi = Object.fromEntries(
-        Object.entries(queryParams)
-          .filter(([, { value }]) => value !== null && value !== undefined)
-          .map(([key, { value }]) => [key, value])
-      );
+    setLoading(true);
 
-      try {
-        const responseData = await api.baseService.get(path, {
-          queryParams: queryParamsForApi,
-          skipAuth: !requiresAuth,
-        });
-        setRawData(responseData);
-        // If no viewport filtering is requested, set filteredData immediately.
-        if (!map || !mapLayerId) {
-          setFilteredData(responseData);
-        }
-        if (responseData.length === 0) {
-          console.warn('No data returned for visualisation:', visualisationName);
-        }
-      } catch (error) {
-        console.error('Error fetching data for visualisation:', error);
-      } finally {
-        setLoading(false);
+    const {
+      dataPath: path,
+      queryParams = {},
+      pathParams = {},
+      requiresAuth,
+      name: visualisationName,
+    } = vis;
+
+    // Flatten params maps into simple key/value objects
+    const queryParamsForApi = toSimpleParamsMap(queryParams);
+    const pathParamsForApi = toSimpleParamsMap(pathParams);
+
+    try {
+      const responseData = await api.baseService.get(path, {
+        pathParams: pathParamsForApi,
+        queryParams: queryParamsForApi,
+        skipAuth: !requiresAuth,
+      });
+      setRawData(responseData);
+      // If no viewport filtering is requested, set filteredData immediately.
+      if (!map || !mapLayerId) {
+        setFilteredData(responseData);
       }
+      if (Array.isArray(responseData) && responseData.length === 0) {
+        console.warn('No data returned for visualisation:', visualisationName);
+      }
+    } catch (error) {
+      console.error('Error fetching data for visualisation:', error);
+    } finally {
+      setLoading(false);
     }
-    },
-    400 // Delay of 400 milliseconds
-  );
+  }, 400); // Delay of 400 milliseconds
 
-  // Fetch data whenever visualisation.queryParams change.
+  // Fetch data whenever visualisation.queryParams or visualisation.pathParams change.
   useEffect(() => {
-    const currentQueryParamsStr = JSON.stringify(visualisation.queryParams);
-    // Only proceed if all required parameters are present.
-    const allRequiredParamsPresent = Object.values(visualisation.queryParams).every(
-      (param) => !param.required || (param.required && param.value !== null && param.value !== undefined)
-    );
-    const queryParamsChanged = prevQueryParamsRef.current !== currentQueryParamsStr;
+    const { queryParams = {}, pathParams = {} } = visualisation || {};
 
-    if (allRequiredParamsPresent && queryParamsChanged) {
+    // Only proceed if all required parameters (query and path) are present.
+    const allRequiredQueryPresent = areAllRequiredParamsPresent(queryParams);
+    const allRequiredPathPresent = areAllRequiredParamsPresent(pathParams);
+    const allRequiredParamsPresent = allRequiredQueryPresent && allRequiredPathPresent;
+
+    // Track a combined signature of both param maps to detect changes.
+    const currentParamsStr = JSON.stringify({ queryParams, pathParams });
+
+    const paramsChanged = prevParamsRef.current !== currentParamsStr;
+
+    if (allRequiredParamsPresent && paramsChanged) {
       fetchDataForVisualisation(visualisation);
-      prevQueryParamsRef.current = currentQueryParamsStr;
+      prevParamsRef.current = currentParamsStr;
     }
-  }, [visualisation.queryParams, visualisation]);
+  }, [visualisation.queryParams, visualisation.pathParams, visualisation, fetchDataForVisualisation]); // include both param maps
 
   // Set up an effect to refilter the raw data when the map viewport changes.
   useEffect(() => {
@@ -116,5 +165,9 @@ export const useFetchVisualisationData = (visualisation, map, mapLayerId, should
   }, [map, mapLayerId, rawData, shouldFilterDataToViewport]);
 
   // Return the filtered data if available; otherwise return the raw data.
-  return { isLoading, data: filteredData || rawData, dataWasReturnedButFiltered: rawData !== null && filteredData?.length === 0 };
+  return {
+    isLoading,
+    data: filteredData || rawData,
+    dataWasReturnedButFiltered: rawData !== null && Array.isArray(filteredData) && filteredData.length === 0,
+  };
 };
