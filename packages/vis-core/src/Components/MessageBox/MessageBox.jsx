@@ -28,6 +28,23 @@ const MessageBoxContainer = styled.div`
   `}
 `;
 
+// Styled wrapper for sticky positioning
+const StickyWrapper = styled.div`
+  position: -webkit-sticky; /* Safari support */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.7);
+  margin: 0px 0px 10px 0px;
+  padding: 15px 20px 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(100%);
+  box-sizing: border-box;
+`;
+
 // Styled component for the icon
 const IconWrapper = styled.div`
   margin-right: 8px; /* Space between icon and text */
@@ -42,9 +59,10 @@ const IconWrapper = styled.div`
  * @param {Object} props - The properties object.
  * @param {string} props.text - The text to display inside the message box.
  * @param {string} props.type - The type of message box ('info', 'warning', 'error').
+ * @param {boolean} props.isSticky - Whether the message box should be sticky positioned.
  * @returns {JSX.Element} The rendered MessageBox component.
  */
-const MessageBox = ({ text, type }) => {
+const MessageBox = ({ text, type, isSticky }) => {
   let Icon;
 
   switch (type) {
@@ -60,7 +78,7 @@ const MessageBox = ({ text, type }) => {
       break;
   }
 
-  return (
+  const messageContent = (
     <MessageBoxContainer type={type}>
       <IconWrapper>
         <Icon style={{ width: '20px', height: '20px', color: 'inherit' }} />
@@ -68,9 +86,15 @@ const MessageBox = ({ text, type }) => {
       {text}
     </MessageBoxContainer>
   );
+
+  if (isSticky) {
+    return <StickyWrapper>{messageContent}</StickyWrapper>;
+  }
+
+  return messageContent;
 };
 
 // Specific components for each type of message box
 export const InfoBox = ({ text }) => <MessageBox text={text} type="info" />;
-export const WarningBox = ({ text }) => <MessageBox text={text} type="warning" />;
+export const WarningBox = ({ text, isSticky }) => <MessageBox text={text} type="warning" isSticky={isSticky} />;
 export const ErrorBox = ({ text }) => <MessageBox text={text} type="error" />;

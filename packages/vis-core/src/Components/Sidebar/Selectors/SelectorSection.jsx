@@ -115,7 +115,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
   const noDataMessage =
     "No data available for the selected filters, please try different filters.";
 
-  const appName = import.meta.env.VITE_APP_NAME;
+  const appName = process.env.REACT_APP_NAME;
   const currentPage = appContext.appPages.find(
     (page) => page.url === window.location.pathname
   );
@@ -134,6 +134,11 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
+      {/* Display a warning message if no data is available - sticky at top */}
+      {dataRequested && noDataAvailable && (
+        <WarningBox text={noDataMessage} isSticky={true} />
+      )}
+      
       {isDiffPage && <InfoBox text={diffPageMessage} />}
       {isTrsePage && <InfoBox text={trsePageMessage} />}
 
@@ -141,11 +146,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       {mapFilters.map((filter) => (
         <InfoBox key={filter.id} text={filter.filterName} />
       ))}
-
-      {/* Display a warning message if no data is available */}
-      {dataRequested && noDataAvailable && (
-        <WarningBox text={noDataMessage} />
-      )}
 
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
@@ -236,7 +236,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               {isDownloading ? (
                 <>Downloading <Spinner /></>
               ) : (
-                isRequestTooLarge ? "Request Too Large" : "Download"
+                isRequestTooLarge ? "Request Too Large" : "Download as CSV"
               )}
             </DownloadButton>
           )}
