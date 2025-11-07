@@ -250,11 +250,16 @@ export const MapVisualisation = ({
       const widthValue = document.getElementById(
         "width-" + layerKey
       )?.value;
+      
+      // Get layer's default opacity from metadata, fallback to 0.65
+      const layerObject = mapItem.getLayer(layer);
+      const defaultOpacity = layerObject?.metadata?.defaultOpacity ?? 0.65;
+      
       const paintProperty = createPaintProperty(
         reclassifiedData,
         resolvedStyle,
         colourPalette,
-        opacityValue ? parseFloat(opacityValue) : 0.65,
+        opacityValue ? parseFloat(opacityValue) : defaultOpacity,
         widthValue ? parseFloat(widthValue) : 7.5
       );
 

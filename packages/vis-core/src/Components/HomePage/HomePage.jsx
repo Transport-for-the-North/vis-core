@@ -112,7 +112,7 @@ export const HomePage = () => {
 
   return (
     <>
-      <div className="landing">
+      <div className="landing selectable-text">
         {/* Header Section with background image */}
         <div
           data-testid="background-img"
@@ -128,7 +128,7 @@ export const HomePage = () => {
         {appContext.introduction && (
           <section className="introduction container-content">
             <h2>About</h2>
-            <div className="container-intro">{parse(appContext.introduction)}</div>
+            <p className="container-intro">{parse(appContext.introduction)}</p>
           </section>
         )}
 

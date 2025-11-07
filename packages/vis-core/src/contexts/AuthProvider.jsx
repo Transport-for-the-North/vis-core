@@ -1,7 +1,7 @@
 import React, { useContext, createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { api } from "../services";
+import { api } from "services";
 import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
