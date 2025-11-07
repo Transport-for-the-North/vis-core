@@ -47,6 +47,26 @@ const administrativeBoundaryFixedSelector = {
   },
 };
 
+const administrativeBoundaryFixedLSOASelector = {
+  filterName: "Administrative Boundaries Fixed",
+  paramName: "zoneTypeId",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "LSOA",
+        paramValue: "19",
+      }
+    ],
+  },
+};
+
 const zoneSelector = {
   filterName: "Optional location filter",
   type: "mapFeatureSelectWithControls",
@@ -518,6 +538,10 @@ const tfnChargingCategorySelector = {
         displayValue: "Local Charging Hubs",
         paramValue: 8,
       },
+      {
+        displayValue: "Rapid Charging",
+        paramValue: 11,
+      },
     ],
   },
 };
@@ -918,6 +942,7 @@ export const selectors = {
   yearTriplet: yearTripletSelector,
   administrativeBoundary: administrativeBoundarySelector,
   administrativeBoundaryFixed: administrativeBoundaryFixedSelector,
+  administrativeBoundaryFixedLSOA: administrativeBoundaryFixedLSOASelector,
   travelScenarioBase: travelScenarioSelectorBase,
   travelScenarioAdditional: travelScenarioSelectorAdditional,
   behaviouralScenario: behaviouralScenarioSelector,

@@ -34,7 +34,7 @@ export const commercialViability = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/14/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/19/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Commercial Viability",
@@ -68,7 +68,7 @@ export const commercialViability = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.administrativeBoundaryFixed, visualisations: ['Commercial Viability'] },
+      { ...selectors.administrativeBoundaryFixedLSOA, visualisations: ['Commercial Viability'] },
       { ...selectors.columnNameCVFixed, visualisations: ['Commercial Viability'] },
       { ...selectors.stbTag, visualisations: ['Commercial Viability'] },
       { ...selectors.zoneSelector, visualisations: ['Commercial Viability'] }
@@ -79,7 +79,7 @@ export const commercialViability = {
       },
       download: {
         filters: [
-          { ...selectors.administrativeBoundaryFixed, type: 'fixed' },
+          { ...selectors.administrativeBoundaryFixedLSOA, type: 'fixed' },
           { ...selectors.columnNameCVFixed, type: 'fixed' },
           { ...selectors.stbTag, type: 'fixed' },
           { ...selectors.zoneSelector, actions: [{action: 'SET_SELECTED_FEATURES'}], filterName: "Optional location selector" },

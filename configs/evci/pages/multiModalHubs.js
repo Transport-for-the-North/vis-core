@@ -33,7 +33,7 @@ export const multiModalHubs = {
         name: "Administrative Boundaries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
+        path: "/api/vectortiles/zones/19/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // matches the path in swagger.json
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Multi-Modal Hubs",
@@ -67,7 +67,7 @@ export const multiModalHubs = {
     ],
     metadataTables: [],
     filters: [
-      { ...selectors.administrativeBoundaryFixed, visualisations: ['Multi-Modal Hubs'] },
+      { ...selectors.administrativeBoundaryFixedLSOA, visualisations: ['Multi-Modal Hubs'] },
       { ...selectors.columnNameMMHFixed, visualisations: ['Multi-Modal Hubs'] },
       { ...selectors.stbTag, visualisations: ['Multi-Modal Hubs'] },
       //{ ...selectors.areaValueDisplay, visualisations: ['Multi-Modal Hubs'] },
@@ -79,7 +79,7 @@ export const multiModalHubs = {
       },
       download: {
         filters: [
-          { ...selectors.administrativeBoundaryFixed, type: 'fixed' },
+          { ...selectors.administrativeBoundaryFixedLSOA, type: 'fixed' },
           { ...selectors.columnNameMMHFixed, type: 'fixed' },
           { ...selectors.stbTag, type: 'fixed' },
           // { ...selectors.areaValueDisplay, multiSelect: true, type: 'toggle' },
