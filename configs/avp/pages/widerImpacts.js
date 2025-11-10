@@ -8,24 +8,47 @@ export const widerImpacts = {
   termsOfUse: "bar",
   config: {
     layers: [
-      
+      {
+        name: "Output Areas",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/zones/28/{z}/{x}/{y}?parentZoneType=16&parentZoneId={parentZoneId}", // change to a real endpoint
+        sourceLayer: "zones",
+        geometryType: "polygon",
+        visualisationName: "Map-based totals",
+        isHoverable: true,
+        isStylable: true,
+        shouldHaveTooltipOnHover: true,
+        shouldHaveLabel: false,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
+        invertedColorScheme: true,
+        trseLabel: true,
+        outlineOnPolygonSelect: true,
+        // customTooltip: {
+        //   url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
+        //   htmlTemplate: caPopupContent
+        // }
+      },
     ],
     visualisations: [
       {
-        name: "TRSE Rank",
+        name: "Map-based totals",
         type: "joinDataToMap",
         joinLayer: "Output Areas",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/trse/output-area-data",
+        dataPath: "/api/trse/output-area-data", // change to a real endpoint
         legendText: [
           {
             displayValue: "Output Areas",
-            legendSubtitleText: "%" 
-          }
-        ]
+            legendSubtitleText: "%",
+          },
+        ],
       },
       {
         name: "Summary callout card",
@@ -33,7 +56,7 @@ export const widerImpacts = {
         cardType: "small",
         cardName: "",
         dataSource: "api",
-        dataPath: "/api/avp/pca/locations/{id}",
+        dataPath: "/api/avp/pca/locations/{id}", // change to a real endpoint
         cardTitle: "NS-SeC distribution for {name}",
         layout: [
           {
@@ -89,7 +112,7 @@ export const widerImpacts = {
         cardType: "small",
         cardName: "",
         dataSource: "api",
-        dataPath: "/api/avp/pca/locations/{id}",
+        dataPath: "/api/avp/pca/locations/{id}", // change to a real endpoint
         cardTitle: "NS-SeC distribution for {name}",
         layout: [
           {
@@ -135,11 +158,102 @@ export const widerImpacts = {
         ],
       },
     ],
-    metadataTables: [
-    ],
+    metadataTables: [],
     filters: [
+      // Select
+      {
+        filterName: "Display values as...",
+        paramName: "showValuesAs",
+        target: "api",
+        actions: [
+          { action: "UPDATE_QUERY_PARAMS" },
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Output Areas" },
+          },
+        ],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "toggle",
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "CA",
+              paramValue: "ca", // Put their true value
+            },
+            {
+              displayValue: "LAD",
+              paramValue: "lad", // Put their true value
+            },
+            {
+              displayValue: "NELUM",
+              paramValue: "nelum", // Put their true value
+            },
+          ],
+        },
+      },
+      // scenario selection
+      {
+        filterName: "Network scenario",
+        paramName: "network_scenario",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "mapFeatureSelectAndPan",
+        forceRequired: true,
+      },
+      // type of network
+      {
+        filterName: "Network type",
+        paramName: "network_type",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "mapFeatureSelectAndPan",
+        forceRequired: true,
+      },
+      // year
+      {
+        filterName: "Year",
+        paramName: "year",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "mapFeatureSelectAndPan",
+        forceRequired: true,
+      },
+      // id zone
+      {
+        filterName: "",
+        paramName: "featureId",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "map",
+        layer: "Output Areas",
+        field: "id",
+      },
     ],
-    additionalFeatures: {
-    },
+    additionalFeatures: {},
   },
 };
