@@ -29,7 +29,7 @@ export const BaseCalloutCardVisualisation = ({
   onUpdate,
   ...props
 }) => {
-  const sidebarIsOpen = props.sidebarIsOpen
+  const sidebarIsOpen = props.sidebarIsOpen;
   const [isVisible, setIsVisible] = useState(true);
   const { state, dispatch } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
@@ -181,7 +181,48 @@ export const BaseCalloutCardVisualisation = ({
     setPrevData(null);
   };
 
-  if (isLoading || !data || !isVisible) return null;
+  // if (isLoading || !data || !isVisible) return null;
+  /* Mock */
+  let dataWiderImpact = {
+    title: "Bedford",
+    gva: 20.13,
+    gva_jobs: 75.02,
+    population: 633.51,
+    jobs: 268.31,
+    ranking: [
+      { name: "Bolton", key: "bolton", score: 10450 },
+      { name: "Allderdale", key: "allderdale", score: 15751 },
+      { name: "York", key: "york", score: 12000 },
+      { name: "Two", key: "two", score: 10200 },
+      { name: "Three", key: "three", score: 10300 },
+      { name: "Four", key: "four", score: 10400 },
+    ],
+    "bar-vertical": [
+      { name: "Bolton", key: "bolton", score: 10450 },
+      { name: "Allderdale", key: "allderdale", score: 15751 },
+      { name: "York", key: "york", score: 12000 },
+      { name: "Two", key: "two", score: 10200 },
+      { name: "Three", key: "three", score: 10300 },
+      { name: "Four", key: "four", score: 10400 },
+    ],
+    text: "Lorem ipsum",
+  };
+  let dataAccessibility = {
+    title: "Bedford",
+    rank: 15,
+    total_rank: 72,
+    decile: 9,
+    ranking: [
+      { name: "Bolton", key: "bolton", score: 10450 },
+      { name: "Allderdale", key: "allderdale", score: 15751 },
+      { name: "York", key: "york", score: 12000 },
+      { name: "Two", key: "two", score: 10200 },
+      { name: "Three", key: "three", score: 10300 },
+      { name: "Four", key: "four", score: 10400 },
+    ],
+    text: "Lorem ipsum",
+  };
+  let isLoading2 = false
 
   return type === "fullscreen" ? (
     <FullScreenCalloutCardVisualisation
