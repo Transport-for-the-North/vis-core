@@ -52,9 +52,11 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         container.style.width = '100%';
       }
 
+      const styleValue = typeof mapStyle === 'function' ? mapStyle() : (mapStyle || defaultMapStyle());
+
       const mapInstance = new maplibregl.Map({
         container,
-        style: mapStyle || defaultMapStyle,
+        style: styleValue,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         // maxZoom: 15,
