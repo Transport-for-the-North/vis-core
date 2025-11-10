@@ -382,10 +382,9 @@ export const CalloutCardVisualisation = ({
             <>
               {visualisation.layout.map((item, idx) => {
                 if (item.type === "html") {
-                  console.log("data : ", data.data);
                   const html = replacePlaceholders(
                     item.fragment,
-                    data, // Here you replace with the data object
+                    data.data, // Here you replace with the data object
                     { customFunctions: customFormattingFunctions }
                   );
                   return (
@@ -397,15 +396,28 @@ export const CalloutCardVisualisation = ({
                     />
                   );
                 } else {
-                  const chartConfig =
-                    item.chartIndex !== undefined
+                  const chartConfig = {
+                    ...(item.chartIndex !== undefined
                       ? visualisation.charts[item.chartIndex]
-                      : item.chartConfig || item;
+                      : item.chartConfig || item),
+                    columns: Array.isArray(data.data[item.type])
+                      ? [...data.data[item.type]]
+                      : [],
+                  };
+
+                  const chartData = Array.isArray(data.data[item.type])
+                    ? Object.fromEntries(
+                        data.data[item.type].map(({ key, score }) => [
+                          key,
+                          score,
+                        ])
+                      )
+                    : {};
                   return (
                     <CardContent key={idx}>
                       <ChartRenderer
                         charts={[chartConfig]}
-                        data={data.data}
+                        data={chartData}
                         formatters={customFormattingFunctions}
                         barHeight={225}
                       />
