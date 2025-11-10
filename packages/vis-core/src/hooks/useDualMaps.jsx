@@ -48,7 +48,7 @@ export const useDualMaps = (
         transformRequest: (url, resourceType) => {
           if (resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
             url = new URL(url);
-            if (!url.searchParams.has('key')) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
+            if (!url.searchParams.has('key')) url.searchParams.append('key', import.meta.env.VITE_APP_MAP_API_TOKEN);
             if (!url.searchParams.has('srs')) url.searchParams.append('srs', 3857);
             return {
               url: new Request(url).url
@@ -60,9 +60,9 @@ export const useDualMaps = (
       const leftMapInstance = new maplibregl.Map({
         container: leftMapContainerRef.current,
         ...commonOptions,
-      })
-        .on("style.load", () => setIsMapStyleLoaded(true))
-        .on("load", () => {
+      });
+      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      leftMapInstance.on("load", () => {
           setIsMapLoaded(true);
         });
       leftMapInstance.addControl(
@@ -75,8 +75,8 @@ export const useDualMaps = (
         container: rightMapContainerRef.current,
         ...commonOptions,
       })
-        .on("style.load", () => setIsMapStyleLoaded(true))
-        .on("load", () => {
+      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      rightMapInstance.on("load", () => {
           setIsMapLoaded(true);
         });
       rightMapInstance.addControl(

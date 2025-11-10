@@ -13,7 +13,7 @@ export const withRoleValidation = (WrappedComponent) => {
     return (props) => {
         const location = useLocation();
         const token = Cookies.get('token');
-        const appName = process.env.REACT_APP_NAME;
+        const appName = import.meta.env.VITE_APP_NAME;
 
         let userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
 
