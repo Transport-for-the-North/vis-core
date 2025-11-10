@@ -27,7 +27,8 @@ export const appConfig = {
     appPages: [
         pages.mapImage,
         pages.nac,
-        pages.pba
+        pages.widerImpacts,
+        pages.accessibility
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
