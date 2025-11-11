@@ -1191,6 +1191,219 @@ const stationWorkTravelMethodMetricSelector = {
     }
 }
 
+const freightWeekdayAvgFlowMetricSelector = {
+    filterName: "Metric",
+    paramName: "columnName",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }, { action: "UPDATE_LEGEND_TEXT" }
+    ],
+    info:'Use this dropdown to select the freight metric that will style the map.',
+    containsLegendInfo: true,
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            {
+                displayValue: "Freight 2022/23 Total",
+                paramValue: "freight_2022_23_total",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 No Commodity",
+                paramValue: "freight_2022_23_no_commodity",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Automotive",
+                paramValue: "freight_2022_23_automotive",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Biomass/Coal",
+                paramValue: "freight_2022_23_biomass_coal",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Construction Materials",
+                paramValue: "freight_2022_23_construction_materials",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 NR Engineering",
+                paramValue: "freight_2022_23_nr_engineering",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Intermodal",
+                paramValue: "freight_2022_23_intermodal",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Metals/Ores",
+                paramValue: "freight_2022_23_metals_ores",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Other",
+                paramValue: "freight_2022_23_other",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Petro/Chem/Ind/Min/Gen Merch",
+                paramValue: "freight_2022_23_petro_chem_ind_min_gen_merch",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Postal Services",
+                paramValue: "freight_2022_23_postal_services",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2022/23 Domestic Waste/Empty Return",
+                paramValue: "freight_2022_23_domestic_waste_and_empty_return_containers",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2028/29 Capacity Constrained",
+                paramValue: "freight_2028_29_2028_29e_capacity_constrained",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2028/29 Unconstrained",
+                paramValue: "freight_2028_29_2028_29e_unconstrained",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Automotive",
+                paramValue: "freight_2040_41_sc2_automotive",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Biomass/Coal",
+                paramValue: "freight_2040_41_sc2_biomass_coal",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Construction Materials",
+                paramValue: "freight_2040_41_sc2_construction_materials",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Intermodal",
+                paramValue: "freight_2040_41_sc2_intermodal",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Metals/Ores",
+                paramValue: "freight_2040_41_sc2_metals_ores",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Other",
+                paramValue: "freight_2040_41_sc2_other",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Petro/Chem/Ind/Min/Gen Merch",
+                paramValue: "freight_2040_41_sc2_petro_chem_ind_min_gen_merch",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Postal Services",
+                paramValue: "freight_2040_41_sc2_postal_services",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Domestic Waste/Empty Return",
+                paramValue: "freight_2040_41_sc2_domestic_waste_and_empty_return_containers",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Unsuppressed",
+                paramValue: "freight_2040_41_sc2_unsuppressed",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2040/41 SC2 Suppressed/Unsuppressed",
+                paramValue: "freight_2040_41_sc2_suppressed_unsuppressed",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Automotive",
+                paramValue: "freight_2050_51_sc2_automotive",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Biomass/Coal",
+                paramValue: "freight_2050_51_sc2_biomass_coal",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Construction Materials",
+                paramValue: "freight_2050_51_sc2_construction_materials",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Intermodal",
+                paramValue: "freight_2050_51_sc2_intermodal",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Metals/Ores",
+                paramValue: "freight_2050_51_sc2_metals_ores",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Other",
+                paramValue: "freight_2050_51_sc2_other",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Petro/Chem/Ind/Min/Gen Merch",
+                paramValue: "freight_2050_51_sc2_petro_chem_ind_min_gen_merch",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Postal Services",
+                paramValue: "freight_2050_51_sc2_postal_services",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Domestic Waste/Empty Return",
+                paramValue: "freight_2050_51_sc2_domestic_waste_and_empty_return_containers",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Unsuppressed",
+                paramValue: "freight_2050_51_sc2_unsuppressed",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Suppressed/Unsuppressed",
+                paramValue: "freight_2050_51_sc2_suppressed_unsuppressed",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Total",
+                paramValue: "freight_2050_51_sc2_total",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC2 Intermodal 1",
+                paramValue: "freight_2050_51_sc2_intermodal_1",
+                legendSubtitleText: "Average trains per weekday"
+            },
+            {
+                displayValue: "Freight 2050/51 SC4 Unsuppressed",
+                paramValue: "freight_2050_51_sc4_unsuppressed",
+                legendSubtitleText: "Average trains per weekday"
+            }
+        ]
+    }
+}
+
 export const selectors = {
   loadingsTOCSelector: loadingsTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -1214,5 +1427,6 @@ export const selectors = {
   stationCarOrVanMetricSelector: stationCarOrVanMetricSelector,
   stationDeprivationMetricSelector: stationDeprivationMetricSelector,
   stationWorkTravelDistanceMetricSelector: stationWorkTravelDistanceMetricSelector,
-  stationWorkTravelMethodMetricSelector: stationWorkTravelMethodMetricSelector
+  stationWorkTravelMethodMetricSelector: stationWorkTravelMethodMetricSelector,
+  freightWeekdayAvgFlowMetricSelector: freightWeekdayAvgFlowMetricSelector
 };

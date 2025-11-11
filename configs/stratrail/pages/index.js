@@ -14,6 +14,9 @@ import { nodeCarOrVan } from "./nodeCarOrVan"
 import { nodeHouseholdDeprivation } from "./nodeHouseholdDeprivation"
 import { nodeWorkTravelDistance } from "./nodeWorkTravelDistance"
 import { nodeWorkTravelMethod } from "./nodeWorkTravelMethod"
+import { freightHighGaugeCleared } from "./freightHighGaugeCleared"
+import { freightHighGauge } from "./freightHighGauge"
+import { freightAvgWeekdayFlows } from "./freightAvgWeekdayFlows"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -31,5 +34,8 @@ export const pages = {
     nodeCarOrVan: nodeCarOrVan,
     nodeHouseholdDeprivation: nodeHouseholdDeprivation,
     nodeWorkTravelDistance: nodeWorkTravelDistance,
-    nodeWorkTravelMethod: nodeWorkTravelMethod
+    nodeWorkTravelMethod: nodeWorkTravelMethod,
+    freightHighGaugeCleared: freightHighGaugeCleared,
+    freightHighGauge: freightHighGauge,
+    freightAvgWeekdayFlows: freightAvgWeekdayFlows,
 }

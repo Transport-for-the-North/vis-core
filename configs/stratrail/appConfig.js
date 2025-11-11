@@ -46,6 +46,9 @@ export const appConfig = {
                 <li><b>Link Frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
                 <li><b>Freight Node Investments:</b> This visualisation shows the current freight node investments in the Freight Investment Pipeline (FRIP).</li>
                 <li><b>Freight Link Investments:</b> This visualisation shows the current freight link investments in the Freight Investment Pipeline (FRIP).</li>
+                <li><b>Freight High Gauge Cleared Network:</b> This map shows the TRU benefit realisation in full - showing routings for the first Trans-Pennine high gauge cleared network.</li>
+                <li><b>Freight High Gauge Types:</b> This map shows the proposed additional high gauge (W12) clearance to interventions to support full TRU freight benefit realisation.</li>
+                <li><b>Freight Weekday Average Flows:</b> This visualisation shows the rail freight network flows in average weekday trains for a number of scenarios developed through the Rail Freight Routing Study in 2024.</li>
             </ul>
             `,
             sectionTitle: "Portal Information",
@@ -175,7 +178,10 @@ export const appConfig = {
         pages.linkFrequency,
         pages.freightNodeInvestments,
         pages.freightLinkInvestments,
-        pages.performanceBi
+        pages.performanceBi,
+        pages.freightHighGaugeCleared,
+        pages.freightHighGauge,
+        pages.freightAvgWeekdayFlows
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",

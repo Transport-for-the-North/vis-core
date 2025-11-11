@@ -30,6 +30,74 @@ export const crpLinesLayerPaint = {
     "line-opacity": 0.3
 };
 
+export const combinedAuthorityFreightCustomPaint = {
+  "fill-color": [
+    'match',
+    ['get', 'name'],
+    'North East', '#D2691E',
+    'North West', '#6a3ddcff',
+    'Yorkshire and The Humber', '#24e5ffff',
+    '#808080' // Default fallback color
+  ],
+  "fill-opacity": [
+    'match',
+    ['get', 'name'],
+    'North East', 0.2,
+    'North West', 0.2,
+    'Yorkshire and The Humber', 0.2,
+    0
+  ]
+};
+
+export const highGaugeLayerPaint = {
+  "line-color": [
+    'match',
+    ['get', 'hg_type'],
+    "FBR W12 MVP", "#b46e1fff",
+    "High Gauge (W10/W12)", "#000000ff",
+    "Transpennine Route Upgrade", "#7f4ae2ff",
+    'Existing Rail Network', '#545454ff',
+    '#545454ff' // Default fallback color
+  ],
+  "line-width": [
+    'match',
+    ['get', 'hg_type'],
+    "FBR W12 MVP", 4,
+    "High Gauge (W10/W12)", 4,
+    "Transpennine Route Upgrade", 4,
+    'Existing Rail Network', 1,
+    0
+  ],
+  "line-opacity": 0.85
+}
+
+export const highGaugeClearedLayerPaint = {
+  "line-color": [
+    'match',
+    ['get', 'network'],
+    'TransPennine High Gauge Cleared Network', '#950303ff',
+    'Existing Rail Network', '#545454ff',
+    '#545454ff' // Default fallback color
+  ],
+  "line-width": [
+    'match',
+    ['get', 'network'],
+    'TransPennine High Gauge Cleared Network', 4,
+    'Existing Rail Network', 1,
+    0
+  ],
+  "line-opacity": 0.85
+};
+
+export const freightLocationLayerPaint = {
+  "circle-color": "#f5f5f5",
+  "circle-radius": 5,
+  "circle-opacity": 0.9,
+  "circle-stroke-color": "#000000",
+  "circle-stroke-width": 2,
+  "circle-stroke-opacity": 1
+};
+
 export const invisiblePolygonCustomPaint = {
   "fill-opacity": 0,
 };
