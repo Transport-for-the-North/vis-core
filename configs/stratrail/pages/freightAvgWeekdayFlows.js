@@ -42,6 +42,7 @@ export const freightAvgWeekdayFlows = {
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
             shouldShowInLegend: true,
+            shouldHaveOpacityControl: false
         },
         {
             uniqueId: "RailOfferFreightHGCVectorTile",
