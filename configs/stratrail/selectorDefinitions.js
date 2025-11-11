@@ -1210,11 +1210,11 @@ const freightWeekdayAvgFlowMetricSelector = {
                 paramValue: "freight_2022_23_total",
                 legendSubtitleText: "Average trains per weekday"
             },
-            {
-                displayValue: "Freight 2022/23 No Commodity",
-                paramValue: "freight_2022_23_no_commodity",
-                legendSubtitleText: "Average trains per weekday"
-            },
+            // {
+            //     displayValue: "Freight 2022/23 No Commodity",
+            //     paramValue: "freight_2022_23_no_commodity",
+            //     legendSubtitleText: "Average trains per weekday"
+            // },
             {
                 displayValue: "Freight 2022/23 Automotive",
                 paramValue: "freight_2022_23_automotive",
@@ -1265,14 +1265,19 @@ const freightWeekdayAvgFlowMetricSelector = {
                 paramValue: "freight_2022_23_domestic_waste_and_empty_return_containers",
                 legendSubtitleText: "Average trains per weekday"
             },
+            // {
+            //     displayValue: "Freight 2028/29 Capacity Constrained",
+            //     paramValue: "freight_2028_29_2028_29e_capacity_constrained",
+            //     legendSubtitleText: "Average trains per weekday"
+            // },
+            // {
+            //     displayValue: "Freight 2028/29 Unconstrained",
+            //     paramValue: "freight_2028_29_2028_29e_unconstrained",
+            //     legendSubtitleText: "Average trains per weekday"
+            // },
             {
-                displayValue: "Freight 2028/29 Capacity Constrained",
-                paramValue: "freight_2028_29_2028_29e_capacity_constrained",
-                legendSubtitleText: "Average trains per weekday"
-            },
-            {
-                displayValue: "Freight 2028/29 Unconstrained",
-                paramValue: "freight_2028_29_2028_29e_unconstrained",
+                displayValue: "Freight 2028/29 Constrained minus Unconstrained",
+                paramValue: "freight_2028_29_constrained_minus_unconstrained",
                 legendSubtitleText: "Average trains per weekday"
             },
             {
@@ -1385,11 +1390,11 @@ const freightWeekdayAvgFlowMetricSelector = {
                 paramValue: "freight_2050_51_sc2_suppressed_unsuppressed",
                 legendSubtitleText: "Average trains per weekday"
             },
-            {
-                displayValue: "Freight 2050/51 SC2 Total",
-                paramValue: "freight_2050_51_sc2_total",
-                legendSubtitleText: "Average trains per weekday"
-            },
+            // {
+            //     displayValue: "Freight 2050/51 SC2 Total",
+            //     paramValue: "freight_2050_51_sc2_total",
+            //     legendSubtitleText: "Average trains per weekday"
+            // },
             {
                 displayValue: "Freight 2050/51 SC2 Intermodal 1",
                 paramValue: "freight_2050_51_sc2_intermodal_1",
