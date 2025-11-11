@@ -2,6 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
+import { stationPopupContent } from "../templates";
 
 export const stationInformation = {
   pageName: "Station Information",
@@ -63,6 +64,11 @@ export const stationInformation = {
             hoverNulls: true,
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
+            customTooltip: {
+                url: "/api/railoffer/station-callout/point?featureId={id}",
+                htmlTemplate: stationPopupContent,
+                joinToDefaultTooltip: true
+            }
         },
     ],
     visualisations: [
