@@ -150,13 +150,10 @@ export const calculateMaxWidthFactor = (width, paintProp) => {
  * @throws {Error} If the input array is not a valid interpolation expression or if the existing factors
  *                 in the interpolation are inconsistent.
  */
-export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, constantOffset) => {
+export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, constantOffset = MAP_CONSTANTS.defaultOffset) => {
   if (!Array.isArray(existingInterpolationArray) || existingInterpolationArray[0] !== "interpolate") {
     throw new Error("Invalid interpolation expression");
   }
-
-  // Use provided constantOffset, or fall back to default if undefined
-  const offsetValue = constantOffset !== undefined ? constantOffset : MAP_CONSTANTS.defaultOffset;
 
   // Extract the existing width
   const baseline = getBaselineMaxForProp(paintProp);
@@ -175,7 +172,7 @@ export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, 
     if (typeof newInterpolationArray[i] === "number") {
       newInterpolationArray[i] *= overallFactor;
       if (newLineOffsetArray) {
-        const lineOffsetValue = -((newInterpolationArray[i] / 2) + offsetValue);
+        const lineOffsetValue = -((newInterpolationArray[i] / 2) + constantOffset);
         newLineOffsetArray.push(newInterpolationArray[i - 1], lineOffsetValue);
       }
     }
@@ -325,14 +322,7 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           0,
           opacityValue ?? 1,
         ],
-
-        "line-offset": layerConfig.defaultLineOffset !== undefined ? [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "valueAbs"],
-          Math.min(...bins), layerConfig.defaultLineOffset,
-          Math.max(...bins), layerConfig.defaultLineOffset
-        ] : [
+        "line-offset": layerConfig.defaultLineOffset ?? [
           "interpolate",
           ["linear"],
           ["feature-state", "valueAbs"],
