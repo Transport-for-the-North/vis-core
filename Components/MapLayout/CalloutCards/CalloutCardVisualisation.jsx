@@ -235,7 +235,7 @@ export const CalloutCardVisualisation = ({
 }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
-  const customFormattingFunctions =
+  let customFormattingFunctions =
     visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
 
@@ -369,6 +369,18 @@ export const CalloutCardVisualisation = ({
     return null;
   }
 
+function formatNumberWithUnit(value, unit = "") {
+  if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
+  if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
+  if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
+  return value.toLocaleString() + unit;
+}
+
+customFormattingFunctions = {
+  ...customFormattingFunctions,
+  formatNumberWithUnit,
+};
+
   if (visualisation.layout && visualisation.layout.length > 0) {
     return (
       <ParentContainer $isVisible={isVisible}>
@@ -382,9 +394,13 @@ export const CalloutCardVisualisation = ({
             <>
               {visualisation.layout.map((item, idx) => {
                 if (item.type === "html") {
+                  const mergedData = {
+                    ...(data.data.mainValues || {}),
+                    ...data.data,
+                  };
                   const html = replacePlaceholders(
                     item.fragment,
-                    data.data, // Here you replace with the data object
+                    mergedData, // Here you replace with the data object
                     { customFunctions: customFormattingFunctions }
                   );
                   return (
@@ -396,33 +412,48 @@ export const CalloutCardVisualisation = ({
                     />
                   );
                 } else {
-                  const chartConfig = {
-                    ...(item.chartIndex !== undefined
-                      ? visualisation.charts[item.chartIndex]
-                      : item.chartConfig || item),
-                    columns: Array.isArray(data.data[item.type])
-                      ? [...data.data[item.type]]
-                      : [],
-                  };
+                  const allGraphs = Object.entries(data.data)
+                    .filter(([key, obj]) => obj && obj.type !== undefined)
+                    .map(([key, obj]) => ({ key, ...obj }));
+                  {
+                    return allGraphs.map((chart, idx) => {
+                      const configs = {
+                        type: chart.type,
+                        title: chart.title || "Title",
+                        columns: chart.values.map((obj) => ({
+                          key: obj.name,
+                          label: obj.name,
+                        })),
+                      };
 
-                  const chartData = Array.isArray(data.data[item.type])
-                    ? Object.fromEntries(
-                        data.data[item.type].map(({ key, score }) => [
-                          key,
-                          score,
-                        ])
-                      )
-                    : {};
-                  return (
-                    <CardContent key={idx}>
-                      <ChartRenderer
-                        charts={[chartConfig]}
-                        data={chartData}
-                        formatters={customFormattingFunctions}
-                        barHeight={225}
-                      />
-                    </CardContent>
-                  );
+                      const hasRank = chart.values.some(
+                        (obj) => obj.rank !== undefined
+                      );
+
+                      if (hasRank) {
+                        configs.ranks = chart.values.reduce((acc, obj) => {
+                          if (obj.rank !== undefined) {
+                            acc[obj.name] = obj.rank;
+                          }
+                          return acc;
+                        }, {});
+                      }
+                      const data = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
+                        return acc;
+                      }, {});
+                      return (
+                        <CardContent key={idx}>
+                          <ChartRenderer
+                            charts={[configs]}
+                            data={data}
+                            formatters={customFormattingFunctions}
+                            barHeight={225}
+                          />
+                        </CardContent>
+                      );
+                    });
+                  }
                 }
               })}
             </>

@@ -676,9 +676,21 @@ const RankingChart = ({ config, data, formatters }) => {
     () => cols.map((c) => ({ label: c.label ?? c.key, key: c.key })),
     [cols]
   );
+  const ranks = config?.ranks;
+
+  const sortedRows = React.useMemo(() => {
+    if (ranks) {
+      return [...rows].sort((a, b) => {
+        const rankA = ranks[a.key] ?? Infinity;
+        const rankB = ranks[b.key] ?? Infinity;
+        return rankA - rankB;
+      });
+    }
+    return rows;
+  }, [rows, ranks]);
 
   // Display everything if isOpen, otherwise only the first 5
-  const visibleRows = isOpen ? rows : rows.slice(0, 5);
+  const visibleRows = isOpen ? sortedRows : sortedRows.slice(0, 5);
 
   const fmt = {
     commify:
@@ -724,7 +736,7 @@ const RankingChart = ({ config, data, formatters }) => {
               <CSSTransition key={r.key} timeout={300} classNames="row">
                 <RowTr>
                   <td>
-                    <RankBadge>{idx + 1}</RankBadge>
+                    <RankBadge>{ranks ? ranks[r.key] : idx + 1}</RankBadge>
                   </td>
                   <NameCell>{r.label}</NameCell>
                   <ScoreCell>{fmt.commify(val)}</ScoreCell>
@@ -795,7 +807,7 @@ export const ChartRenderer = ({
                 formatters={f}
               />
             );
-          case "bar-vertical":
+          case "bar_vertical":
             return (
               <BarChart
                 key={idx}

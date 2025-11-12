@@ -12,7 +12,7 @@ export const widerImpacts = {
         name: "Output Areas",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/28/{z}/{x}/{y}?parentZoneType=16&parentZoneId={parentZoneId}", // change to a real endpoint
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // change to a real endpoint
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Map-based totals",
@@ -27,10 +27,6 @@ export const widerImpacts = {
         invertedColorScheme: true,
         trseLabel: true,
         outlineOnPolygonSelect: true,
-        // customTooltip: {
-        //   url: "/api/trse/callout-data/oa-or-pt-point?featureId={id}&featureType=oa",
-        //   htmlTemplate: caPopupContent
-        // }
       },
     ],
     visualisations: [
@@ -42,7 +38,7 @@ export const widerImpacts = {
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/trse/output-area-data", // change to a real endpoint
+        dataPath: "/api/pba/wei/output-area-data",
         legendText: [
           {
             displayValue: "Output Areas",
@@ -56,13 +52,13 @@ export const widerImpacts = {
         cardType: "small",
         cardName: "",
         dataSource: "api",
-        dataPath: "/api/avp/pca/locations/{id}", // change to a real endpoint
+        dataPath: "/api/pba/wei/summary",
         cardTitle: "NS-SeC distribution for {name}",
         layout: [
           {
             type: "html",
             fragment: `
-              <h2>GB Summary</h2>
+              <h2>{title} Summary</h2>
             `,
           },
           {
@@ -71,32 +67,25 @@ export const widerImpacts = {
               <div class="row small">
                 <div class="card small">
                   <div class="label small">GVA (£)</div>
-                  <div class="value small">{gva}</div>
+                  <div class="value small">{formatNumberWithUnit(gva)}</div>
                 </div>
                 <div class="card small">
                   <div class="label small">GVA (£) / Job</div>
-                  <div class="value small">{gva_jobs}</div>
+                  <div class="value small">{formatNumberWithUnit(gva_per_job)}</div>
                 </div>
                 <div class="card small">
                   <div class="label small">Population</div>
-                  <div class="value small">{population}</div>
+                  <div class="value small">{formatNumberWithUnit(population)}</div>
                 </div>
                 <div class="card small">
                   <div class="label small">Jobs</div>
-                  <div class="value small">{jobs}</div>
+                  <div class="value small">{formatNumberWithUnit(jobs)}</div>
                 </div>
               </div>
             `,
           },
           {
-            type: "ranking",
-            title: "Top 5 Winners",
-            maxRows: 5,
-          },
-          {
-            type: "bar-vertical",
-            title: "Segment Breakdown",
-            maxRows: 5,
+            type: "charts",
           },
           {
             type: "html",
@@ -112,13 +101,13 @@ export const widerImpacts = {
         cardType: "small",
         cardName: "",
         dataSource: "api",
-        dataPath: "/api/avp/pca/locations/{id}", // change to a real endpoint
+        dataPath: "/api/pba/wei/fullinfo",
         cardTitle: "NS-SeC distribution for {name}",
         layout: [
           {
             type: "html",
             fragment: `
-              <h2>{title} Summary</h2>
+              <h2>{title}</h2>
             `,
           },
           {
@@ -127,19 +116,19 @@ export const widerImpacts = {
               <div class="row small">
                 <div class="card small">
                   <div class="label small">GVA (£)</div>
-                  <div class="value small">{gva}</div>
+                  <div class="value small">{formatNumberWithUnit(gva)}</div>
                 </div>
                 <div class="card small">
                   <div class="label small">GVA (£) / Job</div>
-                  <div class="value small">{gva_jobs}</div>
+                  <div class="value small">{formatNumberWithUnit(gva_jobs)}</div>
                 </div>
                 <div class="card small">
                   <div class="label small">Population</div>
-                  <div class="value small">{population}</div>
+                  <div class="value small">{formatNumberWithUnit(population)}</div>
                 </div>
                 <div class="card small">
                   <div class="label small">Jobs</div>
-                  <div class="value small">{jobs}</div>
+                  <div class="value small">{formatNumberWithUnit(jobs)}</div>
                 </div>
               </div>
             `,
@@ -160,38 +149,35 @@ export const widerImpacts = {
     ],
     metadataTables: [],
     filters: [
-      // Select
+      // zoneTypeId
       {
-        filterName: "Display values as...",
-        paramName: "showValuesAs",
+        filterName: "Output Areas",
+        paramName: "zoneTypeId",
         target: "api",
         actions: [
-          { action: "UPDATE_QUERY_PARAMS" },
           {
             action: "UPDATE_PARAMETERISED_LAYER",
             payload: { targetLayer: "Output Areas" },
           },
+          { action: "UPDATE_QUERY_PARAMS" },
         ],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
+        layer: "Output Areas",
         type: "toggle",
         values: {
           source: "local",
           values: [
             {
-              displayValue: "CA",
-              paramValue: "ca", // Put their true value
+              displayValue: "Local Authority",
+              paramValue: 18,
             },
             {
-              displayValue: "LAD",
-              paramValue: "lad", // Put their true value
-            },
-            {
-              displayValue: "NELUM",
-              paramValue: "nelum", // Put their true value
+              displayValue: "MSOA",
+              paramValue: 6,
             },
           ],
         },
@@ -199,30 +185,52 @@ export const widerImpacts = {
       // scenario selection
       {
         filterName: "Network scenario",
-        paramName: "network_scenario",
+        paramName: "networkScenario",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
-        type: "mapFeatureSelectAndPan",
+        type: "toggle",
         forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "Bradford Counterfactual - Local Plan",
+              paramValue: "Bradford Counterfactual - Local Plan", // Put their true value
+            },
+          ],
+        },
       },
       // type of network
       {
         filterName: "Network type",
-        paramName: "network_type",
+        paramName: "networkType",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
-        type: "mapFeatureSelectAndPan",
+        type: "toggle",
         forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "Do Minimum",
+              paramValue: "dm", // Put their true value
+            },
+            {
+              displayValue: "Do Something",
+              paramValue: "ds", // Put their true value
+            },
+          ],
+        },
       },
       // year
       {
@@ -233,25 +241,111 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
-        type: "mapFeatureSelectAndPan",
+        type: "toggle",
         forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "2042",
+              paramValue: 2042, // Put their true value
+            },
+          ],
+        },
       },
       // id zone
       {
-        filterName: "",
-        paramName: "featureId",
+        filterName: "segmentName",
+        paramName: "segmentName",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
-        type: "map",
-        layer: "Output Areas",
-        field: "id",
+        type: "toggle",
+        forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "Totals",
+              paramValue: "Totals", // Put their true value
+            },
+          ],
+        },
+      },
+      // programmeId
+      {
+        filterName: "programmeId",
+        paramName: "programmeId",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          // "Map-based totals",
+        ], // both cards and map
+        type: "toggle",
+        forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "4",
+              paramValue: 4, // Put their true value
+            },
+          ],
+        },
+      },
+      // programmeId
+      {
+        filterName: "dataTypeName",
+        paramName: "dataTypeName",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          // "Map-based totals",
+        ], // both cards and map
+        type: "toggle",
+        forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "GVA per job",
+              paramValue: "GVA per job", // Put their true value
+            },
+          ],
+        },
+      },
+      // zoneId
+      {
+        filterName: "zoneId",
+        paramName: "zoneId",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          // "Summary callout card",
+          // "Map-based totals",
+        ], // both cards and map
+        type: "toggle",
+        forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "208042",
+              paramValue: 208042, // Put their true value
+            },
+          ],
+        },
       },
     ],
     additionalFeatures: {},
