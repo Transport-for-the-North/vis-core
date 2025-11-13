@@ -24,8 +24,8 @@ export const widerImpacts = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
-        invertedColorScheme: true,
-        trseLabel: true,
+        invertedColorScheme: false,
+        // trseLabel: true,
         outlineOnPolygonSelect: true,
       },
     ],
@@ -42,7 +42,7 @@ export const widerImpacts = {
         legendText: [
           {
             displayValue: "Output Areas",
-            legendSubtitleText: "%",
+            legendSubtitleText: "£",
           },
         ],
       },
@@ -58,7 +58,7 @@ export const widerImpacts = {
           {
             type: "html",
             fragment: `
-              <h2>{title} Summary</h2>
+              <h2>{title}</h2>
             `,
           },
           {
@@ -87,12 +87,12 @@ export const widerImpacts = {
           {
             type: "charts",
           },
-          {
-            type: "html",
-            fragment: `
-              <p>{text}</p>
-            `,
-          },
+          // {
+          //   type: "html",
+          //   fragment: `
+          //     <p>{text}</p>
+          //   `,
+          // },
         ],
       },
       {
@@ -138,16 +138,25 @@ export const widerImpacts = {
             title: "Segment Breakdown",
             maxRows: 5,
           },
-          {
-            type: "html",
-            fragment: `
-              <p>{text}</p>
-            `,
-          },
+          // {
+          //   type: "html",
+          //   fragment: `
+          //     <p>{text}</p>
+          //   `,
+          // },
         ],
       },
     ],
-    metadataTables: [],
+    metadataTables: [
+      {
+        name: "pba_luti_runcodes",
+        path: "/api/getgenericdataset?dataset_id=avp_data.pba_luti_runcodes",
+      },
+      {
+        name: "pba_wider_economic_impacts_luti_definitions",
+        path: "/api/getgenericdataset?dataset_id=avp_data.pba_wider_economic_impacts_luti_definitions",
+      },
+    ],
     filters: [
       // zoneTypeId
       {
@@ -167,17 +176,18 @@ export const widerImpacts = {
           "Map-based totals",
         ], // both cards and map
         layer: "Output Areas",
-        type: "toggle",
+        type: "fixed",
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "luti_zone_type_id",
+          paramColumn: "luti_zone_type_id",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Local Authority",
-              paramValue: 18,
-            },
-            {
-              displayValue: "MSOA",
-              paramValue: 6,
+              values: true,
+              operator: "equals",
+              shouldFilterOthers: true
             },
           ],
         },
@@ -193,14 +203,18 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "network_scenario",
+          paramColumn: "network_scenario",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Bradford Counterfactual - Local Plan",
-              paramValue: "Bradford Counterfactual - Local Plan", // Put their true value
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -219,15 +233,15 @@ export const widerImpacts = {
         type: "toggle",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "network_type",
+          paramColumn: "network_type",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Do Minimum",
-              paramValue: "dm", // Put their true value
-            },
-            {
-              displayValue: "Do Something",
-              paramValue: "ds", // Put their true value
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -243,14 +257,18 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "year",
+          paramColumn: "year",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "2042",
-              paramValue: 2042, // Put their true value
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -266,14 +284,19 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_wider_economic_impacts_luti_definitions",
+          displayColumn: "segment_name",
+          paramColumn: "segment_name",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Totals",
-              paramValue: "Totals", // Put their true value
+              values: true,
+              operator: "equals",
+              shouldFilterOthers: true
             },
           ],
         },
@@ -289,7 +312,7 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "fixed",
         forceRequired: true,
         values: {
           source: "local",
@@ -301,7 +324,7 @@ export const widerImpacts = {
           ],
         },
       },
-      // programmeId
+      // dataTypeName
       {
         filterName: "dataTypeName",
         paramName: "dataTypeName",
@@ -312,7 +335,8 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        // type: "toggle",
+        type: "fixed",
         forceRequired: true,
         values: {
           source: "local",

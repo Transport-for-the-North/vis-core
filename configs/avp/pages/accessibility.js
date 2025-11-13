@@ -82,12 +82,12 @@ export const accessibility = {
             title: "Segment Breakdown",
             maxRows: 5,
           },
-          {
-            type: "html",
-            fragment: `
-              <p>{text}</p>
-            `,
-          },
+          // {
+          //   type: "html",
+          //   fragment: `
+          //     <p>{text}</p>
+          //   `,
+          // },
         ],
       },
       // full info callout card
@@ -126,16 +126,25 @@ export const accessibility = {
             title: "Segment Breakdown",
             maxRows: 5,
           },
-          {
-            type: "html",
-            fragment: `
-              <p>{text}</p>
-            `,
-          },
+          // {
+          //   type: "html",
+          //   fragment: `
+          //     <p>{text}</p>
+          //   `,
+          // },
         ],
       },
     ],
-    metadataTables: [],
+    metadataTables: [
+      {
+        name: "v_vis_avp_programmes_run_info",
+        path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
+      },
+      {
+        name: "pba_accessibility_definitions",
+        path: "/api/getgenericdataset?dataset_id=avp_data.pba_accessibility_definitions",
+      },
+    ],
     filters: [
       // scenario selection
       {
@@ -148,14 +157,19 @@ export const accessibility = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "network_scenario",
+          paramColumn: "network_scenario",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Counterfactual",
-              paramValue: "Counterfactual", // Put their true value
+              column: "has_pba_accessibility",
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -174,15 +188,16 @@ export const accessibility = {
         type: "toggle",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "network_type",
+          paramColumn: "network_type",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Do Minimum",
-              paramValue: "dm", // Put their true value
-            },
-            {
-              displayValue: "Do Something",
-              paramValue: "ds", // Put their true value
+              column: "has_pba_accessibility",
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -198,14 +213,19 @@ export const accessibility = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "demand_scenario",
+          paramColumn: "demand_scenario",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "EDGE",
-              paramValue: "EDGE", // Put their true value
+              column: "has_pba_accessibility",
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -221,14 +241,19 @@ export const accessibility = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "nortms_catalog_version",
+          paramColumn: "nortms_catalog_version",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "v9.23",
-              paramValue: "v9.23", // Put their true value
+              column: "has_pba_accessibility",
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -244,14 +269,19 @@ export const accessibility = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "year",
+          paramColumn: "year",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "2042",
-              paramValue: 2042, // Put their true value
+              column: "has_pba_accessibility",
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -267,7 +297,7 @@ export const accessibility = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "fixed",
         forceRequired: true,
         values: {
           source: "local",
@@ -290,14 +320,20 @@ export const accessibility = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
+        // type: "fixed",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_accessibility_definitions",
+          displayColumn: "main_category",
+          paramColumn: "main_category",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Employment",
-              paramValue: "Employment", // Put their true value
+              values: true,
+              operator: "equals",
+              shouldFilterOthers: true
             },
           ],
         },
@@ -329,8 +365,8 @@ export const accessibility = {
               paramValue: 18,
             },
             {
-              displayValue: "MSOA",
-              paramValue: 6,
+              displayValue: "LSOA",
+              paramValue: 19,
             },
           ],
         },
@@ -361,14 +397,18 @@ export const accessibility = {
           // "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
         forceRequired: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "pba_accessibility_definitions",
+          displayColumn: "accessibility_code",
+          paramColumn: "accessibility_code",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "Employment score",
-              paramValue: "Employment score", // Put their true value
+              values: true,
+              operator: "equals",
             },
           ],
         },
