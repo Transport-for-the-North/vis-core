@@ -7,7 +7,28 @@ export const accessibility = {
   legalText: "foo",
   termsOfUse: "bar",
   config: {
-    layers: [],
+    layers: [
+      {
+        name: "Output Areas",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // change to a real endpoint
+        sourceLayer: "zones",
+        geometryType: "polygon",
+        visualisationName: "Map-based totals",
+        isHoverable: true,
+        isStylable: true,
+        shouldHaveTooltipOnHover: true,
+        shouldHaveLabel: false,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
+        invertedColorScheme: true,
+        trseLabel: true,
+        outlineOnPolygonSelect: true,
+      },
+    ],
     visualisations: [
       {
         name: "Map-based totals",
@@ -125,7 +146,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -148,7 +169,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -175,7 +196,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -198,7 +219,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -221,7 +242,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -244,7 +265,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -267,7 +288,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -283,30 +304,40 @@ export const accessibility = {
       },
       // zoneTypeId
       {
-        filterName: "zoneTypeId",
+        filterName: "Output Areas",
         paramName: "zoneTypeId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Output Areas" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
+        layer: "Output Areas",
         type: "toggle",
-        forceRequired: true,
         values: {
           source: "local",
           values: [
             {
-              displayValue: "18",
-              paramValue: 18, // Put their true value
+              displayValue: "Local Authority",
+              paramValue: 18,
+            },
+            {
+              displayValue: "MSOA",
+              paramValue: 6,
             },
           ],
         },
       },
       // zoneId
       {
-        filterName: "zoneId",
+        filterName: "",
         paramName: "zoneId",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -314,6 +345,21 @@ export const accessibility = {
           "Zonal callout card",
           // "Summary callout card",
           // "Map-based totals",
+        ],
+        type: "map",
+        layer: "Output Areas",
+        field: "id",
+      },
+      // accessibilityCode
+      {
+        filterName: "accessibilityCode",
+        paramName: "accessibilityCode",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          // "Zonal callout card",
+          // "Summary callout card",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -321,8 +367,8 @@ export const accessibility = {
           source: "local",
           values: [
             {
-              displayValue: "208026",
-              paramValue: 208026, // Put their true value
+              displayValue: "Employment score",
+              paramValue: "Employment score", // Put their true value
             },
           ],
         },

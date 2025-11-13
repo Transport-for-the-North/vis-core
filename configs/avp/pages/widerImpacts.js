@@ -12,7 +12,7 @@ export const widerImpacts = {
         name: "Output Areas",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}?parentZoneType=15&parentZoneId=@stbZoneId@", // change to a real endpoint
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // change to a real endpoint
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Map-based totals",
@@ -191,7 +191,7 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -214,7 +214,7 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -241,7 +241,7 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -264,7 +264,7 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -287,7 +287,7 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -310,7 +310,7 @@ export const widerImpacts = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -319,14 +319,14 @@ export const widerImpacts = {
           values: [
             {
               displayValue: "GVA per job",
-              paramValue: "GVA per job", // Put their true value
+              paramValue: "GVA", // Put their true value
             },
           ],
         },
       },
       // zoneId
       {
-        filterName: "zoneId",
+        filterName: "",
         paramName: "zoneId",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -334,18 +334,10 @@ export const widerImpacts = {
           "Zonal callout card",
           // "Summary callout card",
           // "Map-based totals",
-        ], // both cards and map
-        type: "toggle",
-        forceRequired: true,
-        values: {
-          source: "local",
-          values: [
-            {
-              displayValue: "208042",
-              paramValue: 208042, // Put their true value
-            },
-          ],
-        },
+        ],
+        type: "map",
+        layer: "Output Areas",
+        field: "id",
       },
     ],
     additionalFeatures: {},
