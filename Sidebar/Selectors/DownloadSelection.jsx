@@ -233,6 +233,14 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
       try {
         setIsFiltersReady(false);
         
+        // If no filters provided, just initialize with empty state
+        if (!filters || filters.length === 0) {
+          setProcessedFilters([]);
+          filterDispatch({ type: 'INITIALIZE_FILTERS', payload: {} });
+          setIsFiltersReady(true);
+          return;
+        }
+        
         // Fetch metadata tables
         const metadataTables = await fetchMetadataTables();
         
@@ -248,20 +256,19 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
       }
     };
 
-    if (filters && filters.length > 0) {
-      initializeDownloadFilters();
-    }
+    initializeDownloadFilters();
   }, [filters, filterDispatch, pageContext]);
 
   // Check request size whenever filterState changes (only for GET requests)
   useEffect(() => {
     const checkRequestSize = () => {
-      if (!filterState || Object.keys(filterState).length === 0) return;
+      // If no filterState or empty, use empty object
+      const currentFilters = filterState || {};
       
       try {
         // Only check size for GET requests
         if (requestMethod === "GET") {
-          const { isValid, error } = api.downloadService.checkGetRequestSize(apiRoute, filterState);
+          const { isValid, error } = api.downloadService.checkGetRequestSize(apiRoute, currentFilters);
           setIsRequestTooLarge(!isValid);
           setRequestError(error);
 
@@ -297,7 +304,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
     
     try {
       await api.downloadService.downloadCsv(apiRoute, {
-        queryParams: filterState,
+        queryParams: filterState || {},
         skipAuth: !requiresAuth,
         method: requestMethod,
       });
@@ -322,14 +329,15 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
       </AccordionSection>
     );
   }
-
-  if (!filterState || Object.keys(filterState).length === 0) {
-    return null;
-  }
   
   return (
     <AccordionSection title="Download data" defaultValue={false}>
-      <InfoBox text={'Use the selections to toggle items on and off. See Glossary "Download" for more information.'} />
+      {/* Only show info box if there are filters */}
+      {Array.isArray(processedFilters) && processedFilters.length > 0 && (
+        <InfoBox text={'Use the selections to toggle items on and off. See Glossary "Download" for more information.'} />
+      )}
+      
+      {/* Render filters if they exist */}
       {Array.isArray(processedFilters) && processedFilters.length > 0 ? (
         <>
           {processedFilters
@@ -404,26 +412,26 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
                 )}
               </SelectorContainer>
             ))}
-            
-          {requestError && (
-            <ErrorBox text={requestError}/>
-          )}
-          
-          <DownloadButton 
-            onClick={handleDownload} 
-            $bgColor={bgColor}
-            disabled={isRequestTooLarge || isDownloading}
-          >
-            {isDownloading ? (
-              <>Downloading <Spinner /></>
-            ) : (
-              isRequestTooLarge ? "Request Too Large" : "Download as CSV"
-            )}
-          </DownloadButton>
         </>
-      ) : (
-        <NoDataParagraph>Loading filters...</NoDataParagraph>
+      ) : null}
+      
+      {/* Always show error if it exists */}
+      {requestError && (
+        <ErrorBox text={requestError}/>
       )}
+      
+      {/* Always show download button */}
+      <DownloadButton 
+        onClick={handleDownload} 
+        $bgColor={bgColor}
+        disabled={isRequestTooLarge || isDownloading}
+      >
+        {isDownloading ? (
+          <>Downloading <Spinner /></>
+        ) : (
+          isRequestTooLarge ? "Request Too Large" : "Download as CSV"
+        )}
+      </DownloadButton>
     </AccordionSection>
   );
 };
