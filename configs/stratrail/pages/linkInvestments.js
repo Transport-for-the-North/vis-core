@@ -113,7 +113,7 @@ export const linkInvestments = {
         },
         download: {
             filters: [
-                { ...selectors.linkInvestmentThemeSelector, multiSelect: true },
+                { ...selectors.linkInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/investment-link-results/download'
         },
