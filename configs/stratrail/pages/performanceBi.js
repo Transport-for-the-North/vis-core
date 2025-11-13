@@ -9,6 +9,6 @@ export const performanceBi = {
   termsOfUse: termsOfUse,
   about: "",
   config: {
-    url: "https://app.powerbi.com/reportEmbed?reportId=42e6b74d-85d6-4a48-bd36-66e2fae1be9c&autoAuth=true&ctid=d58a9e1d-4dca-4595-a9e8-7934a15f3419"
+    url: "https://app.powerbi.com/view?r=eyJrIjoiNzMwYmMxMTctOTFiZi00NTYzLWI0ZGEtNWRhNDQ5OTE3YzhmIiwidCI6ImQ1OGE5ZTFkLTRkY2EtNDU5NS1hOWU4LTc5MzRhMTVmMzQxOSJ9"
   }
 };
