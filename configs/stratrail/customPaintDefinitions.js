@@ -98,6 +98,15 @@ export const freightLocationLayerPaint = {
   "circle-stroke-opacity": 1
 };
 
+export const freightJunctionLayerPaint = {
+  "circle-color": "#f5f5f5",
+  "circle-radius": 5,
+  "circle-opacity": 0.9,
+  "circle-stroke-color": "#000000",
+  "circle-stroke-width": 2,
+  "circle-stroke-opacity": 1
+};
+
 export const invisiblePolygonCustomPaint = {
   "fill-opacity": 0,
 };

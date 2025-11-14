@@ -13,6 +13,21 @@ export const bands = [
                 values: [0, 5, 10, 20, 50, 100, 150, 300, 450]
             },
             {
+                name: "freight_2040_41_sc2_unsuppressed",
+                pageName: "Freight Weekday Average Flows",
+                values: [0, 5, 10, 20, 50, 100, 150, 300, 450]
+            },
+            {
+                name: "freight_2050_51_sc2_unsuppressed",
+                pageName: "Freight Weekday Average Flows",
+                values: [0, 5, 10, 20, 50, 100, 150, 300, 450]
+            },
+            {
+                name: "freight_2050_51_sc4_unsuppressed",
+                pageName: "Freight Weekday Average Flows",
+                values: [0, 5, 10, 20, 50, 100, 150, 300, 450]
+            },
+            {
                 name: "freight_2028_29_constrained_minus_unconstrained",
                 pageName: "Freight Weekday Average Flows",
                 values: [-100, -70, -40, -20, -10, -5, -2, 0]

@@ -17,6 +17,7 @@ import { nodeWorkTravelMethod } from "./nodeWorkTravelMethod"
 import { freightHighGaugeCleared } from "./freightHighGaugeCleared"
 import { freightHighGauge } from "./freightHighGauge"
 import { freightAvgWeekdayFlows } from "./freightAvgWeekdayFlows"
+import { freightJunctions } from "./freightJunctions"
 
 export const pages = {
     linkLoadings: linkLoadings,
@@ -38,4 +39,5 @@ export const pages = {
     freightHighGaugeCleared: freightHighGaugeCleared,
     freightHighGauge: freightHighGauge,
     freightAvgWeekdayFlows: freightAvgWeekdayFlows,
+    freightJunctions: freightJunctions
 }
