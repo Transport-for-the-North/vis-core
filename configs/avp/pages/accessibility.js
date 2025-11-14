@@ -9,10 +9,10 @@ export const accessibility = {
   config: {
     layers: [
       {
-        name: "Output Areas",
+        name: "Zones",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // change to a real endpoint
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}",
         sourceLayer: "zones",
         geometryType: "polygon",
         visualisationName: "Map-based totals",
@@ -24,8 +24,7 @@ export const accessibility = {
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
-        invertedColorScheme: true,
-        trseLabel: true,
+        invertedColorScheme: false,
         outlineOnPolygonSelect: true,
       },
     ],
@@ -33,18 +32,18 @@ export const accessibility = {
       {
         name: "Map-based totals",
         type: "joinDataToMap",
-        joinLayer: "Output Areas",
+        joinLayer: "Zones",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/pba/accessibility/zonal-data",
-        legendText: [
-          {
-            displayValue: "Output Areas",
-            legendSubtitleText: "%",
-          },
-        ],
+        // legendText: [
+        //   {
+        //     displayValue: "Zones",
+        //     legendSubtitleText: "%",
+        //   },
+        // ],
       },
       // summary callout card
       {
@@ -60,21 +59,6 @@ export const accessibility = {
             type: "html",
             fragment: `
               <h2>{title}</h2>
-            `,
-          },
-          {
-            type: "html",
-            fragment: `
-              <div class="row">
-                <div class="card">
-                  <div class="label">Rank</div>
-                  <div class="value">{rank}</div>
-                </div>
-                <div class="card">
-                  <div class="label">Decile</div>
-                  <div class="value">{decile}</div>
-                </div>
-              </div>
             `,
           },
           {
@@ -98,7 +82,7 @@ export const accessibility = {
         cardName: "",
         dataSource: "api",
         dataPath: "/api/pba/accessibility/fullinfo",
-        cardTitle: "NS-SeC distribution for {name}",
+        cardTitle: "{name}",
         layout: [
           {
             type: "html",
@@ -121,11 +105,6 @@ export const accessibility = {
               </div>
             `,
           },
-          {
-            type: "bar-vertical",
-            title: "Segment Breakdown",
-            maxRows: 5,
-          },
           // {
           //   type: "html",
           //   fragment: `
@@ -146,86 +125,35 @@ export const accessibility = {
       },
     ],
     filters: [
-      // scenario selection
+      // zoneTypeId
       {
-        filterName: "Network scenario",
-        paramName: "networkScenario",
+        filterName: "Zone type",
+        paramName: "zoneTypeId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Zones" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          // "Map-based totals",
+          "Map-based totals",
         ], // both cards and map
-        type: "dropdown",
-        forceRequired: true,
-        values: {
-          source: "metadataTable",
-          metadataTableName: "v_vis_avp_programmes_run_info",
-          displayColumn: "network_scenario",
-          paramColumn: "network_scenario",
-          sort: "ascending",
-          where: [
-            {
-              column: "has_pba_accessibility",
-              values: true,
-              operator: "equals",
-            },
-          ],
-        },
-      },
-      // type of network
-      {
-        filterName: "Network type",
-        paramName: "networkType",
-        target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Zonal callout card",
-          "Summary callout card",
-          // "Map-based totals",
-        ], // both cards and map
+        layer: "Zones",
         type: "toggle",
-        forceRequired: true,
         values: {
-          source: "metadataTable",
-          metadataTableName: "v_vis_avp_programmes_run_info",
-          displayColumn: "network_type",
-          paramColumn: "network_type",
-          sort: "ascending",
-          where: [
+          source: "local",
+          values: [
             {
-              column: "has_pba_accessibility",
-              values: true,
-              operator: "equals",
+              displayValue: "Local Authority",
+              paramValue: 18,
             },
-          ],
-        },
-      },
-      // demandScenario
-      {
-        filterName: "demandScenario",
-        paramName: "demandScenario",
-        target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Zonal callout card",
-          "Summary callout card",
-          // "Map-based totals",
-        ], // both cards and map
-        type: "dropdown",
-        forceRequired: true,
-        values: {
-          source: "metadataTable",
-          metadataTableName: "v_vis_avp_programmes_run_info",
-          displayColumn: "demand_scenario",
-          paramColumn: "demand_scenario",
-          sort: "ascending",
-          where: [
             {
-              column: "has_pba_accessibility",
-              values: true,
-              operator: "equals",
+              displayValue: "LSOA",
+              paramValue: 19,
             },
           ],
         },
@@ -246,8 +174,10 @@ export const accessibility = {
         values: {
           source: "metadataTable",
           metadataTableName: "v_vis_avp_programmes_run_info",
-          displayColumn: "nortms_run_id",
+          displayColumn: "nortms_run_id_display",
           paramColumn: "run_id",
+          infoOnHoverColumn: "network_desc",
+          infoBelowOnChangeColumn: "network_desc",
           sort: "ascending",
           where: [
             {
@@ -255,33 +185,10 @@ export const accessibility = {
               values: true,
               operator: "equals",
             },
-          ],
-        },
-      },
-      // year
-      {
-        filterName: "Year",
-        paramName: "year",
-        target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Zonal callout card",
-          "Summary callout card",
-          // "Map-based totals",
-        ], // both cards and map
-        type: "dropdown",
-        forceRequired: true,
-        values: {
-          source: "metadataTable",
-          metadataTableName: "v_vis_avp_programmes_run_info",
-          displayColumn: "year",
-          paramColumn: "year",
-          sort: "ascending",
-          where: [
             {
-              column: "has_pba_accessibility",
-              values: true,
-              operator: "equals",
+              column: "run_id",
+              values: [26, 27, 31, 32],
+              operator: "in",
             },
           ],
         },
@@ -321,7 +228,6 @@ export const accessibility = {
           "Map-based totals",
         ], // both cards and map
         type: "dropdown",
-        // type: "fixed",
         forceRequired: true,
         values: {
           source: "metadataTable",
@@ -330,44 +236,92 @@ export const accessibility = {
           paramColumn: "main_category",
           sort: "ascending",
           where: [
-            {
-              values: true,
-              operator: "equals",
-              shouldFilterOthers: true
-            },
+            { column: "accessibility_description", operator: "notNull" },
+            { column: "main_category", operator: "notNull" },
           ],
         },
       },
-      // zoneTypeId
+      // subCategory
       {
-        filterName: "Output Areas",
-        paramName: "zoneTypeId",
+        filterName: "subCategory",
+        paramName: "",
         target: "api",
-        actions: [
-          {
-            action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Output Areas" },
-          },
-          { action: "UPDATE_QUERY_PARAMS" },
-        ],
-        visualisations: [
-          "Zonal callout card",
-          "Summary callout card",
-          "Map-based totals",
-        ], // both cards and map
-        layer: "Output Areas",
-        type: "toggle",
+        shouldBeFiltered: true,
+        type: "dropdown",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Zonal callout card"],
         values: {
-          source: "local",
-          values: [
-            {
-              displayValue: "Local Authority",
-              paramValue: 18,
-            },
-            {
-              displayValue: "LSOA",
-              paramValue: 19,
-            },
+          source: "metadataTable",
+          metadataTableName: "pba_accessibility_definitions",
+          displayColumn: "sub_category",
+          paramColumn: "sub_category",
+          sort: "ascending",
+          where: [
+            { column: "accessibility_description", operator: "notNull" },
+            { column: "sub_category", operator: "notNull" },
+          ],
+        },
+      },
+      // mode
+      {
+        filterName: "mode",
+        paramName: "",
+        target: "api",
+        shouldBeFiltered: true,
+        type: "dropdown",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Zonal callout card"],
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_accessibility_definitions",
+          displayColumn: "mode",
+          paramColumn: "mode",
+          sort: "ascending",
+          where: [
+            { column: "accessibility_description", operator: "notNull" },
+            { column: "mode", operator: "notNull" },
+          ],
+        },
+      },
+      // journeyTime
+      {
+        filterName: "journeyTime",
+        paramName: "",
+        target: "api",
+        shouldBeFiltered: true,
+        type: "dropdown",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Zonal callout card"],
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_accessibility_definitions",
+          displayColumn: "journey_time",
+          paramColumn: "journey_time",
+          sort: "ascending",
+          where: [
+            { column: "accessibility_description", operator: "notNull" },
+            { column: "journey_time", operator: "notNull" },
+          ],
+        },
+      },
+      // evaluationMetric
+      {
+        filterName: "evaluationMetric",
+        paramName: "",
+        target: "api",
+        shouldBeFiltered: true,
+        type: "dropdown",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Zonal callout card"],
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_accessibility_definitions",
+          displayColumn: "evaluation_metric",
+          paramColumn: "evaluation_metric",
+          sort: "ascending",
+          where: [
+            { column: "accessibility_description", operator: "notNull" },
+            { column: "evaluation_metric", operator: "notNull" },
           ],
         },
       },
@@ -379,11 +333,9 @@ export const accessibility = {
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           "Zonal callout card",
-          // "Summary callout card",
-          // "Map-based totals",
         ],
         type: "map",
-        layer: "Output Areas",
+        layer: "Zones",
         field: "id",
       },
       // accessibilityCode
@@ -391,6 +343,7 @@ export const accessibility = {
         filterName: "accessibilityCode",
         paramName: "accessibilityCode",
         target: "api",
+        shouldBeFiltered: true,
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           // "Zonal callout card",
@@ -404,12 +357,20 @@ export const accessibility = {
           metadataTableName: "pba_accessibility_definitions",
           displayColumn: "accessibility_code",
           paramColumn: "accessibility_code",
+          infoOnHoverColumn: "accessibility_description",
+          infoBelowOnChangeColumn: "accessibility_description",
           sort: "ascending",
           where: [
-            {
-              values: true,
-              operator: "equals",
-            },
+            // All columns must be present (non-null)
+            { column: "id", operator: "notNull" },
+            { column: "accessibility_code", operator: "notNull" },
+            { column: "accessibility_description", operator: "notNull" },
+            { column: "main_category", operator: "notNull" },
+            { column: "sub_category", operator: "notNull" },
+            { column: "accessibility_category_id", operator: "notNull" },
+            { column: "mode", operator: "notNull" },
+            { column: "journey_time", operator: "notNull" },
+            { column: "evaluation_metric", operator: "notNull" },
           ],
         },
       },
