@@ -1,1 +1,1 @@
-export * from './stationPopup';
+export { stationPopupContent } from "./stationPopup";
