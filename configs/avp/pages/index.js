@@ -1,7 +1,7 @@
 import { pca } from './pca'
 import { nac } from './NAC'
-import { widerImpacts } from './widerImpacts'
-import { accessibility } from './accessibility'
+import { widerImpacts } from './pba-wider-impacts'
+import { accessibility } from './pba-accessibility'
 export const pages = {
     pca,
     nac,

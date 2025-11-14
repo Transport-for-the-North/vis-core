@@ -1,7 +1,7 @@
 export const widerImpacts = {
   pageName: "Wider impacts",
   url: "/wider-impacts",
-  about: `<p>Visualise life</p>`,
+  about: `<p>This is customisable 'about' text. Use it to describe what's being visualised and how the user can interact with the data. If required, add more useful context about the data.</p>`,
   type: "MapLayout",
   category: "PBA",
   legalText: "foo",
@@ -9,7 +9,7 @@ export const widerImpacts = {
   config: {
     layers: [
       {
-        name: "Output Areas",
+        name: "Zones",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // change to a real endpoint
@@ -33,18 +33,18 @@ export const widerImpacts = {
       {
         name: "Map-based totals",
         type: "joinDataToMap",
-        joinLayer: "Output Areas",
+        joinLayer: "Zones",
         style: "polygon-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/pba/wei/zonal-data",
-        legendText: [
-          {
-            displayValue: "Output Areas",
-            legendSubtitleText: "£",
-          },
-        ],
+        // legendText: [
+        //   {
+        //     displayValue: "Zones",
+        //     legendSubtitleText: "£",
+        //   },
+        // ],
       },
       {
         name: "Summary callout card",
@@ -160,13 +160,13 @@ export const widerImpacts = {
     filters: [
       // zoneTypeId
       {
-        filterName: "Output Areas",
+        filterName: "Zones",
         paramName: "zoneTypeId",
         target: "api",
         actions: [
           {
             action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Output Areas" },
+            payload: { targetLayer: "Zones" },
           },
           { action: "UPDATE_QUERY_PARAMS" },
         ],
@@ -175,21 +175,16 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        layer: "Output Areas",
+        layer: "Zones",
         type: "fixed",
         values: {
-          source: "metadataTable",
-          metadataTableName: "pba_luti_runcodes",
-          displayColumn: "luti_zone_type_id",
-          paramColumn: "luti_zone_type_id",
-          sort: "ascending",
-          where: [
+          source: "local",
+          values: [
             {
-              values: true,
-              operator: "equals",
-              shouldFilterOthers: true
+              displayValue: "BRONTE",
+              paramValue: 37,
             },
-          ],
+          ]
         },
       },
       // scenario selection
@@ -273,32 +268,60 @@ export const widerImpacts = {
           ],
         },
       },
-      // id zone
+      // dataTypeName
       {
-        filterName: "segmentName",
-        paramName: "segmentName",
+        filterName: "Metric",
+        paramName: "dataTypeName",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        actions: [
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
           "Map-based totals",
-        ], // both cards and map
+        ],
+        info: "",
         type: "dropdown",
-        forceRequired: true,
+        shouldBeBlankOnInit: false,
+        shouldFilterOnValidation: false,
+        shouldBeValidated: false,
+        isClearable: false,
+        multiSelect: false,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_wider_economic_impacts_luti_definitions",
+          displayColumn: "data_type_name",
+          paramColumn: "data_type_name",
+          sort: "ascending",
+        },
+      },
+      {
+        filterName: "Segment",
+        paramName: "segmentName",
+        target: "api",
+        actions: [
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ],
+        info: "",
+        type: "dropdown",
+        shouldBeBlankOnInit: false,
+        shouldFilterOnValidation: false,
+        shouldBeFiltered: true,
+        shouldBeValidated: false,
+        isClearable: false,
+        multiSelect: false,
         values: {
           source: "metadataTable",
           metadataTableName: "pba_wider_economic_impacts_luti_definitions",
           displayColumn: "segment_name",
           paramColumn: "segment_name",
           sort: "ascending",
-          where: [
-            {
-              values: true,
-              operator: "equals",
-              shouldFilterOthers: true
-            },
-          ],
         },
       },
       // programmeId
@@ -324,30 +347,6 @@ export const widerImpacts = {
           ],
         },
       },
-      // dataTypeName
-      {
-        filterName: "dataTypeName",
-        paramName: "dataTypeName",
-        target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Zonal callout card",
-          "Summary callout card",
-          "Map-based totals",
-        ], // both cards and map
-        // type: "toggle",
-        type: "fixed",
-        forceRequired: true,
-        values: {
-          source: "local",
-          values: [
-            {
-              displayValue: "GVA per job",
-              paramValue: "GVA", // Put their true value
-            },
-          ],
-        },
-      },
       // zoneId
       {
         filterName: "",
@@ -356,11 +355,9 @@ export const widerImpacts = {
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           "Zonal callout card",
-          // "Summary callout card",
-          // "Map-based totals",
         ],
         type: "map",
-        layer: "Output Areas",
+        layer: "Zones",
         field: "id",
       },
     ],

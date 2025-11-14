@@ -1,7 +1,7 @@
 export const accessibility = {
   pageName: "Accessibility",
   url: "/accessibility",
-  about: `<p>Visualise life</p>`,
+  about: `<p>This is customisable 'about' text. Use it to describe what's being visualised and how the user can interact with the data. If required, add more useful context about the data.</p>`,
   type: "MapLayout",
   category: "PBA",
   legalText: "foo",
