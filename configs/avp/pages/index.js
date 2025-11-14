@@ -1,9 +1,9 @@
-import { mapImage } from './mapImage'
+import { pca } from './pca'
 import { nac } from './NAC'
 import { widerImpacts } from './widerImpacts'
 import { accessibility } from './accessibility'
 export const pages = {
-    mapImage,
+    pca,
     nac,
     widerImpacts,
     accessibility

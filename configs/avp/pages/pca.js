@@ -1,14 +1,16 @@
 import { loremIpsum } from "utils";
 
-export const mapImage = {
-    pageName: "Map Image",
-    url: "/map-image",
+export const pca = {
+    pageName: "Person-Centred Analysis",
+    url: "/person-centred-analysis",
     about:
         `<p>Visualise life</p>`,
     type: "MapLayout",
     category: null,
     legalText: 'foo',
     termsOfUse: 'bar',
+    customMapZoom: 14,
+    customMapCentre: [-1.76369, 53.79073],
     config: {
         layers: [
             {
@@ -36,14 +38,13 @@ export const mapImage = {
                 cardName: "",
                 dataSource: "api",
                 dataPath: "/api/avp/pca/locations/{id}",
-                htmlFragment: '<p>{programme_id}-{label}-{location_id}-{text_with_placeholders}</p>'
             }
         ],
         metadataTables: [
             {
                 name: "v_vis_avp_programmes_run_info",
                 path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info"
-            }
+            },
         ],
         filters: [
             {
