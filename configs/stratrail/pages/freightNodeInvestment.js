@@ -141,7 +141,7 @@ export const freightNodeInvestments = {
         },
         download: {
             filters: [
-                { ...selectors.nodeFreightInterventionSelector, multiSelect: true },
+                { ...selectors.nodeFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/freight-investment-node-results/download'
         },

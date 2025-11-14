@@ -141,7 +141,7 @@ export const nodeInvestments = {
         },
         download: {
             filters: [
-                { ...selectors.nodeInvestmentThemeSelector, multiSelect: true },
+                { ...selectors.nodeInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/investment-node-results/download'
         },

@@ -113,7 +113,7 @@ export const freightLinkInvestments = {
         },
         download: {
             filters: [
-                { ...selectors.linkFreightInterventionSelector, multiSelect: true },
+                { ...selectors.linkFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/freight-investment-link-results/download'
         },

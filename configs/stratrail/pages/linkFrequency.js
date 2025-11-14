@@ -64,7 +64,7 @@ export const linkFrequency = {
         },
         download: {
             filters: [
-                { ...selectors.timePeriod, multiSelect: true },
+                { ...selectors.timePeriod, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/link-frequency/download'
         },

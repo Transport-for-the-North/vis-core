@@ -49,6 +49,7 @@ export const appConfig = {
                 <li><b>Freight High Gauge Cleared Network:</b> This map shows the TRU benefit realisation in full - showing routings for the first Trans-Pennine high gauge cleared network.</li>
                 <li><b>Freight High Gauge Types:</b> This map shows the proposed additional high gauge (W12) clearance to interventions to support full TRU freight benefit realisation.</li>
                 <li><b>Freight Weekday Average Flows:</b> This visualisation shows the rail freight network flows in average weekday trains for a number of scenarios developed through the Rail Freight Routing Study in 2024.</li>
+                <li><b>Junctions Suppressing Freight Growth by 2040:</b> This visualisation shows junctions assessed as suppressing freight growth by 2040 under a TAG compliant business as usual growth scenario (RFRS 2024).</li>
             </ul>
             `,
             sectionTitle: "Portal Information",
@@ -181,7 +182,8 @@ export const appConfig = {
         pages.performanceBi,
         pages.freightHighGaugeCleared,
         pages.freightHighGauge,
-        pages.freightAvgWeekdayFlows
+        pages.freightAvgWeekdayFlows,
+        pages.freightJunctions
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",

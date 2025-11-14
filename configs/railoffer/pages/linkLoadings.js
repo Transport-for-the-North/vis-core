@@ -30,6 +30,7 @@ export const linkLoadings = {
             isHoverable: true,
             isStylable: true,
             shouldHaveTooltipOnHover: true,
+            shouldHaveHoverOnlyOnData: true,
             shouldHaveLabel: true,
             labelZoomLevel: 12,
             labelNulls: true,
@@ -62,8 +63,8 @@ export const linkLoadings = {
         },
         download: {
             filters: [
-                { ...selectors.loadingsTOCSelector, multiSelect: true },
-                { ...selectors.dayOfWeekSelector, multiSelect: true },
+                { ...selectors.loadingsTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
+                { ...selectors.dayOfWeekSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/link-loadings/download'
         },
