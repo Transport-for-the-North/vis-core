@@ -209,7 +209,7 @@ export const Dropdown = ({ filter, onChange }) => {
   const { state: filterState } = useFilterContext();
   const animatedComponents = makeAnimated();
   const [loading, setLoading] = useState(false);
-  const [isInfoCollapsed, setInfoCollapsed] = useState(true);
+  const [isInfoCollapsed, setInfoCollapsed] = useState(false);
   const prevOptionsRef = useRef([]);
   const prevSelectedOptionsRef = useRef(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
