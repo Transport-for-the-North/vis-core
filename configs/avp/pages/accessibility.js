@@ -38,7 +38,7 @@ export const accessibility = {
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/pba/accessibility/output-area-data",
+        dataPath: "/api/pba/accessibility/zonal-data",
         legendText: [
           {
             displayValue: "Output Areas",
@@ -155,7 +155,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
         type: "dropdown",
         forceRequired: true,
@@ -183,7 +183,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
         type: "toggle",
         forceRequired: true,
@@ -211,7 +211,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
         type: "dropdown",
         forceRequired: true,
@@ -230,10 +230,10 @@ export const accessibility = {
           ],
         },
       },
-      // nortmsCatalogVersion
+      // nortmsRunCodeId
       {
-        filterName: "nortmsCatalogVersion",
-        paramName: "nortmsCatalogVersion",
+        filterName: "nortmsRunCodeId",
+        paramName: "nortmsRunCodeId",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
@@ -246,8 +246,8 @@ export const accessibility = {
         values: {
           source: "metadataTable",
           metadataTableName: "v_vis_avp_programmes_run_info",
-          displayColumn: "nortms_catalog_version",
-          paramColumn: "nortms_catalog_version",
+          displayColumn: "nortms_run_id",
+          paramColumn: "run_id",
           sort: "ascending",
           where: [
             {
@@ -267,7 +267,7 @@ export const accessibility = {
         visualisations: [
           "Zonal callout card",
           "Summary callout card",
-          "Map-based totals",
+          // "Map-based totals",
         ], // both cards and map
         type: "dropdown",
         forceRequired: true,
@@ -303,8 +303,8 @@ export const accessibility = {
           source: "local",
           values: [
             {
-              displayValue: "4",
-              paramValue: 4, // Put their true value
+              displayValue: "2",
+              paramValue: 2, // Put their true value
             },
           ],
         },

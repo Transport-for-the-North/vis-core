@@ -38,7 +38,7 @@ export const widerImpacts = {
         joinField: "id",
         valueField: "value",
         dataSource: "api",
-        dataPath: "/api/pba/wei/output-area-data",
+        dataPath: "/api/pba/wei/zonal-data",
         legendText: [
           {
             displayValue: "Output Areas",
@@ -318,8 +318,8 @@ export const widerImpacts = {
           source: "local",
           values: [
             {
-              displayValue: "4",
-              paramValue: 4, // Put their true value
+              displayValue: "2",
+              paramValue: 2, // Put their true value
             },
           ],
         },
