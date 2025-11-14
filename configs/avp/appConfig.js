@@ -2,7 +2,7 @@ import { pages } from "./pages";
 import { loremIpsum } from "utils";
 
 export const appConfig = {
-    authenticationRequired: false,
+    authenticationRequired: true,
     title: "AVP",
     introduction:
         `<p>${loremIpsum}</p>

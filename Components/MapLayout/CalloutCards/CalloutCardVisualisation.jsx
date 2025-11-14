@@ -370,10 +370,11 @@ export const CalloutCardVisualisation = ({
   }
 
 function formatNumberWithUnit(value, unit = "") {
+  if (value === null || value === undefined || isNaN(value)) return "N/A";
   if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
   if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
   if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
-  return value.toLocaleString() + unit;
+  return Number(value).toFixed(2) + unit;
 }
 
 customFormattingFunctions = {
@@ -419,7 +420,7 @@ customFormattingFunctions = {
                     return allGraphs.map((chart, idx) => {
                       const configs = {
                         type: chart.type,
-                        title: chart.title || "Title",
+                        title: chart.header || "Title",
                         columns: chart.values.map((obj) => ({
                           key: obj.name,
                           label: obj.name,
