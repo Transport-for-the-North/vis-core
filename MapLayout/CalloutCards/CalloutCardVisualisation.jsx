@@ -396,8 +396,8 @@ customFormattingFunctions = {
               {visualisation.layout.map((item, idx) => {
                 if (item.type === "html") {
                   const mergedData = {
-                    ...(data.data.mainValues || {}),
-                    ...data.data,
+                    ...(data.mainValues || {}),
+                    ...data,
                   };
                   const html = replacePlaceholders(
                     item.fragment,
@@ -413,48 +413,46 @@ customFormattingFunctions = {
                     />
                   );
                 } else {
-                  const allGraphs = Object.entries(data.data)
+                  const allGraphs = Object.entries(data)
                     .filter(([key, obj]) => obj && obj.type !== undefined)
                     .map(([key, obj]) => ({ key, ...obj }));
-                  {
-                    return allGraphs.map((chart, idx) => {
-                      const configs = {
-                        type: chart.type,
-                        title: chart.header || "Title",
-                        columns: chart.values.map((obj) => ({
-                          key: obj.name,
-                          label: obj.name,
-                        })),
-                      };
+                  return allGraphs.map((chart, idx) => {
+                    const configs = {
+                      type: chart.type,
+                      title: chart.header || "Title",
+                      columns: chart.values.map((obj) => ({
+                        key: obj.name,
+                        label: obj.name,
+                      })),
+                    };
 
-                      const hasRank = chart.values.some(
-                        (obj) => obj.rank !== undefined
-                      );
+                    const hasRank = chart.values.some(
+                      (obj) => obj.rank !== undefined
+                    );
 
-                      if (hasRank) {
-                        configs.ranks = chart.values.reduce((acc, obj) => {
-                          if (obj.rank !== undefined) {
-                            acc[obj.name] = obj.rank;
-                          }
-                          return acc;
-                        }, {});
-                      }
-                      const data = chart.values.reduce((acc, obj) => {
-                        acc[obj.name] = obj.columnValue;
+                    if (hasRank) {
+                      configs.ranks = chart.values.reduce((acc, obj) => {
+                        if (obj.rank !== undefined) {
+                          acc[obj.name] = obj.rank;
+                        }
                         return acc;
                       }, {});
-                      return (
-                        <CardContent key={idx}>
-                          <ChartRenderer
-                            charts={[configs]}
-                            data={data}
-                            formatters={customFormattingFunctions}
-                            barHeight={225}
-                          />
-                        </CardContent>
-                      );
-                    });
-                  }
+                    }
+                    const data = chart.values.reduce((acc, obj) => {
+                      acc[obj.name] = obj.columnValue;
+                      return acc;
+                    }, {});
+                    return (
+                      <CardContent key={idx}>
+                        <ChartRenderer
+                          charts={[configs]}
+                          data={data}
+                          formatters={customFormattingFunctions}
+                          barHeight={225}
+                        />
+                      </CardContent>
+                    );
+                  });
                 }
               })}
             </>
