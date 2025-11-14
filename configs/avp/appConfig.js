@@ -25,7 +25,7 @@ export const appConfig = {
     logoutButtonImage: "img/burgerIcon.png",
     logoutImage: "img/logout.png",
     appPages: [
-        pages.mapImage,
+        pages.pca,
         pages.nac,
         pages.widerImpacts,
         pages.accessibility
