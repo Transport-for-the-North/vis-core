@@ -371,6 +371,14 @@ export const getScrollbarWidth = (scrollbarWidthProp) => {
 /**
  * Apply one or multiple "where" conditions to a dataset (array of row objects).
  *
+ * Supports the following operators:
+ *   - 'in': rowValue must be included in values (array or scalar)
+ *   - 'notIn': rowValue must NOT be included in values (array or scalar)
+ *   - 'equals': rowValue === value
+ *   - 'notEquals': rowValue !== value
+ *   - 'isNull': rowValue == null (matches null or undefined)
+ *   - 'notNull': rowValue != null (excludes null and undefined)
+ *
  * @param {Array<Object>} rows - The input dataset rows.
  * @param {Object|Array<Object>} where - A single condition or an array of conditions.
  * @returns {Array<Object>} - Rows that pass all conditions.
@@ -378,8 +386,8 @@ export const getScrollbarWidth = (scrollbarWidthProp) => {
  * Condition shape:
  *   {
  *     column: string,
- *     values: any | any[],
- *     operator?: 'in' | 'notIn' | 'equals'
+ *     values?: any | any[], // not required for isNull/notNull
+ *     operator?: 'in' | 'notIn' | 'equals' | 'notEquals' | 'isNull' | 'notNull'
  *   }
  */
 export const applyWhereConditions = (rows, where) => {
@@ -393,7 +401,7 @@ export const applyWhereConditions = (rows, where) => {
       const operator = cond.operator || "in";
       const rowValue = row[cond.column];
 
-      // Normalize condition values to an array for 'in'/'notIn', and a single value for 'equals'
+      // Normalize condition values to an array for 'in'/'notIn', and a single value for equality ops
       const rawValues = cond.values;
       const valuesArray = Array.isArray(rawValues) ? rawValues : [rawValues];
       const equalsValue = Array.isArray(rawValues) ? rawValues[0] : rawValues;
@@ -401,8 +409,14 @@ export const applyWhereConditions = (rows, where) => {
       switch (operator) {
         case "equals":
           return rowValue === equalsValue;
+        case "notEquals":
+          return rowValue !== equalsValue;
         case "notIn":
           return !valuesArray.includes(rowValue);
+        case "isNull":
+          return rowValue == null;
+        case "notNull":
+          return rowValue != null;
         case "in":
         default:
           return valuesArray.includes(rowValue);
