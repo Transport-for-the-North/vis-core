@@ -241,12 +241,6 @@ export const Dropdown = ({ filter, onChange }) => {
     return options.find((option) => option.value === filterState[filter.id]);
   }, [filterState, filter.id, options]);
 
-  useEffect(() => {
-    if (!filter.shouldBeBlankOnInit && selectedOptions === undefined && filterState[filter.id] !== null) {
-      onChange(filter, null);
-    }
-  }, [selectedOptions, filterState, filter, onChange]);
-
   /**
    * Computes a stable signature representing the visible options for this dropdown,
    * excluding the 'All' option for multi-select. The signature includes each option's
@@ -270,6 +264,46 @@ export const Dropdown = ({ filter, onChange }) => {
       }))
     );
   }, [options, filter.multiSelect]);
+
+  useEffect(() => {
+    // If the selection is now invalid (e.g., filtered out), fall back to a suitable value.
+    // For single-select: choose the first visible option (if available) instead of null.
+    if (
+      !filter.shouldBeBlankOnInit &&
+      selectedOptions === undefined &&
+      filterState[filter.id] !== null
+    ) {
+      const visible = filter.multiSelect ? options.slice(1) : options;
+      const fallback = visible[0]?.value ?? null;
+      onChange(filter, fallback);
+    }
+  }, [selectedOptions, filterState, filter, onChange, options]);
+
+  // Ensure multi-select selections stay in sync with filtered options, and fallback when emptied.
+  useEffect(() => {
+    if (!filter.multiSelect) return;
+
+    const current = filterState[filter.id];
+    if (!Array.isArray(current)) return;
+
+    const visibleOptions = options.slice(1); // exclude 'All'
+    const visibleValuesSet = new Set(visibleOptions.map((o) => o.value));
+    const next = current.filter((v) => visibleValuesSet.has(v));
+
+    // If some selected values were filtered out, prune them.
+    if (next.length !== current.length && next.length > 0) {
+      onChange(filter, next);
+      return;
+    }
+
+    // If all selected values are now filtered out, fallback to "all visible" to keep selection valid.
+    if (current.length > 0 && next.length === 0) {
+      const allVisible = visibleOptions.map((o) => o.value);
+      // Mark that 'All' semantic is active so existing logic keeps it updated when options change.
+      setIsAllSelected(true);
+      onChange(filter, allVisible);
+    }
+  }, [optionsSignature, options, filterState, filter, onChange]);
 
   /**
    * Sets loading only when the visible options or their validity change,

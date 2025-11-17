@@ -42,9 +42,13 @@ export function updateFilterValidity(state, filterState) {
     return groups;
   }, {});
 
-  // Narrow valid sets within each group based on selections
+  // Narrow valid sets within each group based on selections,
+  // but ONLY when the source filter has shouldFilterOthers = true,
+  // and only apply narrowing to filters with shouldBeFiltered = true.
   Object.values(filterGroups).forEach((groupFilters) => {
     groupFilters.forEach((filter) => {
+      if (!filter.shouldFilterOthers) return;
+
       const selectedValues = filterState[filter.id];
       if (
         selectedValues &&
@@ -58,9 +62,11 @@ export function updateFilterValidity(state, filterState) {
           : metadataTable.filter((row) => row[filter.values.paramColumn] === selectedValues);
 
         groupFilters.forEach((otherFilter) => {
+          // Only narrow filters that should be filtered
           if (
             otherFilter.id !== filter.id &&
-            otherFilter.values.metadataTableName === sourceName
+            otherFilter.values.metadataTableName === sourceName &&
+            !!otherFilter.shouldBeFiltered
           ) {
             const validParamValues = new Set();
             validRows.forEach((row) => {
