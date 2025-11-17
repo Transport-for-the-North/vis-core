@@ -794,7 +794,6 @@ const columnNameCVFixedSelector = {
       {
         displayValue: "Commercial Viability",
         paramValue: "commercial",
-        legendSubtitleText: "viability"
       }
     ],
   },
@@ -816,7 +815,6 @@ const columnNameMMHFixedSelector = {
       {
         displayValue: "Multi-Modal Hubs",
         paramValue: "multi_modal_hub",
-        legendSubtitleText: "Hubs"
       }
     ],
   },

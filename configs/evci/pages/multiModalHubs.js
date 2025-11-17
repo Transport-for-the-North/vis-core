@@ -2,7 +2,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../TermsOfUse";
 
 export const multiModalHubs = {
-  pageName: "Multi-Modal Hubs",
+  pageName: "Multi-Modal hub EV demand assessment",
   url: "/@stbTag@/multi-modal-hubs",
   type: "MapLayout",
   category: "@stbName@",
@@ -15,11 +15,18 @@ export const multiModalHubs = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows the Multi-Modal Hubs.</p>
-  <p>TfN can support our local authority partners with further information behind these outputs, 
-  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
-  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
-  can be found <a
+  <p>This function provides an assessment of EV demand for key potential multi modal hub locations across the region. </p>
+  <p>Datasets have been collected which cover the factors of influence identified for multi modal hubs. Including: 
+  Existing EVCI network; Grid capacity; EV and EV charging forecasts; Environmental considerations; Proximity to the Highway Network; 
+  Transport Hub Infrastructure; and Origin / Destination demand of rail passengers. </p>
+  <p>These are geospatial datasets, downloaded from publicly available data sources and from TfN data and evidence.</p>
+  <p>A scoring system was developed and agreed with the TfN partnership for each parameter/layer, to provide an assessment of potential requirements for EV charging.</p>
+  <p>It should be emphasised that individual key stakeholders may consider different factors of influence when deciding if a site is appropriate for multi modal hubs. 
+  Further specific site investigation and development work is advised for any locations of interest.</p>
+  <p>TfN can support our local authority partners with further information behind these outputs, this can be 
+  accessed by emailing <u>TfNOffer@transportforthenorth.com</u>.</p>
+  <p>Other users can use the contact us section on the home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. 
+  TfN’s methodology for the EVCI Framework can be found <a
               href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
               target="_blank"
               rel="noopener noreferrer"
@@ -87,8 +94,8 @@ export const multiModalHubs = {
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },
-      warning: `Multi-modal hub suitability and demand scoring based on publicly available data sources and from TfN. This includes grid capacity, existing EV network, EV and EVCI forecast, Rail and bus station locations and OD demand, proximity to highway network and enviro considerations.
-
+      warning: `Datasets have been collected which cover the factors of influence identified for multi modal hubs. Including: Existing EVCI network; Grid capacity; EV and EV charging forecasts; Environmental considerations; Proximity to the Highway Network; Transport Hub Infrastructure; and Origin / Destination demand of rail passengers.
+      These are geospatial datasets, downloaded from publicly available data sources and from TfN data and evidence.
       Further specific site investigation and development work is advised for any locations of interest.`,
     },
   },

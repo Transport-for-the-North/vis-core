@@ -15,12 +15,21 @@ export const commercialViability = {
   customMapCentre: "@mapCentre@",
   customMapZoom: "@mapZoom@",
   about: `
-  <p>This visualisation shows an assessment of investment and revenue potential (areas most likely to see private sector investment) across the 
-  TfN region to inform inclusive planning and delivery decisions (i.e. where focus of public funding should be, or commercial agreements to ensure a whole network outcome).  </p>
-  <p>TfN can support our local authority partners with further information behind these outputs, 
-  this can be accessed by emailing <u>TfNOffer@transportforthenorth.com</u>. <br>Other users can use the contact us section on the 
-  home page to get in touch should they wish to explore insights and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework 
-  can be found <a
+  <p>This visualisation shows an assessment of investment and revenue potential (areas most likely to see private sector investment) 
+  across the TfN region to inform inclusive planning and delivery decisions (i.e. where focus of public funding and interventions should be, 
+  or commercial agreements to ensure a whole network outcome). </p>
+  <p>This assessment considers 5 factors critical to charging infrastructure suppliers considerations: Population density; Indices of 
+  multiple deprivation, proximity to the major road network; Flood risk and Grid Capacity.</p>
+  <p>The data layers, and the weightings applied, were identified through industry intelligence to be representative of the 
+  factors of influence on commercial viability. </p>
+  <p>The weighted sum of each of the 5 factors generates a commercial viability score for 5m-by-5m cells. Each cell is attributed 
+  a commercial viability score, then averaged to generate a single averaged commercial viability score for each LSOA.</p>
+  <p>It should be emphasised that individual key stakeholders may consider different factors of influence or vary inconsideration 
+  of factor importance when deciding if a site is commercially viable, challenged or strategically important. </p>
+  <p>TfN can support our local authority partners with further information behind these outputs, this can be accessed 
+  by emailing <u>TfNOffer@transportforthenorth.com</u>.</p>
+  <p>Other users can use the contact us section on the home page to get in touch should they wish to explore insights 
+  and opportunities arising from this toolkit. TfN’s methodology for the EVCI Framework can be found <a
               href="https://www.transportforthenorth.com/major-roads-network/electric-vehicle-charging-infrastructure/"
               target="_blank"
               rel="noopener noreferrer"
@@ -86,6 +95,9 @@ export const commercialViability = {
         ],
         downloadPath: '/api/evci/zonal-data/download'
       },
+      warning: `This visualisation shows an assessment of investment and revenue potential (areas most likely to see private sector investment) across the TfN region to inform inclusive planning and delivery decisions (i.e. where focus of public funding and interventions should be, or commercial agreements to ensure a whole network outcome).
+       This assessment considers 5 factors critical to charging infrastructure suppliers considerations: Population density; Indices of multiple deprivation, proximity to the major road network; Flood risk and Grid Capacity.
+      It should be emphasised that individual key stakeholders may consider different factors of influence or vary inconsideration of factor importance when deciding if a site is commercially viable, challenged or strategically important.`
     },
   },
 };
