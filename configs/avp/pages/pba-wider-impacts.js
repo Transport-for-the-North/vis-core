@@ -226,40 +226,14 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "toggle",
+        type: "dropdown",
+        shouldBeFiltered: true,
         forceRequired: true,
         values: {
           source: "metadataTable",
           metadataTableName: "pba_luti_runcodes",
           displayColumn: "network_type",
           paramColumn: "network_type",
-          sort: "ascending",
-          where: [
-            {
-              values: true,
-              operator: "equals",
-            },
-          ],
-        },
-      },
-      // year
-      {
-        filterName: "Year",
-        paramName: "year",
-        target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Zonal callout card",
-          "Summary callout card",
-          "Map-based totals",
-        ], // both cards and map
-        type: "dropdown",
-        forceRequired: true,
-        values: {
-          source: "metadataTable",
-          metadataTableName: "pba_luti_runcodes",
-          displayColumn: "year",
-          paramColumn: "year",
           sort: "ascending",
           where: [
             {
@@ -323,6 +297,34 @@ export const widerImpacts = {
           displayColumn: "segment_name",
           paramColumn: "segment_name",
           sort: "ascending",
+        },
+      },
+      // year
+      {
+        filterName: "Year",
+        paramName: "year",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "dropdown",
+        forceRequired: true,
+        shouldBeFiltered: true,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "year",
+          paramColumn: "year",
+          sort: "ascending",
+          where: [
+            {
+              values: true,
+              operator: "equals",
+            },
+          ],
         },
       },
       // programmeId
