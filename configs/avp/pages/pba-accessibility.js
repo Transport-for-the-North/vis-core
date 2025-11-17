@@ -229,6 +229,8 @@ export const accessibility = {
         ], // both cards and map
         type: "dropdown",
         forceRequired: true,
+        shouldBeFiltered: false,
+        shouldFilterOthers: true,
         values: {
           source: "metadataTable",
           metadataTableName: "pba_accessibility_definitions",
@@ -247,6 +249,7 @@ export const accessibility = {
         paramName: "",
         target: "api",
         shouldBeFiltered: true,
+        shouldFilterOthers: true,
         type: "dropdown",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Zonal callout card"],
@@ -262,69 +265,69 @@ export const accessibility = {
           ],
         },
       },
-      // mode
-      {
-        filterName: "mode",
-        paramName: "",
-        target: "api",
-        shouldBeFiltered: true,
-        type: "dropdown",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: ["Zonal callout card"],
-        values: {
-          source: "metadataTable",
-          metadataTableName: "pba_accessibility_definitions",
-          displayColumn: "mode",
-          paramColumn: "mode",
-          sort: "ascending",
-          where: [
-            { column: "accessibility_description", operator: "notNull" },
-            { column: "mode", operator: "notNull" },
-          ],
-        },
-      },
-      // journeyTime
-      {
-        filterName: "journeyTime",
-        paramName: "",
-        target: "api",
-        shouldBeFiltered: true,
-        type: "dropdown",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: ["Zonal callout card"],
-        values: {
-          source: "metadataTable",
-          metadataTableName: "pba_accessibility_definitions",
-          displayColumn: "journey_time",
-          paramColumn: "journey_time",
-          sort: "ascending",
-          where: [
-            { column: "accessibility_description", operator: "notNull" },
-            { column: "journey_time", operator: "notNull" },
-          ],
-        },
-      },
-      // evaluationMetric
-      {
-        filterName: "evaluationMetric",
-        paramName: "",
-        target: "api",
-        shouldBeFiltered: true,
-        type: "dropdown",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: ["Zonal callout card"],
-        values: {
-          source: "metadataTable",
-          metadataTableName: "pba_accessibility_definitions",
-          displayColumn: "evaluation_metric",
-          paramColumn: "evaluation_metric",
-          sort: "ascending",
-          where: [
-            { column: "accessibility_description", operator: "notNull" },
-            { column: "evaluation_metric", operator: "notNull" },
-          ],
-        },
-      },
+      // // mode
+      // {
+      //   filterName: "mode",
+      //   paramName: "",
+      //   target: "api",
+      //   shouldBeFiltered: true,
+      //   type: "dropdown",
+      //   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+      //   visualisations: ["Zonal callout card"],
+      //   values: {
+      //     source: "metadataTable",
+      //     metadataTableName: "pba_accessibility_definitions",
+      //     displayColumn: "mode",
+      //     paramColumn: "mode",
+      //     sort: "ascending",
+      //     where: [
+      //       { column: "accessibility_description", operator: "notNull" },
+      //       { column: "mode", operator: "notNull" },
+      //     ],
+      //   },
+      // },
+      // // journeyTime
+      // {
+      //   filterName: "journeyTime",
+      //   paramName: "",
+      //   target: "api",
+      //   shouldBeFiltered: true,
+      //   type: "dropdown",
+      //   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+      //   visualisations: ["Zonal callout card"],
+      //   values: {
+      //     source: "metadataTable",
+      //     metadataTableName: "pba_accessibility_definitions",
+      //     displayColumn: "journey_time",
+      //     paramColumn: "journey_time",
+      //     sort: "ascending",
+      //     where: [
+      //       { column: "accessibility_description", operator: "notNull" },
+      //       { column: "journey_time", operator: "notNull" },
+      //     ],
+      //   },
+      // },
+      // // evaluationMetric
+      // {
+      //   filterName: "evaluationMetric",
+      //   paramName: "",
+      //   target: "api",
+      //   shouldBeFiltered: true,
+      //   type: "dropdown",
+      //   actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+      //   visualisations: ["Zonal callout card"],
+      //   values: {
+      //     source: "metadataTable",
+      //     metadataTableName: "pba_accessibility_definitions",
+      //     displayColumn: "evaluation_metric",
+      //     paramColumn: "evaluation_metric",
+      //     sort: "ascending",
+      //     where: [
+      //       { column: "accessibility_description", operator: "notNull" },
+      //       { column: "evaluation_metric", operator: "notNull" },
+      //     ],
+      //   },
+      // },
       // zoneId
       {
         filterName: "",
@@ -344,6 +347,7 @@ export const accessibility = {
         paramName: "accessibilityCode",
         target: "api",
         shouldBeFiltered: true,
+        shouldFilterOthers: false,
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: [
           // "Zonal callout card",
@@ -362,15 +366,15 @@ export const accessibility = {
           sort: "ascending",
           where: [
             // All columns must be present (non-null)
-            { column: "id", operator: "notNull" },
-            { column: "accessibility_code", operator: "notNull" },
-            { column: "accessibility_description", operator: "notNull" },
-            { column: "main_category", operator: "notNull" },
-            { column: "sub_category", operator: "notNull" },
-            { column: "accessibility_category_id", operator: "notNull" },
-            { column: "mode", operator: "notNull" },
-            { column: "journey_time", operator: "notNull" },
-            { column: "evaluation_metric", operator: "notNull" },
+            // { column: "id", operator: "notNull" },
+            // { column: "accessibility_code", operator: "notNull" },
+            // { column: "accessibility_description", operator: "notNull" },
+            // { column: "main_category", operator: "notNull" },
+            // { column: "sub_category", operator: "notNull" },
+            // { column: "accessibility_category_id", operator: "notNull" },
+            // { column: "mode", operator: "notNull" },
+            // { column: "journey_time", operator: "notNull" },
+            // { column: "evaluation_metric", operator: "notNull" },
           ],
         },
       },
