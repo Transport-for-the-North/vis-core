@@ -725,7 +725,7 @@ const Map = (props) => {
                 'text-color': '#000000',  // Black text
                 'text-halo-color': '#ffffff',  // White halo for readability
                 'text-halo-width': 2.5,
-                'text-opacity': labelNulls ? 1 : ['case', ['>', ['to-number', ['feature-state', 'value'], 0],0],1,0],
+                'text-opacity': labelNulls ? 1 : ['case', ['>', ['to-number', ['get', 'value'], 0],0],1,0],
               }
             });
           }
