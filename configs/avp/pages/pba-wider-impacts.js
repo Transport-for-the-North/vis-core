@@ -201,6 +201,7 @@ export const widerImpacts = {
         ], // both cards and map
         type: "dropdown",
         forceRequired: true,
+        shouldFilterOthers: true,
         values: {
           source: "metadataTable",
           metadataTableName: "pba_luti_runcodes",
@@ -226,7 +227,7 @@ export const widerImpacts = {
           "Summary callout card",
           "Map-based totals",
         ], // both cards and map
-        type: "dropdown",
+        type: "toggle",
         shouldBeFiltered: true,
         forceRequired: true,
         values: {
@@ -235,12 +236,6 @@ export const widerImpacts = {
           displayColumn: "network_type",
           paramColumn: "network_type",
           sort: "ascending",
-          where: [
-            {
-              values: true,
-              operator: "equals",
-            },
-          ],
         },
       },
       // dataTypeName
@@ -261,6 +256,7 @@ export const widerImpacts = {
         shouldBeBlankOnInit: false,
         shouldFilterOnValidation: false,
         shouldBeValidated: false,
+        shouldFilterOthers: true,
         isClearable: false,
         multiSelect: false,
         values: {
@@ -288,6 +284,7 @@ export const widerImpacts = {
         shouldBeBlankOnInit: false,
         shouldFilterOnValidation: false,
         shouldBeFiltered: true,
+        shouldFilterOthers: true,
         shouldBeValidated: false,
         isClearable: false,
         multiSelect: false,
@@ -313,6 +310,7 @@ export const widerImpacts = {
         type: "dropdown",
         forceRequired: true,
         shouldBeFiltered: true,
+        shouldFilterOthers: true,
         values: {
           source: "metadataTable",
           metadataTableName: "pba_luti_runcodes",
