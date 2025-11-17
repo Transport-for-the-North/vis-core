@@ -494,10 +494,13 @@ const DualMaps = (props) => {
                         tempDiv.className = 'custom-popup';
                         document.body.appendChild(tempDiv);
                         
+                        // Reverse the array for measurement as well
+                        const reversedDataForMeasurement = [...responseData].reverse();
+                        
                         // Render first tooltip to get actual height
                         const firstTooltipHtml = replacePlaceholders(
                           htmlTemplate,
-                          responseData[0],
+                          reversedDataForMeasurement[0],
                           { customFunctions: customFormattingFunctions }
                         );
                         tempDiv.innerHTML = `<div class="maplibregl-popup-content">${firstTooltipHtml}</div>`;
@@ -513,8 +516,9 @@ const DualMaps = (props) => {
                         maxTooltips = Math.max(1, Math.floor(availableSpace / totalHeightPerSection));
                       }
                       
-                      // Limit the number of data items to process
-                      const limitedData = responseData.slice(0, maxTooltips);
+                      // Reverse the array so most recently painted features appear first, then limit
+                      const reversedData = [...responseData].reverse();
+                      const limitedData = reversedData.slice(0, maxTooltips);
                       
                       // Use the same htmlTemplate for each item
                       const tooltipHtmlArray = limitedData.map((dataItem, index) => {
@@ -527,8 +531,8 @@ const DualMaps = (props) => {
                       });
                       
                       // Add indicator if there are more records than displayed
-                      if (responseData.length > maxTooltips) {
-                        tooltipHtmlArray.push(`<div class="more-records-indicator">... and ${responseData.length - maxTooltips} more record(s)</div>`);
+                      if (reversedData.length > maxTooltips) {
+                        tooltipHtmlArray.push(`<div class="more-records-indicator">... and ${reversedData.length - maxTooltips} more record(s)</div>`);
                       }
                       
                       // Join all items with a thick divider
