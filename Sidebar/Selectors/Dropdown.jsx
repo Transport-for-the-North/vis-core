@@ -248,21 +248,41 @@ export const Dropdown = ({ filter, onChange }) => {
   }, [selectedOptions, filterState, filter, onChange]);
 
   /**
-   * Returns a stable JSON key representing filterState excluding the current filter's id.
-   * Used to trigger the loading indicator only when other filters change, not this one.
+   * Computes a stable signature representing the visible options for this dropdown,
+   * excluding the 'All' option for multi-select. The signature includes each option's
+   * value and its validity (isValid). This allows us to set the loading state only
+   * when filtering/validation actually changes what is visible or the validity shown.
+   *
+   * Rationale:
+   * - Filtering via isHidden affects the visible options list (options.length).
+   * - Validation updates isValid when shouldBeValidated is true, which is included here.
+   * - Selections do not alter this signature, so user choices alone won't trigger loading.
    */
-  const otherFiltersKey = useMemo(() => {
-    const entries = Object.entries(filterState).filter(([k]) => k !== filter.id);
-    return JSON.stringify(Object.fromEntries(entries));
-  }, [filterState, filter.id]);
+  const optionsSignature = useMemo(() => {
+    const visible = filter.multiSelect ? options.slice(1) : options;
+    // Build a compact signature including value and validity flag
+    // Note: undefined isValid (for filters with shouldBeValidated = false) will not flicker loading.
+    return JSON.stringify(
+      visible.map((o) => ({
+        v: o.value,
+        // Normalise validity to a tri-state to avoid unnecessary changes:
+        val: typeof o.isValid === 'undefined' ? 'u' : o.isValid ? 't' : 'f',
+      }))
+    );
+  }, [options, filter.multiSelect]);
 
+  /**
+   * Sets loading only when the visible options or their validity change,
+   * which corresponds to actual filtering or validation updates.
+   */
   useEffect(() => {
+    // If signature changes, reflect a short loading state
     setLoading(true);
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 500);
+    }, 400);
     return () => clearTimeout(timer);
-  }, [otherFiltersKey]);
+  }, [optionsSignature]);
 
   useEffect(() => {
     const prevOptions = prevOptionsRef.current;
