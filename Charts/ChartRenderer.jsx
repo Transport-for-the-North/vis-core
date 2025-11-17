@@ -264,6 +264,8 @@ const toSeries = (config, data) =>
 const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  const hasXLabel = !!config.x_axis_title;
+  const hasYLabel = !!config.y_axis_title;
   const formatter = (val) =>
     (formatters.commify || defaultFormatters.commify)(val);
   const barFill = config.barColor || DEFAULTS.BRAND_COLOR;
@@ -275,6 +277,27 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
       ),
     [config, items]
   );
+  const truncateLabel = (label, maxLen = 18) =>
+    label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
+  const CustomTick = (props) => {
+    const { x, y, payload } = props;
+    return (
+      <text
+        x={x}
+        y={y}
+        dy={4}
+        textAnchor="end"
+        fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+      >
+        {truncateLabel(payload.value)}
+      </text>
+    );
+  };
+
+  const chartMargin = { ...DEFAULTS.MARGIN };
+  if (hasXLabel || hasYLabel) {
+    chartMargin.bottom = 20;
+  }
 
   return (
     <ChartSection
@@ -284,7 +307,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     >
       <RBarChart
         data={items}
-        margin={DEFAULTS.MARGIN}
+        margin={chartMargin}
         barCategoryGap="18%"
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
@@ -298,12 +321,33 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
               allowDecimals={false}
               tickFormatter={formatter}
               tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+              label={
+                hasXLabel
+                  ? {
+                      value: config.x_axis_title,
+                      position: "insideBottom",
+                      offset: -5,
+                      fontSize: 14,
+                    }
+                  : undefined
+              }
             />
             <RYAxis
               type="category"
               dataKey="label"
-              width={30}
-              tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+              width={100}
+              tick={<CustomTick />}
+              tickLine={false}
+              label={
+                hasYLabel
+                  ? {
+                      value: config.y_axis_title,
+                      position: "bottom",
+                      offset: 10,
+                      fontSize: 14,
+                    }
+                  : undefined
+              }
             />
           </>
         ) : (
