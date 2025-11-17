@@ -552,16 +552,83 @@ const Map = (props) => {
             const { htmlTemplate, customFormattingFunctions } = customTooltip;
             const featureId = feature.id;
             const requestUrlWithId = resolveTooltipRequestUrl(customTooltip, featureId);
+            const showAllDataInTooltip = layerConfig?.showAllDataInTooltipForEachGeom;
 
             return api.baseService
               .get(requestUrlWithId, { signal: controller.signal })
               .then((responseData) => {
-                const tooltipHtml = replacePlaceholders(
-                  htmlTemplate,
-                  responseData,
-                  { customFunctions: customFormattingFunctions }
-                )
-                return tooltipHtml;
+                // Check if we should show all data and we have an array of records
+                if (showAllDataInTooltip && Array.isArray(responseData) && responseData.length > 0) {
+                  // Get the current popup element to measure its position
+                  const popupElement = hoverInfoRef.current.popup?.getElement();
+                  let maxTooltips = responseData.length; // Default to all
+                  
+                  if (popupElement) {
+                    const popupRect = popupElement.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const popupTop = popupRect.top;
+                    const safetyMargin = 50; // Larger margin to ensure absolutely no overhang
+                    
+                    // Calculate available space from popup top to bottom of viewport
+                    const availableSpace = viewportHeight - popupTop - safetyMargin;
+                    
+                    // Create a temporary element to measure actual tooltip height
+                    const tempDiv = document.createElement('div');
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.visibility = 'hidden';
+                    tempDiv.style.pointerEvents = 'none';
+                    tempDiv.className = 'custom-popup';
+                    document.body.appendChild(tempDiv);
+                    
+                    // Render first tooltip to get actual height
+                    const firstTooltipHtml = replacePlaceholders(
+                      htmlTemplate,
+                      responseData[0],
+                      { customFunctions: customFormattingFunctions }
+                    );
+                    tempDiv.innerHTML = `<div class="maplibregl-popup-content">${firstTooltipHtml}</div>`;
+                    
+                    const actualTooltipHeight = tempDiv.offsetHeight;
+                    const thickDividerHeight = 15; // Height of thick divider between sections
+                    const totalHeightPerSection = actualTooltipHeight + thickDividerHeight;
+                    
+                    // Clean up temporary element
+                    document.body.removeChild(tempDiv);
+                    
+                    // Calculate how many tooltips can fit in available space
+                    maxTooltips = Math.max(1, Math.floor(availableSpace / totalHeightPerSection));
+                  }
+                  
+                  // Limit the number of data items to process
+                  const limitedData = responseData.slice(0, maxTooltips);
+                  
+                  // Use the same htmlTemplate for each item
+                  const tooltipHtmlArray = limitedData.map((dataItem, index) => {
+                    const html = replacePlaceholders(
+                      htmlTemplate,
+                      dataItem,
+                      { customFunctions: customFormattingFunctions }
+                    );
+                    return html;
+                  });
+                  
+                  // Add indicator if there are more records than displayed
+                  if (responseData.length > maxTooltips) {
+                    tooltipHtmlArray.push(`<div class="more-records-indicator">... and ${responseData.length - maxTooltips} more record(s)</div>`);
+                  }
+                  
+                  // Join all items with a thick divider
+                  return tooltipHtmlArray.join('<hr class="thick-divider">');
+                } else {
+                  // Single item or showAllDataInTooltip is false - use original logic
+                  const dataToUse = Array.isArray(responseData) ? responseData[0] : responseData;
+                  const tooltipHtml = replacePlaceholders(
+                    htmlTemplate,
+                    dataToUse,
+                    { customFunctions: customFormattingFunctions }
+                  );
+                  return tooltipHtml;
+                }
               })
               .catch((error) => {
                 if (error.name !== "AbortError") {
