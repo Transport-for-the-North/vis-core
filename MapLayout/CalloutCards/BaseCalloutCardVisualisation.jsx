@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { FullScreenCalloutCardVisualisation } from "./FullScreenCalloutCardVisualisation";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
+import { RecordSelector } from "./RecordSelector";
 import { useFetchVisualisationData } from "hooks";
 import { MapContext } from "contexts";
 import { actionTypes } from "reducers";
@@ -36,6 +37,14 @@ export const BaseCalloutCardVisualisation = ({
 
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // State for handling multiple records
+  const [allRecords, setAllRecords] = useState([]);
+  const [selectedRecordIndex, setSelectedRecordIndex] = useState(0);
+  const [hasMultipleRecords, setHasMultipleRecords] = useState(false);
+  
+  // Flag to prevent data reset when user has made a selection
+  const [userHasSelectedRecord, setUserHasSelectedRecord] = useState(false);
 
   const [nextData, setNextData] = useState(null);
   const [prevData, setPrevData] = useState(null);
@@ -48,10 +57,43 @@ export const BaseCalloutCardVisualisation = ({
   /**
    * Synchronizes the displayed data with the fetched data,
    * except when we are in a transition (showing prefetched data).
+   * Handles both single records and arrays of multiple records.
    */
   useEffect(() => {
     if (!isTransition && response.data) {
-      setData(response.data);
+      // Check if response data is an array
+      if (Array.isArray(response.data)) {
+        const isNewDataSet = allRecords.length !== response.data.length;
+        
+        setAllRecords(response.data);
+        setHasMultipleRecords(response.data.length > 1);
+        
+        if (response.data.length > 0) {
+          // Only reset selection if this is new data or user hasn't made a selection
+          if (isNewDataSet || !userHasSelectedRecord) {
+            setData(response.data[0]);
+            setSelectedRecordIndex(0);
+            setUserHasSelectedRecord(false);
+          } else {
+            // Preserve current selection if possible
+            const validIndex = selectedRecordIndex < response.data.length ? selectedRecordIndex : 0;
+            setData(response.data[validIndex]);
+            if (validIndex !== selectedRecordIndex) {
+              setSelectedRecordIndex(validIndex);
+            }
+          }
+        } else {
+          setData(null);
+        }
+      } else {
+        // Single record
+        setAllRecords([response.data]);
+        setHasMultipleRecords(false);
+        setData(response.data);
+        setSelectedRecordIndex(0);
+        setUserHasSelectedRecord(false);
+      }
+      
       setIsLoading(response.isLoading);
     }
   }, [response, isTransition]);
@@ -69,6 +111,32 @@ export const BaseCalloutCardVisualisation = ({
       setIsTransition(false);
     }
   }, [response.data, isTransition, data]);
+
+  /**
+   * Handles selection of a different record from the dropdown
+   * 
+   * @param {number} index - Index of the selected record
+   */
+  const handleRecordSelection = (index) => {
+    
+    if (index >= 0 && index < allRecords.length) {
+      setSelectedRecordIndex(index);
+      setUserHasSelectedRecord(true);
+      // Force a new object reference to ensure React detects the change
+      setData({ ...allRecords[index] });
+    }
+  };
+
+  /**
+   * Gets display label for a record (used in dropdown)
+   * 
+   * @param {Object} record - The record object
+   * @returns {string} Display label
+   */
+  const getRecordLabel = (record) => {
+    // Try to get a meaningful label from the record
+    return record.title || record.name || record.reference_id || `Record ${allRecords.indexOf(record) + 1}`;
+  };
 
   /**
    * Toggles the visibility of the card
@@ -200,6 +268,14 @@ export const BaseCalloutCardVisualisation = ({
       data={data}
       isLoading={isLoading}
       toggleVisibility={toggleVisibility}
+      recordSelector={hasMultipleRecords ? (
+        <RecordSelector
+          records={allRecords}
+          selectedIndex={selectedRecordIndex}
+          onSelect={handleRecordSelection}
+          getRecordLabel={getRecordLabel}
+        />
+      ) : null}
     />
   );
 };
