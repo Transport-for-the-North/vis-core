@@ -235,8 +235,7 @@ export const CalloutCardVisualisation = ({
 }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
-  let customFormattingFunctions =
-    visualisation.customFormattingFunctions || {};
+  let customFormattingFunctions = visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
 
   // Do not render the card if no data is available,
@@ -274,11 +273,9 @@ export const CalloutCardVisualisation = ({
   useEffect(() => {
     if (data && visualisation.htmlFragment) {
       setIsVisible(true);
-      let html = replacePlaceholders(
-        visualisation.htmlFragment,
-        data,
-        { customFunctions: customFormattingFunctions }
-      );
+      let html = replacePlaceholders(visualisation.htmlFragment, data, {
+        customFunctions: customFormattingFunctions,
+      });
       const sanitizedHtml = DOMPurify.sanitize(html);
       setRenderedContent(sanitizedHtml);
       if (onUpdate) onUpdate();
@@ -290,11 +287,9 @@ export const CalloutCardVisualisation = ({
   // Compute dynamic card title for charts (if configured)
   useEffect(() => {
     if (data && visualisation.cardTitle) {
-      const title = replacePlaceholders(
-        String(visualisation.cardTitle),
-        data,
-        { customFunctions: customFormattingFunctions }
-      );
+      const title = replacePlaceholders(String(visualisation.cardTitle), data, {
+        customFunctions: customFormattingFunctions,
+      });
       // Render as plain text to avoid HTML injection in the title
       setDynamicCardTitle(
         DOMPurify.sanitize(title, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
@@ -369,18 +364,18 @@ export const CalloutCardVisualisation = ({
     return null;
   }
 
-function formatNumberWithUnit(value, unit = "") {
-  if (value === null || value === undefined || isNaN(value)) return "N/A";
-  if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
-  if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
-  if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
-  return Number(value).toFixed(2) + unit;
-}
+  function formatNumberWithUnit(value, unit = "") {
+    if (value === null || value === undefined || isNaN(value)) return "N/A";
+    if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
+    if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
+    if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
+    return Number(value).toFixed(2) + unit;
+  }
 
-customFormattingFunctions = {
-  ...customFormattingFunctions,
-  formatNumberWithUnit,
-};
+  customFormattingFunctions = {
+    ...customFormattingFunctions,
+    formatNumberWithUnit,
+  };
 
   if (visualisation.layout && visualisation.layout.length > 0) {
     return (
@@ -420,6 +415,8 @@ customFormattingFunctions = {
                     const configs = {
                       type: chart.type,
                       title: chart.header || "Title",
+                      x_axis_title: chart?.x_axis_title,
+                      y_axis_title: chart?.y_axis_title,
                       columns: chart.values.map((obj) => ({
                         key: obj.name,
                         label: obj.name,
