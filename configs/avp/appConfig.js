@@ -3,7 +3,7 @@ import { loremIpsum } from "utils";
 
 export const appConfig = {
     authenticationRequired: true,
-    title: "AVP",
+    title: "Strategic Analysis Workstreams - NPR Bradford 2025 SOBC",
     introduction:
         `<p>${loremIpsum}</p>
     `,
