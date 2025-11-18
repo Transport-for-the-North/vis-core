@@ -104,14 +104,12 @@ export const useFetchVisualisationData = (
     const pathParamsForApi = toSimpleParamsMap(pathParams);
 
     try {
-      let responseData = await api.baseService.get(path, {
+      const responseData = await api.baseService.get(path, {
         pathParams: pathParamsForApi,
         queryParams: queryParamsForApi,
         skipAuth: !requiresAuth,
       });
-      
-      // responseData = Array.isArray(responseData) ? responseData.filter(row => row.value !== 0 && row.value != null) : responseData;
-      
+            
       setRawData(responseData);
       // If no viewport filtering is requested, set filteredData immediately.
       if (!map || !mapLayerId) {
