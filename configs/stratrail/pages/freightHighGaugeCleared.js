@@ -1,4 +1,4 @@
-import { freightLocationLayerPaint, highGaugeClearedLayerPaint } from "../customPaintDefinitions";
+import { freightLocationLayerPaint, highGaugeClearedLayerPaint, gaugeClearanceCustomPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 import { termsOfUse } from "../termsOfUse";
 
@@ -15,6 +15,20 @@ export const freightHighGaugeCleared = {
   customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
+        {
+            uniqueId: "RailOfferFreightGaigeClearanceVectorTile",
+            name: "Loading Gauge Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/railoffer_freight_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Freight Gauge Network",
+            customPaint: gaugeClearanceCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldShowInLegend: true,
+        },
         {
             uniqueId: "RailOfferFreightHGCVectorTile",
             name: "Trans-Pennine High Gauge Cleared Network - TRU freight benefits realisation in full",
