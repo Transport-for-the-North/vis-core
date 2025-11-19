@@ -559,70 +559,22 @@ const Map = (props) => {
               .then((responseData) => {
                 // Check if we should show all data and we have an array of records
                 if (showAllDataInTooltip && Array.isArray(responseData) && responseData.length > 0) {
-                  // Get the current popup element to measure its position
-                  const popupElement = hoverInfoRef.current.popup?.getElement();
-                  let maxTooltips = responseData.length; // Default to all
-                  
-                  if (popupElement) {
-                    const popupRect = popupElement.getBoundingClientRect();
-                    const viewportHeight = window.innerHeight;
-                    const popupTop = popupRect.top;
-                    const safetyMargin = 50; // Larger margin to ensure absolutely no overhang
-                    
-                    // Calculate available space from popup top to bottom of viewport
-                    const availableSpace = viewportHeight - popupTop - safetyMargin;
-                    
-                    // Create a temporary element to measure actual tooltip height
-                    const tempDiv = document.createElement('div');
-                    tempDiv.style.position = 'absolute';
-                    tempDiv.style.visibility = 'hidden';
-                    tempDiv.style.pointerEvents = 'none';
-                    tempDiv.className = 'custom-popup';
-                    document.body.appendChild(tempDiv);
-                    
-                    // Reverse the array for measurement as well
-                    const reversedDataForMeasurement = [...responseData].reverse();
-                    
-                    // Render first tooltip to get actual height
-                    const firstTooltipHtml = replacePlaceholders(
-                      htmlTemplate,
-                      reversedDataForMeasurement[0],
-                      { customFunctions: customFormattingFunctions }
-                    );
-                    tempDiv.innerHTML = `<div class="maplibregl-popup-content">${firstTooltipHtml}</div>`;
-                    
-                    const actualTooltipHeight = tempDiv.offsetHeight;
-                    const thickDividerHeight = 15; // Height of thick divider between sections
-                    const totalHeightPerSection = actualTooltipHeight + thickDividerHeight;
-                    
-                    // Clean up temporary element
-                    document.body.removeChild(tempDiv);
-                    
-                    // Calculate how many tooltips can fit in available space
-                    maxTooltips = Math.max(1, Math.floor(availableSpace / totalHeightPerSection));
-                  }
-                  
-                  // Reverse the array so most recently painted features appear first, then limit
+                  // Reverse the array so most recently painted features appear first
                   const reversedData = [...responseData].reverse();
-                  const limitedData = reversedData.slice(0, maxTooltips);
                   
-                  // Use the same htmlTemplate for each item
-                  const tooltipHtmlArray = limitedData.map((dataItem, index) => {
-                    const html = replacePlaceholders(
-                      htmlTemplate,
-                      dataItem,
-                      { customFunctions: customFormattingFunctions }
-                    );
-                    return html;
-                  });
+                  // Only show the first tooltip
+                  const firstTooltipHtml = replacePlaceholders(
+                    htmlTemplate,
+                    reversedData[0],
+                    { customFunctions: customFormattingFunctions }
+                  );
                   
                   // Add indicator if there are more records than displayed
-                  if (reversedData.length > maxTooltips) {
-                    tooltipHtmlArray.push(`<div class="more-records-indicator">... and ${reversedData.length - maxTooltips} more record(s)</div>`);
+                  if (reversedData.length > 1) {
+                    return `${firstTooltipHtml}<hr class="thick-divider"><div class="more-records-indicator">... and ${reversedData.length - 1} more record(s)</div>`;
                   }
                   
-                  // Join all items with a thick divider
-                  return tooltipHtmlArray.join('<hr class="thick-divider">');
+                  return firstTooltipHtml;
                 } else {
                   // Single item or showAllDataInTooltip is false - use original logic
                   const dataToUse = Array.isArray(responseData) ? responseData[0] : responseData;
