@@ -104,11 +104,12 @@ export const appConfig = {
     logoutButtonImage: "img/burgerIcon.png",
     logoutImage: "img/logout.png",
     appPages: [
+        pages.backgroundInfo,
         pages.pca,
         pages.nac,
         pages.widerImpacts,
-        pages.accessibility,
-        pages.sobcTechNote
+        pages.accessibility
+        
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
