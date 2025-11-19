@@ -218,7 +218,7 @@ const Map = (props) => {
 
       // Get layers that have shouldHaveTooltipOnHover set to true and are available on the map
       // Treat click-tooltips as hover-tooltips on touch devices
-      const isTouchonMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none), (pointer: coarse)').matches;
+      const isTouchonMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches || navigator.maxTouchPoints > 0;
       
       const hoverableLayers = Object.keys(state.layers).filter((layerId) => {
         const cfg = state.layers[layerId];
