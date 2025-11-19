@@ -108,7 +108,8 @@ export const appConfig = {
         pages.pca,
         pages.nac,
         pages.widerImpacts,
-        pages.accessibility
+        pages.accessibility,
+        pages.sobcTechNote
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
