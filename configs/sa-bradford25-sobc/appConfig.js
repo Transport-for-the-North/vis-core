@@ -1,5 +1,4 @@
 import { pages } from "./pages";
-import { loremIpsum } from "utils";
 
 export const appConfig = {
     authenticationRequired: true,
