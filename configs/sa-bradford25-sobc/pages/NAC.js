@@ -9,6 +9,6 @@ export const nac = {
   termsOfUse: termsOfUse,
   about: "",
   config: {
-    url: "https://app.powerbi.com/view?r=eyJrIjoiODA2MGVkMTEtYzM4Yi00YTYyLTlhOTAtNWYwZGE5OWI0MzRhIiwidCI6ImQ1OGE5ZTFkLTRkY2EtNDU5NS1hOWU4LTc5MzRhMTVmMzQxOSJ9"
+    url: "https://app.powerbi.com/reportEmbed?reportId=2cc34c49-9dbb-4cc6-9b24-8d3492a3ef05&autoAuth=true&ctid=d58a9e1d-4dca-4595-a9e8-7934a15f3419"
   }
 };
