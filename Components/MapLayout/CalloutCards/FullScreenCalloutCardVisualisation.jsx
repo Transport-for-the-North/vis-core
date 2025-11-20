@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import styled from "styled-components";
+
+import { api } from "services";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { CARD_CONSTANTS } from "defaults";
 import { Hovertip } from "Components/Hovertip";
 import { replacePlaceholders } from "utils";
+
 const { PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } = CARD_CONSTANTS;
 
 /**
@@ -383,6 +387,8 @@ export const FullScreenCalloutCardVisualisation = ({
 
   /**
    * Updates content and image when the current scenario changes
+   * For string URLs pointing at our API, fetch the image with Authorization
+   * and convert it to an object URL so it can be rendered by <img>.
    *
    * Handles different image formats:
    * - Blob: converted to object URL
@@ -391,33 +397,81 @@ export const FullScreenCalloutCardVisualisation = ({
    * - String: used directly as URL
    */
   useEffect(() => {
-    const newContent = replacePlaceholders(
-      data.text_with_placeholders,
-      data.values
-    );
-    setContent(newContent);
-    setImgUrl(null);
+    let objectUrlToRevoke = null;
+    const controller = new AbortController();
 
-    if (data.image_url) {
+    const run = async () => {
+      const newContent = replacePlaceholders(
+        data.text_with_placeholders,
+        data.values
+      );
+      setContent(newContent);
+      setImgUrl(null);
+
+      if (!data.image_url) return;
+
+      // Binary inputs are handled as before
       if (data.image_url instanceof Blob) {
         const url = URL.createObjectURL(data.image_url);
+        objectUrlToRevoke = url;
         setImgUrl(url);
-      } else if (data.image_url instanceof ArrayBuffer) {
-        const blob = new Blob([data.image_url], {
-          type: "image/png",
-        });
-        const url = URL.createObjectURL(blob);
-        setImgUrl(url);
-      } else if (data.image_url instanceof Uint8Array) {
-        const blob = new Blob([data.image_url], {
-          type: "image/png",
-        });
-        const url = URL.createObjectURL(blob);
-        setImgUrl(url);
-      } else if (typeof data.image_url === "string") {
-        setImgUrl(data.image_url);
+        return;
       }
-    }
+      if (data.image_url instanceof ArrayBuffer) {
+        const blob = new Blob([data.image_url], { type: "image/png" });
+        const url = URL.createObjectURL(blob);
+        objectUrlToRevoke = url;
+        setImgUrl(url);
+        return;
+      }
+      if (data.image_url instanceof Uint8Array) {
+        const blob = new Blob([data.image_url], { type: "image/png" });
+        const url = URL.createObjectURL(blob);
+        objectUrlToRevoke = url;
+        setImgUrl(url);
+        return;
+      }
+
+      // String URL: resolve absolute API-aware URL first
+      if (typeof data.image_url === "string") {
+        try {
+          const absoluteUrl = api.baseService.buildAbsoluteUrl(data.image_url); // uses configured API base [3]
+          const apiBaseOrigin = new URL(api.baseService.buildAbsoluteUrl("/")).origin;
+          const targetOrigin = new URL(absoluteUrl, window.location.origin).origin;
+
+          // If the image is served by our API, fetch with Authorization header
+          if (targetOrigin === apiBaseOrigin) {
+            const token = Cookies.get("token"); // set by AuthProvider on login [5]
+            const resp = await fetch(absoluteUrl, {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+              signal: controller.signal,
+            });
+            if (!resp.ok) {
+              throw new Error(`HTTP ${resp.status} while fetching image`);
+            }
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            objectUrlToRevoke = url;
+            setImgUrl(url);
+          } else {
+            // External/third-party image: use as-is
+            setImgUrl(data.image_url);
+          }
+        } catch (e) {
+          if (e.name !== "AbortError") {
+            console.error("Failed to load image:", e);
+          }
+          setImgUrl(null);
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      controller.abort();
+      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
+    };
   }, [data]);
 
   // Check that data exists before rendering
