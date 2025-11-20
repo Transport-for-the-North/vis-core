@@ -410,7 +410,6 @@ export const FullScreenCalloutCardVisualisation = ({
 
       if (!data.image_url) return;
 
-      // Binary inputs are handled as before
       if (data.image_url instanceof Blob) {
         const url = URL.createObjectURL(data.image_url);
         objectUrlToRevoke = url;
