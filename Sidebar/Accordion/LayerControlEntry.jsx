@@ -317,7 +317,9 @@ export const LayerControlEntry = memo(
     
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
+        // Use layer's defaultLineOffset if available, otherwise fall back to default
+        const customOffset = layer.defaultLineOffset ?? undefined;
+        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp, customOffset);
         widthInterpolation = result.widthInterpolation;
         lineOffsetInterpolation = result.lineOffsetInterpolation;
       } else {

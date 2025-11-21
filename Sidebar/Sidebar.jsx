@@ -267,7 +267,7 @@ export const Sidebar = ({
             <Glossary dataDictionary={additionalFeatures.glossary.dataDictionary} />
           </AccordionSection>
         )}
-        {filters && (
+        {filters && Array.isArray(filters) && filters.length > 0 && (
           <SelectorSection
             filters={filters}
             onFilterChange={(filter, value) => onFilterChange(filter, value)}
