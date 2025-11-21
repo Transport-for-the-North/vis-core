@@ -30,6 +30,23 @@ export const crpLinesLayerPaint = {
     "line-opacity": 0.3
 };
 
+export const gaugeClearanceCustomPaint = {
+  "line-color": [
+    'match',
+    ['get', 'gauge_clearance'],
+    'W10 Loading Gauge', '#195e0aff',
+    'W12 Loading Gauge', '#031086ff',
+    '#808080ff' // Default fallback color
+  ],
+  "line-width": [
+    'match',
+    ['get', 'gauge_clearance'],
+    'W10 Loading Gauge', 6,
+    'W12 Loading Gauge', 6,
+    0
+  ],
+  "line-opacity": 0.4
+}
 export const combinedAuthorityFreightCustomPaint = {
   "fill-color": [
     'match',
@@ -52,7 +69,7 @@ export const combinedAuthorityFreightCustomPaint = {
 export const highGaugeLayerPaint = {
   "line-color": [
     'match',
-    ['get', 'hg_type'],
+    ['get', 'freight_realisation'],
     "FBR W12 MVP", "#b46e1fff",
     "High Gauge (W10/W12)", "#000000ff",
     "Transpennine Route Upgrade", "#7f4ae2ff",
@@ -61,7 +78,7 @@ export const highGaugeLayerPaint = {
   ],
   "line-width": [
     'match',
-    ['get', 'hg_type'],
+    ['get', 'freight_realisation'],
     "FBR W12 MVP", 4,
     "High Gauge (W10/W12)", 4,
     "Transpennine Route Upgrade", 4,
@@ -74,14 +91,14 @@ export const highGaugeLayerPaint = {
 export const highGaugeClearedLayerPaint = {
   "line-color": [
     'match',
-    ['get', 'network'],
+    ['get', 'high_gauge_cleared_network'],
     'TransPennine High Gauge Cleared Network', '#950303ff',
     'Existing Rail Network', '#545454ff',
     '#545454ff' // Default fallback color
   ],
   "line-width": [
     'match',
-    ['get', 'network'],
+    ['get', 'high_gauge_cleared_network'],
     'TransPennine High Gauge Cleared Network', 4,
     'Existing Rail Network', 1,
     0

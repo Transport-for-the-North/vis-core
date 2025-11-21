@@ -9,6 +9,7 @@ import { co2Savings, tfnCo2Savings } from "./co2Savings"
 import { enrouteChargingDemand } from "./enrouteChargingDemand"
 import { commercialViability } from "./commercialViability"
 import { multiModalHubs } from "./multiModalHubs"
+import { freightHubs } from "./freightHubs"
 import { offStreetParkingAccess, offStreetParkingDrivewayOnly } from "./offStreetParkingAccess"
 import { energyCapacity } from "./energyCapacity"
 import { pavementRoadWidth } from "./pavementRoadWidths"
@@ -25,6 +26,7 @@ export const pages = {
     co2Savings: co2Savings,
     commercialViability: commercialViability,
     multiModalHubs: multiModalHubs,
+    freightHubs: freightHubs,
     offStreetParkingAccess: offStreetParkingAccess,
     offStreetParkingDrivewayOnly: offStreetParkingDrivewayOnly,
     energyCapacity: energyCapacity,

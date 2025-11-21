@@ -141,79 +141,85 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
   };
 
   // Merge with custom functions if provided
-  const allowedFunctions = { 
-    ...defaultFunctions, 
-    ...(options.customFunctions || {})
+  const allowedFunctions = {
+    ...defaultFunctions,
+    ...(options.customFunctions || {}),
   };
-  
+
   let result = htmlFragment;
 
   // Step 1: Handle colon syntax {functionName:argKey}
-  result = result.replace(/\{(\w+):([a-zA-Z0-9_.]+)\}/g, (match, functionName, argKey) => {
-    const arg = data[argKey];
-    
-    // If arg is undefined, return the original placeholder
-    if (arg === undefined) {
+  result = result.replace(
+    /\{(\w+):([a-zA-Z0-9_.]+)\}/g,
+    (match, functionName, argKey) => {
+      const arg = data[argKey];
+
+      // If arg is undefined, return the original placeholder
+      if (arg === undefined) {
+        return match;
+      }
+
+      // Check if the function is allowed
+      const func = allowedFunctions[functionName];
+      if (func && typeof func === "function") {
+        try {
+          // Check function parameter count to determine how to call it
+          if (func.length >= 2) {
+            // Functions with 2+ parameters get both value and full data object
+            return func(arg, data);
+          } else {
+            // Functions with 1 parameter get just the value
+            return func(arg);
+          }
+        } catch (error) {
+          console.warn(`Error applying function ${functionName}:`, error);
+          return String(arg);
+        }
+      }
+
+      // If function is not allowed, return the original placeholder
       return match;
     }
-
-    // Check if the function is allowed
-    const func = allowedFunctions[functionName];
-    if (func && typeof func === 'function') {
-      try {
-        // Check function parameter count to determine how to call it
-        if (func.length >= 2) {
-          // Functions with 2+ parameters get both value and full data object
-          return func(arg, data);
-        } else {
-          // Functions with 1 parameter get just the value
-          return func(arg);
-        }
-      } catch (error) {
-        console.warn(`Error applying function ${functionName}:`, error);
-        return String(arg);
-      }
-    }
-
-    // If function is not allowed, return the original placeholder
-    return match;
-  });
+  );
 
   // Step 2: Handle parentheses syntax {functionName(argKey)} (existing functionality)
-  result = result.replace(/\{(\w+)\(([a-zA-Z0-9_.]+)\)\}/g, (match, functionName, argKey) => {
-    const arg = data[argKey];
+  result = result.replace(
+    /\{(\w+)\(([a-zA-Z0-9_.]+)\)\}/g,
+    (match, functionName, argKey) => {
+      const arg = data[argKey];
 
-    // If arg is undefined, return the original placeholder
-    if (arg === undefined) {
+      // If arg is undefined, return the original placeholder
+      if (arg === undefined) {
+        return "N/A";
+      }
+
+      // Check if the function is allowed
+      const func = allowedFunctions[functionName];
+      if (func && typeof func === "function") {
+        try {
+          // Check function parameter count to determine how to call it
+          if (func.length >= 2) {
+            // Functions with 2+ parameters get both value and full data object
+            return func(arg, data);
+          } else {
+            // Functions with 1 parameter get just the value
+            return func(arg);
+          }
+        } catch (error) {
+          console.warn(`Error applying function ${functionName}:`, error);
+          return String(arg);
+        }
+      }
+
+      // If function is not allowed, return the original placeholder
       return match;
     }
-
-    // Check if the function is allowed
-    const func = allowedFunctions[functionName];
-    if (func && typeof func === 'function') {
-      try {
-        // Check function parameter count to determine how to call it
-        if (func.length >= 2) {
-          // Functions with 2+ parameters get both value and full data object
-          return func(arg, data);
-        } else {
-          // Functions with 1 parameter get just the value
-          return func(arg);
-        }
-      } catch (error) {
-        console.warn(`Error applying function ${functionName}:`, error);
-        return String(arg);
-      }
-    }
-
-    // If function is not allowed, return the original placeholder
-    return match;
-  });
+  );
 
   // Step 3: Handle simple replacement {key} (existing functionality)
   result = result.replace(/\{([a-zA-Z0-9_]+)\}/g, (match, key) => {
     const value = data[key];
-    return value !== undefined ? value : match;
+    return value !== undefined ? value : "N/A";
   });
 
   return result;
@@ -265,14 +271,20 @@ export function filterGlossaryData(glossaryData, excludeList) {
   for (const key in glossaryData) {
     if (glossaryData.hasOwnProperty(key)) {
       const entry = glossaryData[key];
-      const entryExcludeArray = Array.isArray(entry.exclude) ? entry.exclude : [];
+      const entryExcludeArray = Array.isArray(entry.exclude)
+        ? entry.exclude
+        : [];
 
-      if (!entryExcludeArray.some(excludeItem => excludeArray.includes(excludeItem))) {
+      if (
+        !entryExcludeArray.some((excludeItem) =>
+          excludeArray.includes(excludeItem)
+        )
+      ) {
         filteredGlossaryData[key] = entry;
       }
     }
   }
-  
+
   return filteredGlossaryData;
 }
 
@@ -284,10 +296,9 @@ export function filterGlossaryData(glossaryData, excludeList) {
  * @returns {boolean} - Returns true if the specified paramName is found and forceRequired is true, otherwise returns false.
  */
 export function isParamNameForceRequired(filters, targetParamName) {
-  const filter = filters.find(f => f.paramName === targetParamName);
+  const filter = filters.find((f) => f.paramName === targetParamName);
   return filter ? filter.forceRequired === true : false;
 }
-
 
 /**
  * Build a params map for a given parameter location ("query" or "path") from OpenAPI parameter definitions.
@@ -310,7 +321,7 @@ export function buildParamsMap(parameters, location, filters) {
     const forcedRequired = isParamNameForceRequired(filters, param.name);
     // Per OpenAPI, path params must be required; we keep that behavior but still allow explicit config.
     const required =
-      location === 'path' ? true : Boolean(param.required || forcedRequired);
+      location === "path" ? true : Boolean(param.required || forcedRequired);
 
     const defaultValue = param?.schema?.default ?? null;
 
@@ -335,18 +346,17 @@ export function isWindows10OrLower() {
   return false;
 }
 
-
 export const getScrollbarWidth = (scrollbarWidthProp) => {
   // Create a temporary div container
-  const outer = document.createElement('div');
-  outer.style.visibility = 'hidden';
+  const outer = document.createElement("div");
+  outer.style.visibility = "hidden";
   outer.style.scrollbarWidth = scrollbarWidthProp;
-  outer.style.overflow = 'scroll'; // Force scrollbars
-  outer.style.msOverflowStyle = 'scrollbar'; // Needed for WinJS apps
+  outer.style.overflow = "scroll"; // Force scrollbars
+  outer.style.msOverflowStyle = "scrollbar"; // Needed for WinJS apps
   document.body.appendChild(outer);
 
   // Create a temporary inner div
-  const inner = document.createElement('div');
+  const inner = document.createElement("div");
   outer.appendChild(inner);
 
   // Calculate the scrollbar width
@@ -358,9 +368,16 @@ export const getScrollbarWidth = (scrollbarWidthProp) => {
   return scrollbarWidth;
 };
 
-
 /**
  * Apply one or multiple "where" conditions to a dataset (array of row objects).
+ *
+ * Supports the following operators:
+ *   - 'in': rowValue must be included in values (array or scalar)
+ *   - 'notIn': rowValue must NOT be included in values (array or scalar)
+ *   - 'equals': rowValue === value
+ *   - 'notEquals': rowValue !== value
+ *   - 'isNull': rowValue == null (matches null or undefined)
+ *   - 'notNull': rowValue != null (excludes null and undefined)
  *
  * @param {Array<Object>} rows - The input dataset rows.
  * @param {Object|Array<Object>} where - A single condition or an array of conditions.
@@ -369,8 +386,8 @@ export const getScrollbarWidth = (scrollbarWidthProp) => {
  * Condition shape:
  *   {
  *     column: string,
- *     values: any | any[],
- *     operator?: 'in' | 'notIn' | 'equals'
+ *     values?: any | any[], // not required for isNull/notNull
+ *     operator?: 'in' | 'notIn' | 'equals' | 'notEquals' | 'isNull' | 'notNull'
  *   }
  */
 export const applyWhereConditions = (rows, where) => {
@@ -381,20 +398,26 @@ export const applyWhereConditions = (rows, where) => {
     return conditions.every((cond) => {
       if (!cond || !cond.column) return true; // ignore malformed condition
 
-      const operator = cond.operator || 'in';
+      const operator = cond.operator || "in";
       const rowValue = row[cond.column];
 
-      // Normalize condition values to an array for 'in'/'notIn', and a single value for 'equals'
+      // Normalize condition values to an array for 'in'/'notIn', and a single value for equality ops
       const rawValues = cond.values;
       const valuesArray = Array.isArray(rawValues) ? rawValues : [rawValues];
       const equalsValue = Array.isArray(rawValues) ? rawValues[0] : rawValues;
 
       switch (operator) {
-        case 'equals':
+        case "equals":
           return rowValue === equalsValue;
-        case 'notIn':
+        case "notEquals":
+          return rowValue !== equalsValue;
+        case "notIn":
           return !valuesArray.includes(rowValue);
-        case 'in':
+        case "isNull":
+          return rowValue == null;
+        case "notNull":
+          return rowValue != null;
+        case "in":
         default:
           return valuesArray.includes(rowValue);
       }

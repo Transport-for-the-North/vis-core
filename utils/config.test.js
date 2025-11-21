@@ -79,7 +79,7 @@ describe("replacePlaceholders", () => {
     const html = "<div>{a} {b} {missing}</div>";
     const data = { a: "one", b: 2 };
     const result = replacePlaceholders(html, data);
-    expect(result).toBe("<div>one 2 {missing}</div>");
+    expect(result).toBe("<div>one 2 N/A</div>");
   });
 
   it("applies colon syntax {fn:key} with default allowed functions", () => {
@@ -111,11 +111,11 @@ describe("replacePlaceholders", () => {
     expect(result).toBe("<div>14&nbsp;50%</div>");
   });
 
-  it("leaves placeholder intact when arg is undefined", () => {
+  it("returns N/A when arg is undefined", () => {
     const html = "<div>{formatNumber(value)}</div>";
     const data = {};
     const result = replacePlaceholders(html, data);
-    expect(result).toBe("<div>{formatNumber(value)}</div>");
+    expect(result).toBe("<div>N/A</div>");
   });
 
   it("leaves placeholder intact when function is not allowed", () => {

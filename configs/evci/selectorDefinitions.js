@@ -820,6 +820,27 @@ const columnNameMMHFixedSelector = {
   },
 };
 
+const columnNameFHFixedSelector = {
+  filterName: "Metric",
+  paramName: "columnName",
+  target: "api",
+  actions: [
+    { action: "UPDATE_QUERY_PARAMS" },
+    { action: "UPDATE_LEGEND_TEXT" }
+  ],
+  visualisations: null,
+  type: "fixed",
+  values: {
+    source: "local",
+    values: [
+      {
+        displayValue: "Freight Hubs",
+        paramValue: "freight_hub",
+      }
+    ],
+  },
+};
+
 const columnNameSelector = {
   filterName: "Metric",
   paramName: "columnName",
@@ -962,6 +983,7 @@ export const selectors = {
   columnNameOSPADrivewayOnly: columnNameOSPASelectorDrivewayOnly,
   columnNameCVFixed: columnNameCVFixedSelector,
   columnNameMMHFixed: columnNameMMHFixedSelector,
+  columnNameFHFixed: columnNameFHFixedSelector,
   columnName: columnNameSelector,
   stbTag: stbTagSelector,
   runTypeCodeFixed: runTypeCodeFixedSelector,

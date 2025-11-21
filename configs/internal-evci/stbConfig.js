@@ -17,6 +17,7 @@ const pagesMap = {
     "energyCapacity",
     "commercialViability",
     "multiModalHubs",
+    "freightHubs"
   ]
 };
 

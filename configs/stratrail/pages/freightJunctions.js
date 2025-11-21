@@ -1,4 +1,4 @@
-import { freightJunctionLayerPaint } from "../customPaintDefinitions";
+import { freightJunctionLayerPaint, gaugeClearanceCustomPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 import { termsOfUse } from "../termsOfUse";
 
@@ -14,6 +14,20 @@ export const freightJunctions = {
   customMapCentre: [-2.45, 54.00],
   config: {
     layers: [
+      {
+            uniqueId: "RailOfferFreightGaigeClearanceVectorTile",
+            name: "Loading Gauge Network",
+            type: "tile",
+            source: "api",
+            path: "/api/vectortiles/railoffer_freight_links/{z}/{x}/{y}", // matches the path in swagger.json
+            sourceLayer: "geometry",
+            geometryType: "line",
+            visualisationName: "Freight Gauge Network",
+            customPaint: gaugeClearanceCustomPaint,
+            isHoverable: false,
+            isStylable: false,
+            shouldShowInLegend: true,
+        },
         {
             uniqueId: "RailOfferFreightJunctionVectorTile",
             name: "Freight Junctions",

@@ -30,7 +30,7 @@ export const BaseCalloutCardVisualisation = ({
   onUpdate,
   ...props
 }) => {
-  const sidebarIsOpen = props.sidebarIsOpen
+  const sidebarIsOpen = props.sidebarIsOpen;
   const [isVisible, setIsVisible] = useState(true);
   const { state, dispatch } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
