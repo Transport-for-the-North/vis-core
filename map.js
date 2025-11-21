@@ -223,9 +223,10 @@ export const updateOpacityExpression = (existingExpr, newOpacity) => {
  * @param {Array.<string>} colours - The array of colours available for the styling. Usually an array of #FFFF
  * @param {float} opacityValue - The current opacity value, between 0 and 1
  * @param {float} widthValue - 
+ * @param {Object} layerConfig - Optional layer configuration object that may contain defaultLineOffset
  * @returns The paint property for the given geometries
  */
-export function createPaintProperty(bins, style, colours, opacityValue) {
+export function createPaintProperty(bins, style, colours, opacityValue, layerConfig = {}) {
   let widthObject = [];
   let colors = [];
   let colorObject = [];
@@ -280,7 +281,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
   // line offset expression determined and allocated to line-diverging expression 
   // this ensures line offset is correct if root function used for line-width
   let offsetExpression;
-  offsetExpression = determineLineOffsetExpression(bins, widthObject, functionType);
+  offsetExpression = determineLineOffsetExpression(bins, widthObject, functionType, layerConfig);
 
   switch (style) {
     case "polygon-diverging":
@@ -333,8 +334,7 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           0,
           opacityValue ?? 1,
         ],
-
-        "line-offset": [
+        "line-offset": layerConfig.defaultLineOffset ?? [
           "interpolate",
           ["linear"],
           ["feature-state", "valueAbs"],
@@ -384,7 +384,15 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
           opacityValue ?? 1,
         ],
         "line-width": 3,
-        "line-offset": [
+        "line-offset": layerConfig.defaultLineOffset !== undefined ? [
+          "interpolate",
+          ["linear"],
+          ["to-number", ["feature-state", "valueAbs"]],
+          Math.min(...bins),
+          layerConfig.defaultLineOffset,
+          Math.max(...bins),
+          layerConfig.defaultLineOffset,
+        ] : [
           "interpolate",
           ["linear"],
           ["to-number", ["feature-state", "valueAbs"]],
@@ -556,14 +564,17 @@ const calculateLineWidth = (bins, functionType, binValue) => {
   return width;
 };
 
-const determineLineOffsetExpression = (bins, widthObject, functionType) => {
+const determineLineOffsetExpression = (bins, widthObject, functionType, layerConfig = {}) => {
 
+  // Use custom defaultLineOffset if provided, otherwise use default values
+  const customLineOffset = layerConfig.defaultLineOffset !== undefined ? layerConfig.defaultLineOffset : null;
+  
   // Below either uses root based scaling for offset or linear, depending on width calculation
   // If root function has been used for width, it mirrors this for offset and divides it by 1.3 to avoid the offset being excessive
   // If linear has been used offsets are allocated based off linear scale 
   let offsetExpression;
 
-  if (functionType === "root") {
+  if (functionType === "root" && customLineOffset === null) {
 
     offsetExpression = [
       "/",
@@ -576,14 +587,32 @@ const determineLineOffsetExpression = (bins, widthObject, functionType) => {
       1.3
     ];
 
-  } else {
+  } else if (customLineOffset !== null) {
+    
+    // If custom line offset is provided, use it regardless of function type
+    const minOffset = customLineOffset;
+    const maxOffset = customLineOffset;
 
     offsetExpression = [
       "interpolate",
       ["linear"],
       ["feature-state", "valueAbs"],
-      Math.min(...bins), -1,
-      Math.max(...bins), -5
+      Math.min(...bins), minOffset,
+      Math.max(...bins), maxOffset
+    ];
+
+  } else {
+    
+    // Default linear behavior
+    const minOffset = -1;
+    const maxOffset = -5;
+
+    offsetExpression = [
+      "interpolate",
+      ["linear"],
+      ["feature-state", "valueAbs"],
+      Math.min(...bins), minOffset,
+      Math.max(...bins), maxOffset
     ];
   }
 
