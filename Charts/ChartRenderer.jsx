@@ -399,14 +399,14 @@ const BarChartMultiple = ({
   const hasYLabel = !!config.y_axis_title;
   const formatter = (val) =>
     (formatters.commify || defaultFormatters.commify)(val);
-  const xAxisHeight = React.useMemo(
-    () =>
-      computeXAxisHeight(
-        config,
-        items.map((i) => i.label)
-      ),
-    [config, items]
-  );
+  // const xAxisHeight = React.useMemo(
+  //   () =>
+  //     computeXAxisHeight(
+  //       config,
+  //       items.map((i) => i.label)
+  //     ),
+  //   [config, items]
+  // );
   const truncateLabel = (label, maxLen = 18) =>
     label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
   const CustomTick = (props) => {
@@ -448,7 +448,7 @@ const BarChartMultiple = ({
               domain={[0, "dataMax"]}
               allowDecimals={false}
               tickFormatter={formatter}
-              tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+              tick={<CustomTick />}
               label={
                 hasXLabel
                   ? {
@@ -480,25 +480,51 @@ const BarChartMultiple = ({
           </>
         ) : (
           <>
-            <RXAxis
+            {/* <RXAxis
               dataKey={config.xKey || "label"}
               angle={DEFAULTS.DIMENSIONS.xAngle}
               textAnchor="end"
               height={xAxisHeight}
               interval={0}
-              tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-            />
+              tick={<CustomTick />}
+                            label={
+                hasXLabel
+                  ? {
+                      value: config.x_axis_title,
+                      position: "insideBottom",
+                      offset: -5,
+                      fontSize: 14,
+                    }
+                  : undefined
+              }
+            /> */}
+            <RXAxis dataKey={config.xKey || "label"} />
             <RYAxis
               domain={[0, "dataMax"]}
               allowDataOverflow
               allowDecimals={false}
               tickFormatter={formatter}
-              tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+              tick={<CustomTick />}
               width={DEFAULTS.DIMENSIONS.yAxisWidth}
+              label={
+                hasYLabel
+                  ? {
+                      value: config.y_axis_title,
+                      position: "bottom",
+                      offset: 10,
+                      fontSize: 14,
+                    }
+                  : undefined
+              }
             />
           </>
         )}
         <RTooltip formatter={formatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RLegend
+          verticalAlign="top"
+          align="center"
+          wrapperStyle={{ paddingBottom: 10 }}
+        />
         {config.columns.map((col, idx) => (
           <RBar
             key={col.key}
