@@ -412,38 +412,73 @@ export const CalloutCardVisualisation = ({
                     .filter(([key, obj]) => obj && obj.type !== undefined)
                     .map(([key, obj]) => ({ key, ...obj }));
                   return allGraphs.map((chart, idx) => {
-                    const configs = {
+                    let configs;
+                    let chartData;
+
+                    configs = {
                       type: chart.type,
                       title: chart.header || "Title",
                       x_axis_title: chart?.x_axis_title,
                       y_axis_title: chart?.y_axis_title,
-                      columns: chart.values.map((obj) => ({
-                        key: obj.name,
-                        label: obj.name,
-                      })),
                     };
 
-                    const hasRank = chart.values.some(
-                      (obj) => obj.rank !== undefined
-                    );
+                    if (chart.type === "multiple_bar") {
+                      // Categories = all 'name'
+                      const categories = [
+                        ...new Set(chart.values.map((obj) => obj.name)),
+                      ];
+                      // Series = all networks
+                      const series = [
+                        ...new Set(chart.values.map((obj) => obj.network)),
+                      ];
 
-                    if (hasRank) {
-                      configs.ranks = chart.values.reduce((acc, obj) => {
-                        if (obj.rank !== undefined) {
-                          acc[obj.name] = obj.rank;
-                        }
+                      // Data formaté pour barres groupées
+                      chartData = categories.map((cat) => {
+                        const entry = { label: cat };
+                        chart.values.forEach((obj) => {
+                          if (obj.name === cat) {
+                            entry[obj.network] = obj.columnValue;
+                          }
+                        });
+                        return entry;
+                      });
+
+                      configs.columns = series.map((network) => ({
+                        key: network,
+                        label: network,
+                      }));
+                      configs.xKey = "label";
+                    } else {
+                      // Data formatted for single bar
+                      configs.columns = chart.values.map((obj) => ({
+                        key: obj.name,
+                        label: obj.name,
+                      }));
+
+                      chartData = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
                         return acc;
                       }, {});
+
+                      // ranks if necessary
+                      const hasRank = chart.values.some(
+                        (obj) => obj.rank !== undefined
+                      );
+                      if (hasRank) {
+                        configs.ranks = chart.values.reduce((acc, obj) => {
+                          if (obj.rank !== undefined) {
+                            acc[obj.name] = obj.rank;
+                          }
+                          return acc;
+                        }, {});
+                      }
                     }
-                    const data = chart.values.reduce((acc, obj) => {
-                      acc[obj.name] = obj.columnValue;
-                      return acc;
-                    }, {});
+
                     return (
                       <CardContent key={idx}>
                         <ChartRenderer
                           charts={[configs]}
-                          data={data}
+                          data={chartData}
                           formatters={customFormattingFunctions}
                           barHeight={225}
                         />
@@ -500,13 +535,19 @@ export const CalloutCardVisualisation = ({
           ) : (
             <>
               {/* Render charts if provided */}
-              {Array.isArray(visualisation.charts) && visualisation.charts.length > 0 && (
-                <CardContent>
-                  {/* Optional dynamic title for charts, controlled by visualisation.cardTitle */}
-                  {dynamicCardTitle ? <h2>{dynamicCardTitle}</h2> : null}
-                  <ChartRenderer charts={visualisation.charts} data={data} formatters={customFormattingFunctions} barHeight={225} />
-                </CardContent>
-              )}
+              {Array.isArray(visualisation.charts) &&
+                visualisation.charts.length > 0 && (
+                  <CardContent>
+                    {/* Optional dynamic title for charts, controlled by visualisation.cardTitle */}
+                    {dynamicCardTitle ? <h2>{dynamicCardTitle}</h2> : null}
+                    <ChartRenderer
+                      charts={visualisation.charts}
+                      data={data}
+                      formatters={customFormattingFunctions}
+                      barHeight={225}
+                    />
+                  </CardContent>
+                )}
               {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}
               {renderedContent && (
                 <CardContent
