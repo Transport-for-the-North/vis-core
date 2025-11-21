@@ -63,6 +63,7 @@ export const freightAvgWeekdayFlows = {
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
             defaultOpacity: 0.95, // Custom default opacity for this layer
+            defaultLineOffset: 0,
         },
     ],
     visualisations: [

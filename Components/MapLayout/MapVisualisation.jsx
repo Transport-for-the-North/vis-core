@@ -255,12 +255,15 @@ export const MapVisualisation = ({
       const layerObject = mapItem.getLayer(layer);
       const defaultOpacity = layerObject?.metadata?.defaultOpacity ?? 0.65;
       
+      // Get the layer configuration for custom settings like defaultLineOffset
+      const layerConfig = state.layers[layerKey];
+      
       const paintProperty = createPaintProperty(
         reclassifiedData,
         resolvedStyle,
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : defaultOpacity,
-        widthValue ? parseFloat(widthValue) : 7.5
+        layerConfig
       );
 
       // Use visualisationDataForMap to update the map features
@@ -512,8 +515,7 @@ export const MapVisualisation = ({
         style,
         colourPalette,
         opacityValue ? parseFloat(opacityValue) : 0.65,
-        //widthValue ? parseFloat(widthValue) : 7.5
-        widthValue
+        state.layers[layerKey] // Pass layer config instead of widthValue
       );
 
       // Find the index of the layer that should be above the new layer
