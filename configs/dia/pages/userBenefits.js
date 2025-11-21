@@ -40,38 +40,28 @@ export const userBenefits = {
         dataPath: "/api/dia/user-benefits/zonal-data",
       },
       // callout card
-    //   {
-    //     name: "Zonal callout card",
-    //     type: "calloutCard",
-    //     cardType: "small",
-    //     cardName: "",
-    //     dataSource: "api",
-    //     dataPath: "/api/pba/accessibility/fullinfo",
-    //     cardTitle: "{name}",
-    //     layout: [
-    //       {
-    //         type: "html",
-    //         fragment: `
-    //           <h2>{title}</h2>
-    //         `,
-    //       },
-    //       {
-    //         type: "html",
-    //         fragment: `
-    //           <div class="row">
-    //             <div class="card">
-    //               <div class="label">Rank</div>
-    //               <div class="value">{rank}</div>
-    //             </div>
-    //             <div class="card">
-    //               <div class="label">Decile</div>
-    //               <div class="value">{decile}</div>
-    //             </div>
-    //           </div>
-    //         `,
-    //       },
-    //     ],
-    //   },
+      {
+        name: "Zonal callout card",
+        type: "calloutCard",
+        cardType: "small",
+        cardName: "",
+        dataSource: "local",
+        dataPath: "/api/dia/user-benefits/summary",
+        cardTitle: "{name}",
+        layout: [
+          {
+            type: "html",
+            fragment: `
+              <h2>{title}</h2>
+            `,
+          },
+          {
+            type: "graphs",
+            title: "Segment Breakdown",
+            maxRows: 5,
+          },
+        ],
+      },
     ],
     metadataTables: [
       // to change to real metadata tables
@@ -98,8 +88,8 @@ export const userBenefits = {
           source: "local",
           values: [
             {
-              displayValue: "UJW",
-              paramValue: "UJW",
+              displayValue: "16",
+              paramValue: 16,
             },
           ],
         },
@@ -110,23 +100,23 @@ export const userBenefits = {
         paramName: "programmeId",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: ["Map-based totals"],
+        visualisations: ["Map-based totals", "Zonal callout card"],
         layer: "Zones",
         type: "toggle",
         values: {
           source: "local",
           values: [
             {
-              displayValue: "4",
-              paramValue: 4,
+              displayValue: "2",
+              paramValue: 2,
             },
           ],
         },
       },
-      // userBenefitsCategoryId
+      // userBenefitsActivity
       {
-        filterName: "userBenefitsCategoryId",
-        paramName: "userBenefitsCategoryId",
+        filterName: "userBenefitsActivity",
+        paramName: "userBenefitsActivity",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
@@ -136,8 +126,27 @@ export const userBenefits = {
           source: "local",
           values: [
             {
-              displayValue: "1",
-              paramValue: 1,
+              displayValue: "Business",
+              paramValue: "Business",
+            },
+          ],
+        },
+      },
+      // userBenefitsCategoryDescription
+      {
+        filterName: "userBenefitsCategoryDescription",
+        paramName: "userBenefitsCategoryDescription",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Map-based totals"],
+        layer: "Zones",
+        type: "toggle",
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "G1 - Child",
+              paramValue: "G1 - Child",
             },
           ],
         },
@@ -156,6 +165,7 @@ export const userBenefits = {
         ],
         visualisations: [
           "Map-based totals",
+          "Zonal callout card"
         ],
         layer: "Zones",
         type: "toggle",
@@ -163,8 +173,8 @@ export const userBenefits = {
           source: "local",
           values: [
             {
-              displayValue: "MSOA?",
-              paramValue: 8,
+              displayValue: "39",
+              paramValue: 39,
             },
           ],
         },
