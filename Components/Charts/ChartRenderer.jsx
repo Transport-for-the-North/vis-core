@@ -372,7 +372,14 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
           </>
         )}
         <RTooltip formatter={formatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
-        <RBar dataKey="value" name="Value" fill={barFill} />
+        <RBar dataKey="value" name="Value">
+          {items.map((entry, idx) => (
+            <RCell
+              key={`cell-${idx}`}
+              fill={config.colors[entry.label] || DEFAULTS.BRAND_COLOR}
+            />
+          ))}
+        </RBar>
       </RBarChart>
     </ChartSection>
   );
@@ -399,14 +406,6 @@ const BarChartMultiple = ({
   const hasYLabel = !!config.y_axis_title;
   const formatter = (val) =>
     (formatters.commify || defaultFormatters.commify)(val);
-  // const xAxisHeight = React.useMemo(
-  //   () =>
-  //     computeXAxisHeight(
-  //       config,
-  //       items.map((i) => i.label)
-  //     ),
-  //   [config, items]
-  // );
   const truncateLabel = (label, maxLen = 18) =>
     label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
   const CustomTick = (props) => {
@@ -480,24 +479,6 @@ const BarChartMultiple = ({
           </>
         ) : (
           <>
-            {/* <RXAxis
-              dataKey={config.xKey || "label"}
-              angle={DEFAULTS.DIMENSIONS.xAngle}
-              textAnchor="end"
-              height={xAxisHeight}
-              interval={0}
-              tick={<CustomTick />}
-                            label={
-                hasXLabel
-                  ? {
-                      value: config.x_axis_title,
-                      position: "insideBottom",
-                      offset: -5,
-                      fontSize: 14,
-                    }
-                  : undefined
-              }
-            /> */}
             <RXAxis dataKey={config.xKey || "label"} />
             <RYAxis
               domain={[0, "dataMax"]}
@@ -530,11 +511,7 @@ const BarChartMultiple = ({
             key={col.key}
             dataKey={col.key}
             name={col.label}
-            fill={
-              DEFAULTS.BAR_COLORS
-                ? DEFAULTS.BAR_COLORS[idx % DEFAULTS.BAR_COLORS.length]
-                : DEFAULTS.BRAND_COLOR
-            }
+            fill={config.colors[col.key]}
             barSize={DEFAULTS.BAR_SIZE || 24}
             isAnimationActive={false}
           />
