@@ -253,6 +253,18 @@ export function createPaintProperty(bins, style, colours, opacityValue) {
     }
   }
 
+  // For continuous styles with only negative values to zero, reverse color mapping
+  // so that the most negative (largest magnitude) gets the "hottest" color
+  if (style.includes("continuous") && bins.length > 1) {
+    const maxBin = Math.max(...bins);
+    const minBin = Math.min(...bins);
+    
+    // Check if we have only negative to zero values (max is 0 or close to 0, min is negative)
+    if (maxBin <= 0.001 && minBin < -0.001) {
+      colours = [...colours].reverse();
+    }
+  }
+
   for (var i = 0; i < bins.length; i++) {
     colors.push(bins[i]);
     colors.push(colours[i]);
@@ -530,15 +542,16 @@ const calculateLineWidth = (bins, functionType, binValue) => {
   if (functionType === "root") {
     // get maximum value and normalise each value  
     const maxAbs = Math.max(...bins.map(b => Math.abs(b)));
-    const normalized = Math.abs(binValue / maxAbs);
+    const normalized = Math.abs(binValue) / maxAbs;
     // exponent (higher value deepens curve)
     const exponent = 3;
     const scaled = Math.pow(normalized, 1 / exponent);
     // Ensures width is between 1 and 7.5
     width = 1 + scaled * 7.5;
   } else if (functionType === "linear") {
-    // Linear formula 
-    width = (7.5 / bins[bins.length - 1]) * binValue + 1;
+    // Linear formula - use absolute values for both binValue and max bin
+    const maxBinAbs = Math.max(...bins.map(b => Math.abs(b)));
+    width = (7.5 / maxBinAbs) * Math.abs(binValue) + 1;
   }
   return width;
 };
