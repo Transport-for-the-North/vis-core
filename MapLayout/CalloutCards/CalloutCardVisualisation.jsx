@@ -8,6 +8,7 @@ import { replacePlaceholders } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
+import { getAllColors } from "configs/dia/utils/colors";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
@@ -411,6 +412,25 @@ export const CalloutCardVisualisation = ({
                   const allGraphs = Object.entries(data)
                     .filter(([key, obj]) => obj && obj.type !== undefined)
                     .map(([key, obj]) => ({ key, ...obj }));
+                  // Association of networks has a colour
+                  const colorsList = getAllColors();
+                  const networkColorMap = {};
+                  let colorIdx = 0;
+                  allGraphs.forEach((chart) => {
+                    if (
+                      chart.type === "multiple_bar" &&
+                      Array.isArray(chart.values)
+                    ) {
+                      chart.values.forEach((obj) => {
+                        const network = obj.network;
+                        if (network && !(network in networkColorMap)) {
+                          networkColorMap[network] =
+                            colorsList[colorIdx % colorsList.length];
+                          colorIdx++;
+                        }
+                      });
+                    }
+                  });
                   return allGraphs.map((chart, idx) => {
                     let configs;
                     let chartData;
@@ -420,6 +440,7 @@ export const CalloutCardVisualisation = ({
                       title: chart.header || "Title",
                       x_axis_title: chart?.x_axis_title,
                       y_axis_title: chart?.y_axis_title,
+                      colors: networkColorMap
                     };
 
                     if (chart.type === "multiple_bar") {
