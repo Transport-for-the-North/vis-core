@@ -469,9 +469,10 @@ const BarChartMultiple = ({
                 hasYLabel
                   ? {
                       value: config.y_axis_title,
-                      position: "bottom",
-                      offset: 10,
-                      fontSize: 14,
+                      position: "left",
+                      offset: 0,
+                      fontSize: 10,
+                      angle: -90,
                     }
                   : undefined
               }
@@ -491,9 +492,10 @@ const BarChartMultiple = ({
                 hasYLabel
                   ? {
                       value: config.y_axis_title,
-                      position: "bottom",
-                      offset: 10,
-                      fontSize: 14,
+                      position: "left",
+                      offset: 0,
+                      fontSize: 10,
+                      angle: -90,
                     }
                   : undefined
               }
