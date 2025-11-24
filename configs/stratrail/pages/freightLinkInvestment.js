@@ -70,6 +70,7 @@ export const freightLinkInvestments = {
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
+            showAllDataInTooltipForEachGeom: true,
             customTooltip: {
                 url: "/api/railoffer/freight-link-investment-callout/link?featureId={id}",
                 htmlTemplate: freightInvestPopupContent

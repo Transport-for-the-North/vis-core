@@ -70,6 +70,7 @@ export const linkInvestments = {
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
+            showAllDataInTooltipForEachGeom: true,
             customTooltip: {
                 url: "/api/railoffer/link-investment-callout/link?featureId={id}",
                 htmlTemplate: investPopupContent

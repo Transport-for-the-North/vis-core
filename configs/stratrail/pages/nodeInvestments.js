@@ -98,6 +98,7 @@ export const nodeInvestments = {
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
+            showAllDataInTooltipForEachGeom: true,
             customTooltip: {
                 url: "/api/railoffer/node-investment-callout/point?featureId={id}",
                 htmlTemplate: investPopupContent

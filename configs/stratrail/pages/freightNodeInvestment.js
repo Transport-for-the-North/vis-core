@@ -98,6 +98,7 @@ export const freightNodeInvestments = {
             hoverNulls: false,
             hoverTipShouldIncludeMetadata: false,
             enforceNoClassificationMethod: true,
+            showAllDataInTooltipForEachGeom: true,
             customTooltip: {
                 url: "/api/railoffer/freight-node-investment-callout/point?featureId={id}",
                 htmlTemplate: freightInvestPopupContent
