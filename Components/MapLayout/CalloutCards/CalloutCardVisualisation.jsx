@@ -397,7 +397,7 @@ export const CalloutCardVisualisation = ({
                   };
                   const html = replacePlaceholders(
                     item.fragment,
-                    mergedData, // Here you replace with the data object
+                    mergedData,
                     { customFunctions: customFormattingFunctions }
                   );
                   return (
@@ -453,7 +453,7 @@ export const CalloutCardVisualisation = ({
                         ...new Set(chart.values.map((obj) => obj.network)),
                       ];
 
-                      // Data formaté pour barres groupées
+                      // Data formatted for grouped bars
                       chartData = categories.map((cat) => {
                         const entry = { label: cat };
                         chart.values.forEach((obj) => {
