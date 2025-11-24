@@ -224,14 +224,16 @@ const ToggleButton = styled.button`
  * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({
-  visualisationName,
-  cardName,
-  onUpdate,
-  data,
-  isLoading,
-  hideHandleOnMobile = false,
+export const CalloutCardVisualisation = ({ 
+  visualisationName, 
+  cardName, 
+  onUpdate, 
+  data, 
+  isLoading, 
+  hideHandleOnMobile = false, 
   onVisibilityChange,
+  recordSelector = null,
+  toggleVisibility: externalToggleVisibility = null
 }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
@@ -282,7 +284,7 @@ export const CalloutCardVisualisation = ({
     } else {
       setRenderedContent("");
     }
-  }, [visualisation.htmlFragment]);
+  }, [data, visualisation.htmlFragment]);
 
   // Compute dynamic card title for charts (if configured)
   useEffect(() => {
@@ -307,7 +309,11 @@ export const CalloutCardVisualisation = ({
    * Toggles the visibility of the card.
    */
   const toggleVisibility = () => {
-    setIsVisible(!isVisible);
+    if (externalToggleVisibility) {
+      externalToggleVisibility();
+    } else {
+      setIsVisible(!isVisible);
+    }
     setIsHovered(false);
   };
 
@@ -493,6 +499,7 @@ export const CalloutCardVisualisation = ({
       <ParentContainer $isVisible={isVisible}>
         <CardContainer $isVisible={isVisible}>
           <CardTitle>{cardName}</CardTitle>
+          {recordSelector}
           {!hasDataShouldRender ? (
             <CardContent>
               <WarningBox text="No data available for selection" />

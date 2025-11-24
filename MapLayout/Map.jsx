@@ -552,16 +552,39 @@ const Map = (props) => {
             const { htmlTemplate, customFormattingFunctions } = customTooltip;
             const featureId = feature.id;
             const requestUrlWithId = resolveTooltipRequestUrl(customTooltip, featureId);
+            const showAllDataInTooltip = layerConfig?.showAllDataInTooltipForEachGeom;
 
             return api.baseService
               .get(requestUrlWithId, { signal: controller.signal })
               .then((responseData) => {
-                const tooltipHtml = replacePlaceholders(
-                  htmlTemplate,
-                  responseData,
-                  { customFunctions: customFormattingFunctions }
-                )
-                return tooltipHtml;
+                // Check if we should show all data and we have an array of records
+                if (showAllDataInTooltip && Array.isArray(responseData) && responseData.length > 0) {
+                  // Reverse the array so most recently painted features appear first
+                  const reversedData = [...responseData].reverse();
+                  
+                  // Only show the first tooltip
+                  const firstTooltipHtml = replacePlaceholders(
+                    htmlTemplate,
+                    reversedData[0],
+                    { customFunctions: customFormattingFunctions }
+                  );
+                  
+                  // Add indicator if there are more records than displayed
+                  if (reversedData.length > 1) {
+                    return `${firstTooltipHtml}<hr class="thick-divider"><div class="more-records-indicator">... and ${reversedData.length - 1} more record(s)</div>`;
+                  }
+                  
+                  return firstTooltipHtml;
+                } else {
+                  // Single item or showAllDataInTooltip is false - use original logic
+                  const dataToUse = Array.isArray(responseData) ? responseData[0] : responseData;
+                  const tooltipHtml = replacePlaceholders(
+                    htmlTemplate,
+                    dataToUse,
+                    { customFunctions: customFormattingFunctions }
+                  );
+                  return tooltipHtml;
+                }
               })
               .catch((error) => {
                 if (error.name !== "AbortError") {
