@@ -53,6 +53,8 @@ export const BaseCalloutCardVisualisation = ({
 
   // ========== Data Fetching ==========
   const response = useFetchVisualisationData(visualisation);
+  const responseData = response.data;
+  const remoteIsLoading = response.isLoading;
 
   /**
    * Synchronizes the displayed data with the fetched data,
@@ -60,24 +62,24 @@ export const BaseCalloutCardVisualisation = ({
    * Handles both single records and arrays of multiple records.
    */
   useEffect(() => {
-    if (!isTransition && response.data) {
+    if (!isTransition && responseData) {
       // Check if response data is an array
-      if (Array.isArray(response.data)) {
-        const isNewDataSet = allRecords.length !== response.data.length;
+      if (Array.isArray(responseData)) {
+        const isNewDataSet = allRecords.length !== responseData.length;
         
-        setAllRecords(response.data);
-        setHasMultipleRecords(response.data.length > 1);
+        setAllRecords(responseData);
+        setHasMultipleRecords(responseData.length > 1);
         
-        if (response.data.length > 0) {
+        if (responseData.length > 0) {
           // Only reset selection if this is new data or user hasn't made a selection
           if (isNewDataSet || !userHasSelectedRecord) {
-            setData(response.data[0]);
+            setData(responseData[0]);
             setSelectedRecordIndex(0);
             setUserHasSelectedRecord(false);
           } else {
             // Preserve current selection if possible
-            const validIndex = selectedRecordIndex < response.data.length ? selectedRecordIndex : 0;
-            setData(response.data[validIndex]);
+            const validIndex = selectedRecordIndex < responseData.length ? selectedRecordIndex : 0;
+            setData(responseData[validIndex]);
             if (validIndex !== selectedRecordIndex) {
               setSelectedRecordIndex(validIndex);
             }
@@ -87,16 +89,16 @@ export const BaseCalloutCardVisualisation = ({
         }
       } else {
         // Single record
-        setAllRecords([response.data]);
+        setAllRecords([responseData]);
         setHasMultipleRecords(false);
-        setData(response.data);
+        setData(responseData);
         setSelectedRecordIndex(0);
         setUserHasSelectedRecord(false);
       }
       
-      setIsLoading(response.isLoading);
+      setIsLoading(remoteIsLoading);
     }
-  }, [response, isTransition]);
+  }, [responseData, remoteIsLoading, isTransition, userHasSelectedRecord, allRecords.length, selectedRecordIndex]);
 
   /**
    * Ends the transition state when the fetched data matches the displayed data.
@@ -105,12 +107,12 @@ export const BaseCalloutCardVisualisation = ({
   useEffect(() => {
     if (
       isTransition &&
-      response.data &&
-      response.data.location_id === data?.location_id
+      responseData &&
+      responseData.location_id === data?.location_id
     ) {
       setIsTransition(false);
     }
-  }, [response.data, isTransition, data]);
+  }, [responseData, isTransition, data]);
 
   /**
    * Handles selection of a different record from the dropdown
