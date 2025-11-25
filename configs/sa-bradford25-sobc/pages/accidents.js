@@ -43,8 +43,8 @@ export const accidents = {
     ],
     metadataTables: [
       {
-        name: "dia_accident_outputs",
-        path: "/api/getgenericdataset?dataset_id=avp_data.dia_accident_outputs",
+        name: "avp_networks",
+        path: "/api/getgenericdataset?dataset_id=avp_data.avp_networks",
       },
     ],
     filters: [
@@ -59,11 +59,11 @@ export const accidents = {
         type: "dropdown",
         values: {
           source: "metadataTable",
-          metadataTableName: "dia_accident_outputs",
-          displayColumn: "network_id",
-          paramColumn: "network_id",
+          metadataTableName: "avp_networks",
+          displayColumn: "network",
+          paramColumn: "id",
           sort: "ascending",
-          where: [{ column: "network_id", operator: "notNull" }],
+          where: [{ column: "id", operator: "notNull" }],
         },
       },
       // programmeId
