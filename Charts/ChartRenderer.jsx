@@ -406,22 +406,20 @@ const BarChartMultiple = ({
   const hasYLabel = !!config.y_axis_title;
   const formatter = (val) =>
     (formatters.commify || defaultFormatters.commify)(val);
-  const truncateLabel = (label, maxLen = 18) =>
+  const truncateLabel = (label, maxLen = 7) =>
     label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
-  const CustomTick = (props) => {
-    const { x, y, payload } = props;
-    return (
-      <text
-        x={x}
-        y={y}
-        dy={4}
-        textAnchor="end"
-        fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
-      >
-        {truncateLabel(payload.value)}
-      </text>
-    );
-  };
+const CustomTick = ({ x, y, payload, angle = 0 }) => (
+  <text
+    x={x}
+    y={y}
+    dy={angle ? 16 : 4}
+    textAnchor="end"
+    fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+    transform={angle ? `rotate(${angle}, ${x}, ${y})` : undefined}
+  >
+    {truncateLabel(payload.value)}
+  </text>
+);
   const chartMargin = { ...DEFAULTS.MARGIN };
   if (hasXLabel || hasYLabel) {
     chartMargin.bottom = 20;
@@ -480,7 +478,11 @@ const BarChartMultiple = ({
           </>
         ) : (
           <>
-            <RXAxis dataKey={config.xKey || "label"} />
+            <RXAxis
+              dataKey={config.xKey || "label"}
+              tick={<CustomTick angle={-45}/>}
+              interval={0}
+            />
             <RYAxis
               domain={[0, "dataMax"]}
               allowDataOverflow
