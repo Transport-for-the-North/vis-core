@@ -62,7 +62,7 @@ export const accidents = {
           metadataTableName: "avp_networks",
           displayColumn: "network",
           paramColumn: "id",
-          sort: "ascending",
+          sort: "descending",
           where: [{ column: "id", operator: "notNull" }],
         },
       },
