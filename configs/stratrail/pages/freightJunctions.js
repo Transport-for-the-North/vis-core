@@ -7,7 +7,8 @@ export const freightJunctions = {
   url: "/freight-junctions",
   type: "MapLayout",
   category: "Freight",
-  about: `<p>This visualisation shows junctions assessed as suppressing freight growth by 2040 under a TAG compliant business as usual growth scenario (RFRS 2024)</p>`,
+  about: `<p>This visualisation shows junctions assessed as suppressing freight growth by 2040 under a TAG compliant business as usual growth scenario (RFRS 2024).</p>
+          <p>Please note analysis suggests Weaver Junction is not anticipated to suppress freight growth until 2050.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   customMapZoom: 7,
