@@ -28,8 +28,8 @@ export const accidents = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
       },
-      {
-        name: "Zone Connectors",
+      /* {
+        name: "Network Line Geometries",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/avp_network_line_geometries/{z}/{x}/{y}", // matches the path in swagger.json
@@ -43,7 +43,7 @@ export const accidents = {
         labelNulls: true,
         hoverNulls: true,
         hiddenByDefault: true
-      },
+      }, */
     ],
     visualisations: [
       {
