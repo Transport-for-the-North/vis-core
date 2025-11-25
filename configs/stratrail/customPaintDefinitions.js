@@ -116,7 +116,12 @@ export const freightLocationLayerPaint = {
 };
 
 export const freightJunctionLayerPaint = {
-  "circle-color": "#f5f5f5",
+  "circle-color": [
+    'match',
+    ['get', 'name'],
+    'Weaver Junction (constraint by 2050)', '#ff0000b1',
+    "#f5f5f5",
+  ],
   "circle-radius": 5,
   "circle-opacity": 0.9,
   "circle-stroke-color": "#000000",
