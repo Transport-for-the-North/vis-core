@@ -8,7 +8,7 @@ import { replacePlaceholders } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
-import { getAllColors } from "configs/dia/utils/colors";
+import { getAllColors } from "configs/sa-bradford25-sobc/utils/colors";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
