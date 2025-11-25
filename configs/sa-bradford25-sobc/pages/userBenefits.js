@@ -65,14 +65,14 @@ export const userBenefits = {
     ],
     metadataTables: [
       // to change to real metadata tables
-      //   {
-      //     name: "v_vis_avp_programmes_run_info",
-      //     path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
-      //   },
-      //   {
-      //     name: "pba_accessibility_definitions",
-      //     path: "/api/getgenericdataset?dataset_id=avp_data.pba_accessibility_definitions",
-      //   },
+      {
+        name: "v_vis_avp_programmes_run_info",
+        path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
+      },
+      {
+        name: "dia_user_benefits_definitions",
+        path: "/api/getgenericdataset?dataset_id=avp_data.dia_user_benefits_definitions",
+      },
     ],
     filters: [
       // runCodeId
@@ -83,13 +83,23 @@ export const userBenefits = {
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
         layer: "Zones",
-        type: "toggle",
+        type: "dropdown",
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "nortms_run_id_display",
+          paramColumn: "run_id",
+          sort: "ascending",
+          where: [
             {
-              displayValue: "16",
-              paramValue: 16,
+              column: "has_dia_userbenefits",
+              values: true,
+              operator: "equals",
+            },
+            {
+              column: "run_id",
+              values: [16],
+              operator: "in",
             },
           ],
         },
@@ -102,7 +112,7 @@ export const userBenefits = {
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals", "Zonal callout card"],
         layer: "Zones",
-        type: "toggle",
+        type: "fixed",
         values: {
           source: "local",
           values: [
@@ -121,14 +131,37 @@ export const userBenefits = {
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
         layer: "Zones",
-        type: "toggle",
+        type: "dropdown",
+        shouldFilterOthers: true,
+        shouldBeFiltered: false,
         values: {
-          source: "local",
-          values: [
-            {
-              displayValue: "Business",
-              paramValue: "Business",
-            },
+          source: "metadataTable",
+          metadataTableName: "dia_user_benefits_definitions",
+          displayColumn: "user_benefits_activity",
+          paramColumn: "user_benefits_activity",
+          sort: "ascending",
+          where: [{ column: "user_benefits_activity", operator: "notNull" }],
+        },
+      },
+      // userBenefitsMainCategoryDescription
+      {
+        filterName: "userBenefitsMainCategoryDescription",
+        paramName: "",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Map-based totals"],
+        layer: "Zones",
+        type: "dropdown",
+        shouldFilterOthers: true,
+        shouldBeFiltered: true,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "dia_user_benefits_definitions",
+          displayColumn: "user_benefits_main_category",
+          paramColumn: "user_benefits_main_category",
+          sort: "ascending",
+          where: [
+            { column: "user_benefits_main_category", operator: "notNull" },
           ],
         },
       },
@@ -140,14 +173,18 @@ export const userBenefits = {
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
         layer: "Zones",
-        type: "toggle",
+        type: "dropdown",
+        shouldFilterOthers: false,
+        shouldBeFiltered: true,
         values: {
-          source: "local",
-          values: [
-            {
-              displayValue: "G1 - Child",
-              paramValue: "G1 - Child",
-            },
+          source: "metadataTable",
+          metadataTableName: "dia_user_benefits_definitions",
+          displayColumn: "user_benefits_category",
+          paramColumn: "user_benefits_category",
+          infoOnHoverColumn: "user_benefits_category_desc",
+          sort: "ascending",
+          where: [
+            { column: "user_benefits_category_desc", operator: "notNull" },
           ],
         },
       },
@@ -163,12 +200,9 @@ export const userBenefits = {
           },
           { action: "UPDATE_QUERY_PARAMS" },
         ],
-        visualisations: [
-          "Map-based totals",
-          "Zonal callout card"
-        ],
+        visualisations: ["Map-based totals", "Zonal callout card"],
         layer: "Zones",
-        type: "toggle",
+        type: "fixed",
         values: {
           source: "local",
           values: [
