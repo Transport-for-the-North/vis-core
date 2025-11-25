@@ -116,7 +116,8 @@ export const appConfig = {
         pages.pca,
         pages.nac,
         pages.widerImpacts,
-        pages.accessibility
+        pages.accessibility,
+        pages.airQuality
         
     ],
     footer: {
