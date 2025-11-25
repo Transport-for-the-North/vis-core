@@ -9,12 +9,13 @@ export const accidents = {
   config: {
     layers: [
       {
-        name: "Zones",
+        uniqueId: "DIALevelCrossing",
+        name: "LevelCrossing",
         type: "tile",
         source: "api",
-        path: "api/vectortiles/{dia_level_crossing_geometry}/{z}/{x}/{y}",
-        sourceLayer: "zones",
-        geometryType: "polygon",
+        path: "/api/vectortiles/dia_level_crossing_geometry/{z}/{x}/{y}?network_id={networkId}&programme_id={programmeId}",
+        sourceLayer: "geometry",
+        geometryType: "point",
         visualisationName: "Map-based totals",
         isHoverable: true,
         isStylable: true,
@@ -32,8 +33,8 @@ export const accidents = {
       {
         name: "Map-based totals",
         type: "joinDataToMap",
-        joinLayer: "Zones",
-        style: "polygon-continuous",
+        joinLayer: "LevelCrossing",
+        style: "circle-continuous",
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -54,7 +55,7 @@ export const accidents = {
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
-        layer: "Zones",
+        layer: "LevelCrossing",
         type: "dropdown",
         values: {
           source: "metadataTable",
@@ -72,15 +73,17 @@ export const accidents = {
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
-        layer: "Zones",
+        layer: "LevelCrossing",
         type: "fixed",
+        forceRequired: true,
         values: {
-          source: "metadataTable",
-          metadataTableName: "dia_accident_outputs",
-          displayColumn: "programme_id",
-          paramColumn: "programme_id",
-          sort: "ascending",
-          where: [{ column: "programme_id", operator: "notNull" }],
+          source: "local",
+          values: [
+            {
+              displayValue: "2",
+              paramValue: 2, // Put their true value
+            },
+          ],
         },
       },
       // columnName
@@ -90,7 +93,7 @@ export const accidents = {
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
-        layer: "Zones",
+        layer: "LevelCrossing",
         type: "dropdown",
         values: {
           source: "local",
@@ -100,7 +103,7 @@ export const accidents = {
               paramValue: "category",
             },
             {
-              displayValue: "risk_level",
+              displayValue: "riskLevel",
               paramValue: "risk_level",
             },
           ],
