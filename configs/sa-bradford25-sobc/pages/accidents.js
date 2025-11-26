@@ -66,7 +66,7 @@ export const accidents = {
     filters: [
       // networkId
       {
-        filterName: "networkId",
+        filterName: "Network Scenario",
         paramName: "networkId",
         target: "api",
         actions: [
@@ -116,7 +116,7 @@ export const accidents = {
       },
       // columnName
       {
-        filterName: "columnName",
+        filterName: "Metric",
         paramName: "columnName",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
@@ -127,11 +127,11 @@ export const accidents = {
           source: "local",
           values: [
             {
-              displayValue: "category",
+              displayValue: "Category",
               paramValue: "category",
             },
             {
-              displayValue: "riskLevel",
+              displayValue: "Risk Level",
               paramValue: "risk_level",
             },
           ],
