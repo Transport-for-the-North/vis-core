@@ -8,5 +8,5 @@ const baseSummaryCallout = `<h2>{zone_name} TRSE Risk Summary</h2>
     This area ranks <span class="highlight">{formatOrdinal(high_risk_rank)} out of {formatNumber(zone_count)}</span> {authorityType} for the overall level of TRSE risk.
 </p>`
 
-export const caSummaryCallout = replacePlaceholders(baseSummaryCallout, { authorityType: 'Combined Authorities' });
-export const ladSummaryCallout = replacePlaceholders(baseSummaryCallout, { authorityType: 'Local Authorities' });
+export const caSummaryCallout = replacePlaceholders(baseSummaryCallout, { authorityType: 'Combined Authorities' }, { keepUndefined: true });
+export const ladSummaryCallout = replacePlaceholders(baseSummaryCallout, { authorityType: 'Local Authorities' }, { keepUndefined: true });

@@ -118,7 +118,8 @@ export function replacePlaceholdersInObject(target, source) {
  * @param {Object} data - An object mapping keys to values for substitution.
  * @param {Object} [options={}] - Optional configuration settings.
  * @param {Object} [options.customFunctions] - An object mapping function names to custom formatter functions.
- *                                             These functions receive arguments based on their parameter count.
+ * @param {boolean} [options.keepUndefined=false] - If true, undefined placeholders will remain as text (e.g., "{key}")
+ *                                                  instead of being replaced by "N/A".
  * @returns {string} - The HTML string with placeholders replaced by their corresponding values or formatted values.
  *
  * @example
@@ -188,9 +189,9 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
     (match, functionName, argKey) => {
       const arg = data[argKey];
 
-      // If arg is undefined, return the original placeholder
+      // If arg is undefined, check options to decide whether to keep placeholder or return "N/A"
       if (arg === undefined) {
-        return "N/A";
+        return options.keepUndefined ? match : "N/A";
       }
 
       // Check if the function is allowed
@@ -219,7 +220,11 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
   // Step 3: Handle simple replacement {key} (existing functionality)
   result = result.replace(/\{([a-zA-Z0-9_]+)\}/g, (match, key) => {
     const value = data[key];
-    return value !== undefined ? value : "N/A";
+    // If value is undefined, check options to decide whether to keep placeholder or return "N/A"
+    if (value === undefined) {
+      return options.keepUndefined ? match : "N/A";
+    }
+    return value;
   });
 
   return result;
