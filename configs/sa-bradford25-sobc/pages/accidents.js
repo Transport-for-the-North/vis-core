@@ -13,7 +13,7 @@ export const accidents = {
         name: "Level Crossing",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/dia_level_crossing_geometry/{z}/{x}/{y}?network_id={networkId}&programme_id={programmeId}",
+        path: "/api/vectortiles/dia_level_crossing_geometry/{z}/{x}/{y}?joinType=accidents&network_id={networkId}&programme_id={programmeId}",
         sourceLayer: "geometry",
         geometryType: "point",
         visualisationName: "Map-based totals",
