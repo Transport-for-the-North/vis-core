@@ -13,7 +13,7 @@ export const accidents = {
         name: "Level Crossing",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/dia_level_crossing_geometry/{z}/{x}/{y}?joinType=accidents&network_id={networkId}&programme_id={programmeId}",
+        path: "/api/vectortiles/dia_level_crossing_accident_geometry/{z}/{x}/{y}?network_id={networkId}&programme_id={programmeId}",
         sourceLayer: "geometry",
         geometryType: "point",
         visualisationName: "Map-based totals",
@@ -28,7 +28,7 @@ export const accidents = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
         customTooltip: {
-          url: "/api/dia/accidents/callout-data?nodeId={id}&networkId={networkId}&programmeId={programmeId}&columnName={columnName}",
+          url: "/api/dia/accidents/callout-data?accidentId={id}&networkId={networkId}&programmeId={programmeId}&columnName={columnName}",
           htmlTemplate: `
             <div class="popup-content">
               <div class="metadata-item">
