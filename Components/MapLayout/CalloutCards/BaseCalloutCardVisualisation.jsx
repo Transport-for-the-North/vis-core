@@ -42,7 +42,7 @@ export const BaseCalloutCardVisualisation = ({
   const visualisation = state.visualisations[visualisationName];
 
   const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasHydrated, setHasHydrated] = useState(false);
   
   // State for handling multiple records
   const [allRecords, setAllRecords] = useState([]);
@@ -102,9 +102,17 @@ export const BaseCalloutCardVisualisation = ({
         setUserHasSelectedRecord(false);
       }
       
-      setIsLoading(remoteIsLoading);
+      // Once we have any data, consider initial hydration complete and stop showing loading flashes
+      if (!hasHydrated) setHasHydrated(true);
     }
-  }, [responseData, remoteIsLoading, isTransition, userHasSelectedRecord, allRecords.length, selectedRecordIndex]);
+  }, [
+    responseData,
+    isTransition,
+    userHasSelectedRecord,
+    allRecords.length,
+    selectedRecordIndex,
+    hasHydrated,
+  ]);
 
   /**
    * Ends the transition state when the fetched data matches the displayed data.
@@ -145,8 +153,6 @@ export const BaseCalloutCardVisualisation = ({
     // Try to get a meaningful label from the record
     return record.title || record.name || record.reference_id || `Record ${allRecords.indexOf(record) + 1}`;
   };
-
-
 
   /**
    * Prefetches data for the next or previous location.
@@ -328,12 +334,11 @@ export const BaseCalloutCardVisualisation = ({
     setPrevData(null);
   };
 
-  if (isLoading || !data) return null;
 
   return type === "fullscreen" ? (
     <FullScreenCalloutCardVisualisation
       data={data}
-      isLoading={isLoading}
+      isLoading={remoteIsLoading}
       handleUpdatedData={(locationId, mode) => {
         onUpdateData(locationId, mode);
       }}
@@ -346,7 +351,7 @@ export const BaseCalloutCardVisualisation = ({
       cardName={cardName}
       onUpdate={onUpdate}
       data={data}
-      isLoading={isLoading}
+      isLoading={remoteIsLoading}
       recordSelector={hasMultipleRecords ? (
         <RecordSelector
           records={allRecords}

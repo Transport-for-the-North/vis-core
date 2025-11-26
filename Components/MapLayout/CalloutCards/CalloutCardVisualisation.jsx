@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useMemo, useState, useContext, useRef, useCallback } from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
@@ -237,7 +237,6 @@ export const CalloutCardVisualisation = ({
 }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
-  let customFormattingFunctions = visualisation.customFormattingFunctions || {};
   const buttonRef = useRef(null);
 
   // Do not render the card if no data is available,
@@ -263,44 +262,22 @@ export const CalloutCardVisualisation = ({
     };
   }, [actuallyVisible, onVisibilityChange]);
 
-  // State to hold the rendered HTML content
-  const [renderedContent, setRenderedContent] = useState("");
-  const [isVisible, setIsVisible] = useState(true);
+  // Slide-in: start hidden and slide to visible once the card truly has content.
+  const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const showHandle = !hideHandleOnMobile;
-  const contentRef = useRef(null); // NEW
-  const [dynamicCardTitle, setDynamicCardTitle] = useState("");
+  const contentRef = useRef(null);
 
-  // Effect to replace placeholders in the HTML fragment with actual data and sanitize it
+  // Trigger initial slide-in when the card first becomes actually visible
   useEffect(() => {
-    if (data && visualisation.htmlFragment) {
-      setIsVisible(true);
-      let html = replacePlaceholders(visualisation.htmlFragment, data, {
-        customFunctions: customFormattingFunctions,
-      });
-      const sanitizedHtml = DOMPurify.sanitize(html);
-      setRenderedContent(sanitizedHtml);
-      if (onUpdate) onUpdate();
-    } else {
-      setRenderedContent("");
+    if (actuallyVisible) {
+      // next frame ensures CSS transition fires
+      const id = requestAnimationFrame(() => setIsVisible(true));
+      return () => cancelAnimationFrame(id);
     }
-  }, [data, visualisation.htmlFragment]);
+  }, [actuallyVisible]);
 
-  // Compute dynamic card title for charts (if configured)
-  useEffect(() => {
-    if (data && visualisation.cardTitle) {
-      const title = replacePlaceholders(String(visualisation.cardTitle), data, {
-        customFunctions: customFormattingFunctions,
-      });
-      // Render as plain text to avoid HTML injection in the title
-      setDynamicCardTitle(
-        DOMPurify.sanitize(title, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
-      );
-    } else {
-      setDynamicCardTitle("");
-    }
-  }, [data, visualisation.cardTitle]);
-
+  // Respect hideHandleOnMobile: when true, ensure the card is visible (still slides in on first actual visibility)
   useEffect(() => {
     if (hideHandleOnMobile) setIsVisible(true);
   }, [hideHandleOnMobile]);
@@ -312,12 +289,73 @@ export const CalloutCardVisualisation = ({
     if (externalToggleVisibility) {
       externalToggleVisibility();
     } else {
-      setIsVisible(!isVisible);
+      setIsVisible((v) => !v);
     }
     setIsHovered(false);
   };
 
-  // Render loading state if data is still being fetched
+  const formatNumberWithUnit = useCallback((value, unit = "") => {
+    if (value === null || value === undefined || isNaN(value)) return "N/A";
+    if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
+    if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
+    if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
+    return Number(value).toFixed(2) + unit;
+  }, []);
+
+  let customFormattingFunctions = {
+    ...(visualisation.customFormattingFunctions || {}),
+    formatNumberWithUnit,
+  };
+
+  // Batch compute the sanitized HTML and dynamic title together to avoid multi-step updates
+  const { sanitizedHtml, safeDynamicTitle } = useMemo(() => {
+    if (!data) {
+      return { sanitizedHtml: "", safeDynamicTitle: "" };
+    }
+    const htmlFromFragment = visualisation.htmlFragment
+      ? DOMPurify.sanitize(
+          replacePlaceholders(visualisation.htmlFragment, data, {
+            customFunctions: customFormattingFunctions,
+          })
+        )
+      : "";
+
+    const dynamicTitle = visualisation.cardTitle
+      ? replacePlaceholders(String(visualisation.cardTitle), data, {
+          customFunctions: customFormattingFunctions,
+        })
+      : "";
+
+    const safeTitle = DOMPurify.sanitize(dynamicTitle, {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
+    });
+
+    return { sanitizedHtml: htmlFromFragment, safeDynamicTitle: safeTitle };
+  }, [
+    data,
+    visualisation.htmlFragment,
+    visualisation.cardTitle,
+    customFormattingFunctions,
+  ]);
+
+  // Keep a stable reference to onUpdate so it doesn't churn the effect deps
+  const onUpdateRef = useRef(onUpdate);
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
+
+  // Call onUpdate to trigger the reordering of cards on a new request
+  useEffect(() => {
+    if (isLoading) return;
+    if (!hasDataShouldRender) return;
+    if (typeof onUpdateRef.current !== "function") return;
+
+    onUpdateRef.current();
+  }, [data, visualisation?.htmlFragment, visualisation?.cardTitle, isLoading, hasDataShouldRender]);
+  
+
+  // Loading shell (kept mounted for initial slide-in once data arrives)
   if (isLoading) {
     return (
       <>
@@ -361,27 +399,9 @@ export const CalloutCardVisualisation = ({
     );
   }
 
-  // If there is no data to display, don't render the card
-  // if (!data || Object.keys(data).length === 0) {
-  //   return null; // Don't render the card if there's no data
-  // }
-
   if (!hasDataShouldRender) {
     return null;
   }
-
-  function formatNumberWithUnit(value, unit = "") {
-    if (value === null || value === undefined || isNaN(value)) return "N/A";
-    if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
-    if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
-    if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
-    return Number(value).toFixed(2) + unit;
-  }
-
-  customFormattingFunctions = {
-    ...customFormattingFunctions,
-    formatNumberWithUnit,
-  };
 
   if (visualisation.layout && visualisation.layout.length > 0) {
     return (
@@ -507,18 +527,23 @@ export const CalloutCardVisualisation = ({
           ) : (
             <>
               {/* Render charts if provided */}
-              {Array.isArray(visualisation.charts) && visualisation.charts.length > 0 && (
-                <CardContent>
-                  {/* Optional dynamic title for charts, controlled by visualisation.cardTitle */}
-                  {dynamicCardTitle ? <h2>{dynamicCardTitle}</h2> : null}
-                  <ChartRenderer charts={visualisation.charts} data={data} formatters={customFormattingFunctions} barHeight={225} />
-                </CardContent>
-              )}
+              {Array.isArray(visualisation.charts) &&
+                visualisation.charts.length > 0 && (
+                  <CardContent>
+                    {safeDynamicTitle ? <h2>{safeDynamicTitle}</h2> : null}
+                    <ChartRenderer
+                      charts={visualisation.charts}
+                      data={data}
+                      formatters={customFormattingFunctions}
+                      barHeight={225}
+                    />
+                  </CardContent>
+                )}
               {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}
-              {renderedContent && (
+              {sanitizedHtml && (
                 <CardContent
                   ref={contentRef}
-                  dangerouslySetInnerHTML={{ __html: renderedContent }}
+                  dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
                 />
               )}
             </>
