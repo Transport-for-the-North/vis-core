@@ -20,13 +20,36 @@ export const accidents = {
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
-        shouldHaveLabel: true,
+        shouldHaveLabel: false,
         labelZoomLevel: 12,
         labelNulls: false,
         hoverNulls: true,
         hoverTipShouldIncludeMetadata: false,
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
+        customTooltip: {
+          url: "/api/dia/accidents/callout-data?nodeId={id}&networkId={networkId}&programmeId={programmeId}&columnName={columnName}",
+          htmlTemplate: `
+            <div class="popup-content">
+              <div class="metadata-item">
+                <span class="metadata-key">Crossing Name:</span>
+                <span class="metadata-value">{crossing_name}</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-key">Crossing Type:</span>
+                <span class="metadata-value">{crossing_type}</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-key">{value}:</span>
+                <span class="metadata-value">{value}</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-key">Modification:</span>
+                <span class="metadata-value">{modification}</span>
+              </div>
+            </div>
+        `
+        }
       },
       /* {
         name: "Network Line Geometries",
