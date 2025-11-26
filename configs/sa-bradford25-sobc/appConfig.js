@@ -47,6 +47,8 @@ export const appConfig = {
             `,
             sectionTitle: "Network Appraisal Criteria (NAC)",
             alignment: "left",
+            mapUrl: "/nac",
+            image: "img/avp/featuredBlocks/5.png",
         },
 
         {
@@ -68,6 +70,8 @@ export const appConfig = {
             `,
             sectionTitle: "Distributional Impact Appraisal (DIA)",
             alignment: "left",
+            mapUrl: "/person-centred-analysis",
+            image: "img/avp/featuredBlocks/Manchester Piccadilly Station.png",
         },
         {
             content: `
@@ -83,6 +87,8 @@ export const appConfig = {
         `,
             sectionTitle: "PBA",
             alignment: "left",
+            mapUrl: "/wider-impacts",
+            image: "img/avp/featuredBlocks/6.png",
         },
         {
             content: `
@@ -94,6 +100,8 @@ export const appConfig = {
          </p>`,
             sectionTitle: "PCA",
             alignment: "left",
+            mapUrl: "/person-centred-analysis",
+            image: "img/avp/featuredBlocks/7.png",
         }
     ],
     legalText: 'termsOfUse',
