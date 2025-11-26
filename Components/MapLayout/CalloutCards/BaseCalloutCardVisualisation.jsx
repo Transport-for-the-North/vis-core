@@ -31,7 +31,6 @@ export const BaseCalloutCardVisualisation = ({
   ...props
 }) => {
   const sidebarIsOpen = props.sidebarIsOpen;
-  const [isVisible, setIsVisible] = useState(true);
   const { state, dispatch } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
 
@@ -140,12 +139,7 @@ export const BaseCalloutCardVisualisation = ({
     return record.title || record.name || record.reference_id || `Record ${allRecords.indexOf(record) + 1}`;
   };
 
-  /**
-   * Toggles the visibility of the card
-   */
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
+
 
   /**
    * Prefetches data for the next or previous location.
@@ -251,7 +245,7 @@ export const BaseCalloutCardVisualisation = ({
     setPrevData(null);
   };
 
-  if (isLoading || !data || !isVisible) return null;
+  if (isLoading || !data) return null;
 
   return type === "fullscreen" ? (
     <FullScreenCalloutCardVisualisation
@@ -269,7 +263,6 @@ export const BaseCalloutCardVisualisation = ({
       onUpdate={onUpdate}
       data={data}
       isLoading={isLoading}
-      toggleVisibility={toggleVisibility}
       recordSelector={hasMultipleRecords ? (
         <RecordSelector
           records={allRecords}
