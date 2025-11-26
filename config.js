@@ -338,6 +338,57 @@ export function buildParamsMap(parameters, location, filters) {
   return map;
 }
 
+
+/**
+ * Build a deterministic, stable filter id based on the filter definition.
+ * The id is derived from meaningful fields that should be stable across renders:
+ * - paramName
+ * - filterName
+ * - type
+ * - visualisations (joined)
+ *
+ * If collisions occur (e.g., multiple filters produce the same base id), a
+ * numeric suffix is appended in a deterministic order.
+ *
+ * @param {Object} filter - The filter configuration object from pageContext.config.filters.
+ * @param {Set<string>} usedIds - A set of ids already produced for this initialisation; mutated by the function.
+ * @returns {string} Deterministic and unique id for the filter.
+ */
+export const buildDeterministicFilterId = (filter, usedIds) => {
+  const slugify = (value) =>
+    String(value)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const baseParts = [
+    filter.paramName || "",
+    filter.filterName || "",
+    filter.type || "",
+    Array.isArray(filter.visualisations) ? filter.visualisations.join("|") : "",
+  ].filter(Boolean);
+
+  // If everything is empty, default to 'filter'
+  const base =
+    baseParts
+      .map(slugify)
+      .filter(Boolean)
+      .join("__") || "filter";
+
+  let id = base;
+  let i = 1;
+
+  // Ensure uniqueness while maintaining determinism for given config order
+  while (usedIds.has(id)) {
+    i += 1;
+    id = `${base}--${i}`;
+  }
+
+  usedIds.add(id);
+  return id;
+};
+
 // Function to detect if the OS is Windows 10 or lower
 export function isWindows10OrLower() {
   const { userAgent } = navigator;
