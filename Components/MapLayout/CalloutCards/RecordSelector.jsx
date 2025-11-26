@@ -65,15 +65,15 @@ export const RecordSelector = ({
   onSelect, 
   getRecordLabel 
 }) => {
-  // Convert records to react-select options format
+  // Convert records to react-select options format, reversing the order so last record is first
+  // Keep the original indices as values since selectedIndex refers to original array positions
   const options = records.map((record, index) => ({
-    value: index,
+    value: index, // Keep original index as value
     label: getRecordLabel(record),
-  }));
+  })).reverse();
 
-  // Ensure selectedIndex is valid and get the corresponding option
-  const validSelectedIndex = selectedIndex >= 0 && selectedIndex < options.length ? selectedIndex : 0;
-  const selectedOption = options[validSelectedIndex] || options[0] || null;
+  // Find the option that corresponds to the selectedIndex (which is from the original array)
+  const selectedOption = options.find(option => option.value === selectedIndex) || options[0] || null;
 
   const handleChange = (option) => {
     if (option && option.value !== selectedIndex) {
