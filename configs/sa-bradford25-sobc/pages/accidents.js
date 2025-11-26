@@ -51,11 +51,11 @@ export const accidents = {
         `
         }
       },
-      /* {
+      {
         name: "Network Line Geometries",
         type: "tile",
         source: "api",
-        path: "/api/vectortiles/avp_network_line_geometries/{z}/{x}/{y}", // matches the path in swagger.json
+        path: "/api/vectortiles/avp_network_line_geometry/{z}/{x}/{y}?programme_id={programmeId}",
         sourceLayer: "geometry",
         geometryType: "line",
         isHoverable: true,
@@ -66,7 +66,7 @@ export const accidents = {
         labelNulls: true,
         hoverNulls: true,
         hiddenByDefault: true
-      }, */
+      },
     ],
     visualisations: [
       {
