@@ -10,7 +10,7 @@ export const accidents = {
     layers: [
       {
         uniqueId: "DIALevelCrossing",
-        name: "LevelCrossing",
+        name: "Level Crossing",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/dia_level_crossing_geometry/{z}/{x}/{y}?network_id={networkId}&programme_id={programmeId}",
@@ -20,7 +20,7 @@ export const accidents = {
         isHoverable: true,
         isStylable: true,
         shouldHaveTooltipOnHover: true,
-        shouldHaveLabel: false,
+        shouldHaveLabel: true,
         labelZoomLevel: 12,
         labelNulls: false,
         hoverNulls: true,
@@ -49,7 +49,7 @@ export const accidents = {
       {
         name: "Map-based totals",
         type: "joinDataToMap",
-        joinLayer: "LevelCrossing",
+        joinLayer: "Level Crossing",
         style: "circle-continuous",
         joinField: "id",
         valueField: "value",
@@ -69,9 +69,15 @@ export const accidents = {
         filterName: "networkId",
         paramName: "networkId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Level Crossing" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
         visualisations: ["Map-based totals"],
-        layer: "LevelCrossing",
+        layer: "Level Crossing",
         type: "dropdown",
         values: {
           source: "metadataTable",
@@ -87,9 +93,15 @@ export const accidents = {
         filterName: "programmeId",
         paramName: "programmeId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Level Crossing" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
         visualisations: ["Map-based totals"],
-        layer: "LevelCrossing",
+        layer: "Level Crossing",
         type: "fixed",
         forceRequired: true,
         values: {
@@ -109,7 +121,7 @@ export const accidents = {
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
-        layer: "LevelCrossing",
+        layer: "Level Crossing",
         type: "dropdown",
         values: {
           source: "local",
