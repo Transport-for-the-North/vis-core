@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import styled from "styled-components";
 
@@ -371,10 +371,15 @@ export const FullScreenCalloutCardVisualisation = ({
   ...props
 }) => {
   const sidebarIsOpen = props.sidebarIsOpen;
-  const [isVisible, setIsVisible] = useState(true);
+
+  // Visibility state: start hidden so we can animate in
+  const [isVisible, setIsVisible] = useState(false);
+  const prevIdRef = useRef(null);
+  const firstShownRef = useRef(false);
+
   const handleToggle = () => setIsVisible((v) => !v);
 
-  // the content that will be rendered
+  // Staged content and image (swap together to avoid flicker)
   const [content, setContent] = useState(null);
   const [imgUrl, setImgUrl] = useState(null);
 
@@ -384,6 +389,36 @@ export const FullScreenCalloutCardVisualisation = ({
     useState(false);
   const nextButtonRef = React.useRef(null);
   const [nextButtonRefIsHovered, setNextButtonRefIsHovered] = useState(false);
+
+  /**
+   * Drive initial slide-in and auto-reopen on data change.
+   * - When data first appears: slide-in.
+   * - When data changes (location_id/id) and the card is hidden: slide-in again.
+   */
+  useEffect(() => {
+    if (!data) return;
+
+    const curId = data.location_id ?? data.id ?? "__noid__";
+    const prevId = prevIdRef.current;
+
+    // First time we ever have data: trigger slide-in
+    if (!firstShownRef.current) {
+      const id = requestAnimationFrame(() => setIsVisible(true));
+      firstShownRef.current = true;
+      prevIdRef.current = curId;
+      return () => cancelAnimationFrame(id);
+    }
+
+    // If the data changed and the card is hidden, auto-reopen and slide-in
+    if (prevId !== curId && !isVisible) {
+      const id = requestAnimationFrame(() => setIsVisible(true));
+      prevIdRef.current = curId;
+      return () => cancelAnimationFrame(id);
+    }
+
+    // Just keep the latest id
+    prevIdRef.current = curId;
+  }, [data, isVisible]);
 
   /**
    * Updates content and image when the current scenario changes
@@ -401,46 +436,38 @@ export const FullScreenCalloutCardVisualisation = ({
     const controller = new AbortController();
 
     const run = async () => {
-      const newContent = replacePlaceholders(
+      if (!data) return;
+
+      const nextContent = replacePlaceholders(
         data.text_with_placeholders,
         data.values
       );
-      setContent(newContent);
-      setImgUrl(null);
 
-      if (!data.image_url) return;
-
-      if (data.image_url instanceof Blob) {
-        const url = URL.createObjectURL(data.image_url);
-        objectUrlToRevoke = url;
-        setImgUrl(url);
-        return;
-      }
-      if (data.image_url instanceof ArrayBuffer) {
-        const blob = new Blob([data.image_url], { type: "image/png" });
-        const url = URL.createObjectURL(blob);
-        objectUrlToRevoke = url;
-        setImgUrl(url);
-        return;
-      }
-      if (data.image_url instanceof Uint8Array) {
-        const blob = new Blob([data.image_url], { type: "image/png" });
-        const url = URL.createObjectURL(blob);
-        objectUrlToRevoke = url;
-        setImgUrl(url);
-        return;
-      }
-
-      // String URL: resolve absolute API-aware URL first
-      if (typeof data.image_url === "string") {
-        try {
-          const absoluteUrl = api.baseService.buildAbsoluteUrl(data.image_url); // uses configured API base [3]
+      let nextImgUrl = imgUrl;
+      try {
+        if (!data.image_url) {
+          nextImgUrl = null;
+        } else if (data.image_url instanceof Blob) {
+          const url = URL.createObjectURL(data.image_url);
+          objectUrlToRevoke = url;
+          nextImgUrl = url;
+        } else if (data.image_url instanceof ArrayBuffer) {
+          const blob = new Blob([data.image_url], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          objectUrlToRevoke = url;
+          nextImgUrl = url;
+        } else if (data.image_url instanceof Uint8Array) {
+          const blob = new Blob([data.image_url], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          objectUrlToRevoke = url;
+          nextImgUrl = url;
+        } else if (typeof data.image_url === "string") {
+          const absoluteUrl = api.baseService.buildAbsoluteUrl(data.image_url);
           const apiBaseOrigin = new URL(api.baseService.buildAbsoluteUrl("/")).origin;
           const targetOrigin = new URL(absoluteUrl, window.location.origin).origin;
 
-          // If the image is served by our API, fetch with Authorization header
           if (targetOrigin === apiBaseOrigin) {
-            const token = Cookies.get("token"); // set by AuthProvider on login [5]
+            const token = Cookies.get("token");
             const resp = await fetch(absoluteUrl, {
               headers: token ? { Authorization: `Bearer ${token}` } : {},
               signal: controller.signal,
@@ -451,18 +478,22 @@ export const FullScreenCalloutCardVisualisation = ({
             const blob = await resp.blob();
             const url = URL.createObjectURL(blob);
             objectUrlToRevoke = url;
-            setImgUrl(url);
+            nextImgUrl = url;
           } else {
-            // External/third-party image: use as-is
-            setImgUrl(data.image_url);
+            nextImgUrl = data.image_url; // external
           }
-        } catch (e) {
-          if (e.name !== "AbortError") {
-            console.error("Failed to load image:", e);
-          }
-          setImgUrl(null);
         }
+      } catch (e) {
+        if (e.name !== "AbortError") {
+          console.error("Failed to load image:", e);
+        }
+        // Keep prior image on failure to prevent flicker
+        nextImgUrl = imgUrl;
       }
+
+      // Batch update: text + image together
+      setContent(nextContent);
+      setImgUrl(nextImgUrl);
     };
 
     run();
