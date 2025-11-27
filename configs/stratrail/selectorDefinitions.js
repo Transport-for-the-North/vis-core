@@ -656,16 +656,21 @@ const nodeInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
-            { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
-            { displayValue: "Station Improvement", paramValue: "Station Improvement" },
-            { displayValue: "Freight", paramValue: "Freight" },
-            { displayValue: "New Station", paramValue: "New Station" },
-            { displayValue: "Performance and Reliability", paramValue: "Performance and Reliability" },
-            { displayValue: "Neighbouring Development", paramValue: "Neighbouring Development" },
+            { displayValue: "SRFI", paramValue: "SRFI" },
+            { displayValue: "N/A", paramValue: "N/A" },
             { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
-            { displayValue: "Service Development", paramValue: "Service Development" }
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
+            { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
+            { displayValue: "Station Improvement", paramValue: "Station Improvement" },
+            { displayValue: "Neighbouring Development", paramValue: "Neighbouring Development" },
+            { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
+            { displayValue: "Major Station Redevelopment", paramValue: "Major Station Redevelopment" },
+            { displayValue: "Performance and Reliability Improvement", paramValue: "Performance and Reliability Improvement" },
+            { displayValue: "New Station", paramValue: "New Station" },
+            { displayValue: "Service Development", paramValue: "Service Development" },
+            { displayValue: "Level Crossings", paramValue: "Level Crossings" },
+            { displayValue: "Freight Development", paramValue: "Freight Development" }
         ]
     }
 }
@@ -683,14 +688,20 @@ const linkInvestmentThemeSelector = {
     values: {
         source: "local",
         values: [
-            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
             { displayValue: "Electrification", paramValue: "Electrification" },
-            { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
-            { displayValue: "Station Improvement", paramValue: "Station Improvement" },
-            { displayValue: "Freight", paramValue: "Freight" },
-            { displayValue: "Performance and Reliability", paramValue: "Performance and Reliability" },
+            { displayValue: "N/A", paramValue: "N/A" },
             { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
-            { displayValue: "Service Development", paramValue: "Service Development" }
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
+            { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
+            { displayValue: "Line Speed Improvement", paramValue: "Line Speed Improvement" },
+            { displayValue: "Route Upgrade", paramValue: "Route Upgrade" },
+            { displayValue: "Rail and Multimodal Interchange Upgrade", paramValue: "Rail and Multimodal Interchange Upgrade" },
+            { displayValue: "Signalling", paramValue: "Signalling" },
+            { displayValue: "Performance and Reliability Improvement", paramValue: "Performance and Reliability Improvement" },
+            { displayValue: "New Station", paramValue: "New Station" },
+            { displayValue: "Service Development", paramValue: "Service Development" },
+            { displayValue: "Station Improvement", paramValue: "Station Improvement" },
+            { displayValue: "Freight Development", paramValue: "Freight Development" }
         ]
     }
 }
@@ -763,61 +774,62 @@ const timePeriod = {
     }
 }
 
-const nodeFreightInterventionSelector = {
-    filterName: "Freight Intervention",
-    paramName: "freightIntervention",
-    target: "api",
-    actions: [
-        { action: "UPDATE_QUERY_PARAMS" }
-    ],
-    info:'Use this dropdown to select the freight intervention for the data.',
-    visualisations: null,
-    type: "dropdown",
-    values: {
-        source: "local",
-        values: [
-            { displayValue: "Sheffield Area", paramValue: "Sheffield Area" },
-            { displayValue: "Line Speed Improvements", paramValue: "Line Speed Improvements" },
-            { displayValue: "WCML North of Preston Options", paramValue: "WCML North of Preston Options" },
-            { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
-            { displayValue: "WCML Crewe - Prestion Options", paramValue: "WCML Crewe - Prestion Options" },
-            { displayValue: "Central Manchester Options", paramValue: "Central Manchester Options" },
-            { displayValue: "Manchester TRU", paramValue: "Manchester TRU" },
-            { displayValue: "Infill Electrification", paramValue: "Infill Electrification" },
-            { displayValue: "ECML Capacity", paramValue: "ECML Capacity" },
-            { displayValue: "Capacity Improvements", paramValue: "Capacity Improvements" },
-            { displayValue: "WCML Colwich Jn - Crewe Options", paramValue: "WCML Colwich Jn - Crewe Options" }
-        ]
-    }
-}
+// Not used currently, have commented out.
+// const nodeFreightInterventionSelector = {
+//     filterName: "Freight Intervention",
+//     paramName: "freightIntervention",
+//     target: "api",
+//     actions: [
+//         { action: "UPDATE_QUERY_PARAMS" }
+//     ],
+//     info:'Use this dropdown to select the freight intervention for the data.',
+//     visualisations: null,
+//     type: "dropdown",
+//     values: {
+//         source: "local",
+//         values: [
+//             { displayValue: "Sheffield Area", paramValue: "Sheffield Area" },
+//             { displayValue: "Line Speed Improvements", paramValue: "Line Speed Improvements" },
+//             { displayValue: "WCML North of Preston Options", paramValue: "WCML North of Preston Options" },
+//             { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
+//             { displayValue: "WCML Crewe - Prestion Options", paramValue: "WCML Crewe - Prestion Options" },
+//             { displayValue: "Central Manchester Options", paramValue: "Central Manchester Options" },
+//             { displayValue: "Manchester TRU", paramValue: "Manchester TRU" },
+//             { displayValue: "Infill Electrification", paramValue: "Infill Electrification" },
+//             { displayValue: "ECML Capacity", paramValue: "ECML Capacity" },
+//             { displayValue: "Capacity Improvements", paramValue: "Capacity Improvements" },
+//             { displayValue: "WCML Colwich Jn - Crewe Options", paramValue: "WCML Colwich Jn - Crewe Options" }
+//         ]
+//     }
+// }
 
-const linkFreightInterventionSelector = {
-    filterName: "Freight Intervention",
-    paramName: "freightIntervention",
-    target: "api",
-    actions: [
-        { action: "UPDATE_QUERY_PARAMS" }
-    ],
-    info:'Use this dropdown to select the freight intervention for the data.',
-    visualisations: null,
-    type: "dropdown",
-    values: {
-        source: "local",
-        values: [
-            { displayValue: "Sheffield Area", paramValue: "Sheffield Area" },
-            { displayValue: "Line Speed Improvements", paramValue: "Line Speed Improvements" },
-            { displayValue: "WCML North of Preston Options", paramValue: "WCML North of Preston Options" },
-            { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
-            { displayValue: "WCML Crewe - Prestion Options", paramValue: "WCML Crewe - Prestion Options" },
-            { displayValue: "Central Manchester Options", paramValue: "Central Manchester Options" },
-            { displayValue: "Manchester TRU", paramValue: "Manchester TRU" },
-            { displayValue: "Infill Electrification", paramValue: "Infill Electrification" },
-            { displayValue: "ECML Capacity", paramValue: "ECML Capacity" },
-            { displayValue: "Capacity Improvements", paramValue: "Capacity Improvements" },
-            { displayValue: "WCML Colwich Jn - Crewe Options", paramValue: "WCML Colwich Jn - Crewe Options" }
-        ]
-    }
-}
+// const linkFreightInterventionSelector = {
+//     filterName: "Freight Intervention",
+//     paramName: "freightIntervention",
+//     target: "api",
+//     actions: [
+//         { action: "UPDATE_QUERY_PARAMS" }
+//     ],
+//     info:'Use this dropdown to select the freight intervention for the data.',
+//     visualisations: null,
+//     type: "dropdown",
+//     values: {
+//         source: "local",
+//         values: [
+//             { displayValue: "Sheffield Area", paramValue: "Sheffield Area" },
+//             { displayValue: "Line Speed Improvements", paramValue: "Line Speed Improvements" },
+//             { displayValue: "WCML North of Preston Options", paramValue: "WCML North of Preston Options" },
+//             { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
+//             { displayValue: "WCML Crewe - Prestion Options", paramValue: "WCML Crewe - Prestion Options" },
+//             { displayValue: "Central Manchester Options", paramValue: "Central Manchester Options" },
+//             { displayValue: "Manchester TRU", paramValue: "Manchester TRU" },
+//             { displayValue: "Infill Electrification", paramValue: "Infill Electrification" },
+//             { displayValue: "ECML Capacity", paramValue: "ECML Capacity" },
+//             { displayValue: "Capacity Improvements", paramValue: "Capacity Improvements" },
+//             { displayValue: "WCML Colwich Jn - Crewe Options", paramValue: "WCML Colwich Jn - Crewe Options" }
+//         ]
+//     }
+// }
 
 const stationCarOrVanMetricSelector = {
     filterName: "Metric",
@@ -1409,6 +1421,54 @@ const freightWeekdayAvgFlowMetricSelector = {
     }
 }
 
+const nodeFreightInvestmentThemeSelector = {
+    filterName: "Theme",
+    paramName: "theme",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the theme of the freight investments.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            { displayValue: "Electrification", paramValue: "Electrification" },
+            { displayValue: "SRFI", paramValue: "SRFI" },
+            { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
+            { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
+            { displayValue: "Level Crossings", paramValue: "Level Crossings" },
+            { displayValue: "Freight Development", paramValue: "Freight Development" }
+        ]
+    }
+}
+
+const linkFreightInvestmentThemeSelector = {
+    filterName: "Theme",
+    paramName: "theme",
+    target: "api",
+    actions: [
+        { action: "UPDATE_QUERY_PARAMS" }
+    ],
+    info:'Use this dropdown to select the theme of the freight investments.',
+    visualisations: null,
+    type: "dropdown",
+    values: {
+        source: "local",
+        values: [
+            { displayValue: "Electrification", paramValue: "Electrification" },
+            { displayValue: "New Infrastructure", paramValue: "New Infrastructure" },
+            { displayValue: "Infrastructure Upgrade", paramValue: "Infrastructure Upgrade" },
+            { displayValue: "Gauge Clearance", paramValue: "Gauge Clearance" },
+            { displayValue: "Line Speed Improvement", paramValue: "Line Speed Improvement" },
+            { displayValue: "Signalling", paramValue: "Signalling" },
+            { displayValue: "Freight Development", paramValue: "Freight Development" }
+        ]
+    }
+}
+
 export const selectors = {
   loadingsTOCSelector: loadingsTOCSelector,
   railPeriodSelector: railPeriodSelector,
@@ -1427,11 +1487,13 @@ export const selectors = {
   idFeatureSelector: idFeatureSelector,
   authoritySelector: authoritySelector,
   timePeriod: timePeriod,
-  nodeFreightInterventionSelector: nodeFreightInterventionSelector,
-  linkFreightInterventionSelector: linkFreightInterventionSelector,
+//   nodeFreightInterventionSelector: nodeFreightInterventionSelector,
+//   linkFreightInterventionSelector: linkFreightInterventionSelector,
   stationCarOrVanMetricSelector: stationCarOrVanMetricSelector,
   stationDeprivationMetricSelector: stationDeprivationMetricSelector,
   stationWorkTravelDistanceMetricSelector: stationWorkTravelDistanceMetricSelector,
   stationWorkTravelMethodMetricSelector: stationWorkTravelMethodMetricSelector,
-  freightWeekdayAvgFlowMetricSelector: freightWeekdayAvgFlowMetricSelector
+  freightWeekdayAvgFlowMetricSelector: freightWeekdayAvgFlowMetricSelector,
+  nodeFreightInvestmentThemeSelector: nodeFreightInvestmentThemeSelector,
+  linkFreightInvestmentThemeSelector: linkFreightInvestmentThemeSelector
 };

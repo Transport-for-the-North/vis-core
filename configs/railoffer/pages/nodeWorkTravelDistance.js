@@ -125,10 +125,10 @@ export const nodeWorkTravelDistance = {
     metadataTables: [],
     filters: [
         { ...selectors.stationWorkTravelDistanceMetricSelector, visualisations: ['Node Work Travel Distance Totals'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node Work Travel Distance Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.authoritySelector, visualisations: ['Node Work Travel Distance Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node Work Travel Distance Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
-        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Work Travel Distance Totals'] },
+        { ...selectors.nodeTOCSelector, visualisations: ['Node Work Travel Distance Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, forceRequired: false },
+        { ...selectors.authoritySelector, visualisations: ['Node Work Travel Distance Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, forceRequired: false },
+        { ...selectors.booleanSelector, visualisations: ['Node Work Travel Distance Totals'], shouldInitialSelectAllInMultiSelect: true, forceRequired: false, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
+        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, forceRequired: false, visualisations: ['Node Work Travel Distance Totals'] },
         { ...selectors.idFeatureSelector, visualisations: ['Work Travel Distance Callout'], layer: "Node Work Travel Distance Layer"}
     ],
     additionalFeatures: {

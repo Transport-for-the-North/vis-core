@@ -121,10 +121,10 @@ export const nodeHouseholdDeprivation = {
     metadataTables: [],
     filters: [
         { ...selectors.stationDeprivationMetricSelector, visualisations: ['Node Deprivation Totals'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.authoritySelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
-        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Deprivation Totals'] },
+        { ...selectors.nodeTOCSelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, forceRequired: false },
+        { ...selectors.authoritySelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, forceRequired: false },
+        { ...selectors.booleanSelector, visualisations: ['Node Deprivation Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, forceRequired: false, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
+        { ...selectors.routeNameSelector, multiSelect: true, forceRequired: false, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Deprivation Totals'] },
         { ...selectors.idFeatureSelector, visualisations: ['Household Deprivation Callout'], layer: "Node Deprivation Layer"}
     ],
     additionalFeatures: {

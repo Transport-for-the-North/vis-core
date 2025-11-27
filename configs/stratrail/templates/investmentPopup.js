@@ -7,10 +7,6 @@ export const investPopupContent = `
         <span class="metadata-value">{reference_id}</span>
       </div>
       <div class="metadata-item">
-        <span class="metadata-key">Scheme Code:</span>
-        <span class="metadata-value">{scheme_code}</span>
-      </div>
-      <div class="metadata-item">
         <span class="metadata-key">Programme:</span>
         <span class="metadata-value">{programme}</span>
       </div>
@@ -34,20 +30,12 @@ export const freightInvestPopupContent = `
         <span class="metadata-value">{reference_id}</span>
       </div>
       <div class="metadata-item">
-        <span class="metadata-key">Scheme Code:</span>
-        <span class="metadata-value">{scheme_code}</span>
-      </div>
-      <div class="metadata-item">
         <span class="metadata-key">Programme:</span>
         <span class="metadata-value">{programme}</span>
       </div>
       <div class="metadata-item">
         <span class="metadata-key">Theme:</span>
         <span class="metadata-value">{theme}</span>
-      </div>
-      <div class="metadata-item">
-        <span class="metadata-key">Freight Intervention:</span>
-        <span class="metadata-value">{freight_intervention}</span>
       </div>
       <div class="metadata-item">
         <span class="metadata-key">Status:</span>

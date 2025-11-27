@@ -135,6 +135,6 @@ export const invisiblePolygonCustomPaint = {
 
 export const parentAuthorityBoundaryCustomPaint = {
   "line-color": "#808080",
-  "line-width": 0.75,
-  "line-opacity": 0.65
+  "line-width": 0.5,
+  "line-opacity": 0.5
 };

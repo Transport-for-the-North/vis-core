@@ -79,12 +79,14 @@ export const BaseCalloutCardVisualisation = ({
         if (responseData.length > 0) {
           // Only reset selection if this is new data or user hasn't made a selection
           if (isNewDataSet || !userHasSelectedRecord) {
-            setData(responseData[0]);
-            setSelectedRecordIndex(0);
+            // Default to the last record (to align with map paint which uses last row)
+            const defaultIndex = responseData.length - 1;
+            setData(responseData[defaultIndex]);
+            setSelectedRecordIndex(defaultIndex);
             setUserHasSelectedRecord(false);
           } else {
             // Preserve current selection if possible
-            const validIndex = selectedRecordIndex < responseData.length ? selectedRecordIndex : 0;
+            const validIndex = selectedRecordIndex < responseData.length ? selectedRecordIndex : responseData.length - 1;
             setData(responseData[validIndex]);
             if (validIndex !== selectedRecordIndex) {
               setSelectedRecordIndex(validIndex);
