@@ -186,68 +186,70 @@ export const HomePage = () => {
                       className="tile-top-image"
                     />
                   )}
-                  <h2 className={`title-${alignmentClass}`}>{sectionTitle}</h2>
+                  <div className="tile-section">
+                    <h2 className={`title-${alignmentClass}`}>{sectionTitle}</h2>
 
-                  <div className="tile-body">
-                  {images ? (
-                    // If more than one image is provided in the array:
-                    images.length > 1 ? (
-                      // For wide screens, split content into blocks each with text and image side by side.
-                      windowWidth >= WIDTH_BREAKPOINT ? (
-                        <div className="multiple-blocks">
-                          {createBlockSections(content, images).map((block, i) => (
-                            <div
-                              key={`block-${i}`}
-                              className={`alternating-layout-block ${i % 2 === 0 ? "" : "reverse"}`}
-                            >
-                              <div className="text-block">
-                                  <div className="container-section collapsed">{block.textSegment}</div>
-                              </div>
-                              {block.image && (
-                                <div className="image-block">
-                                  <img
-                                    src={block.image}
-                                    alt={`Image ${i + 1}`}
-                                    style={{
-                                      width: "100%",
-                                      maxHeight: MAX_IMAGE_HEIGHT,
-                                      objectFit: "cover",
-                                      borderRadius: "12px",
-                                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
-                                    }}
-                                  />
+                    <div className="tile-body">
+                    {images ? (
+                      // If more than one image is provided in the array:
+                      images.length > 1 ? (
+                        // For wide screens, split content into blocks each with text and image side by side.
+                        windowWidth >= WIDTH_BREAKPOINT ? (
+                          <div className="multiple-blocks">
+                            {createBlockSections(content, images).map((block, i) => (
+                              <div
+                                key={`block-${i}`}
+                                className={`alternating-layout-block ${i % 2 === 0 ? "" : "reverse"}`}
+                              >
+                                <div className="text-block">
+                                    <div className="container-section collapsed">{block.textSegment}</div>
                                 </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                                {block.image && (
+                                  <div className="image-block">
+                                    <img
+                                      src={block.image}
+                                      alt={`Image ${i + 1}`}
+                                      style={{
+                                        width: "100%",
+                                        maxHeight: MAX_IMAGE_HEIGHT,
+                                        objectFit: "cover",
+                                        borderRadius: "12px",
+                                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          // For narrow screens, interweave text with images in a single column.
+                          <div className="content-wrapper interleaved-content">
+                            <div className="container-section collapsed">
+                              {interweaveContentWithImages(content, images)}
+                              </div>
+                          </div>
+                        )
                       ) : (
-                        // For narrow screens, interweave text with images in a single column.
-                        <div className="content-wrapper interleaved-content">
-                          <div className="container-section collapsed">
-                            {interweaveContentWithImages(content, images)}
-                            </div>
-                        </div>
+                    
+                        <>
+                          <div className="container-section collapsed">{parse(content)}</div>
+                        </>
                       )
                     ) : (
-                  
+                      
                       <>
                         <div className="container-section collapsed">{parse(content)}</div>
                       </>
-                    )
-                  ) : (
-                    
-                    <>
-                      <div className="container-section collapsed">{parse(content)}</div>
-                    </>
-                  )}
-                  </div>
-                  <div className="tile-footer">
-                    {mapUrl && (
-                      <a href={mapUrl} target="_blank" className="go-to-map">
-                        Go to map
-                      </a>
                     )}
+                    </div>
+                    <div className="tile-footer">
+                      {mapUrl && (
+                        <a href={mapUrl} target="_blank" className="go-to-map">
+                          Go to map
+                        </a>
+                      )}
+                    </div>
                   </div>
                   <button
                       type="button"
@@ -256,7 +258,7 @@ export const HomePage = () => {
                       aria-label="Toggle description"
                     >
                       <span className="arrow-icon"></span>
-                    </button>
+                  </button>
                 </section>
 
                 {/* On tablet/mobile, show expanded block directly under this card */}
