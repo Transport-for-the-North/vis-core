@@ -6,7 +6,7 @@ import { crpLinesLayerPaint, parentAuthorityBoundaryCustomPaint, invisiblePolygo
 import glossaryData from "../glossaryData";
 
 export const nodeInvestments = {
-  pageName: "Node Investments (SRIP)",
+  pageName: "Node investments (SRIP)",
   url: "/node-investments",
   type: "MapLayout",
   category: "Investments",

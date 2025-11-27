@@ -3,7 +3,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const linkFrequency = {
-  pageName: "Link Frequency",
+  pageName: "Link frequency",
   url: "/link-frequency",
   type: "MapLayout",
   category: "Link",

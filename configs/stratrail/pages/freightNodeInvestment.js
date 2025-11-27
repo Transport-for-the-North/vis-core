@@ -6,8 +6,8 @@ import { crpLinesLayerPaint, invisiblePolygonCustomPaint, parentAuthorityBoundar
 import glossaryData from "../glossaryData";
 
 export const freightNodeInvestments = {
-  pageName: "Freight Node Investments (FRIP)",
-  url: "/freight-node-investments",
+  pageName: "Freight node investments",
+  url: "/freight-node-investment",
   type: "MapLayout",
   category: "Investments",
   about: `<p>This visualisation shows all the freight node investment/schemes from the Freight Investment Pipeline (FRIP). Each scheme is colour coded by it's current status.</p>

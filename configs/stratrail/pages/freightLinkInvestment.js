@@ -6,8 +6,8 @@ import glossaryData from "../glossaryData";
 import { invisiblePolygonCustomPaint, parentAuthorityBoundaryCustomPaint } from "../customPaintDefinitions";
 
 export const freightLinkInvestments = {
-  pageName: "Freight Link Investments (FRIP)",
-  url: "/freight-link-investments",
+  pageName: "Freight link investments",
+  url: "/freight-link-investment",
   type: "MapLayout",
   category: "Investments",
   about: `<p>This visualisation shows all the freight link investment/schemes from the Freight Investment Pipeline (FRIP). Each scheme is colour coded by it's current status.</p>

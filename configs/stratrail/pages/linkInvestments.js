@@ -6,7 +6,7 @@ import glossaryData from "../glossaryData";
 import { parentAuthorityBoundaryCustomPaint, invisiblePolygonCustomPaint } from "../customPaintDefinitions";
 
 export const linkInvestments = {
-  pageName: "Link Investments (SRIP)",
+  pageName: "Link investments (SRIP)",
   url: "/link-investments",
   type: "MapLayout",
   category: "Investments",

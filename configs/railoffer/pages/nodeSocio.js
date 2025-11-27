@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const nodeSocio = {
-  pageName: "Station Economic Activity Status",
+  pageName: "Station economic activity status",
   url: "/node-socio",
   type: "MapLayout",
   category: "Station",

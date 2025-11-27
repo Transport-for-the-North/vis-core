@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const nodeLoadings = {
-  pageName: "Station Loadings",
+  pageName: "Station loadings",
   url: "/node-loadings",
   type: "MapLayout",
   category: "Station",

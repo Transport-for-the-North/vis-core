@@ -1,7 +1,7 @@
 import { termsOfUse } from "../termsOfUse";
 
 export const performanceBi = {
-  pageName: "Performance Dashboard",
+  pageName: "Performance dashboard",
   url: "/performance",
   type: "IFrameEmbed",
   category: null,

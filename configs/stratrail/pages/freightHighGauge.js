@@ -3,7 +3,7 @@ import glossaryData from "../glossaryData";
 import { termsOfUse } from "../termsOfUse";
 
 export const freightHighGauge = {
-  pageName: "Trans-Pennine Route Upgrade Freight Benefit Realisation",
+  pageName: "Freight high gauge types",
   url: "/freight-high-gauge-types",
   type: "MapLayout",
   category: "Freight",

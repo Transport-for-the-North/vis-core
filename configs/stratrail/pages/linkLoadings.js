@@ -3,7 +3,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const linkLoadings = {
-  pageName: "Link Loadings",
+  pageName: "Link loadings",
   url: "/link-loadings",
   type: "MapLayout",
   category: "Link",

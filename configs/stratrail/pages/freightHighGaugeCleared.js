@@ -3,7 +3,7 @@ import glossaryData from "../glossaryData";
 import { termsOfUse } from "../termsOfUse";
 
 export const freightHighGaugeCleared = {
-  pageName: "Trans-Pennine High Gauge Cleared Network",
+  pageName: "Freight high gauge cleared network",
   url: "/freight-high-gauge-cleared",
   type: "MapLayout",
   category: "Freight",

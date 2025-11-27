@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const nodeWorkTravelDistance = {
-  pageName: "Station Travel to Work Distance",
+  pageName: "Station travel to work distance",
   url: "/node-work-travel-distance",
   type: "MapLayout",
   category: "Station",

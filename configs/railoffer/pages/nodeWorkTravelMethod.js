@@ -4,7 +4,7 @@ import { crpLinesLayerPaint } from "../customPaintDefinitions";
 import glossaryData from "../glossaryData";
 
 export const nodeWorkTravelMethod = {
-  pageName: "Station Work Method of Travel",
+  pageName: "Station work method of travel",
   url: "/node-work-travel-method",
   type: "MapLayout",
   category: "Station",

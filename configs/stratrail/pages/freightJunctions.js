@@ -3,7 +3,7 @@ import glossaryData from "../glossaryData";
 import { termsOfUse } from "../termsOfUse";
 
 export const freightJunctions = {
-  pageName: "Junctions Suppressing Freight Growth by 2040",
+  pageName: "Junctions suppressing freight growth by 2040",
   url: "/freight-junctions",
   type: "MapLayout",
   category: "Freight",

@@ -3,7 +3,7 @@ import { selectors } from "../selectorDefinitions";
 import { termsOfUse } from "../termsOfUse";
 
 export const timingLinks = {
-  pageName: "BPLAN Timing Links",
+  pageName: "BPLAN timing links",
   url: "/timing-links",
   type: "MapLayout",
   category: "Link",

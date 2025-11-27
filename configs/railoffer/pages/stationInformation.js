@@ -5,7 +5,7 @@ import glossaryData from "../glossaryData";
 import { stationPopupContent } from "../templates";
 
 export const stationInformation = {
-  pageName: "Station Information",
+  pageName: "Station information",
   url: "/station-information",
   type: "MapLayout",
   category: "Station",

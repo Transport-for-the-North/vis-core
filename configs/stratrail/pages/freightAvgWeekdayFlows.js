@@ -4,7 +4,7 @@ import { selectors } from "../selectorDefinitions";
 import { combinedAuthorityFreightCustomPaint } from "../customPaintDefinitions";
 
 export const freightAvgWeekdayFlows = {
-  pageName: "Freight Weekday Average Flows",
+  pageName: "Freight weekday average flows",
   url: "/freight-weekday-avg-flows",
   type: "MapLayout",
   category: "Freight",

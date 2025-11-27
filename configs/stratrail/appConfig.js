@@ -3,9 +3,9 @@ import { pages } from "./pages";
 
 export const appConfig = {
     title: "TfN's Strategic Rail Information Portal Visualiser",
-    introduction: `<p>The Strategic Rail Information Portal has been developed to allow railway industry data to be shared with Transport for the North (TfN) Partners through the TfN Offer. This is to enable Partners to better use rail industry data to shape their rail work.</p>
-        <p>The purpose of this platform is to collate and visualise rail data in an interactive, intuitive, and web-based format. This instance of the platform presents information that has been collated and processed by TfN, often from third-party sources, shared under Open Government Licence or other open licences.</p>
-        <p><b>NOTE: This is a proof of concept in it's current state. Data might not be complete and some dropdown selections might break while we work on functionality.</b></p>`,
+    introduction: `<p>The Strategic Rail Information Portal has been developed to allow railway industry data to be shared with Transport for the North (TfN) partners through the TfN Offer. This is to enable partners to better use rail industry data to shape their rail work.</p>
+        <p>The purpose of this platform is to collate and visualise rail data in an interactive, intuitive, and web-based format. This instance of the platform presents information that has been collated and processed by us, often from third-party sources, shared under Open Government Licence or other open licences.</p>
+        <p><b>NOTE: In the current state, this is a proof of concept. Data might not be complete, and some dropdown selections might break while we work on functionality.</b></p>`,
     background: "",
     methodology: "",
     homePageFragments: [
@@ -17,39 +17,39 @@ export const appConfig = {
             <hr style="margin: 24px 0 32px 0; border: none; border-top: 1px solid #ccc;" />
             <ul>
                 <li><b>Navigation:</b> Use the menu to explore different visualisations available in the portal.</li>
-                <li><b>Interactivity:</b> Many visualisations are interactive. Hover over elements to show tooltips, or click elements to show more information (currently only in the investment pages).</li>
+                <li><b>Interactivity:</b> Many visualisations are interactive. Hover over elements to show tooltips or click elements to show more information (currently only in the investment pages).</li>
                 <li><b>Information:</b> Each page contains an "About this visualisation" section that provides context and details about the data being presented and how it was calculated.</li>
-                <li><b>Filters:</b> Use the filters provided on each page to refine the data displayed according to your interests. Each filter contains a info button so the user can understand exactly what it is filtering.</li>
-                <li><b>Data Sources:</b> Each visualisation includes information about the data sources used, ensuring transparency and reliability. This is visible in the "About this visualisation" section in each map page.</li>
-                <li><b>Layer Control:</b> Toggle different layers on and off and change colour schemes in the "Map layer control" section to customize the view according to your needs.</li>
+                <li><b>Filters:</b> Use the filters provided on each page to refine the data displayed according to your interests. Each filter contains an information button so the user can understand exactly what is being filtered.</li>
+                <li><b>Data sources:</b> Each visualisation includes information about the data sources used, ensuring transparency and reliability. This is visible in the "About this visualisation" section in each map page.</li>
+                <li><b>Layer control:</b> Toggle different layers on and off and change colour schemes in the "Map layer control" section to customize the view according to your needs.</li>
                 <li><b>Tooltips:</b> Hover over map features to see detailed information in tooltips.</li>
-                <li><b>Download Data:</b> Where available, use the download options to export data for further analysis.</li>
+                <li><b>Download data:</b> Where available, use the download options to export data for further analysis.</li>
             </ul>
             <hr style="margin: 24px 0 32px 0; border: none; border-top: 1px solid #ccc;" />
             <p>
-                Below are the list of each pages available in the portal along with a brief description of the data they contain.
+                Below are the list of each page available in the portal along with a brief description of the data they contain.
             </p>
             <ul>
-                <li><b>Performance Dashboard:</b> This visualisation shows key performance indicators for Northern and Transpennine Express services.</li>
-                <li><b>Station Information:</b> Various station information such as True/False statistics, such as if the station contains help points, ticket machines etc. Also contains numerical data such as car park spaces and cycle spaces at each station in the NorTMS model.</li>
-                <li><b>Station Loadings:</b> This visualisation shows the boarding and alighting summaries at each station in the NorTMS model.</li>
+                <li><b>Performance dashboard:</b> This visualisation shows key performance indicators for Northern Trains and Transpennine Express services.</li>
+                <li><b>Station information:</b> Various station information such as true/false statistics, such as if the station has help points, ticket machines etc. Also contains numerical data such as car park spaces and cycle spaces at each station in the NorTMS model.</li>
+                <li><b>Station loadings:</b> This visualisation shows the boarding and alighting summaries at each station in the NorTMS model.</li>
                 <li><b>Station Socio-Economic Classifications (NS-SeC):</b> This visualisation shows the NS-SeC (socio-economic classification) information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
-                <li><b>Station Economic Activity Status:</b> This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
-                <li><b>Station Car or Van Availability:</b> This visualisation shows the availability of cars and vans for households near each station, based on 2021 Census data mapped using a 2.5km buffer around stations.</li>
-                <li><b>Station Household Deprivation:</b> This visualisation shows household deprivation indicators across four dimensions (education, employment, health, and housing) for areas near each station, using 2021 Census data.</li>
-                <li><b>Station Travel to Work Distance:</b> This visualisation shows the distance people travel from home to workplace for areas near each station, categorised from working at home to 60km+ distances, using 2021 Census data.</li>
-                <li><b>Station Work Method of Travel:</b> This visualisation shows the main methods of transport used for the longest part of usual journeys to work, including all transport modes from walking to train travel, using 2021 Census data.</li>
-                <li><b>Link Loadings:</b> This visualisation shows the boarding and alighting summaries for each link in the NorTMS model.</li>
-                <li><b>BPLAN Timing Links:</b> This visualisation shows the BPLAN timing link information for each link in our TIPLOC-TIPLOC network.</li>
-                <li><b>Node Investments:</b> This visualisation shows the current node investments in the Investment Pipeline (SRIP).</li>
-                <li><b>Link Investments:</b> This visualisation shows the current link investments in the Investment Pipeline (SRIP).</li>
-                <li><b>Link Frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
-                <li><b>Freight Node Investments:</b> This visualisation shows the current freight node investments in the Freight Investment Pipeline (FRIP).</li>
-                <li><b>Freight Link Investments:</b> This visualisation shows the current freight link investments in the Freight Investment Pipeline (FRIP).</li>
-                <li><b>Freight High Gauge Cleared Network:</b> This map shows the TRU benefit realisation in full - showing routings for the first Trans-Pennine high gauge cleared network.</li>
-                <li><b>Freight High Gauge Types:</b> This map shows the proposed additional high gauge (W12) clearance to interventions to support full TRU freight benefit realisation.</li>
-                <li><b>Freight Weekday Average Flows:</b> This visualisation shows the rail freight network flows in average weekday trains for a number of scenarios developed through the Rail Freight Routing Study in 2024.</li>
-                <li><b>Junctions Suppressing Freight Growth by 2040:</b> This visualisation shows junctions assessed as suppressing freight growth by 2040 under a TAG compliant business as usual growth scenario (RFRS 2024).</li>
+                <li><b>Station economic activity status:</b> This visualisation shows the economic activity information for each station in the NorTMS model which has been connected to LSOA centroids using a 2.5km buffer.</li>
+                <li><b>Station car or van availability:</b> This visualisation shows the availability of cars and vans for households near each station, based on 2021 Census data mapped using a 2.5km buffer around stations.</li>
+                <li><b>Station household deprivation:</b> This visualisation shows household deprivation indicators across four dimensions (education, employment, health, and housing) for areas near each station, using 2021 Census data.</li>
+                <li><b>Station travel to work distance:</b> This visualisation shows the distance people travel from home to workplace for areas near each station, categorised from working at home to 60km+ distances, using 2021 Census data.</li>
+                <li><b>Station work method of travel:</b> This visualisation shows the main methods of transport used for the longest part of usual journeys to work, including all transport modes from walking to train travel, using 2021 Census data.</li>
+                <li><b>Link loadings:</b> This visualisation shows the boarding and alighting summaries for each link in the NorTMS model.</li>
+                <li><b>BPLAN timing links:</b> This visualisation shows the BPLAN timing link information for each link in our TIPLOC-TIPLOC network.</li>
+                <li><b>Node investments:</b> This visualisation shows the current node investments in the investment pipeline (SRIP).</li>
+                <li><b>Link investments:</b> This visualisation shows the current link investments in the investment pipeline (SRIP).</li>
+                <li><b>Link frequency:</b> This visualisation shows the frequency (trains per hour) for each link in the NorTMS model.</li>
+                <li><b>Freight node investments:</b> This visualisation shows the current freight node investments in the Freight Rail Investment Pipeline (FRIP).</li>
+                <li><b>Freight link investments:</b> This visualisation shows the current freight link investments in the Freight Rail Investment Pipeline (FRIP).</li>
+                <li><b>Freight high gauge cleared network:</b> This map shows the TRU benefit realisation in full - showing routings for the first transpennine high gauge cleared network.</li>
+                <li><b>Freight high gauge types:</b> This map shows the proposed additional high gauge (W12) clearance to interventions to support full TRU freight benefit realisation.</li>
+                <li><b>Freight weekday average flows:</b> This visualisation shows the rail freight network flows in average weekday trains for a number of scenarios developed through the Rail Freight Routing Study in 2024 (RFRS 2024).</li>
+                <li><b>Junctions suppressing freight growth by 2040:</b> This visualisation shows junctions assessed as suppressing freight growth by 2040 under a TAG compliant business as usual growth scenario (RFRS 2024).</li>
             </ul>
             `,
             sectionTitle: "Portal Information",
@@ -61,7 +61,7 @@ export const appConfig = {
                 Below are links to trusted external data sources that provide additional rail industry information not directly available within this platform.
             </p>
             <p>
-                <i>Disclaimer: These links lead to external websites. Transport for the North is not responsible for the content or accuracy of external sites.</i>
+                <i>Disclaimer: These links lead to external websites. TfN is not responsible for the content or accuracy of external sites.</i>
             </p>
             <hr style="margin: 24px 0 32px 0; border: none; border-top: 1px solid #ccc;" />
             <div style="display: flex; flex-direction: column; gap: 32px;">
