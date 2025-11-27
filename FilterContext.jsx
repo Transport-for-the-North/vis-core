@@ -27,11 +27,17 @@ const filterReducer = (state, action) => {
     case filterActionTypes.SET_FILTER_VALUE: {
       const { filterId, value } = action.payload;
       const parsedValue =
-        typeof value === "boolean"
+        value == null
           ? value
-          : isNaN(value)
+          : typeof value === 'boolean'
           ? value
-          : Number(value);
+          : Array.isArray(value)
+          ? value
+          : typeof value === 'number'
+          ? value
+          : typeof value === 'string' && !isNaN(value)
+          ? Number(value)
+          : value;
 
       // Check if the value has actually changed
       if (state[filterId] === parsedValue) {
