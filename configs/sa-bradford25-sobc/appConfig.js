@@ -14,17 +14,30 @@ export const appConfig = {
     <p>
         This platform contains a mix of interactive <strong>web-based dashboards</strong>, one for each <em>strategic analysis workstream</em>. The four strategic analysis workstreams constitute:
     </p>
-    <ol>
-        <li><strong>Distributional Impacts Appraisal (DIA)</strong></li>
-        <li><strong>Place-Based Analysis (PBA)</strong></li>
-        <li><strong>Network Appraisal Criteria (NAC)</strong></li>
+    <ul>
         <li><strong>People-Centred Analysis (PCA)</strong></li>
-    </ol>
+        <li><strong>Network Appraisal Criteria (NAC)</strong></li>
+        <li><strong>Place-Based Analysis (PBA)</strong></li>
+        <li><strong>Distributional Impacts Appraisal (DIA)</strong></li>
+    </ul>
 
     `,
     background: "",
     methodology: "",
     homePageFragments: [
+        {
+            content: `
+        <p>
+        People Centred Analysis is a method of relaying technical outputs in a relatable and individual-focused manner and can add real 
+        value to transport scheme business cases through highlighting the human perspective on the case for investment.
+         The outputs of this workstream, presented as a set of Narratives/Personas, are tailored to specific programmes 
+        and often involve working with local partners and authorities to ensure their relevancy.  
+         </p>`,
+            sectionTitle: "People Centred Analysis (PCA)",
+            alignment: "left",
+            mapUrl: "/person-centred-analysis",
+            image: "img/avp/featuredBlocks/7.png",
+        },
         {
             content: `
             
@@ -50,6 +63,23 @@ export const appConfig = {
             mapUrl: "/nac",
             image: "img/avp/featuredBlocks/5.png",
         },
+        {
+            content: `
+        <p>
+        Place-Based Analysis, as defined in the Green Book and TAG, is a methodological approach used to evaluate the impacts of policies, programs, or projects on specific geographical areas within the United Kingdom. 
+        This analysis involves spatially disaggregating the anticipated outcomes of a scheme to assess its social welfare and distributional effects across different regions, such as urban, suburban, and rural areas. 
+        Outputs include metrics such as Change in Transport Related Social Exclusion, User and Level 3 benefits Gross Value Added (GVA ) and others.   
+        </p>
+        
+        <p>
+        
+        </p>
+        `,
+            sectionTitle: "Place-Based Analysis (PBA)",
+            alignment: "left",
+            mapUrl: "/wider-impacts",
+            image: "img/avp/featuredBlocks/6.png",
+        },
 
         {
             content: `      
@@ -72,36 +102,6 @@ export const appConfig = {
             alignment: "left",
             mapUrl: "/person-centred-analysis",
             image: "img/avp/featuredBlocks/Manchester Piccadilly Station.png",
-        },
-        {
-            content: `
-        <p>
-        Place-Based Analysis, as defined in the Green Book and TAG, is a methodological approach used to evaluate the impacts of policies, programs, or projects on specific geographical areas within the United Kingdom. 
-        This analysis involves spatially disaggregating the anticipated outcomes of a scheme to assess its social welfare and distributional effects across different regions, such as urban, suburban, and rural areas. 
-        Outputs include metrics such as Change in Transport Related Social Exclusion, User and Level 3 benefits Gross Value Added (GVA ) and others.   
-        </p>
-        
-        <p>
-        
-        </p>
-        `,
-            sectionTitle: "PBA",
-            alignment: "left",
-            mapUrl: "/wider-impacts",
-            image: "img/avp/featuredBlocks/6.png",
-        },
-        {
-            content: `
-        <p>
-        People Centred Analysis is a method of relaying technical outputs in a relatable and individual-focused manner and can add real 
-        value to transport scheme business cases through highlighting the human perspective on the case for investment.
-         The outputs of this workstream, presented as a set of Narratives/Personas, are tailored to specific programmes 
-        and often involve working with local partners and authorities to ensure their relevancy.  
-         </p>`,
-            sectionTitle: "PCA",
-            alignment: "left",
-            mapUrl: "/person-centred-analysis",
-            image: "img/avp/featuredBlocks/7.png",
         }
     ],
     legalText: 'termsOfUse',
