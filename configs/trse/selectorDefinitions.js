@@ -306,7 +306,7 @@ const oaOrPtPercentileFilter = {
     values: [
       {
         displayValue: "All",
-        paramValue: "",
+        paramValue: 0,
       },
       {
         displayValue: "Top 30% highest risk",
@@ -334,7 +334,7 @@ const oaOrPtEngHighRiskFilter = {
     values: [
       {
         displayValue: "All",
-        paramValue: "0",
+        paramValue: 0,
       },
       {
         displayValue: "High risk nationally",
