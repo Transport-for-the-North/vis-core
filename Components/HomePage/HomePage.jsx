@@ -47,8 +47,9 @@ export const HomePage = () => {
   const { footer, homePageFragments } = appContext;
   // Changed fragmentsContent to be an array that corresponds to homePageFragments order.
   const [fragmentsContent, setFragmentsContent] = useState([]);
+  const [expandedIndex, setExpandedIndex] = useState(null);
   const windowWidth = useWindowWidth();
-
+  const MOBILE_BREAKPOINT = 948;
   /**
    * Fetches content for each fragment defined in homePageFragments.
    * If a fragment has a URL, it fetches the content from the URL.
@@ -132,129 +133,154 @@ export const HomePage = () => {
           </section>
         )}
 
-        {/* Render Fixed Sections */}
-        {fixedSections.map((section, index) => (
-          <section
-            key={section.key}
-            className={`${section.key} ${index % 2 === 0 ? "even-section" : "odd-section"} container-content`}
-          >
-            <h2>{section.title}</h2>
-            <div>{section.content}</div>
-          </section>
-        ))}
+          {/* Render Fixed Sections */}
+          {fixedSections.map((section, index) => (
+            <section
+              key={section.key}
+              className={`${section.key} ${index % 2 === 0 ? "even-section" : "odd-section"} container-content`}
+            >
+              <h2>{section.title}</h2>
+              <div>{section.content}</div>
+            </section>
+          ))}
 
-        {/* Additional Fragments */}
-        {homePageFragments &&
-          Array.isArray(homePageFragments) &&
-          fragmentsContent.length === homePageFragments.length &&
-          homePageFragments.map((fragment, idx) => {
-            const content = fragmentsContent[idx];
-            const effectiveIndex = fixedSections.length + idx;
-            const alignmentClass = fragment.alignment || "center";
-            const backgroundColor = fragment.backgroundColor || "";
-            const sectionTitle = fragment.sectionTitle;
-            const imagePosition = fragment.imagePosition || "right";
-            // Use provided "images" array if available (limit to MAX_IMAGES_ALLOWED)
-            const images =
-              fragment.images &&
-              Array.isArray(fragment.images) &&
-              fragment.images.length
-                ? fragment.images.slice(0, MAX_IMAGES_ALLOWED)
-                : null;
-            // Fallback to a single image if provided.
-            const singleImage = !images && fragment.image;
-            return (
-              <section
-                key={idx}
-                className={`additional-section ${
-                  effectiveIndex % 2 === 0 ? "even-section" : "odd-section"
-                } container-content`}
-                style={{ backgroundColor }}
-              >
-                <h2 className={`title-${alignmentClass}`}>{sectionTitle}</h2>
+        <div className="homepage-grid">
+          {/* Additional Fragments */}
+          {homePageFragments &&
+            Array.isArray(homePageFragments) &&
+            fragmentsContent.length === homePageFragments.length &&
+            homePageFragments.map((fragment, idx) => {
+              const content = fragmentsContent[idx];
+              const effectiveIndex = fixedSections.length + idx;
+              const alignmentClass = fragment.alignment || "center";
+              const backgroundColor = fragment.backgroundColor || "";
+              const sectionTitle = fragment.sectionTitle;
+              const imagePosition = fragment.imagePosition || "right";
+              // Use provided "images" array if available (limit to MAX_IMAGES_ALLOWED)
+              const images =
+                fragment.images &&
+                Array.isArray(fragment.images) &&
+                fragment.images.length
+                  ? fragment.images.slice(0, MAX_IMAGES_ALLOWED)
+                  : null;
+              // Fallback to a single image if provided.
+              const singleImage = !images && fragment.image;
+              const mapUrl = fragment.mapUrl; 
+              const isExpanded = expandedIndex === idx;
 
-                {images ? (
-                  // If more than one image is provided in the array:
-                  images.length > 1 ? (
-                    // For wide screens, split content into blocks each with text and image side by side.
-                    windowWidth >= WIDTH_BREAKPOINT ? (
-                      <div className="multiple-blocks">
-                        {createBlockSections(content, images).map((block, i) => (
-                          <div
-                            key={`block-${i}`}
-                            className={`alternating-layout-block ${i % 2 === 0 ? "" : "reverse"}`}
-                          >
-                            <div className="text-block">{block.textSegment}</div>
-                            {block.image && (
-                              <div className="image-block">
-                                <img
-                                  src={block.image}
-                                  alt={`Image ${i + 1}`}
-                                  style={{
-                                    width: "100%",
-                                    maxHeight: MAX_IMAGE_HEIGHT,
-                                    objectFit: "cover",
-                                    borderRadius: "12px",
-                                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
-                                  }}
-                                />
+              const showInlineExpanded = windowWidth < MOBILE_BREAKPOINT;
+
+              return (
+                <React.Fragment key={idx}>
+                <section
+                  className={`additional-section ${
+                    effectiveIndex % 2 === 0 ? "even-section" : "odd-section"
+                  } container-content tile`}
+                  style={{ backgroundColor }}
+                >
+
+                  {singleImage && (
+                    <img
+                      src={singleImage}
+                      alt={`${sectionTitle} image`}
+                      className="tile-top-image"
+                    />
+                  )}
+                  <div className="tile-section">
+                    <h2 className={`title-${alignmentClass}`}>{sectionTitle}</h2>
+
+                    <div className="tile-body">
+                    {images ? (
+                      // If more than one image is provided in the array:
+                      images.length > 1 ? (
+                        // For wide screens, split content into blocks each with text and image side by side.
+                        windowWidth >= WIDTH_BREAKPOINT ? (
+                          <div className="multiple-blocks">
+                            {createBlockSections(content, images).map((block, i) => (
+                              <div
+                                key={`block-${i}`}
+                                className={`alternating-layout-block ${i % 2 === 0 ? "" : "reverse"}`}
+                              >
+                                <div className="text-block">
+                                    <div className="container-section collapsed">{block.textSegment}</div>
+                                </div>
+                                {block.image && (
+                                  <div className="image-block">
+                                    <img
+                                      src={block.image}
+                                      alt={`Image ${i + 1}`}
+                                      style={{
+                                        width: "100%",
+                                        maxHeight: MAX_IMAGE_HEIGHT,
+                                        objectFit: "cover",
+                                        borderRadius: "12px",
+                                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)"
+                                      }}
+                                    />
+                                  </div>
+                                )}
                               </div>
-                            )}
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        ) : (
+                          // For narrow screens, interweave text with images in a single column.
+                          <div className="content-wrapper interleaved-content">
+                            <div className="container-section collapsed">
+                              {interweaveContentWithImages(content, images)}
+                              </div>
+                          </div>
+                        )
+                      ) : (
+                    
+                        <>
+                          <div className="container-section collapsed">{parse(content)}</div>
+                        </>
+                      )
                     ) : (
-                      // For narrow screens, interweave text with images in a single column.
-                      <div className="content-wrapper interleaved-content">
-                        {interweaveContentWithImages(content, images)}
-                      </div>
-                    )
-                  ) : (
-                    // Single image provided in the "images" array (length === 1)
-                    <>
-                      {singleImage && imagePosition === "left" && (
-                        <img
-                          src={singleImage}
-                          alt={`${sectionTitle} image`}
-                          style={{
-                            width: "100%",
-                            maxHeight: MAX_IMAGE_HEIGHT,
-                            objectFit: "cover"
-                          }}
-                        />
-                      )}
-                      <div className="container-section">{parse(content)}</div>
-                      {singleImage && imagePosition === "right" && (
-                        <img
-                          src={singleImage}
-                          alt={`${sectionTitle} image`}
-                          style={{
-                            width: "100%",
-                            maxHeight: MAX_IMAGE_HEIGHT,
-                            objectFit: "cover"
-                          }}
-                        />
-                      )}
-                    </>
-                  )
-                ) : (
-                  // Fallback when a single image is provided via fragment.image property.
-                  <>
-                    {singleImage && imagePosition === "left" && (
-                      <img src={singleImage} alt={`${sectionTitle} image`} />
+                      
+                      <>
+                        <div className="container-section collapsed">{parse(content)}</div>
+                      </>
                     )}
-                    <div className="container-section">{parse(content)}</div>
-                    {singleImage && imagePosition === "right" && (
-                      <img src={singleImage} alt={`${sectionTitle} image`} />
-                    )}
-                  </>
+                    </div>
+                    <div className="tile-footer">
+                      {mapUrl && (
+                        <a href={mapUrl} target="_blank" className="go-to-map">
+                          Go to map
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                      type="button"
+                      className={`read-more-toggle ${isExpanded ? "expanded" : ""}`}
+                      onClick={() => setExpandedIndex(isExpanded ? null : idx)}
+                      aria-label="Toggle description"
+                    >
+                      <span className="arrow-icon"></span>
+                  </button>
+                </section>
+
+                {/* On tablet/mobile, show expanded block directly under this card */}
+                {showInlineExpanded && isExpanded && (
+                  <section className="expanded-fragment-block">
+                    <div className="expanded-fragment-content">
+                      {parse(content)}
+                    </div>
+                  </section>
                 )}
-                {singleImage && imagePosition === "full-width" && (
-                  <img src={singleImage} alt={`${sectionTitle} image`} />
-                )}
-              </section>
-            );
-          })}
+                </React.Fragment>
+              );
+            })}
+        </div>
+
+        {windowWidth >= MOBILE_BREAKPOINT && expandedIndex !== null && (
+          <section className="expanded-fragment-block">
+            <div className="expanded-fragment-content">
+              {parse(fragmentsContent[expandedIndex])}
+            </div>
+          </section>
+        )}
 
         {/* Contact Section */}
         {appContext.contactText && appContext.contactEmail && (
