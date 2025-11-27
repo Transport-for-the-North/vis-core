@@ -65,7 +65,7 @@ export const accidents = {
         labelZoomLevel: 12,
         labelNulls: true,
         hoverNulls: true,
-        hiddenByDefault: true
+        hiddenByDefault: false
       },
     ],
     visualisations: [
