@@ -6,10 +6,6 @@ export const investmentSummary = `
         <div class="value" style="font-size: 1.2em;">{reference_id}</div>
       </div>
       <div class="card">
-        <div class="label">Scheme Code</div>
-        <div class="value" style="font-size: 1.2em;">{scheme_code}</div>
-      </div>
-      <div class="card">
         <div class="label">Programme</div>
         <div class="value" style="font-size: 1.2em;">{programme}</div>
       </div>
@@ -32,6 +28,38 @@ export const investmentSummary = `
       <div class="card">
         <div class="label">Partners</div>
         <div class="value" style="font-size: 1.2em;">{partners}</div>
+      </div>
+      <div class="card">
+        <div class="label">Train Capacity</div>
+        <div class="value" style="font-size: 1.2em;">{train_capacity}</div>
+      </div>
+      <div class="card">
+        <div class="label">Track Capacity</div>
+        <div class="value" style="font-size: 1.2em;">{track_capacity}</div>
+      </div>
+      <div class="card">
+        <div class="label">Passenger Experience</div>
+        <div class="value" style="font-size: 1.2em;">{passenger_experience}</div>
+      </div>
+      <div class="card">
+        <div class="label">Reliability</div>
+        <div class="value" style="font-size: 1.2em;">{reliability}</div>
+      </div>
+      <div class="card">
+        <div class="label">Performance</div>
+        <div class="value" style="font-size: 1.2em;">{performance}</div>
+      </div>
+      <div class="card">
+        <div class="label">Connectivity</div>
+        <div class="value" style="font-size: 1.2em;">{connectivity}</div>
+      </div>
+      <div class="card">
+        <div class="label">Completion Date</div>
+        <div class="value" style="font-size: 1.2em;">{completion}</div>
+      </div>
+      <div class="card">
+        <div class="label">Estimated Scheme Cost</div>
+        <div class="value" style="font-size: 1.2em;">{scheme_cost}</div>
       </div>
       <div class="card">
         <div class="label">Status</div>
@@ -48,16 +76,8 @@ export const freightInvestmentSummary = `
         <div class="value" style="font-size: 1.2em;">{reference_id}</div>
       </div>
       <div class="card">
-        <div class="label">Scheme Code</div>
-        <div class="value" style="font-size: 1.2em;">{scheme_code}</div>
-      </div>
-      <div class="card">
         <div class="label">Programme</div>
         <div class="value" style="font-size: 1.2em;">{programme}</div>
-      </div>
-      <div class="card">
-        <div class="label">Freight Intervention (if applicable)</div>
-        <div class="value" style="font-size: 1.2em;">{freight_intervention}</div>
       </div>
       <div class="card">
         <div class="label">Description</div>
@@ -78,6 +98,38 @@ export const freightInvestmentSummary = `
       <div class="card">
         <div class="label">Partners</div>
         <div class="value" style="font-size: 1.2em;">{partners}</div>
+      </div>
+      <div class="card">
+        <div class="label">Train Capacity</div>
+        <div class="value" style="font-size: 1.2em;">{train_capacity}</div>
+      </div>
+      <div class="card">
+        <div class="label">Track Capacity</div>
+        <div class="value" style="font-size: 1.2em;">{track_capacity}</div>
+      </div>
+      <div class="card">
+        <div class="label">Passenger Experience</div>
+        <div class="value" style="font-size: 1.2em;">{passenger_experience}</div>
+      </div>
+      <div class="card">
+        <div class="label">Reliability</div>
+        <div class="value" style="font-size: 1.2em;">{reliability}</div>
+      </div>
+      <div class="card">
+        <div class="label">Performance</div>
+        <div class="value" style="font-size: 1.2em;">{performance}</div>
+      </div>
+      <div class="card">
+        <div class="label">Connectivity</div>
+        <div class="value" style="font-size: 1.2em;">{connectivity}</div>
+      </div>
+      <div class="card">
+        <div class="label">Completion Date</div>
+        <div class="value" style="font-size: 1.2em;">{completion}</div>
+      </div>
+      <div class="card">
+        <div class="label">Estimated Scheme Cost</div>
+        <div class="value" style="font-size: 1.2em;">{scheme_cost}</div>
       </div>
       <div class="card">
         <div class="label">Status</div>

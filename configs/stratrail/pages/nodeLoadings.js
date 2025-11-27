@@ -83,10 +83,10 @@ export const nodeLoadings = {
     metadataTables: [],
     filters: [
         { ...selectors.nodeLoadingsMetricSelector, visualisations: ['Node Loading Totals'] },
-        { ...selectors.nodeTOCSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true},
-        { ...selectors.authoritySelector, visualisations: ['Node Loading Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true },
-        { ...selectors.booleanSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
-        { ...selectors.routeNameSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Loading Totals'] },
+        { ...selectors.nodeTOCSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, forceRequired: false },
+        { ...selectors.authoritySelector, visualisations: ['Node Loading Totals'], shouldInitialSelectAllInMultiSelect: true, multiSelect: true, forceRequired: false },
+        { ...selectors.booleanSelector, visualisations: ['Node Loading Totals'], multiSelect: true, shouldInitialSelectAllInMultiSelect: true, forceRequired: false, filterName: "Northern Rail Station", paramName: "stratRailNorth", info: "Use this filter to filter nodes based on if it is labelled as a Northern station by TfN." },
+        { ...selectors.routeNameSelector, multiSelect: true, forceRequired: false, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Loading Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Node Loading Totals'] },
     ],
     additionalFeatures: {

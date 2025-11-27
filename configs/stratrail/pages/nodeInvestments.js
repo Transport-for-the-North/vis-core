@@ -52,34 +52,6 @@ export const nodeInvestments = {
             hoverNulls: true,
             hoverTipShouldIncludeMetadata: false,
         },
-        // {
-        //     uniqueId: "RailOfferLinksVectorTile",
-        //     name: "Network",
-        //     type: "tile",
-        //     source: "api",
-        //     path: "/api/vectortiles/railoffer_links/{z}/{x}/{y}",
-        //     sourceLayer: "geometry",
-        //     geometryType: "line",
-        //     isHoverable: false,
-        //     isStylable: false,
-        //     shouldHaveTooltipOnHover: false,
-        //     shouldHaveLabel: false
-        // },
-        // {
-        //     uniqueId: "RailOfferCRPVectorTile",
-        //     name: "CRP Network",
-        //     type: "tile",
-        //     source: "api",
-        //     path: "/api/vectortiles/railoffer_crp_lines/{z}/{x}/{y}",
-        //     sourceLayer: "geometry",
-        //     geometryType: "line",
-        //     customPaint: crpLinesLayerPaint,
-        //     isHoverable: false,
-        //     isStylable: false,
-        //     shouldShowInLegend: true,
-        //     shouldHaveTooltipOnHover: true,
-        //     shouldHaveLabel: false
-        // },
         {
             uniqueId: "RailOfferInvestmentNodeVectorTile",
             name: "Node Investment Layer",
@@ -100,7 +72,7 @@ export const nodeInvestments = {
             enforceNoClassificationMethod: true,
             showAllDataInTooltipForEachGeom: true,
             customTooltip: {
-                url: "/api/railoffer/node-investment-callout/point?featureId={id}",
+                url: "/api/railoffer/node-investment-callout/point?featureId={id}&theme={theme}",
                 htmlTemplate: investPopupContent
             }
         },
@@ -133,7 +105,7 @@ export const nodeInvestments = {
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.nodeInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Node Investment Results'] },
+        { ...selectors.nodeInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, forceRequired: false, visualisations: ['Node Investment Results', "Investment Callout"] },
         { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Node Investment Layer"}
     ],
     additionalFeatures: {

@@ -72,7 +72,7 @@ export const linkInvestments = {
             enforceNoClassificationMethod: true,
             showAllDataInTooltipForEachGeom: true,
             customTooltip: {
-                url: "/api/railoffer/link-investment-callout/link?featureId={id}",
+                url: "/api/railoffer/link-investment-callout/link?featureId={id}&theme={theme}",
                 htmlTemplate: investPopupContent
             }
         },
@@ -105,7 +105,7 @@ export const linkInvestments = {
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.linkInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Investment Results'] },
+        { ...selectors.linkInvestmentThemeSelector, multiSelect: true, forceRequired: false, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Investment Results', 'Investment Callout'] },
         { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
     ],
     additionalFeatures: {

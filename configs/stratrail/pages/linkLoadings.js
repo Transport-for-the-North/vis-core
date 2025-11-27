@@ -54,7 +54,7 @@ export const linkLoadings = {
     metadataTables: [],
     filters: [
         { ...selectors.linkLoadingsMetricSelector, visualisations: ['Link Loading Totals'] },
-        { ...selectors.loadingsTOCSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Loading Totals'] },
+        { ...selectors.loadingsTOCSelector, multiSelect: true, forceRequired: false, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Loading Totals'] },
         { ...selectors.dayOfWeekSelector, visualisations: ['Link Loading Totals'] },
     ],
     additionalFeatures: {

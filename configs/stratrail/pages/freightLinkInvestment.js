@@ -11,7 +11,7 @@ export const freightLinkInvestments = {
   type: "MapLayout",
   category: "Investments",
   about: `<p>This visualisation shows all the freight link investment/schemes from the Freight Investment Pipeline (FRIP). Each scheme is colour coded by it's current status.</p>
-        <p>Use the filters to select the intervention type(s) you wish to see on the map. Hover over a link to view it's basic information and/or click on a link to see more information about the investment/scheme.</p>`,
+        <p>Use the filters to select the theme(s) you wish to see on the map. Hover over a link to view it's basic information and/or click on a link to see more information about the investment/scheme.</p>`,
   termsOfUse: termsOfUse,
   legalText: termsOfUse,
   customMapZoom: 7,
@@ -72,7 +72,7 @@ export const freightLinkInvestments = {
             enforceNoClassificationMethod: true,
             showAllDataInTooltipForEachGeom: true,
             customTooltip: {
-                url: "/api/railoffer/freight-link-investment-callout/link?featureId={id}",
+                url: "/api/railoffer/freight-link-investment-callout/link?featureId={id}&theme={theme}",
                 htmlTemplate: freightInvestPopupContent
             },
         },
@@ -105,7 +105,7 @@ export const freightLinkInvestments = {
     ],
     metadataTables: [],
     filters: [
-        { ...selectors.linkFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Freight Investment Results'] },
+        { ...selectors.linkFreightInvestmentThemeSelector, forceRequired: false, multiSelect: true, shouldInitialSelectAllInMultiSelect: true, visualisations: ['Link Freight Investment Results', "Investment Callout"] },
         { ...selectors.idFeatureSelector, visualisations: ['Investment Callout'], layer: "Link Investment Layer"}
     ],
     additionalFeatures: {
@@ -114,7 +114,7 @@ export const freightLinkInvestments = {
         },
         download: {
             filters: [
-                { ...selectors.linkFreightInterventionSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
+                { ...selectors.linkFreightInvestmentThemeSelector, multiSelect: true, shouldInitialSelectAllInMultiSelect: true },
             ],
             downloadPath: '/api/railoffer/freight-investment-link-results/download'
         },
