@@ -121,6 +121,10 @@ export const accidents = {
             action: "UPDATE_PARAMETERISED_LAYER",
             payload: { targetLayer: "Level Crossing" },
           },
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Network Line Geometries" },
+          },
           { action: "UPDATE_QUERY_PARAMS" },
         ],
         visualisations: ["Map-based totals"],
