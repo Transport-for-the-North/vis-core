@@ -1,3 +1,5 @@
+import { layers } from "../layers";
+
 export const airQuality = {
   pageName: "Air quality",
   url: "/air-quality",
@@ -27,6 +29,7 @@ export const airQuality = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
       },
+      layers.avpNetworkLineGeometryById
     ],
     visualisations: [
       {
@@ -41,32 +44,45 @@ export const airQuality = {
       },
     ],
     metadataTables: [
-    //   {
-    //     name: "v_vis_avp_programmes_run_info",
-    //     path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
-    //   },
       {
-        name: "dia_airquality_outputs",
-        path: "/api/getgenericdataset?dataset_id=avp_data.dia_airquality_outputs",
+        name: "v_vis_avp_programmes_run_info",
+        path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
+      },
+      {
+        name: "dia_airquality_definitions",
+        path: "/api/getgenericdataset?dataset_id=avp_data.dia_airquality_definitions",
+      },
+      {
+        name: "avp_networks",
+        path: "/api/getgenericdataset?dataset_id=avp_data.avp_networks",
       },
     ],
     filters: [
-      // networkId
+      // zoneTypeId
       {
-        filterName: "networkId",
-        paramName: "networkId",
+        filterName: "Zone type",
+        paramName: "zoneTypeId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: ["Map-based totals"],
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Zones" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
+        visualisations: [
+          "Map-based totals",
+        ], // both cards and map
         layer: "Zones",
-        type: "dropdown",
+        type: "fixed",
         values: {
-          source: "metadataTable",
-          metadataTableName: "dia_airquality_outputs",
-          displayColumn: "network_id",
-          paramColumn: "network_id",
-          sort: "ascending",
-          where: [{ column: "network_id", operator: "notNull" }],
+          source: "local",
+          values: [
+            {
+              displayValue: "MSOA",
+              paramValue: 14,
+            },
+          ],
         },
       },
       // programmeId
@@ -74,17 +90,51 @@ export const airQuality = {
         filterName: "programmeId",
         paramName: "programmeId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Network" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
         visualisations: ["Map-based totals"],
         layer: "Zones",
         type: "fixed",
         values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "2",
+              paramValue: 2,
+            },
+          ],
+        },
+      },
+      // networkId
+      {
+        filterName: "networkId",
+        paramName: "networkId",
+        target: "api",
+        actions: [
+          { action: "UPDATE_QUERY_PARAMS" },
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Network" },
+          },
+        ],
+        visualisations: ["Map-based totals"],
+        layer: "Zones",
+        type: "dropdown",
+        values: {
           source: "metadataTable",
-          metadataTableName: "dia_airquality_outputs",
-          displayColumn: "programme_id",
-          paramColumn: "programme_id",
+          metadataTableName: "avp_networks",
+          displayColumn: "network",
+          paramColumn: "id",
           sort: "ascending",
-          where: [{ column: "programme_id", operator: "notNull" }],
+          where: [
+            { column: "network", operator: "notNull" },
+            { column: "programme_id", operator: "equals", values: 2 }
+          ],
         },
       },
       // airqualityDefinitionsId
@@ -98,38 +148,14 @@ export const airQuality = {
         type: "dropdown",
         values: {
           source: "metadataTable",
-          metadataTableName: "dia_airquality_outputs",
-          displayColumn: "airquality_definitions_id",
-          paramColumn: "airquality_definitions_id",
+          metadataTableName: "dia_airquality_definitions",
+          displayColumn: "description",
+          paramColumn: "id",
           sort: "ascending",
-          where: [{ column: "airquality_definitions_id", operator: "notNull" }],
+          where: [{ column: "id", operator: "notNull" }],
         },
       },
-      // zoneTypeId
-      {
-        filterName: "Zone type",
-        paramName: "zoneTypeId",
-        target: "api",
-        actions: [
-          {
-            action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Zones" },
-          },
-          { action: "UPDATE_QUERY_PARAMS" },
-        ],
-        visualisations: ["Map-based totals"],
-        layer: "Zones",
-        type: "fixed",
-        values: {
-          source: "local",
-          values: [
-            {
-              displayValue: "14",
-              paramValue: 14,
-            },
-          ],
-        },
-      },
+      
     ],
     additionalFeatures: {},
   },
