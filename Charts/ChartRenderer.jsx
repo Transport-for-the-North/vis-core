@@ -259,6 +259,7 @@ const toSeries = (config, data) =>
  * @param {Object} props.config - Chart configuration object
  * @param {Object} props.data - Data object containing values to chart
  * @param {Object} props.formatters - Custom formatting functions for values
+ * @param {Object} props.type - Value that defines whether the graph will be horizontal or vertical
  * @returns {JSX.Element} - Bar chart component with X/Y axes, grid, and tooltip
  */
 const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
@@ -371,7 +372,154 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
           </>
         )}
         <RTooltip formatter={formatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
-        <RBar dataKey="value" name="Value" fill={barFill} />
+        <RBar dataKey="value" name="Value">
+          {items.map((entry, idx) => (
+            <RCell
+              key={`cell-${idx}`}
+              fill={config.colors[entry.label] || DEFAULTS.BRAND_COLOR}
+            />
+          ))}
+        </RBar>
+      </RBarChart>
+    </ChartSection>
+  );
+};
+
+/**
+ * Renders a responsive multiple bar chart using Recharts
+ * @param {Object} props - Component props
+ * @param {Object} props.config - Chart configuration object
+ * @param {Object} props.data - Data object containing values to chart
+ * @param {Object} props.formatters - Custom formatting functions for values
+ * @param {Object} props.type - Value that defines whether the graph will be horizontal or vertical
+ * @returns {JSX.Element} - Bar chart component with X/Y axes, grid, and tooltip
+ */
+const BarChartMultiple = ({
+  config,
+  data,
+  formatters,
+  type = "horizontal",
+}) => {
+  const items = React.useMemo(() => data, [data]);
+  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  const hasXLabel = !!config.x_axis_title;
+  const hasYLabel = !!config.y_axis_title;
+  const formatter = (val) =>
+    (formatters.commify || defaultFormatters.commify)(val);
+  const truncateLabel = (label, maxLen = 7) =>
+    label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
+const CustomTick = ({ x, y, payload, angle = 0 }) => (
+  <text
+    x={x}
+    y={y}
+    dy={angle ? 16 : 4}
+    textAnchor="end"
+    fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+    transform={angle ? `rotate(${angle}, ${x}, ${y})` : undefined}
+  >
+    {truncateLabel(payload.value)}
+  </text>
+);
+  const chartMargin = { ...DEFAULTS.MARGIN };
+  if (hasXLabel || hasYLabel) {
+    chartMargin.bottom = 20;
+  }
+  return (
+    <ChartSection
+      ariaLabel={config.ariaLabel || "Bar chart"}
+      title={config.title}
+      height={height}
+    >
+      <RBarChart
+        data={items}
+        margin={chartMargin}
+        barCategoryGap="18%"
+        barGap={2}
+        layout={type === "horizontal" ? "horizontal" : "vertical"}
+      >
+        <RCartesianGrid {...DEFAULTS.GRID} />
+        {type === "vertical" ? (
+          <>
+            <RXAxis
+              type="number"
+              domain={[0, "dataMax"]}
+              allowDecimals={false}
+              tickFormatter={formatter}
+              tick={<CustomTick />}
+              label={
+                hasXLabel
+                  ? {
+                      value: config.x_axis_title,
+                      position: "insideBottom",
+                      offset: -5,
+                      fontSize: 14,
+                    }
+                  : undefined
+              }
+            />
+            <RYAxis
+              type="category"
+              dataKey={config.xKey || "label"}
+              width={100}
+              tick={<CustomTick />}
+              tickLine={false}
+              label={
+                hasYLabel
+                  ? {
+                      value: config.y_axis_title,
+                      position: "left",
+                      offset: 0,
+                      fontSize: 10,
+                      angle: -90,
+                    }
+                  : undefined
+              }
+            />
+          </>
+        ) : (
+          <>
+            <RXAxis
+              dataKey={config.xKey || "label"}
+              tick={<CustomTick angle={-45}/>}
+              interval={0}
+            />
+            <RYAxis
+              domain={[0, "dataMax"]}
+              allowDataOverflow
+              allowDecimals={false}
+              tickFormatter={formatter}
+              tick={<CustomTick />}
+              width={DEFAULTS.DIMENSIONS.yAxisWidth}
+              label={
+                hasYLabel
+                  ? {
+                      value: config.y_axis_title,
+                      position: "left",
+                      offset: 0,
+                      fontSize: 10,
+                      angle: -90,
+                    }
+                  : undefined
+              }
+            />
+          </>
+        )}
+        <RTooltip formatter={formatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RLegend
+          verticalAlign="top"
+          align="center"
+          wrapperStyle={{ paddingBottom: 10 }}
+        />
+        {config.columns.map((col, idx) => (
+          <RBar
+            key={col.key}
+            dataKey={col.key}
+            name={col.label}
+            fill={config.colors[col.key]}
+            barSize={DEFAULTS.BAR_SIZE || 24}
+            isAnimationActive={false}
+          />
+        ))}
       </RBarChart>
     </ChartSection>
   );
@@ -830,7 +978,15 @@ export const ChartRenderer = ({
   const f = { ...defaultFormatters, ...formatters };
 
   // Determine if data has values
-  const hasAny = data && Object.values(data).some((v) => (Number(v) || 0) > 0);
+  const hasAny = Array.isArray(data)
+    ? data.length > 0 &&
+      data.some((row) =>
+        Object.entries(row)
+          .filter(([k]) => k !== (charts[0]?.xKey || "label"))
+          .some(([, v]) => Number(v) > 0)
+      )
+    : data && Object.values(data).some((v) => (Number(v) || 0) > 0);
+
   if (!hasAny) return <WarningBox text="No data available for selection" />;
 
   return (
@@ -854,6 +1010,33 @@ export const ChartRenderer = ({
           case "bar_vertical":
             return (
               <BarChart
+                key={idx}
+                config={{
+                  ...cfg,
+                  height:
+                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
+                }}
+                data={data}
+                formatters={f}
+                type="vertical"
+              />
+            );
+          case "multiple_bar":
+            return (
+              <BarChartMultiple
+                key={idx}
+                config={{
+                  ...cfg,
+                  height:
+                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
+                }}
+                data={data}
+                formatters={f}
+              />
+            );
+          case "multiple_bar_vertical":
+            return (
+              <BarChartMultiple
                 key={idx}
                 config={{
                   ...cfg,
