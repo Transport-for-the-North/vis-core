@@ -10,7 +10,7 @@ export const accidents = {
   termsOfUse: "bar",
   config: {
     layers: [
-      layers.avpNetworkLineGeometry,
+      layers.avpNetworkLineGeometryById,
       {
         uniqueId: "DIALevelCrossing",
         name: "Level Crossings",
@@ -92,7 +92,6 @@ export const accidents = {
           { action: "UPDATE_QUERY_PARAMS" },
         ],
         visualisations: ["Map-based totals"],
-        layer: "Level Crossing",
         type: "dropdown",
         values: {
           source: "metadataTable",
@@ -122,7 +121,6 @@ export const accidents = {
           { action: "UPDATE_QUERY_PARAMS" },
         ],
         visualisations: ["Map-based totals"],
-        layer: "Level Crossings",
         type: "fixed",
         forceRequired: true,
         values: {
@@ -142,7 +140,6 @@ export const accidents = {
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
-        layer: "Level Crossings",
         type: "dropdown",
         values: {
           source: "local",
