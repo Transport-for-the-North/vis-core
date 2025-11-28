@@ -1,3 +1,6 @@
+import { layers } from "../layers";
+import { metadataTables } from "../metadataTables";
+
 export const userBenefits = {
   pageName: "User Benefits",
   url: "/user-benefits",
@@ -27,13 +30,15 @@ export const userBenefits = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
       },
+      layers.avpNetworkLineGeometry,
     ],
     visualisations: [
       {
         name: "Map-based totals",
         type: "joinDataToMap",
         joinLayer: "Zones",
-        style: "polygon-continuous",
+        style: "polygon",
+        dynamicStyling: true,
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -65,14 +70,8 @@ export const userBenefits = {
     ],
     metadataTables: [
       // to change to real metadata tables
-      {
-        name: "v_vis_avp_programmes_run_info",
-        path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
-      },
-      {
-        name: "dia_user_benefits_definitions",
-        path: "/api/getgenericdataset?dataset_id=avp_data.dia_user_benefits_definitions",
-      },
+      metadataTables.v_vis_avp_programmes_run_info,
+      metadataTables.dia_user_benefits_definitions,
     ],
     filters: [
       // runCodeId
@@ -84,6 +83,7 @@ export const userBenefits = {
         visualisations: ["Map-based totals"],
         layer: "Zones",
         type: "dropdown",
+        shouldFilterOthers: true,
         values: {
           source: "metadataTable",
           metadataTableName: "v_vis_avp_programmes_run_info",
@@ -98,7 +98,7 @@ export const userBenefits = {
             },
             {
               column: "run_id",
-              values: [16],
+              values: [15, 16, 17, 18, 19],
               operator: "in",
             },
           ],
@@ -119,6 +119,39 @@ export const userBenefits = {
             {
               displayValue: "2",
               paramValue: 2,
+            },
+          ],
+        },
+      },
+      // **Network ID
+      {
+        filterName: "Network",
+        paramName: "networkId",
+        target: "api",
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Network" },
+          },
+          // {
+          //   action: "UPDATE_PARAMETERISED_LAYER",
+          //   payload: { targetLayer: "Stations" },
+          // }
+        ],
+        visualisations: ["Map-based totals"],
+        type: "toggle",
+        shouldBeFiltered: true,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "network_scenario",
+          paramColumn: "network_scenario",
+          sort: "descending",
+          where: [
+            {
+              column: "has_dia_userbenefits",
+              values: true,
+              operator: "equals",
             },
           ],
         },
@@ -179,9 +212,8 @@ export const userBenefits = {
         values: {
           source: "metadataTable",
           metadataTableName: "dia_user_benefits_definitions",
-          displayColumn: "user_benefits_category",
-          paramColumn: "user_benefits_category",
-          infoOnHoverColumn: "user_benefits_category_desc",
+          displayColumn: "user_benefits_category_desc",
+          paramColumn: "user_benefits_category_desc",
           sort: "ascending",
           where: [
             { column: "user_benefits_category_desc", operator: "notNull" },

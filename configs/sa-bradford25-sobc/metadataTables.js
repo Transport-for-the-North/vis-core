@@ -33,5 +33,9 @@ export const metadataTables = {
     dia_accessibility_definitions: {
         name: "dia_accessibility_definitions",
         path: "/api/getgenericdataset?dataset_id=avp_data.dia_accessibility_definitions",
+    },
+    dia_user_benefits_definitions: {
+        name: "dia_user_benefits_definitions",
+        path: "/api/getgenericdataset?dataset_id=avp_data.dia_user_benefits_definitions",
     }
 };
