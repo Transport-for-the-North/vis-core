@@ -1,3 +1,6 @@
+import { layers } from "../layers";
+import { metadataTables } from "../metadataTables";
+
 export const accessibilityDIA = {
   pageName: "Accessibility",
   url: "/dia-accessibility",
@@ -27,6 +30,8 @@ export const accessibilityDIA = {
         invertedColorScheme: false,
         outlineOnPolygonSelect: true,
       },
+      layers.avpNetworkLineGeometry,
+      // layers.avpNetworkStationGeometry
     ],
     visualisations: [
       {
@@ -38,63 +43,55 @@ export const accessibilityDIA = {
         valueField: "value",
         dataSource: "api",
         dataPath: "/api/dia/accessibility/zonal-data",
-        // legendText: [
-        //   {
-        //     displayValue: "Zones",
-        //     legendSubtitleText: "%",
-        //   },
-        // ],
       },
     ],
     metadataTables: [
-      {
-        name: "v_vis_avp_programmes_run_info",
-        path: "/api/getgenericdataset?dataset_id=views_vis.v_vis_avp_programmes_run_info",
-      },
-      {
-        name: "dia_accessibility_definitions",
-        path: "/api/getgenericdataset?dataset_id=avp_data.dia_accessibility_definitions",
-      },
+      metadataTables.v_vis_avp_programmes_run_info,
+      metadataTables.dia_accessibility_definitions,
     ],
     filters: [
-      // zoneTypeId
+      // zoneTypeId (fixed -> NoRMS v2.11 is 5)
       {
         filterName: "Zone type",
         paramName: "zoneTypeId",
         target: "api",
         actions: [
-          {
-            action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Zones" },
-          },
+          { action: "UPDATE_PARAMETERISED_LAYER", payload: { targetLayer: "Zones" } },
           { action: "UPDATE_QUERY_PARAMS" },
         ],
-        visualisations: [
-          "Map-based totals"
-        ],
+        visualisations: ["Map-based totals"],
         layer: "Zones",
-        type: "dropdown",
+        type: "fixed",
         values: {
           source: "local",
-          values: [
-            {
-              displayValue: "NoRMS",
-              paramValue: 5,
-            }
-          ],
+          values: [{ displayValue: "NoRMS v2.11", paramValue: 5 }],
         },
       },
-      // nortmsRunCodeId
+
+      // programmeId (fixed)
       {
-        filterName: "nortmsRunCodeId",
+        filterName: "programmeId",
+        paramName: "programmeId",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: ["Map-based totals"],
+        type: "fixed",
+        forceRequired: true,
+        values: {
+          source: "local",
+          values: [{ displayValue: "2", paramValue: 2 }],
+        },
+      },
+
+      // runCodeId (dropdown from v_vis_avp_programmes_run_info)
+      {
+        filterName: "runCodeId",
         paramName: "runCodeId",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Map-based totals"
-        ],
+        visualisations: ["Map-based totals"],
         type: "dropdown",
-        forceRequired: true,
+        shouldFilterOthers: true,
         values: {
           source: "metadataTable",
           metadataTableName: "v_vis_avp_programmes_run_info",
@@ -109,48 +106,54 @@ export const accessibilityDIA = {
               values: true,
               operator: "equals",
             },
-            {
-              column: "run_id",
-              values: [26, 27, 28],
-              operator: "in",
-            },
           ],
         },
       },
-      // programmeId
+      // **Network ID
       {
-        filterName: "programmeId",
-        paramName: "programmeId",
+        filterName: "Network",
+        paramName: "networkId",
         target: "api",
-        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Map-based totals"
-        ],
-        type: "fixed",
-        forceRequired: true,
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Network" },
+          },
+          // {
+          //   action: "UPDATE_PARAMETERISED_LAYER",
+          //   payload: { targetLayer: "Stations" },
+          // }
+      ],
+        visualisations: ["Map-based totals"],
+        type: "toggle",
+        shouldBeFiltered: true,
         values: {
-          source: "local",
-          values: [
+          source: "metadataTable",
+          metadataTableName: "v_vis_avp_programmes_run_info",
+          displayColumn: "network_scenario",
+          paramColumn: "network_scenario",
+          sort: "descending",
+          where: [
             {
-              displayValue: "2",
-              paramValue: 2, // Put their true value
+              column: "has_dia_accessibility",
+              values: true,
+              operator: "equals",
             },
           ],
         },
       },
-      // accessibilityCategory
+      
+      // description -> drives accessibilityDefinitionsId (param is id, display is description)
       {
-        filterName: "accessibilityCategory",
+        filterName: "accessibilityDefinitionsId",
         paramName: "accessibilityDefinitionsId",
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
-        visualisations: [
-          "Map-based totals"
-        ],
+        visualisations: ["Map-based totals"],
         type: "dropdown",
+        shouldBeFiltered: true,
+        shouldFilterOthers: false,
         forceRequired: true,
-        shouldBeFiltered: false,
-        shouldFilterOthers: true,
         values: {
           source: "metadataTable",
           metadataTableName: "dia_accessibility_definitions",
@@ -158,8 +161,8 @@ export const accessibilityDIA = {
           paramColumn: "id",
           sort: "ascending",
           where: [
-            //{ column: "accessibility_description", operator: "notNull" },
-            //{ column: "main_category", operator: "notNull" },
+            { column: "description", operator: "notNull" },
+            { column: "id", operator: "notNull" },
           ],
         },
       },
