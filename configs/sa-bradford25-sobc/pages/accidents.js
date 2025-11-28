@@ -1,3 +1,5 @@
+import { layers } from "../layers";
+
 export const accidents = {
   pageName: "Accidents",
   url: "/accidents",
@@ -8,9 +10,10 @@ export const accidents = {
   termsOfUse: "bar",
   config: {
     layers: [
+      layers.avpNetworkLineGeometry,
       {
         uniqueId: "DIALevelCrossing",
-        name: "Level Crossing",
+        name: "Level Crossings",
         type: "tile",
         source: "api",
         path: "/api/vectortiles/dia_level_crossing_accident_geometry/{z}/{x}/{y}?network_id={networkId}&programme_id={programmeId}",
@@ -50,30 +53,15 @@ export const accidents = {
             </div>
         `
         }
-      },
-      {
-        name: "Network Line Geometries",
-        type: "tile",
-        source: "api",
-        path: "/api/vectortiles/avp_network_line_geometry/{z}/{x}/{y}?programme_id={programmeId}",
-        sourceLayer: "geometry",
-        geometryType: "line",
-        isHoverable: true,
-        isStylable: false,
-        shouldHaveTooltipOnHover: true,
-        shouldHaveLabel: false,
-        labelZoomLevel: 12,
-        labelNulls: true,
-        hoverNulls: true,
-        hiddenByDefault: false
-      },
+      }
     ],
     visualisations: [
       {
         name: "Map-based totals",
         type: "joinDataToMap",
-        joinLayer: "Level Crossing",
-        style: "circle-continuous",
+        joinLayer: "Level Crossings",
+        style: "circle-categorical",
+        dynamicStyling: true,
         joinField: "id",
         valueField: "value",
         dataSource: "api",
@@ -95,7 +83,11 @@ export const accidents = {
         actions: [
           {
             action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Level Crossing" },
+            payload: { targetLayer: "Level Crossings" },
+          },
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Network" },
           },
           { action: "UPDATE_QUERY_PARAMS" },
         ],
@@ -108,7 +100,9 @@ export const accidents = {
           displayColumn: "network",
           paramColumn: "id",
           sort: "descending",
-          where: [{ column: "id", operator: "notNull" }],
+          where: [{ column: "id", operator: "notNull" },
+            { column: "programme_id", operator: "equals", values: 2 }
+          ],
         },
       },
       // programmeId
@@ -119,16 +113,16 @@ export const accidents = {
         actions: [
           {
             action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Level Crossing" },
+            payload: { targetLayer: "Level Crossings" },
           },
           {
             action: "UPDATE_PARAMETERISED_LAYER",
-            payload: { targetLayer: "Network Line Geometries" },
+            payload: { targetLayer: "Network" },
           },
           { action: "UPDATE_QUERY_PARAMS" },
         ],
         visualisations: ["Map-based totals"],
-        layer: "Level Crossing",
+        layer: "Level Crossings",
         type: "fixed",
         forceRequired: true,
         values: {
@@ -148,7 +142,7 @@ export const accidents = {
         target: "api",
         actions: [{ action: "UPDATE_QUERY_PARAMS" }],
         visualisations: ["Map-based totals"],
-        layer: "Level Crossing",
+        layer: "Level Crossings",
         type: "dropdown",
         values: {
           source: "local",
