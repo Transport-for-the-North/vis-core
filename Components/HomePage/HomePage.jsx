@@ -246,7 +246,7 @@ export const HomePage = () => {
                     <div className="tile-footer">
                       {mapUrl && (
                         <a href={mapUrl} target="_blank" className="go-to-map">
-                          Go to map
+                          Go to Dashboard
                         </a>
                       )}
                     </div>

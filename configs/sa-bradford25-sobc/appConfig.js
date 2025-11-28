@@ -100,7 +100,6 @@ export const appConfig = {
             `,
             sectionTitle: "Distributional Impact Appraisal (DIA)",
             alignment: "left",
-            mapUrl: "/person-centred-analysis",
             image: "img/avp/featuredBlocks/Manchester Piccadilly Station.png",
         }
     ],
