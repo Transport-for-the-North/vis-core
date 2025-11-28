@@ -115,8 +115,12 @@ export const appConfig = {
         pages.pca,
         pages.nac,
         pages.widerImpacts,
-        pages.accessibility
-        
+        pages.accessibility,
+        pages.userBenefits,
+        pages.airQuality,
+        pages.accidents,
+        pages.accessibilityDIA,
+        pages.severance
     ],
     footer: {
         creditsText: "© Transport for the North 2024-5. All rights reserved.",
