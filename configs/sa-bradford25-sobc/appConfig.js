@@ -120,6 +120,7 @@ export const appConfig = {
         pages.userBenefits,
         pages.airQuality,
         pages.accidents,
+        pages.accessibilityDIA,
         pages.severance
     ],
     footer: {

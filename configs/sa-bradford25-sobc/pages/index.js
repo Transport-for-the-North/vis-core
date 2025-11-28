@@ -4,6 +4,7 @@ import { widerImpacts } from './pba-wider-impacts'
 import { accessibility } from './pba-accessibility'
 import { userBenefits } from './userBenefits'
 import { backgroundInfo } from './backgroundInfo'
+import { accessibilityDIA } from './dia-accessibility'
 import { airQuality } from './air-quality'
 import { accidents } from './accidents'
 import { severance } from './severance'
@@ -14,6 +15,7 @@ export const pages = {
     accessibility,
     userBenefits,
     backgroundInfo,
+    accessibilityDIA,
     airQuality,
     accidents,
     severance
