@@ -117,6 +117,7 @@ export const appConfig = {
         pages.nac,
         pages.widerImpacts,
         pages.accessibility,
+        pages.userBenefits,
         pages.airQuality,
         pages.accidents,
         pages.severance
