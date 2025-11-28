@@ -134,7 +134,6 @@
   height: auto;           
   object-fit: cover;       
   border-radius: 12px 12px 0 0;
-  margin-bottom: 1rem;
   display: block;
 }
 
@@ -150,6 +149,9 @@
 
 .tile-section {
   padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .tile-body {
@@ -172,7 +174,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .go-to-map {
