@@ -43,7 +43,7 @@ export const severance = {
                 <span class="metadata-value">{crossing_type}</span>
               </div>
               <div class="metadata-item">
-                <span class="metadata-key">{value}:</span>
+                <span class="metadata-key">Value:</span>
                 <span class="metadata-value">{value}</span>
               </div>
               <div class="metadata-item">
