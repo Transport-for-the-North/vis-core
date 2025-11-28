@@ -268,10 +268,12 @@ export const Dropdown = ({ filter, onChange }) => {
   useEffect(() => {
     // If the selection is now invalid (e.g., filtered out), fall back to a suitable value.
     // For single-select: choose the first visible option (if available) instead of null.
+    // Only fallback if forceRequired is not explicitly set to false
     if (
       !filter.shouldBeBlankOnInit &&
       selectedOptions === undefined &&
-      filterState[filter.id] !== null
+      filterState[filter.id] !== null &&
+      filter.forceRequired !== false
     ) {
       const visible = filter.multiSelect ? options.slice(1) : options;
       const fallback = visible[0]?.value ?? null;
@@ -296,8 +298,13 @@ export const Dropdown = ({ filter, onChange }) => {
       return;
     }
 
-    // If all selected values are now filtered out, fallback to "all visible" to keep selection valid.
-    if (current.length > 0 && next.length === 0) {
+    // Only fallback to "all visible" if forceRequired is true or not explicitly set to false
+    // This allows filters with forceRequired: false to have empty selections
+    const shouldFallbackToAll = filter.forceRequired !== false;
+    
+    // If all selected values are now filtered out, fallback to "all visible" to keep selection valid
+    // but only if the filter is required
+    if (current.length > 0 && next.length === 0 && shouldFallbackToAll) {
       const allVisible = visibleOptions.map((o) => o.value);
       // Mark that 'All' semantic is active so existing logic keeps it updated when options change.
       setIsAllSelected(true);
@@ -345,9 +352,13 @@ export const Dropdown = ({ filter, onChange }) => {
       setIsAllSelected(false);
       onChange(filter, selectedOptions.value);
     } else {
-      // Set state to null when cleared
+      // When cleared, set to null for single-select or empty array for multi-select
       setIsAllSelected(false);
-      onChange(filter, null);
+      if (filter.multiSelect) {
+        onChange(filter, []);
+      } else {
+        onChange(filter, null);
+      }
     }
   };
 
