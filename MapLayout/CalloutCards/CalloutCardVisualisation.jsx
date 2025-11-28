@@ -8,6 +8,7 @@ import { replacePlaceholders } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
+import { getAllColors } from "configs/sa-bradford25-sobc/utils/colors";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
@@ -422,7 +423,7 @@ export const CalloutCardVisualisation = ({
                   };
                   const html = replacePlaceholders(
                     item.fragment,
-                    mergedData, // Here you replace with the data object
+                    mergedData,
                     { customFunctions: customFormattingFunctions }
                   );
                   return (
@@ -437,39 +438,94 @@ export const CalloutCardVisualisation = ({
                   const allGraphs = Object.entries(data)
                     .filter(([key, obj]) => obj && obj.type !== undefined)
                     .map(([key, obj]) => ({ key, ...obj }));
+                  // Association of networks has a colour
+                  const colorsList = getAllColors();
+                  const networkColorMap = {};
+                  let colorIdx = 0;
+                  allGraphs.forEach((chart) => {
+                    if (
+                      chart.type === "multiple_bar" &&
+                      Array.isArray(chart.values)
+                    ) {
+                      chart.values.forEach((obj) => {
+                        const network = obj.network;
+                        if (network && !(network in networkColorMap)) {
+                          networkColorMap[network] =
+                            colorsList[colorIdx % colorsList.length];
+                          colorIdx++;
+                        }
+                      });
+                    }
+                  });
                   return allGraphs.map((chart, idx) => {
-                    const configs = {
+                    let configs;
+                    let chartData;
+
+                    configs = {
                       type: chart.type,
                       title: chart.header || "Title",
                       x_axis_title: chart?.x_axis_title,
                       y_axis_title: chart?.y_axis_title,
-                      columns: chart.values.map((obj) => ({
-                        key: obj.name,
-                        label: obj.name,
-                      })),
+                      colors: networkColorMap
                     };
 
-                    const hasRank = chart.values.some(
-                      (obj) => obj.rank !== undefined
-                    );
+                    if (chart.type === "multiple_bar") {
+                      // Categories = all 'name'
+                      const categories = [
+                        ...new Set(chart.values.map((obj) => obj.name)),
+                      ];
+                      // Series = all networks
+                      const series = [
+                        ...new Set(chart.values.map((obj) => obj.network)),
+                      ];
 
-                    if (hasRank) {
-                      configs.ranks = chart.values.reduce((acc, obj) => {
-                        if (obj.rank !== undefined) {
-                          acc[obj.name] = obj.rank;
-                        }
+                      // Data formatted for grouped bars
+                      chartData = categories.map((cat) => {
+                        const entry = { label: cat };
+                        chart.values.forEach((obj) => {
+                          if (obj.name === cat) {
+                            entry[obj.network] = obj.columnValue;
+                          }
+                        });
+                        return entry;
+                      });
+
+                      configs.columns = series.map((network) => ({
+                        key: network,
+                        label: network,
+                      }));
+                      configs.xKey = "label";
+                    } else {
+                      // Data formatted for single bar
+                      configs.columns = chart.values.map((obj) => ({
+                        key: obj.name,
+                        label: obj.name,
+                      }));
+
+                      chartData = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
                         return acc;
                       }, {});
+
+                      // ranks if necessary
+                      const hasRank = chart.values.some(
+                        (obj) => obj.rank !== undefined
+                      );
+                      if (hasRank) {
+                        configs.ranks = chart.values.reduce((acc, obj) => {
+                          if (obj.rank !== undefined) {
+                            acc[obj.name] = obj.rank;
+                          }
+                          return acc;
+                        }, {});
+                      }
                     }
-                    const data = chart.values.reduce((acc, obj) => {
-                      acc[obj.name] = obj.columnValue;
-                      return acc;
-                    }, {});
+
                     return (
                       <CardContent key={idx}>
                         <ChartRenderer
                           charts={[configs]}
-                          data={data}
+                          data={chartData}
                           formatters={customFormattingFunctions}
                           barHeight={225}
                         />
