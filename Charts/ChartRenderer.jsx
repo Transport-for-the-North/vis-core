@@ -898,7 +898,7 @@ const RankingChart = ({ config, data, formatters }) => {
           justifyContent: "space-between",
         }}
       >
-        <Title>{config.title}</Title>
+        <Title>Top 5 by Accessibility Score</Title>
         {rows.length > 5 ? (
           <ToggleButton onClick={() => setIsOpen(!isOpen)}>
             <RotatingIcon $isOpen={isOpen} />
