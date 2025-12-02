@@ -63,6 +63,16 @@ const FullscreenContainer = styled.div`
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out;
   transform: ${({ $isVisible }) =>
     $isVisible ? "translateX(0)" : "translateX(110%)"};
+
+  /* Tablet & mobile */
+  @media (max-width: 900px) {
+    top: 60%;          
+    left: 0;            
+    right: 0;
+    bottom: 0;
+    padding: 12px;     
+    border-radius: 0;   
+  }
 `;
 
 /**
@@ -119,6 +129,15 @@ const TitleImageTextWrapper = styled.div`
   gap: 2rem;
   min-height: 350px;
   max-height: 350px;
+
+  @media (max-width: 1366px) {
+    flex-direction: column-reverse;
+    margin-top: 50px;
+    width: 100%;
+    justify-content: space-between;
+    min-height: auto;
+    max-height: none;
+  }
 `;
 
 /**
@@ -129,6 +148,9 @@ const TitleTextContainer = styled.div`
   flex-direction: column;
   width: 50%;
   justify-content: center;
+  @media (max-width: 1366px) {
+    width: 100%;
+  }
   @media (max-width: 900px) {
     width: 90%;
     align-items: center;
@@ -146,6 +168,9 @@ const ImageContainer = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
+   @media (max-width: 1366px) {
+    width: 100%;
+  }
 `;
 
 /**
@@ -169,6 +194,11 @@ const Title = styled.p`
   text-align: center;
   white-space: normal;
   line-height: 1;
+
+  /* Laptops (1024px–1366px) */
+  @media (max-width: 1366px) {
+    font-size: 2.2rem !important; /* smaller but still readable */
+  }
 `;
 
 /**

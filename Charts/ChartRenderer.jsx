@@ -238,6 +238,15 @@ const defaultFormatters = {
   },
 };
 
+const formatTwoDp = (v) => {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return String(v ?? "");
+  return n.toLocaleString("en-GB", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  });
+};
+
 /**
  * Transforms configuration columns and data into series format for Recharts
  * @param {Object} config - Chart configuration containing columns definition
@@ -269,6 +278,10 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const hasYLabel = !!config.y_axis_title;
   const formatter = (val) =>
     (formatters.commify || defaultFormatters.commify)(val);
+  const tooltipFormatter = (val) =>
+  formatters.tooltipFormatter
+    ? formatters.tooltipFormatter(val)
+    : formatTwoDp(val);
   const barFill = config.barColor || DEFAULTS.BRAND_COLOR;
   const xAxisHeight = React.useMemo(
     () =>
@@ -345,9 +358,9 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
                   ? {
                       value: config.y_axis_title,
                       position: "left",
-                      angle: -90,
-                      offset: 20,
+                      offset: 0,
                       fontSize: 10,
+                      angle: -90,
                     }
                   : undefined
               }
@@ -373,7 +386,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
             />
           </>
         )}
-        <RTooltip formatter={formatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
         <RBar dataKey="value" name="Value">
           {items.map((entry, idx) => (
             <RCell
@@ -408,6 +421,10 @@ const BarChartMultiple = ({
   const hasYLabel = !!config.y_axis_title;
   const formatter = (val) =>
     (formatters.commify || defaultFormatters.commify)(val);
+  const tooltipFormatter = (val) =>
+  formatters.tooltipFormatter
+    ? formatters.tooltipFormatter(val)
+    : formatTwoDp(val);
   const truncateLabel = (label, maxLen = 7) =>
     label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
   const CustomTick = ({ x, y, payload, angle = 0 }) => (
@@ -507,7 +524,7 @@ const BarChartMultiple = ({
             />
           </>
         )}
-        <RTooltip formatter={formatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
         <RLegend
           verticalAlign="top"
           align="center"
