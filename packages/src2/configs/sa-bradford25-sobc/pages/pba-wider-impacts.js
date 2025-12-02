@@ -1,0 +1,367 @@
+export const widerImpacts = {
+  pageName: "Wider impacts",
+  url: "/wider-impacts",
+  about: `<p>This is customisable 'about' text. Use it to describe what's being visualised and how the user can interact with the data. If required, add more useful context about the data.</p>`,
+  type: "MapLayout",
+  category: "PBA",
+  legalText: "foo",
+  termsOfUse: "bar",
+  config: {
+    layers: [
+      {
+        name: "Zones",
+        type: "tile",
+        source: "api",
+        path: "/api/vectortiles/zones/{zoneTypeId}/{z}/{x}/{y}", // change to a real endpoint
+        sourceLayer: "zones",
+        geometryType: "polygon",
+        visualisationName: "Map-based totals",
+        isHoverable: true,
+        isStylable: true,
+        shouldHaveTooltipOnHover: true,
+        shouldHaveLabel: false,
+        labelZoomLevel: 12,
+        labelNulls: false,
+        hoverNulls: true,
+        hoverTipShouldIncludeMetadata: false,
+        invertedColorScheme: false,
+        // trseLabel: true,
+        outlineOnPolygonSelect: true,
+      },
+    ],
+    visualisations: [
+      {
+        name: "Map-based totals",
+        type: "joinDataToMap",
+        joinLayer: "Zones",
+        style: "polygon",
+        dynamicStyling: true,
+        joinField: "id",
+        valueField: "value",
+        dataSource: "api",
+        dataPath: "/api/pba/wei/zonal-data",
+        // legendText: [
+        //   {
+        //     displayValue: "Zones",
+        //     legendSubtitleText: "£",
+        //   },
+        // ],
+      },
+      {
+        name: "Summary callout card",
+        type: "calloutCard",
+        cardType: "small",
+        cardName: "",
+        dataSource: "api",
+        dataPath: "/api/pba/wei/summary",
+        cardTitle: "NS-SeC distribution for {name}",
+        layout: [
+          {
+            type: "html",
+            fragment: `
+              <h2>{title}</h2>
+            `,
+          },
+          {
+            type: "html",
+            fragment: `
+              <div class="row small">
+                <div class="card small">
+                  <div class="label small">GVA (£)</div>
+                  <div class="value small">{formatNumberWithUnit(gva)}</div>
+                </div>
+                <div class="card small">
+                  <div class="label small">GVA (£) / Job</div>
+                  <div class="value small">{formatNumberWithUnit(gva_per_job)}</div>
+                </div>
+                <div class="card small">
+                  <div class="label small">Population</div>
+                  <div class="value small">{formatNumberWithUnit(population)}</div>
+                </div>
+                <div class="card small">
+                  <div class="label small">Jobs</div>
+                  <div class="value small">{formatNumberWithUnit(jobs)}</div>
+                </div>
+              </div>
+            `,
+          },
+          {
+            type: "charts",
+          },
+          // {
+          //   type: "html",
+          //   fragment: `
+          //     <p>{text}</p>
+          //   `,
+          // },
+        ],
+      },
+      {
+        name: "Zonal callout card",
+        type: "calloutCard",
+        cardType: "small",
+        cardName: "",
+        dataSource: "api",
+        dataPath: "/api/pba/wei/fullinfo",
+        cardTitle: "NS-SeC distribution for {name}",
+        layout: [
+          {
+            type: "html",
+            fragment: `
+              <h2>{title}</h2>
+            `,
+          },
+          {
+            type: "html",
+            fragment: `
+              <div class="row small">
+                <div class="card small">
+                  <div class="label small">GVA (£)</div>
+                  <div class="value small">{formatNumberWithUnit(gva)}</div>
+                </div>
+                <div class="card small">
+                  <div class="label small">GVA (£) / Job</div>
+                  <div class="value small">{formatNumberWithUnit(gva_jobs)}</div>
+                </div>
+                <div class="card small">
+                  <div class="label small">Population</div>
+                  <div class="value small">{formatNumberWithUnit(population)}</div>
+                </div>
+                <div class="card small">
+                  <div class="label small">Jobs</div>
+                  <div class="value small">{formatNumberWithUnit(jobs)}</div>
+                </div>
+              </div>
+            `,
+          },
+          {
+            type: "bar-vertical",
+            title: "Segment Breakdown",
+            maxRows: 5,
+          },
+          // {
+          //   type: "html",
+          //   fragment: `
+          //     <p>{text}</p>
+          //   `,
+          // },
+        ],
+      },
+    ],
+    metadataTables: [
+      {
+        name: "pba_luti_runcodes",
+        path: "/api/getgenericdataset?dataset_id=avp_data.pba_luti_runcodes",
+      },
+      {
+        name: "pba_wider_economic_impacts_luti_definitions",
+        path: "/api/getgenericdataset?dataset_id=avp_data.pba_wider_economic_impacts_luti_definitions",
+      },
+    ],
+    filters: [
+      // zoneTypeId
+      {
+        filterName: "Zones",
+        paramName: "zoneTypeId",
+        target: "api",
+        actions: [
+          {
+            action: "UPDATE_PARAMETERISED_LAYER",
+            payload: { targetLayer: "Zones" },
+          },
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        layer: "Zones",
+        type: "fixed",
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "BRONTE",
+              paramValue: 37,
+            },
+          ]
+        },
+      },
+      // scenario selection
+      {
+        filterName: "Network scenario",
+        paramName: "networkScenario",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "dropdown",
+        forceRequired: true,
+        shouldFilterOthers: true,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "network_scenario",
+          paramColumn: "network_scenario",
+          sort: "ascending",
+          where: [
+            {
+              values: true,
+              operator: "equals",
+            },
+          ],
+        },
+      },
+      // type of network
+      {
+        filterName: "Network type",
+        paramName: "networkType",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "toggle",
+        shouldBeFiltered: true,
+        forceRequired: true,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "network_type",
+          paramColumn: "network_type",
+          sort: "ascending",
+        },
+      },
+      // dataTypeName
+      {
+        filterName: "Metric",
+        paramName: "dataTypeName",
+        target: "api",
+        actions: [
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ],
+        info: "",
+        type: "dropdown",
+        shouldBeBlankOnInit: false,
+        shouldFilterOnValidation: false,
+        shouldBeValidated: false,
+        shouldFilterOthers: true,
+        isClearable: false,
+        multiSelect: false,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_wider_economic_impacts_luti_definitions",
+          displayColumn: "data_type_name",
+          paramColumn: "data_type_name",
+          sort: "ascending",
+        },
+      },
+      {
+        filterName: "Segment",
+        paramName: "segmentName",
+        target: "api",
+        actions: [
+          { action: "UPDATE_QUERY_PARAMS" },
+        ],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ],
+        info: "",
+        type: "dropdown",
+        shouldBeBlankOnInit: false,
+        shouldFilterOnValidation: false,
+        shouldBeFiltered: true,
+        shouldFilterOthers: true,
+        shouldBeValidated: false,
+        isClearable: false,
+        multiSelect: false,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_wider_economic_impacts_luti_definitions",
+          displayColumn: "segment_name",
+          paramColumn: "segment_name",
+          sort: "ascending",
+        },
+      },
+      // year
+      {
+        filterName: "Year",
+        paramName: "year",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "dropdown",
+        forceRequired: true,
+        shouldBeFiltered: true,
+        shouldFilterOthers: true,
+        values: {
+          source: "metadataTable",
+          metadataTableName: "pba_luti_runcodes",
+          displayColumn: "year",
+          paramColumn: "year",
+          sort: "ascending",
+          where: [
+            {
+              values: true,
+              operator: "equals",
+            },
+          ],
+        },
+      },
+      // programmeId
+      {
+        filterName: "programmeId",
+        paramName: "programmeId",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+          "Summary callout card",
+          "Map-based totals",
+        ], // both cards and map
+        type: "fixed",
+        forceRequired: true,
+        values: {
+          source: "local",
+          values: [
+            {
+              displayValue: "2",
+              paramValue: 2, // Put their true value
+            },
+          ],
+        },
+      },
+      // zoneId
+      {
+        filterName: "",
+        paramName: "zoneId",
+        target: "api",
+        actions: [{ action: "UPDATE_QUERY_PARAMS" }],
+        visualisations: [
+          "Zonal callout card",
+        ],
+        type: "map",
+        layer: "Zones",
+        field: "id",
+      },
+    ],
+    additionalFeatures: {},
+  },
+};

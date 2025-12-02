@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import Cookies from "js-cookie";
 import maplibregl from "maplibre-gl";
 import { defaultMapStyle } from "defaults";
 import { defaultMapCentre } from "defaults";
 import { defaultMapZoom } from "defaults";
+import { api } from "services";
 
 /**
  * Custom hook to initialize and manage a MapLibre map.
@@ -52,11 +54,15 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         container.style.width = '100%';
       }
 
-      const styleValue = typeof mapStyle === 'function' ? mapStyle() : (mapStyle || defaultMapStyle());
+      // Compute API base once for transformRequest
+      let apiBaseOrigin = null;
+      try {
+        apiBaseOrigin = new URL(api.baseService.buildAbsoluteUrl("/")).origin;
+      } catch { /* noop */ }
 
       const mapInstance = new maplibregl.Map({
         container,
-        style: styleValue,
+        style: mapStyle || defaultMapStyle,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         // maxZoom: 15,
@@ -77,12 +83,27 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
                   url: new Request(url).url
               }
           }
-      }
-      });
-      mapInstance.on("style.load", () => setIsMapStyleLoaded(true))
-      mapInstance.on("load", () => {
-        setIsMapLoaded(true);
-      });
+
+          // Attach Authorization header for API-origin requests (tiles/sprites/glyphs)
+          try {
+            if (apiBaseOrigin) {
+              const u = new URL(url, window.location.origin);
+              if (u.origin === apiBaseOrigin) {
+                const token = Cookies.get('token');
+                if (token) {
+                  return { url, headers: { Authorization: `Bearer ${token}` } };
+                }
+              }
+            }
+          } catch { /* fall through */ }
+
+          return { url };
+        }
+      })
+        .on("style.load", () => setIsMapStyleLoaded(true))
+        .on("load", () => {
+          setIsMapLoaded(true);
+        });
 
       const nav = new maplibregl.NavigationControl({ showZoom: true, showCompass: true });
       const attrib = new maplibregl.AttributionControl({
