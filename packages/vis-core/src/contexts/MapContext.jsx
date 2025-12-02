@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useContext, useReducer } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { actionTypes, mapReducer } from "reducers";
 import {
   hasRouteParameterOrQuery,
@@ -14,7 +13,8 @@ import {
   getGetParameters,
   buildParamsMap,
   getDefaultLayerBufferSize,
-  applyWhereConditions
+  applyWhereConditions,
+  buildDeterministicFilterId
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
@@ -130,11 +130,17 @@ export const MapProvider = ({ children }) => {
       const filters = [];
       const filterState = {};
       const paramNameToUuidMap = {};
+      const usedFilterIds = new Set();
 
       for (const filter of pageContext.config.filters) {
-        const filterWithId = { ...filter, id: uuidv4() }; // Add unique ID to each filter
+        // Build deterministic ID for each filter
+        const deterministicId = buildDeterministicFilterId(filter, usedFilterIds);
+        const filterWithId = { ...filter, id: deterministicId };
         paramNameToUuidMap[filter.paramName] = filterWithId.id; // Add mapping from paramName to UUID
 
+        
+      // Keep the existing action naming for compatibility; value is no longer a UUID
+      paramNameToUuidMap[filter.paramName] = filterWithId.id;
         switch (filter.type) {
           case 'map':
           case 'slider':
