@@ -15,7 +15,7 @@ export const appConfig = {
         This platform contains a mix of interactive <strong>web-based dashboards</strong>, one for each <em>strategic analysis workstream</em>. The four strategic analysis workstreams constitute:
     </p>
     <ul>
-        <li><strong>People-Centred Analysis (PCA)</strong></li>
+        <li><strong>Person-Centred Analysis (PCA)</strong></li>
         <li><strong>Network Appraisal Criteria (NAC)</strong></li>
         <li><strong>Place-Based Analysis (PBA)</strong></li>
         <li><strong>Distributional Impacts Appraisal (DIA)</strong></li>
@@ -28,12 +28,12 @@ export const appConfig = {
         {
             content: `
         <p>
-        People Centred Analysis is a method of relaying technical outputs in a relatable and individual-focused manner and can add real 
+        Person-Centred Analysis is a method of relaying technical outputs in a relatable and individual-focused manner and can add real 
         value to transport scheme business cases through highlighting the human perspective on the case for investment.
          The outputs of this workstream, presented as a set of Narratives/Personas, are tailored to specific programmes 
         and often involve working with local partners and authorities to ensure their relevancy.  
          </p>`,
-            sectionTitle: "People Centred Analysis (PCA)",
+            sectionTitle: "Person-Centred Analysis (PCA)",
             alignment: "left",
             mapUrl: "/person-centred-analysis",
             image: "img/avp/featuredBlocks/7.png",
