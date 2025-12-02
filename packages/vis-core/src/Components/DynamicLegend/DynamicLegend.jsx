@@ -360,6 +360,46 @@ const isRenderableEntry = (e) => {
 };
 
 /**
+ * Gets the width for a legend entry based on layer type and paint properties.
+ * 
+ * This function determines the appropriate width/diameter for legend swatches by:
+ * 1. Using the widthStop value if available (from data-driven styling)
+ * 2. Returning null for mobile devices to allow CSS handling
+ * 3. For circle layers: using circle-radius * 2 or defaulting to 10px
+ * 4. For line layers: searching paintProps["line-width"] array for the label 
+ *    and returning the next index value, or defaulting to 2px
+ * 5. For other layer types: defaulting to 10px
+ * 
+ * @param {Object|null} widthStop - Width stop object with a width property from data-driven styling
+ * @param {boolean} isMobile - Whether the current viewport is mobile (≤ 900px)
+ * @param {Object} layer - The map layer object containing type and other metadata
+ * @param {Object} paintProps - The layer's paint properties containing style definitions
+ * @param {string|number} label - The current legend entry label used for line width lookup
+ * @returns {number|null} The calculated width in pixels, or null for mobile devices
+ */
+const getEntryWidth = (widthStop, isMobile, layer, paintProps, label) => {
+  if (widthStop) return widthStop.width;
+  if (isMobile) return null;
+  
+  if (layer.type === "circle") {
+    return typeof paintProps["circle-radius"] === "number" ? paintProps["circle-radius"] * 2 : 10;
+  }
+  
+  if (layer.type === "line") {
+    const lineWidthArray = paintProps["line-width"];
+    if (Array.isArray(lineWidthArray)) {
+      const labelIndex = lineWidthArray.indexOf(label);
+      return labelIndex !== -1 && labelIndex < lineWidthArray.length - 1 
+        ? lineWidthArray[labelIndex + 1] 
+        : 2;
+    }
+    return 2;
+  }
+  
+  return 10;
+};
+
+/**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
  * It listens for changes in the map's style and updates the legend items accordingly. Each legend
  * item displays color and/or width swatches along with labels indicating the corresponding values.
@@ -376,6 +416,7 @@ export const DynamicLegend = ({ map }) => {
   const legendRef = useRef(null);
   const currentPage = useContext(PageContext);
   const pageCategory = currentPage.category || currentPage.pageName;
+
   useEffect(() => {
     if (!map) return;
 
@@ -543,9 +584,10 @@ export const DynamicLegend = ({ map }) => {
               } else {
                 label = stop.value;
               }
+              
               legendEntries.push({
                 color: stop.color,
-                width: widthStop ? widthStop.width: isMobile ? null : (layer.type === "circle" ? (typeof paintProps["circle-radius"] === "number"? paintProps["circle-radius"] * 2 : 10): (layer.type === "line" ? 2 : 10)),
+                width: getEntryWidth(widthStop, isMobile, layer, paintProps, label),
                 label,
                 type: layer.type,
               });
