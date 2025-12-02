@@ -987,7 +987,7 @@ export const ChartRenderer = ({
       )
     : data && Object.values(data).some((v) => (Number(v) || 0) > 0);
 
-  if (!hasAny) return <WarningBox text="No data available for selection" />;
+  if (!hasAny) return null;
 
   return (
     <div>
