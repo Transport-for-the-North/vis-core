@@ -1,5 +1,27 @@
 import { formatNumber, formatOrdinal } from "./text";
 
+const autoFormatSimpleValue = (value) => {
+  // numbers: format >= 1000 with commas
+  if (typeof value === "number") {
+    if (Math.abs(value) >= 1000) {
+      return formatNumber(value); // already imported
+    }
+    return String(value);
+  }
+
+  // numeric strings: treat like numbers
+  if (typeof value === "string" && value.trim() !== "" && !isNaN(value)) {
+    const num = Number(value);
+    if (Math.abs(num) >= 1000) {
+      return formatNumber(num);
+    }
+    return value;
+  }
+
+  // everything else
+  return String(value ?? "");
+};
+
 /**
  * Replace placeholders in the `target` object with values from the `source` object.
  *
@@ -224,7 +246,7 @@ export const replacePlaceholders = (htmlFragment, data, options = {}) => {
     if (value === undefined) {
       return options.keepUndefined ? match : "N/A";
     }
-    return value;
+    return autoFormatSimpleValue(value);
   });
 
   return result;
