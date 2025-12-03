@@ -109,6 +109,7 @@ export const useFetchVisualisationData = (
         queryParams: queryParamsForApi,
         skipAuth: !requiresAuth,
       });
+            
       setRawData(responseData);
       // If no viewport filtering is requested, set filteredData immediately.
       if (!map || !mapLayerId) {
