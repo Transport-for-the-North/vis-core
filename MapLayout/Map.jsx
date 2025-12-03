@@ -425,6 +425,8 @@ const Map = (props) => {
         const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
         const featureValue = feature.state.value;
+        const hideValueInTooltip = layerConfig?.hideValueInTooltip ?? false; 
+
         if (
           !hoverNulls &&
           (featureValue === null || featureValue === undefined)
@@ -442,7 +444,7 @@ const Map = (props) => {
 
         const featureName = feature.properties.name || "";
         const featureValueDisplay =
-          featureValue !== undefined && featureValue !== null
+          !hideValueInTooltip && featureValue !== undefined && featureValue !== null
             ? numberWithCommas(featureValue)
             : "";
         const layerVisualisationName =

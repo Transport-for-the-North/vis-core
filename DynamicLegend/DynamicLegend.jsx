@@ -436,6 +436,11 @@ export const DynamicLegend = ({ map }) => {
             return state.visualisations[key].joinLayer === layer.id;
           });
           const visualisation = state.visualisations[visualisationKey];
+
+          if (visualisation && visualisation.name === "Station Link Totals") {
+            return null;
+          }
+          
           // Get legendText from visualisation
           const legendText = visualisation?.legendText || [];
 
