@@ -137,6 +137,7 @@ const TitleImageTextWrapper = styled.div`
     justify-content: space-between;
     min-height: auto;
     max-height: none;
+    gap: 0.5rem;
   }
 `;
 
@@ -170,6 +171,8 @@ const ImageContainer = styled.div`
   overflow: hidden;
    @media (max-width: 1366px) {
     width: 100%;
+    min-height: auto;
+    max-height: none;
   }
 `;
 
