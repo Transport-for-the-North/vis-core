@@ -298,6 +298,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const chartMargin = { ...DEFAULTS.MARGIN };
   if (hasXLabel || hasYLabel) {
     chartMargin.bottom = 20;
+    chartMargin.left = 40;
   }
 
   return (
@@ -343,9 +344,10 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
                 hasYLabel
                   ? {
                       value: config.y_axis_title,
-                      position: "bottom",
-                      offset: 10,
-                      fontSize: 14,
+                      position: "left",
+                      angle: -90,
+                      offset: 20,
+                      fontSize: 10,
                     }
                   : undefined
               }
@@ -408,21 +410,23 @@ const BarChartMultiple = ({
     (formatters.commify || defaultFormatters.commify)(val);
   const truncateLabel = (label, maxLen = 7) =>
     label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
-const CustomTick = ({ x, y, payload, angle = 0 }) => (
-  <text
-    x={x}
-    y={y}
-    dy={angle ? 16 : 4}
-    textAnchor="end"
-    fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
-    transform={angle ? `rotate(${angle}, ${x}, ${y})` : undefined}
-  >
-    {truncateLabel(payload.value)}
-  </text>
-);
+  const CustomTick = ({ x, y, payload, angle = 0 }) => (
+    <text
+      x={x}
+      y={y}
+      dy={angle ? 16 : 4}
+      textAnchor="end"
+      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+      transform={angle ? `rotate(${angle}, ${x}, ${y})` : undefined}
+    >
+      {truncateLabel(payload.value)}
+    </text>
+  );
+  const yTickFormatter = (val) => Number(val).toFixed(2);
   const chartMargin = { ...DEFAULTS.MARGIN };
   if (hasXLabel || hasYLabel) {
     chartMargin.bottom = 20;
+    chartMargin.left = 20;
   }
   return (
     <ChartSection
@@ -480,22 +484,21 @@ const CustomTick = ({ x, y, payload, angle = 0 }) => (
           <>
             <RXAxis
               dataKey={config.xKey || "label"}
-              tick={<CustomTick angle={-45}/>}
+              tick={<CustomTick angle={-45} />}
               interval={0}
             />
             <RYAxis
               domain={[0, "dataMax"]}
               allowDataOverflow
               allowDecimals={false}
-              tickFormatter={formatter}
-              tick={<CustomTick />}
+              tickFormatter={yTickFormatter}
               width={DEFAULTS.DIMENSIONS.yAxisWidth}
               label={
                 hasYLabel
                   ? {
                       value: config.y_axis_title,
                       position: "left",
-                      offset: 0,
+                      offset: 10,
                       fontSize: 10,
                       angle: -90,
                     }
