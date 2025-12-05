@@ -363,6 +363,8 @@ const DualMaps = (props) => {
           const layerVisualisationName = state.layers[layerId]?.visualisationName;
           const legendText =
             state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
+          const valueText =
+            state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
 
           let description = "";
 
@@ -372,6 +374,7 @@ const DualMaps = (props) => {
               featureName,
               featureValueDisplay,
               legendText,
+              valueText
             });
 
             // Inject additional metadata if enabled
@@ -398,6 +401,7 @@ const DualMaps = (props) => {
                 featureName,
                 featureValueDisplay,
                 legendText,
+                valueText
               });
 
               // Inject additional metadata if enabled

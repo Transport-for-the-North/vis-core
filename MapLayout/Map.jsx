@@ -451,6 +451,8 @@ const Map = (props) => {
           state.layers[layerId]?.visualisationName;
         const legendText =
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
+        const valueText =
+          state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
 
   let description = "";
 
@@ -460,6 +462,7 @@ const Map = (props) => {
             featureName,
             featureValueDisplay,
             legendText,
+            valueText
           });
 
           // Inject additional metadata if available and enabled
@@ -485,6 +488,7 @@ const Map = (props) => {
               featureName,
               featureValueDisplay,
               legendText,
+              valueText
             });
 
             // Inject additional metadata if available and enabled
