@@ -9,6 +9,7 @@ export function buildDefaultTooltip({
   featureName,
   featureValueDisplay,
   legendText,
+  valueText,
   metadataHtml = "",
 }) {
   const hasValue = featureValueDisplay !== undefined && featureValueDisplay !== null && featureValueDisplay !== "";
@@ -23,7 +24,7 @@ export function buildDefaultTooltip({
         <p class="feature-name">${featureName}</p>
         <hr class="divider">
         <div class="metadata-item">
-          <span class="metadata-key">Value:</span>
+          <span class="metadata-key">${valueText}:</span>
           <span class="metadata-value">${featureValueDisplay} ${legendText ?? ""}</span>
         </div>
         ${metadataHtml}
@@ -43,7 +44,7 @@ export function buildDefaultTooltip({
     return `
       <div class="popup-content">
         <div class="metadata-item">
-          <span class="metadata-key">Value:</span>
+          <span class="metadata-key">${valueText}:</span>
           <span class="metadata-value">${featureValueDisplay} ${legendText ?? ""}</span>
         </div>
         ${metadataHtml}
