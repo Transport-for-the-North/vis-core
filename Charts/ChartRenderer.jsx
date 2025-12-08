@@ -358,8 +358,8 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
                   ? {
                       value: config.y_axis_title,
                       position: "left",
-                      offset: 0,
-                      fontSize: 10,
+                      offset: 20,
+                      fontSize: 14,
                       angle: -90,
                     }
                   : undefined
@@ -918,7 +918,7 @@ const RankingChart = ({ config, data, formatters }) => {
           justifyContent: "space-between",
         }}
       >
-        <Title>Top 5 by Accessibility Score</Title>
+        <Title>{config.title}</Title>
         {rows.length > 5 ? (
           <ToggleButton onClick={() => setIsOpen(!isOpen)}>
             <RotatingIcon $isOpen={isOpen} />
