@@ -166,7 +166,10 @@ const CircleSwatch = styled.div`
 const LineSwatch = styled.div`
   width: 50px;
   height: ${(props) => props.height}px;
-  background-color: ${(props) => props.color};
+  ${(props) => props.isDashed 
+    ? `border-top: ${props.height}px dashed ${props.color}; background-color: transparent;`
+    : `background-color: ${props.color};`
+  }
   margin-right: 5px;
 `;
 
@@ -595,6 +598,7 @@ export const DynamicLegend = ({ map }) => {
                 width: getEntryWidth(widthStop, isMobile, layer, paintProps, label),
                 label,
                 type: layer.type,
+                dashArray: paintProps["line-dasharray"],
               });
             }
           }
@@ -623,6 +627,7 @@ export const DynamicLegend = ({ map }) => {
                 width: defaultWidth,
                 label: title,
                 type: layer.type,
+                dashArray: paintProps["line-dasharray"],
               });
             } else {
               // If there is exactly one entry, force the label to be the layer name.
@@ -700,7 +705,11 @@ export const DynamicLegend = ({ map }) => {
                   {item.type === "circle" ? (
                     <CircleSwatch diameter={entry.width || 10} color={entry.color} />
                   ) : item.type === "line" ? (
-                    <LineSwatch height={entry.width || 2} color={entry.color} />
+                    <LineSwatch 
+                      height={entry.width || 2} 
+                      color={entry.color} 
+                      isDashed={Array.isArray(entry.dashArray) && entry.dashArray.length > 0}
+                    />
                   ) : item.type === "fill" ? (
                     <PolygonSwatch color={entry.color} />
                   ) : null}
@@ -722,6 +731,7 @@ export const DynamicLegend = ({ map }) => {
                       <LineSwatch
                         height={entry.width || 2}
                         color={entry.color}
+                        isDashed={Array.isArray(entry.dashArray) && entry.dashArray.length > 0}
                       />
                     ) : entry.type === "fill" ? (
                       <PolygonSwatch
