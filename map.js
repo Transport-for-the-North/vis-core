@@ -645,8 +645,8 @@ export const resetPaintProperty = (style) => {
     case "point-diverging":
       return {
         "circle-color": "rgb(0, 0, 0)",
-        "circle-stroke-width": 0.5,
-        "circle-opacity": 0.65,
+        "circle-stroke-width": 0.0,
+        "circle-opacity": 0.0,
         "circle-radius": [
           "interpolate",
           ["linear"],
