@@ -391,7 +391,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
           {items.map((entry, idx) => (
             <RCell
               key={`cell-${idx}`}
-              fill={config.colors[entry.label] || DEFAULTS.BRAND_COLOR}
+              fill={(config.colors && config.colors[entry.label]) || DEFAULTS.BRAND_COLOR}
             />
           ))}
         </RBar>
@@ -535,7 +535,7 @@ const BarChartMultiple = ({
             key={col.key}
             dataKey={col.key}
             name={col.label}
-            fill={config.colors[col.key]}
+            fill={(config.colors && config.colors[col.key]) || DEFAULT_COLORS[idx % DEFAULT_COLORS.length]}
             barSize={DEFAULTS.BAR_SIZE || 24}
             isAnimationActive={false}
           />
