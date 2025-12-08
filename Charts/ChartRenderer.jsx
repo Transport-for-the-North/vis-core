@@ -318,7 +318,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={height}
+      height={items.length * 33.3}  // Dynamic height, each line is equivalent to 33.3px
     >
       <RBarChart
         data={items}
