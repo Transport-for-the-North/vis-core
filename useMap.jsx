@@ -100,11 +100,13 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
 
           return { url };
         }
-      })
-        .on("style.load", () => setIsMapStyleLoaded(true))
-        .on("load", () => {
-          setIsMapLoaded(true);
-        });
+      });
+
+      // Add event listeners after map creation
+      mapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      mapInstance.on("load", () => {
+        setIsMapLoaded(true);
+      });
 
       const nav = new maplibregl.NavigationControl({ showZoom: true, showCompass: true });
       const attrib = new maplibregl.AttributionControl({
