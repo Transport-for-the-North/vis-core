@@ -358,8 +358,8 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
                   ? {
                       value: config.y_axis_title,
                       position: "left",
-                      offset: 0,
-                      fontSize: 10,
+                      offset: 20,
+                      fontSize: 14,
                       angle: -90,
                     }
                   : undefined
@@ -391,7 +391,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
           {items.map((entry, idx) => (
             <RCell
               key={`cell-${idx}`}
-              fill={config.colors[entry.label] || DEFAULTS.BRAND_COLOR}
+              fill={(config.colors && config.colors[entry.label]) || DEFAULTS.BRAND_COLOR}
             />
           ))}
         </RBar>
@@ -535,7 +535,7 @@ const BarChartMultiple = ({
             key={col.key}
             dataKey={col.key}
             name={col.label}
-            fill={config.colors[col.key]}
+            fill={(config.colors && config.colors[col.key]) || DEFAULT_COLORS[idx % DEFAULT_COLORS.length]}
             barSize={DEFAULTS.BAR_SIZE || 24}
             isAnimationActive={false}
           />
@@ -918,7 +918,7 @@ const RankingChart = ({ config, data, formatters }) => {
           justifyContent: "space-between",
         }}
       >
-        <Title>Top 5 by Accessibility Score</Title>
+        <Title>{config.title}</Title>
         {rows.length > 5 ? (
           <ToggleButton onClick={() => setIsOpen(!isOpen)}>
             <RotatingIcon $isOpen={isOpen} />

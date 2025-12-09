@@ -469,6 +469,18 @@ export const CalloutCardVisualisation = ({
                       colors: networkColorMap
                     };
 
+                    // Dynamic title for ranking charts
+                    if (
+                      (chart.type === "ranking" &&
+                        visualisation.queryParams?.dataTypeName?.value !==
+                          undefined) ||
+                      null
+                    ) {
+                      configs.title =
+                        "Top 5 by " +
+                        visualisation.queryParams.dataTypeName.value;
+                    }
+
                     if (chart.type === "multiple_bar") {
                       // Categories = all 'name'
                       const categories = [
