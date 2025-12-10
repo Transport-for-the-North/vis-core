@@ -311,17 +311,18 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
 
   const CustomTick = (props) => {
     const { x, y, payload } = props;
-    const lines = wrapLabel(payload.value, 20).split("\n"); // 20 letters max
+    const lines = wrapLabel(payload.value, 20).split("\n"); // Cut the label after a space and 20 characters and create an array
+    const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2; // adjust to center
+
     return (
       <text
         x={x}
-        y={y}
-        dy={4}
+        y={startY}
         textAnchor="end"
         fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
       >
         {lines.map((line, i) => (
-          <tspan x={x} dy={i === 0 ? 0 : 16} key={i}>
+          <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize} key={i}>
             {line}
           </tspan>
         ))}
