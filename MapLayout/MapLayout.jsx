@@ -106,6 +106,33 @@ export const MapLayout = () => {
   };
 
   useEffect(() => {
+    const runFilter = state.filters.find((f) => f.paramName === "runCodeId");
+    const zoneFilter = state.filters.find((f) => f.paramName === "zoneTypeId");
+
+    if (runFilter && zoneFilter) {
+      const selectedRunId = filterState[runFilter.id];
+      const runMetadataName = runFilter.values?.metadataTableName;
+      const runMetadata = runMetadataName ? state.metadataTables[runMetadataName] : null;
+
+      if (selectedRunId != null && Array.isArray(runMetadata)) {
+        const runRow = runMetadata.find(
+          (row) => row?.[runFilter.values.paramColumn] === selectedRunId
+        );
+        const derivedZoneTypeId = runRow?.zone_type_id;
+
+        if (
+          derivedZoneTypeId != null &&
+          filterState[zoneFilter.id] !== derivedZoneTypeId
+        ) {
+          filterDispatch({
+            type: "SET_FILTER_VALUE",
+            payload: { filterId: zoneFilter.id, value: derivedZoneTypeId },
+          });
+          return;
+        }
+      }
+    }
+
     const validatedFilters = updateFilterValidity(state, filterState);
 
     dispatch({
@@ -151,7 +178,7 @@ export const MapLayout = () => {
         });
       }
     });
-  }, [filterState, state.metadataTables, dispatch]);
+  }, [filterState, state.metadataTables, state.filters, dispatch, filterDispatch]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
