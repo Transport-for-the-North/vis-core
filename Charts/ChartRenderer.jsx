@@ -291,19 +291,41 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
       ),
     [config, items]
   );
-  const truncateLabel = (label, maxLen = 18) =>
-    label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
+
+  // Function to wrap long labels into multiple lines after a certain length and a space
+  const wrapLabel = (label, maxLen = 15) => {
+    const words = label.split(" ");
+    let lines = [];
+    let currentLine = "";
+    words.forEach((word) => {
+      if ((currentLine + " " + word).trim().length > maxLen) {
+        lines.push(currentLine.trim());
+        currentLine = word;
+      } else {
+        currentLine += " " + word;
+      }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+    return lines.join("\n");
+  };
+
   const CustomTick = (props) => {
     const { x, y, payload } = props;
+    const lines = wrapLabel(payload.value, 20).split("\n"); // Cut the label after a space and 20 characters and create an array
+    const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2; // adjust to center
+
     return (
       <text
         x={x}
-        y={y}
-        dy={4}
+        y={startY}
         textAnchor="end"
         fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
       >
-        {truncateLabel(payload.value)}
+        {lines.map((line, i) => (
+          <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize} key={i}>
+            {line}
+          </tspan>
+        ))}
       </text>
     );
   };
@@ -318,7 +340,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={height}
+      height={items.length * 45} // Dynamic height, each line is equivalent to 45px
     >
       <RBarChart
         data={items}
