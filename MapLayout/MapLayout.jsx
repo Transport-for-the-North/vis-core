@@ -105,48 +105,64 @@ export const MapLayout = () => {
     });
   };
 
+  /**
+   * Keep derived filters in sync with their source selection and metadata.
+   * For every filter that declares `deriveFromFilter`, we:
+   * - read the current value of its source filter (`sourceParamName`)
+   * - optionally apply override rules driven by other controller filters
+   * - otherwise look up a preferred/fallback value from the source metadata (`metadataColumn`)
+   * - sync the derived filter to the resolved value, or clear it if no match
+   */
   useEffect(() => {
-    const zoneFiltersToSync = state.filters.filter((filter) => filter.syncWithRunFilter);
+    const derivedFilters = state.filters.filter((filter) => filter.deriveFromFilter);
 
-    for (const zoneFilter of zoneFiltersToSync) {
-      const { runParamName, metadataColumn = "zone_type_id", preferredValues = [] } =
-        zoneFilter.syncWithRunFilter;
+    for (const derivedFilter of derivedFilters) {
+      const {
+        sourceParamName,
+        metadataColumn,
+        preferredValues = [],
+      } = derivedFilter.deriveFromFilter ?? {};
 
-      const runFilter = state.filters.find((f) => f.paramName === runParamName);
-      if (!runFilter) {
+      if (!sourceParamName) {
         continue;
       }
 
-      const selectedRunId = filterState[runFilter.id];
-      const runMetadataName = runFilter.values?.metadataTableName;
-      const runMetadata = runMetadataName ? state.metadataTables[runMetadataName] : null;
+      const sourceFilter = state.filters.find((f) => f.paramName === sourceParamName);
+      if (!sourceFilter) {
+        continue;
+      }
 
-      let derivedZoneTypeId = null;
+      const selectedSourceValue = filterState[sourceFilter.id];
+      const sourceMetadataName = sourceFilter.values?.metadataTableName;
+      const sourceMetadata = sourceMetadataName ? state.metadataTables[sourceMetadataName] : null;
 
-      if (Array.isArray(zoneFilter.controllerOverrides)) {
-        for (const override of zoneFilter.controllerOverrides) {
+      let derivedValue = null;
+
+      if (Array.isArray(derivedFilter.overrideRules)) {
+        for (const rule of derivedFilter.overrideRules) {
           const controllerFilter = state.filters.find(
-            (f) => f.paramName === override.controllerParamName
+            (f) => f.paramName === rule.controllerParamName
           );
           if (!controllerFilter) continue;
 
           const controllerValue =
             filterState[controllerFilter.id] ?? controllerFilter.defaultValue ?? null;
 
-          if (controllerValue === override.controllerValue) {
-            derivedZoneTypeId = override.zoneTypeId;
+          if (controllerValue === rule.controllerValue) {
+            derivedValue = rule.derivedValue;
             break;
           }
         }
       }
 
       if (
-        derivedZoneTypeId == null &&
-        selectedRunId != null &&
-        Array.isArray(runMetadata)
+        derivedValue == null &&
+        selectedSourceValue != null &&
+        metadataColumn &&
+        Array.isArray(sourceMetadata)
       ) {
-        const matchingRows = runMetadata.filter(
-          (row) => row?.[runFilter.values.paramColumn] === selectedRunId
+        const matchingRows = sourceMetadata.filter(
+          (row) => row?.[sourceFilter.values.paramColumn] === selectedSourceValue
         );
 
         if (matchingRows.length > 0) {
@@ -158,30 +174,30 @@ export const MapLayout = () => {
           }
 
           const fallbackRow = preferredRow ?? matchingRows[0];
-          derivedZoneTypeId = fallbackRow?.[metadataColumn] ?? null;
+          derivedValue = fallbackRow?.[metadataColumn] ?? null;
         }
       }
 
-      const currentZoneValue = filterState[zoneFilter.id];
+      const currentDerivedValue = filterState[derivedFilter.id];
 
       if (
-        derivedZoneTypeId !== null &&
-        derivedZoneTypeId !== currentZoneValue
+        derivedValue !== null &&
+        derivedValue !== currentDerivedValue
       ) {
         filterDispatch({
           type: "SET_FILTER_VALUE",
-          payload: { filterId: zoneFilter.id, value: derivedZoneTypeId },
+          payload: { filterId: derivedFilter.id, value: derivedValue },
         });
         return;
       }
 
       if (
-        derivedZoneTypeId === null &&
-        currentZoneValue != null
+        derivedValue === null &&
+        currentDerivedValue != null
       ) {
         filterDispatch({
           type: "SET_FILTER_VALUE",
-          payload: { filterId: zoneFilter.id, value: null },
+          payload: { filterId: derivedFilter.id, value: null },
         });
         return;
       }
