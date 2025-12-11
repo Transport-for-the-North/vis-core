@@ -371,7 +371,7 @@ export const LayerControlEntry = memo(
         {/* Collapsible Content with Animation */}
         <CollapsibleContent isExpanded={isExpanded}>
           {/* Layer Search (if applicable) */}
-          {layer.metadata?.path && (
+          {layer.metadata?.path && layer.id !== "Network" && (
             <LayerSearch map={maps[0]} layer={layer} />
           )}
           {/* Opacity Control */}

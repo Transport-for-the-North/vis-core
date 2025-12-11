@@ -7,7 +7,7 @@ import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 import { AppContext } from "contexts";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from "./MapFeatureSelect";
 import { CheckboxSelector, MapFeatureSelectAndPan } from ".";
 import { api } from "services";
@@ -132,6 +132,34 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     ? filters.filter((filter) => filter.type === "map" && filter.filterName)
     : [];
 
+ /**
+ * Initialise "hidetoggle" filters with their default values.
+ *
+ * This effect runs whenever `filters`, `filterState` or `onFilterChange` change.
+ * It looks for filters whose `type` is `"hidetoggle"` and, if a filter does not
+ * yet have a value in `filterState`, it applies the filter's first configured
+ * `paramValue` as its initial value by calling `onFilterChange`.
+ *
+ * This ensures that hide-toggle filters always start in a consistent, defined
+ * state without overwriting any value that has already been chosen by the user.
+ */
+
+  useEffect(() => {
+    if (!Array.isArray(filters)) return;
+
+    filters
+      .filter((f) => f.type === "hidetoggle")
+      .forEach((filter) => {
+        const currentValue = filterState[filter.id];
+        const defaultValue = filter.values?.values?.[0]?.paramValue;
+
+        // Only initialise if we don't already have a value
+        if (currentValue === undefined && defaultValue !== undefined) {
+          onFilterChange(filter, defaultValue);
+        }
+      });
+  }, [filters, filterState, onFilterChange]);
+
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {/* Display a warning message if no data is available - sticky at top */}
@@ -152,80 +180,82 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
           {filters
             .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
             .map((filter) => (
-              <SelectorContainer key={filter.id}>
-                {filter.type !== "map" && <SelectorLabel
-                  htmlFor={filter.paramName}
-                  text={filter.filterName}
-                  info={filter.info ?? null}
-                />}
-                {filter.type === "dropdown" && (
-                  <Dropdown
-                    key={filter.id}
-                    filter={filter}
-                    value={filterState[filter.id]}
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                  />
-                )}
-                {filter.type === "slider" && (
-                  <Slider
-                    key={filter.id}
-                    filter={filter}
-                    value={filterState[filter.id] || filter.min || filter.values[0]}
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                  />
-                )}
-                {filter.type === "toggle" && (
-                  <Toggle
-                    key={filter.id}
-                    filter={filter}
-                    value={
-                      filterState[filter.id] ||
-                      filter.values.values[0].paramValue
-                    }
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                    bgColor={bgColor}
-                  />
-                )}
-                {filter.type === "checkbox" && (
-                  <CheckboxSelector
-                    key={filter.id}
-                    filter={filter}
-                    value={
-                      filterState[filter.id] ||
-                      filter.values.values[0].paramValue
-                    }
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                    bgColor={bgColor}
-                  />
-                )}
-                {filter.type === "mapFeatureSelect" && (
-                  <MapFeatureSelect
-                    key={filter.id}
-                    filter={filter}
-                    value={filterState[filter.id]}
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                    bgColor={bgColor}
-                  />
-                )}
-                {filter.type === "mapFeatureSelectWithControls" && (
-                  <MapFeatureSelectWithControls
-                    key={filter.id}
-                    filter={filter}
-                    value={filterState[filter.id]}
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                    bgColor={bgColor}
-                  />
-                )}
-                {filter.type === "mapFeatureSelectAndPan" && (
-                  <MapFeatureSelectAndPan
-                    key={filter.id}
-                    filter={filter}
-                    value={filterState[filter.id]}
-                    onChange={(filter, value) => handleFilterChange(filter, value)}
-                    bgColor={bgColor}
-                  />
-                )}
-              </SelectorContainer>
+              filter.type === "hidetoggle" ? null : (
+                <SelectorContainer key={filter.id}>
+                  {filter.type !== "map" && <SelectorLabel
+                    htmlFor={filter.paramName}
+                    text={filter.filterName}
+                    info={filter.info ?? null}
+                  />}
+                  {filter.type === "dropdown" && (
+                    <Dropdown
+                      key={filter.id}
+                      filter={filter}
+                      value={filterState[filter.id]}
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                    />
+                  )}
+                  {filter.type === "slider" && (
+                    <Slider
+                      key={filter.id}
+                      filter={filter}
+                      value={filterState[filter.id] || filter.min || filter.values[0]}
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                    />
+                  )}
+                  {filter.type === "toggle" && (
+                    <Toggle
+                      key={filter.id}
+                      filter={filter}
+                      value={
+                        filterState[filter.id] ||
+                        filter.values.values[0].paramValue
+                      }
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      bgColor={bgColor}
+                    />
+                  )}
+                  {filter.type === "checkbox" && (
+                    <CheckboxSelector
+                      key={filter.id}
+                      filter={filter}
+                      value={
+                        filterState[filter.id] ||
+                        filter.values.values[0].paramValue
+                      }
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      bgColor={bgColor}
+                    />
+                  )}
+                  {filter.type === "mapFeatureSelect" && (
+                    <MapFeatureSelect
+                      key={filter.id}
+                      filter={filter}
+                      value={filterState[filter.id]}
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      bgColor={bgColor}
+                    />
+                  )}
+                  {filter.type === "mapFeatureSelectWithControls" && (
+                    <MapFeatureSelectWithControls
+                      key={filter.id}
+                      filter={filter}
+                      value={filterState[filter.id]}
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      bgColor={bgColor}
+                    />
+                  )}
+                  {filter.type === "mapFeatureSelectAndPan" && (
+                    <MapFeatureSelectAndPan
+                      key={filter.id}
+                      filter={filter}
+                      value={filterState[filter.id]}
+                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      bgColor={bgColor}
+                    />
+                  )}
+                </SelectorContainer>
+              )
           ))}
           {downloadPath && (
             <DownloadButton 
