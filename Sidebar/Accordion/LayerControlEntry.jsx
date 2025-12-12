@@ -233,6 +233,7 @@ export const LayerControlEntry = memo(
     const enforceNoColourSchemeSelector = layer.metadata?.enforceNoColourSchemeSelector ?? false;
     const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
     const widthProp = getWidthProperty(layer.type);
+    const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
 
     let currentWidthFactor = null;
     let currentOpacity = null;
@@ -371,7 +372,7 @@ export const LayerControlEntry = memo(
         {/* Collapsible Content with Animation */}
         <CollapsibleContent isExpanded={isExpanded}>
           {/* Layer Search (if applicable) */}
-          {layer.metadata?.path && layer.id !== "Network" && (
+          {enableZoomToFeature && layer.metadata?.path && (
             <LayerSearch map={maps[0]} layer={layer} />
           )}
           {/* Opacity Control */}

@@ -88,7 +88,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (filter.type !== 'fixed') {
+      if (!["fixed", "hidetoggle"].includes(filter.type)) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -150,15 +150,52 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     filters
       .filter((f) => f.type === "hidetoggle")
       .forEach((filter) => {
+        const values = filter.values?.values ?? [];
         const currentValue = filterState[filter.id];
-        const defaultValue = filter.values?.values?.[0]?.paramValue;
+        const defaultValue = values[0]?.paramValue;
+
+        const currentStillValid = currentValue !== undefined && values.some((v) => v.paramValue === currentValue);
 
         // Only initialise if we don't already have a value
-        if (currentValue === undefined && defaultValue !== undefined) {
+        if ((!currentStillValid) && defaultValue !== undefined) {
           onFilterChange(filter, defaultValue);
         }
       });
   }, [filters, filterState, onFilterChange]);
+
+  useEffect(() => {
+    if (!Array.isArray(filters)) return;
+
+    const runCodeFilter = filters.find((f) => f.paramName === "runCodeId");
+    const networkFilter = filters.find((f) => f.paramName === "networkId");
+    if (!runCodeFilter || !networkFilter) return;
+
+    // runCodeId stores the run_id 
+    const selectedRunId = filterState[runCodeFilter.id];
+    if (selectedRunId === undefined || selectedRunId === null) return;
+
+    // Find the selected option in runCodeId options to get its displayValue
+    const runOptions = runCodeFilter.values?.values ?? [];
+    const selectedOption = runOptions.find(
+      (o) => String(o.paramValue) === String(selectedRunId)
+    );
+
+    const label = selectedOption?.displayValue;
+    if (!label) return;
+
+    // Extract the network scenario from the selector filter
+    const match = label.match(/\(\s*\d+\s*,\s*([^,]+)\s*,/);
+    const nextNetwork = match?.[1]?.trim();
+    if (!nextNetwork) return;
+
+    const currentNetwork = filterState[networkFilter.id];
+    console.log("[sync networkId] runCodeId =", selectedRunId, "| derived =", nextNetwork);
+    if (currentNetwork !== nextNetwork) {
+      console.log("[sync networkId] updating:", currentNetwork, "→", nextNetwork);
+      onFilterChange(networkFilter, nextNetwork);
+    }
+  }, [filters, filterState, onFilterChange]);
+
 
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
@@ -178,9 +215,9 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
-            .filter((filter) => filter.type !== "fixed") // Exclude 'fixed' filters
+            .filter((filter) => filter.type !== "fixed" && filter.type !== "hidetoggle") // Exclude 'fixed' filters
             .map((filter) => (
-              filter.type === "hidetoggle" ? null : (
+              
                 <SelectorContainer key={filter.id}>
                   {filter.type !== "map" && <SelectorLabel
                     htmlFor={filter.paramName}
@@ -255,7 +292,6 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                     />
                   )}
                 </SelectorContainer>
-              )
           ))}
           {downloadPath && (
             <DownloadButton 
