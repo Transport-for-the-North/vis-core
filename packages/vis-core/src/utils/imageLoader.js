@@ -5,6 +5,7 @@
  * icon_name and icon_name-hover, and ensures the two symbol layers exist.
  * Hover is driven by feature-state('hover') set elsewhere in the app.
  */
+import Cookies from "js-cookie";
 
 import { api } from "services";
 
@@ -17,12 +18,29 @@ const DEFAULT_ICON_SIZE = 128;
  * @returns {Promise<HTMLImageElement>} Loaded image element ready to draw.
  */
 const loadHtmlImageFromUrl = (url) =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load image from URL: ${url}`));
-    img.src = url;
+  new Promise(async (resolve, reject) => {
+    try {
+      // Build absolute API-aware URL
+      const absoluteUrl = api.baseService.buildAbsoluteUrl(url);
+
+      // Attach JWT from cookie set by AuthProvider
+      const token = Cookies.get("token");
+      const resp = await fetch(absoluteUrl, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status} for ${absoluteUrl}`);
+      }
+
+      const blob = await resp.blob();
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Failed to load image blob: ${absoluteUrl}`));
+      img.src = URL.createObjectURL(blob);
+    } catch (e) {
+      reject(e);
+    }
   });
 
 /**
