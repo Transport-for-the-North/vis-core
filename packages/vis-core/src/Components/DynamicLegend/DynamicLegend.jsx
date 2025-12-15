@@ -166,7 +166,10 @@ const CircleSwatch = styled.div`
 const LineSwatch = styled.div`
   width: 50px;
   height: ${(props) => props.height}px;
-  background-color: ${(props) => props.color};
+  ${(props) => props.isDashed 
+    ? `border-top: ${props.height}px dashed ${props.color}; background-color: transparent;`
+    : `background-color: ${props.color};`
+  }
   margin-right: 5px;
 `;
 
@@ -351,12 +354,151 @@ export const interpretWidthExpression = (expression) => {
   return null;
 };
 
+/**
+ * Interprets a line-dasharray expression from a map style specification and 
+ * determines which values should have dashed lines in the legend.
+*
+* @param {Array|Array<number>} expression - The line-dasharray expression from the map style.
+* @returns {Array|null} - An array of dash stops or null if the expression is invalid.
+*/
+export const interpretDashArrayExpression = (expression) => {
+  if (!expression) return null;
+  
+  if (Array.isArray(expression) && expression.length > 0) {
+    // Handle data-driven styling with 'match' expressions
+    if (expression[0] === "match") {
+      const matchValues = expression.slice(2, -1); // Remove 'match', property, and default value
+      const dashStops = [];
+      
+      for (let i = 0; i < matchValues.length; i += 2) {
+        const value = matchValues[i];
+        const dashArrayValue = matchValues[i + 1];
+        
+        // Check if it's a literal array
+        let isDashed = false;
+        if (Array.isArray(dashArrayValue) && dashArrayValue[0] === 'literal') {
+          const actualDashArray = dashArrayValue[1];
+          // Consider it dashed if it's not [1, 0] (solid) and not empty
+          isDashed = Array.isArray(actualDashArray) && 
+                    actualDashArray.length > 0 && 
+                    !(actualDashArray.length === 2 && actualDashArray[0] === 1 && actualDashArray[1] === 0);
+        }
+        
+        dashStops.push({
+          value: value,
+          isDashed: isDashed,
+        });
+      }
+      
+      return dashStops;
+    }
+    
+    // Handle simple array (legacy or static dasharray)
+    if (typeof expression[0] === 'number') {
+      // Simple dash array like [2, 2] - consider it dashed if not [1, 0]
+      const isDashed = !(expression.length === 2 && expression[0] === 1 && expression[1] === 0);
+      return [{ isDashed }];
+    }
+  }
+  
+  return null;
+};
+
 const isRenderableEntry = (e) => {
   if (!e) return false;
   const hasLabel = e.label != null && String(e.label).trim() !== '';
   const hasKnownSwatch = ['circle', 'line', 'fill'].includes(e.type);
   const hasSize = e.type === 'fill' ? true : Number(e.width) > 0;
   return hasLabel || (hasKnownSwatch && hasSize);
+};
+
+/**
+ * Gets the width for a legend entry based on layer type and paint properties.
+ * 
+ * This function determines the appropriate width/diameter for legend swatches by:
+ * 1. Using the widthStop value if available (from data-driven styling)
+ * 2. Returning null for mobile devices to allow CSS handling
+ * 3. For circle layers: using circle-radius * 2 or defaulting to 10px
+ * 4. For line layers: searching paintProps["line-width"] array for the label 
+ *    and returning the next index value, or defaulting to 2px
+ * 5. For other layer types: defaulting to 10px
+ * 
+ * @param {Object|null} widthStop - Width stop object with a width property from data-driven styling
+ * @param {boolean} isMobile - Whether the current viewport is mobile (≤ 900px)
+ * @param {Object} layer - The map layer object containing type and other metadata
+ * @param {Object} paintProps - The layer's paint properties containing style definitions
+ * @param {string|number} label - The current legend entry label used for line width lookup
+ * @returns {number|null} The calculated width in pixels, or null for mobile devices
+ */
+const getEntryWidth = (widthStop, isMobile, layer, paintProps, label) => {
+  if (widthStop) return widthStop.width;
+  if (isMobile) return null;
+  
+  if (layer.type === "circle") {
+    return typeof paintProps["circle-radius"] === "number" ? paintProps["circle-radius"] * 2 : 10;
+  }
+  
+  if (layer.type === "line") {
+    const lineWidthArray = paintProps["line-width"];
+    if (Array.isArray(lineWidthArray)) {
+      const labelIndex = lineWidthArray.indexOf(label);
+      return labelIndex !== -1 && labelIndex < lineWidthArray.length - 1 
+        ? lineWidthArray[labelIndex + 1] 
+        : 2;
+    }
+    return 2;
+  }
+  
+  return 10;
+};
+
+/**
+ * Gets the dash information for a legend entry based on dash stops and current label value.
+ * 
+ * This function determines whether a legend entry should display as dashed by:
+ * 1. Using the dashStop value if available (from data-driven styling)
+ * 2. Falling back to checking the raw paintProps["line-dasharray"] for legacy support
+ * 3. Considering a line dashed if the dash array is not [1, 0] (solid line indicator)
+ * 
+ * @param {Object|null} dashStop - Dash stop object with isDashed property from data-driven styling
+ * @param {Object} paintProps - The layer's paint properties containing style definitions
+ * @param {string|number} label - The current legend entry label used for dash lookup
+ * @returns {boolean} Whether the legend entry should be displayed as dashed
+ */
+const getEntryDashStatus = (dashStop, paintProps, label) => {
+  if (dashStop && typeof dashStop.isDashed === 'boolean') {
+    return dashStop.isDashed;
+  }
+  
+  // Fallback for legacy or non-data-driven dash arrays
+  const dashArray = paintProps["line-dasharray"];
+  if (Array.isArray(dashArray)) {
+    // For simple arrays, check if it's not [1, 0] (solid)
+    if (typeof dashArray[0] === 'number') {
+      return !(dashArray.length === 2 && dashArray[0] === 1 && dashArray[1] === 0);
+    }
+    
+    // For match expressions in legacy format, find the value for this label
+    if (dashArray[0] === 'match') {
+      const matchValues = dashArray.slice(2, -1);
+      for (let i = 0; i < matchValues.length; i += 2) {
+        if (matchValues[i] === label) {
+          const value = matchValues[i + 1];
+          if (Array.isArray(value) && value[0] === 'literal') {
+            const actualArray = value[1];
+            return Array.isArray(actualArray) && 
+                   actualArray.length > 0 && 
+                   !(actualArray.length === 2 && actualArray[0] === 1 && actualArray[1] === 0);
+          }
+          return Array.isArray(value) && 
+                 value.length > 0 && 
+                 !(value.length === 2 && value[0] === 1 && value[1] === 0);
+        }
+      }
+    }
+  }
+  
+  return false;
 };
 
 /**
@@ -376,6 +518,7 @@ export const DynamicLegend = ({ map }) => {
   const legendRef = useRef(null);
   const currentPage = useContext(PageContext);
   const pageCategory = currentPage.category || currentPage.pageName;
+
   useEffect(() => {
     if (!map) return;
 
@@ -395,6 +538,11 @@ export const DynamicLegend = ({ map }) => {
             return state.visualisations[key].joinLayer === layer.id;
           });
           const visualisation = state.visualisations[visualisationKey];
+
+          if (visualisation && visualisation.name === "Station Link Totals") {
+            return null;
+          }
+          
           // Get legendText from visualisation
           const legendText = visualisation?.legendText || [];
 
@@ -462,6 +610,9 @@ export const DynamicLegend = ({ map }) => {
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
           );
+          let dashStops = interpretDashArrayExpression(
+            paintProps["line-dasharray"]
+          );
 
           // Determine whether current style is categorical. For categorical we should not scale circle sizes.
           const colorStyle = layer.metadata?.colorStyle;
@@ -527,6 +678,7 @@ export const DynamicLegend = ({ map }) => {
               const stop = colorStops[idx];
               const nextStop = colorStops[idx + 1];
               const widthStop = widthStops ? widthStops[idx] : null;
+              const dashStop = dashStops ? dashStops.find(ds => ds.value === stop.value) : null;
               let label;
               if (customLabels && customLabels.length === length) {
                 label = customLabels[idx];
@@ -543,11 +695,13 @@ export const DynamicLegend = ({ map }) => {
               } else {
                 label = stop.value;
               }
+              
               legendEntries.push({
                 color: stop.color,
-                width: widthStop ? widthStop.width: isMobile ? null : (layer.type === "circle" ? (typeof paintProps["circle-radius"] === "number"? paintProps["circle-radius"] * 2 : 10): (layer.type === "line" ? 2 : 10)),
+                width: getEntryWidth(widthStop, isMobile, layer, paintProps, label),
                 label,
                 type: layer.type,
+                isDashed: getEntryDashStatus(dashStop, paintProps, label),
               });
             }
           }
@@ -576,6 +730,7 @@ export const DynamicLegend = ({ map }) => {
                 width: defaultWidth,
                 label: title,
                 type: layer.type,
+                isDashed: getEntryDashStatus(null, paintProps, title),
               });
             } else {
               // If there is exactly one entry, force the label to be the layer name.
@@ -653,7 +808,11 @@ export const DynamicLegend = ({ map }) => {
                   {item.type === "circle" ? (
                     <CircleSwatch diameter={entry.width || 10} color={entry.color} />
                   ) : item.type === "line" ? (
-                    <LineSwatch height={entry.width || 2} color={entry.color} />
+                    <LineSwatch 
+                      height={entry.width || 2} 
+                      color={entry.color} 
+                      isDashed={entry.isDashed || false}
+                    />
                   ) : item.type === "fill" ? (
                     <PolygonSwatch color={entry.color} />
                   ) : null}
@@ -675,6 +834,7 @@ export const DynamicLegend = ({ map }) => {
                       <LineSwatch
                         height={entry.width || 2}
                         color={entry.color}
+                        isDashed={entry.isDashed || false}
                       />
                     ) : entry.type === "fill" ? (
                       <PolygonSwatch

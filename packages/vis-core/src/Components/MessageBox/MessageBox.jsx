@@ -34,14 +34,11 @@ const StickyWrapper = styled.div`
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.7);
   margin: 0px 0px 10px 0px;
-  padding: 15px 20px 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
-  width: calc(100%);
+  width: 100%;
   box-sizing: border-box;
 `;
 

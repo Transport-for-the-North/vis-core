@@ -105,7 +105,104 @@ export const MapLayout = () => {
     });
   };
 
+  /**
+   * Keep derived filters in sync with their source selection and metadata.
+   * For every filter that declares `deriveFromFilter`, we:
+   * - read the current value of its source filter (`sourceParamName`)
+   * - optionally apply override rules driven by other controller filters
+   * - otherwise look up a preferred/fallback value from the source metadata (`metadataColumn`)
+   * - sync the derived filter to the resolved value, or clear it if no match
+   */
   useEffect(() => {
+    const derivedFilters = state.filters.filter((filter) => filter.deriveFromFilter);
+
+    for (const derivedFilter of derivedFilters) {
+      const {
+        sourceParamName,
+        metadataColumn,
+        preferredValues = [],
+      } = derivedFilter.deriveFromFilter ?? {};
+
+      if (!sourceParamName) {
+        continue;
+      }
+
+      const sourceFilter = state.filters.find((f) => f.paramName === sourceParamName);
+      if (!sourceFilter) {
+        continue;
+      }
+
+      const selectedSourceValue = filterState[sourceFilter.id];
+      const sourceMetadataName = sourceFilter.values?.metadataTableName;
+      const sourceMetadata = sourceMetadataName ? state.metadataTables[sourceMetadataName] : null;
+
+      let derivedValue = null;
+
+      if (Array.isArray(derivedFilter.overrideRules)) {
+        for (const rule of derivedFilter.overrideRules) {
+          const controllerFilter = state.filters.find(
+            (f) => f.paramName === rule.controllerParamName
+          );
+          if (!controllerFilter) continue;
+
+          const controllerValue =
+            filterState[controllerFilter.id] ?? controllerFilter.defaultValue ?? null;
+
+          if (controllerValue === rule.controllerValue) {
+            derivedValue = rule.derivedValue;
+            break;
+          }
+        }
+      }
+
+      if (
+        derivedValue == null &&
+        selectedSourceValue != null &&
+        metadataColumn &&
+        Array.isArray(sourceMetadata)
+      ) {
+        const matchingRows = sourceMetadata.filter(
+          (row) => row?.[sourceFilter.values.paramColumn] === selectedSourceValue
+        );
+
+        if (matchingRows.length > 0) {
+          let preferredRow = null;
+          if (preferredValues.length > 0) {
+            preferredRow = preferredValues
+              .map((value) => matchingRows.find((row) => row?.[metadataColumn] === value))
+              .find((row) => row);
+          }
+
+          const fallbackRow = preferredRow ?? matchingRows[0];
+          derivedValue = fallbackRow?.[metadataColumn] ?? null;
+        }
+      }
+
+      const currentDerivedValue = filterState[derivedFilter.id];
+
+      if (
+        derivedValue !== null &&
+        derivedValue !== currentDerivedValue
+      ) {
+        filterDispatch({
+          type: "SET_FILTER_VALUE",
+          payload: { filterId: derivedFilter.id, value: derivedValue },
+        });
+        return;
+      }
+
+      if (
+        derivedValue === null &&
+        currentDerivedValue != null
+      ) {
+        filterDispatch({
+          type: "SET_FILTER_VALUE",
+          payload: { filterId: derivedFilter.id, value: null },
+        });
+        return;
+      }
+    }
+
     const validatedFilters = updateFilterValidity(state, filterState);
 
     dispatch({
@@ -151,7 +248,7 @@ export const MapLayout = () => {
         });
       }
     });
-  }, [filterState, state.metadataTables, dispatch]);
+  }, [filterState, state.metadataTables, state.filters, dispatch, filterDispatch]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
