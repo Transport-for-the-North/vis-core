@@ -48,7 +48,7 @@ export const useDualMaps = (
         transformRequest: (url, resourceType) => {
           if (resourceType !== 'Style' && url.startsWith('https://api.os.uk') ) {
             url = new URL(url);
-            if (!url.searchParams.has('key')) url.searchParams.append('key', import.meta.env.VITE_APP_MAP_API_TOKEN);
+            if (!url.searchParams.has('key')) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
             if (!url.searchParams.has('srs')) url.searchParams.append('srs', 3857);
             return {
               url: new Request(url).url
@@ -61,10 +61,12 @@ export const useDualMaps = (
         container: leftMapContainerRef.current,
         ...commonOptions,
       });
-      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      
+      // Add event listeners after map creation
+      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
       leftMapInstance.on("load", () => {
-          setIsMapLoaded(true);
-        });
+        setIsMapLoaded(true);
+      });
       leftMapInstance.addControl(
         new maplibregl.NavigationControl(),
         "bottom-left"
@@ -74,11 +76,13 @@ export const useDualMaps = (
       const rightMapInstance = new maplibregl.Map({
         container: rightMapContainerRef.current,
         ...commonOptions,
-      })
-      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      });
+      
+      // Add event listeners after map creation
+      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
       rightMapInstance.on("load", () => {
-          setIsMapLoaded(true);
-        });
+        setIsMapLoaded(true);
+      });
       rightMapInstance.addControl(
         new maplibregl.NavigationControl(),
         "bottom-left"

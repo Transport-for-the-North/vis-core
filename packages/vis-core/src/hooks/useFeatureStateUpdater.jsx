@@ -87,12 +87,15 @@ export const useFeatureStateUpdater = () => {
         colorStyle: colorStyle, // assuming paintProperty carries colorStyle information.
       };
 
+      const preserveBaseStyle = specifiedLayer.preserveBaseStyle === true; 
+
       // Update the layer's paint properties.Even if there is no data so that it resets.
       // If transitions are defined (e.g., 'fill-color-transition'), they will animate state changes smoothly.
-      Object.entries(paintProperty).forEach(([key, value]) => {
+      if (paintProperty && !preserveBaseStyle){
+        Object.entries(paintProperty).forEach(([key, value]) => {
         map.setPaintProperty(specifiedLayer.name, key, value);
       });
-
+      }
 
 
       // Create a Set of new feature IDs from the provided data.
@@ -131,6 +134,14 @@ export const useFeatureStateUpdater = () => {
 
       // Save the updated set of feature IDs for this layer for use in subsequent updates.
       layerStatesRef.current[specifiedLayer.name] = newIDs;
+
+      if (preserveBaseStyle){ 
+        map.setFilter(specifiedLayer.name, [
+          'in',
+          ['get', 'id'],
+          ['literal', Array.from(newIDs)],
+        ]);
+      }
     },
     []
   );
