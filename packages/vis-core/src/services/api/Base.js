@@ -1,5 +1,4 @@
 import Cookies from "js-cookie";
-import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../../runtime";
 
 class BaseService {
   /**
@@ -10,13 +9,37 @@ class BaseService {
    * @property {string} [config.pathPostfix] - The postfix to be added to the path.
    */
   constructor(config = { pathPrefix: "" }) {
-    const postFix =
-    config?.pathPostfix && !String(config.pathPostfix).startsWith(":")
-      ? String(config.pathPostfix)
-      : "";
-    
+    const postFix = config?.pathPostfix ?? "";
+    switch (process.env.REACT_APP_PROD_OR_DEV) {
+      case "production":
+        this._apiBaseUrl = process.env.REACT_APP_API_BASE_DOMAIN.trim();
+        if (
+          this._apiBaseUrl.length > 0 &&
+          this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
+        ) {
+          this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
+        }
+        break;
+
+      case "development":
+        if (process.env.REACT_APP_API_BASE_DOMAIN_DEV) {
+          this._apiBaseUrl = process.env.REACT_APP_API_BASE_DOMAIN_DEV.trim();
+          if (
+            this._apiBaseUrl.length > 0 &&
+            this._apiBaseUrl.slice(this._apiBaseUrl.length - 1) === "/"
+          ) {
+            this._apiBaseUrl = this._apiBaseUrl.slice(0, -1);
+          }
+        } else {
+          this._apiBaseUrl = `https://localhost:7127`;
+        }
+        break;
+
+      default:
+        this._apiBaseUrl = `https://localhost:7127`;
+    }
+    this._apiBaseUrl = `${this._apiBaseUrl}${postFix}`;
     this._pathPrefix = config?.pathPrefix ?? "";
-    this._postFix = postFix;
   }
 
   /**
@@ -25,19 +48,9 @@ class BaseService {
    * @returns {string} The full URL.
    */
   _buildUrl(path) {
-    const mode = (getProdOrDev() || "").toLowerCase();
-
-    let base =
-      mode === "production"
-        ? (getApiBaseDomain() || "")
-        : (getApiBaseDomainDev() || "https://localhost:7127");
-
-    base = base.replace(/\/+$/, ""); // strip trailing slash
-
-    let url = `${base}${this._postFix || ""}`;
+    let url = this._apiBaseUrl;
     if (this._pathPrefix) url += `/${this._pathPrefix}`;
-    url += `/${String(path || "").replace(/^\/+/, "")}`;
-
+    url += `${path}`;
     return url;
   }
 
