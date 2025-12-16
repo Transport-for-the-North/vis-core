@@ -61,10 +61,12 @@ export const useDualMaps = (
         container: leftMapContainerRef.current,
         ...commonOptions,
       });
-      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      
+      // Add event listeners after map creation
+      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
       leftMapInstance.on("load", () => {
-          setIsMapLoaded(true);
-        });
+        setIsMapLoaded(true);
+      });
       leftMapInstance.addControl(
         new maplibregl.NavigationControl(),
         "bottom-left"
@@ -74,11 +76,13 @@ export const useDualMaps = (
       const rightMapInstance = new maplibregl.Map({
         container: rightMapContainerRef.current,
         ...commonOptions,
-      })
-      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true))
+      });
+      
+      // Add event listeners after map creation
+      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
       rightMapInstance.on("load", () => {
-          setIsMapLoaded(true);
-        });
+        setIsMapLoaded(true);
+      });
       rightMapInstance.addControl(
         new maplibregl.NavigationControl(),
         "bottom-left"

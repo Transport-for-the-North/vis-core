@@ -209,7 +209,7 @@ export const Dropdown = ({ filter, onChange }) => {
   const { state: filterState } = useFilterContext();
   const animatedComponents = makeAnimated();
   const [loading, setLoading] = useState(false);
-  const [isInfoCollapsed, setInfoCollapsed] = useState(true);
+  const [isInfoCollapsed, setInfoCollapsed] = useState(false);
   const prevOptionsRef = useRef([]);
   const prevSelectedOptionsRef = useRef(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
@@ -241,28 +241,89 @@ export const Dropdown = ({ filter, onChange }) => {
     return options.find((option) => option.value === filterState[filter.id]);
   }, [filterState, filter.id, options]);
 
+  /**
+   * Computes a stable signature representing the visible options for this dropdown,
+   * excluding the 'All' option for multi-select. The signature includes each option's
+   * value and its validity (isValid). This allows us to set the loading state only
+   * when filtering/validation actually changes what is visible or the validity shown.
+   *
+   * Rationale:
+   * - Filtering via isHidden affects the visible options list (options.length).
+   * - Validation updates isValid when shouldBeValidated is true, which is included here.
+   * - Selections do not alter this signature, so user choices alone won't trigger loading.
+   */
+  const optionsSignature = useMemo(() => {
+    const visible = filter.multiSelect ? options.slice(1) : options;
+    // Build a compact signature including value and validity flag
+    // Note: undefined isValid (for filters with shouldBeValidated = false) will not flicker loading.
+    return JSON.stringify(
+      visible.map((o) => ({
+        v: o.value,
+        // Normalise validity to a tri-state to avoid unnecessary changes:
+        val: typeof o.isValid === 'undefined' ? 'u' : o.isValid ? 't' : 'f',
+      }))
+    );
+  }, [options, filter.multiSelect]);
+
   useEffect(() => {
-    if (!filter.shouldBeBlankOnInit && selectedOptions === undefined && filterState[filter.id] !== null) {
-      onChange(filter, null);
+    // If the selection is now invalid (e.g., filtered out), fall back to a suitable value.
+    // For single-select: choose the first visible option (if available) instead of null.
+    // Only fallback if forceRequired is not explicitly set to false
+    if (
+      !filter.shouldBeBlankOnInit &&
+      selectedOptions === undefined &&
+      filterState[filter.id] !== null &&
+      filter.forceRequired !== false
+    ) {
+      const visible = filter.multiSelect ? options.slice(1) : options;
+      const fallback = visible[0]?.value ?? null;
+      onChange(filter, fallback);
     }
-  }, [selectedOptions, filterState, filter, onChange]);
+  }, [selectedOptions, filterState, filter, onChange, options]);
+
+  // Ensure multi-select selections stay in sync with filtered options, and fallback when emptied.
+  useEffect(() => {
+    if (!filter.multiSelect) return;
+
+    const current = filterState[filter.id];
+    if (!Array.isArray(current)) return;
+
+    const visibleOptions = options.slice(1); // exclude 'All'
+    const visibleValuesSet = new Set(visibleOptions.map((o) => o.value));
+    const next = current.filter((v) => visibleValuesSet.has(v));
+
+    // If some selected values were filtered out, prune them.
+    if (next.length !== current.length && next.length > 0) {
+      onChange(filter, next);
+      return;
+    }
+
+    // Only fallback to "all visible" if forceRequired is true or not explicitly set to false
+    // This allows filters with forceRequired: false to have empty selections
+    const shouldFallbackToAll = filter.forceRequired !== false;
+    
+    // If all selected values are now filtered out, fallback to "all visible" to keep selection valid
+    // but only if the filter is required
+    if (current.length > 0 && next.length === 0 && shouldFallbackToAll) {
+      const allVisible = visibleOptions.map((o) => o.value);
+      // Mark that 'All' semantic is active so existing logic keeps it updated when options change.
+      setIsAllSelected(true);
+      onChange(filter, allVisible);
+    }
+  }, [optionsSignature, options, filterState, filter, onChange]);
 
   /**
-   * Returns a stable JSON key representing filterState excluding the current filter's id.
-   * Used to trigger the loading indicator only when other filters change, not this one.
+   * Sets loading only when the visible options or their validity change,
+   * which corresponds to actual filtering or validation updates.
    */
-  const otherFiltersKey = useMemo(() => {
-    const entries = Object.entries(filterState).filter(([k]) => k !== filter.id);
-    return JSON.stringify(Object.fromEntries(entries));
-  }, [filterState, filter.id]);
-
   useEffect(() => {
+    // If signature changes, reflect a short loading state
     setLoading(true);
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 500);
+    }, 400);
     return () => clearTimeout(timer);
-  }, [otherFiltersKey]);
+  }, [optionsSignature]);
 
   useEffect(() => {
     const prevOptions = prevOptionsRef.current;
@@ -291,9 +352,13 @@ export const Dropdown = ({ filter, onChange }) => {
       setIsAllSelected(false);
       onChange(filter, selectedOptions.value);
     } else {
-      // Set state to null when cleared
+      // When cleared, set to null for single-select or empty array for multi-select
       setIsAllSelected(false);
-      onChange(filter, null);
+      if (filter.multiSelect) {
+        onChange(filter, []);
+      } else {
+        onChange(filter, null);
+      }
     }
   };
 

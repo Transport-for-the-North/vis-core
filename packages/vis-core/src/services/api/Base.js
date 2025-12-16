@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+
 import { getProdOrDev, getApiBaseDomain, getApiBaseDomainDev } from "../../runtime";
 
 class BaseService {

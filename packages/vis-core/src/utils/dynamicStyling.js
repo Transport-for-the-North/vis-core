@@ -45,34 +45,12 @@ export const analyzeDataType = (values) => {
     return 'categorical';
   }
   
-  // If we have both negative and positive values, check for diverging pattern
-  // Only consider diverging for larger datasets that weren't caught by categorical
+  // If we have both negative and positive values, it's diverging
+  // Diverging color schemes are designed to show data that diverges from a central value
   if (hasNegativeAndPositive) {
-    const zeroOrNearZero = values.filter(val => Math.abs(val) < 0.01).length;
-    const totalValues = values.length;
-    
-    // If there's a reasonable center point (zero or near-zero values) or symmetric distribution
-    if (zeroOrNearZero > 0 || isSymmetricDistribution(values)) {
-      return 'diverging';
-    }
+    return 'diverging';
   }
   
   // Default to continuous for numeric data
   return 'continuous';
-};
-
-/**
- * Checks if the distribution of values is roughly symmetric around zero
- * @param {Array} values - Array of numeric values
- * @returns {boolean} True if distribution appears symmetric
- */
-const isSymmetricDistribution = (values) => {
-  const positiveValues = values.filter(val => val > 0);
-  const negativeValues = values.filter(val => val < 0);
-  
-  // Check if we have a reasonable balance of positive and negative values
-  const ratio = Math.min(positiveValues.length, negativeValues.length) / 
-                Math.max(positiveValues.length, negativeValues.length);
-  
-  return ratio > 0.3; // At least 30% balance between positive and negative
 };

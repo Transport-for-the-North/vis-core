@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Cookies from "js-cookie";
 import styled from "styled-components";
+
+import { api } from "services";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { CARD_CONSTANTS } from "defaults";
 import { Hovertip } from "Components/Hovertip";
 import { replacePlaceholders } from "utils";
+
 const { PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } = CARD_CONSTANTS;
 
 /**
@@ -59,6 +63,16 @@ const FullscreenContainer = styled.div`
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out;
   transform: ${({ $isVisible }) =>
     $isVisible ? "translateX(0)" : "translateX(110%)"};
+
+  /* Tablet & mobile */
+  @media (max-width: 900px) {
+    top: 60%;          
+    left: 0;            
+    right: 0;
+    bottom: 0;
+    padding: 12px;     
+    border-radius: 0;   
+  }
 `;
 
 /**
@@ -115,6 +129,16 @@ const TitleImageTextWrapper = styled.div`
   gap: 2rem;
   min-height: 350px;
   max-height: 350px;
+
+  @media (max-width: 1366px) {
+    flex-direction: column-reverse;
+    margin-top: 50px;
+    width: 100%;
+    justify-content: space-between;
+    min-height: auto;
+    max-height: none;
+    gap: 0.5rem;
+  }
 `;
 
 /**
@@ -125,6 +149,9 @@ const TitleTextContainer = styled.div`
   flex-direction: column;
   width: 50%;
   justify-content: center;
+  @media (max-width: 1366px) {
+    width: 100%;
+  }
   @media (max-width: 900px) {
     width: 90%;
     align-items: center;
@@ -142,6 +169,11 @@ const ImageContainer = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
+   @media (max-width: 1366px) {
+    width: 100%;
+    min-height: auto;
+    max-height: none;
+  }
 `;
 
 /**
@@ -165,6 +197,11 @@ const Title = styled.p`
   text-align: center;
   white-space: normal;
   line-height: 1;
+
+  /* Laptops (1024px–1366px) */
+  @media (max-width: 1366px) {
+    font-size: 2.2rem !important; /* smaller but still readable */
+  }
 `;
 
 /**
@@ -367,10 +404,15 @@ export const FullScreenCalloutCardVisualisation = ({
   ...props
 }) => {
   const sidebarIsOpen = props.sidebarIsOpen;
-  const [isVisible, setIsVisible] = useState(true);
+
+  // Visibility state: start hidden so we can animate in
+  const [isVisible, setIsVisible] = useState(false);
+  const prevIdRef = useRef(null);
+  const firstShownRef = useRef(false);
+
   const handleToggle = () => setIsVisible((v) => !v);
 
-  // the content that will be rendered
+  // Staged content and image (swap together to avoid flicker)
   const [content, setContent] = useState(null);
   const [imgUrl, setImgUrl] = useState(null);
 
@@ -382,7 +424,39 @@ export const FullScreenCalloutCardVisualisation = ({
   const [nextButtonRefIsHovered, setNextButtonRefIsHovered] = useState(false);
 
   /**
+   * Drive initial slide-in and auto-reopen on data change.
+   * - When data first appears: slide-in.
+   * - When data changes (location_id/id) and the card is hidden: slide-in again.
+   */
+  useEffect(() => {
+    if (!data) return;
+
+    const curId = data.location_id ?? data.id ?? "__noid__";
+    const prevId = prevIdRef.current;
+
+    // First time we ever have data: trigger slide-in
+    if (!firstShownRef.current) {
+      const id = requestAnimationFrame(() => setIsVisible(true));
+      firstShownRef.current = true;
+      prevIdRef.current = curId;
+      return () => cancelAnimationFrame(id);
+    }
+
+    // If the data changed and the card is hidden, auto-reopen and slide-in
+    if (prevId !== curId && !isVisible) {
+      const id = requestAnimationFrame(() => setIsVisible(true));
+      prevIdRef.current = curId;
+      return () => cancelAnimationFrame(id);
+    }
+
+    // Just keep the latest id
+    prevIdRef.current = curId;
+  }, [data, isVisible]);
+
+  /**
    * Updates content and image when the current scenario changes
+   * For string URLs pointing at our API, fetch the image with Authorization
+   * and convert it to an object URL so it can be rendered by <img>.
    *
    * Handles different image formats:
    * - Blob: converted to object URL
@@ -391,33 +465,76 @@ export const FullScreenCalloutCardVisualisation = ({
    * - String: used directly as URL
    */
   useEffect(() => {
-    const newContent = replacePlaceholders(
-      data.text_with_placeholders,
-      data.values
-    );
-    setContent(newContent);
-    setImgUrl(null);
+    let objectUrlToRevoke = null;
+    const controller = new AbortController();
 
-    if (data.image_url) {
-      if (data.image_url instanceof Blob) {
-        const url = URL.createObjectURL(data.image_url);
-        setImgUrl(url);
-      } else if (data.image_url instanceof ArrayBuffer) {
-        const blob = new Blob([data.image_url], {
-          type: "image/png",
-        });
-        const url = URL.createObjectURL(blob);
-        setImgUrl(url);
-      } else if (data.image_url instanceof Uint8Array) {
-        const blob = new Blob([data.image_url], {
-          type: "image/png",
-        });
-        const url = URL.createObjectURL(blob);
-        setImgUrl(url);
-      } else if (typeof data.image_url === "string") {
-        setImgUrl(data.image_url);
+    const run = async () => {
+      if (!data) return;
+
+      const nextContent = replacePlaceholders(
+        data.text_with_placeholders,
+        data.values
+      );
+
+      let nextImgUrl = imgUrl;
+      try {
+        if (!data.image_url) {
+          nextImgUrl = null;
+        } else if (data.image_url instanceof Blob) {
+          const url = URL.createObjectURL(data.image_url);
+          objectUrlToRevoke = url;
+          nextImgUrl = url;
+        } else if (data.image_url instanceof ArrayBuffer) {
+          const blob = new Blob([data.image_url], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          objectUrlToRevoke = url;
+          nextImgUrl = url;
+        } else if (data.image_url instanceof Uint8Array) {
+          const blob = new Blob([data.image_url], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          objectUrlToRevoke = url;
+          nextImgUrl = url;
+        } else if (typeof data.image_url === "string") {
+          const absoluteUrl = api.baseService.buildAbsoluteUrl(data.image_url);
+          const apiBaseOrigin = new URL(api.baseService.buildAbsoluteUrl("/")).origin;
+          const targetOrigin = new URL(absoluteUrl, window.location.origin).origin;
+
+          if (targetOrigin === apiBaseOrigin) {
+            const token = Cookies.get("token");
+            const resp = await fetch(absoluteUrl, {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+              signal: controller.signal,
+            });
+            if (!resp.ok) {
+              throw new Error(`HTTP ${resp.status} while fetching image`);
+            }
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            objectUrlToRevoke = url;
+            nextImgUrl = url;
+          } else {
+            nextImgUrl = data.image_url; // external
+          }
+        }
+      } catch (e) {
+        if (e.name !== "AbortError") {
+          console.error("Failed to load image:", e);
+        }
+        // Keep prior image on failure to prevent flicker
+        nextImgUrl = imgUrl;
       }
-    }
+
+      // Batch update: text + image together
+      setContent(nextContent);
+      setImgUrl(nextImgUrl);
+    };
+
+    run();
+
+    return () => {
+      controller.abort();
+      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
+    };
   }, [data]);
 
   // Check that data exists before rendering

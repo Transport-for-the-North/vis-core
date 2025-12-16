@@ -26,12 +26,33 @@ const filterReducer = (state, action) => {
   switch (action.type) {
     case filterActionTypes.SET_FILTER_VALUE: {
       const { filterId, value } = action.payload;
+
+      // Prevent null/undefined from being written into state
+      if (value == null) {
+        // Explicitly store an empty shape for multi-selects
+        return { ...state, [filterId]: Array.isArray(state[filterId]) ? [] : state[filterId] };
+      }
+
+      // Safe numeric coercion: avoid '' -> 0 and other isNaN quirks
+      const toNumberIfNumeric = (v) => {
+        if (typeof v !== 'string') return v;
+        const t = v.trim();
+        // Only coerce strings that are pure numbers (e.g., '123', '-10', '3.14')
+        return /^[+-]?\d+(\.\d+)?$/.test(t) ? Number(t) : v;
+      };
+
+      // Keep arrays as-is (no element coercion), booleans/numbers as-is,
+      // and only coerce numeric-looking strings.
       const parsedValue =
-        typeof value === "boolean"
+        typeof value === 'boolean'
           ? value
-          : isNaN(value)
+          : Array.isArray(value)
           ? value
-          : Number(value);
+          : typeof value === 'number'
+          ? value
+          : typeof value === 'string'
+          ? toNumberIfNumeric(value)
+          : value;
 
       // Check if the value has actually changed
       if (state[filterId] === parsedValue) {

@@ -21,6 +21,7 @@ const DropdownMenuWrapper = styled.div`
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   overflow: visible;
+  box-sizing: border-box;
 `;
 
 /**
@@ -32,7 +33,7 @@ const DropdownMenuScroll = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 140px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;

@@ -233,6 +233,7 @@ export const LayerControlEntry = memo(
     const enforceNoColourSchemeSelector = layer.metadata?.enforceNoColourSchemeSelector ?? false;
     const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
     const widthProp = getWidthProperty(layer.type);
+    const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
 
     let currentWidthFactor = null;
     let currentOpacity = null;
@@ -317,7 +318,9 @@ export const LayerControlEntry = memo(
     
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
+        // Use layer's defaultLineOffset if available, otherwise fall back to default
+        const customOffset = layer.defaultLineOffset ?? undefined;
+        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp, customOffset);
         widthInterpolation = result.widthInterpolation;
         lineOffsetInterpolation = result.lineOffsetInterpolation;
       } else {
@@ -369,7 +372,7 @@ export const LayerControlEntry = memo(
         {/* Collapsible Content with Animation */}
         <CollapsibleContent isExpanded={isExpanded}>
           {/* Layer Search (if applicable) */}
-          {layer.metadata?.path && (
+          {enableZoomToFeature && layer.metadata?.path && (
             <LayerSearch map={maps[0]} layer={layer} />
           )}
           {/* Opacity Control */}

@@ -95,6 +95,7 @@ export const Layer = ({ layer }) => {
         layerLayout.visibility = layer?.hiddenByDefault ? "none" : "visible";
         layerConfig.layout = {...layerConfig.layout, ...layerLayout };
         layerConfig.metadata = {
+          ...(layer.metadata ?? {}),
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
           path: layer.path ?? null,

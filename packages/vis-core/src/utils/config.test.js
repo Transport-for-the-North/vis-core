@@ -14,6 +14,8 @@ import {
   buildParamsMap,
   isWindows10OrLower,
   getScrollbarWidth,
+  buildDeterministicFilterId,
+  applyWhereConditions,
 } from "./config";
 
 
@@ -79,7 +81,7 @@ describe("replacePlaceholders", () => {
     const html = "<div>{a} {b} {missing}</div>";
     const data = { a: "one", b: 2 };
     const result = replacePlaceholders(html, data);
-    expect(result).toBe("<div>one 2 {missing}</div>");
+    expect(result).toBe("<div>one 2 N/A</div>");
   });
 
   it("applies colon syntax {fn:key} with default allowed functions", () => {
@@ -111,11 +113,11 @@ describe("replacePlaceholders", () => {
     expect(result).toBe("<div>14&nbsp;50%</div>");
   });
 
-  it("leaves placeholder intact when arg is undefined", () => {
+  it("returns N/A when arg is undefined (parentheses syntax)", () => {
     const html = "<div>{formatNumber(value)}</div>";
     const data = {};
     const result = replacePlaceholders(html, data);
-    expect(result).toBe("<div>{formatNumber(value)}</div>");
+    expect(result).toBe("<div>N/A</div>");
   });
 
   it("leaves placeholder intact when function is not allowed", () => {
@@ -133,7 +135,7 @@ describe("replacePlaceholders", () => {
     expect(result).toBe("<div>99</div>");
   });
 
-  it("falls back to raw arg as string if function throws", () => {
+  it("falls back to raw arg as string if function throws (colon syntax)", () => {
     const html = "<div>{boom:x}</div>";
     const data = { x: 3 };
     const customFunctions = {
@@ -143,6 +145,30 @@ describe("replacePlaceholders", () => {
     };
     const result = replacePlaceholders(html, data, { customFunctions });
     expect(result).toBe("<div>3</div>");
+  });
+
+  it("leaves colon placeholder intact when arg is undefined", () => {
+    const html = "<div>{formatNumber:missing}</div>";
+    const data = {};
+    const result = replacePlaceholders(html, data);
+    // For colon syntax, undefined args keep the placeholder
+    expect(result).toBe("<div>{formatNumber:missing}</div>");
+  });
+
+  it("respects keepUndefined=true for simple and parentheses placeholders", () => {
+    const html = "<div>{a} {formatNumber(b)} {unknownFn:c}</div>";
+    const data = {}; // all missing
+    const result = replacePlaceholders(html, data, { keepUndefined: true });
+    // {a} untouched, {formatNumber(b)} untouched (parentheses), {unknownFn:c} untouched because fn not allowed
+    expect(result).toBe("<div>{a} {formatNumber(b)} {unknownFn:c}</div>");
+  });
+
+  it("handles dot keys literally for colon syntax as well", () => {
+    const html = "<div>{formatNumber:a.b}</div>";
+    const data = { "a.b": 77 };
+    const result = replacePlaceholders(html, data);
+    expect(numSpy).toHaveBeenCalledWith(77);
+    expect(result).toBe("<div>77</div>");
   });
 });
 
@@ -169,6 +195,15 @@ describe("filterGlossaryData", () => {
       c: { definition: "C", exclude: [] },
       d: { definition: "D" },
     });
+  });
+
+  it("returns all entries when excludeList is empty array or empty string", () => {
+    const resultEmptyArray = filterGlossaryData(glossaryData, []);
+    expect(resultEmptyArray).toEqual(glossaryData);
+
+    const resultEmptyString = filterGlossaryData(glossaryData, "");
+    // No term has an empty-string exclusion, so all should pass
+    expect(resultEmptyString).toEqual(glossaryData);
   });
 });
 
@@ -251,6 +286,13 @@ describe("isWindows10OrLower", () => {
     );
     expect(isWindows10OrLower()).toBe(false);
   });
+
+  it("returns true for Windows 8.1 (NT 6.3)", () => {
+    uaGetterSpy.mockReturnValue(
+      "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 Chrome/114 Safari/537.36"
+    );
+    expect(isWindows10OrLower()).toBe(true);
+  });
 });
 
 describe("getScrollbarWidth", () => {
@@ -293,5 +335,106 @@ describe("getScrollbarWidth", () => {
     expect(width).toBe(0);
 
     createSpy.mockRestore();
+  });
+});
+
+describe("buildDeterministicFilterId", () => {
+  it("builds a slugged id from stable fields", () => {
+    const used = new Set();
+    const filter = {
+      paramName: "Q1",
+      filterName: "My Filter",
+      type: "select",
+      visualisations: ["Alpha", "Beta"]
+    };
+    const id = buildDeterministicFilterId(filter, used);
+    // visualisations joined with '|' then slugified -> alpha-beta
+    expect(id).toBe("q1__my-filter__select__alpha-beta");
+    expect(used.has(id)).toBe(true);
+  });
+
+  it("ensures uniqueness with deterministic suffix", () => {
+    const used = new Set(["q1__my-filter__select__alpha-beta"]);
+    const filter = {
+      paramName: "Q1",
+      filterName: "My Filter",
+      type: "select",
+      visualisations: ["Alpha", "Beta"]
+    };
+    const id2 = buildDeterministicFilterId(filter, used);
+    expect(id2).toBe("q1__my-filter__select__alpha-beta--2");
+    expect(used.has(id2)).toBe(true);
+
+    const id3 = buildDeterministicFilterId(filter, used);
+    expect(id3).toBe("q1__my-filter__select__alpha-beta--3");
+    expect(used.has(id3)).toBe(true);
+  });
+
+  it("falls back to 'filter' when all parts are empty", () => {
+    const used = new Set();
+    const id = buildDeterministicFilterId({}, used);
+    expect(id).toBe("filter");
+
+    // Next call collides and should suffix
+    const id2 = buildDeterministicFilterId({}, used);
+    expect(id2).toBe("filter--2");
+  });
+});
+
+describe("applyWhereConditions", () => {
+  const rows = [
+    { id: 1, status: "active", score: 10, tag: null },
+    { id: 2, status: "inactive", score: 20, tag: undefined },
+    { id: 3, status: "active", score: 30, tag: "x" },
+    { id: 4, status: "pending", score: 20, tag: "y" },
+  ];
+
+  it("supports 'in' with scalar and array values", () => {
+    const r1 = applyWhereConditions(rows, { column: "status", values: "active", operator: "in" });
+    expect(r1.map(r => r.id)).toEqual([1, 3]);
+
+    const r2 = applyWhereConditions(rows, { column: "score", values: [20, 30], operator: "in" });
+    expect(r2.map(r => r.id)).toEqual([2, 3, 4]);
+  });
+
+  it("supports 'notIn'", () => {
+    const r = applyWhereConditions(rows, { column: "status", values: ["inactive", "pending"], operator: "notIn" });
+    expect(r.map(r => r.id)).toEqual([1, 3]);
+  });
+
+  it("supports 'equals' and 'notEquals'", () => {
+    const eq = applyWhereConditions(rows, { column: "score", values: 20, operator: "equals" });
+    expect(eq.map(r => r.id)).toEqual([2, 4]);
+
+    const ne = applyWhereConditions(rows, { column: "status", values: "active", operator: "notEquals" });
+    expect(ne.map(r => r.id)).toEqual([2, 4]);
+  });
+
+  it("supports 'isNull' and 'notNull'", () => {
+    const isNull = applyWhereConditions(rows, { column: "tag", operator: "isNull" });
+    // tag null or undefined => ids 1,2
+    expect(isNull.map(r => r.id)).toEqual([1, 2]);
+
+    const notNull = applyWhereConditions(rows, { column: "tag", operator: "notNull" });
+    expect(notNull.map(r => r.id)).toEqual([3, 4]);
+  });
+
+  it("ANDs multiple conditions together", () => {
+    const where = [
+      { column: "status", values: "active", operator: "equals" },
+      { column: "score", values: [10, 20], operator: "in" }, // only score 10 matches among active
+    ];
+    const r = applyWhereConditions(rows, where);
+    expect(r.map(r => r.id)).toEqual([1]);
+  });
+
+  it("ignores malformed conditions (no column) by treating them as pass-through", () => {
+    const where = [
+      null,
+      { }, // missing column
+      { column: "status", values: "pending", operator: "equals" },
+    ];
+    const r = applyWhereConditions(rows, where);
+    expect(r.map(r => r.id)).toEqual([4]);
   });
 });
