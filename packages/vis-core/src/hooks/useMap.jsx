@@ -54,6 +54,8 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         container.style.width = '100%';
       }
 
+      const styleValue = typeof mapStyle === 'function' ? mapStyle() : (mapStyle || defaultMapStyle());
+
       // Compute API base once for transformRequest
       let apiBaseOrigin = null;
       try {
@@ -62,7 +64,7 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
 
       const mapInstance = new maplibregl.Map({
         container,
-        style: mapStyle || defaultMapStyle,
+        style: styleValue,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         // maxZoom: 15,
@@ -78,7 +80,7 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
           // Append OS params
           if (resourceType !== 'Style' && url.startsWith('https://api.os.uk')) {
             url = new URL(url);
-            if (!url.searchParams.has('key')) url.searchParams.append('key', process.env.REACT_APP_MAP_API_TOKEN);
+            if (!url.searchParams.has('key')) url.searchParams.append('key', import.meta.env.VITE_APP_MAP_API_TOKEN);
             if (!url.searchParams.has('srs')) url.searchParams.append('srs', 3857);
             return {
               url: new Request(url).url

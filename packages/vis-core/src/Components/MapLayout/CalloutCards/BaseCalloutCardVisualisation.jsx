@@ -34,10 +34,12 @@ export const BaseCalloutCardVisualisation = ({
   cardName,
   onUpdate,
   locationFilterId,
+  getAllColors,
   ...props
 }) => {
   const sidebarIsOpen = props.sidebarIsOpen;
   const { state, dispatch } = useContext(MapContext);
+  const injectedGetAllColors = state?.appConfig?.getAllColors;
   const { dispatch: filterDispatch } = useFilterContext();
   const visualisation = state.visualisations[visualisationName];
 
@@ -354,6 +356,7 @@ export const BaseCalloutCardVisualisation = ({
       onUpdate={onUpdate}
       data={data}
       isLoading={remoteIsLoading}
+      getAllColors={getAllColors ?? injectedGetAllColors}
       recordSelector={hasMultipleRecords ? (
         <RecordSelector
           records={allRecords}

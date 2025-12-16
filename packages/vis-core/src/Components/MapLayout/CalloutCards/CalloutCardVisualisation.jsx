@@ -8,7 +8,6 @@ import { replacePlaceholders } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
-import { getAllColors } from "configs/sa-bradford25-sobc/utils/colors";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
@@ -234,11 +233,17 @@ export const CalloutCardVisualisation = ({
   hideHandleOnMobile = false, 
   onVisibilityChange,
   recordSelector = null,
-  toggleVisibility: externalToggleVisibility = null
+  toggleVisibility: externalToggleVisibility = null,
+  getAllColors,
 }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
   const buttonRef = useRef(null);
+
+  const colorsList = useMemo(() => {
+    if (typeof getAllColors === "function") return getAllColors();
+    return ["#A0CA2A", "#E97132", "#7317DE", "#6D6875", "#3A86FF"]; // fallback
+  }, [getAllColors]);
 
   // Do not render the card if no data is available,
   // or if the data is an empty object,
@@ -439,7 +444,6 @@ export const CalloutCardVisualisation = ({
                     .filter(([key, obj]) => obj && obj.type !== undefined)
                     .map(([key, obj]) => ({ key, ...obj }));
                   // Association of networks has a colour
-                  const colorsList = getAllColors();
                   const networkColorMap = {};
                   let colorIdx = 0;
                   allGraphs.forEach((chart) => {

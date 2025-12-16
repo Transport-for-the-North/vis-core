@@ -237,7 +237,7 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
   
   const lastSegment = path.substring(path.lastIndexOf('/') + 1);
   // gets app name
-  const appName = process.env.REACT_APP_NAME;
+  const appName = import.meta.env.VITE_APP_NAME;
 
   // determines whether to use linear or root function for width 
   functionType = chooseLinearOrRootFunction(bins, appName, lastSegment);
