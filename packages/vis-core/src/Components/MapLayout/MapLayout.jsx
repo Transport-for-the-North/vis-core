@@ -205,10 +205,12 @@ export const MapLayout = () => {
 
     const validatedFilters = updateFilterValidity(state, filterState);
 
-    dispatch({
-      type: "UPDATE_FILTER_VALUES",
-      payload: { updatedFilters: validatedFilters },
-    });
+    if (JSON.stringify(validatedFilters) !== JSON.stringify(state.filters)) {
+      dispatch({
+        type: "UPDATE_FILTER_VALUES",
+        payload: { updatedFilters: validatedFilters },
+      });
+    }
 
     state.filters.forEach((filter) => {
       let selectedValue
