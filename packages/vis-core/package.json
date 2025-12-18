@@ -1,6 +1,6 @@
 {
   "name": "@transport-for-the-north/vis-core",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "private": false,
   "type": "module",
   "main": "dist/index.cjs",
@@ -85,12 +85,14 @@
     "lodash.debounce": "^4.0.8",
     "maplibre-gl": "^5.10.0",
     "polished": "^4.3.1",
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "recharts": "^2.12.7",
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "@auth0/auth0-react": "^2.6.0",
     "@heroicons/react": "^2.2.0",
     "@mapcomponents/react-maplibre": "^1.6.0",
@@ -117,7 +119,7 @@
     "lz-string": "^1.5.0",
     "polished": "^4.3.1",
     "react-icons": "^5.5.0",
-    "react-leaflet": "^5.0.0",
+    "react-leaflet": "^4.2.1",
     "react-modal": "^3.16.3",
     "react-redux": "^9.2.0",
     "react-router": "^7.9.4",
