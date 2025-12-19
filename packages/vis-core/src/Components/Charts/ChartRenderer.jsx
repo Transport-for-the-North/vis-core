@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   ResponsiveContainer,
   BarChart as RBarChart,
@@ -911,6 +911,14 @@ const RankingChart = ({ config, data, formatters }) => {
     [cols]
   );
   const ranks = config?.ranks;
+  const nodeRefs = useRef(new Map());
+
+  const getNodeRef = (key) => {
+    if (!nodeRefs.current.has(key)) {
+      nodeRefs.current.set(key, React.createRef());
+    }
+    return nodeRefs.current.get(key);
+  };
 
   const sortedRows = React.useMemo(() => {
     if (ranks) {
@@ -966,9 +974,10 @@ const RankingChart = ({ config, data, formatters }) => {
         <TransitionGroup component="tbody">
           {visibleRows.map((r, idx) => {
             const val = data[r.key];
+            const nodeRef = getNodeRef(r.key);
             return (
-              <CSSTransition key={r.key} timeout={300} classNames="row">
-                <RowTr>
+              <CSSTransition key={r.key} timeout={300} classNames="row" nodeRef={nodeRef}>
+                <RowTr ref={nodeRef}>
                   <td>
                     <RankBadge>{ranks ? ranks[r.key] : idx + 1}</RankBadge>
                   </td>
