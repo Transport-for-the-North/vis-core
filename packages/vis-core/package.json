@@ -1,6 +1,6 @@
 {
   "name": "@transport-for-the-north/vis-core",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "private": false,
   "type": "module",
   "main": "dist/index.cjs",
@@ -91,8 +91,8 @@
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "@auth0/auth0-react": "^2.6.0",
     "@heroicons/react": "^2.2.0",
     "@mapcomponents/react-maplibre": "^1.6.0",
