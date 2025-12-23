@@ -280,6 +280,7 @@ export const MapLayout = () => {
         additionalFeatures={pageContext.config.additionalFeatures}
         infoBoxText={layerZoomMessage}
         downloadPath={pageContext.config.downloadPath}
+        downloadShapefilePath={pageContext.config.downloadShapefilePath}
         requestMethod={pageContext.config.requestMethod}
         setIsOpen={setSidebarIsOpen}
       >

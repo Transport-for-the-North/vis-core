@@ -114,7 +114,7 @@ export class DownloadService extends BaseService {
     }
   
   /**
-   * Downloads a csv from the specified path with query parameters.
+   * Downloads a CSV file or a Shapefile ZIP archive from the specified path with query parameters.
    *
    * @param {string} [subPath=""] - The sub-path for the file request.
    * @param {Object} [options={}] - Additional options, including query parameters and headers.
@@ -125,7 +125,7 @@ export class DownloadService extends BaseService {
    * @returns {Promise<void>} Resolves when the download is initiated.
    * @throws {Error} If the GET request exceeds the maximum size limit.
    */
-  async downloadCsv(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {}, method: "GET" }) {
+  async downloadFile(subPath = "", options = { queryParams: {}, skipAuth: false, headers: {}, method: "GET" }) {
     console.log(options?.queryParams);
     const queryParams = updateQueryParams(options?.queryParams);
     const method = options.method?.toUpperCase() || "GET";
@@ -170,8 +170,16 @@ export class DownloadService extends BaseService {
     }
     
     const blob = await response.blob();
+    
+    // Assign file name based on url
+    let filename = null;
+    if (url.includes("shapefile")) {
+      filename = "downloads.zip";
+    } else {
+      filename = "downloads.csv";
+    }
+    
     // Extract filename from Content-Disposition header, if available
-    let filename = "download.csv"; // Default filename
     const disposition = response.headers.get("Content-Disposition");
     if (disposition && disposition.indexOf("attachment") !== -1) {
       const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
