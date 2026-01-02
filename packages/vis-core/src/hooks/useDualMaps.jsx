@@ -31,9 +31,10 @@ export const useDualMaps = (
     /**
      * Initializes the two MapLibre map instances.
      */
-    const initializeDualMap = () => {
+    const initializeDualMap = () => {      
+      const styleValue = typeof mapStyle === "function" ? mapStyle() : (mapStyle || defaultMapStyle);
       const commonOptions = {
-        style: mapStyle || defaultMapStyle,
+        style: styleValue,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
         // maxZoom: 16,
