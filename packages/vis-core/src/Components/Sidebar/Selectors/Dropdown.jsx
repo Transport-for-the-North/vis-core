@@ -48,8 +48,7 @@ const InfoBelowPanel = styled.div`
  * Button that toggles the collapse state of the info panel.
  * Uses a ChevronRightIcon rotated to indicate expanded/collapsed.
  *
- * Props:
- * - $collapsed: boolean - whether the panel is collapsed (controls icon rotation).
+ * @param {{ $collapsed: boolean }} props - whether the panel is collapsed (controls icon rotation).
  */
 const CollapseButton = styled.button`
   position: absolute;
@@ -185,8 +184,8 @@ export const Dropdown = ({ filter, onChange }) => {
   const prevSelectedOptionsRef = useRef(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
-  const options = useMemo(() => {
-    const filteredOptions = filter.values.values
+  const baseOptions = useMemo(() => {
+    return filter.values.values
       .filter((option) => !option.isHidden)
       .map((option) => ({
         value: option.paramValue,
@@ -195,15 +194,14 @@ export const Dropdown = ({ filter, onChange }) => {
         infoOnHover: option?.infoOnHover ?? null,
         infoBelowOnChange: option?.infoBelowOnChange ?? null,
       }));
+  }, [filter.values.values]);
+
+  const options = useMemo(() => {
     if (filter.multiSelect) {
-      const allOption = {
-        value: 'all',
-        label: 'All',
-      };
-      return [allOption, ...filteredOptions];
+      return [{ value: "all", label: "All" }, ...baseOptions];
     }
-    return filteredOptions;
-  }, [filter.values.values, filter.multiSelect]);
+    return baseOptions;
+  }, [baseOptions, filter.multiSelect]);
 
   const selectedOptions = useMemo(() => {
     if (Array.isArray(filterState[filter.id])) {
@@ -316,8 +314,7 @@ export const Dropdown = ({ filter, onChange }) => {
         onChange(filter, options.slice(1).map(option => option.value));
       } else {
         setIsAllSelected(false);
-        const values = selectedOptions.map(option => option.value);
-        onChange(filter, values);
+        onChange(filter, selectedOptions.map((o) => o.value));
       }
     } else if (selectedOptions) {
       setIsAllSelected(false);
@@ -325,11 +322,7 @@ export const Dropdown = ({ filter, onChange }) => {
     } else {
       // When cleared, set to null for single-select or empty array for multi-select
       setIsAllSelected(false);
-      if (filter.multiSelect) {
-        onChange(filter, []);
-      } else {
-        onChange(filter, null);
-      }
+      onChange(filter, filter.multiSelect ? [] : null);
     }
   };
 
@@ -338,8 +331,8 @@ export const Dropdown = ({ filter, onChange }) => {
     prevSelectedOptionsRef.current = filterState[filter.id];
   }, [filterState, filter.id]);
 
+  // Optional auto-select when exactly one option is available
   useEffect(() => {
-    // Automatically select the only option if there's just one available
     if (options.length === 1 && filterState[filter.id] !== options[0].value) {
       onChange(filter, options[0].value);
     }
@@ -371,6 +364,10 @@ export const Dropdown = ({ filter, onChange }) => {
     return `Details available — expand for details.`;
   }, [infoBelowItems, selectedOptions]);
 
+  // Single-select placeholder: show "All" when includeAllOption is set and value is null
+  const placeholder =
+    !filter.multiSelect && filter.includeAllOption && !hasSelection ? "All" : "Select...";
+
   return (
     <StyledDropdown>
       <Select
@@ -379,12 +376,13 @@ export const Dropdown = ({ filter, onChange }) => {
         value={selectedOptions}
         onChange={handleDropdownChange}
         formatOptionLabel={formatOptionLabel}
-        styles={customStyles}
+        styles={selectStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body}
         isClearable={filter.isClearable}
         isMulti={filter.multiSelect}
         isLoading={loading}
+        placeholder={placeholder}
       />
       {hasSelection && infoBelowItems.length > 0 && (
         <InfoBelowPanel>
