@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
-import { ColourSchemeDropdown } from "../Selectors";
+import { ColourSchemeDropdown, BandEditor } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
 import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression} from "utils/map"
@@ -407,18 +407,31 @@ export const LayerControlEntry = memo(
               <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
             </WidthControl>
           )}
-          {/* Color Scheme and Classification (if stylable) */}
+          {/* Color Scheme, Band Editor, and Classification (if stylable) */}
           {layer.metadata?.isStylable && (
             <div style={{ marginTop: "1rem" }}>
-              {!enforceNoColourSchemeSelector && 
-              !((visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
-                visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Passengers Over Seating Capacity") &&
-              (currentPage.pageName === "Link Totals" || currentPage.pageName === "Link Totals Side-by-Side")) &&
-              <ColourSchemeDropdown
-                colorStyle={colorStyle}
-                handleColorChange={handleColorChange}
-                layerName={layer.id}
-              />}
+              {!enforceNoColourSchemeSelector &&
+                !((visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
+                  visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Passengers Over Seating Capacity") &&
+                  (currentPage.pageName === "Link Totals" || currentPage.pageName === "Link Totals Side-by-Side")) &&
+                <ColourSchemeDropdown
+                  colorStyle={colorStyle}
+                  handleColorChange={handleColorChange}
+                  layerName={layer.id}
+                />}
+
+              {/* BandEditor for continuous/diverging only */}
+              {(colorStyle === "continuous" || colorStyle === "diverging") && hasDefaultBands && (
+                <BandEditor
+                  bands={hasDefaultBands.values}
+                  onChange={(newBands) => {
+                    // TODO: Implement update logic for bands in state and map/legend
+                    // Example: dispatch({ type: 'UPDATE_BANDS', layerId: layer.id, bands: newBands })
+                  }}
+                  isDiverging={colorStyle === "diverging"}
+                />
+              )}
+
               {!enforceNoClassificationMethod && <ClassificationDropdown
                 classType={{
                   Default: "d",
@@ -434,7 +447,7 @@ export const LayerControlEntry = memo(
                   handleClassificationChange(value, layer.id)
                 }
               />}
-          </div>
+            </div>
           )}
         </CollapsibleContent>
       </LayerControlContainer>
