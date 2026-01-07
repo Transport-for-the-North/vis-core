@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { SelectorLabel } from "./SelectorLabel";
@@ -101,18 +100,47 @@ const UpdateButton = styled.button`
   }
 `;
 
-
+/**
+ * BandEditor component allows users to customize classification band values for map layers.
+ * Provides an interface to edit the number of bands and their individual threshold values.
+ * Only shown for continuous and diverging color schemes.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {number[]} props.bands - Array of current band threshold values.
+ * @param {Function} props.onChange - Callback function invoked when user updates band values.
+ * @param {boolean} props.isDiverging - Whether the color scheme is diverging (affects min band count).
+ * @returns {JSX.Element} The rendered BandEditor component.
+ *
+ * @example
+ * <BandEditor
+ *   bands={[0, 10, 20, 30, 40]}
+ *   onChange={(newBands) => handleBandChange(newBands)}
+ *   isDiverging={false}
+ * />
+ */
 export const BandEditor = ({ bands, onChange, isDiverging }) => {
   const [localBands, setLocalBands] = useState(bands);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Sync localBands with bands prop (from parent/classification changes)
+  /**
+   * Synchronize local band state with incoming bands prop.
+   * Resets changes flag when parent updates the bands.
+   */
   useEffect(() => {
     setLocalBands(bands);
     setHasChanges(false);
   }, [bands]);
 
-  // Validate bands: each band must be greater than the previous one
+  /**
+   * Validates band values to ensure they are in ascending order.
+   * Each band value must be strictly greater than the previous one.
+   *
+   * @returns {Object} Validation result containing:
+   *   - valid: {boolean} Whether the bands are valid
+   *   - error: {string|null} Error message if validation fails
+   *   - errorIndex: {number|null} Index of the problematic band
+   */
   const validateBands = () => {
     const numericBands = localBands.filter(v => v !== "" && !isNaN(v)).map(Number);
     
@@ -135,7 +163,12 @@ export const BandEditor = ({ bands, onChange, isDiverging }) => {
 
   const validation = validateBands();
 
-  // Handle band value change
+  /**
+   * Handles changes to individual band values.
+   *
+   * @param {number} idx - Index of the band being modified.
+   * @param {string} value - New value for the band.
+   */
   const handleBandChange = (idx, value) => {
     const newBands = [...localBands];
     newBands[idx] = value === "" ? "" : Number(value);
@@ -143,7 +176,12 @@ export const BandEditor = ({ bands, onChange, isDiverging }) => {
     setHasChanges(true);
   };
 
-  // Handle band count change
+  /**
+   * Handles changes to the number of bands.
+   * Adds new bands with incremental values or truncates existing bands.
+   *
+   * @param {Event} e - Change event from the select dropdown.
+   */
   const handleBandCountChange = (e) => {
     const count = Number(e.target.value);
     let newBands = [...localBands];
@@ -160,7 +198,10 @@ export const BandEditor = ({ bands, onChange, isDiverging }) => {
     setHasChanges(true);
   };
 
-  // Handle update button click
+  /**
+   * Handles the update button click.
+   * Filters out invalid values and invokes the onChange callback with valid bands.
+   */
   const handleUpdate = () => {
     const validBands = localBands.filter(v => v !== "" && !isNaN(v)).map(Number);
     onChange(validBands);
