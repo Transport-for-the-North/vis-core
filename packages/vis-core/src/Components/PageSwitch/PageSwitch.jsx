@@ -1,5 +1,5 @@
 import React from "react";
-import { MapLayout, IFrameEmbedPage } from "Components";
+import { MapLayout, IFrameEmbedPage, TableLayout } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
 
 /**
@@ -25,7 +25,9 @@ export const PageSwitch = ({ pageConfig }) => {
               </FilterProvider>
             );
           case "IFrameEmbed":
-            return <IFrameEmbedPage config={pageConfig.config} />;            
+            return <IFrameEmbedPage config={pageConfig.config} />;
+          case "TableLayout":
+            return <TableLayout config={pageConfig.config} />;
           default:
             return <div>Nothing</div>;
         }
