@@ -108,6 +108,23 @@ const StatusMessage = styled.div`
   font-size: 1rem;
 `;
 
+/**
+ * TableLayout component displays tabular data with filtering capabilities.
+ * Fetches data from a specified endpoint and renders it in a filterable table format.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.config - Configuration object for the table.
+ * @param {Object} props.config.recordsEndpoint - Endpoint configuration for fetching table data.
+ * @param {string} props.config.recordsEndpoint.path - API path to fetch records from.
+ * @param {Object} [props.config.recordsEndpoint.requestOptions] - Optional request configuration.
+ * @param {Array} props.config.columns - Array of column definitions.
+ * @param {string} props.config.columns[].accessor - Property name to access data in each row.
+ * @param {string} props.config.columns[].header - Display name for the column header.
+ * @param {boolean} [props.config.columns[].filter] - Whether to show a filter dropdown for this column.
+ * @param {string} [props.config.columns[].type] - Data type of the column (e.g., 'boolean').
+ * @returns {JSX.Element} The rendered TableLayout component.
+ */
 export function TableLayout({ config }) {
   const { recordsEndpoint, columns = [] } = config || {};
   
