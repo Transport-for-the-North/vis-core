@@ -15,7 +15,7 @@ jest.mock("maplibre-gl", () => ({
 }));
 
 jest.mock("./CalloutCards/BaseCalloutCardVisualisation", () => ({
-  CalloutCardVisualisation: ({ visualisationName, cardName, onUpdate, type, sidebarIsOpen }) => {
+  BaseCalloutCardVisualisation: ({ visualisationName, cardName, onUpdate, type, sidebarIsOpen }) => {
     return (
       <div data-testid="callout-card-visualisation">
         Mock BaseCalloutCardVisualisation - {visualisationName} - {cardName} - {type} - {sidebarIsOpen}
@@ -36,6 +36,17 @@ jest.mock("./MapVisualisation", () => ({
   },
 }));
 
+jest.mock("Components", () => ({
+  ScrollableContainer: ({ children, showOnMobile, hideCardHandleOnMobile }) => {
+    return (
+      <div data-testid="scrollable-container">
+        Mock ScrollableContainer - {showOnMobile.toString()} - {hideCardHandleOnMobile.toString()}
+        {children}
+      </div>
+    );
+  }
+}))
+
 const mockMapContext = {
   state: {
     visualisations: {
@@ -55,12 +66,15 @@ describe("Test to render a CalloutVisualisationCard", () => {
       },
       calloutCard1: {
         type: "calloutCard",
+        cardType: "small",
         cardName: "Test Card1",
         queryParams: {},
       },
     },
     map: {},
     maps: {},
+    sidebarIsOpen: false,
+    left: "left"
   };
   it("classic use", () => {
     render(
@@ -68,8 +82,8 @@ describe("Test to render a CalloutVisualisationCard", () => {
         <VisualisationManager {...props} />
       </MapContext.Provider>
     );
-    const cardName = screen.getByText(/Mock BaseCalloutCardVisualisation - Test Card/i);
-    const cardName1 = screen.getByText(/Mock BaseCalloutCardVisualisation - Test Card1/i);
+    const cardName = screen.getByText(/Mock BaseCalloutCardVisualisation - calloutCard - Test Card/i);
+    const cardName1 = screen.getByText(/Mock BaseCalloutCardVisualisation - calloutCard1 - Test Card1/i);
     expect(cardName).toBeInTheDocument();
     expect(cardName1).toBeInTheDocument();
   });

@@ -15,6 +15,7 @@ jest.mock("services", () => ({
 }));
 jest.mock("uuid", () => ({
   v4: jest.fn(() => "mocked-uuid-id"),
+  uuidv4: jest.fn(() => "mocked-uuid-id"),
 }));
 jest.mock("utils", () => ({
   hasRouteParameterOrQuery: jest.fn(() => true),
