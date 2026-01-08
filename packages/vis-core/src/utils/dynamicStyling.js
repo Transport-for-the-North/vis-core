@@ -29,28 +29,32 @@ export const determineDynamicStyle = (dataSample, baseStyle) => {
  * @returns {string} 'categorical', 'continuous', or 'diverging'
  */
 export const analyzeDataType = (values) => {
-  // Check if all values are strings or if there are very few unique numeric values
+  // Check if all values are strings
   const uniqueValues = [...new Set(values)];
   const isAllStrings = values.every(val => typeof val === 'string');
   const hasNegativeAndPositive = values.some(val => val < 0) && values.some(val => val > 0);
-  
+
   // If all values are strings, it's categorical
   if (isAllStrings) {
     return 'categorical';
   }
-  
-  // Prioritize categorical for small datasets with few unique values (including boolean-like data)
-  // This handles cases like [0,1], [-1,1], [1,2,3], etc.
-  if (uniqueValues.length <= 10 && values.every(val => Number.isInteger(val))) {
+
+  // Only treat boolean-like integer sets as categorical: [0], [1], [0,1], [1,0]
+  if (
+    values.every(val => Number.isInteger(val)) &&
+    (
+      (uniqueValues.length === 1 && (uniqueValues[0] === 0 || uniqueValues[0] === 1)) ||
+      (uniqueValues.length === 2 && uniqueValues.includes(0) && uniqueValues.includes(1))
+    )
+  ) {
     return 'categorical';
   }
-  
+
   // If we have both negative and positive values, it's diverging
-  // Diverging color schemes are designed to show data that diverges from a central value
   if (hasNegativeAndPositive) {
     return 'diverging';
   }
-  
+
   // Default to continuous for numeric data
   return 'continuous';
 };
