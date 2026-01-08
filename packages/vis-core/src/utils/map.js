@@ -706,6 +706,14 @@ export const reclassifyData = (
 
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
+    if (classificationMethod === "c") {
+      // Use custom bands if provided
+      if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
+        return options.customBands;
+      }
+      // Fallback to default method if no custom bands
+      classificationMethod = "d";
+    }
     if (classificationMethod === "d") {
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
@@ -729,6 +737,14 @@ export const reclassifyData = (
     return values;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
+    if (classificationMethod === "c") {
+      // Use custom bands if provided
+      if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
+        return options.customBands;
+      }
+      // Fallback to default method if no custom bands
+      classificationMethod = "d";
+    }
     if (classificationMethod === "d") {
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);

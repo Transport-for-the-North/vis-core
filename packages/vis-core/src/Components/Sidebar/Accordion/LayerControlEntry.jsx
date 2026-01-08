@@ -180,6 +180,7 @@ export const LayerControlEntry = memo(
     maps,
     handleColorChange,
     handleClassificationChange,
+    handleCustomBandsChange,
     state,
   }) => {
     const [visibility, setVisibility] = useState(
@@ -262,6 +263,34 @@ export const LayerControlEntry = memo(
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
     const [widthFactor, setWidth] = useState(initialWidth || 1);
+
+    // Extract current bins from layer paint properties
+    const currentBins = useMemo(() => {
+      if (!maps.length || !maps[0].getLayer(layer.id)) {
+        return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      }
+      
+      const paintProps = layer.paint;
+      const colorExpression = paintProps?.["line-color"] || 
+                              paintProps?.["circle-color"] || 
+                              paintProps?.["fill-color"];
+      
+      if (!colorExpression || !Array.isArray(colorExpression)) {
+        return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      }
+      
+      // Extract bins from interpolate expression: ["interpolate", ["linear"], ["feature-state", "value"], bin1, color1, bin2, color2, ...]
+      if (colorExpression[0] === "interpolate") {
+        const stops = colorExpression.slice(3); // Skip ["interpolate", ["linear"], ["feature-state", "value"]]
+        const bins = [];
+        for (let i = 0; i < stops.length; i += 2) {
+          bins.push(stops[i]);
+        }
+        return bins.length > 0 ? bins : (hasDefaultBands?.values || [0, 1, 2, 3, 4]);
+      }
+      
+      return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+    }, [maps, layer.id, layer.paint, hasDefaultBands]);
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -421,12 +450,11 @@ export const LayerControlEntry = memo(
                 />}
 
               {/* BandEditor for continuous/diverging only */}
-              {(colorStyle === "continuous" || colorStyle === "diverging") && hasDefaultBands && (
+              {(colorStyle === "continuous" || colorStyle === "diverging") && (
                 <BandEditor
-                  bands={hasDefaultBands.values}
+                  bands={currentBins}
                   onChange={(newBands) => {
-                    // TODO: Implement update logic for bands in state and map/legend
-                    // Example: dispatch({ type: 'UPDATE_BANDS', layerId: layer.id, bands: newBands })
+                    handleCustomBandsChange(newBands, layer.id);
                   }}
                   isDiverging={colorStyle === "diverging"}
                 />
