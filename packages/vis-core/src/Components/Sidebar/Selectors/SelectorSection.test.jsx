@@ -124,6 +124,13 @@ const mockAppContexte = {
   contactText: "contactText",
   contactEmail: "contactEmail",
   legalText: "legalText",
+  apiSchema: {
+    paths: {
+      "/downloadPath": {
+        get: jest.fn()
+      }
+    }
+  }
 };
 const mockFilterContext = {
   state: {
@@ -150,6 +157,7 @@ let props = {
   filter: [],
   onFilterChange: jest.fn(),
   bgColor: "white",
+  downloadPath: "/downloadPath"
 };
 
 describe("SelectorSection component test", () => {
@@ -184,7 +192,7 @@ describe("SelectorSection component test", () => {
     expect(value).toBeInTheDocument();
     expect(buttonText).toBeInTheDocument();
     // check the onClick of the button
-    const button = screen.getByRole("button");
+    const button = screen.getByText(/Download as CSV/);
     userEvent.click(button);
     // check if the function is launched
     await waitFor(() => {
@@ -226,7 +234,7 @@ describe("SelectorSection component test", () => {
     expect(value).toBeInTheDocument();
     expect(buttonText).toBeInTheDocument();
     // check the onClick of the button
-    const button = screen.getByRole("button");
+    const button = screen.getByText(/Download as CSV/);
     userEvent.click(button);
     // check if the function is launched
     await waitFor(() => {

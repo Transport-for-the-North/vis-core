@@ -178,6 +178,7 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
     await waitFor(() => {
       expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith({
         id: "Accessibility",
+        bufferSize: 0,
         type: "fill",
         source: "Accessibility",
         paint: {
@@ -190,6 +191,7 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
         layout: { visibility: "visible" },
         metadata: {
           isStylable: true,
+          defaultOpacity: 0.65,
           path: "/api/vectortiles/zones/5/{z}/{x}/{y}",
           shouldShowInLegend: true,
           shouldHaveOpacityControl: true,

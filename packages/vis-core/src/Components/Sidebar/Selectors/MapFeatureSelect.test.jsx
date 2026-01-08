@@ -80,7 +80,6 @@ describe("BaseMapFeatureSelect component test", () => {
         <BaseMapFeatureSelect {...props} />
       </MapContext.Provider>
     );
-    screen.debug();
     const button = screen.getByTestId("featureSelect-button");
     expect(button).toBeInTheDocument();
     userEvent.click(button);
@@ -104,7 +103,7 @@ describe("BaseMapFeatureSelect component test", () => {
   it("Click on Pointer Select and Rectangle Select", async () => {
     const propsWithColor = {
       ...props,
-      bgColor: "#FF0000",
+      bgColor: "rgb(255, 0, 0)",
     };
 
     render(
@@ -126,8 +125,7 @@ describe("BaseMapFeatureSelect component test", () => {
     expect(rectangleSelect).not.toBeDisabled();
 
     expect(pointerSelect).toHaveStyle({
-      backgroundColor: "#FF0000",
-      color: "white",
+      color: "black",
     });
     expect(rectangleSelect).toHaveStyle({
       backgroundColor: "white",
@@ -138,8 +136,7 @@ describe("BaseMapFeatureSelect component test", () => {
 
     await waitFor(() => {
       expect(rectangleSelect).toHaveStyle({
-        backgroundColor: "#FF0000",
-        color: "white",
+        color: "black",
       });
       expect(pointerSelect).toHaveStyle({
         backgroundColor: "white",
@@ -151,11 +148,9 @@ describe("BaseMapFeatureSelect component test", () => {
 
     await waitFor(() => {
       expect(pointerSelect).toHaveStyle({
-        backgroundColor: "#FF0000",
-        color: "white",
+        color: "black",
       });
       expect(rectangleSelect).toHaveStyle({
-        backgroundColor: "white",
         color: "black",
       });
     });

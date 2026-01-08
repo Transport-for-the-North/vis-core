@@ -61,6 +61,7 @@ jest.mock("maplibre-gl", () => {
 import maplibregl from "maplibre-gl";
 import Map from "./Map";
 import { ThemeProvider } from "styled-components";
+import { get } from "lodash";
 
 const OriginalPopupClass = (() => {
   class Popup {
@@ -118,7 +119,10 @@ let mockMapContext = {
         visualisationName: "visualisationName",
       },
     },
-    visualisedFeatureIds: { first: "first", second: "second" },
+    visualisedFeatureIds: {
+      first: [{ value: "201" }],
+      second: [{ value: "201" }],
+    },
     visualisations: {
       climate: {
         id: "climate",
@@ -176,7 +180,6 @@ let mockMapContext = {
     selectionLayer: null,
     selectedFeatures: [],
     isFeatureSelectActive: false,
-    visualisedFeatureIds: null,
     currentZoom: 10,
     colorSchemesByLayer: {
       id: {
@@ -229,8 +232,10 @@ beforeEach(() => {
   }
   maplibregl.default.Popup = OriginalPopupClass;
 
-  on.mockReset();
-  on.mockImplementation(() => {});
+  // on.mockReset();
+  on.mockImplementation((eventName, callback) => {
+    callback({ type: eventName, originalEvent: {} });
+  });
   getCanvas.mockReturnValue({
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
@@ -238,6 +243,7 @@ beforeEach(() => {
       cursor: "pointer",
     },
   });
+  getLayer.mockReturnValue(true);
   useMap.mockReturnValue({
     map: {
       addControl,
@@ -283,6 +289,16 @@ const theme = {
 
 describe("Initial rendering", () => {
   it("DynamicLegend and VisualisationManager are rendering", () => {
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        visualisedFeatureIds: {
+          first: [{ value: "201" }],
+          second: [{ value: "201" }],
+        },
+      },
+    };
     render(
       <ThemeProvider theme={theme}>
         <FilterContext.Provider value={mockFilterContext}>
@@ -628,6 +644,41 @@ describe("Tests of handleMapHover function", () => {
       },
     };
 
+    on.mockImplementation((eventName, callback) => {
+      if (eventName === "click") {
+        callback({
+          type: "touchend",
+          originalEvent: {
+            changedTouches: [{ clientX: 42, clientY: 1337 }],
+          },
+        });
+      } else {
+        callback({
+          type: eventName,
+          originalEvent: {},
+        });
+      }
+    });
+    getLayer.mockReturnValue(true);
+    getCanvas.mockReturnValue({
+      getBoundingClientRect: jest.fn().mockReturnValue({ left: 0, top: 0 }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    });
+    useMap.mockReturnValue({
+      map: {
+        addControl,
+        on,
+        getCanvas,
+        off,
+        getLayer,
+        queryRenderedFeatures,
+        setFilter,
+        setFeatureState,
+      },
+      isMapReady: true,
+    });
+
     render(
       <ThemeProvider theme={theme}>
         <FilterContext.Provider value={mockFilterContext}>
@@ -638,28 +689,14 @@ describe("Tests of handleMapHover function", () => {
       </ThemeProvider>
     );
 
-    // const mouseMoveCallback = on.mock.calls.find(
-    //   (call) => call[0] === "mousemove"
-    // )[1];
-
-    // act(() => {
-    //   mouseMoveCallback({
-    //     point: { x: 100, y: 200 },
-    //     lngLat: { lng: 2.3522, lat: 48.8566 },
-    //   });
-    // });
-
     expect(queryRenderedFeatures).toHaveBeenCalledWith(
-      [
-        [100, 200],
-        [100, 200],
-      ],
-      expect.objectContaining({ layers: ["first", "second", "id"] })
+      { x: 42, y: 1337 },
+      { layers: ["first"] }
     );
 
     expect(setFeatureState).toHaveBeenCalledWith(
       { source: "source", id: "id", sourceLayer: "source-layer" },
-      { hover: true }
+      { selected: true }
     );
   });
 
@@ -681,6 +718,41 @@ describe("Tests of handleMapHover function", () => {
         },
       },
     };
+
+    on.mockImplementation((eventName, callback) => {
+      if (eventName === "click") {
+        callback({
+          type: "touchend",
+          originalEvent: {
+            changedTouches: [{ clientX: 42, clientY: 1337 }],
+          },
+        });
+      } else {
+        callback({
+          type: eventName,
+          originalEvent: {},
+        });
+      }
+    });
+    getLayer.mockReturnValue(true);
+    getCanvas.mockReturnValue({
+      getBoundingClientRect: jest.fn().mockReturnValue({ left: 0, top: 0 }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    });
+    useMap.mockReturnValue({
+      map: {
+        addControl,
+        on,
+        getCanvas,
+        off,
+        getLayer,
+        queryRenderedFeatures,
+        setFilter,
+        setFeatureState,
+      },
+      isMapReady: true,
+    });
 
     render(
       <ThemeProvider theme={theme}>
@@ -716,6 +788,16 @@ describe("Tests of handleMapHover function", () => {
         },
       },
     };
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }));
 
     const apiError = new Error("Network error");
     api.baseService.get = jest.fn().mockRejectedValue(apiError);
@@ -833,6 +915,16 @@ describe("handleLayerClick function test", () => {
         },
       },
     ]);
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }));
   });
 
   it("queryRenderedFeatures is called with the great parameters", () => {
@@ -858,7 +950,6 @@ describe("handleLayerClick function test", () => {
           return this;
         },
       };
-      capturedPopup = instance;
       return instance;
     });
 
@@ -1063,6 +1154,22 @@ describe("Pan and centre map", () => {
         },
       },
     };
+    queryRenderedFeatures.mockReturnValue([
+      {
+        id: 123,
+        layer: {
+          id: "id",
+          source: "test-source",
+          "source-layer": "test-source-layer",
+        },
+        properties: {
+          name: "Test Feature",
+        },
+        state: {
+          value: 10,
+        },
+      },
+    ]);
   });
 
   it("Classic test", () => {
@@ -1166,6 +1273,16 @@ describe("mouseLeaveCallback function test", () => {
         callback(mockParams);
       }
     });
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: false, // requirement to launch the function: hoverCallback
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }));
   });
 
   afterEach(() => {

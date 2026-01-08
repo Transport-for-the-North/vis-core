@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import DualMaps from "./DualMaps";
 import { MapContext, FilterContext } from "contexts";
 import { useDualMaps } from "hooks";
+import { ThemeProvider } from "styled-components";
 
 // TO CONTINUE
 
@@ -127,6 +128,12 @@ let mockFilterContext = {
   dispatch: jest.fn(),
 };
 
+let theme = {
+  mq: {
+    mobile: "mobile",
+  },
+};
+
 let props = {
   extraCopyrightText: "ImAnExtraCopyrightText",
 };
@@ -149,15 +156,25 @@ beforeEach(() => {
     isMapLoaded: "isMapLoaded",
     isMapReady: "isMapReady",
   });
+  global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn().mockReturnValue(true),
+    disconnect: jest.fn()
+  }));
+  window.matchMedia = jest.fn().mockImplementation(() => ({
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+  }))
 });
 describe("DualMaps component test", () => {
   it("Check the render with a classic use", () => {
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
     // Check if there are 2 Layer with "first" and 2 Layer with "second"
     const layersFirst = screen.getAllByText(/first/);
@@ -190,11 +207,13 @@ describe("DualMaps component test", () => {
       },
     };
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
     expect(screen.getByText(/Dynamic Legend: left/)).toBeInTheDocument();
   });
@@ -223,11 +242,13 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
   });
   it("Tried to throw the handleMapHover function", () => {
     const { unmount } = render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
     // On function to have been called
     expect(on).toHaveBeenCalledWith("mousemove", expect.any(Function));
@@ -273,11 +294,13 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     });
 
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
     const mousemoveCall = mockLeftMap.on.mock.calls.find(
       (call) => call[0] === "mousemove"
@@ -297,11 +320,13 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
 
   it("Test function getCanvas() is called", () => {
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
     expect(on).toHaveBeenCalledWith(
       "mouseenter",
@@ -335,11 +360,13 @@ describe("Test with shouldHaveLabel = true", () => {
   });
   it("Test handleZoom function is called", () => {
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
   });
 });
@@ -433,11 +460,13 @@ describe("Tests when apiRequest is not null", () => {
   });
   it("Basic test", async () => {
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
     await waitFor(() => {
       expect(api.baseService.get).toHaveBeenCalledWith(
@@ -450,7 +479,7 @@ describe("Tests when apiRequest is not null", () => {
   });
 });
 
-describe.only("Tests when features is null", () => {
+describe("Tests when features is null", () => {
   let setFeatureState;
 
   beforeEach(() => {
@@ -490,7 +519,7 @@ describe.only("Tests when features is null", () => {
     const getLayer = jest.fn().mockReturnValue(true);
     const project = jest.fn().mockReturnValue(true);
     const queryRenderedFeatures = jest.fn().mockReturnValue([]);
-    
+
     setFeatureState = jest.fn();
 
     useDualMaps.mockReturnValue({
@@ -527,11 +556,13 @@ describe.only("Tests when features is null", () => {
   // TO CONTINUE
   it("should call setFeatureState when features is empty", () => {
     render(
-      <FilterContext.Provider value={mockFilterContext}>
-        <MapContext.Provider value={mockMapContext}>
-          <DualMaps {...props} />
-        </MapContext.Provider>
-      </FilterContext.Provider>
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
     );
 
     // expect(setFeatureState).toHaveBeenCalled();

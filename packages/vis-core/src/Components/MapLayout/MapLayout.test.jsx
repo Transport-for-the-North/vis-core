@@ -3,6 +3,7 @@ import { MapLayout } from ".";
 import { AppContext, FilterContext, MapContext } from "contexts";
 import { PageContext } from "contexts";
 import userEvent from "@testing-library/user-event";
+import { ThemeProvider } from "styled-components";
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -14,6 +15,11 @@ jest.mock("maplibre-gl", () => ({
     flyTo: jest.fn(),
   })),
 }));
+let theme = {
+  mq: {
+    mobile: "mobile",
+  },
+};
 let mockMapContext = {
   state: {
     mapStyle: "default",
@@ -196,15 +202,17 @@ jest.mock("./DualMaps", () => ({
 describe("MapLayout component test", () => {
   it("Basic use", async () => {
     render(
-      <AppContext.Provider value={mockAppContexte}>
-        <PageContext.Provider value={mockPageContext}>
-          <FilterContext.Provider value={mockFilterContext}>
-            <MapContext.Provider value={mockMapContext}>
-              <MapLayout />
-            </MapContext.Provider>
-          </FilterContext.Provider>
-        </PageContext.Provider>
-      </AppContext.Provider>
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={mockMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
     );
     // Dimmed check
     expect(screen.getByText(/dimmed: false/)).toBeInTheDocument();
@@ -238,15 +246,17 @@ describe("MapLayout component test", () => {
 
   it("Use of !initializedRef.current && state.pageIsReady is good", async () => {
     render(
-      <AppContext.Provider value={mockAppContexte}>
-        <PageContext.Provider value={mockPageContext}>
-          <FilterContext.Provider value={mockFilterContext}>
-            <MapContext.Provider value={mockMapContext}>
-              <MapLayout />
-            </MapContext.Provider>
-          </FilterContext.Provider>
-        </PageContext.Provider>
-      </AppContext.Provider>
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={mockMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
     );
     // expect dispatch is called
     const parametersExpected = {
@@ -267,15 +277,17 @@ describe("MapLayout component test", () => {
 
   it("filterDispatch is called to reset filters", async () => {
     const { rerender } = render(
-      <AppContext.Provider value={mockAppContexte}>
-        <PageContext.Provider value={mockPageContext}>
-          <FilterContext.Provider value={mockFilterContext}>
-            <MapContext.Provider value={mockMapContext}>
-              <MapLayout />
-            </MapContext.Provider>
-          </FilterContext.Provider>
-        </PageContext.Provider>
-      </AppContext.Provider>
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={mockMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
     );
     // filterDispatch is not called because pageContext is not change yet
     expect(mockFilterContext.dispatch).not.toHaveBeenCalled();
@@ -286,15 +298,17 @@ describe("MapLayout component test", () => {
       config: { someConfig: "value2" },
     };
     rerender(
-      <AppContext.Provider value={mockAppContexte}>
-        <PageContext.Provider value={newPageContext}>
-          <FilterContext.Provider value={mockFilterContext}>
-            <MapContext.Provider value={mockMapContext}>
-              <MapLayout />
-            </MapContext.Provider>
-          </FilterContext.Provider>
-        </PageContext.Provider>
-      </AppContext.Provider>
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={newPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={mockMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
     );
     expect(mockFilterContext.dispatch).toHaveBeenCalledWith({
       type: "RESET_FILTERS",
@@ -330,15 +344,17 @@ describe("tests when !filter.visualisations[0].includes(`Side`)", () => {
 
   it("Test when action = UPDATE_COLOR_SCHEME", () => {
     render(
-      <AppContext.Provider value={mockAppContexte}>
-        <PageContext.Provider value={mockPageContext}>
-          <FilterContext.Provider value={mockFilterContext}>
-            <MapContext.Provider value={mockMapContext2}>
-              <MapLayout />
-            </MapContext.Provider>
-          </FilterContext.Provider>
-        </PageContext.Provider>
-      </AppContext.Provider>
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={mockMapContext2}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
     );
     // expect dispatch is called with type = UPDATE_COLOR_SCHEME
     expect(mockMapContext2.dispatch).toHaveBeenCalledWith({

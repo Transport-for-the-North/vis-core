@@ -14,11 +14,11 @@ jest.mock("maplibre-gl", () => ({
   })),
 }));
 
-jest.mock("./CalloutCardVisualisation", () => ({
-  CalloutCardVisualisation: ({ visualisationName, cardName, onUpdate }) => {
+jest.mock("./CalloutCards/BaseCalloutCardVisualisation", () => ({
+  CalloutCardVisualisation: ({ visualisationName, cardName, onUpdate, type, sidebarIsOpen }) => {
     return (
       <div data-testid="callout-card-visualisation">
-        Mock CalloutCardVisualisation - {visualisationName} - {cardName}
+        Mock BaseCalloutCardVisualisation - {visualisationName} - {cardName} - {type} - {sidebarIsOpen}
         <button onClick={onUpdate}>button: {cardName}</button>
       </div>
     );
@@ -68,12 +68,12 @@ describe("Test to render a CalloutVisualisationCard", () => {
         <VisualisationManager {...props} />
       </MapContext.Provider>
     );
-    const cardName = screen.getByText(/calloutCard - Test Card/i);
-    const cardName1 = screen.getByText(/calloutCard1 - Test Card1/i);
+    const cardName = screen.getByText(/Mock BaseCalloutCardVisualisation - Test Card/i);
+    const cardName1 = screen.getByText(/Mock BaseCalloutCardVisualisation - Test Card1/i);
     expect(cardName).toBeInTheDocument();
     expect(cardName1).toBeInTheDocument();
   });
-  it("Clique on the onUpdate button", async () => {
+  it("Click on the onUpdate button", async () => {
     render(
       <MapContext.Provider value={mockMapContext}>
         <VisualisationManager {...props} />
