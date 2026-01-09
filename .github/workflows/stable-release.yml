@@ -1,0 +1,75 @@
+name: Create Stable Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.4.8)'
+        required: true
+        type: string
+      previous_stable:
+        description: 'Previous stable version to compare against (e.g., 0.4.7)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@transport-for-the-north'
+
+      - name: Update package.json version
+        run: |
+          cd packages/vis-core
+          npm version ${{ inputs.version }} --no-git-tag-version
+
+      - name: Install dependencies
+        run: |
+          cd packages/vis-core
+          npm install
+
+      - name: Build package
+        run: |
+          cd packages/vis-core
+          npm run build
+
+      - name: Publish to GitHub Packages
+        run: |
+          cd packages/vis-core
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: v${{ inputs.version }}
+          body: |
+            ## Stable Release v${{ inputs.version }}
+            
+            ### Installation
+            ```bash
+            npm install @transport-for-the-north/vis-core@${{ inputs.version }}
+            ```
+            
+            ---
+            
+          prerelease: false
+          generate_release_notes: true
+          previous_tag: v${{ inputs.previous_stable }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
