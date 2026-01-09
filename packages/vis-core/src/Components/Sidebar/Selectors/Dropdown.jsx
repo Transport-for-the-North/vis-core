@@ -241,7 +241,6 @@ export const Dropdown = ({ filter, onChange }) => {
     if (
       !filter.shouldBeBlankOnInit &&
       selectedOptions === undefined &&
-      filterState[filter.id] !== null &&
       filter.forceRequired !== false
     ) {
       const visible = filter.multiSelect ? options.slice(1) : options;
