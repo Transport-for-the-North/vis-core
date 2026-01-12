@@ -1,11 +1,11 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { AppContext, FilterContext, MapProvider, PageContext } from "contexts";
 
-const mockDispatch = jest.fn();
+// Mock all dependencies before importing the components
 jest.mock("react", () => ({
   ...jest.requireActual("react"),
   useReducer: jest.fn(),
 }));
+
 jest.mock("services", () => ({
   api: {
     baseService: {
@@ -13,26 +13,62 @@ jest.mock("services", () => ({
     },
   },
 }));
+
 jest.mock("uuid", () => ({
   v4: jest.fn(() => "mocked-uuid-id"),
   uuidv4: jest.fn(() => "mocked-uuid-id"),
 }));
+
 jest.mock("utils", () => ({
   hasRouteParameterOrQuery: jest.fn(() => true),
   extractParamsWithValues: jest.fn(() => true),
-  processParameters: jest.fn(),
-  updateUrlParameters: jest.fn(() => true),
+  processParameters: jest.fn(() => ({
+    params: {},
+    missingParams: [],
+  })),
+  updateUrlParameters: jest.fn((path) => path),
   checkSecurityRequirements: jest.fn(() => true),
+  sortValues: jest.fn((values) => values),
+  isValidCondition: jest.fn(() => true),
+  applyCondition: jest.fn(),
+  parseStringToArray: jest.fn((str) => (Array.isArray(str) ? str : [str])),
+  getGetParameters: jest.fn(() => []),
+  buildParamsMap: jest.fn(() => ({})),
+  getDefaultLayerBufferSize: jest.fn(() => 0),
+  applyWhereConditions: jest.fn((data) => data),
+  buildDeterministicFilterId: jest.fn(() => "mock-filter-id"),
 }));
-import { api } from "services";
-import { hasRouteParameterOrQuery, processParameters } from "utils";
-import { v4 as uuidv4 } from "uuid";
+
+jest.mock("defaults", () => ({
+  defaultMapStyle: "mock-style",
+  defaultMapZoom: 10,
+  defaultMapCentre: [0, 0],
+}));
+
+// Now import after mocks
 import React from "react";
+import { AppContext, FilterContext, MapProvider, PageContext } from "contexts";
+import { api } from "services";
+import {
+  hasRouteParameterOrQuery,
+  processParameters,
+  getGetParameters,
+  buildParamsMap,
+  getDefaultLayerBufferSize,
+  updateUrlParameters,
+} from "utils";
+import { v4 as uuidv4 } from "uuid";
+
+const mockDispatch = jest.fn();
 const mockUseReducer = React.useReducer;
 const mockGet = api.baseService.get;
 const mockUuid = uuidv4;
 const mockProcessParameters = processParameters;
 const mockHasRouteParameterOrQuery = hasRouteParameterOrQuery;
+const mockGetGetParameters = getGetParameters;
+const mockBuildParamsMap = buildParamsMap;
+const mockGetDefaultLayerBufferSize = getDefaultLayerBufferSize;
+const mockUpdateUrlParameters = updateUrlParameters;
 
 let mockFilterContext = {
   state: {
@@ -142,12 +178,23 @@ const mockPageContext = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  
+  // Re-initialize mock implementations after clearAllMocks
   mockUuid.mockReturnValue("mocked-uuid-id");
   mockGet.mockResolvedValue([{ id: 1 }]);
-      mockUseReducer.mockReturnValue([
-      {pageIsReady: true},
-      jest.fn(),
-    ]);
+  mockUseReducer.mockReturnValue([
+    {pageIsReady: true},
+    jest.fn(),
+  ]);
+  mockProcessParameters.mockReturnValue({
+    params: {},
+    missingParams: [],
+  });
+  mockHasRouteParameterOrQuery.mockReturnValue(true);
+  mockGetGetParameters.mockReturnValue([]);
+  mockBuildParamsMap.mockReturnValue({});
+  mockGetDefaultLayerBufferSize.mockReturnValue(0);
+  mockUpdateUrlParameters.mockImplementation((path) => path);
 });
 
 describe("MapProvider component tests", () => {
