@@ -100,11 +100,11 @@ describe("Tests when useFetchVisualisationData return valid values", () => {
     expect(htmlFragment).toBeInTheDocument();
     expect(htmlFragment.tagName).toBe("P"); // To be a <p/> element
     // check the button
-    expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();
     await userEvent.click(button);
-    expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
+    expect(screen.getByText("ChevronRight")).toBeInTheDocument();
   });
 
   it("Function onUpdate have been called", () => {
@@ -150,10 +150,10 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
         </MapContext.Provider>
       </ThemeProvider>
     );
-    expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
     const toggleButton = screen.getByRole("button");
     await userEvent.click(toggleButton);
-    expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
+    expect(screen.getByText("ChevronRight")).toBeInTheDocument();
   });
 });
 
