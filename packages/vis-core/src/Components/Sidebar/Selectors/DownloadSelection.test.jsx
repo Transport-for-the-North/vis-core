@@ -219,7 +219,7 @@ describe("DownloadSection", () => {
   });
 
   describe("Initial rendering", () => {
-    it("returns null if filterState is empty", async () => {
+    it("renders with download button even if filterState is empty", async () => {
       const mockFilterContext = createMockFilterContext({});
       render(
         <FilterContext.Provider value={mockFilterContext}>
@@ -229,13 +229,17 @@ describe("DownloadSection", () => {
         </FilterContext.Provider>
       );
 
+      // Wait for filters to finish loading
       await waitFor(() => {
-        expect(screen.queryByText("Download data")).not.toBeInTheDocument();
+        expect(screen.queryByText("Loading filters...")).not.toBeInTheDocument();
       });
 
-      await waitFor(() => {
-        expect(screen.queryByTestId("accordion")).not.toBeInTheDocument();
-      });
+      // Accordion should be present
+      expect(screen.getByText("Download data")).toBeInTheDocument();
+      expect(screen.getByTestId("accordion")).toBeInTheDocument();
+      
+      // Download button should be present even with empty filterState
+      expect(screen.getByText("Download as CSV")).toBeInTheDocument();
     });
 
     it("displays the component if filterState is not empty", () => {
