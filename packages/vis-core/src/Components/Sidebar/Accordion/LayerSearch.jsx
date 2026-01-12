@@ -40,13 +40,11 @@ export const LayerSearch = ({ map, layer }) => {
             selectedOption.value
           );
 
-          // Fit the map to the bounds of the feature
+          // Fit the map to the bounds and center on the centroid
           map.fitBounds(bounds.coordinates[0], {
-            padding: 20,
+            padding: 50,
+            center: centroid.coordinates
           });
-
-          // Center the map on the centroid of the feature
-          map.setCenter(centroid.coordinates);
 
           // Add a temporary label for the selected feature
           const labelLayerId = 'feature-label';
