@@ -304,7 +304,7 @@ describe("Tests of reclassifyAndStyleGeoJSONMap function", () => {
       "line-continuous",
       expect.anything(),
       expect.anything(),
-      undefined
+      {}
     );
   });
 });
