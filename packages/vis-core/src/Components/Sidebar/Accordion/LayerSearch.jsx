@@ -40,13 +40,28 @@ export const LayerSearch = ({ map, layer }) => {
             selectedOption.value
           );
 
-          // Fit the map to the bounds and center on the centroid
-          map.fitBounds(bounds.coordinates[0], {
-            padding: 50,
-            center: centroid.coordinates
+          // Extract the bounding box coordinates
+          // bounds.coordinates[0] is the polygon ring, we need to find min/max
+          const coords = bounds.coordinates[0];
+          const lngs = coords.map(c => c[0]);
+          const lats = coords.map(c => c[1]);
+          const minLng = Math.min(...lngs);
+          const maxLng = Math.max(...lngs);
+          const minLat = Math.min(...lats);
+          const maxLat = Math.max(...lats);
+          
+          // Calculate padding based on geometry size
+          const lngDiff = maxLng - minLng;
+          const latDiff = maxLat - minLat;
+          const maxDiff = Math.max(lngDiff, latDiff);
+          const basePadding = maxDiff < 0.01 ? 150 : maxDiff < 0.05 ? 120 : 100;
+          
+          // Fit bounds to show entire geometry - DO NOT use center option as it conflicts
+          map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
+            padding: basePadding
           });
 
-          // Add a temporary label for the selected feature
+          // Add a temporary label for the selected feature with guaranteed visibility
           const labelLayerId = 'feature-label';
           const labelSourceId = 'feature-label-source';
 
@@ -81,11 +96,14 @@ export const LayerSearch = ({ map, layer }) => {
               'text-size': 14,
               'text-offset': [0, 1.5],
               'text-anchor': 'top',
+              'text-allow-overlap': true,
+              'text-ignore-placement': true,
             },
             paint: {
               'text-color': '#000000',
               'text-halo-color': '#ffffff',
               'text-halo-width': 2,
+              'text-opacity': 1,
             },
           });
 
