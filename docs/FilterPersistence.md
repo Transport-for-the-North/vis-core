@@ -159,19 +159,6 @@ const railPeriodSelector = {
 };
 ```
 
-### Example Use Cases
-
-Good candidates for persistence:
-- **Rail Period Selector** - Users often want to compare the same period across different pages
-- **Day of Week Selector** - Users typically analyze weekday or weekend data consistently
-- **TOC Selector** - When focusing on a specific train operator
-- **Authority Selector** - When analyzing a specific geographical area
-
-Not recommended for persistence:
-- **Download filters** - These are isolated to specific download contexts
-- **Metric selectors** - Different pages have different metrics
-- **Visualization-specific filters** - May not be relevant across pages
-
 ## Validation and Safety
 
 ### Automatic Validation
@@ -205,18 +192,6 @@ Each persisted filter value is stored with metadata:
   "paramName": "railPeriod"
 }
 ```
-
-**Storage Key Example:** `filter_state_Rail Period Selector_railPeriod`
-
-## Browser Compatibility
-
-The implementation uses `localStorage`, which is supported in all modern browsers:
-- Chrome/Edge: All versions
-- Firefox: All versions
-- Safari: All versions
-- Opera: All versions
-
-**Storage Limits:** localStorage typically has a 5-10MB limit per domain, which is more than sufficient for filter state persistence.
 
 ## Performance Considerations
 
