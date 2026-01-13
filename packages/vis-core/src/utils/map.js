@@ -1145,5 +1145,9 @@ export function hasAnyGeometryNotNull(featureCollection) {
  * @returns {*} Resolved buffer size.
  */
 export function getDefaultLayerBufferSize(geometryType, bufferSize) {
-  return bufferSize != null ? bufferSize : (geometryType === 'line' ? 7 : 0);
+  const BUFFER_FLOOR = 3; // Minimum buffer size in pixels
+  const defaultBuffer = geometryType === 'line' ? 10 : 0;
+  const resolvedBuffer = bufferSize != null ? bufferSize : defaultBuffer;
+  // Apply floor to ensure minimum buffer size
+  return Math.max(BUFFER_FLOOR, resolvedBuffer);
 }

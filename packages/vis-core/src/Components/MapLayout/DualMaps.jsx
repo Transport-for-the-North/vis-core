@@ -154,9 +154,26 @@ const DualMaps = (props) => {
       }
 
       // Determine the maximum bufferSize among the layers
+      const BUFFER_FLOOR = 3; // Minimum buffer size in pixels
+      
+      // Calculate buffer with line width offset to extend from line edge
       const maxBufferSize = Math.max(
+        BUFFER_FLOOR,
         ...hoverableLayers.map(
-          (layerId) => state.layers[layerId].bufferSize ?? 0
+          (layerId) => {
+            const layer = state.layers[layerId];
+            const baseBuffer = layer.bufferSize ?? 0;
+            
+            // For line layers, add half the line width to buffer so it extends from edge
+            if (layer.geometryType === 'line' && layer.mapLayer?.paint?.['line-width']) {
+              const lineWidth = layer.mapLayer.paint['line-width'];
+              // Handle both constant and expression-based line widths
+              const width = typeof lineWidth === 'number' ? lineWidth : 7.5; // Use max default if expression
+              return baseBuffer + (width / 2);
+            }
+            
+            return baseBuffer;
+          }
         )
       );
 
