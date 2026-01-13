@@ -2,6 +2,9 @@ name: Publish to GitHub Packages
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'main'
 
 jobs:
   publish:
@@ -13,6 +16,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -20,22 +25,6 @@ jobs:
           node-version: '24'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@transport-for-the-north'
-
-      - name: Get version and commit hash
-        id: version
-        run: |
-          cd packages/vis-core
-          BASE_VERSION=$(node -p "require('./package.json').version")
-          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-          FULL_VERSION="${BASE_VERSION}-b_${SHORT_SHA}"
-          echo "base_version=${BASE_VERSION}" >> $GITHUB_OUTPUT
-          echo "full_version=${FULL_VERSION}" >> $GITHUB_OUTPUT
-          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
-
-      - name: Update package.json version
-        run: |
-          cd packages/vis-core
-          npm version ${{ steps.version.outputs.full_version }} --no-git-tag-version
 
       - name: Install dependencies
         run: |
@@ -47,32 +36,8 @@ jobs:
           cd packages/vis-core
           npm run build
 
-      - name: Publish to GitHub Packages
-        run: |
-          cd packages/vis-core
-          npm publish --tag beta
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.full_version }}
-          name: v${{ steps.version.outputs.full_version }}
-          body: |
-            ## Beta Release
-            
-            **Version:** ${{ steps.version.outputs.full_version }}
-            **Base Version:** ${{ steps.version.outputs.base_version }}
-            **Commit:** ${{ github.sha }}
-            
-            This is an automated beta release from the main branch.
-            
-            ### Installation
-            ```bash
-            npm install @transport-for-the-north/vis-core@${{ steps.version.outputs.full_version }}
-            ```
-          prerelease: true
-          generate_release_notes: true
+      - name: Run semantic-release
+        run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
