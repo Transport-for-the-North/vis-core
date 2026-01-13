@@ -746,7 +746,7 @@ export const reclassifyData = (
     const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
     let roundedBins = unroundedBins.map((ele) => Math.round(ele * 100) / 100);
     if (classificationMethod === "l") {
-      absValues = absValues.map(replaceZeroValues);
+      roundedBins = roundedBins.map(replaceZeroPointValues);
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
     if (style.includes("line")) return [0, ...roundedBins];
