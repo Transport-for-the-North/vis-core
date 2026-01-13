@@ -918,15 +918,15 @@ export const getHoverLayerStyle = (geometryType) => {
             "interpolate",
             ["linear"],
             ["zoom"],
-            // Specify zoom levels and corresponding line widths
+            // Specify zoom levels and corresponding line offsets - increased for better gap
             5,
-            -1, // At zoom level 5, line width will be 1
+            -2, // At zoom level 5, line offset increased to -2
             10,
-            -2, // At zoom level 10, line width will be 2
+            -4, // At zoom level 10, line offset increased to -4
             15,
-            -6, // At zoom level 15, line width will be 4
+            -8, // At zoom level 15, line offset increased to -8
             20,
-            -8, // At zoom level 20, line width will be 8
+            -12, // At zoom level 20, line offset increased to -12
           ],
         }
       };
