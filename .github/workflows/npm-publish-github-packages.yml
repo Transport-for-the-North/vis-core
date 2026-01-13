@@ -1,44 +1,39 @@
-# name: Publish to GitHub Packages
+name: Publish to GitHub Packages
 
-# on:
-#   workflow_dispatch:
-#   push:
-#     branches:
-#       - 'main'
-#     tags:
-#       - 'v*'
+on:
+  workflow_dispatch:
 
-# jobs:
-#   publish:
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: read
-#       packages: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-#       - name: Setup Node.js
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '24'
-#           registry-url: 'https://npm.pkg.github.com'
-#           scope: '@transport-for-the-north'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@transport-for-the-north'
 
-#       - name: Install dependencies
-#         run: |
-#           cd packages/vis-core
-#           npm install
+      - name: Install dependencies
+        run: |
+          cd packages/vis-core
+          npm install
 
-#       - name: Build package
-#         run: |
-#           cd packages/vis-core
-#           npm run build
+      - name: Build package
+        run: |
+          cd packages/vis-core
+          npm run build
 
-#       - name: Publish to GitHub Packages
-#         run: |
-#           cd packages/vis-core
-#           npm publish
-#         env:
-#           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to GitHub Packages
+        run: |
+          cd packages/vis-core
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
