@@ -19,6 +19,7 @@ import {
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
 import { api } from "services";
+import { ErrorOverlay, MetadataTableError } from "Components/ErrorOverlay/MetadataTableError";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -69,6 +70,7 @@ export const MapProvider = ({ children }) => {
     isLoading: true,
     isDynamicStylingLoading: false,
     pageIsReady: false,
+    metadataError: null,
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
@@ -96,6 +98,7 @@ export const MapProvider = ({ children }) => {
      */
     const fetchMetadataTables = async () => {
       const metadataTables = {};
+      const emptyTables = [];
       
       for (const table of pageContext.config.metadataTables) {
         try {
@@ -113,12 +116,18 @@ export const MapProvider = ({ children }) => {
           }
 
           metadataTables[table.name] = filteredData;
+          
+          // Check if table is empty
+          if (!Array.isArray(filteredData) || filteredData.length === 0) {
+            emptyTables.push(table.name);
+          }
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
+          emptyTables.push(table.name);
         }
       }
 
-      return metadataTables;
+      return { metadataTables, emptyTables };
     };
 
     /**
@@ -184,7 +193,7 @@ export const MapProvider = ({ children }) => {
 
               case 'metadataTable':
                 const metadataTable = metadataTables[filter.values.metadataTableName];
-                if (metadataTable) {
+                if (metadataTable && Array.isArray(metadataTable) && metadataTable.length > 0) {
                   // NEW: apply "where" clause to restrict rows before building values
                   let rows = metadataTable;
                   if (filter.values.where) {
@@ -218,7 +227,7 @@ export const MapProvider = ({ children }) => {
                   filter.values.values = uniqueValues;
                   filters.push(filterWithId);
                 } else {
-                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                  console.error(`Metadata table ${filter.values.metadataTableName} not found or empty`);
                 }
                 break;
 
@@ -363,7 +372,18 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise filters
-      const metadataTables = await fetchMetadataTables();
+      const { metadataTables, emptyTables } = await fetchMetadataTables();
+      
+      // Check if any required metadata tables are empty
+      if (emptyTables.length > 0) {
+        dispatch({ 
+          type: actionTypes.SET_METADATA_ERROR, 
+          payload: emptyTables 
+        });
+        dispatch({ type: actionTypes.SET_LOADING_FINISHED });
+        return;
+      }
+      
       dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
       await initializeFilters(metadataTables);
 
@@ -381,7 +401,13 @@ export const MapProvider = ({ children }) => {
 
   return (
     <MapContext.Provider value={contextValue}>
-      {state.pageIsReady ? children : <div>Loading...</div>}
+      {state.metadataError ? (
+        <MetadataTableError emptyTables={state.metadataError} />
+      ) : state.pageIsReady ? (
+        children
+      ) : (
+        <div>Loading...</div>
+      )}
     </MapContext.Provider>
   );
 };

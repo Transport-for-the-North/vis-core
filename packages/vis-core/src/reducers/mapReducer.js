@@ -80,6 +80,7 @@ export const actionTypes = {
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
   UPDATE_METADATA_FILTER: "UPDATE_METADATA_FILTER",
   SET_METADATA_TABLES: "SET_METADATA_TABLES",
+  SET_METADATA_ERROR: "SET_METADATA_ERROR",
   SET_FILTERS: "SET_FILTERS",
   RESET_CONTEXT: "RESET_CONTEXT",
   UPDATE_FILTER_VALUES: "UPDATE_FILTER_VALUES",
@@ -538,6 +539,9 @@ export const mapReducer = (state, action) => {
     }
     case actionTypes.SET_METADATA_TABLES: {
       return { ...state, metadataTables: action.payload };
+    }
+    case actionTypes.SET_METADATA_ERROR: {
+      return { ...state, metadataError: action.payload };
     }
     case actionTypes.SET_FILTERS: {
       return { ...state, filters: action.payload };
