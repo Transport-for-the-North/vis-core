@@ -11,8 +11,10 @@
     "README.md",
     "LICENSE"
   ],
-  "sideEffects": ["**/*.css"],
-  "style": "dist/style.css", 
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "style": "dist/style.css",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
