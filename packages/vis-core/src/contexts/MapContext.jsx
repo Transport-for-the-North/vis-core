@@ -19,7 +19,7 @@ import {
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
 import { api } from "services";
-import { ErrorOverlay, MetadataTableError } from "Components/ErrorOverlay/MetadataTableError";
+import { ErrorOverlay } from "Components/ErrorOverlay/ErrorOverlay";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -402,7 +402,38 @@ export const MapProvider = ({ children }) => {
   return (
     <MapContext.Provider value={contextValue}>
       {state.metadataError ? (
-        <MetadataTableError emptyTables={state.metadataError} />
+        <ErrorOverlay
+          title="Configuration Error"
+          subtitle="Unable to Load Page"
+          message={
+            state.metadataError.length === 1
+              ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
+              : `${state.metadataError.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`
+          }
+          supportMessage="Please contact support for assistance"
+          supportDetails="This issue typically indicates a data configuration problem that requires administrative attention."
+          technicalDetails={
+            state.metadataError.length === 1 ? (
+              <>
+                <div style={{ marginBottom: '8px' }}>
+                  Metadata table: <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{state.metadataError[0]}</code>
+                </div>
+                <div>Error: Table "{state.metadataError[0]}" returned no data from the API.</div>
+              </>
+            ) : (
+              <>
+                <div style={{ marginBottom: '8px' }}>
+                  Empty metadata tables ({state.metadataError.length}):
+                </div>
+                {state.metadataError.map((table, index) => (
+                  <div key={index} style={{ marginBottom: '4px' }}>
+                    • <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{table}</code>
+                  </div>
+                ))}
+              </>
+            )
+          }
+        />
       ) : state.pageIsReady ? (
         children
       ) : (

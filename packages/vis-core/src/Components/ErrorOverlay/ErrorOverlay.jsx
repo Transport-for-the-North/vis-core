@@ -9,10 +9,11 @@ const Overlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.85);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 10000;
   padding: 20px;
+  overflow-y: auto;
 `;
 
 const ErrorContainer = styled.div`
@@ -22,6 +23,10 @@ const ErrorContainer = styled.div`
   width: 100%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  margin: auto 0;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
 `;
 
 const ErrorHeader = styled.div`
@@ -47,6 +52,9 @@ const ErrorSubtitle = styled.p`
 
 const ErrorContent = styled.div`
   padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 `;
 
 const ErrorMessage = styled.div`
@@ -126,12 +134,10 @@ const ChevronIcon = styled.span`
 `;
 
 const CollapsibleContent = styled.div`
-  padding: 16px;
   background: white;
-  max-height: ${props => props.$isOpen ? '400px' : '0'};
-  overflow: ${props => props.$isOpen ? 'auto' : 'hidden'};
-  transition: max-height 0.3s ease-in-out;
-  border-top: ${props => props.$isOpen ? '1px solid #e0e0e0' : 'none'};
+  display: ${props => props.$isOpen ? 'block' : 'none'};
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
 `;
 
 const ErrorDetails = styled.div`
@@ -228,55 +234,3 @@ export const ErrorOverlay = ({
   );
 };
 
-/**
- * MetadataTableError component - convenience wrapper for metadata table errors.
- * 
- * @param {Object} props - Component props
- * @param {Array} props.emptyTables - Array of empty table names
- * @returns {JSX.Element} Error overlay component
- */
-export const MetadataTableError = ({ emptyTables = [] }) => {
-  const errorMessage = emptyTables.length === 1
-    ? `The metadata table is empty or contains no valid data.`
-    : `${emptyTables.length} metadata tables are empty or contain no valid data.`;
-
-  const TableName = styled.code`
-    background: #e3f2fd;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    color: #1976d2;
-  `;
-
-  const technicalDetails = emptyTables.length === 1 ? (
-    <>
-      <div style={{ marginBottom: '8px' }}>
-        Metadata table: <TableName>{emptyTables[0]}</TableName>
-      </div>
-      <div>Error: Table "{emptyTables[0]}" returned no data from the API.</div>
-    </>
-  ) : (
-    <>
-      <div style={{ marginBottom: '8px' }}>
-        Empty metadata tables ({emptyTables.length}):
-      </div>
-      {emptyTables.map((table, index) => (
-        <div key={index} style={{ marginBottom: '4px' }}>
-          • <TableName>{table}</TableName>
-        </div>
-      ))}
-    </>
-  );
-
-  return (
-    <ErrorOverlay
-      title="Configuration Error"
-      subtitle="Unable to Load Page"
-      message={`${errorMessage} This page requires valid metadata to function properly.`}
-      supportMessage="Please contact support for assistance"
-      supportDetails="This issue typically indicates a data configuration problem that requires administrative attention."
-      technicalDetails={technicalDetails}
-    />
-  );
-};
