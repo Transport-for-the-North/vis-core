@@ -406,7 +406,7 @@ export function TableLayout({ config }) {
             {filteredData.length === 0 && (
               <EmptyStateOverlay>
                 <EmptyStateMessage>
-                  {tableData.length === 0 ? "No data to display" : "No results match your filters"}
+                  {tableData.length === 0 ? "No data to display" : "No results match your filters"} {/* Differentiate no data vs no filter results */}
                 </EmptyStateMessage>
               </EmptyStateOverlay>
             )}
