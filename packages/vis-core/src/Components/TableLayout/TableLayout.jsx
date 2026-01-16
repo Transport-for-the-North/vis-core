@@ -25,6 +25,27 @@ const RowCountSection = styled.div`
   flex-shrink: 0;
 `;
 
+const ResetButton = styled.button`
+  padding: 6px 12px;
+  background: #6b46c1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #5a3a9e;
+  }
+
+  &:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+  }
+`;
+
 const Badge = styled.span`
   background: #f3f4f6;
   padding: 6px 12px;
@@ -48,6 +69,7 @@ const TableContainer = styled.div`
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid #e5e7eb;
+  position: relative;
 `;
 
 const Table = styled.table`
@@ -95,6 +117,7 @@ const TableDataCell = styled.td`
   color: #1f2937;
   font-size: 0.875rem;
   background: #fff;
+  text-align: ${props => props.$isNumeric ? 'right' : 'left'};
 
   tr:hover & {
     background-color: #f9fafb;
@@ -106,6 +129,30 @@ const StatusMessage = styled.div`
   text-align: center;
   color: #6b7280;
   font-size: 1rem;
+`;
+
+const EmptyStateOverlay = styled.div`
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+`;
+
+const EmptyStateMessage = styled.div`
+  padding: 24px 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: auto;
 `;
 
 /**
@@ -145,6 +192,17 @@ export function TableLayout({ config }) {
   const [fetchError, setFetchError] = useState(null);
   const [filterValues, setFilterValues] = useState({});
 
+  // Helper function to determine if a value is numeric
+  const isNumericValue = (value) => {
+    if (value == null || value === "") return false;
+    if (typeof value === 'number') return true;
+    if (typeof value === 'boolean') return false;
+    
+    // Check if string represents a number
+    const strValue = String(value).trim();
+    return !isNaN(strValue) && !isNaN(parseFloat(strValue)) && strValue !== '';
+  };
+
   // Helper function to format cell values for display
   const formatCellValue = (value, column) => {
     if (value == null || value === "") return "";
@@ -163,6 +221,14 @@ export function TableLayout({ config }) {
     
     return String(value);
   };
+
+  // Helper function to reset all filters
+  const resetFilters = () => {
+    setFilterValues({});
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = Object.values(filterValues).some(val => val && val !== "");
 
   useEffect(() => {
     let cancelled = false;
@@ -217,7 +283,7 @@ export function TableLayout({ config }) {
   // Filter data client-side based on filter values
   const filteredData = useMemo(() => {
     if (!Array.isArray(tableData)) return [];
-    return tableData.filter((row) => {
+    const filtered = tableData.filter((row) => {
       return safeColumns.every((column) => {
         const filterValue = filterValues[column?.accessor];
         if (!filterValue || filterValue === "") return true;
@@ -225,18 +291,87 @@ export function TableLayout({ config }) {
         const rowValue = row[column?.accessor];
         const formattedRowValue = formatCellValue(rowValue, column);
         
+        // If column has a spacer, use substring matching
+        if (column?.spacer) {
+          return formattedRowValue.includes(filterValue);
+        }
+        
         // Exact match - compare formatted values
         return formattedRowValue === filterValue;
       });
     });
+    
+    // Sort by columns that have sort: true, in order
+    const sortColumns = safeColumns.filter(col => col?.sort === true);
+    if (sortColumns.length > 0) {
+      return [...filtered].sort((a, b) => {
+        for (const column of sortColumns) {
+          const aVal = a[column.accessor];
+          const bVal = b[column.accessor];
+          
+          // Handle null/undefined values
+          if (aVal == null && bVal == null) continue;
+          if (aVal == null) return 1;
+          if (bVal == null) return -1;
+          
+          // Compare values
+          if (aVal < bVal) return -1;
+          if (aVal > bVal) return 1;
+        }
+        return 0;
+      });
+    }
+    
+    return filtered;
   }, [tableData, safeColumns, filterValues]);
 
-  // Generate unique filter options for each column
+  // Generate unique filter options for each column based on currently filtered data
   const getColumnFilterOptions = (accessor) => {
     // Find the column definition to check its type
     const column = safeColumns.find(col => col?.accessor === accessor);
     
-    const uniqueValues = [...new Set(tableData.map(row => {
+    // Get data that is filtered by all OTHER filters (not this one)
+    const dataFilteredByOthers = tableData.filter((row) => {
+      return safeColumns.every((col) => {
+        // Skip the current column we're generating options for
+        if (col?.accessor === accessor) return true;
+        
+        const filterValue = filterValues[col?.accessor];
+        if (!filterValue || filterValue === "") return true;
+        
+        const rowValue = row[col?.accessor];
+        const formattedRowValue = formatCellValue(rowValue, col);
+        
+        // If column has a spacer, use substring matching
+        if (col?.spacer) {
+          return formattedRowValue.includes(filterValue);
+        }
+        
+        // Exact match - compare formatted values
+        return formattedRowValue === filterValue;
+      });
+    });
+    
+    // If column has a spacer, split values and get unique items
+    if (column?.spacer) {
+      const allValues = dataFilteredByOthers.flatMap(row => {
+        const value = row[accessor];
+        const formattedValue = formatCellValue(value, column);
+        if (!formattedValue) return [];
+        
+        // Split by spacer and trim each item
+        return formattedValue.split(column.spacer).map(item => item.trim());
+      });
+      
+      const uniqueValues = [...new Set(allValues)]
+        .filter(val => val != null && val !== "")
+        .sort();
+      
+      return uniqueValues;
+    }
+    
+    // Default behavior: exact unique values
+    const uniqueValues = [...new Set(dataFilteredByOthers.map(row => {
       const value = row[accessor];
       // Format the value the same way it will be displayed
       return formatCellValue(value, column);
@@ -253,6 +388,12 @@ export function TableLayout({ config }) {
       <RowCountSection>
           <span>Rows</span>
           <Badge>{filteredData.length}</Badge>
+          <ResetButton 
+            onClick={resetFilters}
+            disabled={!hasActiveFilters}
+          >
+            Reset Filters
+          </ResetButton>
         </RowCountSection>
 
         <TableContainer>
@@ -260,12 +401,16 @@ export function TableLayout({ config }) {
           <StatusMessage>Loading...</StatusMessage>
         ) : fetchError ? (
           <StatusMessage>Error: {fetchError}</StatusMessage>
-        ) : filteredData.length === 0 ? (
-          <StatusMessage>
-            {tableData.length === 0 ? "No data to display" : "No results match your filters"}
-          </StatusMessage>
         ) : (
-          <Table>
+          <>
+            {filteredData.length === 0 && (
+              <EmptyStateOverlay>
+                <EmptyStateMessage>
+                  {tableData.length === 0 ? "No data to display" : "No results match your filters"}
+                </EmptyStateMessage>
+              </EmptyStateOverlay>
+            )}
+            <Table>
             <thead>
               <tr>
                 {safeColumns.map((column) => (
@@ -297,16 +442,23 @@ export function TableLayout({ config }) {
                 const rowKey = `${row?.reference_id || row?.id || row?._id || 'row'}-${rowIndex}`;
                 return (
                   <tr key={rowKey}>
-                    {safeColumns.map((column) => (
-                      <TableDataCell key={column?.accessor}>
-                        {formatCellValue(row?.[column?.accessor], column)}
-                      </TableDataCell>
-                    ))}
+                    {safeColumns.map((column) => {
+                      const cellValue = row?.[column?.accessor];
+                      return (
+                        <TableDataCell 
+                          key={column?.accessor}
+                          $isNumeric={isNumericValue(cellValue)}
+                        >
+                          {formatCellValue(cellValue, column)}
+                        </TableDataCell>
+                      );
+                    })}
                   </tr>
                 );
               })}
             </tbody>
           </Table>
+          </>
         )}
       </TableContainer>
     </PageContainer>
