@@ -32,6 +32,7 @@ import {
   makeTextMeasurer,
   mergeExpandOnly,
 } from "utils/dataTableSizing";
+import { AppButton } from "Components/AppButton";
 
 /**
  * @typedef {Object} DataTableColumn
@@ -503,15 +504,14 @@ export function DataTable({
           </span>
         </div>
 
-        <button
+        <AppButton
           type="button"
           onClick={resetWidths}
           title="Reset column widths"
           aria-label="Reset column widths"
-          style={{ padding: "5px 8px", borderRadius: 5 }}
         >
           Reset Widths
-        </button>
+        </AppButton>
       </StickyControls>
 
       <MeasureHost ref={measureHostRef} />

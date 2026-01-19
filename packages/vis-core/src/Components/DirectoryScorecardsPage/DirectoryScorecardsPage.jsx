@@ -8,7 +8,6 @@ import { api } from "services";
 import { applyTopFilterScoping } from "utils/applyTopFilterScoping";
 
 import {
-  Button,
   DetailsGrid,
   LeftPane,
   Page,
@@ -19,6 +18,8 @@ import {
   Toolbar,
   TwoPane,
 } from "./DirectoryScorecardsPage.styles";
+
+import { AppButton } from "Components/AppButton";
 
 /**
  * Config-driven page that renders:
@@ -154,9 +155,12 @@ export function DirectoryScorecardsPage() {
               </div>
 
               <div style={{ display: "flex", gap: 6 }}>
-                <Button disabled={selectedIds.size === 0} onClick={clearSelected}>
+                <AppButton 
+                  disabled={selectedIds.size === 0}
+                  onClick={clearSelected}
+                >
                   Clear Selected
-                </Button>
+                </AppButton>
               </div>
             </Toolbar>
 

@@ -95,31 +95,6 @@ export const Tag = styled.span`
 `;
 
 /**
- * Primary action button.
- */
-export const Button = styled.button`
-  padding: 5px 8px;
-  border: 1px solid ${(p) => p.theme.activeBg};
-  background: ${(p) => p.theme.activeBg};
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.85rem;
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-
-  &:focus-visible {
-    outline: 2px solid rgba(76, 29, 149, 0.9);
-    outline-offset: 2px;
-    border-radius: 6px;
-  }
-`;
-
-/**
  * Responsive grid for selected record scorecards.
  */
 export const DetailsGrid = styled.div`

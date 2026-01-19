@@ -15,7 +15,7 @@ export const StickyControls = styled.div`
   z-index: 5;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
-  padding: 6px 8px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
