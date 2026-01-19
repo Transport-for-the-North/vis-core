@@ -34,8 +34,8 @@ export const StyledTable = styled.table`
   border-collapse: collapse;
   font-size: 0.9rem;
   table-layout: fixed;
-  width: max-content;
-  max-width: none;
+  width: 100%;
+  min-width: max-content;
 `;
 
 export const Th = styled.th`

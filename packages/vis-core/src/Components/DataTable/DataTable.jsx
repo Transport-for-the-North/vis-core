@@ -187,6 +187,7 @@ export function DataTable({
 
   /**
    * Recomputes and overwrites all column widths from the current filtered rows.
+   * Accounts for available container width and expands columns proportionally if space allows.
    *
    * @returns {void}
    */
@@ -199,7 +200,7 @@ export function DataTable({
       tableRef.current
     );
 
-    const next = computeReasonableWrapWidthsPx({
+    const baseWidths = computeReasonableWrapWidthsPx({
       columns,
       filteredRows: filtered,
       autoFitSampleSize,
@@ -208,7 +209,37 @@ export function DataTable({
       perColumnMaxPx,
     });
 
-    setColWidthsPx(next);
+    // Get available width from parent container
+    const container = tableRef.current.parentElement;
+    if (container) {
+      const availableWidth = container.clientWidth;
+      const selectColWidth = 75;
+      
+      // Calculate total base width (without spacer)
+      const totalBaseWidth = Object.values(baseWidths).reduce((sum, w) => sum + w, 0);
+      const totalWithSelect = totalBaseWidth + selectColWidth;
+      
+      // Add a small buffer (2px) to prevent rounding issues causing overflow
+      const buffer = 2;
+      
+      // If we have extra space, distribute it proportionally
+      if (totalWithSelect < availableWidth - buffer) {
+        const extraSpace = availableWidth - totalWithSelect - buffer;
+        const scaleFactor = (totalBaseWidth + extraSpace) / totalBaseWidth;
+        
+        const expanded = {};
+        columns.forEach((_, idx) => {
+          const baseW = baseWidths[idx] ?? 160;
+          const maxW = perColumnMaxPx?.[columns[idx]?.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
+          expanded[idx] = Math.min(maxW, Math.floor(baseW * scaleFactor));
+        });
+        
+        setColWidthsPx(expanded);
+        return;
+      }
+    }
+
+    setColWidthsPx(baseWidths);
   }, [autoFitSampleSize, columns, filtered, perColumnMaxPx, setColWidthsPx]);
 
   /**
@@ -251,6 +282,64 @@ export function DataTable({
 
     return () => cancelAnimationFrame(id);
   }, [resetWidths, ensureWidthsFitFiltered]);
+
+  // Respond to window resize - but ensure we don't shrink below content requirements
+  useEffect(() => {
+    const handleResize = () => {
+      if (!measureHostRef.current || !tableRef.current) return;
+
+      measureHostRef.current.innerHTML = "";
+      const { measureOneLinePx, measureHeaderTwoLineWidthPx } = makeTextMeasurer(
+        measureHostRef.current,
+        tableRef.current
+      );
+
+      const requiredWidths = computeReasonableWrapWidthsPx({
+        columns,
+        filteredRows: filtered,
+        autoFitSampleSize,
+        measureOneLinePx,
+        measureHeaderTwoLineWidthPx,
+        perColumnMaxPx,
+      });
+
+      // Get available width from parent container
+      const container = tableRef.current.parentElement;
+      if (container) {
+        const availableWidth = container.clientWidth;
+        const selectColWidth = 75;
+        
+        // Calculate total required width (without spacer)
+        const totalRequiredWidth = Object.values(requiredWidths).reduce((sum, w) => sum + w, 0);
+        const totalWithSelect = totalRequiredWidth + selectColWidth;
+        
+        // Add a small buffer (2px) to prevent rounding issues causing overflow
+        const buffer = 2;
+        
+        // If we have extra space, distribute it proportionally
+        if (totalWithSelect < availableWidth - buffer) {
+          const extraSpace = availableWidth - totalWithSelect - buffer;
+          const scaleFactor = (totalRequiredWidth + extraSpace) / totalRequiredWidth;
+          
+          const expanded = {};
+          columns.forEach((_, idx) => {
+            const requiredW = requiredWidths[idx] ?? 160;
+            const maxW = perColumnMaxPx?.[columns[idx]?.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
+            expanded[idx] = Math.min(maxW, Math.floor(requiredW * scaleFactor));
+          });
+          
+          setColWidthsPx(expanded);
+          return;
+        }
+      }
+
+      // If container is narrower, use required widths (will cause horizontal scroll)
+      setColWidthsPx(requiredWidths);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [autoFitSampleSize, columns, filtered, perColumnMaxPx, setColWidthsPx]);
 
   /* ---------------------------- Drag column resizing ---------------------------- */
 
@@ -452,6 +541,8 @@ export function DataTable({
             {columns.map((_, idx) => (
               <col key={idx} style={getColumnWidthStyle(idx)} />
             ))}
+            {/* Flex spacer column to fill remaining width */}
+            <col style={{ width: "auto" }} />
           </colgroup>
 
           <thead>
@@ -502,6 +593,9 @@ export function DataTable({
                   </Th>
                 );
               })}
+
+              {/* Flex spacer header */}
+              <Th style={{ width: "auto" }} scope="col" />
             </tr>
 
             <tr>
@@ -605,6 +699,9 @@ export function DataTable({
                   <FilterRowCell key={`f-${c.accessor}`} style={getColumnWidthStyle(idx)} />
                 );
               })}
+
+              {/* Flex spacer filter cell */}
+              <FilterRowCell style={{ width: "auto" }} />
             </tr>
           </thead>
 
@@ -643,6 +740,9 @@ export function DataTable({
                       <CellInner>{row[c.accessor]}</CellInner>
                     </Td>
                   ))}
+
+                  {/* Flex spacer body cell */}
+                  <Td style={{ width: "auto" }} />
                 </Tr>
               );
             })}
