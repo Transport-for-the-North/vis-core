@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
-import { PageContext } from "contexts";
+import { PageContext, AppContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
 import { loremIpsum, updateFilterValidity } from "utils";
 import { defaultBgColour } from "defaults";
@@ -62,6 +62,7 @@ export const MapLayout = () => {
   const isLoading = state.isLoading;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
+  const appConfig = useContext(AppContext);
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
@@ -276,7 +277,7 @@ export const MapLayout = () => {
         filters={state.filters}
         legalText={pageContext.legalText ?? loremIpsum}
         onFilterChange={handleFilterChange}
-        bgColor={pageContext.navbarLinkBgColour || defaultBgColour}
+        bgColor={pageContext.navbarLinkBgColour || appConfig?.theme?.bgColour || defaultBgColour}
         additionalFeatures={pageContext.config.additionalFeatures}
         infoBoxText={layerZoomMessage}
         downloadPath={pageContext.config.downloadPath}
