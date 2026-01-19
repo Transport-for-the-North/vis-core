@@ -1,6 +1,29 @@
 import React from "react";
-import { MapLayout, IFrameEmbedPage, TableLayout } from "Components";
+import styled from "styled-components";
+import { MapLayout, IFrameEmbedPage, DynamicForm, TableLayout } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
+
+const FormPageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  max-width: 720px;
+  margin: 0 auto;
+`;
+
+const FormPageTitle = styled.h1`
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0 0 8px 0;
+`;
+
+const FormPageDescription = styled.p`
+  font-size: 1rem;
+  color: #555;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+`;
 import { DirectoryScorecardsPage } from "Components";
 
 /**
@@ -26,15 +49,7 @@ export const PageSwitch = ({ pageConfig }) => {
               </FilterProvider>
             );
           case "IFrameEmbed":
-            return <IFrameEmbedPage config={pageConfig.config} />;
-          case "TableLayout":
-            return <TableLayout config={pageConfig.config} />;
-          case "DirectoryScorecards":
-            return (
-              <FilterProvider>
-                <DirectoryScorecardsPage/>
-              </FilterProvider>
-            );
+            return <IFrameEmbedPage config={pageConfig.config} />;            
           default:
             return <div>Nothing</div>;
         }
