@@ -29,7 +29,7 @@ jest.mock("services", () => ({
   api: {
     downloadService: {
       checkGetRequestSize: jest.fn(() => ({ isValid: true, error: null })),
-      downloadCsv: jest.fn(() => Promise.resolve()),
+      downloadFile: jest.fn(() => Promise.resolve()),
     },
   },
 }));
@@ -507,7 +507,7 @@ describe("DownloadSection", () => {
       });
       await userEvent.click(downloadButton);
 
-      expect(api.downloadService.downloadCsv).toHaveBeenCalledWith(
+      expect(api.downloadService.downloadFile).toHaveBeenCalledWith(
         "/api/download",
         {
           queryParams: { dropdown1: "option1", slider1: 75 },
@@ -521,7 +521,7 @@ describe("DownloadSection", () => {
       const mockFilterContext = createMockFilterContext({ initialized: true });
 
       const { api } = require("services");
-      api.downloadService.downloadCsv.mockImplementation(
+      api.downloadService.downloadFile.mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
@@ -536,7 +536,7 @@ describe("DownloadSection", () => {
       const downloadButton = await screen.findByRole("button", {
         name: /Download/i,
       });
-      userEvent.click(downloadButton);
+      await userEvent.click(downloadButton);
 
       await waitFor(() => {
         expect(screen.getByText(/Downloading/i)).toBeInTheDocument();
@@ -575,7 +575,7 @@ describe("DownloadSection", () => {
       const mockFilterContext = createMockFilterContext({ initialized: true });
 
       const { api } = require("services");
-      api.downloadService.downloadCsv.mockRejectedValue(
+      api.downloadService.downloadFile.mockRejectedValue(
         new Error("Network error")
       );
 

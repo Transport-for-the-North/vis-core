@@ -229,7 +229,7 @@ describe("MapLayout component test", () => {
     await userEvent.click(handleColorChangeButton);
     expect(mockMapContext.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: "UPDATE_FILTER_VALUES",
+        type: "UPDATE_COLOR_SCHEME",
       })
     );
     // handleClassificationChangeButton is called

@@ -53,7 +53,7 @@ describe("CheckboxSelector component test", () => {
     expect(input2).toBeInTheDocument();
     expect(input3).toBeInTheDocument();
   });
-  it("Change value of input without multiselect", () => {
+  it("Change value of input without multiselect", async () => {
     render(
       <FilterContext.Provider value={{ state: {} }}>
         <CheckboxSelector onChange={fake} bgColor="#31b231" filter={filter} />
@@ -67,14 +67,14 @@ describe("CheckboxSelector component test", () => {
     expect(input3).toBeInTheDocument();
 
     // Change the value of input1 to go into the handleCheckboxChange function
-    userEvent.click(input1);
-    userEvent.click(input2);
+    await userEvent.click(input1);
+    await userEvent.click(input2);
     // Only one can be coched
     expect(input1).not.toBeChecked();
     expect(input2).toBeChecked();
     expect(input3).not.toBeChecked();
   });
-  it("Change value of input with multiselect", () => {
+  it("Change value of input with multiselect", async () => {
     const filterMultiselect = {
       ...filter,
       multiSelect: true,
@@ -98,8 +98,8 @@ describe("CheckboxSelector component test", () => {
 
     // color check
     // Change value of input1 for go in the handleCheckboxChange function
-    userEvent.click(input1);
-    userEvent.click(input2);
+    await userEvent.click(input1);
+    await userEvent.click(input2);
     // Only one can be coched
     expect(input1).toBeChecked();
     expect(input2).toBeChecked();

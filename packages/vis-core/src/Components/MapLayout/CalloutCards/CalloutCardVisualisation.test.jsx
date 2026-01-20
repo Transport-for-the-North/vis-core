@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { MapContext } from "contexts";
 import userEvent from "@testing-library/user-event";
@@ -100,11 +100,16 @@ describe("Tests when useFetchVisualisationData return valid values", () => {
     expect(htmlFragment).toBeInTheDocument();
     expect(htmlFragment.tagName).toBe("P"); // To be a <p/> element
     // check the button
-    expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();
+    // Wait for the card to become visible (requestAnimationFrame transition)
+    await waitFor(() => {
+      expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    });
     await userEvent.click(button);
-    expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
+    });
   });
 
   it("Function onUpdate have been called", () => {
@@ -150,10 +155,15 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
         </MapContext.Provider>
       </ThemeProvider>
     );
-    expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
     const toggleButton = screen.getByRole("button");
+    // Wait for the card to become visible (requestAnimationFrame transition)
+    await waitFor(() => {
+      expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    });
     await userEvent.click(toggleButton);
-    expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
+    });
   });
 });
 

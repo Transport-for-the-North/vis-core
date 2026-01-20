@@ -93,8 +93,8 @@ jest.mock("./VisualisationManager", () => ({
   ...jest.requireActual("./VisualisationManager"),
   VisualisationManager: () => <div>VisualisationManager</div>,
 }));
-jest.mock("components", () => ({
-  ...jest.requireActual("components"),
+jest.mock("Components", () => ({
+  ...jest.requireActual("Components"),
   DynamicLegend: () => <div>DynamicLegend</div>,
 }));
 jest.mock("services", () => ({
