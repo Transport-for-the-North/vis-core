@@ -4,14 +4,20 @@ let mapApiToken = '';
 
 type Mode = 'production' | 'development' | '';
 
+// Helper to safely get environment variables
+// In Jest: uses global importMeta injected by jest.config.js  
+// In Vite/runtime: uses import.meta.env (transformed by Babel)
+declare const importMeta: any;
+const env = typeof importMeta !== 'undefined' ? importMeta.env : {};
+
 let runtimeEnv: {
   prodOrDev: Mode;
   apiBaseDomain: string;
   apiBaseDomainDev: string;
 } = {
-  prodOrDev: (import.meta as any)?.env?.VITE_PROD_OR_DEV ?? '',
-  apiBaseDomain: (import.meta as any)?.env?.VITE_API_BASE_DOMAIN ?? '',
-  apiBaseDomainDev: (import.meta as any)?.env?.VITE_API_BASE_DOMAIN_DEV ?? '',
+  prodOrDev: env.VITE_PROD_OR_DEV ?? '',
+  apiBaseDomain: env.VITE_API_BASE_DOMAIN ?? '',
+  apiBaseDomainDev: env.VITE_API_BASE_DOMAIN_DEV ?? '',
 };
 
 // ---- setters / getters ----
