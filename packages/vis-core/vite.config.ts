@@ -37,11 +37,10 @@ export default defineConfig(({ command }) => ({
         `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime", "react-router-dom", "@mapbox/mapbox-gl-draw", 
-        "mapbox-gl", "@turf/turf", "chroma-js", "polished", "js-cookie", "@auth0/auth0-react", "lodash.debounce",
+      external: ["react", "react-dom", "react/jsx-runtime", "react-router-dom", "@mapbox/mapbox-gl-draw",
+        "mapbox-gl", "maplibre-gl", "@turf/turf", "chroma-js", "polished", "js-cookie", "@auth0/auth0-react", "lodash.debounce",
         "@heroicons/react", "leaflet", "lz-string", "jwt-decode", "html-react-parser", "dompurify", "colorbrewer",
-        "@ookla/mapbox-gl-draw-rectangle", "@mapcomponents/react-maplibre", "styled-components", "recharts",
-        "react-select"
+        "@ookla/mapbox-gl-draw-rectangle", "@mapcomponents/react-maplibre", "styled-components", "recharts", "react-select", "proj4"
       ],
       output: {
         globals: { react: "React", "react-dom": "ReactDOM" },
