@@ -76,6 +76,41 @@ const CoordinateLabel = styled.span`
   margin-bottom: 2px;
 `;
 
+const DateInput = styled(Input)`
+  font-family: 'Hanken Grotesk', sans-serif;
+  
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+`;
+
+const CheckboxInput = styled.input`
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: ${(props) => props.$accentColor || '#007bff'};
+  flex-shrink: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+`;
+
+const CheckboxLabel = styled.label`
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  line-height: 1.4;
+  user-select: none;
+`;
+
 const CoordinateField = styled.div`
   display: flex;
   flex-direction: column;
@@ -230,6 +265,42 @@ const selectStyles = {
 };
 
 /**
+ * Checks if a field should be visible based on the visibleWhen condition.
+ * @param {Object} field - The field configuration.
+ * @param {Object} formValues - Current form values.
+ * @returns {boolean} Whether the field should be visible.
+ */
+const isFieldVisible = (field, formValues) => {
+  if (!field.visibleWhen) return true;
+  
+  const { field: dependsOn, values, operator = 'in' } = field.visibleWhen;
+  const currentValue = formValues[dependsOn];
+  
+  switch (operator) {
+    case 'in':
+      // Show if current value is in the allowed values array
+      return values.includes(currentValue);
+    case 'notIn':
+      // Show if current value is NOT in the values array
+      return !values.includes(currentValue);
+    case 'equals':
+      // Show if current value equals the single value
+      return currentValue === values;
+    case 'notEquals':
+      // Show if current value does not equal the single value
+      return currentValue !== values;
+    case 'exists':
+      // Show if the field has any value
+      return currentValue !== '' && currentValue !== null && currentValue !== undefined;
+    case 'notExists':
+      // Show if the field has no value
+      return currentValue === '' || currentValue === null || currentValue === undefined;
+    default:
+      return values.includes(currentValue);
+  }
+};
+
+/**
  * Validates a single field value based on its type and configuration.
  * @param {*} value - The field value to validate.
  * @param {Object} field - The field configuration.
@@ -246,6 +317,10 @@ const validateField = (value, field) => {
       if (value.lat === '' || value.lng === '' || value.lat === null || value.lng === null) {
         return { isValid: false, error: 'Both latitude and longitude are required' };
       }
+    }
+    // For checkbox, it must be checked if required
+    if (field.type === 'checkbox' && value !== true) {
+      return { isValid: false, error: 'This confirmation is required' };
     }
   }
 
@@ -344,6 +419,10 @@ const validateField = (value, field) => {
  * @param {string} [props.config.fields[].optionValueKey='value'] - Key for option value in API response.
  * @param {string} [props.config.fields[].optionLabelKey='label'] - Key for option label in API response.
  * @param {Array} [props.config.fields[].options] - Static options for dropdown (if not using API).
+ * @param {Object} [props.config.fields[].visibleWhen] - Conditional visibility configuration.
+ * @param {string} props.config.fields[].visibleWhen.field - The field ID this visibility depends on.
+ * @param {Array|*} props.config.fields[].visibleWhen.values - Values that make this field visible.
+ * @param {string} [props.config.fields[].visibleWhen.operator='in'] - Comparison operator: 'in', 'notIn', 'equals', 'notEquals', 'exists', 'notExists'.
  * @param {string} [props.bgColor='#007bff'] - Primary color for buttons.
  * @param {Function} [props.onSubmitSuccess] - Callback after successful submission.
  * @param {Function} [props.onSubmitError] - Callback after submission error.
@@ -377,6 +456,9 @@ export const DynamicForm = ({
   bgColor = '#007bff',
   onSubmitSuccess,
   onSubmitError,
+  onCoordinateChange,
+  externalCoordinates,
+  onFieldChange,
 }) => {
   const { title, submitEndpoint, submitMethod = 'POST', fields = [] } = config;
 
@@ -386,6 +468,8 @@ export const DynamicForm = ({
     fields.forEach((field) => {
       if (field.type === 'coordinates') {
         values[field.id] = field.defaultValue || { lat: '', lng: '' };
+      } else if (field.type === 'checkbox') {
+        values[field.id] = field.defaultValue || false;
       } else {
         values[field.id] = field.defaultValue ?? '';
       }
@@ -404,6 +488,28 @@ export const DynamicForm = ({
 
   // Service instance for API calls
   const apiService = useMemo(() => new BaseService(), []);
+
+  // Find the coordinate field ID
+  const coordinateFieldId = useMemo(() => {
+    const coordField = fields.find((f) => f.type === 'coordinates');
+    return coordField?.id;
+  }, [fields]);
+
+  // Handle external coordinate updates (e.g., from map click)
+  useEffect(() => {
+    if (!externalCoordinates || !coordinateFieldId) return;
+    
+    setFormValues((prev) => ({
+      ...prev,
+      [coordinateFieldId]: externalCoordinates,
+    }));
+    setTouched((prev) => ({ ...prev, [coordinateFieldId]: true }));
+    
+    // Also notify parent
+    if (onCoordinateChange) {
+      onCoordinateChange(externalCoordinates);
+    }
+  }, [externalCoordinates, coordinateFieldId, onCoordinateChange]);
 
   // Fetch dropdown options from API endpoints
   useEffect(() => {
@@ -435,16 +541,27 @@ export const DynamicForm = ({
   const handleChange = useCallback((fieldId, value) => {
     setFormValues((prev) => ({ ...prev, [fieldId]: value }));
     setTouched((prev) => ({ ...prev, [fieldId]: true }));
-  }, []);
+    // Notify parent of field changes
+    if (onFieldChange) {
+      onFieldChange(fieldId, value);
+    }
+  }, [onFieldChange]);
 
   // Handle coordinate field change
   const handleCoordinateChange = useCallback((fieldId, coord, value) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [fieldId]: { ...prev[fieldId], [coord]: value },
-    }));
+    setFormValues((prev) => {
+      const newCoords = { ...prev[fieldId], [coord]: value };
+      // Notify parent of coordinate changes
+      if (onCoordinateChange) {
+        onCoordinateChange(newCoords);
+      }
+      return {
+        ...prev,
+        [fieldId]: newCoords,
+      };
+    });
     setTouched((prev) => ({ ...prev, [fieldId]: true }));
-  }, []);
+  }, [onCoordinateChange]);
 
   // Handle field blur for validation
   const handleBlur = useCallback(
@@ -459,12 +576,18 @@ export const DynamicForm = ({
     [fields, formValues]
   );
 
-  // Validate all fields
+  // Get only visible fields based on current form values
+  const visibleFields = useMemo(() => {
+    return fields.filter((field) => isFieldVisible(field, formValues));
+  }, [fields, formValues]);
+
+  // Validate all visible fields
   const validateAllFields = useCallback(() => {
     const newErrors = {};
     let isValid = true;
 
-    fields.forEach((field) => {
+    // Only validate visible fields
+    visibleFields.forEach((field) => {
       const { isValid: fieldValid, error } = validateField(formValues[field.id], field);
       if (!fieldValid) {
         isValid = false;
@@ -473,20 +596,20 @@ export const DynamicForm = ({
     });
 
     setErrors(newErrors);
-    // Mark all fields as touched
+    // Mark all visible fields as touched
     const allTouched = {};
-    fields.forEach((field) => {
+    visibleFields.forEach((field) => {
       allTouched[field.id] = true;
     });
     setTouched(allTouched);
 
     return isValid;
-  }, [fields, formValues]);
+  }, [visibleFields, formValues]);
 
-  // Build submission data with proper field names
+  // Build submission data with proper field names (only visible fields)
   const buildSubmissionData = useCallback(() => {
     const data = {};
-    fields.forEach((field) => {
+    visibleFields.forEach((field) => {
       const value = formValues[field.id];
       const key = field.name || field.id;
 
@@ -512,17 +635,23 @@ export const DynamicForm = ({
         case 'dropdown':
           data[key] = value !== '' ? value : null;
           break;
+        case 'checkbox':
+          data[key] = value === true;
+          break;
+        case 'date':
+          data[key] = value !== '' ? value : null;
+          break;
         default:
           data[key] = value !== '' ? value : null;
       }
     });
     return data;
-  }, [fields, formValues]);
+  }, [visibleFields, formValues]);
 
-  // Get display data for success message
+  // Get display data for success message (only visible fields)
   const getDisplayData = useCallback(() => {
     const displayData = [];
-    fields.forEach((field) => {
+    visibleFields.forEach((field) => {
       const value = formValues[field.id];
       let displayValue;
 
@@ -539,6 +668,12 @@ export const DynamicForm = ({
           displayValue = selectedOption ? selectedOption.label : value || 'Not selected';
           break;
         }
+        case 'checkbox':
+          displayValue = value === true ? '✓ Confirmed' : 'Not confirmed';
+          break;
+        case 'date':
+          displayValue = value !== '' ? value : 'Not provided';
+          break;
         default:
           displayValue = value !== '' ? value : 'Not provided';
       }
@@ -546,7 +681,7 @@ export const DynamicForm = ({
       displayData.push({ label: field.label, value: displayValue });
     });
     return displayData;
-  }, [fields, formValues, dropdownOptions]);
+  }, [visibleFields, formValues, dropdownOptions]);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -728,6 +863,40 @@ export const DynamicForm = ({
         );
       }
 
+      case 'date':
+        return (
+          <DateInput
+            type="date"
+            id={field.id}
+            name={field.name || field.id}
+            value={value}
+            onChange={(e) => handleChange(field.id, e.target.value)}
+            onBlur={() => handleBlur(field.id)}
+            min={field.min}
+            max={field.max}
+            disabled={isSubmitting}
+          />
+        );
+
+      case 'checkbox':
+        return (
+          <CheckboxContainer>
+            <CheckboxInput
+              type="checkbox"
+              id={field.id}
+              name={field.name || field.id}
+              checked={value === true}
+              onChange={(e) => handleChange(field.id, e.target.checked)}
+              onBlur={() => handleBlur(field.id)}
+              disabled={isSubmitting}
+              $accentColor={bgColor}
+            />
+            <CheckboxLabel htmlFor={field.id}>
+              {field.checkboxLabel || field.label}
+            </CheckboxLabel>
+          </CheckboxContainer>
+        );
+
       default:
         return (
           <Input
@@ -755,12 +924,15 @@ export const DynamicForm = ({
         </ErrorMessage>
       )}
 
-      {fields.map((field) => (
+      {visibleFields.map((field) => (
         <FieldGroup key={field.id}>
-          <Label htmlFor={field.id}>
-            {field.label}
-            {field.required && <RequiredAsterisk>*</RequiredAsterisk>}
-          </Label>
+          {/* Checkboxes have their own label - don't render separate label */}
+          {field.type !== 'checkbox' && (
+            <Label htmlFor={field.id}>
+              {field.label}
+              {field.required && <RequiredAsterisk>*</RequiredAsterisk>}
+            </Label>
+          )}
           {renderField(field)}
           {touched[field.id] && errors[field.id] && (
             <ErrorText>{errors[field.id]}</ErrorText>
