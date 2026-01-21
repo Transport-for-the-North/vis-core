@@ -10,10 +10,11 @@ import { darken } from "polished";
  * - Provides hover, active (indented + scaled), focus, and disabled states.
  * - Follows accessibility best practices with focus indicators and semantic markup.
  *
- * Props:
- * - $bgColor?: string - Background color for the button (defaults to a theme primary if present).
- * - $width?: string - Optional width override (defaults to "auto").
- * - $height?: string - Optional height override (defaults to "32px").
+ * @param {Object} props - Styled-component props.
+ * @param {string} [props.$bgColor] - Background color for the button (defaults to theme primary if present).
+ * @param {string} [props.$width="auto"] - Optional width override.
+ * @param {string} [props.$height="32px"] - Optional height override.
+ * @returns {JSX.Element} A styled button component.
  */
 export const AppButton = styled.button`
   cursor: pointer;
