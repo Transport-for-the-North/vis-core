@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { getByPath } from "utils/getByPath";
 
 import {
+  ContentWrapper,
   EmptyState,
   MetricLabel,
   MetricLabelStrong,
@@ -105,6 +106,7 @@ export function Scorecard({
           Remove
         </RemoveBtn>
       </PanelTitle>
+      <ContentWrapper>
 
       {!details ? (
         <EmptyState role="status" aria-live="polite">
@@ -145,6 +147,7 @@ export function Scorecard({
           ))}
         </>
       )}
+      </ContentWrapper>
     </Panel>
   );
 }

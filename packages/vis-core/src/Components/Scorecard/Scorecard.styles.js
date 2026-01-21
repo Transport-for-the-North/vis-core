@@ -9,6 +9,17 @@ export const Panel = styled.section`
   background: #fff;
   padding: 8px;
   font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+`;
+
+/**
+ * Wrapper which pushes content to bottom.
+ * Helps contend with variable title section length,
+ * so that content aligns across rows.
+ */
+export const ContentWrapper = styled.div`
+  margin-top: auto;
 `;
 
 /**
