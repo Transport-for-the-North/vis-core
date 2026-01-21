@@ -39,6 +39,7 @@ export const PanelTitle = styled.header`
  * Remove action button.
  */
 export const RemoveBtn = styled.button`
+  align-self: start;
   border: none;
   background: #eee;
   color: #333;
