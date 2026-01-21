@@ -21,6 +21,7 @@ export const PanelTitle = styled.header`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  text-align: left;
 `;
 
 /**
