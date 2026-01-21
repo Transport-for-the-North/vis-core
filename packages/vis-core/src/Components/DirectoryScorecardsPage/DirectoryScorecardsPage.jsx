@@ -64,6 +64,7 @@ export function DirectoryScorecardsPage() {
   );
 
   const idAccessor = config.selection?.rowIdAccessor || "id";
+  const titleAccessor = config.selection?.titleAccessor || idAccessor;
   const clickableAccessor =
     config.selection?.clickableAccessor ||
     config.clickBehavior?.clickableAccessor ||
@@ -200,6 +201,7 @@ export function DirectoryScorecardsPage() {
                         record={record}
                         details={detailsCache[recordId]}
                         idAccessor={idAccessor}
+                        titleAccessor={titleAccessor}
                         formatterRegistry={formatterRegistry}
                         onRemove={(remId) => {
                           setSelectedIds((prev) => {

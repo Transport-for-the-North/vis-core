@@ -78,14 +78,15 @@ export function Scorecard({
   details,
   onRemove,
   idAccessor,
+  titleAccessor,
   formatterRegistry,
 }) {
   const recordId = record?.[idAccessor];
 
   const titleText = useMemo(() => {
-    const name = record?.network_scenario || record?.name || "";
-    return `${recordId} — ${name}`.trim();
-  }, [recordId, record?.network_scenario, record?.name]);
+    const name = record?.[titleAccessor] || recordId;
+    return `${name}`.trim();
+  }, [recordId, record?.name]);
 
   /** @type {ScorecardPanel[]} */
   const panels = Array.isArray(record?.panels) ? record.panels : [];
