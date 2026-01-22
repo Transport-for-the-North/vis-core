@@ -433,28 +433,16 @@ export const LayerControlEntry = memo(
               )}
 
               {!enforceNoClassificationMethod && <ClassificationDropdown
-                classType={
-                  hasDefaultBands && hasDefaultBands.values
-                    ? {
-                      Default: "d",
-                      Quantile: "q",
-                      Equidistant: "e",
-                      Logarithmic: "l",
-                      "K-Means": "k",
-                      "Jenks Natural Breaks": "j",
-                      "Standard Deviation": "s",
-                      "Head/Tail Breaks": "h",
-                    }
-                    : {
-                      Quantile: "q",
-                      Equidistant: "e",
-                      Logarithmic: "l",
-                      "K-Means": "k",
-                      "Jenks Natural Breaks": "j",
-                      "Standard Deviation": "s",
-                      "Head/Tail Breaks": "h",
-                    }
-                }
+                classType={{
+                  ...(hasDefaultBands?.values && {Default: "d"}),
+                  Quantile: "q",
+                  Equidistant: "e",
+                  Logarithmic: "l",
+                  "K-Means": "k",
+                  "Jenks Natural Breaks": "j",
+                  "Standard Deviation": "s",
+                  "Head/Tail Breaks": "h",
+                }}
                 classification={
                   state.layers[layer.id]?.class_method ?? "d"
                 }
