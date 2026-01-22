@@ -5,7 +5,7 @@
  * @param {number[]} data - Array of numerical values
  * @param {number} numClasses - Number of classes to create
  * @returns {number[]} Array of break points
- */
+ */ 
 export function jenksBreaks(data, numClasses) {
   // Sort data in ascending order
   const sortedData = [...data].sort((a, b) => a - b);
