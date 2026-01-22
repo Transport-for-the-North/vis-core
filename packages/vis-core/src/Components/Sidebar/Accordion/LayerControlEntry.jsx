@@ -441,12 +441,18 @@ export const LayerControlEntry = memo(
                       Equidistant: "e",
                       Logarithmic: "l",
                       "K-Means": "k",
+                      "Jenks Natural Breaks": "j",
+                      "Standard Deviation": "s",
+                      "Head/Tail Breaks": "h",
                     }
                     : {
                       Quantile: "q",
                       Equidistant: "e",
                       Logarithmic: "l",
                       "K-Means": "k",
+                      "Jenks Natural Breaks": "j",
+                      "Standard Deviation": "s",
+                      "Head/Tail Breaks": "h",
                     }
                 }
                 classification={
