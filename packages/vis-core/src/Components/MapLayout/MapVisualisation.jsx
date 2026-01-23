@@ -513,17 +513,64 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     };
 
     if (visualisation.type === "joinDataToMap") {
-      if (map.getLayer(layerName)) {
-        performReclassification();
-      } else {
-        const onStyleData = () => {
-          if (map.getLayer(layerName)) {
-            map.off("styledata", onStyleData);
-            performReclassification();
+      const maxRetries = 10;
+      const retryDelay = 200;
+      let retryCount = 0;
+      let timeoutId = null;
+      let styleDataHandler = null;
+      let sourceDataHandler = null;
+      let isCleanedUp = false;
+      
+      const checkLayerAndPerform = () => {
+        if (isCleanedUp) {
+          console.log(`Cleanup called for ${layerName}, aborting retry`);
+          return;
+        }
+
+        if (map.getLayer(layerName)) {
+          if (retryCount > 0) {
+            console.log(`Layer ${layerName} ready after ${retryCount} retries`);
           }
-        };
-        map.on("styledata", onStyleData);
-      }
+          performReclassification();
+        } else if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Layer ${layerName} not ready, retry ${retryCount}/${maxRetries}`);
+          timeoutId = setTimeout(checkLayerAndPerform, retryDelay);
+        } else {
+          console.warn(`Layer ${layerName} not found after ${maxRetries} retries, listening for events`);
+          
+          styleDataHandler = () => {
+            if (isCleanedUp) return;
+            if (map.getLayer(layerName)) {
+              map.off("styledata", styleDataHandler);
+              if (sourceDataHandler) map.off("sourcedata", sourceDataHandler);
+              console.log(`Layer ${layerName} ready via styledata event`);
+              performReclassification();
+            }
+          };
+          map.on("styledata", styleDataHandler);
+          
+          sourceDataHandler = (e) => {
+            if (isCleanedUp) return;
+            if (e.sourceId === layerName && e.isSourceLoaded && map.getLayer(layerName)) {
+              map.off("sourcedata", sourceDataHandler);
+              if (styleDataHandler) map.off("styledata", styleDataHandler);
+              console.log(`Layer ${layerName} ready via sourcedata event`);
+              performReclassification();
+            }
+          };
+          map.on("sourcedata", sourceDataHandler);
+        }
+      };
+      
+      checkLayerAndPerform();
+      
+      return () => {
+        isCleanedUp = true;
+        if (timeoutId) clearTimeout(timeoutId);
+        if (styleDataHandler) map.off("styledata", styleDataHandler);
+        if (sourceDataHandler) map.off("sourcedata", sourceDataHandler);
+      };
     } else {
       performReclassification();
     }
