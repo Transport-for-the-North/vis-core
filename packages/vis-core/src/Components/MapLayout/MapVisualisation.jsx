@@ -350,6 +350,12 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
   useEffect(() => {
     if (!map) return;
 
+    const layerConfig = state.layers[layerKey];
+    if (!layerConfig) {
+      console.log(`Layer config for ${layerKey} not yet in state, deferring update`);
+      return;
+    }
+
     // Determine if reclassification is needed
     const dataHasChanged =
       combinedData !== prevCombinedDataRef.current &&
@@ -390,8 +396,10 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
             Array.isArray(dataToVisualize) &&
             dataToVisualize.length === 0
           ) {
+            console.log(`${visualisationName}: No data to visualise, resetting map style`);
             resetMapStyle(resolvedStyle);
           } else {
+            console.log(`${visualisationName}: Reclassifying with ${dataToVisualize.length} features`);
             reclassifyAndStyleMap(
               map,
               dataToClassify,
