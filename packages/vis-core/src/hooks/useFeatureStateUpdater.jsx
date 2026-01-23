@@ -136,7 +136,6 @@ export const useFeatureStateUpdater = () => {
         });
       }
 
-
       // Create a Set of new feature IDs from the provided data.
       const safeData = Array.isArray(data) ? data : []; // Ensure data is an array.
       const newIDs = new Set(safeData.map((row) => Number(row.id)));
@@ -144,43 +143,56 @@ export const useFeatureStateUpdater = () => {
       // Retrieve the previous set of feature IDs for this layer from the ref, or initialize as an empty Set.
       const prevIDs = layerStatesRef.current[specifiedLayer.name] || new Set();
 
-      // For each row in the new data, update the feature state with the new values.
-      safeData.forEach((row) => {
-        const id = Number(row.id);
-        map.setFeatureState(
-          {
-            source: specifiedLayer.name,
-            sourceLayer: specifiedLayer.sourceLayer,
-            id,
-          },
-          {
-            value: row.value,
-            valueAbs: Math.abs(row.value),
-          }
-        );
-      });
-
-      // Remove feature state for features that were updated previously but are not present in the new data.
-      prevIDs.forEach((id) => {
-        if (!newIDs.has(id)) {
-          map.removeFeatureState({
-            source: specifiedLayer.name,
-            sourceLayer: specifiedLayer.sourceLayer,
-            id,
+      // Batch feature state updates for better performance
+      // Use requestAnimationFrame to ensure DOM is ready
+      const updateFeatureStates = () => {
+        try {
+          // For each row in the new data, update the feature state with the new values.
+          safeData.forEach((row) => {
+            const id = Number(row.id);
+            map.setFeatureState(
+              {
+                source: specifiedLayer.name,
+                sourceLayer: specifiedLayer.sourceLayer,
+                id,
+              },
+              {
+                value: row.value,
+                valueAbs: Math.abs(row.value),
+              }
+            );
           });
+
+          // Remove feature state for features that were updated previously but are not present in the new data.
+          prevIDs.forEach((id) => {
+            if (!newIDs.has(id)) {
+              map.removeFeatureState({
+                source: specifiedLayer.name,
+                sourceLayer: specifiedLayer.sourceLayer,
+                id,
+              });
+            }
+          });
+
+          // Save the updated set of feature IDs for this layer for use in subsequent updates.
+          layerStatesRef.current[specifiedLayer.name] = newIDs;
+
+          if (preserveBaseStyle){ 
+            map.setFilter(specifiedLayer.name, [
+              'in',
+              ['get', 'id'],
+              ['literal', Array.from(newIDs)],
+            ]);
+          }
+          
+          console.log(`Successfully updated ${newIDs.size} features for layer ${layerName}`);
+        } catch (error) {
+          console.error(`Error updating feature states for ${layerName}:`, error);
         }
-      });
+      };
 
-      // Save the updated set of feature IDs for this layer for use in subsequent updates.
-      layerStatesRef.current[specifiedLayer.name] = newIDs;
-
-      if (preserveBaseStyle){ 
-        map.setFilter(specifiedLayer.name, [
-          'in',
-          ['get', 'id'],
-          ['literal', Array.from(newIDs)],
-        ]);
-      }
+      // Execute in next frame to ensure layer is fully initialized
+      requestAnimationFrame(updateFeatureStates);
     },
     []
   );
