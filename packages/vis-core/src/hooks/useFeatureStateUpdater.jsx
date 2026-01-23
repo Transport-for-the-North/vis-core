@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 /**
  * Custom hook for updating Maplibre GL JS feature state efficiently.
@@ -37,6 +37,28 @@ export const useFeatureStateUpdater = () => {
    */
   const layerStatesRef = useRef({});
   const pendingOperationsRef = useRef({});
+  const pendingTimeoutsRef = useRef({});
+
+  /**
+   * Cleanup function to clear all pending operations.
+   */
+  useEffect(() => {
+    return () => {
+      // Clear all pending timeouts on unmount
+      Object.values(pendingTimeoutsRef.current).forEach(timeoutId => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      });
+      
+      // Clear the refs
+      pendingOperationsRef.current = {};
+      pendingTimeoutsRef.current = {};
+      layerStatesRef.current = {};
+
+      console.log("useFeatureStateUpdater: Cleaned up all pending operations");
+    };
+  }, []);
 
   /**
    * Updates the Maplibre GL JS feature state for a specific layer based on new data.
@@ -88,12 +110,17 @@ export const useFeatureStateUpdater = () => {
           const operationKey = `${layerName}-${Date.now()}`;
           pendingOperationsRef.current[operationKey] = true;
           
-          setTimeout(() => {
+          const timeoutId = setTimeout(() => {
+            // Check if operation is still pending (component not unmounted)
             if (pendingOperationsRef.current[operationKey]) {
               delete pendingOperationsRef.current[operationKey];
+              delete pendingTimeoutsRef.current[operationKey];
               addFeaturesToMap(map, paintProperty, layers, data, colorStyle, layerName, retryCount + 1);
             }
           }, RETRY_DELAY * (retryCount + 1)); // Exponential backoff
+          
+          // Store timeout ID for cleanup
+          pendingTimeoutsRef.current[operationKey] = timeoutId;
           
           return;
         } else {
