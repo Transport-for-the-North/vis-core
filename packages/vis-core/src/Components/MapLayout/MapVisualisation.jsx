@@ -14,7 +14,7 @@ import {
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks";
 import { defaultMapColourMapper } from "defaults";
 
 /**
@@ -27,12 +27,7 @@ import { defaultMapColourMapper } from "defaults";
  * @param {Object[]} [props.maps] - An array containing the left and right map instances for side-by-side maps.
  * @returns {null} This component doesn't render anything directly.
  */
-export const MapVisualisation = ({
-  visualisationName,
-  map,
-  left = null,
-  maps,
-}) => {
+export const MapVisualisation = ({ visualisationName, map, left = null, maps }) => {
   const { state, dispatch } = useMapContext();
   const appContext = useContext(AppContext);
 
@@ -49,8 +44,8 @@ export const MapVisualisation = ({
     left === null
       ? state.visualisations[visualisationName]
       : left
-      ? state.leftVisualisations[visualisationName]
-      : state.rightVisualisations[visualisationName];
+        ? state.leftVisualisations[visualisationName]
+        : state.rightVisualisations[visualisationName];
 
     // State for tracking resolved dynamic styles
   const [resolvedStyle, setResolvedStyle] = useState(visualisation?.style);
@@ -58,34 +53,40 @@ export const MapVisualisation = ({
 
   // Use resolved style for color determination - memoized to react to resolvedStyle changes
   const colorStyle = useMemo(() => {
-    return resolvedStyle?.split("-")[1] || 'continuous'; // Default fallback
+    return resolvedStyle?.split("-")[1] || "continuous"; // Default fallback
   }, [resolvedStyle]);
 
   // Determine the layer key based on the visualisation type
   const layerKey =
-    visualisation.type === "joinDataToMap" ? visualisation.joinLayer : visualisationName;
+    visualisation.type === "joinDataToMap"
+      ? visualisation.joinLayer
+      : visualisationName;
 
   // Retrieve classificationMethod per layer
-  const classificationMethod =
-    state.layers[layerKey]?.class_method ?? "d";
+  const classificationMethod = state.layers[layerKey]?.class_method ?? "d";
 
   // Determine the layerColorScheme based on visualisation type
   const layerColorScheme = useMemo(() => {
     return (
-      state.colorSchemesByLayer[layerKey] ??
-      defaultMapColourMapper[colorStyle]
+      state.colorSchemesByLayer[layerKey] ?? defaultMapColourMapper[colorStyle]
     );
   }, [layerKey, state.colorSchemesByLayer, colorStyle]);
 
-  const shouldFilterDataToViewport = visualisation.shouldFilterDataToViewport || false;
+  const shouldFilterDataToViewport =
+    visualisation.shouldFilterDataToViewport || false;
 
   // Use the custom hook to fetch data for the visualisation
   const {
     isLoading,
     data: visualisationData,
     error,
-    dataWasReturnedButFiltered
-  } = useFetchVisualisationData(visualisation, map, layerKey, shouldFilterDataToViewport);
+    dataWasReturnedButFiltered,
+  } = useFetchVisualisationData(
+    visualisation,
+    map,
+    layerKey,
+    shouldFilterDataToViewport,
+  );
 
   // Effect to resolve dynamic styling when visualisation data is available
   useEffect(() => {
@@ -129,7 +130,11 @@ export const MapVisualisation = ({
   // Handle no data returned state
   useEffect(() => {
     if (!isLoading) {
-      if ((visualisationData && visualisationData.length === 0) && !dataWasReturnedButFiltered) {
+      if (
+        visualisationData &&
+        visualisationData.length === 0 &&
+        !dataWasReturnedButFiltered
+      ) {
         // No data returned from the API
         dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
       } else if (visualisationData || dataWasReturnedButFiltered) {
@@ -200,8 +205,7 @@ export const MapVisualisation = ({
       );
 
       // Get trseLabel from state.layers
-      const trseLabel =
-        state.layers[layerKey]?.trseLabel === true;
+      const trseLabel = state.layers[layerKey]?.trseLabel === true;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -222,16 +226,17 @@ export const MapVisualisation = ({
       );
 
       // Determine the current color scheme
-      const currentColor = (colorSchemes[colorStyle] && colorSchemes[colorStyle].some(
-        (e) => e === layerColorScheme.value
-      ))
-        ? layerColorScheme.value
-        : defaultMapColourMapper[colorStyle]?.value || defaultMapColourMapper['continuous'].value;
+      const currentColor =
+        colorSchemes[colorStyle] &&
+        colorSchemes[colorStyle].some((e) => e === layerColorScheme.value)
+          ? layerColorScheme.value
+          : defaultMapColourMapper[colorStyle]?.value ||
+            defaultMapColourMapper["continuous"].value;
 
       // Calculate the color palette based on the classification
       const invertColorScheme =
         state.layers[layerKey]?.invertedColorScheme === true;
-      
+
       // If the metric has a colours array and its length matches the bins, use it! Note that this will be default and NOT CHANGEABLE
       let colourPalette;
       if (
@@ -241,23 +246,25 @@ export const MapVisualisation = ({
       ) {
         colourPalette = metric.colours;
       } else {
-        colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
+        colourPalette = calculateColours(
+          currentColor,
+          reclassifiedData,
+          invertColorScheme,
+        );
       }
       // Update the map style
       const opacityValue = document.getElementById(
         "opacity-" + layerKey
       )?.value;
-      const widthValue = document.getElementById(
-        "width-" + layerKey
-      )?.value;
-      
+      const widthValue = document.getElementById("width-" + layerKey)?.value;
+
       // Get layer's default opacity from metadata, fallback to 0.65
       const layerObject = mapItem.getLayer(layer);
       const defaultOpacity = layerObject?.metadata?.defaultOpacity ?? 0.65;
-      
+
       // Get the layer configuration for custom settings like defaultLineOffset
       const layerConfig = state.layers[layerKey];
-      
+
       const paintProperty = createPaintProperty(
         reclassifiedData,
         resolvedStyle,
@@ -283,11 +290,9 @@ export const MapVisualisation = ({
       visualisation.queryParams,
       layerColorScheme,
       layerKey,
-      // calculateColours,
       colorStyle,
     ]
   );
-
 
   /**
    * Calculates the color palette based on the provided color scheme and number of bins.
@@ -302,8 +307,7 @@ export const MapVisualisation = ({
     if (bins.length >= 9) {
       colors = chroma.scale(colourScheme).colors(bins.length);
     } else {
-      colors =
-        colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
+      colors = colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
     }
     if (invert) {
       colors = colors.slice().reverse();
@@ -340,6 +344,9 @@ export const MapVisualisation = ({
     ]
   );
 
+  /**
+   * Core effect to reclassify and update the data on the map.
+   */
   useEffect(() => {
     if (!map) return;
 
@@ -375,7 +382,6 @@ export const MapVisualisation = ({
     const layerName = layerKey;
     const dataToVisualize = visualisationData || [];
     const dataToClassify = combinedData;
-    // const dataForClassification = filterDataToViewport(dataToClassify, map, layerName);
 
     const performReclassification = () => {
       switch (visualisation.type) {
@@ -398,7 +404,9 @@ export const MapVisualisation = ({
           break;
         }
         case "geojson": {
-          const parsedDataToVisualize = dataToVisualize[0] ? dataToVisualize[0].feature_collection : dataToVisualize.feature_collection;
+          const parsedDataToVisualize = dataToVisualize[0]
+            ? dataToVisualize[0].feature_collection
+            : dataToVisualize.feature_collection;
           if (parsedDataToVisualize) {
             reclassifyAndStyleGeoJSONMap(
               JSON.parse(parsedDataToVisualize),
@@ -440,7 +448,6 @@ export const MapVisualisation = ({
     isResolvingStyle,
     visualisation.type,
     visualisationName,
-    // reclassifyAndStyleMap,
     layerKey,
   ]);
 
@@ -495,7 +502,7 @@ export const MapVisualisation = ({
 
       // Determine current color scheme
       const currentColor = colorSchemes[colorStyle].some(
-        (e) => e === layerColorScheme.value
+        (e) => e === layerColorScheme.value,
       )
         ? layerColorScheme.value
         : defaultMapColourMapper[colorStyle].value;
@@ -505,11 +512,9 @@ export const MapVisualisation = ({
 
       // Create paint property
       const opacityValue = document.getElementById(
-        "opacity-" + layerKey
+        "opacity-" + layerKey,
       )?.value;
-      const widthValue = document.getElementById(
-        "width-" + layerKey
-      )?.value;
+      const widthValue = document.getElementById("width-" + layerKey)?.value;
       const paintProperty = createPaintProperty(
         reclassifiedData,
         style,
@@ -538,8 +543,10 @@ export const MapVisualisation = ({
             metadata: {
               colorStyle: colorStyle,
               isStylable: true,
-              enforceNoColourSchemeSelector: visualisation.enforceNoColourSchemeSelector ?? false,
-              enforceNoClassificationMethod: visualisation.enforceNoClassificationMethod ?? false,
+              enforceNoColourSchemeSelector:
+                visualisation.enforceNoColourSchemeSelector ?? false,
+              enforceNoClassificationMethod:
+                visualisation.enforceNoClassificationMethod ?? false,
             },
           },
           beforeLayerId
@@ -554,10 +561,9 @@ export const MapVisualisation = ({
         });
       } else {
         // Update the paint properties
-        for (const [
-          paintPropertyName,
-          paintPropertyArray,
-        ] of Object.entries(paintProperty)) {
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(
+          paintProperty,
+        )) {
           map.setPaintProperty(
             visualisationName,
             paintPropertyName,
@@ -566,15 +572,7 @@ export const MapVisualisation = ({
         }
       }
     },
-    [
-      map,
-      visualisationName,
-      layerColorScheme,
-      // calculateColours,
-      colorStyle,
-      dispatch,
-      layerKey,
-    ]
+    [map, visualisationName, layerColorScheme, colorStyle, dispatch, layerKey],
   );
 
   return null;
