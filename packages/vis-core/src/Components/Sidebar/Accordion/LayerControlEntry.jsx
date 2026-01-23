@@ -457,6 +457,23 @@ export const LayerControlEntry = memo(
                     handleCustomBandsChange(newBands, layer.id);
                   }}
                   isDiverging={colorStyle === "diverging"}
+                  data={
+                    // Try to get the data array for this layer from visualisation
+                    (visualisation && visualisation.data && Array.isArray(visualisation.data))
+                      ? visualisation.data.map(row => {
+                          // Try to extract the value for banding (value, metric, or first number)
+                          if (typeof row === 'object' && row !== null) {
+                            if (typeof row.value === 'number') return row.value;
+                            if (typeof row.metric === 'number') return row.metric;
+                            // fallback: first number property
+                            const num = Object.values(row).find(v => typeof v === 'number');
+                            if (typeof num === 'number') return num;
+                          }
+                          if (typeof row === 'number') return row;
+                          return null;
+                        }).filter(v => typeof v === 'number' && !isNaN(v))
+                      : []
+                  }
                 />
               )}
 

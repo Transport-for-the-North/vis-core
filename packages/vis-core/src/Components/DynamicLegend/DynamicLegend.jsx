@@ -2,7 +2,7 @@ import { forEach } from "lodash";
 import React, { useEffect, useState, useRef, useContext } from "react";
 import styled from "styled-components";
 import { convertStringToNumber, numberWithCommas } from "utils";
-import { useMapContext } from "hooks";
+import { useMapContext, useFetchVisualisationData } from "hooks";
 import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
 
@@ -191,6 +191,16 @@ const LegendDivider = styled.div`
   margin: 4px;
   max-width: 80%;
   width: 80px;
+`;
+
+const OutOfBandMessage = styled.div`
+  color: #d32f2f;
+  font-size: 0.85em;
+  margin: 6px 0 0 0;
+  padding: 6px 8px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  border-left: 3px solid #d32f2f;
 `;
 
 /**
@@ -519,6 +529,14 @@ export const DynamicLegend = ({ map }) => {
   const currentPage = useContext(PageContext);
   const pageCategory = currentPage.category || currentPage.pageName;
 
+  // Build a lookup of already-fetched data by layerId from state.visualisations
+  const visualisationDataByLayer = {};
+  Object.entries(state.visualisations).forEach(([key, vis]) => {
+    if (vis && vis.joinLayer && vis.data) {
+      visualisationDataByLayer[vis.joinLayer] = vis.data;
+    }
+  });
+
   useEffect(() => {
     if (!map) return;
 
@@ -744,16 +762,23 @@ export const DynamicLegend = ({ map }) => {
           if (filteredEntries.length === 0) {
             return null;
           }
+
+          // Parse legend entry labels, remove commas, convert to float
+          const legendNumericEntries = filteredEntries
+            .map(e => parseFloat(String(e.label).replace(/,/g, '')))
+            .filter(v => !isNaN(v));
           
           return {
             layerId: layer.id,
             title: displayValue,
             subtitle: legendSubtitleText,
             legendEntries: filteredEntries,
+            legendEntriesNumeric: legendNumericEntries,
             trseLabel,
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
+            
           };
         })
         .filter(Boolean);
@@ -799,58 +824,107 @@ export const DynamicLegend = ({ map }) => {
   
   const content = (
     <LegendContainer ref={legendRef} $outside={isMobile}>
-      {legendItems.map((item, index) => (
-        <LegendGroup key={item.layerId}>
-          <LegendItemContainer>
-            {item.noStyle ? (
-              item.legendEntries.map((entry, idx) => (
-                <LegendItem key={idx}>
-                  {item.type === "circle" ? (
-                    <CircleSwatch diameter={entry.width || 10} color={entry.color} />
-                  ) : item.type === "line" ? (
-                    <LineSwatch 
-                      height={entry.width || 2} 
-                      color={entry.color} 
-                      isDashed={entry.isDashed || false}
-                    />
-                  ) : item.type === "fill" ? (
-                    <PolygonSwatch color={entry.color} />
-                  ) : null}
-                  <LegendLabel>{entry.label}</LegendLabel>
-                </LegendItem>
-              ))
-            ) : (
-              <>
-                <LegendTitle>{item.title}</LegendTitle>
-                {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
-                {item.legendEntries.map((entry, idx) => (
+      {legendItems.map((item, index) => {
+        // Out-of-band check: only for continuous/diverging bands
+        let outOfBand = false;
+        let minBand = null, maxBand = null;
+        let bandsManuallySet = false;
+        
+        if (item.legendEntriesNumeric && Array.isArray(item.legendEntriesNumeric) && item.legendEntriesNumeric.length > 1) {
+          // Use actual band values from item.visualisation.bands for min/max
+          const bandEdges = item.legendEntriesNumeric.filter(v => !isNaN(v));
+          minBand = Math.min(...bandEdges);
+          maxBand = Math.max(...bandEdges);
+          // Get data for this layer
+          const data = visualisationDataByLayer[item.layerId];
+          if (Array.isArray(data) && data.length > 0 && minBand !== null && maxBand !== null) {
+            // Extract all metric values
+            const values = data.map(row => {
+              if (typeof row === 'object' && row !== null) {
+                let v = row.value ?? row.metric;
+                if (v === undefined) {
+                  for (const k in row) {
+                    if (typeof row[k] === 'number') return row[k];
+                  }
+                }
+                return v;
+              } else if (typeof row === 'number') {
+                return row;
+              }
+              return null;
+            }).filter(v => v !== null && !isNaN(v));
+            // Determine if bands are manually set (not default)
+            // If bands exactly match min/max of data, treat as default
+            const dataMin = Math.min(...values);
+            const dataMax = Math.max(...values);
+            // Debug log for band/data min/max
+            console.log(`Legend Debug [${item.layerId}]: minBand=${minBand}, maxBand=${maxBand}, dataMin=${dataMin}, dataMax=${dataMax}, bandEdges=${bandEdges}`);
+            bandsManuallySet = (minBand < dataMin || maxBand < dataMax);
+            // Only set outOfBand if there are actual data values outside the band range
+            outOfBand = bandsManuallySet && values.some(v => v < minBand || v > maxBand);
+            // If bands are not manually set, never show OutOfBandMessage
+            if (!bandsManuallySet) outOfBand = false;
+            console.log(`Legend Debug, Out of Band check: ${outOfBand}, bandsManuallySet=${bandsManuallySet}`);
+          }
+        }
+        return (
+          <LegendGroup key={item.layerId}>
+            <LegendItemContainer>
+              {item.noStyle ? (
+                item.legendEntries.map((entry, idx) => (
                   <LegendItem key={idx}>
-                    {entry.type === "circle" ? (
-                      <CircleSwatch
-                        diameter={entry.width || 10}
-                        color={entry.color}
-                      />
-                    ) : entry.type === "line" ? (
-                      <LineSwatch
-                        height={entry.width || 2}
-                        color={entry.color}
+                    {item.type === "circle" ? (
+                      <CircleSwatch diameter={entry.width || 10} color={entry.color} />
+                    ) : item.type === "line" ? (
+                      <LineSwatch 
+                        height={entry.width || 2} 
+                        color={entry.color} 
                         isDashed={entry.isDashed || false}
                       />
-                    ) : entry.type === "fill" ? (
-                      <PolygonSwatch
-                        color={entry.color}
-                      />
+                    ) : item.type === "fill" ? (
+                      <PolygonSwatch color={entry.color} />
                     ) : null}
                     <LegendLabel>{entry.label}</LegendLabel>
                   </LegendItem>
-                ))}
-              </>
-            )}
-          </LegendItemContainer>
-          {/* Render divider within the group, if not the last group */}
-          {index < legendItems.length - 1 && <LegendDivider />}
-        </LegendGroup>
-      ))}
+                ))
+              ) : (
+                <>
+                  <LegendTitle>{item.title}</LegendTitle>
+                  {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
+                  {item.legendEntries.map((entry, idx) => (
+                    <LegendItem key={idx}>
+                      {entry.type === "circle" ? (
+                        <CircleSwatch
+                          diameter={entry.width || 10}
+                          color={entry.color}
+                        />
+                      ) : entry.type === "line" ? (
+                        <LineSwatch
+                          height={entry.width || 2}
+                          color={entry.color}
+                          isDashed={entry.isDashed || false}
+                        />
+                      ) : entry.type === "fill" ? (
+                        <PolygonSwatch
+                          color={entry.color}
+                        />
+                      ) : null}
+                      <LegendLabel>{entry.label}</LegendLabel>
+                    </LegendItem>
+                  ))}
+                  {outOfBand && (
+                    <OutOfBandMessage>
+                      Some data is outside the specified bands.<br />It will not be shown in the legend.
+                    </OutOfBandMessage>
+                  )}
+                </>
+              )}
+            </LegendItemContainer>
+            {/* Render divider within the group, if not the last group */}
+            {index < legendItems.length - 1 && <LegendDivider />}
+          </LegendGroup>
+        );
+      })}
     </LegendContainer>
   );
 
