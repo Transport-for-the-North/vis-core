@@ -37,6 +37,13 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
   const prevColorRef = useRef({});
   const prevClassMethodRef = useRef({});
 
+  // Ref to track pending updates during style resolution and timeouts
+  const pendingUpdateRef = useRef(false);
+  const styleResolutionTimeoutRef = useRef(null);
+  
+  // Ref to track if the layer has been styled
+  const hasStyledLayerRef = useRef(false);
+
   const { addFeaturesToMap } = useFeatureStateUpdater();
 
   // Determine the visualisation based on side (left, right, or single)
@@ -47,7 +54,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
         ? state.leftVisualisations[visualisationName]
         : state.rightVisualisations[visualisationName];
 
-    // State for tracking resolved dynamic styles
+  // State for tracking resolved dynamic styles
   const [resolvedStyle, setResolvedStyle] = useState(visualisation?.style);
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
 
@@ -88,34 +95,66 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     shouldFilterDataToViewport,
   );
 
-  // Effect to resolve dynamic styling when visualisation data is available
+  // Effect to resolve dynamic styling - wait for loading to complete
   useEffect(() => {
+    // Clear any pending timeout
+    if (styleResolutionTimeoutRef.current) {
+      clearTimeout(styleResolutionTimeoutRef.current);
+    }
+
     if (visualisation?.dynamicStyling && visualisation.style && !visualisation.style.includes('-')) {
-      if (visualisationData && visualisationData.length > 0) {
-        setIsResolvingStyle(true);
-        dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_LOADING }); // Show dynamic styling indicator
-        try {
-          // Use the already fetched data to determine dynamic style
-          const newResolvedStyle = determineDynamicStyle(visualisationData, visualisation.style);
-          setResolvedStyle(newResolvedStyle);
-          console.log(`Dynamic styling resolved from existing data: ${visualisation.style} -> ${newResolvedStyle}`);
-        } catch (error) {
-          console.warn('Failed to resolve dynamic style from data:', error);
-          setResolvedStyle(`${visualisation.style}-continuous`); // Fallback to continuous
-        } finally {
-          setIsResolvingStyle(false);
-          dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_FINISHED }); // Hide dynamic styling indicator
-        }
-      } else {
+      // Only resolve style when data is complete (not loading anymore)
+      if (!isLoading && visualisationData && visualisationData.length > 0) {
+        dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_LOADING });
+        
+        // Use setTimeout to batch state updates
+        styleResolutionTimeoutRef.current = setTimeout(() => {
+          try {
+            // Use the already fetched data to determine dynamic style
+            const newResolvedStyle = determineDynamicStyle(visualisationData, visualisation.style);
+            
+            // Update both states in same microtask
+            setResolvedStyle(newResolvedStyle);
+            setIsResolvingStyle(false);
+            
+            console.log(`Dynamic styling resolved from ${visualisationData.length} data points: ${visualisation.style} -> ${newResolvedStyle}`);
+            
+            dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_FINISHED });
+            
+            // Trigger pending update if one was requested during resolution
+            if (pendingUpdateRef.current) {
+              pendingUpdateRef.current = false;
+            }
+          } catch (error) {
+            console.warn('Failed to resolve dynamic style from data:', error);
+            setResolvedStyle(`${visualisation.style}-continuous`);
+            setIsResolvingStyle(false);
+            dispatch({ type: actionTypes.SET_DYNAMIC_STYLING_FINISHED });
+          }
+        }, 0);
+      } else if (isLoading) {
         // While waiting for data, use a temporary style to prevent errors
+        console.log(`Dynamic styling waiting for data to load for ${visualisationName}`);
         setResolvedStyle(`${visualisation.style}-continuous`);
         setIsResolvingStyle(true);
+      } else if (!visualisationData || visualisationData.length === 0) {
+        // No data returned, use continuous as fallback
+        console.log(`Dynamic styling: no data for ${visualisationName}, defaulting to continuous`);
+        setResolvedStyle(`${visualisation.style}-continuous`);
+        setIsResolvingStyle(false);
       }
     } else if (!visualisation?.dynamicStyling) {
       setResolvedStyle(visualisation?.style);
       setIsResolvingStyle(false);
     }
-  }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, dispatch]);
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (styleResolutionTimeoutRef.current) {
+        clearTimeout(styleResolutionTimeoutRef.current);
+      }
+    };
+  }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, isLoading, dispatch, visualisationName]);
 
   // Handle loading state
   useEffect(() => {
