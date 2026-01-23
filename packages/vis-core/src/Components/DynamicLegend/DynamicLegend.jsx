@@ -858,13 +858,11 @@ export const DynamicLegend = ({ map }) => {
             const dataMin = Math.min(...values);
             const dataMax = Math.max(...values);
             // Debug log for band/data min/max
-            console.log(`Legend Debug [${item.layerId}]: minBand=${minBand}, maxBand=${maxBand}, dataMin=${dataMin}, dataMax=${dataMax}, bandEdges=${bandEdges}`);
             bandsManuallySet = (minBand < dataMin || maxBand < dataMax);
             // Only set outOfBand if there are actual data values outside the band range
             outOfBand = bandsManuallySet && values.some(v => v < minBand || v > maxBand);
             // If bands are not manually set, never show OutOfBandMessage
             if (!bandsManuallySet) outOfBand = false;
-            console.log(`Legend Debug, Out of Band check: ${outOfBand}, bandsManuallySet=${bandsManuallySet}`);
           }
         }
         return (
