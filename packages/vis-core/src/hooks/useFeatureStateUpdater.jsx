@@ -124,12 +124,16 @@ export const useFeatureStateUpdater = () => {
 
       const preserveBaseStyle = specifiedLayer.preserveBaseStyle === true; 
 
-      // Update the layer's paint properties.Even if there is no data so that it resets.
-      // If transitions are defined (e.g., 'fill-color-transition'), they will animate state changes smoothly.
+      // Apply paint properties before setting feature state
+      // This ensures the style expressions are in place when features render
       if (paintProperty && !preserveBaseStyle){
         Object.entries(paintProperty).forEach(([key, value]) => {
-        map.setPaintProperty(specifiedLayer.name, key, value);
-      });
+          try {
+            map.setPaintProperty(specifiedLayer.name, key, value);
+          } catch (error) {
+            console.error(`Failed to set paint property ${key} on ${specifiedLayer.name}:`, error);
+          }
+        });
       }
 
 
