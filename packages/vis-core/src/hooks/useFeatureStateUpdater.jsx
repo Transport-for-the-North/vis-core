@@ -36,6 +36,7 @@ export const useFeatureStateUpdater = () => {
    * @type {Object.<string, Set<number>>}
    */
   const layerStatesRef = useRef({});
+  const pendingOperationsRef = useRef({});
 
   /**
    * Updates the Maplibre GL JS feature state for a specific layer based on new data.
@@ -63,19 +64,53 @@ export const useFeatureStateUpdater = () => {
    * addFeaturesToMap(map, { 'fill-color': ['interpolate', ['linear'], ['feature-state', 'value'], 0, 'blue', 100, 'red'], colorStyle: 'myColorStyle' }, layers, data, 'myLayer');
    */
   const addFeaturesToMap = useCallback(
-    (map, paintProperty, layers, data, colorStyle, layerName) => {
+    (map, paintProperty, layers, data, colorStyle, layerName, retryCount = 0) => {
+      const MAX_RETRIES = 3;
+      const RETRY_DELAY = 150;
+
       // Find the specified layer in the layers object.
       const specifiedLayer = Object.values(layers).find(
         (layer) => layer.name === layerName
       );
 
-      // Return early if the layer is not found, not present on the map, or not stylable, or there's no data.
-      if (
-        !specifiedLayer ||
-        !map.getLayer(specifiedLayer.name) ||
-        !specifiedLayer.isStylable
-      ) {
+      // If layer not found but retries remain, schedule retry
+      if (!specifiedLayer) {
+        console.warn(`Layer config for ${layerName} not found`);
         return;
+      }
+
+      // Check if layer exists on map, if not and retries remain, retry
+      if (!map.getLayer(specifiedLayer.name)) {
+        if (retryCount < MAX_RETRIES) {
+          console.log(`Layer ${layerName} not on map yet, scheduling retry ${retryCount + 1}/${MAX_RETRIES}`);
+          
+          // Store pending operation
+          const operationKey = `${layerName}-${Date.now()}`;
+          pendingOperationsRef.current[operationKey] = true;
+          
+          setTimeout(() => {
+            if (pendingOperationsRef.current[operationKey]) {
+              delete pendingOperationsRef.current[operationKey];
+              addFeaturesToMap(map, paintProperty, layers, data, colorStyle, layerName, retryCount + 1);
+            }
+          }, RETRY_DELAY * (retryCount + 1)); // Exponential backoff
+          
+          return;
+        } else {
+          console.warn(`Layer ${layerName} not on map after ${MAX_RETRIES} retries, giving up`);
+          return;
+        }
+      }
+
+      // Check isStylable
+      if (!specifiedLayer.isStylable) {
+        console.log(`Layer ${layerName} is not stylable, skipping`);
+        return;
+      }
+
+      // If we got here after retries, log success
+      if (retryCount > 0) {
+        console.log(`Successfully found layer ${layerName} after ${retryCount} retries`);
       }
 
       // Retrieve the layer from the map.
@@ -84,7 +119,7 @@ export const useFeatureStateUpdater = () => {
       // Update the layer's metadata with additional paint properties (e.g., colorStyle).
       layerFromMap.metadata = {
         ...layerFromMap.metadata,
-        colorStyle: colorStyle, // assuming paintProperty carries colorStyle information.
+        colorStyle: colorStyle,
       };
 
       const preserveBaseStyle = specifiedLayer.preserveBaseStyle === true; 
