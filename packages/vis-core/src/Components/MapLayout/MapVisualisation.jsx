@@ -235,6 +235,9 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     ) => {
       // Check if the specified layer exists on the map
       if (!mapItem.getLayer(layer)) {
+        console.warn(
+          `Layer ${layer} not found on map during reclassifyAndStyleMap`,
+        );
         return;
       }
 
@@ -404,11 +407,13 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
       prevVisualisationDataRef.current !== undefined;
     const colorHasChanged =
       layerColorScheme !== null &&
-      prevColorRef.current[layerKey];
+      prevColorRef.current[layerKey] !== undefined &&
+      layerColorScheme !== prevColorRef.current[layerKey];
     const prevClassificationMethod =
       prevClassMethodRef.current[layerKey];
     const classificationHasChanged =
-      classificationMethod !== prevClassificationMethod;
+      classificationMethod !== prevClassificationMethod &&
+      prevClassificationMethod !== undefined;
 
     const needUpdate =
       dataHasChanged ||
@@ -493,9 +498,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
           break;
         }
         case "geojson": {
-          const parsedDataToVisualize = dataToVisualize[0]
-            ? dataToVisualize[0].feature_collection
-            : dataToVisualize.feature_collection;
+          const parsedDataToVisualize = dataToVisualize[0] ? dataToVisualize[0].feature_collection : dataToVisualize.feature_collection;
           if (parsedDataToVisualize) {
             reclassifyAndStyleGeoJSONMap(
               JSON.parse(parsedDataToVisualize),
@@ -580,7 +583,6 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     map,
     layerColorScheme,
     classificationMethod,
-    resetMapStyle,
     resolvedStyle,
     isResolvingStyle,
     visualisation.type,
