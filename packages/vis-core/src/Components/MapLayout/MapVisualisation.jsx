@@ -416,7 +416,47 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
       colorHasChanged ||
       classificationHasChanged;
 
-    if (!needUpdate || !resolvedStyle || isResolvingStyle || !colorStyle) return;
+    // If we styled with no data, and now we have data, we need an update
+    const previouslyHadNoData = 
+      prevVisualisationDataRef.current !== undefined &&
+      (!prevVisualisationDataRef.current || prevVisualisationDataRef.current.length === 0);
+    const nowHasData = visualisationData && visualisationData.length > 0;
+    const transitionedFromNoDataToData = previouslyHadNoData && nowHasData;
+
+    // Also consider it a first run if we transitioned from no data to having data
+    const isFirstRun = (!hasStyledLayerRef.current || transitionedFromNoDataToData) && 
+                      visualisationData && 
+                      visualisationData.length > 0;
+
+    if (transitionedFromNoDataToData) {
+      console.log(`${visualisationName}: Transitioned from no data to ${visualisationData.length} data points, triggering update`);
+      // Reset the styled flag so we treat this as a fresh styling
+      hasStyledLayerRef.current = false;
+    }
+
+    if (isResolvingStyle && (needUpdate || isFirstRun)) {
+      pendingUpdateRef.current = true;
+      console.log(`Deferring update for ${visualisationName} - style still resolving`);
+      return;
+    }
+
+    // Guard conditions
+    if (!needUpdate && !isFirstRun) {
+      console.log(`${visualisationName}: No update needed (needUpdate=${needUpdate}, isFirstRun=${isFirstRun})`);
+      return;
+    }
+    if (!resolvedStyle || !colorStyle) {
+      console.log(`${visualisationName}: Missing resolvedStyle or colorStyle, skipping update`);
+      return;
+    }
+
+    console.log(`${visualisationName}: Proceeding with reclassification:`, {
+      needUpdate,
+      isFirstRun,
+      transitionedFromNoDataToData,
+      dataLength: visualisationData?.length || 0,
+      resolvedStyle,
+    });
 
     // Update the refs to the current data
     prevCombinedDataRef.current = combinedData;
@@ -437,6 +477,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
           ) {
             console.log(`${visualisationName}: No data to visualise, resetting map style`);
             resetMapStyle(resolvedStyle);
+            hasStyledLayerRef.current = true; // Mark as styled even with no data
           } else {
             console.log(`${visualisationName}: Reclassifying with ${dataToVisualize.length} features`);
             reclassifyAndStyleMap(
@@ -447,6 +488,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
               classificationMethod,
               layerName
             );
+            hasStyledLayerRef.current = true;
           }
           break;
         }
@@ -462,6 +504,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
           } else {
             resetMapStyle(resolvedStyle);
           }
+          hasStyledLayerRef.current = true;
           break;
         }
         default:
@@ -496,7 +539,28 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     visualisation.type,
     visualisationName,
     layerKey,
+    colorStyle
   ]);
+
+  // Trigger update when style resolution completes if there was a pending update
+  useEffect(() => {
+    if (
+      !isResolvingStyle &&
+      pendingUpdateRef.current &&
+      resolvedStyle &&
+      colorStyle
+    ) {
+      console.log(`Executing deferred update for ${visualisationName}`);
+      pendingUpdateRef.current = false;
+
+      // Force refs to undefined to trigger update
+      prevCombinedDataRef.current = undefined;
+      prevVisualisationDataRef.current = undefined;
+
+      // Also reset the styled flag so it's treated as a first run
+      hasStyledLayerRef.current = false;
+    }
+  }, [isResolvingStyle, resolvedStyle, colorStyle, visualisationName]);
 
   // **Run-once cleanup
   useEffect(() => {
