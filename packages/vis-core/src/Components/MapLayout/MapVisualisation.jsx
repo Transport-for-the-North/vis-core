@@ -40,6 +40,8 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
   // Ref to track pending updates during style resolution and timeouts
   const pendingUpdateRef = useRef(false);
   const styleResolutionTimeoutRef = useRef(null);
+
+  const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   
   // Ref to track if the layer has been styled
   const hasStyledLayerRef = useRef(false);
@@ -433,6 +435,9 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
                       visualisationData && 
                       visualisationData.length > 0;
 
+    // forceUpdateCounter > 0 means we had a deferred update
+    const isDeferredUpdate = forceUpdateCounter > 0 && !pendingUpdateRef.current;
+
     if (transitionedFromNoDataToData) {
       console.log(`${visualisationName}: Transitioned from no data to ${visualisationData.length} data points, triggering update`);
       // Reset the styled flag so we treat this as a fresh styling
@@ -446,8 +451,8 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     }
 
     // Guard conditions
-    if (!needUpdate && !isFirstRun) {
-      console.log(`${visualisationName}: No update needed (needUpdate=${needUpdate}, isFirstRun=${isFirstRun})`);
+    if (!needUpdate && !isFirstRun && !isDeferredUpdate) {
+      console.log(`${visualisationName}: No update needed (needUpdate=${needUpdate}, isFirstRun=${isFirstRun}, isDeferredUpdate=${isDeferredUpdate})`);
       return;
     }
     if (!resolvedStyle || !colorStyle) {
@@ -608,6 +613,9 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
 
       // Also reset the styled flag so it's treated as a first run
       hasStyledLayerRef.current = false;
+
+      // Increment counter to trigger main effect re-run
+      setForceUpdateCounter((prev) => prev + 1);
     }
   }, [isResolvingStyle, resolvedStyle, colorStyle, visualisationName]);
 
@@ -732,7 +740,7 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
         }
       }
     },
-    [map, visualisationName, layerColorScheme, colorStyle, dispatch, layerKey],
+    [map, visualisationName, layerColorScheme, colorStyle, dispatch, layerKey, forceUpdateCounter],
   );
 
   return null;
