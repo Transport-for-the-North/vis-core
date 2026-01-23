@@ -478,6 +478,12 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     const dataToVisualize = visualisationData || [];
     const dataToClassify = combinedData;
 
+    // Cleanup tracking vars
+    let timeoutId = null;
+    let styleDataHandler = null;
+    let sourceDataHandler = null;
+    let isCleanedUp = false;
+
     const performReclassification = () => {
       switch (visualisation.type) {
         case "joinDataToMap": {
@@ -524,10 +530,6 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
       const maxRetries = 10;
       const retryDelay = 200;
       let retryCount = 0;
-      let timeoutId = null;
-      let styleDataHandler = null;
-      let sourceDataHandler = null;
-      let isCleanedUp = false;
       
       const checkLayerAndPerform = () => {
         if (isCleanedUp) {
@@ -572,16 +574,29 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
       };
       
       checkLayerAndPerform();
-      
-      return () => {
-        isCleanedUp = true;
-        if (timeoutId) clearTimeout(timeoutId);
-        if (styleDataHandler) map.off("styledata", styleDataHandler);
-        if (sourceDataHandler) map.off("sourcedata", sourceDataHandler);
-      };
     } else {
+      // For non-joinDataToMap types, just perform the reclassification directly
       performReclassification();
     }
+
+    return () => {
+      isCleanedUp = true;
+      
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        console.log(`Cleared timeout for ${layerName}`);
+      }
+      
+      if (styleDataHandler) {
+        map.off("styledata", styleDataHandler);
+        console.log(`Removed styledata listener for ${layerName}`);
+      }
+      
+      if (sourceDataHandler) {
+        map.off("sourcedata", sourceDataHandler);
+        console.log(`Removed sourcedata listener for ${layerName}`);
+      }
+    };
   }, [
     combinedData,
     visualisationData,
@@ -593,7 +608,8 @@ export const MapVisualisation = ({ visualisationName, map, left = null, maps }) 
     visualisation.type,
     visualisationName,
     layerKey,
-    colorStyle
+    colorStyle,
+    forceUpdateCounter,
   ]);
 
   // Trigger update when style resolution completes if there was a pending update
