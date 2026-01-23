@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import chroma from 'chroma-js';
 import styled from "styled-components";
+import { roundToSignificantFigures } from "utils/math";
 import { SelectorLabel } from "./SelectorLabel";
 
 const BandEditorContainer = styled.div`
@@ -52,7 +54,7 @@ const BandInput = styled.input`
   border-radius: 4px;
   border: ${props => props.$hasError ? '2px solid #d32f2f' : '1px solid #d1d1e0'};
   background: #fff;
-  text-align: center;
+  text-align: right;
   font-size: 0.9rem;
   box-sizing: border-box;
   min-width: 0;
@@ -110,6 +112,7 @@ const UpdateButton = styled.button`
  * @param {number[]} props.bands - Array of current band threshold values.
  * @param {Function} props.onChange - Callback function invoked when user updates band values.
  * @param {boolean} props.isDiverging - Whether the color scheme is diverging (affects min band count).
+ * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
  *
  * @example
@@ -117,9 +120,10 @@ const UpdateButton = styled.button`
  *   bands={[0, 10, 20, 30, 40]}
  *   onChange={(newBands) => handleBandChange(newBands)}
  *   isDiverging={false}
+ *   data={[1,2,3,4,5,6,7,8,9,10]}
  * />
  */
-export const BandEditor = ({ bands, onChange, isDiverging }) => {
+export const BandEditor = ({ bands, onChange, isDiverging, data = [], defaultBandValues = null, onReset = null }) => {
   const [localBands, setLocalBands] = useState(bands);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -212,26 +216,88 @@ export const BandEditor = ({ bands, onChange, isDiverging }) => {
   const minBands = isDiverging ? 3 : 2;
   const maxBands = 9;
 
+  // Helper to recalculate default bands (quantile binning using chroma-js)
+  // This function now requires `chroma` and `data` to be present and will
+  // return the quantile thresholds rounded to two significant figures.
+  // If chroma or sufficient data is not available, it returns the current local bands.
+  const recalculateDefaultBands = () => {
+    const count = localBands.length;
+    // If the app provides default band values (from config), prefer those
+    if (defaultBandValues && Array.isArray(defaultBandValues) && defaultBandValues.length > 0) {
+      const rounded = defaultBandValues.map(v => roundToSignificantFigures(Number(v), 2));
+      return rounded.length >= count ? rounded.slice(0, count) : rounded;
+    }
+
+    if (!chroma || !data || !Array.isArray(data)) return localBands;
+
+    // Extract numeric values from data (support objects or raw numbers)
+    const numericValues = data.map((row) => {
+      if (row == null) return NaN;
+      if (typeof row === 'number') return row;
+      if (typeof row === 'string') return Number(row.replace(/,/g, ''));
+      if (typeof row === 'object') {
+        // try common fields
+        if (typeof row.value === 'number') return row.value;
+        if (typeof row.metric === 'number') return row.metric;
+        // try to find first numeric property
+        for (const k in row) {
+          if (typeof row[k] === 'number') return row[k];
+          if (typeof row[k] === 'string' && !Number.isNaN(Number(row[k].replace(/,/g, '')))) return Number(row[k].replace(/,/g, ''));
+        }
+      }
+      return NaN;
+    }).filter(v => Number.isFinite(v));
+
+    if (numericValues.length < count) return localBands;
+
+    try {
+      const limits = chroma.limits(numericValues, 'q', count);
+      const thresholds = limits.slice(1).map(v => roundToSignificantFigures(Number(v), 2));
+      return thresholds;
+    } catch (e) {
+      return localBands;
+    }
+  };
+
+  const handleResetBands = () => {
+    const defaults = recalculateDefaultBands();
+    setLocalBands(defaults);
+    // Apply immediately (don't require separate Update click)
+    const validDefaults = defaults.filter(v => v !== "" && !isNaN(v)).map(Number);
+    onChange(validDefaults);
+    if (typeof onReset === 'function') {
+      try { onReset(); } catch (e) { /* ignore */ }
+    }
+    setHasChanges(false);
+  };
+
   return (
     <BandEditorContainer>
       <SelectorLabel text="Edit banding" />
-      
       <BandHeader>
         <span style={{ fontSize: "0.9rem", color: "#555", fontWeight: 500 }}>Number of bands:</span>
-        <BandCountSelect
-          value={localBands.length}
-          onChange={handleBandCountChange}
-        >
-          {Array.from({ length: maxBands - minBands + 1 }, (_, i) => minBands + i).map((n) => (
-            <option key={n} value={n}>{n}</option>
-          ))}
-        </BandCountSelect>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <BandCountSelect
+            value={localBands.length}
+            onChange={handleBandCountChange}
+          >
+            {Array.from({ length: maxBands - minBands + 1 }, (_, i) => minBands + i).map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </BandCountSelect>
+          <UpdateButton
+            type="button"
+            style={{ padding: '4px 10px', fontSize: '0.85em', width: 'auto', background: '#eee', color: '#4b3e91', border: '1px solid #d1d1e0', fontWeight: 500 }}
+            onClick={handleResetBands}
+            disabled={localBands.length < 2}
+          >
+            Reset bands
+          </UpdateButton>
+        </div>
       </BandHeader>
-      
       {validation.error && (
         <ErrorMessage>{validation.error}</ErrorMessage>
       )}
-      
       <BandInputsGrid>
         {localBands.map((band, idx) => (
           <BandInputWrapper key={idx}>
@@ -246,7 +312,6 @@ export const BandEditor = ({ bands, onChange, isDiverging }) => {
           </BandInputWrapper>
         ))}
       </BandInputsGrid>
-      
       <UpdateButton onClick={handleUpdate} disabled={!hasChanges || !validation.valid}>
         Update banding
       </UpdateButton>
