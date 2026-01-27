@@ -1,6 +1,6 @@
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo, useState } from "react";
-import { useMapContext } from "hooks";
+import { useMapContext, useDataFetchState } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
 import {
@@ -16,6 +16,7 @@ import {
 import chroma from "chroma-js";
 import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
+import { DataFetchState } from "enums";
 
 /**
  * MapVisualisation component responsible for rendering visualizations on a map.
@@ -84,8 +85,22 @@ export const MapVisualisation = ({
     isLoading,
     data: visualisationData,
     error,
-    dataWasReturnedButFiltered
-  } = useFetchVisualisationData(visualisation, map, layerKey, shouldFilterDataToViewport);
+    dataWasReturnedButFiltered,
+    fetchState,
+    resetFetchState,
+  } = useFetchVisualisationData(
+    visualisation,
+    map,
+    layerKey,
+    shouldFilterDataToViewport,
+  );
+
+  // Reset fetch state when visualisation changes (page navigation)
+  useEffect(() => {
+    hasStyledLayerRef.current = false;
+    prevCombinedDataRef.current = undefined;
+    prevVisualisationDataRef.current = undefined;
+  }, [visualisationName, resetFetchState]);
 
   // Effect to resolve dynamic styling when visualisation data is available
   useEffect(() => {
@@ -126,21 +141,31 @@ export const MapVisualisation = ({
     }
   }, [isLoading, dispatch]);
 
-  // Handle no data returned state
+  // Handle no data returned state based on fetch state machine
   useEffect(() => {
-    if (!isLoading) {
-      if ((visualisationData && visualisationData.length === 0) && !dataWasReturnedButFiltered) {
-        // No data returned from the API
-        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
-      } else if (visualisationData || dataWasReturnedButFiltered) {
-        // Data was returned
+    switch (fetchState) {
+      case DataFetchState.IDLE:
+        // Don't change anything during idle - let previous state persist
+        // until we actually start loading
+        break;
+      case DataFetchState.LOADING:
+        // Clear the "no data" message while loading
+        // This prevents stale "no data" from previous page/query
         dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
-      } else if (error) {
-        // An error occurred
+        break;
+      case DataFetchState.ERROR:
+      case DataFetchState.EMPTY:
+        // Genuinely no data or error occurred
         dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
-      }
+        break;
+      case DataFetchState.SUCCESS:
+        // Data loaded successfully
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
+        break;
+      default:
+        break;
     }
-  }, [isLoading, visualisationData, error, dispatch]);
+  }, [fetchState, dispatch]);
 
   // Update the visualisation data in the global state when fetched
   useEffect(() => {
