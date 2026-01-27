@@ -19,6 +19,24 @@ import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 
 /**
+ * Calculates the colour palette based on the provided color scheme and number of bins.
+ */
+const calculateColours = (colourScheme, bins, invert = false) => {
+  const minBins = 3;
+  const maxBins = 9;
+  
+  let colors;
+  if (bins.length >= maxBins) {
+    colors = chroma.scale(colourScheme).colors(bins.length);
+  } else {
+    const binCount = Math.min(Math.max(bins.length, minBins), maxBins);
+    colors = colorbrewer[colourScheme][binCount];
+  }
+  
+  return invert ? colors.slice().reverse() : colors;
+};
+
+/**
  * MapVisualisation component responsible for rendering visualizations on a map.
  *
  * @param {Object} props - The properties passed to the component.
@@ -310,31 +328,7 @@ export const MapVisualisation = ({
       layerKey,
       // calculateColours,
       colorStyle,
-    ]
   );
-
-
-  /**
-   * Calculates the color palette based on the provided color scheme and number of bins.
-   *
-   * @param {string} colourScheme - The name of the color scheme to use.
-   * @param {Array} bins - The bins representing the data distribution.
-   * @param {boolean} invert - Whether to invert the color scheme.
-   * @returns {string[]} An array of color values representing the color palette.
-   */
-  const calculateColours = useCallback((colourScheme, bins, invert = false) => {
-    let colors;
-    if (bins.length >= 9) {
-      colors = chroma.scale(colourScheme).colors(bins.length);
-    } else {
-      colors =
-        colorbrewer[colourScheme][Math.min(Math.max(bins.length, 3), 9)];
-    }
-    if (invert) {
-      colors = colors.slice().reverse();
-    }
-    return colors;
-  }, []);
 
   /**
    * Reset the map style to the default style for a specified layer.
@@ -343,26 +337,90 @@ export const MapVisualisation = ({
    */
   const resetMapStyle = useCallback(
     (style) => {
-      if (map) {
-        const paintProperty = resetPaintProperty(style);
-        addFeaturesToMap(
-          map,
-          paintProperty,
-          state.layers,
-          visualisationData,
-          colorStyle,
-          layerKey
+
+  /**
+   * Reclassifies GeoJSON data and styles the map accordingly.
+   */
+  const reclassifyAndStyleGeoJSONMap = useCallback(
+    (featureCollection, style) => {
+      if (!featureCollection || !map) {
+        return;
+      }
+      
+      if (!hasAnyGeometryNotNull(featureCollection)) {
+        if (map.getLayer(visualisationName)) {
+          map.removeLayer(visualisationName);
+        }
+        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+        return;
+      }
+      
+      if (!map.getSource(visualisationName)) {
+        map.addSource(visualisationName, {
+          type: "geojson",
+          data: featureCollection,
+        });
+      } else {
+        map.getSource(visualisationName).setData(featureCollection);
+      }
+
+      const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
+
+      const currentColor = colorSchemes[colorStyle]?.some(
+        (e) => e === layerColorScheme?.value
+      )
+        ? layerColorScheme.value
+        : defaultMapColourMapper[colorStyle]?.value;
+
+      const colourPalette = calculateColours(currentColor, reclassifiedData);
+
+      const opacityValue = document.getElementById(`opacity-${layerKey}`)?.value;
+      
+      const paintProperty = createPaintProperty(
+        reclassifiedData,
+        style,
+        colourPalette,
+        opacityValue ? parseFloat(opacityValue) : DEFAULT_OPACITY,
+        state.layers[layerKey]
+      );
+
+      const layers = map.getStyle().layers;
+      const layerIndex = layers.findIndex(
+        (layer) => layer.id.includes("-hover") || layer.id === "selected-feature-layer"
+      );
+      const beforeLayerId = layerIndex !== -1 ? layers[layerIndex].id : undefined;
+
+      if (!map.getLayer(visualisationName)) {
+        map.addLayer(
+          {
+            id: visualisationName,
+            type: "fill",
+            source: visualisationName,
+            paint: paintProperty,
+            metadata: {
+              colorStyle: colorStyle,
+              isStylable: true,
+              enforceNoColourSchemeSelector: visualisation?.enforceNoColourSchemeSelector ?? false,
+              enforceNoClassificationMethod: visualisation?.enforceNoClassificationMethod ?? false,
+            },
+          },
+          beforeLayerId
         );
+
+        dispatch({
+          type: "UPDATE_COLOR_SCHEME",
+          payload: {
+            layerName: visualisationName,
+            color_scheme: layerColorScheme,
+          },
+        });
+      } else {
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintProperty)) {
+          map.setPaintProperty(visualisationName, paintPropertyName, paintPropertyArray);
+        }
       }
     },
-    [
-      map,
-      JSON.stringify(state.layers),
-      addFeaturesToMap,
-      visualisationData,
-      layerKey,
-      colorStyle
-    ]
+    [map, visualisationName, layerColorScheme, colorStyle, dispatch, layerKey, state.layers, visualisation]
   );
 
   useEffect(() => {
@@ -481,126 +539,7 @@ export const MapVisualisation = ({
         }
       }
     };
-  }, [map, visualisation.type, visualisationName]);
-
-  /**
-   * Reclassifies GeoJSON data and styles the map accordingly.
-   * If the layer does not exist, it adds a new layer below any existing 'selected-feature-layer' or layers with '-hover' in their names.
-   * If the layer exists, it updates the paint properties of the layer.
-   *
-   * @param {Object} featureCollection - The GeoJSON feature collection to be added or updated on the map.
-   * @param {string} style - The style string indicating the type of visualisation (e.g., 'polygon-categorical').
-   */
-  const reclassifyAndStyleGeoJSONMap = useCallback(
-    (featureCollection, style) => {
-      if (!featureCollection) {
-        return;
-      }
-      if (!hasAnyGeometryNotNull(featureCollection)) {
-        // Remove the layer and source if no valid data is returned
-        if (map.getLayer(visualisationName)) {
-          map.removeLayer(visualisationName);
-        }
-        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
-        return;
-      }
-      if (!map.getSource(visualisationName)) {
-        // Add a new source
-        map.addSource(visualisationName, {
-          type: "geojson",
-          data: featureCollection,
-        });
-      } else {
-        // Update the existing source
-        map.getSource(visualisationName).setData(featureCollection);
-      }
-
-      // Reclassify data
-      const reclassifiedData = reclassifyGeoJSONData(featureCollection, style);
-
-      // Determine current color scheme
-      const currentColor = colorSchemes[colorStyle].some(
-        (e) => e === layerColorScheme.value
-      )
-        ? layerColorScheme.value
-        : defaultMapColourMapper[colorStyle].value;
-
-      // Calculate color palette
-      const colourPalette = calculateColours(currentColor, reclassifiedData);
-
-      // Create paint property
-      const opacityValue = document.getElementById(
-        "opacity-" + layerKey
-      )?.value;
-      const widthValue = document.getElementById(
-        "width-" + layerKey
-      )?.value;
-      const paintProperty = createPaintProperty(
-        reclassifiedData,
-        style,
-        colourPalette,
-        opacityValue ? parseFloat(opacityValue) : 0.65,
-        state.layers[layerKey] // Pass layer config instead of widthValue
-      );
-
-      // Find the index of the layer that should be above the new layer
-      const layers = map.getStyle().layers;
-      const layerIndex = layers.findIndex(
-        (layer) =>
-          layer.id.includes("-hover") || layer.id === "selected-feature-layer"
-      );
-      const beforeLayerId =
-        layerIndex !== -1 ? layers[layerIndex].id : undefined;
-
-      if (!map.getLayer(visualisationName)) {
-        // Add a new layer below the reference layer
-        map.addLayer(
-          {
-            id: visualisationName,
-            type: "fill",
-            source: visualisationName,
-            paint: paintProperty,
-            metadata: {
-              colorStyle: colorStyle,
-              isStylable: true,
-              enforceNoColourSchemeSelector: visualisation.enforceNoColourSchemeSelector ?? false,
-              enforceNoClassificationMethod: visualisation.enforceNoClassificationMethod ?? false,
-            },
-          },
-          beforeLayerId
-        );
-
-        dispatch({
-          type: "UPDATE_COLOR_SCHEME",
-          payload: {
-            layerName: visualisationName,
-            color_scheme: layerColorScheme,
-          },
-        });
-      } else {
-        // Update the paint properties
-        for (const [
-          paintPropertyName,
-          paintPropertyArray,
-        ] of Object.entries(paintProperty)) {
-          map.setPaintProperty(
-            visualisationName,
-            paintPropertyName,
-            paintPropertyArray
-          );
-        }
-      }
-    },
-    [
-      map,
-      visualisationName,
-      layerColorScheme,
-      // calculateColours,
-      colorStyle,
-      dispatch,
-      layerKey,
-    ]
-  );
+  }, [map, visualisation?.type, visualisationName]);
 
   return null;
 };
