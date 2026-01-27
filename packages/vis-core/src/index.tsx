@@ -1,7 +1,7 @@
 // packages/vis-core/src/index.ts
 export * from './defaults';
 export {
-  setMapApiToken, getMapApiToken, setProdOrDev, getProdOrDev, setApiBaseDomain, getApiBaseDomain, setApiBaseDomainDev, getApiBaseDomainDev,
+  setMapApiToken, getMapApiToken, setProdOrDev, getProdOrDev, setApiBaseDomain, getApiBaseDomain, setApiBaseDomainDev, getApiBaseDomainDev, setAppName, getAppName
 } from './runtime';
 export * as Components from './Components';
 export * as contexts from './contexts';

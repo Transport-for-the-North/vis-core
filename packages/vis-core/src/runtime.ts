@@ -8,13 +8,18 @@ let runtimeEnv: {
   prodOrDev: Mode;
   apiBaseDomain: string;
   apiBaseDomainDev: string;
+  appName: string;
 } = {
   prodOrDev: (import.meta as any)?.env?.VITE_PROD_OR_DEV ?? '',
   apiBaseDomain: (import.meta as any)?.env?.VITE_API_BASE_DOMAIN ?? '',
   apiBaseDomainDev: (import.meta as any)?.env?.VITE_API_BASE_DOMAIN_DEV ?? '',
+  appName: (import.meta as any)?.env?.VITE_APP_NAME ?? '',
 };
 
 // ---- setters / getters ----
+export const setAppName = (v: string) => { runtimeEnv.appName = v || ''; };
+export const getAppName = () => runtimeEnv.appName;
+
 export const setMapApiToken = (v?: string) => { mapApiToken = v ?? ''; };
 export const getMapApiToken = () => mapApiToken;
 
