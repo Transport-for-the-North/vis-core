@@ -220,8 +220,8 @@ export function DataTable({
       const totalBaseWidth = Object.values(baseWidths).reduce((sum, w) => sum + w, 0);
       const totalWithSelect = totalBaseWidth + selectColWidth;
       
-      // Add a small buffer (2px) to prevent rounding issues causing overflow
-      const buffer = 2;
+      // Add a small buffer (5px) to prevent rounding issues causing overflow
+      const buffer = 5;
       
       // If we have extra space, distribute it proportionally
       if (totalWithSelect < availableWidth - buffer) {
@@ -314,8 +314,8 @@ export function DataTable({
         const totalRequiredWidth = Object.values(requiredWidths).reduce((sum, w) => sum + w, 0);
         const totalWithSelect = totalRequiredWidth + selectColWidth;
         
-        // Add a small buffer (2px) to prevent rounding issues causing overflow
-        const buffer = 2;
+        // Add a small buffer (5px) to prevent rounding/subpixel issues causing overflow
+        const buffer = 5;
         
         // If we have extra space, distribute it proportionally
         if (totalWithSelect < availableWidth - buffer) {
