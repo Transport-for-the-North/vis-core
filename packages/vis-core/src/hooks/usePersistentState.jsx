@@ -13,12 +13,17 @@ export function usePersistentState(key, initialValue) {
     try {
       const raw = localStorage.getItem(key);
       return raw ? JSON.parse(raw) : initialValue;
-    } catch {
+    } catch (err) {
+      console.warn('Failed to read persistent state:', err);
       return initialValue;
     }
   });
   useEffect(() => {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (err) {
+      console.warn('Failed to write persistent state:', err);
+    }
   }, [key, value]);
   return [value, setValue];
 }
