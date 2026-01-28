@@ -34,8 +34,8 @@ export const PageSwitch = ({ pageConfig }) => {
               <FilterProvider>
                 <DirectoryScorecardsPage/>
               </FilterProvider>
-            )
-            default:
+            );
+          default:
             return <div>Nothing</div>;
         }
       })()}

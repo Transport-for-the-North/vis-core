@@ -1,10 +1,1 @@
-diff a/packages/vis-core/src/Components/index.js b/packages/vis-core/src/Components/index.js	(rejected hunks)
-@@ -17,4 +17,5 @@ export * from './MessageBox'
- export * from './IFrameEmbedPage'
- export * from './NotFoundPage'
- export * from './Charts'
--export * from './RunsDirectoryPage'
-\ No newline at end of file
-+export * from './RunsDirectoryPage'
-+export * from './DirectoryScorecardsPage'
-\ No newline at end of file
+
