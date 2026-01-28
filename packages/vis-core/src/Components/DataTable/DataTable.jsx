@@ -285,63 +285,62 @@ export function DataTable({
   }, [resetWidths, ensureWidthsFitFiltered]);
 
   // Respond to window resize - but ensure we don't shrink below content requirements
-  useEffect(() => {
-    const handleResize = () => {
-      if (!measureHostRef.current || !tableRef.current) return;
+  const handleResize = useCallback(() => {
+    if (!measureHostRef.current || !tableRef.current) return;
 
-      measureHostRef.current.innerHTML = "";
-      const { measureOneLinePx, measureHeaderTwoLineWidthPx } = makeTextMeasurer(
-        measureHostRef.current,
-        tableRef.current
-      );
+    measureHostRef.current.innerHTML = "";
+    const { measureOneLinePx, measureHeaderTwoLineWidthPx } = makeTextMeasurer(
+      measureHostRef.current,
+      tableRef.current
+    );
 
-      const requiredWidths = computeReasonableWrapWidthsPx({
-        columns,
-        filteredRows: filtered,
-        autoFitSampleSize,
-        measureOneLinePx,
-        measureHeaderTwoLineWidthPx,
-        perColumnMaxPx,
-      });
+    const requiredWidths = computeReasonableWrapWidthsPx({
+      columns,
+      filteredRows: filtered,
+      autoFitSampleSize,
+      measureOneLinePx,
+      measureHeaderTwoLineWidthPx,
+      perColumnMaxPx,
+    });
 
-      // Get available width from parent container
-      const container = tableRef.current.parentElement;
-      if (container) {
-        const availableWidth = container.clientWidth;
-        const selectColWidth = 75;
-        
-        // Calculate total required width (without spacer)
-        const totalRequiredWidth = Object.values(requiredWidths).reduce((sum, w) => sum + w, 0);
-        const totalWithSelect = totalRequiredWidth + selectColWidth;
-        
-        // Add a small buffer (5px) to prevent rounding/subpixel issues causing overflow
-        const buffer = 5;
-        
-        // If we have extra space, distribute it proportionally
-        if (totalWithSelect < availableWidth - buffer) {
-          const extraSpace = availableWidth - totalWithSelect - buffer;
-          const scaleFactor = (totalRequiredWidth + extraSpace) / totalRequiredWidth;
-          
-          const expanded = {};
-          columns.forEach((_, idx) => {
-            const requiredW = requiredWidths[idx] ?? 160;
-            const maxW = perColumnMaxPx?.[columns[idx]?.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
-            expanded[idx] = Math.min(maxW, Math.floor(requiredW * scaleFactor));
-          });
-          
-          setColWidthsPx(expanded);
-          return;
-        }
+    // Get available width from parent container
+    const container = tableRef.current.parentElement;
+    if (container) {
+      const availableWidth = container.clientWidth;
+      const selectColWidth = 75;
+
+      // Calculate total required width (without spacer)
+      const totalRequiredWidth = Object.values(requiredWidths).reduce((sum, w) => sum + w, 0);
+      const totalWithSelect = totalRequiredWidth + selectColWidth;
+
+      // Add a small buffer (2px) to prevent rounding issues causing overflow
+      const buffer = 2;
+
+      // If we have extra space, distribute it proportionally
+      if (totalWithSelect < availableWidth - buffer) {
+        const extraSpace = availableWidth - totalWithSelect - buffer;
+        const scaleFactor = (totalRequiredWidth + extraSpace) / totalRequiredWidth;
+
+        const expanded = {};
+        columns.forEach((_, idx) => {
+          const requiredW = requiredWidths[idx] ?? 160;
+          const maxW = perColumnMaxPx?.[columns[idx]?.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
+          expanded[idx] = Math.min(maxW, Math.floor(requiredW * scaleFactor));
+        });
+
+        setColWidthsPx(expanded);
+        return;
       }
+    }
 
-      // If container is narrower, use required widths (will cause horizontal scroll)
-      setColWidthsPx(requiredWidths);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    // If container is narrower, use required widths (will cause horizontal scroll)
+    setColWidthsPx(requiredWidths);
   }, [autoFitSampleSize, columns, filtered, perColumnMaxPx, setColWidthsPx]);
 
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
   /* ---------------------------- Drag column resizing ---------------------------- */
 
   /**
