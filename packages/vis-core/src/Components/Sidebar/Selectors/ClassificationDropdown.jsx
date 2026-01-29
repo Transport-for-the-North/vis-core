@@ -67,10 +67,8 @@ export const ClassificationDropdown = ({
       <Select
         components={animatedComponents}
         options={options}
-        defaultValue={
-          options.some((e) => e.value === classification)
-            ? options.find((e) => e.value === classification)
-            : options[0]
+        value={
+          options.find((e) => e.value === classification) || options[0]
         }
         styles={customStyles}
         menuPlacement="auto"
