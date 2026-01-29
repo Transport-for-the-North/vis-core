@@ -11,6 +11,7 @@ export * as layouts from './layouts';
 export * as reducers from './reducers';
 export * as services from './services';
 export * as utils from './utils';
+export * as enums from './enums';
 
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 

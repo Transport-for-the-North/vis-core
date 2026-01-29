@@ -1146,6 +1146,188 @@ export const getSourceLayer = (map, layerId) => {
   return layer ? layer['sourceLayer'] : null;
 };
 
+/**
+ * Safely retrieves the value from a feature's state.
+ * @param {Object} feature - The map feature
+ * @returns {*} The feature state value, or undefined if not available
+ */
+export const getFeatureStateValue = (feature) => {
+  return feature?.state?.value;
+};
+
+/**
+ * Validates that a point object has valid numeric x and y coordinates.
+ * @param {Object} point - The point object to validate
+ * @returns {boolean} - Whether the point has valid coordinates
+ */
+export const isValidPoint = (point) => {
+  return (
+    point != null &&
+    typeof point.x === 'number' &&
+    typeof point.y === 'number' &&
+    !Number.isNaN(point.x) &&
+    !Number.isNaN(point.y)
+  );
+};
+
+/**
+ * Recursively checks if a paint expression contains null values in positions
+ * where numbers are expected.
+ * 
+ * @param {*} value - The value to check
+ * @returns {boolean} - Whether the value is valid
+ */
+export const isValidPaintExpression = (value) => {
+  // null and undefined are invalid
+  if (value === null || value === undefined) {
+    return false;
+  }
+  
+  // NaN is invalid
+  if (typeof value === 'number' && Number.isNaN(value)) {
+    return false;
+  }
+  
+  // For arrays (expressions), check each element
+  if (Array.isArray(value)) {
+    // Empty arrays are technically valid
+    if (value.length === 0) {
+      return true;
+    }
+    
+    // Check for null in numeric positions of common expressions
+    const expressionType = value[0];
+    
+    // For interpolate expressions, check that numeric stops don't have null values
+    if (expressionType === 'interpolate' || expressionType === 'interpolate-hcl' || expressionType === 'interpolate-lab') {
+      // Format: ['interpolate', interpolation, input, stop1, output1, stop2, output2, ...]
+      // Check stops (indices 3, 5, 7, ...) and outputs (indices 4, 6, 8, ...)
+      for (let i = 3; i < value.length; i++) {
+        const item = value[i];
+        // Stop values (odd indices after position 2) must be numbers
+        if ((i - 3) % 2 === 0 && (item === null || item === undefined)) {
+          console.warn(`Invalid null stop value in interpolate expression at index ${i}`);
+          return false;
+        }
+        // Output values should not be null for numeric outputs
+        if ((i - 3) % 2 === 1 && item === null) {
+          console.warn(`Invalid null output value in interpolate expression at index ${i}`);
+          return false;
+        }
+      }
+    }
+    
+    // For step expressions
+    if (expressionType === 'step') {
+      // Format: ['step', input, defaultOutput, stop1, output1, stop2, output2, ...]
+      for (let i = 2; i < value.length; i++) {
+        if (value[i] === null || value[i] === undefined) {
+          console.warn(`Invalid null value in step expression at index ${i}`);
+          return false;
+        }
+      }
+    }
+    
+    // For case expressions, check that outputs are not null
+    if (expressionType === 'case') {
+      // Format: ['case', condition1, output1, condition2, output2, ..., fallback]
+      // Outputs are at indices 2, 4, 6, ... and fallback is the last element
+      for (let i = 2; i < value.length; i += 2) {
+        if (value[i] === null) {
+          console.warn(`Invalid null output in case expression at index ${i}`);
+          return false;
+        }
+      }
+      // Check fallback (last element)
+      if (value[value.length - 1] === null) {
+        console.warn('Invalid null fallback in case expression');
+        return false;
+      }
+    }
+    
+    // For match expressions
+    if (expressionType === 'match') {
+      // Format: ['match', input, label1, output1, label2, output2, ..., fallback]
+      // Fallback is the last element
+      if (value[value.length - 1] === null) {
+        console.warn('Invalid null fallback in match expression');
+        return false;
+      }
+    }
+    
+    // For coalesce, all values except the last can potentially be null (that's the point)
+    // but the last one (fallback) should not be null
+    if (expressionType === 'coalesce') {
+      if (value[value.length - 1] === null) {
+        console.warn('Invalid null fallback in coalesce expression');
+        return false;
+      }
+    }
+  }
+  
+  return true;
+};
+
+/**
+ * Checks if a paint property value is valid for Maplibre GL JS.
+ * Values must not be null, undefined, or NaN.
+ * 
+ * @param {*} value - The value to validate
+ * @returns {boolean} - Whether the value is valid
+ */
+export const isValidPaintValue = (value) => {
+  if (value === null || value === undefined) {
+    return false;
+  }
+  
+  // Check for NaN (only applies to numbers)
+  if (typeof value === 'number' && Number.isNaN(value)) {
+    return false;
+  }
+  
+  // For arrays (expressions), do deeper validation
+  if (Array.isArray(value)) {
+    return isValidPaintExpression(value);
+  }
+  
+  return true;
+};
+
+/**
+ * Applies paint properties to a map layer.
+ * Skips null, undefined, or invalid values to prevent Maplibre errors.
+ * 
+ * @param {object} map - The Maplibre GL JS map instance
+ * @param {string} layerName - The layer name to apply properties to
+ * @param {object} paintProperty - Object of paint property key-value pairs
+ */
+export const applyPaintProperties = (map, layerName, paintProperty) => {
+  if (!paintProperty || typeof paintProperty !== 'object') {
+    return;
+  }
+
+  Object.entries(paintProperty).forEach(([key, value]) => {
+    // Skip invalid values
+    if (!isValidPaintValue(value)) {
+      console.warn(
+        `Skipping paint property "${key}" on layer "${layerName}": invalid value`,
+        value
+      );
+      return;
+    }
+
+    try {
+      map.setPaintProperty(layerName, key, value);
+    } catch (error) {
+      console.error(
+        `Failed to set paint property "${key}" on "${layerName}":`,
+        error,
+        'Value was:',
+        value
+      );
+    }
+  });
+};
 
 /**
   * Checks whether all the features in a GeoJSON feature collection have non-null geometries.
