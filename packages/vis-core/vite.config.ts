@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react';
 import dts from "vite-plugin-dts";
 import path from "node:path";
 
-export default defineConfig({
+// @ts-ignore - using vite for build only, not for testing
+export default defineConfig(({ command }) => ({
+  // Explicitly disable test mode to prevent vitest from running
+  ...(command === 'serve' || command === 'build' ? {} : { test: undefined }),
   plugins: [
     react(),
     dts({
@@ -61,4 +64,4 @@ export default defineConfig({
       enums: path.resolve(__dirname, "src/enums"),
     },
   },
-});
+}));

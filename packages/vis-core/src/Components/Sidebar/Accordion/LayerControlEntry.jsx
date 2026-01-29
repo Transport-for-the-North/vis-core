@@ -352,16 +352,17 @@ export const LayerControlEntry = memo(
             tabIndex="0"
             aria-expanded={isExpanded}
             onKeyDown={handleKeyPress}
+            data-testid="HeaderLeft"
           >
             {/* Expand/Collapse Toggle (now a span) */}
             <ExpandCollapseToggle>
-              {isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+              {isExpanded ? <ChevronDownIcon data-testid="ChevronDownIcon"/> : <ChevronRightIcon data-testid="ChevronRightIcon"/>}
             </ExpandCollapseToggle>
             {/* Layer Name */}
             <LayerName>{layer.id}</LayerName>
           </HeaderLeft>
           {/* Visibility Toggle */}
-          <VisibilityToggle onClick={toggleVisibility}>
+          <VisibilityToggle onClick={toggleVisibility} data-testid="visibility-toggle">
             {visibility === "visible" ? (
               <EyeIcon aria-label="Hide layer" title="Hide layer" />
             ) : (
@@ -397,6 +398,7 @@ export const LayerControlEntry = memo(
               <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
               <Slider
                 id={`width-${layer.id}`}
+                data-testid="slider width factor"
                 type="range"
                 min={isNodeLayer ? 0.1 : 0.5}
                 max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links

@@ -25,7 +25,7 @@ import {
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
-import { uniq } from "lodash";
+import { mapKeys, uniq } from "lodash";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -93,7 +93,7 @@ const Map = (props) => {
   const pickFeatureAtPoint = useCallback(
     (point) => {
       if (!map) return null;
-
+      console.log("map.getLayer(id) : ", map.getLayer("id"));
       const filterLayers = memoizedFilters
         .filter((f) => f.type === "map")
         .map((f) => f.layer)
