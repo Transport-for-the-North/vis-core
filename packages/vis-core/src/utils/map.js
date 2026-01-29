@@ -57,6 +57,10 @@ export function getOpacityProperty(layerType) {
       opacityProp = "circle-opacity";
       break;
     }
+    case "heatmap": {
+      opacityProp = "heatmap-opacity";
+      break;
+    }
     case "symbol": {
       opacityProp = "icon-opacity";
       break;
@@ -90,6 +94,12 @@ export function getWidthProperty(layerType) {
     }
     case "circle": {
       widthProp = "circle-radius";
+      break;
+    }
+    case "heatmap": {
+      // Heatmap does not have a width property exposed to the layer control.
+      // Return null so callers can skip width UI without emitting warnings.
+      widthProp = null;
       break;
     }
     default:
@@ -282,8 +292,88 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
   // this ensures line offset is correct if root function used for line-width
   let offsetExpression;
   offsetExpression = determineLineOffsetExpression(bins, widthObject, functionType, layerConfig);
-
+  
   switch (style) {
+      case 'heatmap-continuous':
+        // Use the same continuous colour mapping as other continuous styles but render as circles
+        // Reuse the prepared `colors` array (stops + colours) and `bins` for min/max
+        const colorExpr = ["interpolate", ["linear"], ["feature-state", "value"], ...colors];
+        // Radius: interpolate value to a reasonable radius range using bins directly
+        const radiusExpr = [
+          "interpolate",
+          ["linear"],
+          ["to-number", ["feature-state", "valueAbs"]],
+          Math.min(...bins), 2,
+          Math.max(...bins), 25
+        ];
+        // For heatmap-continuous emit Maplibre heatmap paint properties using
+        // `heatmap-density` for colour mapping (domain 0..1). Build the
+        // color ramp from the supplied `colours` array so the UI colour
+        // selector can control the heatmap palette.
+        let heatmapColorStops = null;
+        try {
+          if (Array.isArray(colours) && colours.length > 0) {
+            heatmapColorStops = ["interpolate", ["linear"], ["heatmap-density"]];
+            const lastIndex = colours.length - 1;
+            for (let i = 0; i < colours.length; i++) {
+              const pos = lastIndex === 0 ? 0 : i / lastIndex;
+              // Make the first stop transparent to create a blur-like effect
+              // at very low density.
+              const color = i === 0 ? chroma(colours[i]).alpha(0).css() : colours[i];
+              heatmapColorStops.push(pos, color);
+            }
+          }
+        } catch (e) {
+            heatmapColorStops = [
+            'interpolate',
+            ['linear'],
+            ['heatmap-density'],
+            0,
+            'rgba(33,102,172,0)',
+            0.2,
+            'rgb(103,169,207)',
+            0.4,
+            'rgb(209,229,240)',
+            0.6,
+            'rgb(253,219,199)',
+            0.8,
+            'rgb(239,138,98)',
+            1,
+            'rgb(178,24,43)'
+          ];
+        }
+
+        const heatmapColor = heatmapColorStops;
+
+        return {
+          "heatmap-color": heatmapColor,
+          "heatmap-weight": [
+            "interpolate",
+            ["linear"],
+            ["to-number", ["feature-state", "valueAbs"]],
+            Math.min(...bins), 0,
+            Math.max(...bins), 1
+          ],
+          'heatmap-intensity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0,
+            1,
+            9,
+            3
+          ],
+          'heatmap-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0,
+            8,
+            9,
+            60
+          ],
+          "heatmap-opacity": opacityValue ?? 0.8
+        };
     case "polygon-diverging":
     case "polygon-continuous": {
       return {
