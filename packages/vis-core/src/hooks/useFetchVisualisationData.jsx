@@ -137,6 +137,15 @@ export const useFetchVisualisationData = (
   const prevVisualisationNameRef = useRef();
 
   /**
+   * - React StrictMode (dev) mounts/unmounts quickly; a 400ms debounced call can be cancelled
+   *   before it fires, so params signature would still be consumed.
+   *
+   * This ref stores the signature for the *scheduled* fetch and is only committed to
+   * prevParamsRef when the debounced fetch actually begins executing.
+   */
+  const pendingParamsSignatureRef = useRef(null);
+
+  /**
    * Resets the fetch state - useful when visualisation changes (e.g., page navigation).
    */
   const resetFetchState = useCallback(() => {
@@ -146,6 +155,7 @@ export const useFetchVisualisationData = (
     setError(null);
     setLoading(false);
     prevParamsRef.current = undefined;
+    pendingParamsSignatureRef.current = null; // keep in sync
   }, []);
 
   // Reset state when visualisation name changes (page navigation)
@@ -169,6 +179,15 @@ export const useFetchVisualisationData = (
       debounce(async (vis) => {
         if (!vis) return;
 
+        /**
+         * Commit the params signature only when the fetch actually starts.
+         * This prevents "scheduled then cancelled" from blocking future fetches.
+         */
+        if (pendingParamsSignatureRef.current) {
+          prevParamsRef.current = pendingParamsSignatureRef.current;
+          pendingParamsSignatureRef.current = null;
+        }
+
         setLoading(true);
         setHasInitiatedFetch(true);
         setError(null);
@@ -181,9 +200,9 @@ export const useFetchVisualisationData = (
           name: visualisationName,
         } = vis;
 
-      // Flatten params maps into simple key/value objects
-      const queryParamsForApi = toSimpleParamsMap(queryParams);
-      const pathParamsForApi = toSimpleParamsMap(pathParams);
+        // Flatten params maps into simple key/value objects
+        const queryParamsForApi = toSimpleParamsMap(queryParams);
+        const pathParamsForApi = toSimpleParamsMap(pathParams);
 
         try {
           const responseData = await api.baseService.get(path, {
@@ -234,8 +253,15 @@ export const useFetchVisualisationData = (
     const paramsChanged = prevParamsRef.current !== currentParamsStr;
 
     if (allRequiredParamsPresent && paramsChanged) {
+      /**
+       * Store signature as "pending" and schedule the debounced fetch.
+       * Then immediately flush to ensure the initial call isn't lost to rapid
+       * mount/unmount cycles (e.g. React 18 StrictMode dev).
+       */
+      pendingParamsSignatureRef.current = currentParamsStr;
+
       fetchDataForVisualisation(visualisation);
-      prevParamsRef.current = currentParamsStr;
+      fetchDataForVisualisation.flush?.();
     }
   }, [
     visualisation,
