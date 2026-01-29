@@ -4,6 +4,12 @@ let mapApiToken = '';
 
 type Mode = 'production' | 'development' | '';
 
+// Helper to safely get environment variables
+// In Jest: uses global importMeta injected by jest.config.js  
+// In Vite/runtime: uses import.meta.env (transformed by Babel)
+declare const importMeta: any;
+const env = typeof importMeta !== 'undefined' ? importMeta.env : {};
+
 let runtimeEnv: {
   prodOrDev: Mode;
   apiBaseDomain: string;

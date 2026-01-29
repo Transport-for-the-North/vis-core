@@ -41,12 +41,12 @@ describe("ResponsiveNavbarLinks component test", () => {
     // Click on child link
     const third = screen.getByText("Third");
     expect(third).toBeInTheDocument();
-    userEvent.click(third);
+    await userEvent.click(third);
     await waitFor(() => {
       expect(screen.getByText("Third1")).toBeInTheDocument();
     })
     const childThird = screen.getByText("Third1");
-    userEvent.click(childThird);
+    await userEvent.click(childThird);
     expect(fakeOnCLick).toHaveBeenCalled();
     expect(screen.getByText("Third1")).toBeInTheDocument();
   });
@@ -65,7 +65,7 @@ describe("ResponsiveNavbarLinks component test", () => {
     // Click on child link
     const second = screen.getByText("Second");
     expect(second).toBeInTheDocument();
-    userEvent.click(second);
+    await userEvent.click(second);
     expect(fakeOnCLick).toHaveBeenCalled();
     await waitFor(() => {
       expect(screen.getByText("SecondPage")).toBeInTheDocument();

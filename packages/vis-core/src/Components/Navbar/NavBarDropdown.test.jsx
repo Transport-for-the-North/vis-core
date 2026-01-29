@@ -181,7 +181,7 @@ describe("RecursiveDropdownItem component test", () => {
     item.click();
     const parent = item.closest("a");
     expect(parent).toHaveStyle({ backgroundColor: "#2c34a7ff" });
-    expect(parent).toHaveStyle({ color: rgb(255, 255, 255) });
+    expect(parent).toHaveStyle({ color: "rgb(249, 249, 249)" });
     expect(parent).toHaveAttribute("href", "/");
 
     // Click on child

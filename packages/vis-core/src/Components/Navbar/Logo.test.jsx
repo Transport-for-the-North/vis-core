@@ -4,12 +4,12 @@ import userEvent from "@testing-library/user-event";
 
 const fakeOnClick = jest.fn();
 describe("Logo Component", () => {
-    it("renders correctly with image and left position", () => {
+    it("renders correctly with image and left position", async () => {
         render(<Logo onClick={fakeOnClick} logoImage="logo.png" position="left" />);
         const img = screen.getByAltText("Logo");
         expect(img).toBeInTheDocument();
         expect(img).toHaveAttribute("src", "logo.png");
-        userEvent.click(img);
+        await userEvent.click(img);
         expect(fakeOnClick).toHaveBeenCalled();
     });
 });
