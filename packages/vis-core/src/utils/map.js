@@ -1,5 +1,10 @@
 import { roundToSignificantFigures } from "./math";
 import chroma from "chroma-js";
+import { 
+  jenksBreaks, 
+  standardDeviationBreaks, 
+  headTailBreaks
+} from './classificationMethods';
 
 /**
  * Helper: Extracts the metric definition from the defaultBands.
@@ -718,7 +723,32 @@ export const reclassifyData = (
     if (classificationMethod === "l") {
       values = values.map(replaceZeroValues);
     }
-    const unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
+
+    let unroundedBins;
+
+    // Apply the appropriate classification method
+    switch (classificationMethod) {
+      case "j": // Jenks Natural Breaks
+        unroundedBins = jenksBreaks(values, 8);
+        break;
+      
+      case "s": // Standard Deviation
+        unroundedBins = standardDeviationBreaks(values, 7);
+        break;
+      
+      case "h": // Head/Tail Breaks
+        unroundedBins = headTailBreaks(values);
+        break;
+      
+      case "q": // Quantile
+      case "l": // Logarithmic
+      case "k": // K-means
+      default:
+        // Use chroma for these methods
+        unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
+        break;
+    }
+
     let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
     if (classificationMethod === "l") {
       roundedBins = roundedBins.map(replaceZeroPointValues);
@@ -743,10 +773,36 @@ export const reclassifyData = (
     if (classificationMethod === "l") {
       absValues = absValues.map(replaceZeroValues);
     }
-    const unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
+
+    let unroundedBins;
+
+    // Apply the appropriate classification method
+    switch (classificationMethod) {
+      case "j": // Jenks Natural Breaks
+        unroundedBins = jenksBreaks(absValues, 3);
+        break;
+      
+      case "s": // Standard Deviation
+        unroundedBins = standardDeviationBreaks(absValues, 3);
+        break;
+      
+      case "h": // Head/Tail Breaks
+        unroundedBins = headTailBreaks(absValues);
+        // Limit to 3 classes for diverging
+        unroundedBins = unroundedBins.slice(0, Math.min(4, unroundedBins.length));
+        break;
+      
+      case "q": // Quantile
+      case "l": // Logarithmic
+      case "k": // K-means
+      default:
+        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
+        break;
+    }
+
     let roundedBins = unroundedBins.map((ele) => Math.round(ele * 100) / 100);
     if (classificationMethod === "l") {
-      absValues = absValues.map(replaceZeroValues);
+      roundedBins = roundedBins.map(replaceZeroPointValues);
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
     if (style.includes("line")) return [0, ...roundedBins];
