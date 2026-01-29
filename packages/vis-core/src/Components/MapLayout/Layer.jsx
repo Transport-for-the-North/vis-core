@@ -81,6 +81,19 @@ export const Layer = ({ layer }) => {
           minzoom: layer.minZoom || 0,
           bufferSize: layer.bufferSize
         };
+        // If a visualisation is attached to this layer and requests a heatmap style,
+        // ensure the base layer is created as a Maplibre `heatmap` so heatmap paint
+        // properties can be applied later.
+        const visualisationForLayer = Object.values(state.visualisations).find(v => v.joinLayer === layer.name);
+        if (visualisationForLayer && typeof visualisationForLayer.style === 'string' && visualisationForLayer.style.includes('heatmap')) {
+          layerConfig.type = 'heatmap';
+          // If a heatmap visualisation is attached, ensure the base layer's paint
+          // is heatmap-compatible. Do not fall back to the existing `getLayerStyle`
+          // (which returns circle paint for point geometry) as that will produce
+          // invalid `circle-*` paint properties for a heatmap layer.
+          layerConfig.paint = layer.customPaint || { 'heatmap-weight': 1 };
+        }
+        console.log(state.visualisations);
         layerConfig.paint = layer.customPaint || layerConfig.paint;
 
         // Apply defaultOpacity to the layer's paint properties if specified

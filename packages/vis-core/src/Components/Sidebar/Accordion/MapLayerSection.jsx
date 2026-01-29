@@ -30,7 +30,8 @@ export const MapLayerSection = ({
           (layer.type === "fill" ||
             layer.type === "line" ||
             layer.type === "circle" ||
-            layer.type === "symbol") &&
+            layer.type === "symbol" ||
+            layer.type === "heatmap") &&
             layer.source !== "default" &&
             !layer.id.endsWith("-hover") &&
             !layer.id.endsWith("-select") &&

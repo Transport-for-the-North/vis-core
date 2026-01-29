@@ -327,13 +327,19 @@ export const LayerControlEntry = memo(
         widthExpression = 1; // Default width expression if not using feature-state
       }
     
+      // If there's no width property for this layer type (e.g., heatmap), skip applying width changes.
+      if (!widthProp) {
+        setWidth(widthFactor);
+        return;
+      }
+
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
           // Set the width property
           map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
-    
+
           // Set the line-offset property if applicable
-          if (widthProp.includes("line") && lineOffsetInterpolation) {
+          if (widthProp && widthProp.includes("line") && lineOffsetInterpolation) {
             map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
           }
         }
