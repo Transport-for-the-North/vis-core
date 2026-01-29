@@ -29,6 +29,7 @@ export default defineConfig(({ command }) => ({
         reducers:  path.resolve(__dirname, 'src/reducers/index.js'),
         services:  path.resolve(__dirname, 'src/services/index.js'),
         utils:     path.resolve(__dirname, 'src/utils/index.js'),
+        enums:     path.resolve(__dirname, 'src/enums/index.js'),
       },
       name: "VisFrameworkCore",
       formats: ["es", "cjs"],
@@ -60,6 +61,7 @@ export default defineConfig(({ command }) => ({
       reducers:   path.resolve(__dirname, "src/reducers"),
       utils:      path.resolve(__dirname, "src/utils"),
       defaults: path.resolve(__dirname, "src/defaults.js"),
+      enums: path.resolve(__dirname, "src/enums"),
     },
   },
 }));
