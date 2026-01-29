@@ -199,9 +199,10 @@ export const MapVisualisation = ({
         (page) => page.url === window.location.pathname
       );
 
-      // Get trseLabel from state.layers
+      // Get trseLabel and customBands from state.layers
       const trseLabel =
         state.layers[layerKey]?.trseLabel === true;
+      const customBands = state.layers[layerKey]?.customBands;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -210,7 +211,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { trseLabel } // Pass trseLabel in options
+        { trseLabel, customBands } // Pass trseLabel and customBands in options
       );
 
       // Get the metric definition for the current page/metric
