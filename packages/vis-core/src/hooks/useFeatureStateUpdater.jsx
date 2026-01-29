@@ -64,9 +64,8 @@ const updateFeatureStates = (map, layer, data, prevIDs) => {
     }
     
     // Ensure value is a valid number, default to 0 if null/undefined
-    const value = row.value != null && Number.isFinite(Number(row.value)) 
-      ? Number(row.value) 
-      : 0;
+    const value = row.value;
+    const isNumeric = typeof value === 'number' && Number.isFinite(value);
     
     newIDs.add(id);
     
@@ -78,7 +77,7 @@ const updateFeatureStates = (map, layer, data, prevIDs) => {
       },
       {
         value: value,
-        valueAbs: Math.abs(value),
+        valueAbs: isNumeric ? Math.abs(value) : null,
       }
     );
   });
