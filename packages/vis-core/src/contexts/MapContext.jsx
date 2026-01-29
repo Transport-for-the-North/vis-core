@@ -19,6 +19,7 @@ import {
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
 import { api } from "services";
+import { ErrorOverlay } from "Components/ErrorOverlay/ErrorOverlay";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -69,6 +70,7 @@ export const MapProvider = ({ children }) => {
     isLoading: true,
     isDynamicStylingLoading: false,
     pageIsReady: false,
+    metadataError: null,
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
@@ -96,6 +98,7 @@ export const MapProvider = ({ children }) => {
      */
     const fetchMetadataTables = async () => {
       const metadataTables = {};
+      const emptyTables = [];
       
       for (const table of pageContext.config.metadataTables) {
         try {
@@ -113,12 +116,18 @@ export const MapProvider = ({ children }) => {
           }
 
           metadataTables[table.name] = filteredData;
+          
+          // Check if table is empty
+          if (!Array.isArray(filteredData) || filteredData.length === 0) {
+            emptyTables.push(table.name);
+          }
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
+          emptyTables.push(table.name);
         }
       }
 
-      return metadataTables;
+      return { metadataTables, emptyTables };
     };
 
     /**
@@ -184,7 +193,7 @@ export const MapProvider = ({ children }) => {
 
               case 'metadataTable':
                 const metadataTable = metadataTables[filter.values.metadataTableName];
-                if (metadataTable) {
+                if (metadataTable && Array.isArray(metadataTable) && metadataTable.length > 0) {
                   // NEW: apply "where" clause to restrict rows before building values
                   let rows = metadataTable;
                   if (filter.values.where) {
@@ -218,7 +227,7 @@ export const MapProvider = ({ children }) => {
                   filter.values.values = uniqueValues;
                   filters.push(filterWithId);
                 } else {
-                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                  console.error(`Metadata table ${filter.values.metadataTableName} not found or empty`);
                 }
                 break;
 
@@ -363,7 +372,18 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise filters
-      const metadataTables = await fetchMetadataTables();
+      const { metadataTables, emptyTables } = await fetchMetadataTables();
+      
+      // Check if any required metadata tables are empty
+      if (emptyTables.length > 0) {
+        dispatch({ 
+          type: actionTypes.SET_METADATA_ERROR, 
+          payload: emptyTables 
+        });
+        dispatch({ type: actionTypes.SET_LOADING_FINISHED });
+        return;
+      }
+      
       dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
       await initializeFilters(metadataTables);
 
@@ -381,7 +401,44 @@ export const MapProvider = ({ children }) => {
 
   return (
     <MapContext.Provider value={contextValue}>
-      {state.pageIsReady ? children : <div>Loading...</div>}
+      {state.metadataError ? (
+        <ErrorOverlay
+          title="Configuration Error"
+          subtitle="Unable to Load Page"
+          message={
+            state.metadataError.length === 1
+              ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
+              : `${state.metadataError.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`
+          }
+          supportMessage="Please contact support for assistance"
+          supportDetails="This issue typically indicates a data configuration problem that requires administrative attention."
+          technicalDetails={
+            state.metadataError.length === 1 ? (
+              <>
+                <div style={{ marginBottom: '8px' }}>
+                  Metadata table: <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{state.metadataError[0]}</code>
+                </div>
+                <div>Error: Table "{state.metadataError[0]}" returned no data from the API.</div>
+              </>
+            ) : (
+              <>
+                <div style={{ marginBottom: '8px' }}>
+                  Empty metadata tables ({state.metadataError.length}):
+                </div>
+                {state.metadataError.map((table, index) => (
+                  <div key={index} style={{ marginBottom: '4px' }}>
+                    • <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{table}</code>
+                  </div>
+                ))}
+              </>
+            )
+          }
+        />
+      ) : state.pageIsReady ? (
+        children
+      ) : (
+        <div>Loading...</div>
+      )}
     </MapContext.Provider>
   );
 };
