@@ -360,8 +360,8 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
             ['zoom'],
             0,
             1,
-            9,
-            3
+            19,
+            10
           ],
           'heatmap-radius': [
             'interpolate',
@@ -369,8 +369,8 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
             ['zoom'],
             0,
             8,
-            9,
-            60
+            19,
+            100
           ],
           "heatmap-opacity": opacityValue ?? 0.8
         };

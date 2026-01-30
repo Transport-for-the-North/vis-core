@@ -163,6 +163,14 @@ const CircleSwatch = styled.div`
   margin-right: 5px;
 `;
 
+const HeatmapSwatch = styled.div`
+  width: 120px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  margin-right: 8px;
+`;
+
 const LineSwatch = styled.div`
   width: 50px;
   height: ${(props) => props.height}px;
@@ -425,7 +433,7 @@ export const interpretDashArrayExpression = (expression) => {
 const isRenderableEntry = (e) => {
   if (!e) return false;
   const hasLabel = e.label != null && String(e.label).trim() !== '';
-  const hasKnownSwatch = ['circle', 'line', 'fill'].includes(e.type);
+  const hasKnownSwatch = ['circle', 'line', 'fill', 'heatmap'].includes(e.type);
   const hasSize = e.type === 'fill' ? true : Number(e.width) > 0;
   return hasLabel || (hasKnownSwatch && hasSize);
 };
@@ -548,6 +556,7 @@ export const DynamicLegend = ({ map }) => {
           const isStylableOrShouldShow = layer.metadata && (layer.metadata.isStylable || layer.metadata.shouldShowInLegend);
           const isWithinZoomRange = (layer.minzoom === undefined || state.currentZoom >= layer.minzoom) &&
             (layer.maxzoom === undefined || state.currentZoom <= layer.maxzoom);
+          // Allow heatmap-backed layers through so we can render a density legend
           return isStylableOrShouldShow && isWithinZoomRange;
         })
         .map((layer, index) => {
@@ -623,7 +632,8 @@ export const DynamicLegend = ({ map }) => {
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
             paintProps["circle-color"] ||
-            paintProps["fill-color"]
+            paintProps["fill-color"] ||
+            paintProps["heatmap-color"]
           );
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
@@ -698,6 +708,13 @@ export const DynamicLegend = ({ map }) => {
               const widthStop = widthStops ? widthStops[idx] : null;
               const dashStop = dashStops ? dashStops.find(ds => ds.value === stop.value) : null;
               let label;
+              // If this is a heatmap, interpret the stop value as a 0..1 density and show percent
+              const isHeatmapLayer = layer.type === 'heatmap' || (visualisation && typeof visualisation.style === 'string' && visualisation.style.toLowerCase().includes('heatmap'));
+              if (isHeatmapLayer) {
+                const numeric = Number(stop.value);
+                label = Number.isFinite(numeric) ? `${Math.round(numeric * 100)}%` : stop.value;
+              }
+              
               if (customLabels && customLabels.length === length) {
                 label = customLabels[idx];
               } else if (trseLabel && nextStop) {
@@ -711,7 +728,7 @@ export const DynamicLegend = ({ map }) => {
                   label = `${startValue}-${endValue}`;
                 }
               } else {
-                label = stop.value;
+                if (!label) label = stop.value;
               }
               
               legendEntries.push({
@@ -763,6 +780,9 @@ export const DynamicLegend = ({ map }) => {
             return null;
           }
           
+          // For heatmap layers expose the full color ramp so the renderer can draw a single gradient swatch
+          const colorRamp = (layer.type === 'heatmap' && colorStops && colorStops.length > 0) ? colorStops : null;
+
           return {
             layerId: layer.id,
             title: displayValue,
@@ -772,6 +792,7 @@ export const DynamicLegend = ({ map }) => {
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
+            colorRamp,
           };
         })
         .filter(Boolean);
@@ -820,7 +841,33 @@ export const DynamicLegend = ({ map }) => {
       {legendItems.map((item, index) => (
         <LegendGroup key={item.layerId}>
           <LegendItemContainer>
-            {item.noStyle ? (
+            {item.colorRamp ? (
+              // Render a single heatmap density swatch using the provided color ramp
+              <>
+                <LegendTitle>{item.title}</LegendTitle>
+                {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
+                <LegendItem style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                  {(() => {
+                    // Ensure ramp is sorted left->right by numeric value
+                    const sorted = [...item.colorRamp].slice().sort((a, b) => Number(a.value) - Number(b.value));
+                    const gradientStops = sorted.map((s) => `${s.color} ${Math.round(Number(s.value) * 100)}%`).join(', ');
+                    const minLabel = sorted[0] ? `${Math.round(Number(sorted[0].value) * 100)}%` : '';
+                    const maxLabel = sorted[sorted.length - 1] ? `${Math.round(Number(sorted[sorted.length - 1].value) * 100)}%` : '';
+                    return (
+                      <>
+                        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <HeatmapSwatch style={{ flex: 1, minWidth: 120, maxWidth: 400, background: `linear-gradient(to right, ${gradientStops})` }} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                          <LegendLabel style={{ fontSize: '0.8em' }}>{minLabel}</LegendLabel>
+                          <LegendLabel style={{ fontSize: '0.8em' }}>{maxLabel}</LegendLabel>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </LegendItem>
+              </>
+            ) : item.noStyle ? (
               item.legendEntries.map((entry, idx) => (
                 <LegendItem key={idx}>
                   {item.type === "circle" ? (
