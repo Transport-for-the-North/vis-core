@@ -19,7 +19,7 @@ import {
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
 import { api } from "services";
-import { ErrorOverlay } from "Components/ErrorOverlay/ErrorOverlay";
+import { ErrorOverlay } from "Components";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
