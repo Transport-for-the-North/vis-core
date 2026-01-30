@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useContext, useReducer } from "react";
-import { actionTypes, mapReducer } from "reducers";
+import { actionTypes, mapReducer, errorActionTypes } from "reducers";
 import {
   hasRouteParameterOrQuery,
   updateUrlParameters,
@@ -17,9 +17,8 @@ import {
   buildDeterministicFilterId
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext, FilterContext } from "contexts";
+import { AppContext, PageContext, FilterContext, ErrorProvider, ErrorContext } from "contexts";
 import { api } from "services";
-import { ErrorOverlay } from "Components";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
@@ -48,6 +47,8 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
+  const _errorCtx = useContext(ErrorContext);
+  const errorDispatch = (_errorCtx && _errorCtx.dispatch) ? _errorCtx.dispatch : (() => {});
 
   // Initialize state within the provider function
   const initialState = {
@@ -376,10 +377,45 @@ export const MapProvider = ({ children }) => {
       
       // Check if any required metadata tables are empty
       if (emptyTables.length > 0) {
-        dispatch({ 
-          type: actionTypes.SET_METADATA_ERROR, 
-          payload: emptyTables 
-        });
+        const message =
+          emptyTables.length === 1
+            ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
+            : `${emptyTables.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`;
+
+          const technicalDetails =
+            emptyTables.length === 1 ? (
+              <>
+                <div style={{ marginBottom: '8px' }}>
+                  Metadata table: <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{emptyTables[0]}</code>
+                </div>
+                <div>Error: Table "{emptyTables[0]}" returned no data from the API.</div>
+              </>
+            ) : (
+              <>
+                <div style={{ marginBottom: '8px' }}>
+                  Empty metadata tables ({emptyTables.length}):
+                </div>
+                {emptyTables.map((table, index) => (
+                  <div key={index} style={{ marginBottom: '4px' }}>
+                    • <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{table}</code>
+                  </div>
+                ))}
+              </>
+            );
+
+          // Dispatch into ErrorContext reducer so MapContext sets SET_ERROR
+          errorDispatch({
+            type: errorActionTypes.SET_ERROR,
+            payload: {
+              title: 'Configuration Error',
+              subtitle: 'Unable to Load Page',
+              message,
+              supportMessage: 'Please contact support for assistance',
+              supportDetails: 'This issue typically indicates a data configuration problem that requires administrative attention.',
+              technicalDetails,
+            },
+          });
+
         dispatch({ type: actionTypes.SET_LOADING_FINISHED });
         return;
       }
@@ -401,44 +437,9 @@ export const MapProvider = ({ children }) => {
 
   return (
     <MapContext.Provider value={contextValue}>
-      {state.metadataError ? (
-        <ErrorOverlay
-          title="Configuration Error"
-          subtitle="Unable to Load Page"
-          message={
-            state.metadataError.length === 1
-              ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
-              : `${state.metadataError.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`
-          }
-          supportMessage="Please contact support for assistance"
-          supportDetails="This issue typically indicates a data configuration problem that requires administrative attention."
-          technicalDetails={
-            state.metadataError.length === 1 ? (
-              <>
-                <div style={{ marginBottom: '8px' }}>
-                  Metadata table: <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{state.metadataError[0]}</code>
-                </div>
-                <div>Error: Table "{state.metadataError[0]}" returned no data from the API.</div>
-              </>
-            ) : (
-              <>
-                <div style={{ marginBottom: '8px' }}>
-                  Empty metadata tables ({state.metadataError.length}):
-                </div>
-                {state.metadataError.map((table, index) => (
-                  <div key={index} style={{ marginBottom: '4px' }}>
-                    • <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{table}</code>
-                  </div>
-                ))}
-              </>
-            )
-          }
-        />
-      ) : state.pageIsReady ? (
-        children
-      ) : (
-        <div>Loading...</div>
-      )}
+      <ErrorProvider>
+        {state.pageIsReady ? children : <div>Loading...</div>}
+      </ErrorProvider>
     </MapContext.Provider>
   );
 };
