@@ -11,6 +11,8 @@ import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from "./Layer";
 import {
   getSourceLayer,
+  getFeatureStateValue,
+  isValidPoint,
   numberWithCommas,
   replacePlaceholders,
   buildDefaultTooltip,
@@ -23,7 +25,7 @@ import {
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
-import { uniq } from "lodash";
+import { mapKeys, uniq } from "lodash";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -91,7 +93,7 @@ const Map = (props) => {
   const pickFeatureAtPoint = useCallback(
     (point) => {
       if (!map) return null;
-
+      console.log("map.getLayer(id) : ", map.getLayer("id"));
       const filterLayers = memoizedFilters
         .filter((f) => f.type === "map")
         .map((f) => f.layer)
@@ -214,7 +216,10 @@ const Map = (props) => {
    */
   const handleMapHover = useCallback(
     (e, forcedFeatures = null) => {
-      if (!map || !e.point) return;
+      // Validate map and event point with numeric coordinates
+      if (!map || !isValidPoint(e?.point)) {
+        return;
+      }
 
       // Get layers that have shouldHaveTooltipOnHover set to true and are available on the map
       // Treat click-tooltips as hover-tooltips on touch devices
@@ -245,47 +250,60 @@ const Map = (props) => {
         }
 
         // Determine the maximum bufferSize among the layers
-         const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-         const dpr = window.devicePixelRatio || 1;
-         // On touch devices, used a minimum buffer to account for finger size
-         const minTapBufferPx = isTouch ? Math.round(6 * dpr) : 0;
-         const BUFFER_FLOOR = 3; // Minimum buffer size in pixels
-         
-         // Calculate buffer with line width offset to extend from line edge
-         const maxBufferSize = Math.max(
-           BUFFER_FLOOR,
-           minTapBufferPx,
-            ...hoverableLayers.map((layerId) => {
-              const layer = state.layers[layerId];
-              const baseBuffer = layer.bufferSize ?? 0;
-              
-              // For line layers, add half the line width to buffer so it extends from edge
-              if (layer.geometryType === 'line' && layer.mapLayer?.paint?.['line-width']) {
-                const lineWidth = layer.mapLayer.paint['line-width'];
-                // Handle both constant and expression-based line widths
-                const width = typeof lineWidth === 'number' ? lineWidth : 7.5; // Use max default if expression
-                return baseBuffer + (width / 2);
-              }
-              
-              return baseBuffer;
-            })
-         );
-          const bufferedPoint = [
-           [e.point.x - maxBufferSize, e.point.y - maxBufferSize],
-           [e.point.x + maxBufferSize, e.point.y + maxBufferSize],
-         ];
-          const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
-           layers: hoverableLayers,
-         });
-          if (isTouchonMobile) {
-           features = featuresWithDuplicates.length ? [featuresWithDuplicates[0]] : [];
-         } else {      
-           // Below removes duplicates from features array
-           const seen = new Set();
-           for (const f of featuresWithDuplicates) {
-             if (!seen.has(f.id)) { seen.add(f.id); features.push(f); }
-           }
-       }
+        const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+        const dpr = window.devicePixelRatio || 1;
+        // On touch devices, used a minimum buffer to account for finger size
+        const minTapBufferPx = isTouch ? Math.round(6 * dpr) : 0;
+
+
+        // Calculate buffer with line width offset to extend from line edge
+        const maxBufferSize = Math.max(
+          BUFFER_FLOOR,
+          minTapBufferPx,
+          ...hoverableLayers.map((layerId) => {
+            const layer = state.layers[layerId];
+            const baseBuffer = layer.bufferSize ?? 0;
+            
+            // For line layers, add half the line width to buffer so it extends from edge
+            if (layer.geometryType === 'line' && layer.mapLayer?.paint?.['line-width']) {
+              const lineWidth = layer.mapLayer.paint['line-width'];
+              // Handle both constant and expression-based line widths
+              const width = typeof lineWidth === 'number' ? lineWidth : 7.5; // Use max default if expression
+              return baseBuffer + (width / 2);
+            }
+            
+            return baseBuffer;
+          })
+        );
+        const bufferedPoint = [
+          [pointX - buffer, pointY - buffer],
+          [pointX + buffer, pointY + buffer],
+        ];
+        // Double-check bufferedPoint values are valid before querying
+        const hasValidBufferedPoint = bufferedPoint.every(
+          (coord) => coord.every((val) => typeof val === 'number' && Number.isFinite(val))
+        );
+        
+        if (!hasValidBufferedPoint) {
+          console.warn('Invalid buffered point coordinates, skipping query:', bufferedPoint);
+          return;
+        }
+        
+        const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
+          layers: hoverableLayers,
+        });
+        if (isTouchonMobile) {
+          features = validFeatures.length ? [validFeatures[0]] : [];
+        } else {      
+          // Below removes duplicates from features array
+          const seen = new Set();
+          for (const f of validFeatures) {
+            if (!seen.has(f.id)) { 
+              seen.add(f.id); 
+              features.push(f); 
+            }
+          }
+        }
       }
 
       if (features.length === 0) {
@@ -304,10 +322,16 @@ const Map = (props) => {
 
       // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
       const filteredFeatures = features.filter((feature) => {
-        const layerId = feature.layer.id;
+        const layerId = feature.layer?.id;
+        if (!layerId) return false;
+        
         const layerConfig = state.layers[layerId];
-        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
-        const featureValue = feature.state.value;
+        if (!layerConfig) return false;
+        
+        const shouldHaveHoverOnlyOnData = layerConfig.shouldHaveHoverOnlyOnData ?? false;
+        
+        // Safely get feature value - feature.state may be null or undefined
+        const featureValue = getFeatureStateValue(feature);
         
         // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
         if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
@@ -428,21 +452,26 @@ const Map = (props) => {
         hoverInfoRef.current.timeoutId = null;
       }
 
-  let descriptions = [];
-  // Track API requests and how they map back to description indexes so we can merge results precisely
-  const apiRequests = [];
-  const requestIndexByDescriptionIndex = {};
+      let descriptions = [];
+      // Track API requests and how they map back to description indexes so we can merge results precisely
+      const apiRequests = [];
+      const requestIndexByDescriptionIndex = {};
 
       filteredFeatures.forEach((feature) => {
         const layerId = feature.layer.id;
         const layerConfig = state.layers[layerId];
-        const customTooltip = layerConfig?.customTooltip;
+        
+        // Skip if no layer config found
+        if (!layerConfig) return;
+        
+        const customTooltip = layerConfig.customTooltip;
         const hoverNulls = layerConfig.hoverNulls ?? true;
-        const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
-        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
+        const shouldIncludeMetadata = layerConfig.hoverTipShouldIncludeMetadata;
+        const shouldHaveHoverOnlyOnData = layerConfig.shouldHaveHoverOnlyOnData ?? false;
 
-        const featureValue = feature.state.value;
-        const hideValueInTooltip = layerConfig?.hideValueInTooltip ?? false; 
+        // Safely get feature value
+        const featureValue = getFeatureStateValue(feature);
+        const hideValueInTooltip = layerConfig.hideValueInTooltip ?? false; 
 
         if (
           !hoverNulls &&
@@ -459,19 +488,18 @@ const Map = (props) => {
           return; // Skip this feature as it has no data
         }
 
-        const featureName = feature.properties.name || "";
+        const featureName = feature.properties?.name || "";
         const featureValueDisplay =
           !hideValueInTooltip && featureValue !== undefined && featureValue !== null
             ? numberWithCommas(featureValue)
             : "";
-        const layerVisualisationName =
-          state.layers[layerId]?.visualisationName;
+        const layerVisualisationName = layerConfig.visualisationName;
         const legendText =
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
         const valueText =
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
 
-  let description = "";
+        let description = "";
 
         if (!customTooltip) {
           // Immediate data
@@ -484,7 +512,7 @@ const Map = (props) => {
 
           // Inject additional metadata if available and enabled
           if (description && shouldIncludeMetadata) {
-            const metadataDescription = generateMetadataHtml(feature.properties);
+            const metadataDescription = generateMetadataHtml(feature.properties || {});
             if (metadataDescription) {
               const lastDivIndex = description.lastIndexOf("</div>");
               if (lastDivIndex !== -1) {
@@ -510,7 +538,7 @@ const Map = (props) => {
 
             // Inject additional metadata if available and enabled
             if (description && shouldIncludeMetadata) {
-              const metadataDescription = generateMetadataHtml(feature.properties);
+              const metadataDescription = generateMetadataHtml(feature.properties || {});
               if (metadataDescription) {
                 const lastDivIndex = description.lastIndexOf("</div>");
                 if (lastDivIndex !== -1) {
@@ -572,6 +600,12 @@ const Map = (props) => {
             ({ feature, layerId, featureName, joinToDefault }) => {
             const layerConfig = state.layers[layerId];
             const customTooltip = layerConfig?.customTooltip;
+            
+            // Guard against missing customTooltip
+            if (!customTooltip) {
+              return Promise.resolve(joinToDefault ? "<p>Data unavailable.</p>" : buildErrorTooltip(featureName));
+            }
+            
             const { htmlTemplate, customFormattingFunctions } = customTooltip;
             const featureId = feature.id;
             const requestUrlWithId = resolveTooltipRequestUrl(customTooltip, featureId);
@@ -603,7 +637,7 @@ const Map = (props) => {
                   const dataToUse = Array.isArray(responseData) ? responseData[0] : responseData;
                   const tooltipHtml = replacePlaceholders(
                     htmlTemplate,
-                    dataToUse,
+                    dataToUse || {},
                     { customFunctions: customFormattingFunctions }
                   );
                   return tooltipHtml;
@@ -658,7 +692,7 @@ const Map = (props) => {
         hoverInfoRef.current.timeoutId = timeoutId;
       }
     },
-    [map, state.layers, state.visualisations]
+    [map, state.layers, state.visualisations, generateMetadataHtml]
   );
 
   /**

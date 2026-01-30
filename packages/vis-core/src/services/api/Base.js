@@ -9,6 +9,7 @@ class BaseService {
    * @param {Object} [config={ pathPrefix: "" }] - The configuration object.
    * @property {string} config.pathPrefix - The prefix to be added to the path.
    * @property {string} [config.pathPostfix] - The postfix to be added to the path.
+   * @property {"csv"|"repeat"} [config.defaultArrayFormat="csv"] - Default query array format.
    */
   constructor(config = { pathPrefix: "" }) {
     const postFix =
@@ -18,6 +19,8 @@ class BaseService {
     
     this._pathPrefix = config?.pathPrefix ?? "";
     this._postFix = postFix;
+    this._defaultArrayFormat =
+      config?.defaultArrayFormat === "repeat" ? "repeat" : "csv";
   }
 
   /**
@@ -61,50 +64,52 @@ class BaseService {
   }
 
   /**
-   * Builds a query string from a dictionary of query parameters.
+   * Builds a URL-encoded query string from a dictionary of query parameters.
+   * Arrays default to CSV (comma-separated) unless overridden by options.arrayFormat === "repeat".
    *
-   * @param {Object} [queryDict={}] - The dictionary of query parameters.
-   * @returns {string} The query string.
+   * @param {Record<string, any>} [queryDict={}]
+   * @param {{ arrayFormat?: "csv"|"repeat" }} [options]
+   * @returns {string} Query string without the leading '?'.
+   */
+  _buildQueryString(queryDict = {}, options = {}) {
+    const arrayFormat =
+      options?.arrayFormat === "repeat" ? "repeat" : this._defaultArrayFormat;
+
+    const sp = new URLSearchParams();
+
+    Object.entries(queryDict || {}).forEach(([key, rawVal]) => {
+      if (rawVal === undefined || rawVal === null) return;
+
+      if (Array.isArray(rawVal)) {
+        if (arrayFormat === "repeat") {
+          rawVal.forEach((v) => {
+            if (v === undefined || v === null) return;
+            sp.append(key, String(v));
+          });
+        } else {
+          const csv = rawVal
+            .filter((v) => v !== undefined && v !== null)
+            .map((v) => String(v))
+            .join(",");
+          if (csv.length > 0) sp.set(key, csv);
+        }
+        return;
+      }
+
+      sp.set(key, String(rawVal));
+    });
+
+    return sp.toString();
+  }
+
+  /**
+   * Backwards-compatible alias.
+   * NOTE: now URL-encodes and arrays default to CSV.
+   *
+   * @deprecated Prefer _buildQueryString
    */
   _buildQuery(queryDict = {}) {
-    const tokens = this._makeParamTokens(
-      ...this._splitDuplicateAndNonDuplicateParams(queryDict)
-    );
-    return tokens.map(([param, value]) => `${param}=${value}`).join("&");
-  }
-
-  /**
-   * Splits the query parameters into duplicate and non-duplicate parameters.
-   *
-   * @param {Object} queryDict - The dictionary of query parameters.
-   * @returns {Array} An array containing two dictionaries: one for non-duplicate parameters and one for duplicate parameters.
-   */
-  _splitDuplicateAndNonDuplicateParams(queryDict) {
-    const duplicateParams = Object.fromEntries(
-      Object.entries(queryDict).filter(([_, value]) => Array.isArray(value))
-    );
-    const nonDuplicateParams = Object.fromEntries(
-      Object.entries(queryDict).filter(([_, value]) => !Array.isArray(value))
-    );
-    return [nonDuplicateParams, duplicateParams];
-  }
-
-  /**
-   * Creates an array of parameter tokens from the non-duplicate and duplicate parameters.
-   *
-   * @param {Object} [nonDuplicateParams={}] - The dictionary of non-duplicate parameters.
-   * @param {Object} [duplicateParams={}] - The dictionary of duplicate parameters.
-   * @returns {Array} An array of parameter tokens.
-   */
-  _makeParamTokens(nonDuplicateParams = {}, duplicateParams = {}) {
-    const tokens = [];
-    Object.entries(nonDuplicateParams).forEach(([key, value]) =>
-      tokens.push([key, value])
-    );
-    Object.entries(duplicateParams).forEach(([key, arr]) =>
-      arr.forEach((value) => tokens.push([key, value]))
-    );
-    return tokens;
+    return this._buildQueryString(queryDict);
   }
 
   /**
@@ -162,6 +167,31 @@ class BaseService {
   }
 
   /**
+   * Unwraps common list response shapes into an array.
+   * Supports { data }, { results }, { rows }.
+   *
+   * @param {any} res
+   * @returns {any[]}
+   */
+  unwrapListResponse(res) {
+    if (Array.isArray(res)) return res;
+    const candidate = res?.data ?? res?.results ?? res?.rows;
+    return Array.isArray(candidate) ? candidate : [];
+  }
+
+  /**
+   * Unwraps common object response shapes into an object/value.
+   * Supports { data }, { result }.
+   *
+   * @param {any} res
+   * @returns {any|null}
+   */
+  unwrapObjectResponse(res) {
+    if (res === undefined || res === null) return null;
+    return res?.data ?? res?.result ?? res;
+  }
+
+  /**
    * Makes a GET request to the specified path with additional options.
    *
    * @param {string} path - The path for the GET request.
@@ -186,8 +216,7 @@ class BaseService {
     if (!result.ok) {
       throw new Error(`HTTP error! status: ${result.status}`);
     }
-    const data = await result.json();
-    return data;
+    return await result.json();
   }
 
   /**
@@ -198,6 +227,7 @@ class BaseService {
    * @property {Object} [options.queryParams={}] - The query parameters for the GET request.
    * @property {Object} [options.pathParams={}] - Values for path placeholders.
    * @param {boolean} [options.skipAuth=false] - Flag to skip adding Authorization header.
+   * @property {{ arrayFormat?: "csv"|"repeat" }} [options.queryOptions] - Array format (repeat or csv)
    * @returns {Promise<Object>} The response data.
    *
    * @example
@@ -207,12 +237,19 @@ class BaseService {
    * });
    * // GET /locations/42?scenarioId=123
    */
-  async get(subPath = "", options = { queryParams: {}, pathParams: {}, skipAuth: false }) {
-    const withPathParams = this._applyPathParams(subPath, options?.pathParams || {});
-    const params = this._buildQuery(options?.queryParams || {});
+  async get(
+    subPath = "",
+    options = { queryParams: {}, pathParams: {}, skipAuth: false }
+  ) {
+    const withPathParams = this._applyPathParams(
+      subPath,
+      options?.pathParams || {}
+    );
+    const params = this._buildQueryString(options?.queryParams || {}, {
+      arrayFormat: options?.queryOptions?.arrayFormat,
+    });
     const path = params ? `${withPathParams}?${params}` : withPathParams;
-    const results = await this._get(path, {}, options.skipAuth);
-    return results;
+    return await this._get(path, {}, options.skipAuth);
   }
 
   /**
@@ -243,9 +280,9 @@ class BaseService {
     if (!result.ok) {
       throw new Error(`HTTP error! status: ${result.status}`);
     }
-    const responseData = await result.json();
-    return responseData;
+    return await result.json();
   }
+
   /**
    * Makes a POST request to the specified path with data, path and query parameters.
    *
@@ -254,6 +291,7 @@ class BaseService {
    * @param {Object} [options={}] - Additional options, including query parameters.
    * @property {Object} [options.pathParams={}] - Values for path placeholders.
    * @property {Object} [options.queryParams={}] - The query parameters for the POST request.
+   * @property {{ arrayFormat?: "csv"|"repeat" }} [options.queryOptions]
    * @returns {Promise<Object>} The response data.
    * 
    * @example
@@ -268,11 +306,15 @@ class BaseService {
     data,
     options = { queryParams: {}, pathParams: {}, skipAuth: false }
   ) {
-    const withPathParams = this._applyPathParams(subPath, options?.pathParams || {});
-    const params = this._buildQuery(options?.queryParams || {});
+    const withPathParams = this._applyPathParams(
+      subPath,
+      options?.pathParams || {}
+    );
+    const params = this._buildQueryString(options?.queryParams || {}, {
+      arrayFormat: options?.queryOptions?.arrayFormat,
+    });
     const path = params ? `${withPathParams}?${params}` : withPathParams;
-    const results = await this._post(path, data, {}, options.skipAuth);
-    return results;
+    return await this._post(path, data, {}, options.skipAuth);
   }
 }
 
