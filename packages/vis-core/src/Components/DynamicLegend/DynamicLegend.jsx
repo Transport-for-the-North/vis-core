@@ -844,7 +844,7 @@ export const DynamicLegend = ({ map }) => {
             {item.colorRamp ? (
               // Render a single heatmap density swatch using the provided color ramp
               <>
-                <LegendTitle>{item.title}</LegendTitle>
+                <LegendTitle>{`${item.title} (density)`}</LegendTitle>
                 {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
                 <LegendItem style={{ flexDirection: 'column', alignItems: 'stretch' }}>
                   {(() => {
