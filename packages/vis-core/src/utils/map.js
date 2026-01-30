@@ -974,15 +974,15 @@ export const getHoverLayerStyle = (geometryType) => {
             "interpolate",
             ["linear"],
             ["zoom"],
-            // Specify zoom levels and corresponding line widths
+            // Specify zoom levels and corresponding line offsets - increased for better gap
             5,
-            -1, // At zoom level 5, line width will be 1
+            -2, // At zoom level 5, line offset increased to -2
             10,
-            -2, // At zoom level 10, line width will be 2
+            -4, // At zoom level 10, line offset increased to -4
             15,
-            -6, // At zoom level 15, line width will be 4
+            -8, // At zoom level 15, line offset increased to -8
             20,
-            -8, // At zoom level 20, line width will be 8
+            -12, // At zoom level 20, line offset increased to -12
           ],
         }
       };
@@ -1383,5 +1383,9 @@ export function hasAnyGeometryNotNull(featureCollection) {
  * @returns {*} Resolved buffer size.
  */
 export function getDefaultLayerBufferSize(geometryType, bufferSize) {
-  return bufferSize != null ? bufferSize : (geometryType === 'line' ? 7 : 0);
+  const BUFFER_FLOOR = 3; // Minimum buffer size in pixels
+  const defaultBuffer = geometryType === 'line' ? 10 : 0;
+  const resolvedBuffer = bufferSize != null ? bufferSize : defaultBuffer;
+  // Apply floor to ensure minimum buffer size
+  return Math.max(BUFFER_FLOOR, resolvedBuffer);
 }

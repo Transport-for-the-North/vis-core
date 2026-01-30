@@ -254,21 +254,31 @@ const Map = (props) => {
         const dpr = window.devicePixelRatio || 1;
         // On touch devices, used a minimum buffer to account for finger size
         const minTapBufferPx = isTouch ? Math.round(6 * dpr) : 0;
+
+
+        // Calculate buffer with line width offset to extend from line edge
         const maxBufferSize = Math.max(
+          BUFFER_FLOOR,
           minTapBufferPx,
-          ...hoverableLayers.map((layerId) => state.layers[layerId].bufferSize ?? 0)
+          ...hoverableLayers.map((layerId) => {
+            const layer = state.layers[layerId];
+            const baseBuffer = layer.bufferSize ?? 0;
+            
+            // For line layers, add half the line width to buffer so it extends from edge
+            if (layer.geometryType === 'line' && layer.mapLayer?.paint?.['line-width']) {
+              const lineWidth = layer.mapLayer.paint['line-width'];
+              // Handle both constant and expression-based line widths
+              const width = typeof lineWidth === 'number' ? lineWidth : 7.5; // Use max default if expression
+              return baseBuffer + (width / 2);
+            }
+            
+            return baseBuffer;
+          })
         );
-        
-        // Ensure buffer calculations result in valid numbers
-        const pointX = e.point.x;
-        const pointY = e.point.y;
-        const buffer = Number.isFinite(maxBufferSize) ? maxBufferSize : 0;
-        
         const bufferedPoint = [
           [pointX - buffer, pointY - buffer],
           [pointX + buffer, pointY + buffer],
         ];
-        
         // Double-check bufferedPoint values are valid before querying
         const hasValidBufferedPoint = bufferedPoint.every(
           (coord) => coord.every((val) => typeof val === 'number' && Number.isFinite(val))
@@ -282,12 +292,6 @@ const Map = (props) => {
         const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
           layers: hoverableLayers,
         });
-        
-        // Filter out any features that don't have required properties
-        const validFeatures = (featuresWithDuplicates || []).filter(
-          (f) => f && f.id != null && f.layer && f.layer.id
-        );
-        
         if (isTouchonMobile) {
           features = validFeatures.length ? [validFeatures[0]] : [];
         } else {      
