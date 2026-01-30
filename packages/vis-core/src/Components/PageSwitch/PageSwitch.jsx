@@ -1,6 +1,7 @@
 import React from "react";
-import { MapLayout, IFrameEmbedPage } from "Components";
+import { MapLayout, IFrameEmbedPage, TableLayout } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
+import { DirectoryScorecardsPage } from "Components";
 
 /**
  * PageSwitch component dynamically renders different page layouts based on the provided page configuration.
@@ -25,7 +26,15 @@ export const PageSwitch = ({ pageConfig }) => {
               </FilterProvider>
             );
           case "IFrameEmbed":
-            return <IFrameEmbedPage config={pageConfig.config} />;            
+            return <IFrameEmbedPage config={pageConfig.config} />;
+          case "TableLayout":
+            return <TableLayout config={pageConfig.config} />;
+          case "DirectoryScorecards":
+            return (
+              <FilterProvider>
+                <DirectoryScorecardsPage/>
+              </FilterProvider>
+            );
           default:
             return <div>Nothing</div>;
         }

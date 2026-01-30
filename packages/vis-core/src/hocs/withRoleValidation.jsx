@@ -2,6 +2,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
+import { getAppName } from '../runtime';
 
 /**
  * Higher-Order Component to check authentication and roles.
@@ -13,7 +14,7 @@ export const withRoleValidation = (WrappedComponent) => {
     return (props) => {
         const location = useLocation();
         const token = Cookies.get('token');
-        const appName = import.meta.env.VITE_APP_NAME;
+        const appName = getAppName(); //Retrieve app name from runtime.
 
         let userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
 
