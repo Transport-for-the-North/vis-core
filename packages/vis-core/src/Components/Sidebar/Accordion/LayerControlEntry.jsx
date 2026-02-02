@@ -11,7 +11,7 @@ import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown, BandEditor } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
-import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression} from "utils/map"
+import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map"
 
 /**
  * Styled container for the layer control entry.
@@ -216,7 +216,7 @@ export const LayerControlEntry = memo(
     });
     const visualisation =
       currentPage.pageName.includes("Side-by-Side") ||
-      currentPage.pageName.includes("Side by Side")
+        currentPage.pageName.includes("Side by Side")
         ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
         : state.visualisations[Object.keys(state.visualisations)[0]];
 
@@ -252,7 +252,7 @@ export const LayerControlEntry = memo(
       ? currentOpacity[currentOpacity.length - 1]
       : currentOpacity;
 
-    
+
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
       const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
@@ -327,7 +327,7 @@ export const LayerControlEntry = memo(
       const max = isNodeLayer ? 2.5 : 10;
       const widthFactor = Math.max(min, Math.min(max, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
-    
+
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
         // Use layer's defaultLineOffset if available, otherwise fall back to default
@@ -338,19 +338,19 @@ export const LayerControlEntry = memo(
       } else {
         widthExpression = widthFactor; // Default width expression if not using feature-state
       }
-    
+
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
           // Set the width property
           map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
-    
+
           // Set the line-offset property if applicable
           if (widthProp.includes("line") && lineOffsetInterpolation) {
             map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
           }
         }
       });
-    
+
       setWidth(widthFactor);
     };
 
@@ -393,16 +393,17 @@ export const LayerControlEntry = memo(
             tabIndex="0"
             aria-expanded={isExpanded}
             onKeyDown={handleKeyPress}
+            data-testid="HeaderLeft"
           >
             {/* Expand/Collapse Toggle (now a span) */}
             <ExpandCollapseToggle>
-              {isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+              {isExpanded ? <ChevronDownIcon data-testid="ChevronDownIcon"/> : <ChevronRightIcon data-testid="ChevronRightIcon"/>}
             </ExpandCollapseToggle>
             {/* Layer Name */}
             <LayerName>{layer.id}</LayerName>
           </HeaderLeft>
           {/* Visibility Toggle */}
-          <VisibilityToggle onClick={toggleVisibility}>
+          <VisibilityToggle onClick={toggleVisibility} data-testid="visibility-toggle">
             {visibility === "visible" ? (
               <EyeIcon aria-label="Hide layer" title="Hide layer" />
             ) : (
@@ -438,6 +439,7 @@ export const LayerControlEntry = memo(
               <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
               <Slider
                 id={`width-${layer.id}`}
+                data-testid="slider width factor"
                 type="range"
                 min={isNodeLayer ? 0.1 : 0.5}
                 max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
@@ -475,11 +477,14 @@ export const LayerControlEntry = memo(
 
               {!enforceNoClassificationMethod && <ClassificationDropdown
                 classType={{
-                  Default: "d",
+                  ...(hasDefaultBands?.values && {Default: "d"}),
                   Quantile: "q",
                   Equidistant: "e",
                   Logarithmic: "l",
                   "K-Means": "k",
+                  "Jenks Natural Breaks": "j",
+                  "Standard Deviation": "s",
+                  "Head/Tail Breaks": "h",
                 }}
                 classification={
                   state.layers[layer.id]?.class_method ?? "d"
