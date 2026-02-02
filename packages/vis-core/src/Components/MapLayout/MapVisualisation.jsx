@@ -30,14 +30,17 @@ const LAYER_RETRY_CONFIG = {
  * Calculates the colour palette based on the provided color scheme and number of bins.
  */
 const calculateColours = (colourScheme, bins, invert = false) => {
-  const minBins = 3;
   const maxBins = 9;
   
   let colors;
-  if (bins.length >= maxBins) {
+  // colorbrewer does not provide 1-2 class palettes for many schemes.
+  // For small bin counts (especially 2), use chroma to sample the full scheme.
+  if (bins.length > 0 && bins.length < 3) {
+    colors = chroma.scale(colourScheme).colors(bins.length);
+  } else if (bins.length >= maxBins) {
     colors = chroma.scale(colourScheme).colors(bins.length);
   } else {
-    const binCount = Math.min(Math.max(bins.length, minBins), maxBins);
+    const binCount = Math.min(Math.max(bins.length, 3), maxBins);
     colors = colorbrewer[colourScheme][binCount];
   }
   
