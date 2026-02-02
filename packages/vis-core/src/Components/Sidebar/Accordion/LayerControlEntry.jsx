@@ -264,6 +264,27 @@ export const LayerControlEntry = memo(
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
     const [widthFactor, setWidth] = useState(initialWidth || 1);
 
+    const bandEditorData = useMemo(() => {
+      if (!visualisation || !visualisation.data || !Array.isArray(visualisation.data)) {
+        return [];
+      }
+      return visualisation.data
+        .map((row) => {
+          if (typeof row === "number") return row;
+          if (typeof row === "object" && row !== null) {
+            if (typeof row.value === "number") return row.value;
+            if (typeof row.metric === "number") return row.metric;
+            const num = Object.values(row).find((v) => typeof v === "number");
+            if (typeof num === "number") return num;
+          }
+          return null;
+        })
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    }, [visualisation]);
+
+    const hasExistingCustomBands = Array.isArray(state.layers?.[layer.id]?.customBands) && state.layers[layer.id].customBands.length > 0;
+    const canEditBands = bandEditorData.length >= 2 || hasExistingCustomBands;
+
     // Extract current bins from layer paint properties
     const currentBins = useMemo(() => {
       if (!maps.length || !maps[0].getLayer(layer.id)) {
@@ -452,30 +473,19 @@ export const LayerControlEntry = memo(
                 />}
 
               {/* BandEditor for continuous/diverging only */}
-              {(colorStyle === "continuous" || colorStyle === "diverging") && (
+              {canEditBands && (colorStyle === "continuous" || colorStyle === "diverging") && (
                 <BandEditor
                   bands={currentBins}
                   onChange={(newBands) => {
                     handleCustomBandsChange(newBands, layer.id);
                   }}
                   isDiverging={colorStyle === "diverging"}
-                  data={
-                    // Try to get the data array for this layer from visualisation
-                    (visualisation && visualisation.data && Array.isArray(visualisation.data))
-                      ? visualisation.data.map(row => {
-                          // Try to extract the value for banding (value, metric, or first number)
-                          if (typeof row === 'object' && row !== null) {
-                            if (typeof row.value === 'number') return row.value;
-                            if (typeof row.metric === 'number') return row.metric;
-                            // fallback: first number property
-                            const num = Object.values(row).find(v => typeof v === 'number');
-                            if (typeof num === 'number') return num;
-                          }
-                          if (typeof row === 'number') return row;
-                          return null;
-                        }).filter(v => typeof v === 'number' && !isNaN(v))
-                      : []
-                  }
+                  data={bandEditorData}
+                  defaultBandValues={hasDefaultBands?.values || null}
+                  onReset={() => {
+                    // Reset uses equidistant bins; reflect that in the classification dropdown.
+                    handleClassificationChange("e", layer.id);
+                  }}
                 />
               )}
 

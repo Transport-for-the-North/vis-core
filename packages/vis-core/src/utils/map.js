@@ -711,6 +711,18 @@ export const reclassifyData = (
 
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
+
+    // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
+    // prefer the provided bands so the band count matches the editor.
+    if (
+      classificationMethod === "e" &&
+      options.customBands &&
+      Array.isArray(options.customBands) &&
+      options.customBands.length > 0
+    ) {
+      return options.customBands;
+    }
+
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
@@ -767,6 +779,18 @@ export const reclassifyData = (
     return values;
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
+
+    // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
+    // prefer the provided bands so the band count matches the editor.
+    if (
+      classificationMethod === "e" &&
+      options.customBands &&
+      Array.isArray(options.customBands) &&
+      options.customBands.length > 0
+    ) {
+      return options.customBands;
+    }
+
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {

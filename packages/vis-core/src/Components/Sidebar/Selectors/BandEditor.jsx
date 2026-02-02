@@ -216,51 +216,68 @@ export const BandEditor = ({ bands, onChange, isDiverging, data = [], defaultBan
   const minBands = isDiverging ? 3 : 2;
   const maxBands = 9;
 
-  // Helper to recalculate default bands (quantile binning using chroma-js)
-  // This function now requires `chroma` and `data` to be present and will
-  // return the quantile thresholds rounded to two significant figures.
-  // If chroma or sufficient data is not available, it returns the current local bands.
-  const recalculateDefaultBands = () => {
-    const count = localBands.length;
-    // If the app provides default band values (from config), prefer those
-    if (defaultBandValues && Array.isArray(defaultBandValues) && defaultBandValues.length > 0) {
-      const rounded = defaultBandValues.map(v => roundToSignificantFigures(Number(v), 2));
-      return rounded.length >= count ? rounded.slice(0, count) : rounded;
-    }
-
-    if (!chroma || !data || !Array.isArray(data)) return localBands;
-
-    // Extract numeric values from data (support objects or raw numbers)
-    const numericValues = data.map((row) => {
-      if (row == null) return NaN;
-      if (typeof row === 'number') return row;
-      if (typeof row === 'string') return Number(row.replace(/,/g, ''));
-      if (typeof row === 'object') {
-        // try common fields
-        if (typeof row.value === 'number') return row.value;
-        if (typeof row.metric === 'number') return row.metric;
-        // try to find first numeric property
-        for (const k in row) {
-          if (typeof row[k] === 'number') return row[k];
-          if (typeof row[k] === 'string' && !Number.isNaN(Number(row[k].replace(/,/g, '')))) return Number(row[k].replace(/,/g, ''));
-        }
+  const roundMonotonic = (values, initialSigFigs = 2) => {
+    let sigFigs = initialSigFigs;
+    let roundedValues = values.map((value) => roundToSignificantFigures(Number(value), sigFigs));
+    for (let i = 1; i < roundedValues.length; i++) {
+      while (roundedValues[i] <= roundedValues[i - 1] && sigFigs < 10) {
+        sigFigs++;
+        roundedValues = values.map((value) => roundToSignificantFigures(Number(value), sigFigs));
       }
-      return NaN;
-    }).filter(v => Number.isFinite(v));
+    }
+    return roundedValues;
+  };
 
-    if (numericValues.length < count) return localBands;
+  const getNumericArray = (arr) =>
+    Array.isArray(arr)
+      ? arr.map(Number).filter((v) => Number.isFinite(v))
+      : [];
 
-    try {
-      const limits = chroma.limits(numericValues, 'q', count);
-      const thresholds = limits.slice(1).map(v => roundToSignificantFigures(Number(v), 2));
-      return thresholds;
-    } catch (e) {
+  // Reset should prefer an equidistant set of bands for the current band count.
+  // Source for min/max preference order:
+  // 1) actual numeric data (best)
+  // 2) current local band range (what user is working with)
+  // 3) configured defaultBandValues (fallback)
+  const calculateEquidistantBands = () => {
+    const count = localBands.length;
+    if (!count || count < 2) return localBands;
+
+    const numericData = getNumericArray(data);
+    const numericLocalBands = getNumericArray(localBands);
+    const numericDefaults = getNumericArray(defaultBandValues);
+
+    const rangeSource =
+      numericData.length >= 2
+        ? numericData
+        : (numericLocalBands.length >= 2 ? numericLocalBands : numericDefaults);
+
+    if (!rangeSource || rangeSource.length < 2) {
       return localBands;
     }
+
+    let min = Math.min(...rangeSource);
+    let max = Math.max(...rangeSource);
+
+    if (isDiverging) {
+      const maxAbs = Math.max(Math.abs(min), Math.abs(max));
+      min = -maxAbs;
+      max = maxAbs;
+    }
+
+    if (!Number.isFinite(min) || !Number.isFinite(max)) return localBands;
+
+    // If range collapses, create a tiny increasing range to satisfy validation.
+    if (min === max) {
+      max = min + 1e-6 * (count - 1);
+    }
+
+    const step = (max - min) / (count - 1);
+    const raw = Array.from({ length: count }, (_, i) => min + step * i);
+    return roundMonotonic(raw, 2);
   };
 
   const handleResetBands = () => {
-    const defaults = recalculateDefaultBands();
+    const defaults = calculateEquidistantBands();
     setLocalBands(defaults);
     // Apply immediately (don't require separate Update click)
     const validDefaults = defaults.filter(v => v !== "" && !isNaN(v)).map(Number);
