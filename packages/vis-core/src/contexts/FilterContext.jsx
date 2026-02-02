@@ -29,8 +29,8 @@ const filterReducer = (state, action) => {
 
       // Prevent null/undefined from being written into state
       if (value == null) {
-        // Explicitly store an empty shape for multi-selects
-        return { ...state, [filterId]: Array.isArray(state[filterId]) ? [] : state[filterId] };
+        const isArray = Array.isArray(state[filterId]);
+        return { ...state, [filterId]: isArray ? [] : null };
       }
 
       // Safe numeric coercion: avoid '' -> 0 and other isNaN quirks

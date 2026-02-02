@@ -9,7 +9,7 @@ const Container = styled.div`
 `;
 
 // Custom ValueContainer to display count of selected features
-const CustomValueContainer = ({ children, ...props }) => {
+export const CustomValueContainer = ({ children, ...props }) => {
   const MAX_DISPLAY_COUNT = 100;
   const { getValue } = props;
   const selectedValues = getValue();

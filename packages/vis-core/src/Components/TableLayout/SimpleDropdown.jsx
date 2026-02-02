@@ -51,6 +51,18 @@ const DropdownWrapper = styled.div`
   }
 `;
 
+/**
+ * SimpleDropdown component provides a searchable dropdown with clear functionality.
+ * Built on top of react-select with custom styling.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {string[]} props.options - Array of option values to display in the dropdown.
+ * @param {string} props.value - Currently selected value.
+ * @param {Function} props.onChange - Callback function invoked when selection changes. Receives the selected value or empty string.
+ * @param {string} [props.placeholder="Filter..."] - Placeholder text displayed when no value is selected.
+ * @returns {JSX.Element} The rendered SimpleDropdown component.
+ */
 export const SimpleDropdown = ({ options, value, onChange, placeholder = "Filter..." }) => {
   const formattedOptions = options.map(opt => ({
     value: opt,

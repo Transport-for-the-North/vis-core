@@ -165,6 +165,7 @@ export const Sidebar = ({
   additionalFeatures,
   infoBoxText,
   downloadPath,
+  downloadShapefilePath,
   requestMethod,
   children,
   setIsOpen
@@ -273,6 +274,7 @@ export const Sidebar = ({
             onFilterChange={(filter, value) => onFilterChange(filter, value)}
             bgColor={bgColor}
             downloadPath={downloadPath}
+            downloadShapefilePath = {downloadShapefilePath}
             requestMethod={requestMethod || 'GET'}
           />
         )}

@@ -5,6 +5,7 @@ const StyledLabel = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  font-size: 0.9rem;
 `;
 
 const InfoButton = styled.button`

@@ -547,8 +547,8 @@ export const mapReducer = (state, action) => {
       visualisationNames.forEach((visName) => {
         if (updatedVisualisations[visName]) {
           const newLegendText = {
-            displayValue: required_values.displayValue,
-            legendSubtitleText: required_values.legendSubtitleText,
+            displayValue: required_values?.displayValue,
+            legendSubtitleText: required_values?.legendSubtitleText,
           };
 
           updatedVisualisations[visName] = {
