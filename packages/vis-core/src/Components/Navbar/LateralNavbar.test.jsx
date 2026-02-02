@@ -109,7 +109,7 @@ const theme = {
 };
 
 describe("LateralNavbar component test", () => {
-  it("basic functionality test", () => {
+  it("basic functionality test", async () => {
     render(
       <MemoryRouter>
         <AppContext.Provider value={mockAppContext}>
@@ -131,7 +131,7 @@ describe("LateralNavbar component test", () => {
     expect(noCategory2).toHaveAttribute("href", "/url2");
     expect(noCategory).toHaveAttribute("href", "/url");
   });
-  it("basic functionality test with multiple categories and an externals categories", () => {
+  it("basic functionality test with multiple categories and an externals categories", async () => {
     render(
       <MemoryRouter>
         <AppContext.Provider value={mockAppContext}>
@@ -150,7 +150,7 @@ describe("LateralNavbar component test", () => {
 
     // Simulate click on a nav item
     const item = screen.getByText("pageName");
-    userEvent.click(item);
+    await userEvent.click(item);
     expect(fakeOnClick).toHaveBeenCalled();
 
     // External links

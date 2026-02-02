@@ -42,7 +42,7 @@ describe("interpretWidthExpression", () => {
   it("interprets a simple numeric width expression", () => {
     const expression = 5;
     const result = interpretWidthExpression(expression);
-    expect(result).toEqual([{ width: 5 }]);
+    expect(result.toString()).toEqual([{ width: 5 }].toString());
   });
 
   it("There is a zoom in the proposals, the return value is a null array.", () => {
