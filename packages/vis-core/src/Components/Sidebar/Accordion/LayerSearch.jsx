@@ -25,6 +25,8 @@ export const LayerSearch = ({ map, layer }) => {
   const zoomToFeaturePlaceholderText = 
     layer.metadata?.zoomToFeaturePlaceholderText || 'Search features in this layer...';
   const zoomToFeatureMaxZoom = layer.metadata?.zoomToFeatureMaxZoom ?? 14;
+  const zoomToFeatureDuration = layer.metadata?.zoomToFeatureDuration ?? 1000;
+  const zoomToFeatureLinear = layer.metadata?.zoomToFeatureLinear ?? false;
   /**
    * Handles the change event when a feature is selected.
    * Zooms to the selected feature on the map and adds a temporary label.
@@ -62,6 +64,10 @@ export const LayerSearch = ({ map, layer }) => {
             padding: basePadding,
             // Prevent over-zooming when the geometry bounds are very small
             maxZoom: zoomToFeatureMaxZoom,
+            // Speed up the camera transition (ms). Set to 0 for instant jump.
+            duration: zoomToFeatureDuration,
+            // When true, uses a constant speed easing (snappier feel).
+            linear: zoomToFeatureLinear,
           });
 
           // Add a temporary label for the selected feature with guaranteed visibility
@@ -126,7 +132,7 @@ export const LayerSearch = ({ map, layer }) => {
         }
       }
     },
-    [layer.metadata.path, map, zoomToFeatureMaxZoom]
+    [layer.metadata.path, map, zoomToFeatureDuration, zoomToFeatureLinear, zoomToFeatureMaxZoom]
   );
 
   return (
