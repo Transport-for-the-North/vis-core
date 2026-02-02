@@ -24,6 +24,7 @@ export const LayerSearch = ({ map, layer }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const zoomToFeaturePlaceholderText = 
     layer.metadata?.zoomToFeaturePlaceholderText || 'Search features in this layer...';
+  const zoomToFeatureMaxZoom = layer.metadata?.zoomToFeatureMaxZoom ?? 14;
   /**
    * Handles the change event when a feature is selected.
    * Zooms to the selected feature on the map and adds a temporary label.
@@ -58,7 +59,9 @@ export const LayerSearch = ({ map, layer }) => {
           
           // Fit bounds to show entire geometry - DO NOT use center option as it conflicts
           map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
-            padding: basePadding
+            padding: basePadding,
+            // Prevent over-zooming when the geometry bounds are very small
+            maxZoom: zoomToFeatureMaxZoom,
           });
 
           // Add a temporary label for the selected feature with guaranteed visibility
@@ -123,7 +126,7 @@ export const LayerSearch = ({ map, layer }) => {
         }
       }
     },
-    [layer.metadata.path, map]
+    [layer.metadata.path, map, zoomToFeatureMaxZoom]
   );
 
   return (
