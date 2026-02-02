@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState, useEffect, useMemo } from "react";
+import React, { memo, useContext, useState, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 import {
   EyeIcon,
@@ -203,6 +203,8 @@ export const LayerControlEntry = memo(
       );
     }, [isExpanded, layer.id]);
     const currentPage = useContext(PageContext);
+    const mapConfig = currentPage?.config?.map;
+    const defaultNodeWidthFactorFromPage = mapConfig?.defaultNodeWidthFactor;
     const appConfig = useContext(AppContext);
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
@@ -253,15 +255,25 @@ export const LayerControlEntry = memo(
 
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
-    const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
-    const showWidth = isFeatureStateWidthExpression;
+      const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
+      const showWidth = isFeatureStateWidthExpression || isNodeLayer;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
       : currentWidthFactor;
 
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [widthFactor, setWidth] = useState(initialWidth || 1);
+    const desiredDefaultNodeWidth =
+      typeof defaultNodeWidthFactorFromPage === "number"
+        ? defaultNodeWidthFactorFromPage
+        : null;
+
+    const initialWidthForUI =
+      isNodeLayer && desiredDefaultNodeWidth != null
+        ? desiredDefaultNodeWidth
+        : (initialWidth || 1);
+
+    const [widthFactor, setWidth] = useState(initialWidthForUI);
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -324,7 +336,7 @@ export const LayerControlEntry = memo(
         widthInterpolation = result.widthInterpolation;
         lineOffsetInterpolation = result.lineOffsetInterpolation;
       } else {
-        widthExpression = 1; // Default width expression if not using feature-state
+        widthExpression = widthFactor; // Default width expression if not using feature-state
       }
 
       maps.forEach((map) => {
@@ -341,6 +353,35 @@ export const LayerControlEntry = memo(
 
       setWidth(widthFactor);
     };
+
+    const appliedNodeDefaultRef = useRef(false);
+
+    useEffect(() => {
+      if (appliedNodeDefaultRef.current) return;
+      if (!maps?.length) return;
+      if (!isNodeLayer) return;
+      if (!widthProp) return;
+      if (isFeatureStateWidthExpression) return;
+
+      if (typeof desiredDefaultNodeWidth !== "number") return;
+
+      maps.forEach((map) => {
+        if (map?.getLayer?.(layer.id)) {
+          map.setPaintProperty(layer.id, widthProp, desiredDefaultNodeWidth);
+        }
+      });
+
+      setWidth(desiredDefaultNodeWidth);
+      appliedNodeDefaultRef.current = true;
+    }, [
+      maps,
+      layer.id,
+      isNodeLayer,
+      widthProp,
+      isFeatureStateWidthExpression,
+      desiredDefaultNodeWidth,
+    ]);
+
 
     return (
       <LayerControlContainer>
