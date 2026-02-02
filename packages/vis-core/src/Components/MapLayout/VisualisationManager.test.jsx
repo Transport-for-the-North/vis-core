@@ -1,0 +1,142 @@
+import { VisualisationManager } from "./VisualisationManager";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MapContext } from "contexts";
+
+jest.mock("maplibre-gl", () => ({
+  Map: jest.fn(() => ({
+    on: jest.fn(),
+    off: jest.fn(),
+    remove: jest.fn(),
+    addLayer: jest.fn(),
+    setStyle: jest.fn(),
+    flyTo: jest.fn(),
+  })),
+}));
+
+jest.mock("./CalloutCards/BaseCalloutCardVisualisation", () => ({
+  BaseCalloutCardVisualisation: ({ visualisationName, cardName, onUpdate, type, sidebarIsOpen }) => {
+    return (
+      <div data-testid="callout-card-visualisation">
+        Mock BaseCalloutCardVisualisation - {visualisationName} - {cardName} - {type} - {sidebarIsOpen}
+        <button onClick={onUpdate}>button: {cardName}</button>
+      </div>
+    );
+  },
+}));
+
+jest.mock("./MapVisualisation", () => ({
+  MapVisualisation: ({ visualisationName, map, maps, left }) => {
+    return (
+      <div data-testid="callout-card-visualisation">
+        Mock CalloutCardVisualisation - {visualisationName} -{" "}
+        {JSON.stringify(map)} - {JSON.stringify(maps)} - {left}
+      </div>
+    );
+  },
+}));
+
+jest.mock("Components", () => ({
+  ScrollableContainer: ({ children, showOnMobile, hideCardHandleOnMobile }) => {
+    return (
+      <div data-testid="scrollable-container">
+        Mock ScrollableContainer - {showOnMobile.toString()} - {hideCardHandleOnMobile.toString()}
+        {children}
+      </div>
+    );
+  }
+}))
+
+const mockMapContext = {
+  state: {
+    visualisations: {
+      calloutCard: {},
+      calloutCard1: {}
+    },
+  },
+};
+
+describe("Test to render a CalloutVisualisationCard", () => {
+  const props = {
+    visualisationConfigs: {
+      calloutCard: {
+        type: "calloutCard",
+        cardName: "Test Card",
+        queryParams: {},
+      },
+      calloutCard1: {
+        type: "calloutCard",
+        cardType: "small",
+        cardName: "Test Card1",
+        queryParams: {},
+      },
+    },
+    map: {},
+    maps: {},
+    sidebarIsOpen: false,
+    left: "left"
+  };
+  it("classic use", () => {
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...props} />
+      </MapContext.Provider>
+    );
+    const cardName = screen.getByText(/Mock BaseCalloutCardVisualisation - calloutCard - Test Card/i);
+    const cardName1 = screen.getByText(/Mock BaseCalloutCardVisualisation - calloutCard1 - Test Card1/i);
+    expect(cardName).toBeInTheDocument();
+    expect(cardName1).toBeInTheDocument();
+  });
+  it("Click on the onUpdate button", async () => {
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...props} />
+      </MapContext.Provider>
+    );
+    const onUpdateButton = screen.getByText(/button: Test Card1/);
+    userEvent.click(onUpdateButton);
+  });
+});
+
+describe("Test to render a Map", () => {
+  const propsType1 = {
+    visualisationConfigs: {
+      map: {
+        type: "geojson",
+        queryParams: {},
+      },
+    },
+    map: {},
+    maps: {},
+  };
+  const propsType2 = {
+    visualisationConfigs: {
+      map: {
+        type: "geojson",
+        queryParams: {},
+      },
+    },
+    map: {},
+    maps: {},
+  };
+  it("render a map with the geojson type", () => {
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...propsType1} />
+      </MapContext.Provider>
+    );
+    expect(
+      screen.getByText(/Mock CalloutCardVisualisation/)
+    ).toBeInTheDocument();
+  });
+  it("render a map with the joinDataToMap type", () => {
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...propsType2} />
+      </MapContext.Provider>
+    );
+    expect(
+      screen.getByText(/Mock CalloutCardVisualisation/)
+    ).toBeInTheDocument();
+  });
+});

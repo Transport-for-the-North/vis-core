@@ -203,11 +203,27 @@ const LegendDivider = styled.div`
 * @throws Will throw an error if less than two color stops or width stops are provided.
 */
 function interpolateWidths(colorStops, widthStops, type) {
-  if (!colorStops || colorStops.length < 2) {
-    throw new Error('At least two color stops are required.');
+
+  // Validate input
+  if (!colorStops || colorStops.length === 0) {
+    throw new Error('At least one color stop is required.');
   }
-  if (!widthStops || widthStops.length < 2) {
-    throw new Error('At least two width stops are required.');
+  if (!widthStops || widthStops.length === 0) {
+    throw new Error('At least one width stop is required.');
+  }
+
+  // If the number of color stops matches width stops, map directly
+  if (colorStops.length === widthStops.length) {
+    return colorStops.map((cs, i) => ({
+      value: cs.value,
+      width: type === 'circle' ? widthStops[i].width * 2 : widthStops[i].width
+    }));
+  }
+
+  // If only one width stop, apply it to all color stops
+  if (widthStops.length === 1) {
+    const width = widthStops[0].width;
+    return colorStops.map(cs => ({ value: cs.value, width: type === 'circle' ? width * 2 : width }));
   }
 
   const convertedWidthStops = widthStops.map(stop => ({
@@ -330,7 +346,9 @@ export const interpretColorExpression = (expression) => {
 export const interpretWidthExpression = (expression) => {
   if (!expression) return null;
   if (typeof expression === "number") {
-    return [{ width: expression }];
+    const arr = [{ width: expression }];
+    arr._styleValue = expression;
+    return arr;
   } else if (Array.isArray(expression)) {
     if (expression.some((item) => Array.isArray(item) && item.includes("zoom"))) {
       return [];

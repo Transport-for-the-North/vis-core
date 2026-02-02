@@ -50,11 +50,11 @@ describe("Login component test", () => {
     expect(submitButton).toBeInTheDocument();
 
     // Enter data into the input fields
-    userEvent.type(inputUsername, "testuser");
-    userEvent.type(inputPassword, "testpassword");
+    await userEvent.type(inputUsername, "testuser");
+    await userEvent.type(inputPassword, "testpassword");
 
     // Submit the form
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     // Check that loginAction has been called with the correct data.
     await waitFor(() => {
@@ -84,10 +84,10 @@ describe("Login component test", () => {
     const inputPassword = screen.getByLabelText(/Password*/i);
     const submitButton = screen.getByRole("button", { name: /Continue/i });
 
-    userEvent.type(inputUsername, "falseuser");
-    userEvent.type(inputPassword, "falsepassword");
+    await userEvent.type(inputUsername, "falseuser");
+    await userEvent.type(inputPassword, "falsepassword");
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockLoginActionFailed).toHaveBeenCalledWith(
