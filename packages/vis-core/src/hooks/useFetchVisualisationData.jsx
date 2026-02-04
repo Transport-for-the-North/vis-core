@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback, useContext } from 'react';
 import { debounce } from 'lodash';
 import { api } from 'services';
 
 import { DataFetchState } from 'enums';
+import { ErrorContext } from 'contexts';
+import { errorActionTypes } from 'reducers';
 
 /**
  * Helper: Filters the full dataset based on IDs visible in the map.
@@ -135,6 +137,9 @@ export const useFetchVisualisationData = (
   // Track previous combined params (query + path) to avoid refetching unnecessarily.
   const prevParamsRef = useRef();
   const prevVisualisationNameRef = useRef();
+  // Access ErrorContext to display an overlay for missing parameters (if provider present)
+  const errorContext = useContext(ErrorContext);
+  const errorDispatch = errorContext?.dispatch;
 
   /**
    * - React StrictMode (dev) mounts/unmounts quickly; a 400ms debounced call can be cancelled
@@ -247,12 +252,64 @@ export const useFetchVisualisationData = (
       areAllRequiredParamsPresent(queryParams) &&
       areAllRequiredParamsPresent(pathParams);
 
+    // If required params are missing, show an overlay with details and skip fetching.
+    if (!allRequiredParamsPresent) {
+      const missingFrom = (params = {}) =>
+        Object.entries(params)
+          .filter(([, def]) => def?.required && (def.value === null || def.value === undefined))
+          .map(([key]) => key);
+
+      const missingQuery = missingFrom(queryParams);
+      const missingPath = missingFrom(pathParams);
+
+      const technicalDetails = JSON.stringify({ missingQuery, missingPath, queryParams, pathParams }, null, 2);
+
+      if (errorDispatch) {
+        errorDispatch({
+          type: errorActionTypes.SET_ERROR,
+          payload: {
+            title: 'Missing required parameters',
+            subtitle: visualisation?.name ? `Visualisation: ${visualisation.name}` : 'Visualisation',
+            message: (
+              <div>
+                {missingQuery.length > 0 && (
+                  <div style={{ marginBottom: 6 }}>
+                    <strong>Missing query params:</strong>{' '}
+                    {missingQuery.join(', ')}
+                  </div>
+                )}
+
+                {missingPath.length > 0 && (
+                  <div>
+                    <strong>Missing path params:</strong>{' '}
+                    {missingPath.join(', ')}
+                  </div>
+                )}
+              </div>
+            ),
+            supportMessage: 'Please supply the required parameters and try again.',
+            supportDetails: 'Check the visualisation configuration or page selectors.',
+            technicalDetails,
+            headerColor: '#d32f2f',
+            showTechnicalDetails: true,
+          },
+        });
+      }
+
+      return;
+    }
+
+    // Clear any previously shown param-missing overlay.
+    if (errorDispatch) {
+      errorDispatch({ type: errorActionTypes.CLEAR_ERROR });
+    }
+
     // Track a combined signature of both param maps to detect changes.
     const currentParamsStr = JSON.stringify({ queryParams, pathParams });
 
     const paramsChanged = prevParamsRef.current !== currentParamsStr;
 
-    if (allRequiredParamsPresent && paramsChanged) {
+    if (paramsChanged) {
       /**
        * Store signature as "pending" and schedule the debounced fetch.
        * Then immediately flush to ensure the initial call isn't lost to rapid
@@ -268,6 +325,7 @@ export const useFetchVisualisationData = (
     visualisation?.queryParams,
     visualisation?.pathParams,
     fetchDataForVisualisation,
+    errorDispatch,
   ]);
 
   // Refilter the raw data when the map viewport changes.

@@ -255,7 +255,6 @@ const Map = (props) => {
         // On touch devices, used a minimum buffer to account for finger size
         const minTapBufferPx = isTouch ? Math.round(6 * dpr) : 0;
 
-        const BUFFER_FLOOR = 3;
 
         // Calculate buffer with line width offset to extend from line edge
         const maxBufferSize = Math.max(
@@ -276,16 +275,10 @@ const Map = (props) => {
             return baseBuffer;
           })
         );
-
-        const pointX = e.point.x;
-        const pointY = e.point.y;
-        const buffer = Number.isFinite(maxBufferSize) ? maxBufferSize : 0;
-        
         const bufferedPoint = [
           [pointX - buffer, pointY - buffer],
           [pointX + buffer, pointY + buffer],
         ];
-        
         // Double-check bufferedPoint values are valid before querying
         const hasValidBufferedPoint = bufferedPoint.every(
           (coord) => coord.every((val) => typeof val === 'number' && Number.isFinite(val))
@@ -299,12 +292,6 @@ const Map = (props) => {
         const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
           layers: hoverableLayers,
         });
-        
-        // Filter out any features that don't have required properties
-        const validFeatures = (featuresWithDuplicates || []).filter(
-          (f) => f && f.id != null && f.layer && f.layer.id
-        );
-        
         if (isTouchonMobile) {
           features = validFeatures.length ? [validFeatures[0]] : [];
         } else {      
