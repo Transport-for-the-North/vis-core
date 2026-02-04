@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
-import {
-  PageSwitch,
-  HomePage,
-  Navbar,
-  Login,
-  Unauthorized,
+import { 
+  PageSwitch, 
+  HomePage, 
+  Navbar, 
+  Login, 
+  Unauthorized, 
   TermsOfUse,
-  NotFound
+  NotFound 
 } from "../index";
 import { Dashboard } from "../../layouts";
-import { AppContext, AuthProvider, ErrorProvider } from "../../contexts";
+import { AppContext, AuthProvider } from "../../contexts";
 import { api } from "../../services";
-import {
-  withWarning,
-  withRoleValidation,
-  composeHOCs,
-  withTermsOfUse
+import { 
+  withWarning, 
+  withRoleValidation, 
+  composeHOCs, 
+  withTermsOfUse 
 } from "../../hocs";
 
 /**
@@ -30,23 +30,9 @@ import {
  * @param {Function} props.bandsLoader - Function that returns bands modules
  * @param {string} props.appName - The application name (from VITE_APP_NAME env variable)
  * @param {string} [props.appCssClass="App"] - Optional CSS class for the app wrapper
- * @param {JSX.Element} [props.customRoutes=null] - Optional additional Route components to inject into the router
- * @param {Function} [props.customProviders=null] - Optional function that wraps the app content with custom context providers
- * @param {JSX.Element} [props.beforeDashboard=null] - Optional content to render before the Dashboard component
- * @param {JSX.Element} [props.afterDashboard=null] - Optional content to render after the Dashboard component
- * @returns {JSX.Element} The rendered application component
+ * @returns {JSX.Element}
  */
-export function BaseApp({
-  theme,
-  configLoader,
-  bandsLoader,
-  appName,
-  appCssClass = "App",
-  customRoutes = null,
-  customProviders = null,
-  beforeDashboard = null,
-  afterDashboard = null
-}) {
+export function BaseApp({ theme, configLoader, bandsLoader, appName, appCssClass = "App" }) {
   const [appConfig, setAppConfig] = useState(null);
 
   useEffect(() => {
@@ -65,10 +51,10 @@ export function BaseApp({
         // Get config modules from the app-specific loader
         const configModules = configLoader();
         const bandModules = bandsLoader();
-
+        
         const configPath = `./configs/${appName}/appConfig.js`;
         const bandsPath = `./configs/${appName}/bands.js`;
-
+        
         if (!configModules[configPath]) {
           throw new Error(`Config not found for app: ${appName}`);
         }
@@ -123,64 +109,46 @@ export function BaseApp({
   }
 
   const isAuthRequired = appConfig.authenticationRequired ?? true;
-  const HomePageWithRoleValidation = isAuthRequired
-    ? withRoleValidation(HomePage)
+  const HomePageWithRoleValidation = isAuthRequired 
+    ? withRoleValidation(HomePage) 
     : HomePage;
-  const NotFoundWithRoleValidation = isAuthRequired
-    ? withRoleValidation(NotFound)
+  const NotFoundWithRoleValidation = isAuthRequired 
+    ? withRoleValidation(NotFound) 
     : NotFound;
 
-  // Standard routes
-  const standardRoutes = (
-    <>
-      <Route path="/login" element={<Login />} />
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/" element={<HomePageWithRoleValidation />} />
-      {appConfig.appPages.map((page) => {
-        const PageComponent = isAuthRequired
-          ? withRoleValidation(PageSwitch)
-          : PageSwitch;
-        const WrappedPageComponent = composeHOCs(
-          withWarning,
-          withTermsOfUse
-        )(PageComponent);
-        return (
-          <Route
-            key={page.pageName}
-            path={page.url}
-            element={<WrappedPageComponent pageConfig={page} />}
-          />
-        );
-      })}
-      {customRoutes}
-      <Route path="*" element={<NotFoundWithRoleValidation />} />
-    </>
-  );
-
-  const appContent = (
+  return (
     <div className={appCssClass}>
       <AuthProvider>
-        <ErrorProvider>
-          <ThemeProvider theme={theme}>
-            <AppContext.Provider value={appConfig}>
-              {beforeDashboard}
-              <Navbar />
-              <Dashboard>
-                <Routes>
-                  {standardRoutes}
-                </Routes>
-              </Dashboard>
-              {afterDashboard}
-            </AppContext.Provider>
-          </ThemeProvider>
-        </ErrorProvider>
+        <ThemeProvider theme={theme}>
+          <AppContext.Provider value={appConfig}>
+            <Navbar />
+            <Dashboard>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/" element={<HomePageWithRoleValidation />} />
+                {appConfig.appPages.map((page) => {
+                  const PageComponent = isAuthRequired
+                    ? withRoleValidation(PageSwitch)
+                    : PageSwitch;
+                  const WrappedPageComponent = composeHOCs(
+                    withWarning, 
+                    withTermsOfUse
+                  )(PageComponent);
+                  return (
+                    <Route
+                      key={page.pageName}
+                      path={page.url}
+                      element={<WrappedPageComponent pageConfig={page} />}
+                    />
+                  );
+                })}
+                <Route path="*" element={<NotFoundWithRoleValidation />} />
+              </Routes>
+            </Dashboard>
+          </AppContext.Provider>
+        </ThemeProvider>
       </AuthProvider>
     </div>
   );
-
-  if (customProviders) {
-    return customProviders(appContent);
-  }
-
-  return appContent;
 }
