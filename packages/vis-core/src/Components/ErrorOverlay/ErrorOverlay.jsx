@@ -150,6 +150,8 @@ const ErrorDetails = styled.div`
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+  max-height: 240px;
+  overflow: auto;
   text-align: left;
 `;
 
