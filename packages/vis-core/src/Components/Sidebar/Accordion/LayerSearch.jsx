@@ -21,6 +21,7 @@ const SearchContainer = styled.div`
  * @returns {JSX.Element} The rendered LayerSearch component.
  */
 export const LayerSearch = ({ map, layer }) => {
+  const LABEL_DISPLAY_DURATION = 5000; // Duration to show the label in milliseconds
   const [selectedOption, setSelectedOption] = useState(null);
   const zoomToFeaturePlaceholderText = 
     layer.metadata?.zoomToFeaturePlaceholderText || 'Search features in this layer...';
@@ -121,12 +122,9 @@ export const LayerSearch = ({ map, layer }) => {
               map.removeLayer(labelLayerId);
               map.removeSource(labelSourceId);
             }
-            map.off('move', removeLabel);
-            map.off('click', removeLabel);
           };
 
-          map.on('move', removeLabel);
-          map.on('click', removeLabel);
+          setTimeout(removeLabel, LABEL_DISPLAY_DURATION);
         } catch (error) {
           console.error('Failed to fetch bounds:', error);
         }
