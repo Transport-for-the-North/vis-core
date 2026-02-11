@@ -264,6 +264,13 @@ export const MapLayout = () => {
     });
   };
 
+  const handleCustomBandsChange = (customBands, layerName) => {
+    dispatch({
+      type: "UPDATE_CUSTOM_BANDS",
+      payload: { customBands, layerName },
+    });
+  };
+
   return (
     <LayoutContainer>
       <Dimmer dimmed={isLoading} showLoader={true} />
@@ -285,6 +292,7 @@ export const MapLayout = () => {
         <MapLayerSection
           handleColorChange={handleColorChange}
           handleClassificationChange={handleClassificationChange}
+          handleCustomBandsChange={handleCustomBandsChange}
         />
       </Sidebar>
 

@@ -17,6 +17,7 @@ export const MapLayerSection = ({
   handleColorChange,
   handleClassificationChange,
   handleWidthFactorChange,
+  handleCustomBandsChange,
 }) => {
   const { state } = useMapContext();
   const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
@@ -78,6 +79,7 @@ export const MapLayerSection = ({
           handleColorChange={handleColorChange}
           handleClassificationChange={handleClassificationChange}
           handleWidthFactorChange={handleWidthFactorChange}
+          handleCustomBandsChange={handleCustomBandsChange}
           state={state}
         />
       ))}
