@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { AppContext } from "contexts";
 import { useAuth } from "contexts/AuthProvider";
 import { useWindowWidth } from "hooks";
-import { buildNavbarLinks } from "utils";
+import { buildNavbarLinks, validateAppConfigAgainstOpenApi } from "utils";
 import { Button } from "./Button";
 import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
@@ -71,6 +71,7 @@ export function Navbar() {
   const [activeLink, setActiveLink] = useState("");
   const appContext = useContext(AppContext);
   const { logOut } = useAuth();
+  const didValidateOpenApiRef = useRef(false);
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
   const [$bgColor, setBgColor] = useState("#7317de");
   const navigate = useNavigate();
@@ -106,6 +107,29 @@ export function Navbar() {
     setActiveLink(location.pathname);
     setSideNavOpen(false);
   }, [location]);
+
+  // Validate config vs OpenAPI exactly once per app load.
+  // This is always-on for this vis-core version, but only logs when issues exist.
+  useEffect(() => {
+    if (didValidateOpenApiRef.current) return;
+    const apiSchema = appContext?.apiSchema;
+    const appPages = appContext?.appPages;
+    if (!apiSchema || !Array.isArray(appPages) || appPages.length === 0) return;
+
+    const { errors, warnings } = validateAppConfigAgainstOpenApi(appContext, apiSchema);
+    if (errors.length || warnings.length) {
+      console.groupCollapsed(
+        `[vis-core] OpenAPI validation: ${errors.length} error(s), ${warnings.length} warning(s)`
+      );
+      if (warnings.length) console.warn("[vis-core] OpenAPI validation warnings", warnings);
+      if (errors.length) console.error("[vis-core] OpenAPI validation errors", errors);
+      console.groupEnd();
+    } else {
+      console.info("[vis-core] OpenAPI validation complete (no issues)");
+    }
+
+    didValidateOpenApiRef.current = true;
+  }, [appContext]);
 
   if (
     location.pathname === "/login" ||
