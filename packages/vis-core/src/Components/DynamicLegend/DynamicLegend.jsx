@@ -848,7 +848,10 @@ export const DynamicLegend = ({ map }) => {
         let minBand = null, maxBand = null;
         let bandsManuallySet = false;
         
-        if (item.legendEntriesNumeric && Array.isArray(item.legendEntriesNumeric) && item.legendEntriesNumeric.length > 1) {
+        const classMethod = state.layers?.[item.layerId]?.class_method;
+
+        // Only show this warning for explicit custom banding.
+        if (classMethod === 'c' && item.legendEntriesNumeric && Array.isArray(item.legendEntriesNumeric) && item.legendEntriesNumeric.length > 1) {
           // Use actual band values from item.visualisation.bands for min/max
           const bandEdges = item.legendEntriesNumeric.filter(v => !isNaN(v));
           minBand = Math.min(...bandEdges);

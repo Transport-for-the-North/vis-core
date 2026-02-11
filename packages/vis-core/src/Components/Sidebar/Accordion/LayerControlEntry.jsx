@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState, useEffect, useMemo } from "react";
+import React, { memo, useContext, useState, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 import {
   EyeIcon,
@@ -236,21 +236,33 @@ export const LayerControlEntry = memo(
     const widthProp = getWidthProperty(layer.type);
     const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
 
+    // Track the last non-custom classification method so BandEditor reset can restore it.
+    const currentClassMethod = state.layers?.[layer.id]?.class_method ?? "d";
+    const prevNonCustomClassMethodRef = useRef(
+      currentClassMethod !== "c" ? currentClassMethod : "d"
+    );
+    useEffect(() => {
+      if (currentClassMethod && currentClassMethod !== "c") {
+        prevNonCustomClassMethodRef.current = currentClassMethod;
+      }
+    }, [currentClassMethod]);
+
     let currentWidthFactor = null;
     let currentOpacity = null;
 
     if (maps.length > 0 && maps[0].getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
-      currentWidthFactor = widthProp ? maps[0].getPaintProperty(layer.id, widthProp) : null;
+      currentWidthFactor = widthProp
+        ? maps[0].getPaintProperty(layer.id, widthProp)
+        : null;
     }
 
     const isFeatureStateExpression =
       Array.isArray(currentOpacity) && currentOpacity[0] === "case";
     const initialOpacity = isFeatureStateExpression
-      ? currentOpacity[currentOpacity.length - 1]
+      ? currentOpacity?.[currentOpacity.length - 1]
       : currentOpacity;
-
 
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
@@ -480,11 +492,15 @@ export const LayerControlEntry = memo(
                     handleCustomBandsChange(newBands, layer.id);
                   }}
                   isDiverging={colorStyle === "diverging"}
+                  isCustom={currentClassMethod === "c"}
                   data={bandEditorData}
                   defaultBandValues={hasDefaultBands?.values || null}
                   onReset={() => {
-                    // Reset uses equidistant bins; reflect that in the classification dropdown.
-                    handleClassificationChange("e", layer.id);
+                    // Restore the last non-custom classification method (default/equidistant/etc)
+                    // and clear custom bands so the method can recompute its own.
+                    const target = prevNonCustomClassMethodRef.current || "d";
+                    handleCustomBandsChange([], layer.id);
+                    handleClassificationChange(target, layer.id);
                   }}
                 />
               )}

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import chroma from 'chroma-js';
 import styled from "styled-components";
-import { roundToSignificantFigures } from "utils/math";
 import { SelectorLabel } from "./SelectorLabel";
+import { AppButton } from "Components";
 
 const BandEditorContainer = styled.div`
   margin-top: 12px;
@@ -75,33 +74,6 @@ const ErrorMessage = styled.div`
   border-left: 3px solid #d32f2f;
 `;
 
-const UpdateButton = styled.button`
-  width: 100%;
-  padding: 8px 12px;
-  background-color: #4b3e91;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover {
-    background-color: #3d3278;
-  }
-  
-  &:focus {
-    outline: 2px solid #4b3e91;
-    outline-offset: 2px;
-  }
-  
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
 /**
  * BandEditor component allows users to customize classification band values for map layers.
  * Provides an interface to edit the number of bands and their individual threshold values.
@@ -112,6 +84,7 @@ const UpdateButton = styled.button`
  * @param {number[]} props.bands - Array of current band threshold values.
  * @param {Function} props.onChange - Callback function invoked when user updates band values.
  * @param {boolean} props.isDiverging - Whether the color scheme is diverging (affects min band count).
+ * @param {boolean} [props.isCustom] - Whether the current classification method is custom.
  * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
  *
@@ -123,7 +96,8 @@ const UpdateButton = styled.button`
  *   data={[1,2,3,4,5,6,7,8,9,10]}
  * />
  */
-export const BandEditor = ({ bands, onChange, isDiverging, data = [], defaultBandValues = null, onReset = null }) => {
+export const BandEditor = ({ bands, onChange, isDiverging, isCustom = false, onReset = null, ..._unusedProps }) => {
+  void _unusedProps;
   const [localBands, setLocalBands] = useState(bands);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -216,75 +190,23 @@ export const BandEditor = ({ bands, onChange, isDiverging, data = [], defaultBan
   const minBands = isDiverging ? 3 : 2;
   const maxBands = 9;
 
-  const roundMonotonic = (values, initialSigFigs = 2) => {
-    let sigFigs = initialSigFigs;
-    let roundedValues = values.map((value) => roundToSignificantFigures(Number(value), sigFigs));
-    for (let i = 1; i < roundedValues.length; i++) {
-      while (roundedValues[i] <= roundedValues[i - 1] && sigFigs < 10) {
-        sigFigs++;
-        roundedValues = values.map((value) => roundToSignificantFigures(Number(value), sigFigs));
-      }
-    }
-    return roundedValues;
-  };
-
-  const getNumericArray = (arr) =>
-    Array.isArray(arr)
-      ? arr.map(Number).filter((v) => Number.isFinite(v))
-      : [];
-
-  // Reset should prefer an equidistant set of bands for the current band count.
-  // Source for min/max preference order:
-  // 1) actual numeric data (best)
-  // 2) current local band range (what user is working with)
-  // 3) configured defaultBandValues (fallback)
-  const calculateEquidistantBands = () => {
-    const count = localBands.length;
-    if (!count || count < 2) return localBands;
-
-    const numericData = getNumericArray(data);
-    const numericLocalBands = getNumericArray(localBands);
-    const numericDefaults = getNumericArray(defaultBandValues);
-
-    const rangeSource =
-      numericData.length >= 2
-        ? numericData
-        : (numericLocalBands.length >= 2 ? numericLocalBands : numericDefaults);
-
-    if (!rangeSource || rangeSource.length < 2) {
-      return localBands;
-    }
-
-    let min = Math.min(...rangeSource);
-    let max = Math.max(...rangeSource);
-
-    if (isDiverging) {
-      const maxAbs = Math.max(Math.abs(min), Math.abs(max));
-      min = -maxAbs;
-      max = maxAbs;
-    }
-
-    if (!Number.isFinite(min) || !Number.isFinite(max)) return localBands;
-
-    // If range collapses, create a tiny increasing range to satisfy validation.
-    if (min === max) {
-      max = min + 1e-6 * (count - 1);
-    }
-
-    const step = (max - min) / (count - 1);
-    const raw = Array.from({ length: count }, (_, i) => min + step * i);
-    return roundMonotonic(raw, 2);
-  };
-
   const handleResetBands = () => {
-    const defaults = calculateEquidistantBands();
-    setLocalBands(defaults);
-    // Apply immediately (don't require separate Update click)
-    const validDefaults = defaults.filter(v => v !== "" && !isNaN(v)).map(Number);
-    onChange(validDefaults);
-    if (typeof onReset === 'function') {
-      try { onReset(); } catch (e) { /* ignore */ }
+    // If the current classification is custom, delegate to parent so it can restore
+    // the pre-custom classification method (default/equidistant/etc) and clear custom bands.
+    if (isCustom) {
+      if (typeof onReset === "function") {
+        try {
+          onReset();
+        } catch (e) {
+          /* ignore */
+        }
+      }
+      setHasChanges(false);
+      return;
     }
+
+    // Otherwise, just revert any unsaved local edits back to the current non-custom bands.
+    setLocalBands(bands);
     setHasChanges(false);
   };
 
@@ -302,14 +224,9 @@ export const BandEditor = ({ bands, onChange, isDiverging, data = [], defaultBan
               <option key={n} value={n}>{n}</option>
             ))}
           </BandCountSelect>
-          <UpdateButton
-            type="button"
-            style={{ padding: '4px 10px', fontSize: '0.85em', width: 'auto', background: '#eee', color: '#4b3e91', border: '1px solid #d1d1e0', fontWeight: 500 }}
-            onClick={handleResetBands}
-            disabled={localBands.length < 2}
-          >
+          <AppButton type="button" onClick={handleResetBands} disabled={localBands.length < 2}>
             Reset bands
-          </UpdateButton>
+          </AppButton>
         </div>
       </BandHeader>
       {validation.error && (
@@ -329,9 +246,9 @@ export const BandEditor = ({ bands, onChange, isDiverging, data = [], defaultBan
           </BandInputWrapper>
         ))}
       </BandInputsGrid>
-      <UpdateButton onClick={handleUpdate} disabled={!hasChanges || !validation.valid}>
+      <AppButton $width="100%" type="button" onClick={handleUpdate} disabled={!hasChanges || !validation.valid}>
         Update banding
-      </UpdateButton>
+      </AppButton>
     </BandEditorContainer>
   );
 };
