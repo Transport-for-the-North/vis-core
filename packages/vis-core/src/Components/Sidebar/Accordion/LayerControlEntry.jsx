@@ -236,6 +236,11 @@ export const LayerControlEntry = memo(
     const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
     const widthProp = getWidthProperty(layer.type);
     const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
+    const layerConfigFromState = state?.layers?.[layer.id];
+    const effectiveDefaultLineOffset =
+      layerConfigFromState?.defaultLineOffset ??
+      layer.metadata?.defaultLineOffset ??
+      layer.defaultLineOffset;
 
     let currentWidthFactor = null;
     let currentOpacity = null;
@@ -327,14 +332,14 @@ export const LayerControlEntry = memo(
       const max = isNodeLayer ? 2.5 : 10;
       const widthFactor = Math.max(min, Math.min(max, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
+      const hasDefaultLineOffset = effectiveDefaultLineOffset !== undefined && effectiveDefaultLineOffset !== null;
 
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        // Use layer's defaultLineOffset if available, otherwise fall back to default
-        const customOffset = layer.defaultLineOffset ?? undefined;
-        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp, customOffset);
+        // Keep line-offset fixed to defaultLineOffset if provided
+        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
         widthInterpolation = result.widthInterpolation;
-        lineOffsetInterpolation = result.lineOffsetInterpolation;
+        lineOffsetInterpolation = hasDefaultLineOffset ? null : result.lineOffsetInterpolation;
       } else {
         widthExpression = widthFactor; // Default width expression if not using feature-state
       }
@@ -345,8 +350,12 @@ export const LayerControlEntry = memo(
           map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
 
           // Set the line-offset property if applicable
-          if (widthProp.includes("line") && lineOffsetInterpolation) {
-            map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+          if (widthProp.includes("line")) {
+            if (hasDefaultLineOffset) {
+              map.setPaintProperty(layer.id, "line-offset", effectiveDefaultLineOffset);
+            } else if (lineOffsetInterpolation) {
+              map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+            }
           }
         }
       });
