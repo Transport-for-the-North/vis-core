@@ -20,6 +20,7 @@ jest.mock("uuid", () => ({
 }));
 
 jest.mock("utils", () => ({
+  ...jest.requireActual("utils"),
   hasRouteParameterOrQuery: jest.fn(() => true),
   extractParamsWithValues: jest.fn(() => true),
   processParameters: jest.fn(() => ({

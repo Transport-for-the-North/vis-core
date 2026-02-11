@@ -3,6 +3,20 @@ import userEvent from "@testing-library/user-event";
 import { Dropdown } from "Components/Sidebar/Selectors/Dropdown";
 import { FilterContext } from "contexts";
 
+jest.mock("styled-components", () => {
+  const actual = jest.requireActual("styled-components");
+  const styled = actual.default ?? actual;
+  return {
+    __esModule: true,
+    ...actual,
+    default: styled,
+    useTheme: () => ({
+      borderRadius: "4px",
+      activeBg: "#6b46c1",
+    }),
+  };
+});
+
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
     on: jest.fn(),
