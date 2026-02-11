@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState, useEffect, useMemo } from "react";
+import React, { memo, useContext, useState, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 import {
   EyeIcon,
@@ -11,7 +11,7 @@ import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown, BandEditor } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
-import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression} from "utils/map"
+import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map"
 
 /**
  * Styled container for the layer control entry.
@@ -203,6 +203,8 @@ export const LayerControlEntry = memo(
       );
     }, [isExpanded, layer.id]);
     const currentPage = useContext(PageContext);
+    const mapConfig = currentPage?.config?.map;
+    const defaultNodeWidthFactorFromPage = mapConfig?.defaultNodeWidthFactor;
     const appConfig = useContext(AppContext);
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
@@ -214,7 +216,7 @@ export const LayerControlEntry = memo(
     });
     const visualisation =
       currentPage.pageName.includes("Side-by-Side") ||
-      currentPage.pageName.includes("Side by Side")
+        currentPage.pageName.includes("Side by Side")
         ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
         : state.visualisations[Object.keys(state.visualisations)[0]];
 
@@ -234,6 +236,11 @@ export const LayerControlEntry = memo(
     const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
     const widthProp = getWidthProperty(layer.type);
     const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
+    const layerConfigFromState = state?.layers?.[layer.id];
+    const effectiveDefaultLineOffset =
+      layerConfigFromState?.defaultLineOffset ??
+      layer.metadata?.defaultLineOffset ??
+      layer.defaultLineOffset;
 
     let currentWidthFactor = null;
     let currentOpacity = null;
@@ -250,18 +257,28 @@ export const LayerControlEntry = memo(
       ? currentOpacity[currentOpacity.length - 1]
       : currentOpacity;
 
-    
+
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
       const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
-      const showWidth = isFeatureStateWidthExpression;
+      const showWidth = isFeatureStateWidthExpression || isNodeLayer;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
       : currentWidthFactor;
 
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [widthFactor, setWidth] = useState(initialWidth || 1);
+    const desiredDefaultNodeWidth =
+      typeof defaultNodeWidthFactorFromPage === "number"
+        ? defaultNodeWidthFactorFromPage
+        : null;
+
+    const initialWidthForUI =
+      isNodeLayer && desiredDefaultNodeWidth != null
+        ? desiredDefaultNodeWidth
+        : (initialWidth || 1);
+
+    const [widthFactor, setWidth] = useState(initialWidthForUI);
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -315,32 +332,65 @@ export const LayerControlEntry = memo(
       const max = isNodeLayer ? 2.5 : 10;
       const widthFactor = Math.max(min, Math.min(max, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
-    
+      const hasDefaultLineOffset = effectiveDefaultLineOffset !== undefined && effectiveDefaultLineOffset !== null;
+
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        // Use layer's defaultLineOffset if available, otherwise fall back to default
-        const customOffset = layer.defaultLineOffset ?? undefined;
-        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp, customOffset);
+        // Keep line-offset fixed to defaultLineOffset if provided
+        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
         widthInterpolation = result.widthInterpolation;
-        lineOffsetInterpolation = result.lineOffsetInterpolation;
+        lineOffsetInterpolation = hasDefaultLineOffset ? null : result.lineOffsetInterpolation;
       } else {
-        widthExpression = 1; // Default width expression if not using feature-state
+        widthExpression = widthFactor; // Default width expression if not using feature-state
       }
-    
+
       maps.forEach((map) => {
         if (map.getLayer(layer.id)) {
           // Set the width property
           map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
-    
+
           // Set the line-offset property if applicable
-          if (widthProp.includes("line") && lineOffsetInterpolation) {
-            map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+          if (widthProp.includes("line")) {
+            if (hasDefaultLineOffset) {
+              map.setPaintProperty(layer.id, "line-offset", effectiveDefaultLineOffset);
+            } else if (lineOffsetInterpolation) {
+              map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+            }
           }
         }
       });
-    
+
       setWidth(widthFactor);
     };
+
+    const appliedNodeDefaultRef = useRef(false);
+
+    useEffect(() => {
+      if (appliedNodeDefaultRef.current) return;
+      if (!maps?.length) return;
+      if (!isNodeLayer) return;
+      if (!widthProp) return;
+      if (isFeatureStateWidthExpression) return;
+
+      if (typeof desiredDefaultNodeWidth !== "number") return;
+
+      maps.forEach((map) => {
+        if (map?.getLayer?.(layer.id)) {
+          map.setPaintProperty(layer.id, widthProp, desiredDefaultNodeWidth);
+        }
+      });
+
+      setWidth(desiredDefaultNodeWidth);
+      appliedNodeDefaultRef.current = true;
+    }, [
+      maps,
+      layer.id,
+      isNodeLayer,
+      widthProp,
+      isFeatureStateWidthExpression,
+      desiredDefaultNodeWidth,
+    ]);
+
 
     return (
       <LayerControlContainer>
@@ -352,16 +402,17 @@ export const LayerControlEntry = memo(
             tabIndex="0"
             aria-expanded={isExpanded}
             onKeyDown={handleKeyPress}
+            data-testid="HeaderLeft"
           >
             {/* Expand/Collapse Toggle (now a span) */}
             <ExpandCollapseToggle>
-              {isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+              {isExpanded ? <ChevronDownIcon data-testid="ChevronDownIcon"/> : <ChevronRightIcon data-testid="ChevronRightIcon"/>}
             </ExpandCollapseToggle>
             {/* Layer Name */}
             <LayerName>{layer.id}</LayerName>
           </HeaderLeft>
           {/* Visibility Toggle */}
-          <VisibilityToggle onClick={toggleVisibility}>
+          <VisibilityToggle onClick={toggleVisibility} data-testid="visibility-toggle">
             {visibility === "visible" ? (
               <EyeIcon aria-label="Hide layer" title="Hide layer" />
             ) : (
@@ -397,6 +448,7 @@ export const LayerControlEntry = memo(
               <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
               <Slider
                 id={`width-${layer.id}`}
+                data-testid="slider width factor"
                 type="range"
                 min={isNodeLayer ? 0.1 : 0.5}
                 max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
@@ -434,11 +486,14 @@ export const LayerControlEntry = memo(
 
               {!enforceNoClassificationMethod && <ClassificationDropdown
                 classType={{
-                  Default: "d",
+                  ...(hasDefaultBands?.values && {Default: "d"}),
                   Quantile: "q",
                   Equidistant: "e",
                   Logarithmic: "l",
                   "K-Means": "k",
+                  "Jenks Natural Breaks": "j",
+                  "Standard Deviation": "s",
+                  "Head/Tail Breaks": "h",
                 }}
                 classification={
                   state.layers[layer.id]?.class_method ?? "d"
