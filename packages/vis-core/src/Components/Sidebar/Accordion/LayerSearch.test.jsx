@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { LayerSearch } from "Components/Sidebar/Accordion/LayerSearch";
 import { api } from "services";
 import userEvent from "@testing-library/user-event";
@@ -93,9 +93,13 @@ describe("LayerSearch component test", () => {
         [0, 0],
         [1, 1],
       ],
-      { padding: 20 }
+      {
+        padding: 100,
+        maxZoom: 14,
+        duration: 1000,
+        linear: false,
+      }
     );
-    expect(mockMap.setCenter).toHaveBeenCalledWith([0.5, 0.5]);
     expect(mockMap.removeLayer).toHaveBeenCalledWith("feature-label");
     expect(mockMap.removeSource).toHaveBeenCalledWith("feature-label-source");
     expect(mockMap.addSource).toHaveBeenCalledWith("feature-label-source", {
@@ -121,65 +125,41 @@ describe("LayerSearch component test", () => {
         "text-size": 14,
         "text-offset": [0, 1.5],
         "text-anchor": "top",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
       },
       paint: {
         "text-color": "#000000",
         "text-halo-color": "#ffffff",
         "text-halo-width": 2,
+        "text-opacity": 1,
       },
     });
-    expect(mockMap.on).toHaveBeenCalledWith("move", expect.any(Function));
   });
   it("Test of removeLabel function", async () => {
-    let moveCallback;
-    let clickCallback;
-
-    // Modify the mock to capture the callbacks
-    mockMap.on = jest.fn((event, callback) => {
-      if (event === "move") moveCallback = callback;
-      if (event === "click") clickCallback = callback;
-    });
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     render(<LayerSearch {...props} />);
 
-    await userEvent.click(screen.getByText("mock FeatureSelect"));
+    await user.click(screen.getByText("mock FeatureSelect"));
     await waitFor(() => {
       expect(api.geodataService.getFeatureGeometry).toHaveBeenCalled();
     });
-    await waitFor(() => {
-      expect(mockMap.on).toHaveBeenCalledTimes(2); // move and click
+
+    // Reset the mocks and trigger timeout-driven cleanup
+    mockMap.removeLayer.mockClear();
+    mockMap.removeSource.mockClear();
+
+    mockMap.getLayer.mockReturnValue(true);
+
+    act(() => {
+      jest.advanceTimersByTime(5000);
     });
 
-    // Now check the events
-    expect(mockMap.on).toHaveBeenCalledWith("move", expect.any(Function));
-    expect(mockMap.on).toHaveBeenCalledWith("click", expect.any(Function));
-
-    // Reset the mocks
-    mockMap.removeLayer.mockClear();
-    mockMap.removeSource.mockClear();
-    mockMap.off.mockClear();
-
-    mockMap.getLayer.mockReturnValue(true);
-
-    // Execute the move callback
-    expect(moveCallback).toBeDefined();
-    moveCallback();
-
-    // Check that removeLabel has been executed
     expect(mockMap.removeLayer).toHaveBeenCalledWith("feature-label");
     expect(mockMap.removeSource).toHaveBeenCalledWith("feature-label-source");
-    expect(mockMap.off).toHaveBeenCalledWith("move", moveCallback);
-    expect(mockMap.off).toHaveBeenCalledWith("click", moveCallback);
 
-    // Test also with click
-    mockMap.removeLayer.mockClear();
-    mockMap.removeSource.mockClear();
-    mockMap.off.mockClear();
-    mockMap.getLayer.mockReturnValue(true);
-
-    clickCallback();
-
-    expect(mockMap.removeLayer).toHaveBeenCalledWith("feature-label");
-    expect(mockMap.removeSource).toHaveBeenCalledWith("feature-label-source");
+    jest.useRealTimers();
   });
 });
