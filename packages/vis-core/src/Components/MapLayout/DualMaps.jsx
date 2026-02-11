@@ -414,11 +414,12 @@ const DualMaps = (props) => {
 
             if (joinToDefault) {
               // Build default description first
+              const customValueText = customTooltip.defaultValueName || valueText;
               description = buildDefaultTooltip({
                 featureName,
                 featureValueDisplay,
                 legendText,
-                valueText
+                valueText: customValueText
               });
 
               // Inject additional metadata if enabled
