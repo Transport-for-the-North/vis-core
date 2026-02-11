@@ -542,11 +542,12 @@ const Map = (props) => {
           const joinToDefault = !!customTooltip.joinToDefaultTooltip;
 
           if (joinToDefault) {
+            const customValueText = customTooltip.defaultValueName || valueText;
             description = buildDefaultTooltip({
               featureName,
               featureValueDisplay,
               legendText,
-              valueText
+              valueText: customValueText
             });
 
             // Inject additional metadata if available and enabled
