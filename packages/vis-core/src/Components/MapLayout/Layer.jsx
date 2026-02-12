@@ -136,6 +136,14 @@ export const Layer = ({ layer }) => {
               : layer.path;
           sourceConfig.type = "vector";
           sourceConfig.tiles = [url];
+          // If configured, ensure the *source* also respects zoom constraints.
+          // (MapLibre can request tiles for hidden layers unless the source is also gated.)
+          if (typeof layer.minZoom === "number") {
+            sourceConfig.minzoom = layer.minZoom;
+          }
+          if (typeof layer.maxZoom === "number") {
+            sourceConfig.maxzoom = layer.maxZoom;
+          }
           sourceConfig.promoteId = "id";
           mapInstance.addSource(layer.name, sourceConfig);
           

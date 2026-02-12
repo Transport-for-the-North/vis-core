@@ -161,6 +161,41 @@ let props = {
 };
 
 describe("SelectorSection component test", () => {
+  it("Does not render viewport filter in sidebar", async () => {
+    props = {
+      ...props,
+      filters: [
+        {
+          type: "dropdown",
+          id: "viewport",
+          paramName: "viewport",
+          filterName: "Viewport",
+          values: "dropdown",
+        },
+        {
+          type: "dropdown",
+          id: "dropdown",
+          paramName: "hazard",
+          filterName: "Hazard",
+          values: "dropdown",
+        },
+      ],
+    };
+
+    render(
+      <AppContext.Provider value={mockAppContexte}>
+        <MapContext.Provider value={{ state: mockState, dispatch }}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <SelectorSection {...props} />
+          </FilterContext.Provider>
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    expect(screen.queryByText("Viewport")).not.toBeInTheDocument();
+    expect(screen.getByText("Hazard")).toBeInTheDocument();
+  });
+
   it("Basic use of dropdown type", async () => {
     props = {
       ...props,
