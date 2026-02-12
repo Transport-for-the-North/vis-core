@@ -138,8 +138,7 @@ export const useFetchVisualisationData = (
   const prevParamsRef = useRef();
   const prevVisualisationNameRef = useRef();
   // Access ErrorContext to display an overlay for missing parameters (if provider present)
-  const errorContext = useContext(ErrorContext);
-  const errorDispatch = errorContext?.dispatch;
+  const { state: errorState, dispatch: errorDispatch } = useContext(ErrorContext);
 
   /**
    * - React StrictMode (dev) mounts/unmounts quickly; a 400ms debounced call can be cancelled
@@ -252,50 +251,8 @@ export const useFetchVisualisationData = (
       areAllRequiredParamsPresent(queryParams) &&
       areAllRequiredParamsPresent(pathParams);
 
-    // If required params are missing, show an overlay with details and skip fetching.
+    // If required params are missing, skip fetching.
     if (!allRequiredParamsPresent) {
-      const missingFrom = (params = {}) =>
-        Object.entries(params)
-          .filter(([, def]) => def?.required && (def.value === null || def.value === undefined))
-          .map(([key]) => key);
-
-      const missingQuery = missingFrom(queryParams);
-      const missingPath = missingFrom(pathParams);
-
-      const technicalDetails = JSON.stringify({ missingQuery, missingPath, queryParams, pathParams }, null, 2);
-
-      if (errorDispatch) {
-        errorDispatch({
-          type: errorActionTypes.SET_ERROR,
-          payload: {
-            title: 'Missing required parameters',
-            subtitle: visualisation?.name ? `Visualisation: ${visualisation.name}` : 'Visualisation',
-            message: (
-              <div>
-                {missingQuery.length > 0 && (
-                  <div style={{ marginBottom: 6 }}>
-                    <strong>Missing query params:</strong>{' '}
-                    {missingQuery.join(', ')}
-                  </div>
-                )}
-
-                {missingPath.length > 0 && (
-                  <div>
-                    <strong>Missing path params:</strong>{' '}
-                    {missingPath.join(', ')}
-                  </div>
-                )}
-              </div>
-            ),
-            supportMessage: 'Please supply the required parameters and try again.',
-            supportDetails: 'Check the visualisation configuration or page selectors.',
-            technicalDetails,
-            headerColor: '#d32f2f',
-            showTechnicalDetails: true,
-          },
-        });
-      }
-
       return;
     }
 
@@ -309,7 +266,7 @@ export const useFetchVisualisationData = (
 
     const paramsChanged = prevParamsRef.current !== currentParamsStr;
 
-    if (paramsChanged) {
+    if (allRequiredParamsPresent && paramsChanged) {
       /**
        * Store signature as "pending" and schedule the debounced fetch.
        * Then immediately flush to ensure the initial call isn't lost to rapid
@@ -325,6 +282,7 @@ export const useFetchVisualisationData = (
     visualisation?.queryParams,
     visualisation?.pathParams,
     fetchDataForVisualisation,
+    errorState,
     errorDispatch,
   ]);
 

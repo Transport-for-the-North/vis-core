@@ -47,8 +47,7 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
-  const _errorCtx = useContext(ErrorContext);
-  const errorDispatch = (_errorCtx && _errorCtx.dispatch) ? _errorCtx.dispatch : (() => {});
+  const { state: errorState, dispatch: errorDispatch } = useContext(ErrorContext);
 
   // Initialize state within the provider function
   const initialState = {
@@ -383,25 +382,9 @@ export const MapProvider = ({ children }) => {
             : `${emptyTables.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`;
 
           const technicalDetails =
-            emptyTables.length === 1 ? (
-              <>
-                <div style={{ marginBottom: '8px' }}>
-                  Metadata table: <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{emptyTables[0]}</code>
-                </div>
-                <div>Error: Table "{emptyTables[0]}" returned no data from the API.</div>
-              </>
-            ) : (
-              <>
-                <div style={{ marginBottom: '8px' }}>
-                  Empty metadata tables ({emptyTables.length}):
-                </div>
-                {emptyTables.map((table, index) => (
-                  <div key={index} style={{ marginBottom: '4px' }}>
-                    • <code style={{ background: '#e3f2fd', padding: '2px 6px', borderRadius: '3px', fontFamily: 'Courier New, monospace', fontSize: '13px', color: '#1976d2' }}>{table}</code>
-                  </div>
-                ))}
-              </>
-            );
+            emptyTables.length === 1
+              ? `Metadata table: ${emptyTables[0]}\nError: Table "${emptyTables[0]}" returned no data from the API.`
+              : `Empty metadata tables (${emptyTables.length}):\n${emptyTables.map((t) => `- ${t}`).join('\n')}`;
 
           // Dispatch into ErrorContext reducer so MapContext sets SET_ERROR
           errorDispatch({
@@ -436,10 +419,10 @@ export const MapProvider = ({ children }) => {
   }, [pageContext]);
 
   return (
-    <MapContext.Provider value={contextValue}>
-      <ErrorProvider>
+    <ErrorProvider>
+      <MapContext.Provider value={contextValue}>
         {state.pageIsReady ? children : <div>Loading...</div>}
-      </ErrorProvider>
-    </MapContext.Provider>
+      </MapContext.Provider>
+    </ErrorProvider>
   );
 };

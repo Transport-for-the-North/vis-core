@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 const Overlay = styled.div`
   position: fixed;
@@ -126,11 +127,11 @@ const CollapsibleHeader = styled.button`
   }
 `;
 
-const ChevronIcon = styled.span`
+const ChevronIcon = styled(ChevronDownIcon)`
+  width: 16px;
+  height: 16px;
   transition: transform 0.2s;
-  transform: ${props => props.$isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
-  display: inline-block;
-  font-size: 12px;
+  transform: ${props => (props.$isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
 `;
 
 const CollapsibleContent = styled.div`
@@ -217,7 +218,7 @@ export const ErrorOverlay = ({
                 aria-controls="error-details"
               >
                 <span>Technical Details</span>
-                <ChevronIcon $isOpen={isDetailsOpen}>▼</ChevronIcon>
+                <ChevronIcon $isOpen={isDetailsOpen} aria-hidden="true" />
               </CollapsibleHeader>
               <CollapsibleContent 
                 id="error-details" 
