@@ -79,6 +79,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
   const [requestError, setRequestError] = useState(null);
   const [isRequestTooLarge, setIsRequestTooLarge] = useState(false);
 
+  const isViewportFilter = (filter) => filter?.type === "mapViewport" || filter?.paramName === "viewport";
+
   const apiSchema = appContext.apiSchema;
   const apiRoute = downloadPath;
   const requiresAuth = checkSecurityRequirements(apiSchema, apiRoute);
@@ -96,7 +98,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (!["fixed", "hidetoggle"].includes(filter.type)) {
+      if (!["fixed", "hidetoggle", "mapViewport"].includes(filter.type) && filter.paramName && !isViewportFilter(filter)) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -124,7 +126,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (filter.type !== 'fixed') {
+      if (!["fixed", "mapViewport"].includes(filter.type) && filter.paramName && !isViewportFilter(filter)) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -164,7 +166,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
   // Filter for all filters of type 'map' that have a filterName.
   const mapFilters = Array.isArray(filters)
-    ? filters.filter((filter) => filter.type === "map" && filter.filterName)
+    ? filters.filter((filter) => filter.type === "map" && filter.filterName && !isViewportFilter(filter))
     : [];
 
  /**
@@ -250,7 +252,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
-            .filter((filter) => filter.type !== "fixed" && filter.type !== "hidetoggle") // Exclude 'fixed' filters
+            .filter((filter) => !["fixed", "hidetoggle", "mapViewport"].includes(filter.type) && !isViewportFilter(filter))
             .map((filter) => (
               
                 <SelectorContainer key={filter.id}>
