@@ -1180,7 +1180,6 @@ const Map = (props) => {
 
     const viewportFilters = state.filters.filter((f) => f?.type === "mapViewport");
     if (viewportFilters.length === 0) return;
-    console.log('[Viewport] Found viewport filters:', viewportFilters);
 
     const resolveViewportMinZoom = (filter) => {
       // Prefer a per-filter minZoom if configured, otherwise infer from any join-layer(s)
@@ -1250,7 +1249,6 @@ const Map = (props) => {
         if (!isInValidZoomRange) {
           // If this is first time or transitioning OUT of valid range, mark as false
           if (wasInValidZoomRange === true) {
-            console.log('[Viewport] Zoom below minZoom threshold - clearing viewport filter');
             // Only dispatch if we're transitioning OUT of the valid range
             filterZoomStateRef.current[filter.id] = false;
 
@@ -1284,7 +1282,6 @@ const Map = (props) => {
 
         // We're in valid zoom range
         if (wasInValidZoomRange === false) {
-          console.log('[Viewport] Zoom now in valid range - recalculating viewport');
           filterZoomStateRef.current[filter.id] = true;
         }
 
@@ -1328,7 +1325,6 @@ const Map = (props) => {
         lastViewportSignatureRef.current[filter.id] = signature;
 
         // Store bbox in FilterContext (useful for debugging/other components).
-        console.log('[Viewport] Dispatching viewport update:', bbox);
         filterDispatch({
           type: "SET_FILTER_VALUE",
           payload: { filterId: filter.id, value: bbox, filter },

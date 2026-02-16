@@ -15,15 +15,12 @@ import { DataFetchState } from 'enums';
 const filterDataToViewport = (data, map, mapLayerId) => {
   // Query rendered features on the given layer.
   const visibleFeatures = map.queryRenderedFeatures({ layers: [mapLayerId] });
-  console.log('[Viewport] filterDataToViewport - mapLayerId:', mapLayerId, '- visibleFeatures count:', visibleFeatures.length);
   // Create a set of visible IDs (assuming each feature has an id or feature.properties.id)
   const visibleIDs = new Set(
     visibleFeatures.map((feature) => feature.id || feature.properties?.id)
   );
-  console.log('[Viewport] filterDataToViewport - visibleIDs count:', visibleIDs.size, '- total data records:', data.length);
   // Return only records whose id is in the visibleIDs set.
   const filtered = data.filter((record) => visibleIDs.has(record.id));
-  console.log('[Viewport] filterDataToViewport - filtered records count:', filtered.length);
   return filtered;
 };
 
@@ -228,7 +225,6 @@ export const useFetchVisualisationData = (
 
         // Check cache first
         if (responseCache.current.has(cacheKey)) {
-          console.log('[Data Fetch] Cache hit - returning cached response');
           const cachedData = responseCache.current.get(cacheKey);
           setRawData(cachedData);
           
@@ -249,8 +245,6 @@ export const useFetchVisualisationData = (
         abortControllerRef.current = new AbortController();
 
         try {
-          console.log('[Data Fetch] Fetching data with params:', { west: queryParamsForApi.west, south: queryParamsForApi.south, east: queryParamsForApi.east, north: queryParamsForApi.north });
-          
           const responseData = await api.baseService.get(path, {
             pathParams: pathParamsForApi,
             queryParams: queryParamsForApi,
@@ -320,7 +314,6 @@ export const useFetchVisualisationData = (
 
     // If viewport is being cleared, immediately clear the data and set loading to false
     if (isViewportClearing) {
-      console.log('[Viewport] Viewport parameters cleared - immediately clearing data');
       setRawData(null);
       setFilteredData(null);
       setLoading(false);
@@ -358,25 +351,20 @@ export const useFetchVisualisationData = (
   // Refilter the raw data when the map viewport changes.
   useEffect(() => {
     // Only run if both map and mapLayerId are provided and when rawData is available.
-    console.log('[Viewport] Viewport filtering effect - map:', !!map, '- mapLayerId:', mapLayerId, '- rawData:', !!rawData, '- shouldFilterDataToViewport:', shouldFilterDataToViewport);
     if (!map || !mapLayerId || rawData === null || !shouldFilterDataToViewport) return;
     if (!Array.isArray(rawData)) {
       // Only arrays can be filtered by record.id; keep original otherwise.
-      console.log('[Viewport] rawData is not array, keeping original');
       setFilteredData(rawData);
       return;
     }
 
     // Define a debounced filtering function so that rapid viewport changes do not swamp the updates.
     const applyViewportFilter = debounce(() => {
-      console.log('[Viewport] applyViewportFilter called - mapLayerId:', mapLayerId);
       const visibleData = filterDataToViewport(rawData, map, mapLayerId);
-      console.log('[Viewport] Setting filtered data - records:', visibleData.length);
       setFilteredData(visibleData);
     }, 200);
 
     // Run filtering initially.
-    console.log('[Viewport] Initializing viewport filter - shouldFilterDataToViewport:', shouldFilterDataToViewport);
     applyViewportFilter();
     // Listen for the map's "moveend" event to reapply filtering when the viewport changes.
     map.on('moveend', applyViewportFilter);
