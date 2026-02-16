@@ -149,10 +149,25 @@ export const useFetchVisualisationData = (
    */
   const pendingParamsSignatureRef = useRef(null);
 
+  // Cache for API responses based on query string
+  const responseCache = useRef(new Map());
+  const maxCacheSize = 20; // Limit cache to avoid excessive memory usage
+
+  // Track abort controller for request cancellation
+  const abortControllerRef = useRef(null);
+
   /**
    * Resets the fetch state - useful when visualisation changes (e.g., page navigation).
    */
   const resetFetchState = useCallback(() => {
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Clear cache for this visualisation
+    responseCache.current.clear();
+    
     setHasInitiatedFetch(false);
     setRawData(null);
     setFilteredData(null);
@@ -208,12 +223,55 @@ export const useFetchVisualisationData = (
         const queryParamsForApi = toSimpleParamsMap(queryParams);
         const pathParamsForApi = toSimpleParamsMap(pathParams);
 
+        // Create a cache key based on the request
+        const cacheKey = JSON.stringify({ path, queryParamsForApi, pathParamsForApi });
+
+        // Check cache first
+        if (responseCache.current.has(cacheKey)) {
+          console.log('[Data Fetch] Cache hit - returning cached response');
+          const cachedData = responseCache.current.get(cacheKey);
+          setRawData(cachedData);
+          
+          if (!map || !mapLayerId || !shouldFilterDataToViewport) {
+            setFilteredData(cachedData);
+          }
+          
+          setLoading(false);
+          return;
+        }
+
+        // Cancel any previous request
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+
+        // Create new abort controller for this request
+        abortControllerRef.current = new AbortController();
+
         try {
+          console.log('[Data Fetch] Fetching data with params:', { west: queryParamsForApi.west, south: queryParamsForApi.south, east: queryParamsForApi.east, north: queryParamsForApi.north });
+          
           const responseData = await api.baseService.get(path, {
             pathParams: pathParamsForApi,
             queryParams: queryParamsForApi,
             skipAuth: !requiresAuth,
+            signal: abortControllerRef.current.signal,
           });
+
+          // Only set data if request wasn't aborted
+          if (abortControllerRef.current.signal.aborted) {
+            console.log('[Data Fetch] Request was aborted, ignoring response');
+            return;
+          }
+
+          // Store in cache
+          responseCache.current.set(cacheKey, responseData);
+          
+          // Keep cache size manageable
+          if (responseCache.current.size > maxCacheSize) {
+            const firstKey = responseCache.current.keys().next().value;
+            responseCache.current.delete(firstKey);
+          }
 
           setRawData(responseData);
 
@@ -226,8 +284,11 @@ export const useFetchVisualisationData = (
             console.warn('No data returned for visualisation:', visualisationName);
           }
         } catch (e) {
-          console.error('Error fetching data for visualisation:', e);
-          setError(e);
+          // Don't log abort errors
+          if (e.name !== 'AbortError') {
+            console.error('Error fetching data for visualisation:', e);
+            setError(e);
+          }
         } finally {
           setLoading(false);
         }
@@ -239,6 +300,9 @@ export const useFetchVisualisationData = (
   useEffect(() => {
     return () => {
       fetchDataForVisualisation.cancel();
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
     };
   }, [fetchDataForVisualisation]);
 
@@ -247,13 +311,15 @@ export const useFetchVisualisationData = (
     const { queryParams = {}, pathParams = {} } = visualisation || {};
 
     // Check if this is a viewport clearing (all viewport params are null)
+    // Only check if viewport params actually exist in queryParams
     const viewportParams = ['west', 'south', 'east', 'north', 'zoom'];
-    const isViewportClearing = viewportParams.every(param => 
+    const hasAnyViewportParam = viewportParams.some(param => param in queryParams);
+    const isViewportClearing = hasAnyViewportParam && viewportParams.every(param => 
       queryParams[param]?.value === null || queryParams[param]?.value === undefined
     );
 
     // If viewport is being cleared, immediately clear the data and set loading to false
-    if (isViewportClearing && Object.keys(queryParams).length > 0) {
+    if (isViewportClearing) {
       console.log('[Viewport] Viewport parameters cleared - immediately clearing data');
       setRawData(null);
       setFilteredData(null);
