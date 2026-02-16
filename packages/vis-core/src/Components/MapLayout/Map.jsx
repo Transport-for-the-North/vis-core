@@ -1185,34 +1185,23 @@ const Map = (props) => {
     const resolveViewportMinZoom = (filter) => {
       // Prefer a per-filter minZoom if configured, otherwise infer from any join-layer(s)
       // used by the visualisations this viewport targets.
-      if (typeof filter?.minZoom === "number") {
-        console.log('[Viewport] Filter has minZoom:', filter.minZoom);
-        return filter.minZoom;
-      }
+      if (typeof filter?.minZoom === "number") return filter.minZoom;
 
       const visualisationNames = Array.isArray(filter?.visualisations) ? filter.visualisations : [];
       const candidates = [];
 
       visualisationNames.forEach((visName) => {
         const vis = state.visualisations?.[visName];
-        console.log('[Viewport] Looking for visualisation:', visName, '- Found:', !!vis, '- vis:', vis);
         const joinLayerName = vis?.joinLayer;
-        console.log('[Viewport] joinLayerName:', joinLayerName);
         if (!joinLayerName) return;
 
         const joinLayer = state.layers?.[joinLayerName];
-        console.log('[Viewport] Looking for layer by joinLayerName:', joinLayerName, '- Found:', !!joinLayer, '- minZoom:', joinLayer?.minZoom);
-        console.log('[Viewport] Available layers:', Object.keys(state.layers || {}));
         if (typeof joinLayer?.minZoom === "number") {
           candidates.push(joinLayer.minZoom);
         }
       });
 
-      console.log('[Viewport] Candidates:', candidates);
-      if (candidates.length === 0) {
-        console.log('[Viewport] No minZoom candidates found - returning null (will be treated as no restriction)');
-        return null;
-      }
+      if (candidates.length === 0) return null;
       return Math.max(...candidates);
     };
 
@@ -1223,12 +1212,12 @@ const Map = (props) => {
 
     const applyViewport = () => {
       const zoom = map.getZoom();
-      console.log('[Viewport] applyViewport called - Current zoom level:', zoom);
 
       // Early optimization: check if any filter could need processing
       // Skip entire function if all filters are below minZoom and already initialized
       const filterStates = [];
       let anyFilterCouldNeedProcessing = false;
+      let hasJustEnteredValidZoomRange = false;
 
       for (const filter of viewportFilters) {
         const minZoom = resolveViewportMinZoom(filter);
@@ -1237,6 +1226,11 @@ const Map = (props) => {
 
         filterStates.push({ filter, minZoom, isInValidZoomRange, wasInValidZoomRange });
 
+        // Check if entering valid range
+        if (isInValidZoomRange && wasInValidZoomRange === false) {
+          hasJustEnteredValidZoomRange = true;
+        }
+
         // Process if: in valid zoom, or transitioning between states, or first time (undefined)
         if (isInValidZoomRange || wasInValidZoomRange !== false) {
           anyFilterCouldNeedProcessing = true;
@@ -1244,17 +1238,12 @@ const Map = (props) => {
       }
 
       if (!anyFilterCouldNeedProcessing) {
-        console.log('[Viewport] All filters below minZoom and already initialized - skipping entire applyViewport');
         return;
       }
 
       filterStates.forEach(({ filter, minZoom, isInValidZoomRange, wasInValidZoomRange }) => {
-        console.log('[Viewport] Processing filter:', filter.filterName, '- Target visualisations:', filter.visualisations);
-        console.log('[Viewport] Resolved minZoom for filter:', minZoom, '- Current zoom:', zoom);
-
         // Optimization: if already below minZoom and still below minZoom, skip all processing
         if (!isInValidZoomRange && wasInValidZoomRange === false) {
-          console.log('[Viewport] Still below minZoom threshold - skipping processing');
           return;
         }
 
@@ -1265,24 +1254,29 @@ const Map = (props) => {
             // Only dispatch if we're transitioning OUT of the valid range
             filterZoomStateRef.current[filter.id] = false;
 
-            // Clear the filter value and any mapped query params.
+            // Use a special clear action to avoid triggering data refresh spinner
             filterDispatch({
               type: "SET_FILTER_VALUE",
-              payload: { filterId: filter.id, value: null, filter },
+              payload: { filterId: filter.id, value: null, filter, isClearingViewport: true },
             });
 
+            // Clear all query params without triggering data fetch
             (filter.actions || []).forEach((action) => {
               const paramName = action?.payload?.paramName || filter.paramName;
               if (!paramName) return;
-              console.log('[Viewport] Clearing action:', action.action, '- paramName:', paramName);
               dispatch({
                 type: action.action,
-                payload: { filter, value: null, paramName, ...action.payload },
+                payload: { 
+                  filter, 
+                  value: null, 
+                  paramName, 
+                  isClearingViewport: true,  // Signal this is viewport clearing, not data refresh
+                  ...action.payload 
+                },
               });
             });
           } else if (wasInValidZoomRange === undefined) {
             // First time and below minZoom - just mark as false, don't dispatch
-            console.log('[Viewport] Starting below minZoom threshold - initializing state');
             filterZoomStateRef.current[filter.id] = false;
           }
           return;
@@ -1291,13 +1285,6 @@ const Map = (props) => {
         // We're in valid zoom range
         if (wasInValidZoomRange === false) {
           console.log('[Viewport] Zoom now in valid range - recalculating viewport');
-          filterZoomStateRef.current[filter.id] = true;
-        } else if (wasInValidZoomRange === true) {
-          // Already in valid range on previous call - check if we need to update
-          console.log('[Viewport] Already in valid zoom range - checking if viewport changed');
-        } else {
-          // First time checking this filter
-          console.log('[Viewport] First time in valid zoom range - calculating viewport');
           filterZoomStateRef.current[filter.id] = true;
         }
 
@@ -1309,17 +1296,39 @@ const Map = (props) => {
           north: Number(bounds.getNorth().toFixed(6)),
           zoom: Number(zoom.toFixed(2)),
         };
-        console.log('[Viewport] Calculated viewport bbox:', bbox);
 
         const signature = JSON.stringify(bbox);
-        if (lastViewportSignatureRef.current[filter.id] === signature) {
-          console.log('[Viewport] Viewport signature unchanged - skipping dispatch');
+        const lastSignature = lastViewportSignatureRef.current[filter.id];
+        
+        if (lastSignature === signature) {
           return;
         }
+
+        // Before updating, check if this is just a small pan that shouldn't trigger re-fetch
+        // Only update if zoom changed OR bbox boundaries changed significantly
+        if (lastSignature) {
+          try {
+            const lastBbox = JSON.parse(lastSignature);
+            const zoomChanged = Math.abs(lastBbox.zoom - bbox.zoom) >= 0.25; // 0.25 zoom level threshold
+            const bboxShifted = 
+              Math.abs(lastBbox.west - bbox.west) > 0.05 ||  // ~5km threshold
+              Math.abs(lastBbox.east - bbox.east) > 0.05 ||
+              Math.abs(lastBbox.north - bbox.north) > 0.05 ||
+              Math.abs(lastBbox.south - bbox.south) > 0.05;
+
+            // If neither zoom nor bbox significantly changed, skip the update
+            if (!zoomChanged && !bboxShifted) {
+              return;
+            }
+          } catch (e) {
+            // Continue if parsing fails
+          }
+        }
+
         lastViewportSignatureRef.current[filter.id] = signature;
 
         // Store bbox in FilterContext (useful for debugging/other components).
-        console.log('[Viewport] Dispatching SET_FILTER_VALUE with bbox:', bbox);
+        console.log('[Viewport] Dispatching viewport update:', bbox);
         filterDispatch({
           type: "SET_FILTER_VALUE",
           payload: { filterId: filter.id, value: bbox, filter },
@@ -1330,7 +1339,6 @@ const Map = (props) => {
           const valueKey = action?.payload?.valueKey;
           const value = valueKey ? bbox[valueKey] : bbox;
           const paramName = action?.payload?.paramName || filter.paramName;
-          console.log('[Viewport] Applying action:', action.action, '- valueKey:', valueKey, '- extracted value:', value, '- paramName:', paramName);
           if (!paramName) return;
           dispatch({
             type: action.action,
@@ -1341,18 +1349,60 @@ const Map = (props) => {
     };
 
     const debouncedApplyViewport = debounce(applyViewport, debounceMs);
+    
+    // For faster response when entering valid zoom range, use minimal debounce
+    const fastDebouncedApplyViewport = debounce(applyViewport, 100);
 
-    map.on("moveend", debouncedApplyViewport);
-    map.on("zoomend", debouncedApplyViewport);
+    // Use fast debounce if we just entered valid range, otherwise normal debounce
+    const executeApplyViewport = (justEntered) => {
+      if (justEntered) {
+        fastDebouncedApplyViewport();
+      } else {
+        debouncedApplyViewport();
+      }
+    };
+
+    const handleMoveEnd = () => {
+      const zoom = map.getZoom();
+      let hasJustEntered = false;
+      for (const filter of viewportFilters) {
+        const minZoom = resolveViewportMinZoom(filter);
+        const isInValidZoomRange = minZoom === null || zoom >= minZoom;
+        const wasInValidZoomRange = filterZoomStateRef.current[filter.id];
+        if (isInValidZoomRange && wasInValidZoomRange === false) {
+          hasJustEntered = true;
+          break;
+        }
+      }
+      executeApplyViewport(hasJustEntered);
+    };
+
+    const handleZoomEnd = () => {
+      const zoom = map.getZoom();
+      let hasJustEntered = false;
+      for (const filter of viewportFilters) {
+        const minZoom = resolveViewportMinZoom(filter);
+        const isInValidZoomRange = minZoom === null || zoom >= minZoom;
+        const wasInValidZoomRange = filterZoomStateRef.current[filter.id];
+        if (isInValidZoomRange && wasInValidZoomRange === false) {
+          hasJustEntered = true;
+          break;
+        }
+      }
+      executeApplyViewport(hasJustEntered);
+    };
+
+    map.on("moveend", handleMoveEnd);
+    map.on("zoomend", handleZoomEnd);
 
     // Run once on mount so the initial API request includes the viewport.
-    debouncedApplyViewport();
-    debouncedApplyViewport.flush?.();
+    applyViewport();
 
     return () => {
-      map.off("moveend", debouncedApplyViewport);
-      map.off("zoomend", debouncedApplyViewport);
+      map.off("moveend", handleMoveEnd);
+      map.off("zoomend", handleZoomEnd);
       debouncedApplyViewport.cancel?.();
+      fastDebouncedApplyViewport.cancel?.();
     };
   }, [map, state.filters, state.layers, state.visualisations, dispatch, filterDispatch]);
 

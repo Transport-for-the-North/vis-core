@@ -246,6 +246,21 @@ export const useFetchVisualisationData = (
   useEffect(() => {
     const { queryParams = {}, pathParams = {} } = visualisation || {};
 
+    // Check if this is a viewport clearing (all viewport params are null)
+    const viewportParams = ['west', 'south', 'east', 'north', 'zoom'];
+    const isViewportClearing = viewportParams.every(param => 
+      queryParams[param]?.value === null || queryParams[param]?.value === undefined
+    );
+
+    // If viewport is being cleared, immediately clear the data and set loading to false
+    if (isViewportClearing && Object.keys(queryParams).length > 0) {
+      console.log('[Viewport] Viewport parameters cleared - immediately clearing data');
+      setRawData(null);
+      setFilteredData(null);
+      setLoading(false);
+      return;
+    }
+
     // Only proceed if all required parameters (query and path) are present.
     const allRequiredParamsPresent =
       areAllRequiredParamsPresent(queryParams) &&
