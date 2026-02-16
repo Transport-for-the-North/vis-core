@@ -15,12 +15,16 @@ import { DataFetchState } from 'enums';
 const filterDataToViewport = (data, map, mapLayerId) => {
   // Query rendered features on the given layer.
   const visibleFeatures = map.queryRenderedFeatures({ layers: [mapLayerId] });
+  console.log('[Viewport] filterDataToViewport - mapLayerId:', mapLayerId, '- visibleFeatures count:', visibleFeatures.length);
   // Create a set of visible IDs (assuming each feature has an id or feature.properties.id)
   const visibleIDs = new Set(
     visibleFeatures.map((feature) => feature.id || feature.properties?.id)
   );
+  console.log('[Viewport] filterDataToViewport - visibleIDs count:', visibleIDs.size, '- total data records:', data.length);
   // Return only records whose id is in the visibleIDs set.
-  return data.filter((record) => visibleIDs.has(record.id));
+  const filtered = data.filter((record) => visibleIDs.has(record.id));
+  console.log('[Viewport] filterDataToViewport - filtered records count:', filtered.length);
+  return filtered;
 };
 
 /**
@@ -273,20 +277,25 @@ export const useFetchVisualisationData = (
   // Refilter the raw data when the map viewport changes.
   useEffect(() => {
     // Only run if both map and mapLayerId are provided and when rawData is available.
+    console.log('[Viewport] Viewport filtering effect - map:', !!map, '- mapLayerId:', mapLayerId, '- rawData:', !!rawData, '- shouldFilterDataToViewport:', shouldFilterDataToViewport);
     if (!map || !mapLayerId || rawData === null || !shouldFilterDataToViewport) return;
     if (!Array.isArray(rawData)) {
       // Only arrays can be filtered by record.id; keep original otherwise.
+      console.log('[Viewport] rawData is not array, keeping original');
       setFilteredData(rawData);
       return;
     }
 
     // Define a debounced filtering function so that rapid viewport changes do not swamp the updates.
     const applyViewportFilter = debounce(() => {
+      console.log('[Viewport] applyViewportFilter called - mapLayerId:', mapLayerId);
       const visibleData = filterDataToViewport(rawData, map, mapLayerId);
+      console.log('[Viewport] Setting filtered data - records:', visibleData.length);
       setFilteredData(visibleData);
     }, 200);
 
     // Run filtering initially.
+    console.log('[Viewport] Initializing viewport filter - shouldFilterDataToViewport:', shouldFilterDataToViewport);
     applyViewportFilter();
     // Listen for the map's "moveend" event to reapply filtering when the viewport changes.
     map.on('moveend', applyViewportFilter);
