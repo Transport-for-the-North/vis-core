@@ -16,3 +16,4 @@ export * from './getByPath'
 export * from './openApiValidation'
 
 export * from './mapSpiders'
+export * from './svgPageHelpers'

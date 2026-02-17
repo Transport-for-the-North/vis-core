@@ -1,5 +1,5 @@
 import React from "react";
-import { MapLayout, IFrameEmbedPage, TableLayout } from "Components";
+import { MapLayout, IFrameEmbedPage, TableLayout, SVGGalleryManager } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
 import { DirectoryScorecardsPage } from "Components";
 
@@ -12,6 +12,7 @@ import { DirectoryScorecardsPage } from "Components";
  * @returns {JSX.Element} The rendered PageSwitch component.
  */
 export const PageSwitch = ({ pageConfig }) => {
+
   return (
     <PageContext.Provider value={pageConfig}>
       {(() => {
@@ -35,6 +36,8 @@ export const PageSwitch = ({ pageConfig }) => {
                 <DirectoryScorecardsPage/>
               </FilterProvider>
             );
+          case "SVGPage":
+            return <SVGGalleryManager config={pageConfig.config} />;
           default:
             return <div>Nothing</div>;
         }
