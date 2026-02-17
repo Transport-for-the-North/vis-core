@@ -217,7 +217,7 @@ const FormPageContent = ({ pageConfig }) => {
  * @property {string} pageConfig.type - The type of page layout to render.
  * @returns {JSX.Element} The rendered PageSwitch component.
  */
-export const PageSwitch = ({ pageConfig }) => {
+export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
   return (
     <PageContext.Provider value={pageConfig}>
       {(() => {
@@ -235,6 +235,11 @@ export const PageSwitch = ({ pageConfig }) => {
             return <IFrameEmbedPage config={pageConfig.config} />;
           case "FormPage":
             return <FormPageContent pageConfig={pageConfig} />;
+          case "CustomPage":
+            if (customPageComponent) {
+              return customPageComponent;
+            }
+            return <div>Custom page component not provided</div>;
           default:
             return <div>Nothing</div>;
         }
