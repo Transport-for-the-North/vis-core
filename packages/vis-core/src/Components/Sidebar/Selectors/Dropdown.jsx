@@ -1,49 +1,17 @@
 import React, { useMemo, useEffect, useState, useRef } from 'react';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { useFilterContext } from 'hooks';
 import { SelectorLabel } from '.';
+import { makeSelectStyles } from 'utils/selectStyles';
 
 const CONTROL_COLOUR = 'rgb(220, 220, 220)';
-const CONTROL_BORDER_RADIUS = 6;
 
-// Custom style for the react-select options
-const customStyles = {
-  menuPortal: (base) => ({
-    ...base,
-    zIndex: 9998,
-  }),
-  control: (base, state) => ({
-    ...base,
-    borderColor: CONTROL_COLOUR,
-    borderRadius: CONTROL_BORDER_RADIUS,
-    boxShadow: state.isFocused ? '0 0 0 1px rgba(0, 0, 0, 0.06)' : 'none',
-    '&:hover': {
-      borderColor: CONTROL_COLOUR,
-    },
-  }),
-  option: (styles, { isFocused }) => ({
-    ...styles,
-    display: 'flex',
-    fontSize: '0.9rem',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px',
-    backgroundColor: isFocused ? 'lightgray' : 'white',
-    color: 'black',
-    cursor: 'pointer',
-    ':active': {
-      ...styles[':active'],
-      backgroundColor: 'lightgray',
-    },
-    ':hover': {
-      backgroundColor: 'lightgray',
-    },
-  }),
-};
-
+/**
+ * Styled container around the dropdown and the optional info panel below.
+ */
 const StyledDropdown = styled.div`
   width: 100%;
   margin-bottom: 10px;
@@ -59,7 +27,7 @@ const InfoBelowPanel = styled.div`
   border-bottom: 1px solid ${CONTROL_COLOUR};
   border-left: 1px solid ${CONTROL_COLOUR};
   border-top: none;
-  border-radius: 0 0 ${CONTROL_BORDER_RADIUS}px ${CONTROL_BORDER_RADIUS}px;
+  border-radius: 0 0 ${(p) => p.theme.borderRadius} ${(p) => p.theme.borderRadius};
   font-size: 0.85rem;
   color: #333;
   position: relative;
@@ -72,7 +40,7 @@ const InfoBelowPanel = styled.div`
     left: 0;
     width: 3px;
     background: #adadadff;
-    border-bottom-left-radius: ${CONTROL_BORDER_RADIUS}px;
+    border-bottom-left-radius: ${(p) => p.theme.borderRadius};
   }
 `;
 
@@ -80,8 +48,7 @@ const InfoBelowPanel = styled.div`
  * Button that toggles the collapse state of the info panel.
  * Uses a ChevronRightIcon rotated to indicate expanded/collapsed.
  *
- * Props:
- * - $collapsed: boolean - whether the panel is collapsed (controls icon rotation).
+ * @param {{ $collapsed: boolean }} props - whether the panel is collapsed (controls icon rotation).
  */
 const CollapseButton = styled.button`
   position: absolute;
@@ -206,6 +173,9 @@ const formatOptionLabel = (data, meta) => {
  * @returns {JSX.Element} The Dropdown component.
  */
 export const Dropdown = ({ filter, onChange }) => {
+  const theme = useTheme();
+  const selectStyles = useMemo(() => makeSelectStyles(theme), [theme]);
+
   const { state: filterState } = useFilterContext();
   const animatedComponents = makeAnimated();
   const [loading, setLoading] = useState(false);
@@ -214,8 +184,8 @@ export const Dropdown = ({ filter, onChange }) => {
   const prevSelectedOptionsRef = useRef(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
-  const options = useMemo(() => {
-    const filteredOptions = filter.values.values
+  const baseOptions = useMemo(() => {
+    return filter.values.values
       .filter((option) => !option.isHidden)
       .map((option) => ({
         value: option.paramValue,
@@ -224,15 +194,14 @@ export const Dropdown = ({ filter, onChange }) => {
         infoOnHover: option?.infoOnHover ?? null,
         infoBelowOnChange: option?.infoBelowOnChange ?? null,
       }));
+  }, [filter.values.values]);
+
+  const options = useMemo(() => {
     if (filter.multiSelect) {
-      const allOption = {
-        value: 'all',
-        label: 'All',
-      };
-      return [allOption, ...filteredOptions];
+      return [{ value: "all", label: "All" }, ...baseOptions];
     }
-    return filteredOptions;
-  }, [filter.values.values, filter.multiSelect]);
+    return baseOptions;
+  }, [baseOptions, filter.multiSelect]);
 
   const selectedOptions = useMemo(() => {
     if (Array.isArray(filterState[filter.id])) {
@@ -272,7 +241,6 @@ export const Dropdown = ({ filter, onChange }) => {
     if (
       !filter.shouldBeBlankOnInit &&
       selectedOptions === undefined &&
-      filterState[filter.id] !== null &&
       filter.forceRequired !== false
     ) {
       const visible = filter.multiSelect ? options.slice(1) : options;
@@ -288,12 +256,17 @@ export const Dropdown = ({ filter, onChange }) => {
     const current = filterState[filter.id];
     if (!Array.isArray(current)) return;
 
+    console.log(`[Dropdown ${filter.filterName}] Current selection:`, current, 'persistState:', filter.persistState);
+
     const visibleOptions = options.slice(1); // exclude 'All'
     const visibleValuesSet = new Set(visibleOptions.map((o) => o.value));
     const next = current.filter((v) => visibleValuesSet.has(v));
 
+    console.log(`[Dropdown ${filter.filterName}] After filtering to visible:`, next, 'visible count:', visibleOptions.length);
+
     // If some selected values were filtered out, prune them.
     if (next.length !== current.length && next.length > 0) {
+      console.log(`[Dropdown ${filter.filterName}] Pruning invalid selections`);
       onChange(filter, next);
       return;
     }
@@ -302,13 +275,21 @@ export const Dropdown = ({ filter, onChange }) => {
     // This allows filters with forceRequired: false to have empty selections
     const shouldFallbackToAll = filter.forceRequired !== false;
     
+    // Don't override persisted state with "select all" behavior
+    // If the filter has persistState enabled and the current selection is intentionally limited,
+    // we should respect that rather than auto-selecting all
+    const hasPersistState = filter.persistState === true;
+    
     // If all selected values are now filtered out, fallback to "all visible" to keep selection valid
-    // but only if the filter is required
-    if (current.length > 0 && next.length === 0 && shouldFallbackToAll) {
+    // but only if the filter is required and doesn't have persisted state that should be respected
+    if (current.length > 0 && next.length === 0 && shouldFallbackToAll && !hasPersistState) {
+      console.log(`[Dropdown ${filter.filterName}] All selections invalid, falling back to all`);
       const allVisible = visibleOptions.map((o) => o.value);
       // Mark that 'All' semantic is active so existing logic keeps it updated when options change.
       setIsAllSelected(true);
       onChange(filter, allVisible);
+    } else if (current.length > 0 && next.length === 0 && hasPersistState) {
+      console.log(`[Dropdown ${filter.filterName}] All selections invalid but has persistState, not auto-selecting all`);
     }
   }, [optionsSignature, options, filterState, filter, onChange]);
 
@@ -345,8 +326,7 @@ export const Dropdown = ({ filter, onChange }) => {
         onChange(filter, options.slice(1).map(option => option.value));
       } else {
         setIsAllSelected(false);
-        const values = selectedOptions.map(option => option.value);
-        onChange(filter, values);
+        onChange(filter, selectedOptions.map((o) => o.value));
       }
     } else if (selectedOptions) {
       setIsAllSelected(false);
@@ -354,11 +334,7 @@ export const Dropdown = ({ filter, onChange }) => {
     } else {
       // When cleared, set to null for single-select or empty array for multi-select
       setIsAllSelected(false);
-      if (filter.multiSelect) {
-        onChange(filter, []);
-      } else {
-        onChange(filter, null);
-      }
+      onChange(filter, filter.multiSelect ? [] : null);
     }
   };
 
@@ -367,8 +343,8 @@ export const Dropdown = ({ filter, onChange }) => {
     prevSelectedOptionsRef.current = filterState[filter.id];
   }, [filterState, filter.id]);
 
+  // Optional auto-select when exactly one option is available
   useEffect(() => {
-    // Automatically select the only option if there's just one available
     if (options.length === 1 && filterState[filter.id] !== options[0].value) {
       onChange(filter, options[0].value);
     }
@@ -400,6 +376,10 @@ export const Dropdown = ({ filter, onChange }) => {
     return `Details available — expand for details.`;
   }, [infoBelowItems, selectedOptions]);
 
+  // Single-select placeholder: show "All" when includeAllOption is set and value is null
+  const placeholder =
+    !filter.multiSelect && filter.includeAllOption && !hasSelection ? "All" : "Select...";
+
   return (
     <StyledDropdown>
       <Select
@@ -408,12 +388,13 @@ export const Dropdown = ({ filter, onChange }) => {
         value={selectedOptions}
         onChange={handleDropdownChange}
         formatOptionLabel={formatOptionLabel}
-        styles={customStyles}
+        styles={selectStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body}
         isClearable={filter.isClearable}
         isMulti={filter.multiSelect}
         isLoading={loading}
+        placeholder={placeholder}
       />
       {hasSelection && infoBelowItems.length > 0 && (
         <InfoBelowPanel>

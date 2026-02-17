@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react';
 import dts from "vite-plugin-dts";
 import path from "node:path";
 
-export default defineConfig({
+// @ts-ignore - using vite for build only, not for testing
+export default defineConfig(({ command }) => ({
+  // Explicitly disable test mode to prevent vitest from running
+  ...(command === 'serve' || command === 'build' ? {} : { test: undefined }),
   plugins: [
     react(),
     dts({
@@ -26,6 +29,7 @@ export default defineConfig({
         reducers:  path.resolve(__dirname, 'src/reducers/index.js'),
         services:  path.resolve(__dirname, 'src/services/index.js'),
         utils:     path.resolve(__dirname, 'src/utils/index.js'),
+        enums:     path.resolve(__dirname, 'src/enums/index.js'),
       },
       name: "VisFrameworkCore",
       formats: ["es", "cjs"],
@@ -57,6 +61,7 @@ export default defineConfig({
       reducers:   path.resolve(__dirname, "src/reducers"),
       utils:      path.resolve(__dirname, "src/utils"),
       defaults: path.resolve(__dirname, "src/defaults.js"),
+      enums: path.resolve(__dirname, "src/enums"),
     },
   },
-});
+}));

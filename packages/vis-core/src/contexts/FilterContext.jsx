@@ -1,5 +1,6 @@
 // contexts/FilterContext.js
 import React, { createContext, useReducer } from 'react';
+import { saveFilterState } from '../utils/filterPersistence';
 
 /**
  * Create a context for filter values
@@ -25,12 +26,12 @@ const filterActionTypes = {
 const filterReducer = (state, action) => {
   switch (action.type) {
     case filterActionTypes.SET_FILTER_VALUE: {
-      const { filterId, value } = action.payload;
+      const { filterId, value, filter } = action.payload;
 
       // Prevent null/undefined from being written into state
       if (value == null) {
-        // Explicitly store an empty shape for multi-selects
-        return { ...state, [filterId]: Array.isArray(state[filterId]) ? [] : state[filterId] };
+        const isArray = Array.isArray(state[filterId]);
+        return { ...state, [filterId]: isArray ? [] : null };
       }
 
       // Safe numeric coercion: avoid '' -> 0 and other isNaN quirks
@@ -57,6 +58,11 @@ const filterReducer = (state, action) => {
       // Check if the value has actually changed
       if (state[filterId] === parsedValue) {
         return state; // No change in state
+      }
+
+      // Save to localStorage if filter has persistState enabled
+      if (filter && filter.persistState) {
+        saveFilterState(filter, parsedValue);
       }
 
       return {

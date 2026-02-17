@@ -117,7 +117,7 @@ export const Layer = ({ layer }) => {
 
             // Add the hover layer if the layer is hoverable
             if (layer.isHoverable) {
-              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
+              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
               hoverLayerConfig.id = `${layer.name}-hover`;
               mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
             }
@@ -184,7 +184,7 @@ export const Layer = ({ layer }) => {
 
           // Add the hover layer if the layer is hoverable
           if (layer.isHoverable) {
-            const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
+            const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
             hoverLayerConfig.id = `${layer.name}-hover`;
             hoverLayerConfig.source = layer.name;
             hoverLayerConfig["source-layer"] = layer.sourceLayer;
