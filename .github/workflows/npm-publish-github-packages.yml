@@ -1,13 +1,46 @@
-name: Publish to GitHub Packages
+name: Test and Publish to GitHub Packages
 
 on:
   workflow_dispatch:
   push:
     branches:
       - 'main'
+      - 'dev'
+  pull_request:
+    branches:
+      - 'main'
+      - 'dev'
 
 jobs:
+  test_job:
+    name: Test and Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'packages/vis-core/package-lock.json'
+
+      - name: Install dependencies
+        run: |
+          cd packages/vis-core
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd packages/vis-core
+          npm test
+        env:
+          CI: true
+
   publish:
+    needs: test_job
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
