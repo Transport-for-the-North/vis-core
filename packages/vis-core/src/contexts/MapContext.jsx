@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useContext, useReducer } from "react";
-import { actionTypes, mapReducer } from "reducers";
+import { actionTypes, mapReducer, errorActionTypes } from "reducers";
 import {
   hasRouteParameterOrQuery,
   updateUrlParameters,
@@ -18,7 +18,7 @@ import {
   getInitialFilterValue
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext, FilterContext } from "contexts";
+import { AppContext, PageContext, FilterContext, ErrorProvider, ErrorContext } from "contexts";
 import { api } from "services";
 
 // Create a context for the app configuration
@@ -48,6 +48,7 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
+  const { state: errorState, dispatch: errorDispatch } = useContext(ErrorContext);
 
   // Initialize state within the provider function
   const initialState = {
@@ -70,6 +71,7 @@ export const MapProvider = ({ children }) => {
     isLoading: true,
     isDynamicStylingLoading: false,
     pageIsReady: false,
+    metadataError: null,
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
@@ -97,6 +99,7 @@ export const MapProvider = ({ children }) => {
      */
     const fetchMetadataTables = async () => {
       const metadataTables = {};
+      const emptyTables = [];
       
       for (const table of pageContext.config.metadataTables) {
         try {
@@ -114,12 +117,18 @@ export const MapProvider = ({ children }) => {
           }
 
           metadataTables[table.name] = filteredData;
+          
+          // Check if table is empty
+          if (!Array.isArray(filteredData) || filteredData.length === 0) {
+            emptyTables.push(table.name);
+          }
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
+          emptyTables.push(table.name);
         }
       }
 
-      return metadataTables;
+      return { metadataTables, emptyTables };
     };
 
     /**
@@ -185,7 +194,7 @@ export const MapProvider = ({ children }) => {
 
               case 'metadataTable':
                 const metadataTable = metadataTables[filter.values.metadataTableName];
-                if (metadataTable) {
+                if (metadataTable && Array.isArray(metadataTable) && metadataTable.length > 0) {
                   // NEW: apply "where" clause to restrict rows before building values
                   let rows = metadataTable;
                   if (filter.values.where) {
@@ -219,7 +228,7 @@ export const MapProvider = ({ children }) => {
                   filter.values.values = uniqueValues;
                   filters.push(filterWithId);
                 } else {
-                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                  console.error(`Metadata table ${filter.values.metadataTableName} not found or empty`);
                 }
                 break;
 
@@ -351,7 +360,37 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise filters
-      const metadataTables = await fetchMetadataTables();
+      const { metadataTables, emptyTables } = await fetchMetadataTables();
+      
+      // Check if any required metadata tables are empty
+      if (emptyTables.length > 0) {
+        const message =
+          emptyTables.length === 1
+            ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
+            : `${emptyTables.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`;
+
+          const technicalDetails =
+            emptyTables.length === 1
+              ? `Metadata table: ${emptyTables[0]}\nError: Table "${emptyTables[0]}" returned no data from the API.`
+              : `Empty metadata tables (${emptyTables.length}):\n${emptyTables.map((t) => `- ${t}`).join('\n')}`;
+
+          // Dispatch into ErrorContext reducer so MapContext sets SET_ERROR
+          errorDispatch({
+            type: errorActionTypes.SET_ERROR,
+            payload: {
+              title: 'Configuration Error',
+              subtitle: 'Unable to Load Page',
+              message,
+              supportMessage: 'Please contact support for assistance',
+              supportDetails: 'This issue typically indicates a data configuration problem that requires administrative attention.',
+              technicalDetails,
+            },
+          });
+
+        dispatch({ type: actionTypes.SET_LOADING_FINISHED });
+        return;
+      }
+      
       dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
       await initializeFilters(metadataTables);
 
@@ -368,8 +407,10 @@ export const MapProvider = ({ children }) => {
   }, [pageContext]);
 
   return (
-    <MapContext.Provider value={contextValue}>
-      {state.pageIsReady ? children : <div>Loading...</div>}
-    </MapContext.Provider>
+    <ErrorProvider>
+      <MapContext.Provider value={contextValue}>
+        {state.pageIsReady ? children : <div>Loading...</div>}
+      </MapContext.Provider>
+    </ErrorProvider>
   );
 };
