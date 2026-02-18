@@ -36,7 +36,7 @@ import {
  * @param {JSX.Element} [props.afterDashboard=null] - Optional content to render after the Dashboard component
  * @returns {JSX.Element} The rendered application component
  */
-function BaseApp({
+export function BaseApp({
   theme,
   configLoader,
   bandsLoader,
@@ -182,5 +182,3 @@ function BaseApp({
 
   return appContent;
 }
-
-export default BaseApp;
