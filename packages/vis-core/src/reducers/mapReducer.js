@@ -78,6 +78,8 @@ export const actionTypes = {
   SET_DYNAMIC_STYLING_FINISHED: "SET_DYNAMIC_STYLING_FINISHED",
   UPDATE_LEGEND_TEXT: "UPDATE_LEGEND_TEXT",
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
+  UPDATE_CUSTOM_BANDS: "UPDATE_CUSTOM_BANDS",
+  UPDATE_LAYER_WIDTH_FACTOR: "UPDATE_LAYER_WIDTH_FACTOR",
   UPDATE_METADATA_FILTER: "UPDATE_METADATA_FILTER",
   SET_METADATA_TABLES: "SET_METADATA_TABLES",
   SET_FILTERS: "SET_FILTERS",
@@ -260,6 +262,35 @@ export const mapReducer = (state, action) => {
           [layerName]: {
             ...state.layers[layerName],
             class_method,
+          },
+        },
+      };
+    }
+
+    case actionTypes.UPDATE_CUSTOM_BANDS: {
+      const { customBands, layerName } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            customBands,
+            class_method: 'c', // Set to custom classification
+          },
+        },
+      };
+    }
+
+    case actionTypes.UPDATE_LAYER_WIDTH_FACTOR: {
+      const { layerName, widthFactor } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            widthFactor,
           },
         },
       };
