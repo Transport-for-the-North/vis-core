@@ -92,8 +92,6 @@ const Map = (props) => {
 
   const lastViewportSignatureRef = useRef({});
 
-  const filterZoomStateRef = useRef({});
-
   // Single feature picker for map clicks
   const pickFeatureAtPoint = useCallback(
     (point) => {
@@ -1212,77 +1210,20 @@ const Map = (props) => {
     const applyViewport = () => {
       const zoom = map.getZoom();
 
-      // Early optimization: check if any filter could need processing
-      // Skip entire function if all filters are below minZoom and already initialized
-      const filterStates = [];
-      let anyFilterCouldNeedProcessing = false;
-      let hasJustEnteredValidZoomRange = false;
-
-      for (const filter of viewportFilters) {
+      viewportFilters.forEach((filter) => {
         const minZoom = resolveViewportMinZoom(filter);
         const isInValidZoomRange = minZoom === null || zoom >= minZoom;
-        const wasInValidZoomRange = filterZoomStateRef.current[filter.id];
-
-        filterStates.push({ filter, minZoom, isInValidZoomRange, wasInValidZoomRange });
-
-        // Check if entering valid range
-        if (isInValidZoomRange && wasInValidZoomRange === false) {
-          hasJustEnteredValidZoomRange = true;
-        }
-
-        // Process if: in valid zoom, or transitioning between states, or first time (undefined)
-        if (isInValidZoomRange || wasInValidZoomRange !== false) {
-          anyFilterCouldNeedProcessing = true;
-        }
-      }
-
-      if (!anyFilterCouldNeedProcessing) {
-        return;
-      }
-
-      filterStates.forEach(({ filter, minZoom, isInValidZoomRange, wasInValidZoomRange }) => {
-        // Optimization: if already below minZoom and still below minZoom, skip all processing
-        if (!isInValidZoomRange && wasInValidZoomRange === false) {
-          return;
-        }
 
         if (!isInValidZoomRange) {
-          // If this is first time or transitioning OUT of valid range, mark as false
-          if (wasInValidZoomRange === true) {
-            // Only dispatch if we're transitioning OUT of the valid range
-            filterZoomStateRef.current[filter.id] = false;
-
-            // Use a special clear action to avoid triggering data refresh spinner
+          // Below minZoom: clear the stored bbox so consumers can treat it as unavailable.
+          if (lastViewportSignatureRef.current[filter.id] !== null) {
+            lastViewportSignatureRef.current[filter.id] = null;
             filterDispatch({
               type: "SET_FILTER_VALUE",
-              payload: { filterId: filter.id, value: null, filter, isClearingViewport: true },
+              payload: { filterId: filter.id, value: null, filter },
             });
-
-            // Clear all query params without triggering data fetch
-            (filter.actions || []).forEach((action) => {
-              const paramName = action?.payload?.paramName || filter.paramName;
-              if (!paramName) return;
-              dispatch({
-                type: action.action,
-                payload: { 
-                  filter, 
-                  value: null, 
-                  paramName, 
-                  isClearingViewport: true,  // Signal this is viewport clearing, not data refresh
-                  ...action.payload 
-                },
-              });
-            });
-          } else if (wasInValidZoomRange === undefined) {
-            // First time and below minZoom - just mark as false, don't dispatch
-            filterZoomStateRef.current[filter.id] = false;
           }
           return;
-        }
-
-        // We're in valid zoom range
-        if (wasInValidZoomRange === false) {
-          filterZoomStateRef.current[filter.id] = true;
         }
 
         const bounds = map.getBounds();
@@ -1296,41 +1237,33 @@ const Map = (props) => {
 
         const signature = JSON.stringify(bbox);
         const lastSignature = lastViewportSignatureRef.current[filter.id];
-        
-        if (lastSignature === signature) {
-          return;
-        }
+        if (lastSignature === signature) return;
 
-        // Before updating, check if this is just a small pan that shouldn't trigger re-fetch
-        // Only update if zoom changed OR bbox boundaries changed significantly
+        // Optional "small movement" thresholding to avoid excessive updates.
         if (lastSignature) {
           try {
             const lastBbox = JSON.parse(lastSignature);
-            const zoomChanged = Math.abs(lastBbox.zoom - bbox.zoom) >= 0.25; // 0.25 zoom level threshold
-            const bboxShifted = 
-              Math.abs(lastBbox.west - bbox.west) > 0.05 ||  // ~5km threshold
+            const zoomChanged = Math.abs(lastBbox.zoom - bbox.zoom) >= 0.25;
+            const bboxShifted =
+              Math.abs(lastBbox.west - bbox.west) > 0.05 ||
               Math.abs(lastBbox.east - bbox.east) > 0.05 ||
               Math.abs(lastBbox.north - bbox.north) > 0.05 ||
               Math.abs(lastBbox.south - bbox.south) > 0.05;
-
-            // If neither zoom nor bbox significantly changed, skip the update
-            if (!zoomChanged && !bboxShifted) {
-              return;
-            }
-          } catch (e) {
+            if (!zoomChanged && !bboxShifted) return;
+          } catch {
             // Continue if parsing fails
           }
         }
 
         lastViewportSignatureRef.current[filter.id] = signature;
 
-        // Store bbox in FilterContext (useful for debugging/other components).
+        // Store bbox in FilterContext.
         filterDispatch({
           type: "SET_FILTER_VALUE",
           payload: { filterId: filter.id, value: bbox, filter },
         });
 
-        // Apply configured actions, typically mapping bbox keys to query params.
+        // Apply configured actions (if any), typically mapping bbox keys to query params.
         (filter.actions || []).forEach((action) => {
           const valueKey = action?.payload?.valueKey;
           const value = valueKey ? bbox[valueKey] : bbox;
@@ -1345,60 +1278,20 @@ const Map = (props) => {
     };
 
     const debouncedApplyViewport = debounce(applyViewport, debounceMs);
-    
-    // For faster response when entering valid zoom range, use minimal debounce
-    const fastDebouncedApplyViewport = debounce(applyViewport, 100);
 
-    // Use fast debounce if we just entered valid range, otherwise normal debounce
-    const executeApplyViewport = (justEntered) => {
-      if (justEntered) {
-        fastDebouncedApplyViewport();
-      } else {
-        debouncedApplyViewport();
-      }
-    };
-
-    const handleMoveEnd = () => {
-      const zoom = map.getZoom();
-      let hasJustEntered = false;
-      for (const filter of viewportFilters) {
-        const minZoom = resolveViewportMinZoom(filter);
-        const isInValidZoomRange = minZoom === null || zoom >= minZoom;
-        const wasInValidZoomRange = filterZoomStateRef.current[filter.id];
-        if (isInValidZoomRange && wasInValidZoomRange === false) {
-          hasJustEntered = true;
-          break;
-        }
-      }
-      executeApplyViewport(hasJustEntered);
-    };
-
-    const handleZoomEnd = () => {
-      const zoom = map.getZoom();
-      let hasJustEntered = false;
-      for (const filter of viewportFilters) {
-        const minZoom = resolveViewportMinZoom(filter);
-        const isInValidZoomRange = minZoom === null || zoom >= minZoom;
-        const wasInValidZoomRange = filterZoomStateRef.current[filter.id];
-        if (isInValidZoomRange && wasInValidZoomRange === false) {
-          hasJustEntered = true;
-          break;
-        }
-      }
-      executeApplyViewport(hasJustEntered);
-    };
+    const handleMoveEnd = () => debouncedApplyViewport();
+    const handleZoomEnd = () => debouncedApplyViewport();
 
     map.on("moveend", handleMoveEnd);
     map.on("zoomend", handleZoomEnd);
 
-    // Run once on mount so the initial API request includes the viewport.
+    // Run once on mount so the viewport bbox is available immediately.
     applyViewport();
 
     return () => {
       map.off("moveend", handleMoveEnd);
       map.off("zoomend", handleZoomEnd);
       debouncedApplyViewport.cancel?.();
-      fastDebouncedApplyViewport.cancel?.();
     };
   }, [map, state.filters, state.layers, state.visualisations, dispatch, filterDispatch]);
 
