@@ -224,13 +224,13 @@ const ToggleButton = styled.button`
  * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ 
-  visualisationName, 
-  cardName, 
-  onUpdate, 
-  data, 
-  isLoading, 
-  hideHandleOnMobile = false, 
+export const CalloutCardVisualisation = ({
+  visualisationName,
+  cardName,
+  onUpdate,
+  data,
+  isLoading,
+  hideHandleOnMobile = false,
   onVisibilityChange,
   recordSelector = null,
   toggleVisibility: externalToggleVisibility = null,
@@ -320,16 +320,16 @@ export const CalloutCardVisualisation = ({
     }
     const htmlFromFragment = visualisation.htmlFragment
       ? DOMPurify.sanitize(
-          replacePlaceholders(visualisation.htmlFragment, data, {
-            customFunctions: customFormattingFunctions,
-          })
-        )
+        replacePlaceholders(visualisation.htmlFragment, data, {
+          customFunctions: customFormattingFunctions,
+        })
+      )
       : "";
 
     const dynamicTitle = visualisation.cardTitle
       ? replacePlaceholders(String(visualisation.cardTitle), data, {
-          customFunctions: customFormattingFunctions,
-        })
+        customFunctions: customFormattingFunctions,
+      })
       : "";
 
     const safeTitle = DOMPurify.sanitize(dynamicTitle, {
@@ -359,7 +359,7 @@ export const CalloutCardVisualisation = ({
 
     onUpdateRef.current();
   }, [data, visualisation?.htmlFragment, visualisation?.cardTitle, isLoading, hasDataShouldRender]);
-  
+
 
   // Loading shell (kept mounted for initial slide-in once data arrives)
   if (isLoading) {
@@ -477,7 +477,7 @@ export const CalloutCardVisualisation = ({
                     if (
                       (chart.type === "ranking" &&
                         visualisation.queryParams?.dataTypeName?.value !==
-                          undefined) ||
+                        undefined) ||
                       null
                     ) {
                       configs.title =
@@ -511,6 +511,46 @@ export const CalloutCardVisualisation = ({
                         label: network,
                       }));
                       configs.xKey = "label";
+                    } else if (chart.type === "multiple_bar_vertical") {
+                      const groupKey = chart.values[0]?.network !== undefined ? "network" : "year";
+                      const distinctGroups = [...new Set(chart.values.map((obj) => obj[groupKey]))];
+
+                      if (distinctGroups.length > 1) {
+                        return distinctGroups.map((group, groupIdx) => {
+                          const groupValues = chart.values.filter((obj) => obj[groupKey] === group);
+
+                          // Exactly what else does, but for each group
+                          const groupConfigs = {
+                            ...configs,
+                            type: "bar_vertical",
+                            title: `${chart.header} (${group})`,
+                          };
+                          groupConfigs.columns = groupValues.map((obj) => ({ key: obj.name, label: obj.name }));
+                          const groupChartData = groupValues.reduce((acc, obj) => {
+                            acc[obj.name] = obj.columnValue;
+                            return acc;
+                          }, {});
+
+                          return (
+                            <CardContent key={`${idx}-${groupIdx}`}>
+                              <ChartRenderer
+                                charts={[groupConfigs]}
+                                data={groupChartData}
+                                formatters={customFormattingFunctions}
+                                barHeight={225}
+                              />
+                            </CardContent>
+                          );
+                        });
+                      }
+
+                      // Only 1 group — exactly what else does
+                      configs.type = "bar_vertical";
+                      configs.columns = chart.values.map((obj) => ({ key: obj.name, label: obj.name }));
+                      chartData = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
+                        return acc;
+                      }, {});
                     } else {
                       // Data formatted for single bar
                       configs.columns = chart.values.map((obj) => ({
