@@ -20,7 +20,8 @@ const filterDataToViewport = (data, map, mapLayerId) => {
     visibleFeatures.map((feature) => feature.id || feature.properties?.id)
   );
   // Return only records whose id is in the visibleIDs set.
-  return data.filter((record) => visibleIDs.has(record.id));
+  const filtered = data.filter((record) => visibleIDs.has(record.id));
+  return filtered;
 };
 
 /**
@@ -145,10 +146,25 @@ export const useFetchVisualisationData = (
    */
   const pendingParamsSignatureRef = useRef(null);
 
+  // Cache for API responses based on query string
+  const responseCache = useRef(new Map());
+  const maxCacheSize = 20; // Limit cache to avoid excessive memory usage
+
+  // Track abort controller for request cancellation
+  const abortControllerRef = useRef(null);
+
   /**
    * Resets the fetch state - useful when visualisation changes (e.g., page navigation).
    */
   const resetFetchState = useCallback(() => {
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Clear cache for this visualisation
+    responseCache.current.clear();
+    
     setHasInitiatedFetch(false);
     setRawData(null);
     setFilteredData(null);
@@ -204,12 +220,52 @@ export const useFetchVisualisationData = (
         const queryParamsForApi = toSimpleParamsMap(queryParams);
         const pathParamsForApi = toSimpleParamsMap(pathParams);
 
+        // Create a cache key based on the request
+        const cacheKey = JSON.stringify({ path, queryParamsForApi, pathParamsForApi });
+
+        // Check cache first
+        if (responseCache.current.has(cacheKey)) {
+          const cachedData = responseCache.current.get(cacheKey);
+          setRawData(cachedData);
+          
+          if (!map || !mapLayerId || !shouldFilterDataToViewport) {
+            setFilteredData(cachedData);
+          }
+          
+          setLoading(false);
+          return;
+        }
+
+        // Cancel any previous request
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+
+        // Create new abort controller for this request
+        abortControllerRef.current = new AbortController();
+
         try {
           const responseData = await api.baseService.get(path, {
             pathParams: pathParamsForApi,
             queryParams: queryParamsForApi,
             skipAuth: !requiresAuth,
+            signal: abortControllerRef.current.signal,
           });
+
+          // Only set data if request wasn't aborted
+          if (abortControllerRef.current.signal.aborted) {
+            console.log('[Data Fetch] Request was aborted, ignoring response');
+            return;
+          }
+
+          // Store in cache
+          responseCache.current.set(cacheKey, responseData);
+          
+          // Keep cache size manageable
+          if (responseCache.current.size > maxCacheSize) {
+            const firstKey = responseCache.current.keys().next().value;
+            responseCache.current.delete(firstKey);
+          }
 
           setRawData(responseData);
 
@@ -222,8 +278,11 @@ export const useFetchVisualisationData = (
             console.warn('No data returned for visualisation:', visualisationName);
           }
         } catch (e) {
-          console.error('Error fetching data for visualisation:', e);
-          setError(e);
+          // Don't log abort errors
+          if (e.name !== 'AbortError') {
+            console.error('Error fetching data for visualisation:', e);
+            setError(e);
+          }
         } finally {
           setLoading(false);
         }
@@ -235,6 +294,9 @@ export const useFetchVisualisationData = (
   useEffect(() => {
     return () => {
       fetchDataForVisualisation.cancel();
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
     };
   }, [fetchDataForVisualisation]);
 

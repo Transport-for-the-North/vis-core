@@ -248,6 +248,28 @@ export const updateUrlParameters = (template, current, params, opts = { pathArra
 };
 
 /**
+ * Appends query parameters to a URL.
+ *
+ * - Skips params with null/undefined values.
+ * - URL-encodes both keys and values.
+ * - Preserves any existing query string.
+ *
+ * @param {string} url
+ * @param {Record<string, any>} params
+ * @returns {string}
+ */
+export const appendQueryParams = (url, params) => {
+  const entries = Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined);
+  if (entries.length === 0) return url;
+
+  const joiner = url.includes("?") ? "&" : "?";
+  const qs = entries
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+    .join("&");
+  return `${url}${joiner}${qs}`;
+};
+
+/**
  * Extracts route parameters enclosed in curly braces, and also supports ":param" style.
  *
  * @param {string} url - The URL or path from which to extract route parameters.

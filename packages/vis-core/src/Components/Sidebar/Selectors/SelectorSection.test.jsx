@@ -161,6 +161,42 @@ let props = {
 };
 
 describe("SelectorSection component test", () => {
+  it("Does not render mapViewport filter in sidebar", async () => {
+    const viewportFilter = {
+      type: "mapViewport",
+      id: "viewport-filter-1",
+      paramName: "viewport",
+      filterName: "MapViewport",
+      values: { source: "local", values: [] },
+    };
+    const regularFilter = {
+      type: "dropdown",
+      id: "dropdown-1",
+      paramName: "category",
+      filterName: "Category",
+      values: { source: "local", values: [] },
+    };
+
+    props = {
+      ...props,
+      filters: [viewportFilter, regularFilter],
+    };
+
+    render(
+      <AppContext.Provider value={mockAppContexte}>
+        <MapContext.Provider value={{ state: mockState, dispatch }}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <SelectorSection {...props} />
+          </FilterContext.Provider>
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    // mapViewport type filters should not be rendered in sidebar
+    // Only the regular dropdown filter should be rendered
+    expect(screen.getByTestId("mock-dropdown")).toBeInTheDocument();
+  });
+
   it("Basic use of dropdown type", async () => {
     props = {
       ...props,

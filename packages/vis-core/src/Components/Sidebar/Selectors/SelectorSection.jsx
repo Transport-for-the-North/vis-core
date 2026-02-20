@@ -96,7 +96,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (!["fixed", "hidetoggle"].includes(filter.type)) {
+      if (!["fixed", "hidetoggle", "mapViewport"].includes(filter.type) && filter.paramName) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -124,7 +124,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (filter.type !== 'fixed') {
+      if (!["fixed", "mapViewport"].includes(filter.type) && filter.paramName) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -250,7 +250,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
-            .filter((filter) => filter.type !== "fixed" && filter.type !== "hidetoggle") // Exclude 'fixed' filters
+            .filter((filter) => !["fixed", "hidetoggle", "mapViewport"].includes(filter.type))
             .map((filter) => (
               
                 <SelectorContainer key={filter.id}>

@@ -56,6 +56,9 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
 
       const styleValue = typeof mapStyle === 'function' ? mapStyle() : (mapStyle || defaultMapStyle());
 
+      // Will be assigned after Map construction; transformRequest can still close over it.
+      let mapInstance = null;
+
       // Compute API base once for transformRequest
       let apiBaseOrigin = null;
       try {
@@ -85,6 +88,31 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
             return {
               url: new Request(url).url
             }
+          }
+
+          // For tile requests marked with __viewport=1, append current viewport bbox.
+          // The bbox is stored on the map instance by Layer.jsx as map.__viscoreViewportBbox.
+          try {
+            if (resourceType === 'Tile') {
+              const u = new URL(url, window.location.origin);
+              if (u.searchParams.get('__viewport') === '1') {
+                const bbox = mapInstance?.__viscoreViewportBbox;
+                if (bbox && typeof bbox === 'object') {
+                  const { west, south, east, north } = bbox;
+                  if ([west, south, east, north].every((v) => v !== null && v !== undefined)) {
+                    u.searchParams.set('west', String(west));
+                    u.searchParams.set('south', String(south));
+                    u.searchParams.set('east', String(east));
+                    u.searchParams.set('north', String(north));
+                  }
+                }
+
+                // Keep the marker param (harmless); it also indicates the layer expects viewport filtering.
+                url = u.toString();
+              }
+            }
+          } catch {
+            // Ignore malformed URLs / environments
           }
 
           // Attach Authorization header for API-origin requests (tiles/sprites/glyphs)

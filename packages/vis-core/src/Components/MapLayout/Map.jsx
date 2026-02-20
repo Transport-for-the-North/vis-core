@@ -25,6 +25,7 @@ import {
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
+import debounce from "lodash.debounce";
 import { mapKeys, uniq } from "lodash";
 
 const StyledMapContainer = styled.div`
@@ -88,6 +89,8 @@ const Map = (props) => {
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
 
   const lastTouchTimeRef = useRef(0);
+
+  const lastViewportSignatureRef = useRef({});
 
   // Single feature picker for map clicks
   const pickFeatureAtPoint = useCallback(
@@ -1124,6 +1127,32 @@ const Map = (props) => {
     }
   }, [isMapReady]);
 
+  // Keep `state.currentZoom` in sync with the actual map zoom.
+  // This is used by DynamicLegend and useLayerZoomMessage. Previously it was
+  // only updated when label layers were enabled, which caused zoom-gated UI to
+  // get stuck on pages without labels.
+  useEffect(() => {
+    if (!map) return;
+
+    const updateZoom = () => {
+      dispatch({
+        type: actionTypes.STORE_CURRENT_ZOOM,
+        payload: map.getZoom(),
+      });
+    };
+
+    map.on("zoom", updateZoom);
+    map.on("zoomend", updateZoom);
+
+    // Initial sync
+    updateZoom();
+
+    return () => {
+      map.off("zoom", updateZoom);
+      map.off("zoomend", updateZoom);
+    };
+  }, [map, dispatch]);
+
   // **Handle map clicks (for map filters)**
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {
@@ -1141,6 +1170,130 @@ const Map = (props) => {
       }
     };
   }, [isMapReady, map, handleMapClick]);
+
+  // **Capture viewport (bbox) into FilterContext + query params**
+  useEffect(() => {
+    // Don't wait for full style/layer readiness; bounds/zoom are available as soon as the map instance exists.
+    if (!map || !Array.isArray(state.filters) || state.filters.length === 0) return;
+
+    const viewportFilters = state.filters.filter((f) => f?.type === "mapViewport");
+    if (viewportFilters.length === 0) return;
+
+    const resolveViewportMinZoom = (filter) => {
+      // Prefer a per-filter minZoom if configured, otherwise infer from any join-layer(s)
+      // used by the visualisations this viewport targets.
+      if (typeof filter?.minZoom === "number") return filter.minZoom;
+
+      const visualisationNames = Array.isArray(filter?.visualisations) ? filter.visualisations : [];
+      const candidates = [];
+
+      visualisationNames.forEach((visName) => {
+        const vis = state.visualisations?.[visName];
+        const joinLayerName = vis?.joinLayer;
+        if (!joinLayerName) return;
+
+        const joinLayer = state.layers?.[joinLayerName];
+        if (typeof joinLayer?.minZoom === "number") {
+          candidates.push(joinLayer.minZoom);
+        }
+      });
+
+      if (candidates.length === 0) return null;
+      return Math.max(...candidates);
+    };
+
+    const debounceMs =
+      typeof viewportFilters[0]?.debounceMs === "number" && viewportFilters[0].debounceMs >= 0
+        ? viewportFilters[0].debounceMs
+        : 250;
+
+    const applyViewport = () => {
+      const zoom = map.getZoom();
+
+      viewportFilters.forEach((filter) => {
+        const minZoom = resolveViewportMinZoom(filter);
+        const isInValidZoomRange = minZoom === null || zoom >= minZoom;
+
+        if (!isInValidZoomRange) {
+          // Below minZoom: clear the stored bbox so consumers can treat it as unavailable.
+          if (lastViewportSignatureRef.current[filter.id] !== null) {
+            lastViewportSignatureRef.current[filter.id] = null;
+            filterDispatch({
+              type: "SET_FILTER_VALUE",
+              payload: { filterId: filter.id, value: null, filter },
+            });
+          }
+          return;
+        }
+
+        const bounds = map.getBounds();
+        const bbox = {
+          west: Number(bounds.getWest().toFixed(6)),
+          south: Number(bounds.getSouth().toFixed(6)),
+          east: Number(bounds.getEast().toFixed(6)),
+          north: Number(bounds.getNorth().toFixed(6)),
+          zoom: Number(zoom.toFixed(2)),
+        };
+
+        const signature = JSON.stringify(bbox);
+        const lastSignature = lastViewportSignatureRef.current[filter.id];
+        if (lastSignature === signature) return;
+
+        // Optional "small movement" thresholding to avoid excessive updates.
+        if (lastSignature) {
+          try {
+            const lastBbox = JSON.parse(lastSignature);
+            const zoomChanged = Math.abs(lastBbox.zoom - bbox.zoom) >= 0.25;
+            const bboxShifted =
+              Math.abs(lastBbox.west - bbox.west) > 0.05 ||
+              Math.abs(lastBbox.east - bbox.east) > 0.05 ||
+              Math.abs(lastBbox.north - bbox.north) > 0.05 ||
+              Math.abs(lastBbox.south - bbox.south) > 0.05;
+            if (!zoomChanged && !bboxShifted) return;
+          } catch {
+            // Continue if parsing fails
+          }
+        }
+
+        lastViewportSignatureRef.current[filter.id] = signature;
+
+        // Store bbox in FilterContext.
+        filterDispatch({
+          type: "SET_FILTER_VALUE",
+          payload: { filterId: filter.id, value: bbox, filter },
+        });
+
+        // Apply configured actions (if any), typically mapping bbox keys to query params.
+        (filter.actions || []).forEach((action) => {
+          const valueKey = action?.payload?.valueKey;
+          const value = valueKey ? bbox[valueKey] : bbox;
+          const paramName = action?.payload?.paramName || filter.paramName;
+          if (!paramName) return;
+          dispatch({
+            type: action.action,
+            payload: { filter, value, paramName, ...action.payload },
+          });
+        });
+      });
+    };
+
+    const debouncedApplyViewport = debounce(applyViewport, debounceMs);
+
+    const handleMoveEnd = () => debouncedApplyViewport();
+    const handleZoomEnd = () => debouncedApplyViewport();
+
+    map.on("moveend", handleMoveEnd);
+    map.on("zoomend", handleZoomEnd);
+
+    // Run once on mount so the viewport bbox is available immediately.
+    applyViewport();
+
+    return () => {
+      map.off("moveend", handleMoveEnd);
+      map.off("zoomend", handleZoomEnd);
+      debouncedApplyViewport.cancel?.();
+    };
+  }, [map, state.filters, state.layers, state.visualisations, dispatch, filterDispatch]);
 
   // **Apply layer filters**
   useEffect(() => {
