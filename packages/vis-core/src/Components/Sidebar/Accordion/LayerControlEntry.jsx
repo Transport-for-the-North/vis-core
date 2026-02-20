@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
-import { ColourSchemeDropdown, BandEditor } from "../Selectors";
+import { ColourSchemeDropdown, BandEditor, SelectorLabel } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
 import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map"
@@ -161,6 +161,13 @@ const WidthControl = styled.div`
 const WidthSlider = styled.input`
   flex-grow: 1;
   margin-right: 10px;
+`;
+
+const SectionDivider = styled.hr`
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 0.75rem 0;
+  width: 100%;
 `;
 
 /**
@@ -404,6 +411,183 @@ export const LayerControlEntry = memo(
       setWidth(widthFactor);
     };
 
+    const showLayerSearch = enableZoomToFeature && layer.metadata?.path;
+
+    const showColourSchemeDropdown =
+      layer.metadata?.isStylable &&
+      !enforceNoColourSchemeSelector &&
+      !(
+        (visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
+          visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value ===
+            "Passengers Over Seating Capacity") &&
+        (currentPage.pageName === "Link Totals" ||
+          currentPage.pageName === "Link Totals Side-by-Side")
+      );
+
+    const showBandEditor =
+      layer.metadata?.isStylable &&
+      canEditBands &&
+      (colorStyle === "continuous" || colorStyle === "diverging");
+
+    const showClassificationDropdownStandalone =
+      layer.metadata?.isStylable &&
+      !enforceNoClassificationMethod &&
+      !showBandEditor;
+
+    const renderSectionList = (sections) =>
+      sections
+        .filter(Boolean)
+        .map((section, idx) => (
+          <React.Fragment key={section.key}>
+            {idx > 0 && <SectionDivider />}
+            {section.node}
+          </React.Fragment>
+        ));
+
+    const collapsibleSections = [];
+
+    if (showLayerSearch) {
+      collapsibleSections.push({
+        key: "search",
+        node: <LayerSearch map={maps[0]} layer={layer} />, 
+      });
+    }
+
+    if (shouldHaveOpacityControl) {
+      collapsibleSections.push({
+        key: "opacity",
+        node: (
+          <OpacityControl>
+            <ControlLabel htmlFor={`opacity-${layer.id}`}>
+              Opacity
+            </ControlLabel>
+            <Slider
+              id={`opacity-${layer.id}`}
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={opacity}
+              onChange={handleOpacityChange}
+            />
+            <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
+          </OpacityControl>
+        ),
+      });
+    }
+
+    if (showWidth) {
+      collapsibleSections.push({
+        key: "width",
+        node: (
+          <WidthControl>
+            <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
+            <Slider
+              id={`width-${layer.id}`}
+              data-testid="slider width factor"
+              type="range"
+              min={isNodeLayer ? 0.1 : 0.5}
+              max={isNodeLayer ? 2.5 : 10} // 2.5 for nodes, 10 for links
+              step="0.1"
+              value={widthFactor}
+              onChange={handleWidthFactorChange}
+            />
+            <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
+          </WidthControl>
+        ),
+      });
+    }
+
+    if (layer.metadata?.isStylable) {
+      const stylableSections = [];
+
+      if (showColourSchemeDropdown) {
+        stylableSections.push({
+          key: "colour-scheme",
+          node: (
+            <ColourSchemeDropdown
+              colorStyle={colorStyle}
+              handleColorChange={handleColorChange}
+              layerName={layer.id}
+            />
+          ),
+        });
+      }
+
+      if (showBandEditor) {
+        stylableSections.push({
+          key: "band-editor",
+          node: (
+            <>
+              {!enforceNoClassificationMethod && (
+                <>
+                  <SelectorLabel text="Edit banding" />
+                  <ClassificationDropdown
+                    classType={{
+                      Default: "d",
+                      Custom: "c",
+                      Quantile: "q",
+                      Equidistant: "e",
+                      Logarithmic: "l",
+                      "K-Means": "k",
+                      "Jenks Natural Breaks": "j",
+                      "Standard Deviation": "s",
+                      "Head/Tail Breaks": "h",
+                    }}
+                    classification={state.layers[layer.id]?.class_method ?? "d"}
+                    onChange={(value) => handleClassificationChange(value, layer.id)}
+                  />
+                </>
+              )}
+              <BandEditor
+                showLabel={enforceNoClassificationMethod}
+                bands={currentBins}
+                onChange={(newBands) => {
+                  handleCustomBandsChange(newBands, layer.id);
+                }}
+                isDiverging={colorStyle === "diverging"}
+                isCustom={currentClassMethod === "c"}
+                data={bandEditorData}
+                defaultBandValues={hasDefaultBands?.values || null}
+                onReset={() => {
+                  const target = prevNonCustomClassMethodRef.current || "d";
+                  handleCustomBandsChange([], layer.id);
+                  handleClassificationChange(target, layer.id);
+                }}
+              />
+            </>
+          ),
+        });
+      }
+
+      if (showClassificationDropdownStandalone) {
+        stylableSections.push({
+          key: "classification",
+          node: (
+            <ClassificationDropdown
+              classType={{
+                Default: "d",
+                Quantile: "q",
+                Equidistant: "e",
+                Logarithmic: "l",
+                "K-Means": "k",
+                "Jenks Natural Breaks": "j",
+                "Standard Deviation": "s",
+                "Head/Tail Breaks": "h",
+              }}
+              classification={state.layers[layer.id]?.class_method ?? "d"}
+              onChange={(value) => handleClassificationChange(value, layer.id)}
+            />
+          ),
+        });
+      }
+
+      collapsibleSections.push({
+        key: "stylable",
+        node: <div style={{ marginTop: "1rem" }}>{renderSectionList(stylableSections)}</div>,
+      });
+    }
+
     return (
       <LayerControlContainer>
         <LayerHeader>
@@ -434,97 +618,7 @@ export const LayerControlEntry = memo(
         </LayerHeader>
         {/* Collapsible Content with Animation */}
         <CollapsibleContent isExpanded={isExpanded}>
-          {/* Layer Search (if applicable) */}
-          {enableZoomToFeature && layer.metadata?.path && (
-            <LayerSearch map={maps[0]} layer={layer} />
-          )}
-          {/* Opacity Control */}
-          {shouldHaveOpacityControl && (<OpacityControl>
-            <ControlLabel htmlFor={`opacity-${layer.id}`}>
-              Opacity
-            </ControlLabel>
-            <Slider
-              id={`opacity-${layer.id}`}
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={opacity}
-              onChange={handleOpacityChange}
-            />
-            <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
-          </OpacityControl>)}
-          {/* Width Control (if applicable) */}
-          {showWidth && (
-            <WidthControl>
-              <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
-              <Slider
-                id={`width-${layer.id}`}
-                data-testid="slider width factor"
-                type="range"
-                min={isNodeLayer ? 0.1 : 0.5}
-                max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
-                step="0.1"
-                value={widthFactor}
-                onChange={handleWidthFactorChange}
-              />
-              <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
-            </WidthControl>
-          )}
-          {/* Color Scheme, Band Editor, and Classification (if stylable) */}
-          {layer.metadata?.isStylable && (
-            <div style={{ marginTop: "1rem" }}>
-              {!enforceNoColourSchemeSelector &&
-                !((visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
-                  visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Passengers Over Seating Capacity") &&
-                  (currentPage.pageName === "Link Totals" || currentPage.pageName === "Link Totals Side-by-Side")) &&
-                <ColourSchemeDropdown
-                  colorStyle={colorStyle}
-                  handleColorChange={handleColorChange}
-                  layerName={layer.id}
-                />}
-
-              {/* BandEditor for continuous/diverging only */}
-              {canEditBands && (colorStyle === "continuous" || colorStyle === "diverging") && (
-                <BandEditor
-                  bands={currentBins}
-                  onChange={(newBands) => {
-                    handleCustomBandsChange(newBands, layer.id);
-                  }}
-                  isDiverging={colorStyle === "diverging"}
-                  isCustom={currentClassMethod === "c"}
-                  data={bandEditorData}
-                  defaultBandValues={hasDefaultBands?.values || null}
-                  onReset={() => {
-                    // Restore the last non-custom classification method (default/equidistant/etc)
-                    // and clear custom bands so the method can recompute its own.
-                    const target = prevNonCustomClassMethodRef.current || "d";
-                    handleCustomBandsChange([], layer.id);
-                    handleClassificationChange(target, layer.id);
-                  }}
-                />
-              )}
-
-              {!enforceNoClassificationMethod && <ClassificationDropdown
-                classType={{
-                  ...(hasDefaultBands?.values && {Default: "d"}),
-                  Quantile: "q",
-                  Equidistant: "e",
-                  Logarithmic: "l",
-                  "K-Means": "k",
-                  "Jenks Natural Breaks": "j",
-                  "Standard Deviation": "s",
-                  "Head/Tail Breaks": "h",
-                }}
-                classification={
-                  state.layers[layer.id]?.class_method ?? "d"
-                }
-                onChange={(value) =>
-                  handleClassificationChange(value, layer.id)
-                }
-              />}
-            </div>
-          )}
+          {renderSectionList(collapsibleSections)}
         </CollapsibleContent>
       </LayerControlContainer>
     );

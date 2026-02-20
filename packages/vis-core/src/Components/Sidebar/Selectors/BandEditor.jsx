@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { SelectorLabel } from "./SelectorLabel";
-import { AppButton } from "Components";
+import { AppButton } from "Components/AppButton";
 
 const BandEditorContainer = styled.div`
   margin-top: 12px;
@@ -14,6 +14,46 @@ const BandHeader = styled.div`
   justify-content: space-between;
   margin-bottom: 10px;
   margin-top: 8px;
+`;
+
+const BandMetaContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  margin-top: 8px;
+`;
+
+const BandActionRow = styled.div`
+  display: flex;
+  gap: 8px;
+  width: 100%;
+`;
+
+const BandActionLeft = styled.div`
+  flex: 2;
+`;
+
+const BandActionRight = styled.div`
+  flex: 1;
+`;
+
+const ResetButton = styled(AppButton)`
+  background-color: transparent;
+  color: ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? "#7317de"};
+  border: 1px solid ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? "#7317de"};
+
+  &:hover:not(:disabled) {
+    background-color: ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? "#7317de"};
+    color: white;
+  }
+
+  &:disabled {
+    opacity: 1;
+    background-color: transparent;
+    color: #666;
+    border-color: #d1d1e0;
+  }
 `;
 
 const BandCountSelect = styled.select`
@@ -96,7 +136,15 @@ const ErrorMessage = styled.div`
  *   data={[1,2,3,4,5,6,7,8,9,10]}
  * />
  */
-export const BandEditor = ({ bands, onChange, isDiverging, isCustom = false, onReset = null, ..._unusedProps }) => {
+export const BandEditor = ({
+  bands,
+  onChange,
+  isDiverging,
+  isCustom = false,
+  onReset = null,
+  showLabel = true,
+  ..._unusedProps
+}) => {
   void _unusedProps;
   const [localBands, setLocalBands] = useState(bands);
   const [hasChanges, setHasChanges] = useState(false);
@@ -212,10 +260,10 @@ export const BandEditor = ({ bands, onChange, isDiverging, isCustom = false, onR
 
   return (
     <BandEditorContainer>
-      <SelectorLabel text="Edit banding" />
-      <BandHeader>
-        <span style={{ fontSize: "0.9rem", color: "#555", fontWeight: 500 }}>Number of bands:</span>
-        <div style={{ display: 'flex', gap: 8 }}>
+      {showLabel && <SelectorLabel text="Edit banding" />}
+      <BandMetaContainer>
+        <BandHeader>
+          <span style={{ fontSize: "0.9rem", color: "#555", fontWeight: 500 }}>Number of bands:</span>
           <BandCountSelect
             value={localBands.length}
             onChange={handleBandCountChange}
@@ -224,11 +272,8 @@ export const BandEditor = ({ bands, onChange, isDiverging, isCustom = false, onR
               <option key={n} value={n}>{n}</option>
             ))}
           </BandCountSelect>
-          <AppButton type="button" onClick={handleResetBands} disabled={localBands.length < 2}>
-            Reset bands
-          </AppButton>
-        </div>
-      </BandHeader>
+        </BandHeader>
+      </BandMetaContainer>
       {validation.error && (
         <ErrorMessage>{validation.error}</ErrorMessage>
       )}
@@ -246,9 +291,23 @@ export const BandEditor = ({ bands, onChange, isDiverging, isCustom = false, onR
           </BandInputWrapper>
         ))}
       </BandInputsGrid>
-      <AppButton $width="100%" type="button" onClick={handleUpdate} disabled={!hasChanges || !validation.valid}>
-        Update banding
-      </AppButton>
+      <BandActionRow>
+        <BandActionLeft>
+          <AppButton $width="100%" type="button" onClick={handleUpdate} disabled={!hasChanges || !validation.valid}>
+            Update
+          </AppButton>
+        </BandActionLeft>
+        <BandActionRight>
+          <ResetButton
+            $width="100%"
+            type="button"
+            onClick={handleResetBands}
+            disabled={localBands.length < 2 || (!hasChanges && !isCustom)}
+          >
+            Reset
+          </ResetButton>
+        </BandActionRight>
+      </BandActionRow>
     </BandEditorContainer>
   );
 };
