@@ -155,7 +155,7 @@ export const calculateMaxWidthFactor = (width, paintProp) => {
  * @throws {Error} If the input array is not a valid interpolation expression or if the existing factors
  *                 in the interpolation are inconsistent.
  */
-export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, constantOffset = MAP_CONSTANTS.defaultOffset) => {
+export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, constantOffset) => {
   if (!Array.isArray(existingInterpolationArray) || existingInterpolationArray[0] !== "interpolate") {
     throw new Error("Invalid interpolation expression");
   }
@@ -169,6 +169,7 @@ export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, 
 
   const overallFactor = factor / oldFactorMax;
   const newInterpolationArray = [...existingInterpolationArray];
+  const hasCustomOffset = constantOffset !== undefined && constantOffset !== null;
   const newLineOffsetArray = paintProp.includes("line")
     ? ["interpolate", ["linear"], ["feature-state", "valueAbs"]]
     : null;
@@ -177,7 +178,9 @@ export const applyWidthFactor = (existingInterpolationArray, factor, paintProp, 
     if (typeof newInterpolationArray[i] === "number") {
       newInterpolationArray[i] *= overallFactor;
       if (newLineOffsetArray) {
-        const lineOffsetValue = -((newInterpolationArray[i] / 2) + constantOffset);
+        const lineOffsetValue = hasCustomOffset
+          ? constantOffset
+          : -((newInterpolationArray[i] / 2) + MAP_CONSTANTS.defaultOffset);
         newLineOffsetArray.push(newInterpolationArray[i - 1], lineOffsetValue);
       }
     }
@@ -965,7 +968,8 @@ export const getLayerStyle = (geometryType) => {
  * @property {string} geometryType - The type of geometry for the hover layer. Possible values are "polygon", "line", or "point".
  * @returns {Object} The style configuration object for the hover layer.
  */
-export const getHoverLayerStyle = (geometryType) => {
+export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
+  const hasCustomOffset = layerConfig.defaultLineOffset !== undefined && layerConfig.defaultLineOffset !== null;
   switch (geometryType) {
     case "polygon":
       return {
@@ -1010,20 +1014,22 @@ export const getHoverLayerStyle = (geometryType) => {
             20,
             16, // At zoom level 20, line width will be 8
           ],
-          "line-offset": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            // Specify zoom levels and corresponding line offsets - increased for better gap
-            5,
-            -2, // At zoom level 5, line offset increased to -2
-            10,
-            -4, // At zoom level 10, line offset increased to -4
-            15,
-            -8, // At zoom level 15, line offset increased to -8
-            20,
-            -12, // At zoom level 20, line offset increased to -12
-          ],
+          "line-offset": hasCustomOffset
+            ? layerConfig.defaultLineOffset
+            : [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                // Specify zoom levels and corresponding line offsets - increased for better gap
+                5,
+                -2, // At zoom level 5, line offset increased to -2
+                10,
+                -4, // At zoom level 10, line offset increased to -4
+                15,
+                -8, // At zoom level 15, line offset increased to -8
+                20,
+                -12, // At zoom level 20, line offset increased to -12
+              ],
         }
       };
     case "point":

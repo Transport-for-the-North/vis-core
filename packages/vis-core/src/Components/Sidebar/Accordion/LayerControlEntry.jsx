@@ -211,6 +211,8 @@ export const LayerControlEntry = memo(
       );
     }, [isExpanded, layer.id]);
     const currentPage = useContext(PageContext);
+    const mapConfig = currentPage?.config?.map;
+    const defaultNodeWidthFactorFromPage = mapConfig?.defaultNodeWidthFactor;
     const appConfig = useContext(AppContext);
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
@@ -242,6 +244,11 @@ export const LayerControlEntry = memo(
     const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
     const widthProp = getWidthProperty(layer.type);
     const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
+    const layerConfigFromState = state?.layers?.[layer.id];
+    const effectiveDefaultLineOffset =
+      layerConfigFromState?.defaultLineOffset ??
+      layer.metadata?.defaultLineOffset ??
+      layer.defaultLineOffset;
 
     // Track the last non-custom classification method so BandEditor reset can restore it.
     const currentClassMethod = state.layers?.[layer.id]?.class_method ?? "d";
@@ -273,15 +280,25 @@ export const LayerControlEntry = memo(
 
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
-    const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
-    const showWidth = isFeatureStateWidthExpression;
+      const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
+      const showWidth = isFeatureStateWidthExpression || isNodeLayer;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
       : currentWidthFactor;
 
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [widthFactor, setWidth] = useState(initialWidth || 1);
+    const desiredDefaultNodeWidth =
+      typeof defaultNodeWidthFactorFromPage === "number"
+        ? defaultNodeWidthFactorFromPage
+        : null;
+
+    const initialWidthForUI =
+      isNodeLayer && desiredDefaultNodeWidth != null
+        ? desiredDefaultNodeWidth
+        : (initialWidth || 1);
+
+    const [widthFactor, setWidth] = useState(initialWidthForUI);
 
     const bandEditorData = useMemo(() => {
       if (!visualisation || !visualisation.data || !Array.isArray(visualisation.data)) {
@@ -384,16 +401,16 @@ export const LayerControlEntry = memo(
       const max = isNodeLayer ? 2.5 : 10;
       const widthFactor = Math.max(min, Math.min(max, raw));
       let widthInterpolation, lineOffsetInterpolation, widthExpression;
+      const hasDefaultLineOffset = effectiveDefaultLineOffset !== undefined && effectiveDefaultLineOffset !== null;
 
       if (isFeatureStateWidthExpression) {
         // Apply the width factor using the applyWidthFactor function
-        // Use layer's defaultLineOffset if available, otherwise fall back to default
-        const customOffset = layer.defaultLineOffset ?? undefined;
-        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp, customOffset);
+        // Keep line-offset fixed to defaultLineOffset if provided
+        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
         widthInterpolation = result.widthInterpolation;
-        lineOffsetInterpolation = result.lineOffsetInterpolation;
+        lineOffsetInterpolation = hasDefaultLineOffset ? null : result.lineOffsetInterpolation;
       } else {
-        widthExpression = 1; // Default width expression if not using feature-state
+        widthExpression = widthFactor; // Default width expression if not using feature-state
       }
 
       maps.forEach((map) => {
@@ -402,8 +419,12 @@ export const LayerControlEntry = memo(
           map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
 
           // Set the line-offset property if applicable
-          if (widthProp.includes("line") && lineOffsetInterpolation) {
-            map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+          if (widthProp.includes("line")) {
+            if (hasDefaultLineOffset) {
+              map.setPaintProperty(layer.id, "line-offset", effectiveDefaultLineOffset);
+            } else if (lineOffsetInterpolation) {
+              map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
+            }
           }
         }
       });
@@ -587,6 +608,34 @@ export const LayerControlEntry = memo(
         node: <div style={{ marginTop: "1rem" }}>{renderSectionList(stylableSections)}</div>,
       });
     }
+    const appliedNodeDefaultRef = useRef(false);
+
+    useEffect(() => {
+      if (appliedNodeDefaultRef.current) return;
+      if (!maps?.length) return;
+      if (!isNodeLayer) return;
+      if (!widthProp) return;
+      if (isFeatureStateWidthExpression) return;
+
+      if (typeof desiredDefaultNodeWidth !== "number") return;
+
+      maps.forEach((map) => {
+        if (map?.getLayer?.(layer.id)) {
+          map.setPaintProperty(layer.id, widthProp, desiredDefaultNodeWidth);
+        }
+      });
+
+      setWidth(desiredDefaultNodeWidth);
+      appliedNodeDefaultRef.current = true;
+    }, [
+      maps,
+      layer.id,
+      isNodeLayer,
+      widthProp,
+      isFeatureStateWidthExpression,
+      desiredDefaultNodeWidth,
+    ]);
+
 
     return (
       <LayerControlContainer>

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
-import { loremIpsum, updateFilterValidity } from "utils";
+import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
 import { defaultBgColour } from "defaults";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
@@ -71,10 +71,8 @@ export const MapLayout = () => {
     if (!initializedRef.current && state.pageIsReady) {
       state.filters.forEach((filter) => {
         filter.actions.forEach((actionObj) => {
-          let defaultValue =
-            filter.defaultValue ||
-            filter.min ||
-            filter.values?.values[0]?.paramValue;
+          // Use getInitialFilterValue to get persisted state or default value
+          let defaultValue = getInitialFilterValue(filter);
 
           let sides = "";
           if (filter.filterName.includes("Left")) sides = "left";
@@ -101,7 +99,7 @@ export const MapLayout = () => {
   const handleFilterChange = (filter, value) => {
     filterDispatch({
       type: 'SET_FILTER_VALUE',
-      payload: { filterId: filter.id, value },
+      payload: { filterId: filter.id, value, filter },
     });
   };
 
