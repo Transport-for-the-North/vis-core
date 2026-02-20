@@ -14,6 +14,6 @@ export * from './tooltip'
 export * from './filterPersistence'
 export * from './getByPath'
 export * from './openApiValidation'
-
 export * from './mapSpiders'
 export * from './svgPageHelpers'
+export * from './svgGalleryManagerHelpers'
