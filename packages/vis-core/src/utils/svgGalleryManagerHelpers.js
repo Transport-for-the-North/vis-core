@@ -1,10 +1,10 @@
 /**
- * Helper functions for SVG page rendering (network schematics).
- * These functions handle dynamic legend/caveat configuration, SVG detection, and data normalization.
+ * Helper functions for SVG gallery rendering (network schematics).
+ * These functions handle dynamic legend/caveat configuration, SVG detection, and data normalisation.
  */
 
 /**
- * Sort an array of option objects by their displayValue.
+ * Sort an array of option objects by their `displayValue`.
  * @param {Array<Object>} options - Array of option objects with displayValue property.
  * @param {string|Object} sortConfig - Sort direction: 'ascending', 'descending', or config object with 'order' property.
  * @returns {Array<Object>} - Sorted array of options.
@@ -29,16 +29,16 @@ export const sortOptions = (options, sortConfig) => {
 };
 
 /**
- * Normalize text for case-insensitive comparison.
- * @param {*} value - The value to normalize.
+ * Normalise text for case-insensitive comparison.
+ * @param {*} value - The value to normalise.
  * @returns {string} - Lowercase trimmed string.
  */
 export const normaliseText = (value) => `${value ?? ''}`.trim().toLowerCase();
 
 /**
- * Normalize an asset path (e.g., converts "public/..." to "/...").
- * @param {string} assetPath - The asset path to normalize.
- * @returns {string|null} - The normalized path or null if invalid.
+ * Normalise an asset path (e.g., converts "public/..." to "/...").
+ * @param {string} assetPath - The asset path to normalise.
+ * @returns {string|null} - The normalised path or null if invalid.
  */
 export const normaliseAssetPath = (assetPath) => {
   if (typeof assetPath !== 'string' || assetPath.trim() === '') return null;
@@ -58,31 +58,14 @@ export const normaliseAssetPath = (assetPath) => {
 export const normaliseRows = (response) => {
   if (Array.isArray(response)) return response;
   if (response?.data && Array.isArray(response.data)) return response.data;
+  if (response?.data?.data && Array.isArray(response.data.data)) return response.data.data;
+  if (response?.data?.rows && Array.isArray(response.data.rows)) return response.data.rows;
+  if (response?.data?.result && Array.isArray(response.data.result)) return response.data.result;
+  if (response?.data?.results && Array.isArray(response.data.results)) return response.data.results;
   if (response?.rows && Array.isArray(response.rows)) return response.rows;
   if (response?.result && Array.isArray(response.result)) return response.result;
+  if (response?.results && Array.isArray(response.results)) return response.results;
   return [];
-};
-
-/**
- * Build a URL with query parameters appended.
- * @param {string} basePath - The base API path.
- * @param {Object} queryParams - Object of query parameters.
- * @returns {string} - The complete URL with query string.
- */
-export const buildPathWithQuery = (basePath, queryParams) => {
-  const params = new URLSearchParams();
-  Object.entries(queryParams).forEach(([key, value]) => {
-    if (value === null || value === undefined || value === '') return;
-    if (Array.isArray(value)) {
-      value.forEach((entry) => params.append(key, entry));
-      return;
-    }
-    params.append(key, value);
-  });
-
-  const serialised = params.toString();
-  if (!serialised) return basePath;
-  return `${basePath}${basePath.includes('?') ? '&' : '?'}${serialised}`;
 };
 
 /**
@@ -117,13 +100,20 @@ export const ruleMatchesSelectedValue = (rule, selectedValue) => {
  * Resolve SVG URL from a data row.
  * Scans multiple column names for raw SVG markup or URLs.
  * @param {Object} row - The data row containing SVG information.
+ * @param {Object} [options] - Options controlling resolution.
+ * @param {string} [options.valueField] - Preferred field name containing SVG markup/URL.
  * @returns {string|null} - Data URI or URL pointing to the SVG, or null if not found.
  */
-export const resolveSvgUrl = (row) => {
+export const resolveSvgUrl = (row, options = {}) => {
   if (!row || typeof row !== 'object') return null;
+
+  const valueField = typeof options?.valueField === 'string' && options.valueField.trim() !== ''
+    ? options.valueField.trim()
+    : null;
 
   // Candidate column names for SVG content (in order of preference)
   const candidateKeys = [
+    ...(valueField ? [valueField] : []),
     'svg',
     'SVG',
     'svg_text',

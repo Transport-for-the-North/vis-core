@@ -1,4 +1,4 @@
-# SVG Page Configuration Guide
+# SVGGalleryManager Configuration Guide
 
 This guide explains how to configure and use the **SVGGalleryManager** component for displaying dynamic SVG galleries with legends and caveats.
 
@@ -16,7 +16,7 @@ All behaviour is driven by a page configuration object—no code changes needed 
 ## Component Location
 
 ```
-src/Components/SvgPage/SvgPage.jsx
+src/Components/SvgGalleryManager/SvgGalleryManager.jsx
 ```
 
 ## Configuration Structure
@@ -188,10 +188,10 @@ Example: Select "Network Scenario" → "View" dropdown updates to only show view
 
 ## Helper Functions
 
-All helper functions for SVG page operations are in:
+All helper functions for SVG gallery operations are in:
 
 ```
-src/utils/svgPageHelpers.js
+src/utils/svgGalleryManagerHelpers.js
 ```
 
 ### Exported Functions
@@ -201,7 +201,6 @@ src/utils/svgPageHelpers.js
 | `normaliseText(value)` | Normalise text for case-insensitive comparison |
 | `normaliseAssetPath(path)` | Convert relative asset paths (e.g., "public/..." → "/...") |
 | `normaliseRows(response)` | Detect and extract row array from various API response shapes |
-| `buildPathWithQuery(basePath, params)` | Build URL with query parameters |
 | `ruleMatchesSelectedValue(rule, value)` | Check if a legend/caveat rule matches a selected value |
 | `resolveSvgUrl(row)` | Detect SVG source from multiple column names or raw markup |
 | `sortOptions(options, sortConfig)` | Sort option objects by displayValue |
@@ -249,7 +248,7 @@ The component automatically:
 export const createNetworkSchematicsPage = () => ({
   pageName: "Network Schematics",
   url: "/network-schematics",
-  type: "SVGPage",
+  type: "SVGGalleryManager",
   
   config: {
     pageTitle: "Railway Network Schematic Diagrams",
