@@ -36,8 +36,12 @@ export const PageSwitch = ({ pageConfig }) => {
                 <DirectoryScorecardsPage/>
               </FilterProvider>
             );
-          case "SVGPage":
-            return <SVGGalleryManager config={pageConfig.config} />;
+          case "SVGGalleryManager":
+            return (
+              <FilterProvider>
+                <SVGGalleryManager config={pageConfig.config} />
+              </FilterProvider>
+            );
           default:
             return <div>Nothing</div>;
         }
