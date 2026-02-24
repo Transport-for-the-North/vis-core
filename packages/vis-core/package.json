@@ -78,8 +78,7 @@
     "build": "vite build",
     "build:watch": "vite build --watch",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "build:watch": "vite build --watch"
+    "test:watch": "jest --watch --passWithNoTests"
   },
   "peerDependencies": {
     "@auth0/auth0-react": "^2.6.0",
