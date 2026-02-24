@@ -154,4 +154,53 @@ describe("DynamicLegend", () => {
     const legendContainer = screen.getByText("water-layer").closest("div");
     expect(legendContainer).toBeInTheDocument();
   });
+
+  it("does not render layers with shouldShowInLegend = false", () => {
+    const mockMapWithGetStyle = {
+      ...mockMap,
+      getStyle: jest.fn(() => ({
+        layers: [
+          {
+            id: "network",
+            type: "line",
+            metadata: {
+              isStylable: true,
+              shouldShowInLegend: false,
+            },
+            paint: {
+              "line-color": "#00ffff",
+              "line-width": 2,
+            },
+          },
+        ],
+      })),
+    };
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {},
+      currentZoom: 10,
+    };
+
+    render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={mockMapWithGetStyle} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = mockMapWithGetStyle.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    expect(screen.queryByText("network")).not.toBeInTheDocument();
+  });
 });

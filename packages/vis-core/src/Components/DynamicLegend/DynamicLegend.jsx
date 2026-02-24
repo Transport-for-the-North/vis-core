@@ -545,10 +545,12 @@ export const DynamicLegend = ({ map }) => {
 
       const items = layers
         .filter((layer) => {
-          const isStylableOrShouldShow = layer.metadata && (layer.metadata.isStylable || layer.metadata.shouldShowInLegend);
+          const shouldShowInLegend =
+            layer.metadata &&
+            (layer.metadata.shouldShowInLegend ?? layer.metadata.isStylable);
           const isWithinZoomRange = (layer.minzoom === undefined || state.currentZoom >= layer.minzoom) &&
             (layer.maxzoom === undefined || state.currentZoom <= layer.maxzoom);
-          return isStylableOrShouldShow && isWithinZoomRange;
+          return shouldShowInLegend && isWithinZoomRange;
         })
         .map((layer, index) => {
           // Get the visualisation associated with this layer via joinLayer
@@ -556,10 +558,6 @@ export const DynamicLegend = ({ map }) => {
             return state.visualisations[key].joinLayer === layer.id;
           });
           const visualisation = state.visualisations[visualisationKey];
-
-          if (visualisation && visualisation.name === "Station Link Totals") {
-            return null;
-          }
           
           // Get legendText from visualisation
           const legendText = visualisation?.legendText || [];
