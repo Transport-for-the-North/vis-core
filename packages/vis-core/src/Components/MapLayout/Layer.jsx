@@ -44,15 +44,7 @@ export const Layer = ({ layer }) => {
   const loadingRef = useRef(false);
 
   // Track the last tiles URL we applied per map instance (used to avoid redundant updates).
-  const lastTilesUrlByMapRef = useRef(new WeakMap());
-
-  const viewportBbox = useMemo(() => {
-    if (!layer.appendViewportParamsToTiles) return null;
-    const viewportParamName = layer.viewportFilterParamName || "viewport";
-    const viewportUuid = paramNameToUuidMap?.[viewportParamName];
-    const bbox = viewportUuid ? filters?.[viewportUuid] : null;
-    return bbox && typeof bbox === "object" ? bbox : null;
-  }, [layer.appendViewportParamsToTiles, layer.viewportFilterParamName, filters, paramNameToUuidMap]);
+  const lastTilesUrlByMapRef = useRef(new WeakMap());  
 
   const computedTileUrl = useMemo(() => {
     if (layer.type !== "tile") return null;
@@ -62,28 +54,10 @@ export const Layer = ({ layer }) => {
         ? api.geodataService.buildTileLayerUrl(layer.path)
         : layer.path;
 
-    if (!layer.appendViewportParamsToTiles) return baseUrl;
+    return baseUrl;
+  }, [layer.type, layer.source, layer.path]);
 
-    // Keep the tile template stable to avoid MapLibre source teardown/re-add (which clears the map).
-    // We add a marker param; the actual west/south/east/north are appended per-request in transformRequest.
-    return appendQueryParams(baseUrl, { __viewport: 1 });
-  }, [
-    layer.type,
-    layer.source,
-    layer.path,
-    layer.appendViewportParamsToTiles,
-    // Intentionally do NOT depend on bbox; tile template stays stable.
-  ]);
-
-  // Keep latest viewport bbox on each map instance so useMap's transformRequest can append it per tile request.
-  useEffect(() => {
-    if (!layer.appendViewportParamsToTiles) return;
-    const targetMaps = maps || (map ? [map] : []);
-    if (targetMaps.length === 0) return;
-    targetMaps.forEach((mapInstance) => {
-      mapInstance.__viscoreViewportBbox = viewportBbox;
-    });
-  }, [map, maps, layer.appendViewportParamsToTiles, viewportBbox]);
+  
 
   useEffect(() => {
     // Determine the maps to operate on
@@ -184,9 +158,6 @@ export const Layer = ({ layer }) => {
               ? api.geodataService.buildTileLayerUrl(layer.path)
               : layer.path);
 
-          if (layer.appendViewportParamsToTiles) {
-            mapInstance.__viscoreViewportBbox = viewportBbox;
-          }
 
           sourceConfig.type = "vector";
           sourceConfig.tiles = [url];
@@ -315,9 +286,6 @@ export const Layer = ({ layer }) => {
     if (targetMaps.length === 0) return;
     if (!computedTileUrl) return;
 
-    // When viewport filtering is enabled we keep the tile template stable;
-    // transformRequest handles per-request bbox, so no source updates are needed.
-    if (layer.appendViewportParamsToTiles) return;
 
     targetMaps.forEach((mapInstance) => {
       const src = mapInstance.getSource(layer.name);

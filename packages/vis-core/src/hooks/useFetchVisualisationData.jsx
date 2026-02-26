@@ -220,7 +220,22 @@ export const useFetchVisualisationData = (
         const queryParamsForApi = toSimpleParamsMap(queryParams);
         const pathParamsForApi = toSimpleParamsMap(pathParams);
 
-        // Create a cache key based on the request
+        // If configured to filter server-side by viewport, add the current bbox to the query params
+        if (shouldFilterDataToViewport && map && typeof map.getBounds === 'function') {
+          try {
+            const bounds = map.getBounds();
+            queryParamsForApi.west = Number(bounds.getWest().toFixed(6));
+            queryParamsForApi.south = Number(bounds.getSouth().toFixed(6));
+            queryParamsForApi.east = Number(bounds.getEast().toFixed(6));
+            queryParamsForApi.north = Number(bounds.getNorth().toFixed(6));
+            // Optional: include zoom to allow server to choose detail level
+            queryParamsForApi.zoom = Number(map.getZoom().toFixed(2));
+          } catch (err) {
+            // ignore bbox attach failures
+          }
+        }
+
+        // Create a cache key based on the request (including bbox when present)
         const cacheKey = JSON.stringify({ path, queryParamsForApi, pathParamsForApi });
 
         // Check cache first
@@ -332,10 +347,37 @@ export const useFetchVisualisationData = (
     fetchDataForVisualisation,
   ]);
 
-  // Refilter the raw data when the map viewport changes.
+  // When server-side viewport filtering is enabled, re-fetch data when the map viewport changes.
   useEffect(() => {
-    // Only run if both map and mapLayerId are provided and when rawData is available.
-    if (!map || !mapLayerId || rawData === null || !shouldFilterDataToViewport) return;
+    if (!map || !shouldFilterDataToViewport) return;
+
+    const handleMoveEnd = debounce(() => {
+      const { queryParams = {}, pathParams = {} } = visualisation || {};
+      // Only refetch if required params are present
+      if (!areAllRequiredParamsPresent(queryParams) || !areAllRequiredParamsPresent(pathParams)) return;
+
+      // Trigger a fetch which will include the current bbox in the query params
+      fetchDataForVisualisation(visualisation);
+      fetchDataForVisualisation.flush?.();
+    }, 250);
+
+    map.on('moveend', handleMoveEnd);
+
+    return () => {
+      map.off('moveend', handleMoveEnd);
+      handleMoveEnd.cancel?.();
+    };
+  }, [map, shouldFilterDataToViewport, visualisation, fetchDataForVisualisation]);
+
+  // Refilter the raw data when the map viewport changes (client-side filtering).
+  // NOTE: When server-side viewport filtering is enabled (`shouldFilterDataToViewport === true`),
+  // the API will return a dataset already limited to the current bbox. In that mode we should
+  // NOT perform additional client-side filtering against vector tiles (queryRenderedFeatures),
+  // since that previously caused the visualisation to operate at the tile feature level.
+  useEffect(() => {
+    // Only run client-side filtering when map and mapLayerId are present, rawData is available,
+    // and server-side viewport filtering is NOT enabled.
+    if (!map || !mapLayerId || rawData === null || shouldFilterDataToViewport) return;
     if (!Array.isArray(rawData)) {
       // Only arrays can be filtered by record.id; keep original otherwise.
       setFilteredData(rawData);

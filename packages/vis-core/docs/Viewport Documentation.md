@@ -1,112 +1,106 @@
 # Viewport documentation (vis-core)
 
-This document explains how **viewport-aware vector tile filtering** works in `vis-core` and how to configure it.
+This document explains how viewport-aware data-side filtering works in `vis-core` and how to configure it. The frontend writes the current map bbox into `FilterContext`; data endpoints are called with bbox query parameters so the backend returns only the features intersecting the viewport.
 
 ## What it does
 
 - Captures the current map bounds (bbox) from MapLibre.
 - Stores that bbox in `FilterContext` via a `mapViewport` filter.
-- For configured **vector tile layers**, appends `west/south/east/north` to each tile request **without recreating the MapLibre source/layers**.
-
-This avoids the “layer flicker / clearing on zoom” issue that can occur when a tile source is removed and re-added on every viewport update.
+- Optionally pushes `west/south/east/north` (and `zoom`) into the query params for data API calls, so server-side endpoints return only viewport-intersecting features.
 
 ## When to use it
 
-Use viewport filtering when:
-- Your backend vector tile endpoint supports `west`, `south`, `east`, `north` query parameters.
-- You want to reduce the amount of data returned for a tile request (e.g., dense line networks).
+Use data-side viewport filtering when:
+- Your backend data endpoints accept bbox query parameters (`west`, `south`, `east`, `north`) and can filter results server-side.
+- You want to reduce the size of data responses returned to the client (e.g., large point or line datasets) and avoid client-side clipping.
 
-Do **not** use it for non-tile API calls unless your data endpoint actually accepts these params.
+Do **not** enable viewport filtering for endpoints that do not accept bbox params.
 
 ## Configuration
 
 ### 1) Add a viewport filter
 
-Add a filter of `type: "mapViewport"` to your page config. The filter stores bbox in `FilterContext`.
+Add a filter of `type: "mapViewport"` to your page config. The filter records the current bbox in `FilterContext`, and actions on the filter are used to push bbox values into the page/query params that the data hooks will send to your API.
 
-Example:
+Example (based on `src/configs/cvt/pages/osRisk.js`):
 
 ```js
 {
-  filterName: "Viewport",
-  paramName: "viewport",
-  type: "mapViewport",
-  target: "api",
-  values: { source: "local", values: [] },
-
-  // Optional: if you also want to push bbox into query params for a data endpoint,
-  // you can add actions. For viewport-filtered tiles, actions are not required.
-  actions: [],
+   filterName: "Viewport",
+   paramName: "viewport",
+   type: "mapViewport",
+   target: "api",
+   visualisations: ["Road OS Risk"],
+   values: { source: "local", values: [] },
+   actions: [
+      { action: "UPDATE_QUERY_PARAMS", payload: { paramName: "west", valueKey: "west" } },
+      { action: "UPDATE_QUERY_PARAMS", payload: { paramName: "south", valueKey: "south" } },
+      { action: "UPDATE_QUERY_PARAMS", payload: { paramName: "east", valueKey: "east" } },
+      { action: "UPDATE_QUERY_PARAMS", payload: { paramName: "north", valueKey: "north" } },
+      { action: "UPDATE_QUERY_PARAMS", payload: { paramName: "zoom", valueKey: "zoom" } },
+   ],
 }
 ```
 
 Notes:
-- `Map.jsx` is responsible for updating this filter on `moveend` and `zoomend`.
-- If a `minZoom` is configured (directly on the filter, or inferred from join layers), the bbox is cleared below that zoom.
-- Updates are debounced (default 250ms) and also apply a small “movement threshold” to avoid excessive updates when the bbox hasn’t meaningfully changed.
+- `Map.jsx` updates the `mapViewport` filter on `moveend` and `zoomend`.
+- If a `minZoom` is configured (on the filter or inferred from visualisations), the bbox is cleared below that zoom.
+- Updates are debounced (default ~250ms) and apply a small movement threshold to avoid unnecessary API calls when the bbox hasn't meaningfully changed.
 
-### 2) Enable viewport bounds on a vector tile layer
+### 2) Enable data-side viewport filtering for visualisations
 
-In your layer config:
+For visualisations that fetch data (e.g., `joinDataToMap` used by `osRisk`), enable viewport filtering on the visualization and ensure the corresponding `mapViewport` filter pushes bbox params into the API query string. The data hook will include those params when calling the backend.
+
+Example visualization config (from `osRisk.js`):
 
 ```js
 {
-  name: "OS Road Network",
-  type: "tile",
-  source: "api",
-  path: "/api/vectortiles/cvt_os_roads/{z}/{x}/{y}",
-
-  appendViewportParamsToTiles: true,
-  viewportFilterParamName: "viewport", // optional, defaults to "viewport"
+   name: "Road OS Risk",
+   type: "joinDataToMap",
+   joinLayer: "OS Road Network",
+   shouldFilterDataToViewport: true,
+   style: "line-continuous",
+   joinField: "id",
+   valueField: "value",
+   dataSource: "api",
+   dataPath: "/api/cvt/os-risk-results",
 }
 ```
 
 What this does:
-- `Layer.jsx` keeps the tile template URL **stable** but adds a marker query param `__viewport=1`.
-- `Layer.jsx` also stores the latest bbox on the MapLibre instance (`map.__viscoreViewportBbox`).
-- `useMap.jsx` uses MapLibre’s `transformRequest` hook to append `west/south/east/north` to every tile request when it sees `__viewport=1`.
+- When the `mapViewport` filter updates its query params (via `UPDATE_QUERY_PARAMS` actions), the visualization's data hook includes `west/south/east/north` (and `zoom` if present) in the request to `dataPath`.
+- The backend should use those bbox params to filter returned features; the frontend then joins the returned data to the `joinLayer` on the map using `joinField`.
 
 ## How it works (dataflow)
 
-1. **MapLibre viewport changes** (`moveend`, `zoomend`).
-2. `Map.jsx` computes bbox (lon/lat degrees):
-   - `west`, `south`, `east`, `north` (rounded to 6dp)
-   - `zoom` (rounded to 2dp; used for change detection/thresholding, not sent to the backend)
-3. `Map.jsx` writes bbox into `FilterContext` via `SET_FILTER_VALUE` for the `mapViewport` filter.
-4. `Layer.jsx` reads bbox from `FilterContext` and stores it on each map instance:
-   - `map.__viscoreViewportBbox = { west, south, east, north, zoom }`
-5. Tile layers with `appendViewportParamsToTiles: true` get a stable tiles URL with `__viewport=1`.
-6. `useMap.jsx` `transformRequest` intercepts tile requests and appends:
-   - `west`, `south`, `east`, `north`
+1. Map viewport changes (`moveend`, `zoomend`).
+2. `Map.jsx` computes bbox (lon/lat degrees): `west`, `south`, `east`, `north` (rounded to 6dp) and `zoom` (rounded to 2dp for thresholding).
+3. `Map.jsx` writes the bbox into `FilterContext` via `SET_FILTER_VALUE` for the `mapViewport` filter.
+4. The `mapViewport` filter dispatches any configured `actions` (commonly `UPDATE_QUERY_PARAMS`) which write `west/south/east/north/zoom` into the page/query params for data hooks.
+5. Visualisations with `shouldFilterDataToViewport: true` include those params when calling their `dataPath` on the `dataSource`.
+6. The backend returns only features intersecting the bbox; the frontend joins returned data to the map (e.g., `joinDataToMap`) and updates styling/interaction.
 
 ## Backend expectations
 
-Your vector tile endpoint should accept and validate:
+Your data endpoints should accept and validate bbox params (lon/lat degrees): `west`, `south`, `east`, `north`.
+
+Typical patterns:
+- No bounds provided → return the full dataset or server-side default pagination.
+- Bounds provided → apply spatial filter and return only features intersecting the bbox.
+
+Server-side validations to consider:
 - `west < east`
 - `south < north`
-
-The bbox values sent from the frontend are in lon/lat degrees (from MapLibre bounds).
-
-The typical pattern is:
-- No bounds provided → return normal tile content.
-- Bounds provided → apply a spatial constraint and return only intersecting features.
+- Optional: enforce a maximum area or geometry count to avoid heavy responses.
 
 ## Troubleshooting
 
-### The map clears or flickers
+### The data doesn't appear filtered
 
-This usually happens when the tile **source is removed/re-added** during viewport updates.
-
-With the current approach, viewport bounds are appended per-request using `transformRequest`, so the source/layers should remain mounted.
-
-### The layer doesn’t seem filtered
-
-- Confirm the layer has `appendViewportParamsToTiles: true`.
-- Confirm the backend is reading `west/south/east/north` query params.
-- Confirm the viewport filter exists and is of type `mapViewport`.
+- Confirm the page includes a `mapViewport` filter with `actions` that update query params (see `osRisk.js`).
+- Confirm the visualization has `shouldFilterDataToViewport: true` and that its data hook sends query params to the correct `dataPath`.
+- Confirm the backend is reading `west/south/east/north` (and `zoom` if used).
 
 ### Data endpoints stop returning data
 
-If you previously pushed viewport bounds into **visualisation query params**, the data hook may treat missing/cleared params as “required params missing”.
-
-Fix: keep viewport bounds for **tiles only** (use `appendViewportParamsToTiles`) unless the data endpoint explicitly supports bbox params.
+If the data hook treats missing/cleared params as an error (e.g., required params), make sure the backend can accept absent bbox params or adjust the filter/actions to only add params when appropriate (for example, respect `minZoom`).
