@@ -99,7 +99,7 @@ export const Layer = ({ layer }) => {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
           path: layer.path ?? null,
-          shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false),
+          shouldShowInLegend: layer.shouldShowInLegend ?? (layer.isStylable ? true : false),
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true, // opacity control should appear by default
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false, // colour scheme selector should appear if stylable, unless this is enforced
           enforceNoClassificationMethod: layer.enforceNoClassificationMethod ?? false, // classification method selector should appear if stylable, unless this is enforced
@@ -117,7 +117,7 @@ export const Layer = ({ layer }) => {
 
             // Add the hover layer if the layer is hoverable
             if (layer.isHoverable) {
-              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
+              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
               hoverLayerConfig.id = `${layer.name}-hover`;
               mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
             }
@@ -184,7 +184,7 @@ export const Layer = ({ layer }) => {
 
           // Add the hover layer if the layer is hoverable
           if (layer.isHoverable) {
-            const hoverLayerConfig = getHoverLayerStyle(layer.geometryType);
+            const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
             hoverLayerConfig.id = `${layer.name}-hover`;
             hoverLayerConfig.source = layer.name;
             hoverLayerConfig["source-layer"] = layer.sourceLayer;

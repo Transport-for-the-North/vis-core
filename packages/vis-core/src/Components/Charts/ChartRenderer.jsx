@@ -340,7 +340,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={items.length * 45} // Dynamic height, each line is equivalent to 45px
+      height={config.height ?? items.length * 45} // Allow explicit height override; otherwise keep dynamic height
     >
       <RBarChart
         data={items}
@@ -1044,16 +1044,17 @@ export const ChartRenderer = ({
     <div>
       {charts.map((cfg, idx) => {
         const type = (cfg.type || "").toLowerCase();
+        const resolvedBarChartHeight = cfg?.height ?? cfg?.barHeight ?? barHeight;
+        const cfgWithResolvedHeight =
+          resolvedBarChartHeight === undefined
+            ? cfg
+            : { ...cfg, height: resolvedBarChartHeight };
         switch (type) {
           case "bar":
             return (
               <BarChart
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
               />
@@ -1062,11 +1063,7 @@ export const ChartRenderer = ({
             return (
               <BarChart
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
                 type="vertical"
@@ -1076,11 +1073,7 @@ export const ChartRenderer = ({
             return (
               <BarChartMultiple
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
               />
@@ -1089,11 +1082,7 @@ export const ChartRenderer = ({
             return (
               <BarChartMultiple
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
                 type="vertical"

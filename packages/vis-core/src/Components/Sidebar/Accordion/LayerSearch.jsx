@@ -21,9 +21,13 @@ const SearchContainer = styled.div`
  * @returns {JSX.Element} The rendered LayerSearch component.
  */
 export const LayerSearch = ({ map, layer }) => {
+  const LABEL_DISPLAY_DURATION = 5000; // Duration to show the label in milliseconds
   const [selectedOption, setSelectedOption] = useState(null);
   const zoomToFeaturePlaceholderText = 
     layer.metadata?.zoomToFeaturePlaceholderText || 'Search features in this layer...';
+  const zoomToFeatureMaxZoom = layer.metadata?.zoomToFeatureMaxZoom ?? 14;
+  const zoomToFeatureDuration = layer.metadata?.zoomToFeatureDuration ?? 1000;
+  const zoomToFeatureLinear = layer.metadata?.zoomToFeatureLinear ?? false;
   /**
    * Handles the change event when a feature is selected.
    * Zooms to the selected feature on the map and adds a temporary label.
@@ -40,15 +44,34 @@ export const LayerSearch = ({ map, layer }) => {
             selectedOption.value
           );
 
-          // Fit the map to the bounds of the feature
-          map.fitBounds(bounds.coordinates[0], {
-            padding: 20,
+          // Extract the bounding box coordinates
+          // bounds.coordinates[0] is the polygon ring, we need to find min/max
+          const coords = bounds.coordinates[0];
+          const lngs = coords.map(c => c[0]);
+          const lats = coords.map(c => c[1]);
+          const minLng = Math.min(...lngs);
+          const maxLng = Math.max(...lngs);
+          const minLat = Math.min(...lats);
+          const maxLat = Math.max(...lats);
+          
+          // Calculate padding based on geometry size
+          const lngDiff = maxLng - minLng;
+          const latDiff = maxLat - minLat;
+          const maxDiff = Math.max(lngDiff, latDiff);
+          const basePadding = maxDiff < 0.01 ? 150 : maxDiff < 0.05 ? 120 : 100;
+          
+          // Fit bounds to show entire geometry - DO NOT use center option as it conflicts
+          map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
+            padding: basePadding,
+            // Prevent over-zooming when the geometry bounds are very small
+            maxZoom: zoomToFeatureMaxZoom,
+            // Speed up the camera transition (ms). Set to 0 for instant jump.
+            duration: zoomToFeatureDuration,
+            // When true, uses a constant speed easing (snappier feel).
+            linear: zoomToFeatureLinear,
           });
 
-          // Center the map on the centroid of the feature
-          map.setCenter(centroid.coordinates);
-
-          // Add a temporary label for the selected feature
+          // Add a temporary label for the selected feature with guaranteed visibility
           const labelLayerId = 'feature-label';
           const labelSourceId = 'feature-label-source';
 
@@ -83,11 +106,14 @@ export const LayerSearch = ({ map, layer }) => {
               'text-size': 14,
               'text-offset': [0, 1.5],
               'text-anchor': 'top',
+              'text-allow-overlap': true,
+              'text-ignore-placement': true,
             },
             paint: {
               'text-color': '#000000',
               'text-halo-color': '#ffffff',
               'text-halo-width': 2,
+              'text-opacity': 1,
             },
           });
 
@@ -96,18 +122,15 @@ export const LayerSearch = ({ map, layer }) => {
               map.removeLayer(labelLayerId);
               map.removeSource(labelSourceId);
             }
-            map.off('move', removeLabel);
-            map.off('click', removeLabel);
           };
 
-          map.on('move', removeLabel);
-          map.on('click', removeLabel);
+          setTimeout(removeLabel, LABEL_DISPLAY_DURATION);
         } catch (error) {
           console.error('Failed to fetch bounds:', error);
         }
       }
     },
-    [layer.metadata.path, map]
+    [layer.metadata.path, map, zoomToFeatureDuration, zoomToFeatureLinear, zoomToFeatureMaxZoom]
   );
 
   return (
