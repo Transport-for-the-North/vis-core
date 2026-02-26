@@ -6,6 +6,7 @@ import { Scorecard } from "Components/Scorecard";
 import { TopFilters } from "./TopFilters";
 import { api } from "services";
 import { applyTopFilterScoping } from "utils/applyTopFilterScoping";
+import { applyWhereConditions } from "utils/config";
 
 import {
   DetailsGrid,
@@ -58,9 +59,16 @@ export function DirectoryScorecardsPage() {
     };
   }, [config.recordsEndpoint, filters, filterState]);
 
+  // Scope the records based on any client-side filter conditions, post-server fetch
+  const clientScopedRecords = useMemo(() => {
+    const where = config.recordsEndpoint?.clientFilter?.where;
+    if (!Array.isArray(where) || where.length === 0) return records;
+    return applyWhereConditions(records, where);
+  }, [records, config.recordsEndpoint]);
+
   const scopedRows = useMemo(
-    () => applyTopFilterScoping(records, filters, filterState, isReady),
-    [records, filters, filterState, isReady]
+    () => applyTopFilterScoping(clientScopedRecords, filters, filterState, isReady),
+    [clientScopedRecords, filters, filterState, isReady]
   );
 
   const idAccessor = config.selection?.rowIdAccessor || "id";
