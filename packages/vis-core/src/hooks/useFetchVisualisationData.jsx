@@ -146,6 +146,9 @@ export const useFetchVisualisationData = (
    */
   const pendingParamsSignatureRef = useRef(null);
 
+  // Track if this is the first fetch so we can bypass the debounce delay on load
+  const isFirstFetchRef = useRef(true);
+
   // Cache for API responses based on query string
   const responseCache = useRef(new Map());
   const maxCacheSize = 20; // Limit cache to avoid excessive memory usage
@@ -172,6 +175,9 @@ export const useFetchVisualisationData = (
     setLoading(false);
     prevParamsRef.current = undefined;
     pendingParamsSignatureRef.current = null; // keep in sync
+
+    // Reset the first fetch flag when the visualisation changes
+    isFirstFetchRef.current = true;
   }, []);
 
   // Reset state when visualisation name changes (page navigation)
@@ -338,7 +344,12 @@ export const useFetchVisualisationData = (
       pendingParamsSignatureRef.current = currentParamsStr;
 
       fetchDataForVisualisation(visualisation);
-      fetchDataForVisualisation.flush?.();
+
+      // CONDITIONAL FLUSH: Only bypass the debounce if it's the very first load
+      if (isFirstFetchRef.current) {
+        fetchDataForVisualisation.flush?.();
+        isFirstFetchRef.current = false;
+      }
     }
   }, [
     visualisation,
@@ -358,7 +369,6 @@ export const useFetchVisualisationData = (
 
       // Trigger a fetch which will include the current bbox in the query params
       fetchDataForVisualisation(visualisation);
-      fetchDataForVisualisation.flush?.();
     }, 250);
 
     map.on('moveend', handleMoveEnd);
