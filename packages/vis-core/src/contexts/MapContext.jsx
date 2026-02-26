@@ -18,7 +18,7 @@ import {
   getInitialFilterValue
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext, FilterContext, ErrorProvider, ErrorContext } from "contexts";
+import { AppContext, PageContext, FilterContext, ErrorContext } from "contexts";
 import { api } from "services";
 
 // Create a context for the app configuration
@@ -407,10 +407,8 @@ export const MapProvider = ({ children }) => {
   }, [pageContext]);
 
   return (
-    <ErrorProvider>
-      <MapContext.Provider value={contextValue}>
-        {state.pageIsReady ? children : <div>Loading...</div>}
-      </MapContext.Provider>
-    </ErrorProvider>
+    <MapContext.Provider value={contextValue}>
+      {state.pageIsReady ? children : <div>Loading...</div>}
+    </MapContext.Provider>
   );
 };
