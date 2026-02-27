@@ -33,6 +33,8 @@ export default {
     '^reducers$': '<rootDir>/src/reducers/index.js',
     '^utils/(.*)$': '<rootDir>/src/utils/$1',
     '^utils$': '<rootDir>/src/utils/index.js',
+    '^enums/(.*)$': '<rootDir>/src/enums/$1',
+    '^enums$': '<rootDir>/src/enums/index.js',
     '^defaults$': '<rootDir>/src/defaults.js',
   },
   transform: {

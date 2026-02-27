@@ -20,6 +20,7 @@ jest.mock("uuid", () => ({
 }));
 
 jest.mock("utils", () => ({
+  ...jest.requireActual("utils"),
   hasRouteParameterOrQuery: jest.fn(() => true),
   extractParamsWithValues: jest.fn(() => true),
   processParameters: jest.fn(() => ({
@@ -43,6 +44,11 @@ jest.mock("defaults", () => ({
   defaultMapStyle: "mock-style",
   defaultMapZoom: 10,
   defaultMapCentre: [0, 0],
+  CARD_CONSTANTS: {
+    PADDING: 10,
+    TOGGLE_BUTTON_WIDTH: 20,
+    TOGGLE_BUTTON_HEIGHT: 20,
+  },
 }));
 
 // Now import after mocks

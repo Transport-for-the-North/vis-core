@@ -32,6 +32,8 @@ const mockMapContext = {
         getSource: jest.fn(),
         addSource: jest.fn(),
         addLayer: jest.fn(),
+        isStyleLoaded: jest.fn(() => true),
+        style: {},
       },
     ],
     paramNameToUuidMap: {
@@ -281,8 +283,8 @@ describe("One missing param in the layer param", () => {
       },
     };
 
-    mockMapContext.state.maps[0].getLayer.mockReturnValue(true);
-    mockMapContext.state.maps[0].getSource.mockReturnValue(true);
+    mockMapContext.state.maps[0].getLayer.mockReturnValue({ id: "Accessibility" });
+    mockMapContext.state.maps[0].getSource.mockReturnValue({ id: "mock-source" });
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -408,8 +410,8 @@ describe("Cleanup function to remove layers and sources when the component unmou
         visualisationName: "Bus Accessibility",
       },
     };
-    mockMapContext.state.maps[0].getLayer.mockReturnValue(true);
-    mockMapContext.state.maps[0].getSource.mockReturnValue(true);
+    mockMapContext.state.maps[0].getLayer.mockReturnValue({ id: "mock-layer" });
+    mockMapContext.state.maps[0].getSource.mockReturnValue({ id: "mock-source" });
   });
   it("functions to remove", () => {
     const { unmount } = render(
