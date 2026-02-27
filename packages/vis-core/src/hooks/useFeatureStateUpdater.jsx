@@ -4,8 +4,8 @@ import { isValidPaintExpression, isValidPaintValue, applyPaintProperties } from 
 
 // Constants
 const RETRY_CONFIG = {
-  maxRetries: 3,
-  baseDelay: 150,
+  maxRetries: 8,
+  baseDelay: 250,
 };
 
 /**
@@ -15,6 +15,11 @@ const createRetryManager = () => {
   const pendingOperations = new Map();
 
   const schedule = (key, operation, delay) => {
+    // Actually clear the existing timeout if one exists for this key
+    if (pendingOperations.has(key)) {
+      clearTimeout(pendingOperations.get(key));
+    }
+
     const timeoutId = setTimeout(() => {
       pendingOperations.delete(key);
       operation();
@@ -70,7 +75,7 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
     
     newStates.set(id, value);
     
-    // OPTIMIZATION: Only call setFeatureState if the feature is new or its value changed.
+    // Only call setFeatureState if the feature is new or its value changed.
     // This prevents performance stuttering when passing accumulated data on map pans.
     if (!prevStates.has(id) || prevStates.get(id) !== value) {
       map.setFeatureState(
@@ -156,10 +161,10 @@ export const useFeatureStateUpdater = () => {
           return;
         }
 
-        // Check if layer exists on map
-        if (!map.getLayer(specifiedLayer.name)) {
+        // Check if style is loaded alongside checking if layer exists
+        if (!map.isStyleLoaded() || !map.getLayer(specifiedLayer.name)) {
           if (retryCount < maxRetries) {
-            const operationKey = `${layerName}-retry-${retryCount}`;
+            const operationKey = `${layerName}-update`;
             const delay = baseDelay * (retryCount + 1);
             
             retryManager.schedule(operationKey, () => performUpdate(retryCount + 1), delay);
@@ -198,11 +203,18 @@ export const useFeatureStateUpdater = () => {
 
           // Apply filter if preserving base style
           if (specifiedLayer.preserveBaseStyle) {
-            map.setFilter(specifiedLayer.name, [
-              'in',
-              ['get', 'id'],
-              ['literal', Array.from(newStates.keys())],
-            ]);
+            const keys = Array.from(newStates.keys());
+            
+            if (keys.length > 0) {
+              map.setFilter(specifiedLayer.name, [
+                'in',
+                ['get', 'id'],
+                ['literal', keys],
+              ]);
+            } else {
+              // Safe fallback that hides all features without crashing the renderer
+              map.setFilter(specifiedLayer.name, ['==', ['get', 'id'], -1]);
+            }
           }
         } catch (error) {
           console.error(`Error updating feature states for ${layerName}:`, error);
