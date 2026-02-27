@@ -184,8 +184,11 @@ export const useFetchVisualisationData = (
   // Track previous combined params (query + path) to avoid refetching unnecessarily.
   const prevParamsRef = useRef();
   const prevVisualisationNameRef = useRef();
+  
   // Access ErrorContext to display an overlay for missing parameters (if provider present)
-  const { state: errorState, dispatch: errorDispatch } = useContext(ErrorContext);
+  const errorContext = useContext(ErrorContext);
+  const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
+  const errorState = errorContext?.state ?? null;
 
   /**
    * - React StrictMode (dev) mounts/unmounts quickly; a 400ms debounced call can be cancelled

@@ -48,7 +48,9 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
-  const { state: errorState, dispatch: errorDispatch } = useContext(ErrorContext);
+  const errorContext = useContext(ErrorContext);
+  const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
+  const errorState = errorContext?.state ?? null;
 
   // Initialize state within the provider function
   const initialState = {
