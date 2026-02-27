@@ -532,18 +532,19 @@ export const MapVisualisation = ({
       return;
     }
 
-    // Update the refs to the current data
-    prevCombinedDataRef.current = combinedData;
-    prevVisualisationDataRef.current = visualisationData;
-    prevColorRef.current[layerKey] = layerColorScheme;
-    prevClassMethodRef.current[layerKey] = classificationMethod;
-
     const dataToVisualise = visualisationData || [];
     const dataToClassify = combinedData;
 
     let cleanupFns = [];
 
     const performReclassification = () => {
+      
+      // Update the refs to the current data
+      prevCombinedDataRef.current = combinedData;
+      prevVisualisationDataRef.current = visualisationData;
+      prevColorRef.current[layerKey] = layerColorScheme;
+      prevClassMethodRef.current[layerKey] = classificationMethod;
+      
       switch (visualisation.type) {
         case "joinDataToMap": {
           if (
