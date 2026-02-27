@@ -1,6 +1,12 @@
-import { useEffect, useContext, useRef } from "react";
+import { useEffect, useContext, useMemo, useRef } from "react";
 import { api } from "services";
-import { getHoverLayerStyle, getLayerStyle, getSelectedLayerStyle, getOpacityProperty } from "utils";
+import {
+  appendQueryParams,
+  getHoverLayerStyle,
+  getLayerStyle,
+  getSelectedLayerStyle,
+  getOpacityProperty,
+} from "utils";
 import { useMapContext} from "hooks";
 import { FilterContext } from "contexts";
 import { actionTypes } from "reducers";
@@ -37,6 +43,22 @@ export const Layer = ({ layer }) => {
   const filters = filterContext?.state || {};
   const loadingRef = useRef(false);
 
+  // Track the last tiles URL we applied per map instance (used to avoid redundant updates).
+  const lastTilesUrlByMapRef = useRef(new WeakMap());  
+
+  const computedTileUrl = useMemo(() => {
+    if (layer.type !== "tile") return null;
+
+    const baseUrl =
+      layer.source === "api"
+        ? api.geodataService.buildTileLayerUrl(layer.path)
+        : layer.path;
+
+    return baseUrl;
+  }, [layer.type, layer.source, layer.path]);
+
+  
+
   useEffect(() => {
     // Determine the maps to operate on
     const targetMaps = maps || (map ? [map] : []);
@@ -48,6 +70,7 @@ export const Layer = ({ layer }) => {
     // If missingParams are present, remove the layer if it exists
     if (layer.missingParams?.length > 0) {
       targetMaps.forEach((mapInstance) => {
+        if (!mapInstance || !mapInstance.style) return;
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
         }
@@ -72,6 +95,8 @@ export const Layer = ({ layer }) => {
 
     // Check if the layer is already added to avoid duplicates
     targetMaps.forEach((mapInstance) => {
+      if (!mapInstance) return;
+
       if (!mapInstance.getSource(layer.name)) {
         let sourceConfig = {};
         let layerConfig = {
@@ -131,13 +156,26 @@ export const Layer = ({ layer }) => {
         // Handle tile layer type
         else if (layer.type === "tile") {
           const url =
-            layer.source === "api"
+            computedTileUrl ||
+            (layer.source === "api"
               ? api.geodataService.buildTileLayerUrl(layer.path)
-              : layer.path;
+              : layer.path);
+
+
           sourceConfig.type = "vector";
           sourceConfig.tiles = [url];
+          // If configured, ensure the *source* also respects zoom constraints.
+          // (MapLibre can request tiles for hidden layers unless the source is also gated.)
+          if (typeof layer.minZoom === "number") {
+            sourceConfig.minzoom = layer.minZoom;
+          }
+          if (typeof layer.maxZoom === "number") {
+            sourceConfig.maxzoom = layer.maxZoom;
+          }
           sourceConfig.promoteId = "id";
           mapInstance.addSource(layer.name, sourceConfig);
+          // Remember what we mounted with so later tile-template updates can diff correctly.
+          lastTilesUrlByMapRef.current.set(mapInstance, url);
           
           // Apply defaultOpacity to tile layer paint properties if specified
           if (layer.defaultOpacity) {
@@ -212,6 +250,8 @@ export const Layer = ({ layer }) => {
     // Cleanup function to remove layers and sources when the component unmounts
     return () => {
       targetMaps.forEach((mapInstance) => {
+        if (!mapInstance || !mapInstance.style) return;
+
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
         }
@@ -242,6 +282,127 @@ export const Layer = ({ layer }) => {
       });
     };
   }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType]);
+
+  // If this is a tile layer and its computed tile URL changes,
+  // update the existing source tiles in-place.
+  useEffect(() => {
+    if (layer.type !== "tile") return;
+    const targetMaps = maps || (map ? [map] : []);
+    if (targetMaps.length === 0) return;
+    if (!computedTileUrl) return;
+
+
+    targetMaps.forEach((mapInstance) => {
+      if (!mapInstance) return;
+
+      const src = mapInstance.getSource(layer.name);
+      if (!src) return;
+
+      const lastUrl = lastTilesUrlByMapRef.current.get(mapInstance);
+      if (lastUrl === computedTileUrl) return;
+
+      // Prefer in-place update if supported by MapLibre.
+      if (typeof src.setTiles === "function") {
+        try {
+          src.setTiles([computedTileUrl]);
+          lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
+          return;
+        } catch (e) {
+          // Fall through to remove/re-add.
+        }
+      }
+
+      // Fallback: remove and re-add source + layers.
+      try {
+        [
+          layer.name,
+          `${layer.name}-symbols`,
+          `${layer.name}-symbols-hover`,
+          `${layer.name}-hover`,
+          `${layer.name}-select`,
+          `${layer.name}-label`,
+        ].forEach((layerId) => {
+          if (mapInstance.getLayer(layerId)) mapInstance.removeLayer(layerId);
+        });
+        if (mapInstance.getSource(layer.name)) mapInstance.removeSource(layer.name);
+      } catch {
+        // If removal fails, don't try to re-add.
+        return;
+      }
+
+      const sourceConfig = {
+        type: "vector",
+        tiles: [computedTileUrl],
+        promoteId: "id",
+      };
+      if (typeof layer.minZoom === "number") sourceConfig.minzoom = layer.minZoom;
+      if (typeof layer.maxZoom === "number") sourceConfig.maxzoom = layer.maxZoom;
+
+      mapInstance.addSource(layer.name, sourceConfig);
+
+      const baseLayerConfig = {
+        ...getLayerStyle(layer.geometryType),
+        id: layer.name,
+        source: layer.name,
+        "source-layer": layer.sourceLayer,
+        maxzoom: layer.maxZoom || 24,
+        minzoom: layer.minZoom || 0,
+        bufferSize: layer.bufferSize,
+        paint: layer.customPaint || getLayerStyle(layer.geometryType).paint,
+        layout: {
+          ...(getLayerStyle(layer.geometryType).layout || {}),
+          visibility: layer?.hiddenByDefault ? "none" : "visible",
+        },
+        metadata: {
+          ...(layer.metadata ?? {}),
+          ...(getLayerStyle(layer.geometryType).metadata || {}),
+          isStylable: layer.isStylable ?? false,
+          path: layer.path ?? null,
+          shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false),
+          shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true,
+          enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false,
+          enforceNoClassificationMethod: layer.enforceNoClassificationMethod ?? false,
+          zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
+          defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY,
+          bufferSize: layer.bufferSize,
+        },
+      };
+
+      // Apply defaultOpacity if specified.
+      if (layer.defaultOpacity) {
+        const opacityProp = getOpacityProperty(baseLayerConfig.type);
+        if (baseLayerConfig.paint && opacityProp) {
+          baseLayerConfig.paint[opacityProp] = layer.defaultOpacity;
+        }
+      }
+
+      mapInstance.addLayer(baseLayerConfig);
+
+      if (layer.isHoverable) {
+        const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
+        hoverLayerConfig.id = `${layer.name}-hover`;
+        hoverLayerConfig.source = layer.name;
+        hoverLayerConfig["source-layer"] = layer.sourceLayer;
+        hoverLayerConfig.metadata = {
+          ...hoverLayerConfig.metadata,
+          isStylable: false,
+        };
+        mapInstance.addLayer(hoverLayerConfig);
+      }
+
+      const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
+      selectLayerConfig.id = `${layer.name}-select`;
+      selectLayerConfig.source = layer.name;
+      selectLayerConfig["source-layer"] = layer.sourceLayer;
+      selectLayerConfig.metadata = {
+        ...selectLayerConfig.metadata,
+        isStylable: false,
+      };
+      mapInstance.addLayer(selectLayerConfig);
+
+      lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
+    });
+  }, [map, maps, layer, computedTileUrl]);
 
   useEffect(() => {
     // Determine target map(s)
