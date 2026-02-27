@@ -44,10 +44,11 @@ const createRetryManager = () => {
 
 /**
  * Updates feature states on the map for the given data.
+ * Performs a diff against prevStates to avoid redundant map operations.
  */
-const updateFeatureStates = (map, layer, data, prevIDs) => {
+const updateFeatureStates = (map, layer, data, prevStates) => {
   const safeData = Array.isArray(data) ? data : [];
-  const newIDs = new Set();
+  const newStates = new Map();
 
   // Update feature states for new data
   safeData.forEach((row) => {
@@ -67,24 +68,28 @@ const updateFeatureStates = (map, layer, data, prevIDs) => {
     const value = row.value;
     const isNumeric = typeof value === 'number' && Number.isFinite(value);
     
-    newIDs.add(id);
+    newStates.set(id, value);
     
-    map.setFeatureState(
-      {
-        source: layer.name,
-        sourceLayer: layer.sourceLayer,
-        id,
-      },
-      {
-        value: value,
-        valueAbs: isNumeric ? Math.abs(value) : null,
-      }
-    );
+    // OPTIMIZATION: Only call setFeatureState if the feature is new or its value changed.
+    // This prevents performance stuttering when passing accumulated data on map pans.
+    if (!prevStates.has(id) || prevStates.get(id) !== value) {
+      map.setFeatureState(
+        {
+          source: layer.name,
+          sourceLayer: layer.sourceLayer,
+          id,
+        },
+        {
+          value: value,
+          valueAbs: isNumeric ? Math.abs(value) : null,
+        }
+      );
+    }
   });
 
-  // Remove stale feature states
-  prevIDs.forEach((id) => {
-    if (!newIDs.has(id)) {
+  // Remove stale feature states (e.g. when non-spatial filters change and data is cleared)
+  prevStates.forEach((_, id) => {
+    if (!newStates.has(id)) {
       map.removeFeatureState({
         source: layer.name,
         sourceLayer: layer.sourceLayer,
@@ -93,7 +98,7 @@ const updateFeatureStates = (map, layer, data, prevIDs) => {
     }
   });
 
-  return newIDs;
+  return newStates;
 };
 
 
@@ -101,12 +106,13 @@ const updateFeatureStates = (map, layer, data, prevIDs) => {
  * Custom hook for updating Maplibre GL JS feature state efficiently.
  *
  * This hook exposes a function that updates the feature state for a specific layer.
- * It maintains an internal mapping of layer names to Sets of feature IDs and performs
+ * It maintains an internal mapping of layer names to Maps of feature IDs/values and performs
  * differential updates to minimize unnecessary operations.
  *
  * @returns {Object} An object containing the addFeaturesToMap function.
  */
 export const useFeatureStateUpdater = () => {
+  // Changed from tracking Sets to tracking Maps (id -> value) for diffing
   const layerStatesRef = useRef(new Map());
   const retryManagerRef = useRef(createRetryManager());
 
@@ -181,21 +187,21 @@ export const useFeatureStateUpdater = () => {
           applyPaintProperties(map, specifiedLayer.name, paintProperty);
         }
 
-        // Get previous feature IDs for this layer
-        const prevIDs = layerStatesRef.current.get(specifiedLayer.name) || new Set();
+        // Get previous feature states (Map of id -> value) for this layer
+        const prevStates = layerStatesRef.current.get(specifiedLayer.name) || new Map();
 
         try {
-          const newIDs = updateFeatureStates(map, specifiedLayer, data, prevIDs);
+          const newStates = updateFeatureStates(map, specifiedLayer, data, prevStates);
           
-          // Store updated feature IDs
-          layerStatesRef.current.set(specifiedLayer.name, newIDs);
+          // Store updated feature states
+          layerStatesRef.current.set(specifiedLayer.name, newStates);
 
           // Apply filter if preserving base style
           if (specifiedLayer.preserveBaseStyle) {
             map.setFilter(specifiedLayer.name, [
               'in',
               ['get', 'id'],
-              ['literal', Array.from(newIDs)],
+              ['literal', Array.from(newStates.keys())],
             ]);
           }
         } catch (error) {
@@ -221,7 +227,8 @@ export const useFeatureStateUpdater = () => {
    * Useful for debugging or external state management.
    */
   const getLayerFeatureIds = useCallback((layerName) => {
-    return layerStatesRef.current.get(layerName) || new Set();
+    const stateMap = layerStatesRef.current.get(layerName);
+    return stateMap ? new Set(stateMap.keys()) : new Set();
   }, []);
 
   return { 
