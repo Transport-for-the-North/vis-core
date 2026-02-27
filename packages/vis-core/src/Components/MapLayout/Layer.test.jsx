@@ -239,6 +239,36 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
       });
     });
   });
+
+  it("Respects shouldShowInLegend = false", async () => {
+    props = {
+      ...props,
+      layer: {
+        ...props.layer,
+        type: "geojson",
+        isStylable: true,
+        shouldShowInLegend: false,
+      },
+    };
+    api.geodataService.getLayer.mockResolvedValue("getLayer returned");
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <Layer {...props} />
+      </MapContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "Accessibility",
+          metadata: expect.objectContaining({
+            shouldShowInLegend: false,
+          }),
+        })
+      );
+    });
+  });
 });
 
 describe("One missing param in the layer param", () => {

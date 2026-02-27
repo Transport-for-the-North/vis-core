@@ -139,20 +139,29 @@ export const MapProvider = ({ children }) => {
         const filterWithId = { ...filter, id: deterministicId };
         paramNameToUuidMap[filter.paramName] = filterWithId.id; // Add mapping from paramName to UUID
 
-        
-      // Keep the existing action naming for compatibility; value is no longer a UUID
-      paramNameToUuidMap[filter.paramName] = filterWithId.id;
-        switch (filter.type) {
+        switch (filterWithId.type) {
           case 'map':
           case 'slider':
           case 'mapFeatureSelect':
           case 'mapFeatureSelectWithControls':
           case 'mapFeatureSelectAndPan':
+          case 'mapViewport':
             filters.push(filterWithId);
             break;
 
           default:
-            switch (filter.values.source) {
+            // Some filter types don't define `values` (or configs may be incomplete).
+            // Don't hard-crash the page; log and treat as a value-less filter.
+            if (!filterWithId.values || !filterWithId.values.source) {
+              console.error(
+                "[MapContext] Filter is missing `values.source`. This filter will be initialised without selectable values:",
+                filterWithId
+              );
+              filters.push(filterWithId);
+              break;
+            }
+
+            switch (filterWithId.values.source) {
               case 'local':
                 filters.push(filterWithId);
                 break;
@@ -168,12 +177,12 @@ export const MapProvider = ({ children }) => {
                     metadataFilters,
                     ({ field_name }) => field_name
                   );
-                  const baseParamName = filter.paramName.includes('DoMinimum')
-                    ? filter.paramName.replace('DoMinimum', '')
-                    : filter.paramName.includes('DoSomething')
-                    ? filter.paramName.replace('DoSomething', '')
-                    : filter.paramName;
-                  filter.values.values = apiFilterValues[baseParamName][0].distinct_values.map((v) => ({
+                  const baseParamName = filterWithId.paramName.includes('DoMinimum')
+                    ? filterWithId.paramName.replace('DoMinimum', '')
+                    : filterWithId.paramName.includes('DoSomething')
+                    ? filterWithId.paramName.replace('DoSomething', '')
+                    : filterWithId.paramName;
+                  filterWithId.values.values = apiFilterValues[baseParamName][0].distinct_values.map((v) => ({
                     displayValue: v,
                     paramValue: v,
                   }));
@@ -184,22 +193,22 @@ export const MapProvider = ({ children }) => {
                 break;
 
               case 'metadataTable':
-                const metadataTable = metadataTables[filter.values.metadataTableName];
+                const metadataTable = metadataTables[filterWithId.values.metadataTableName];
                 if (metadataTable) {
                   // NEW: apply "where" clause to restrict rows before building values
                   let rows = metadataTable;
-                  if (filter.values.where) {
-                    rows = applyWhereConditions(metadataTable, filter.values.where);
+                  if (filterWithId.values.where) {
+                    rows = applyWhereConditions(metadataTable, filterWithId.values.where);
                   }
 
                   let uniqueValues = [];
                   rows.forEach(option => {
                     const value = {
-                      displayValue: option[filter.values.displayColumn],
-                      paramValue: option[filter.values.paramColumn],
-                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null,
-                      infoOnHover: option[filter.values?.infoOnHoverColumn] ?? null,
-                      infoBelowOnChange: option[filter.values?.infoBelowOnChangeColumn] ?? null,
+                      displayValue: option[filterWithId.values.displayColumn],
+                      paramValue: option[filterWithId.values.paramColumn],
+                      legendSubtitleText: option[filterWithId.values?.legendSubtitleTextColumn] || null,
+                      infoOnHover: option[filterWithId.values?.infoOnHoverColumn] ?? null,
+                      infoBelowOnChange: option[filterWithId.values?.infoBelowOnChangeColumn] ?? null,
                     };
                     if (!isDuplicateValue(uniqueValues, value)) {
                       uniqueValues.push(value);
@@ -207,24 +216,24 @@ export const MapProvider = ({ children }) => {
                   });
 
                   // Apply sorting if specified
-                  if (filter.values.sort) {
-                    uniqueValues = sortValues(uniqueValues, filter.values.sort);
+                  if (filterWithId.values.sort) {
+                    uniqueValues = sortValues(uniqueValues, filterWithId.values.sort);
                   }
 
                   // Apply exclusion if specified
-                  if (filter.values.exclude) {
-                    uniqueValues = uniqueValues.filter(value => !filter.values.exclude.includes(value.paramValue));
+                  if (filterWithId.values.exclude) {
+                    uniqueValues = uniqueValues.filter(value => !filterWithId.values.exclude.includes(value.paramValue));
                   }
 
-                  filter.values.values = uniqueValues;
+                  filterWithId.values.values = uniqueValues;
                   filters.push(filterWithId);
                 } else {
-                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                  console.error(`Metadata table ${filterWithId.values.metadataTableName} not found`);
                 }
                 break;
 
               default:
-                console.error('Unknown filter source:', filter.values.source);
+                console.error('Unknown filter source:', filterWithId.values.source);
             }
         }
 
