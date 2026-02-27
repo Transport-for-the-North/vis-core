@@ -78,6 +78,7 @@
     "build": "vite build",
     "build:watch": "vite build --watch",
     "test": "jest --passWithNoTests",
+    "test:output": "jest --passWithNoTests --outputFile=jest-results.json --json",
     "test:watch": "jest --watch --passWithNoTests"
   },
   "peerDependencies": {
