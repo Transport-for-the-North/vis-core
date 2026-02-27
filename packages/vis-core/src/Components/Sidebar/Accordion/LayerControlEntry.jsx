@@ -472,7 +472,7 @@ export const LayerControlEntry = memo(
                   layerName={layer.id}
                 />}
 
-              {/* BandEditor for continuous/diverging only */}
+              {/* BandEditor for continuous/diverging only
               {(colorStyle === "continuous" || colorStyle === "diverging") && hasDefaultBands && (
                 <BandEditor
                   bands={hasDefaultBands.values}
@@ -482,7 +482,7 @@ export const LayerControlEntry = memo(
                   }}
                   isDiverging={colorStyle === "diverging"}
                 />
-              )}
+              )} */}
 
               {!enforceNoClassificationMethod && <ClassificationDropdown
                 classType={{
