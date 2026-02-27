@@ -586,7 +586,7 @@ export const MapVisualisation = ({
       const checkLayerAndPerform = () => {
         if (isCleanedUp) return;
 
-        if (map.getLayer(layerKey)) {
+        if (map.isStyleLoaded() && map.getLayer(layerKey)) {
           performReclassification();
         } else if (retryCount < maxRetries) {
           retryCount++;
@@ -594,7 +594,7 @@ export const MapVisualisation = ({
           cleanupFns.push(() => clearTimeout(timeoutId));
         } else {
           const handleLayerReady = () => {
-            if (isCleanedUp || !map.getLayer(layerKey)) return;
+            if (isCleanedUp || !map.isStyleLoaded() || !map.getLayer(layerKey)) return;
             cleanup();
             performReclassification();
           };
