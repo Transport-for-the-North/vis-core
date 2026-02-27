@@ -334,6 +334,7 @@ describe("Conditional rendering of subcomponents", () => {
         queryRenderedFeatures,
         setFilter,
         setFeatureState,
+        getZoom
       },
       isMapReady: undefined, // empty
     });
@@ -474,6 +475,7 @@ describe("handleMapHover is called or not", () => {
         queryRenderedFeatures,
         setFilter,
         setFeatureState,
+        getZoom,
       },
       isMapReady: true,
     });
@@ -580,6 +582,7 @@ describe("Tests of handleMapHover function", () => {
         queryRenderedFeatures,
         setFilter,
         setFeatureState,
+        getZoom,
       },
       isMapReady: true,
     });
@@ -608,6 +611,7 @@ describe("Tests of handleMapHover function", () => {
         queryRenderedFeatures,
         setFilter,
         setFeatureState,
+        getZoom,
       },
       isMapReady: true,
     });
@@ -675,6 +679,7 @@ describe("Tests of handleMapHover function", () => {
         queryRenderedFeatures,
         setFilter,
         setFeatureState,
+        getZoom,
       },
       isMapReady: true,
     });
@@ -750,6 +755,7 @@ describe("Tests of handleMapHover function", () => {
         queryRenderedFeatures,
         setFilter,
         setFeatureState,
+        getZoom,
       },
       isMapReady: true,
     });

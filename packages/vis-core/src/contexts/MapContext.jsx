@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useContext, useReducer } from "react";
-import { actionTypes, mapReducer } from "reducers";
+import { actionTypes, mapReducer, errorActionTypes } from "reducers";
 import {
   hasRouteParameterOrQuery,
   updateUrlParameters,
@@ -18,7 +18,7 @@ import {
   getInitialFilterValue
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext, FilterContext } from "contexts";
+import { AppContext, PageContext, FilterContext, ErrorContext } from "contexts";
 import { api } from "services";
 
 // Create a context for the app configuration
@@ -48,6 +48,9 @@ export const MapProvider = ({ children }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { dispatch: filterDispatch } = useContext(FilterContext);
+  const errorContext = useContext(ErrorContext);
+  const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
+  const errorState = errorContext?.state ?? null;
 
   // Initialize state within the provider function
   const initialState = {
@@ -70,6 +73,7 @@ export const MapProvider = ({ children }) => {
     isLoading: true,
     isDynamicStylingLoading: false,
     pageIsReady: false,
+    metadataError: null,
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
@@ -97,6 +101,7 @@ export const MapProvider = ({ children }) => {
      */
     const fetchMetadataTables = async () => {
       const metadataTables = {};
+      const emptyTables = [];
       
       for (const table of pageContext.config.metadataTables) {
         try {
@@ -114,12 +119,18 @@ export const MapProvider = ({ children }) => {
           }
 
           metadataTables[table.name] = filteredData;
+          
+          // Check if table is empty
+          if (!Array.isArray(filteredData) || filteredData.length === 0) {
+            emptyTables.push(table.name);
+          }
         } catch (error) {
           console.error(`Failed to fetch metadata table ${table.name}:`, error);
+          emptyTables.push(table.name);
         }
       }
 
-      return metadataTables;
+      return { metadataTables, emptyTables };
     };
 
     /**
@@ -139,20 +150,29 @@ export const MapProvider = ({ children }) => {
         const filterWithId = { ...filter, id: deterministicId };
         paramNameToUuidMap[filter.paramName] = filterWithId.id; // Add mapping from paramName to UUID
 
-        
-      // Keep the existing action naming for compatibility; value is no longer a UUID
-      paramNameToUuidMap[filter.paramName] = filterWithId.id;
-        switch (filter.type) {
+        switch (filterWithId.type) {
           case 'map':
           case 'slider':
           case 'mapFeatureSelect':
           case 'mapFeatureSelectWithControls':
           case 'mapFeatureSelectAndPan':
+          case 'mapViewport':
             filters.push(filterWithId);
             break;
 
           default:
-            switch (filter.values.source) {
+            // Some filter types don't define `values` (or configs may be incomplete).
+            // Don't hard-crash the page; log and treat as a value-less filter.
+            if (!filterWithId.values || !filterWithId.values.source) {
+              console.error(
+                "[MapContext] Filter is missing `values.source`. This filter will be initialised without selectable values:",
+                filterWithId
+              );
+              filters.push(filterWithId);
+              break;
+            }
+
+            switch (filterWithId.values.source) {
               case 'local':
                 filters.push(filterWithId);
                 break;
@@ -168,12 +188,12 @@ export const MapProvider = ({ children }) => {
                     metadataFilters,
                     ({ field_name }) => field_name
                   );
-                  const baseParamName = filter.paramName.includes('DoMinimum')
-                    ? filter.paramName.replace('DoMinimum', '')
-                    : filter.paramName.includes('DoSomething')
-                    ? filter.paramName.replace('DoSomething', '')
-                    : filter.paramName;
-                  filter.values.values = apiFilterValues[baseParamName][0].distinct_values.map((v) => ({
+                  const baseParamName = filterWithId.paramName.includes('DoMinimum')
+                    ? filterWithId.paramName.replace('DoMinimum', '')
+                    : filterWithId.paramName.includes('DoSomething')
+                    ? filterWithId.paramName.replace('DoSomething', '')
+                    : filterWithId.paramName;
+                  filterWithId.values.values = apiFilterValues[baseParamName][0].distinct_values.map((v) => ({
                     displayValue: v,
                     paramValue: v,
                   }));
@@ -184,22 +204,22 @@ export const MapProvider = ({ children }) => {
                 break;
 
               case 'metadataTable':
-                const metadataTable = metadataTables[filter.values.metadataTableName];
-                if (metadataTable) {
+                const metadataTable = metadataTables[filterWithId.values.metadataTableName];
+                if (metadataTable && Array.isArray(metadataTable) && metadataTable.length > 0) {
                   // NEW: apply "where" clause to restrict rows before building values
                   let rows = metadataTable;
-                  if (filter.values.where) {
-                    rows = applyWhereConditions(metadataTable, filter.values.where);
+                  if (filterWithId.values.where) {
+                    rows = applyWhereConditions(metadataTable, filterWithId.values.where);
                   }
 
                   let uniqueValues = [];
                   rows.forEach(option => {
                     const value = {
-                      displayValue: option[filter.values.displayColumn],
-                      paramValue: option[filter.values.paramColumn],
-                      legendSubtitleText: option[filter.values?.legendSubtitleTextColumn] || null,
-                      infoOnHover: option[filter.values?.infoOnHoverColumn] ?? null,
-                      infoBelowOnChange: option[filter.values?.infoBelowOnChangeColumn] ?? null,
+                      displayValue: option[filterWithId.values.displayColumn],
+                      paramValue: option[filterWithId.values.paramColumn],
+                      legendSubtitleText: option[filterWithId.values?.legendSubtitleTextColumn] || null,
+                      infoOnHover: option[filterWithId.values?.infoOnHoverColumn] ?? null,
+                      infoBelowOnChange: option[filterWithId.values?.infoBelowOnChangeColumn] ?? null,
                     };
                     if (!isDuplicateValue(uniqueValues, value)) {
                       uniqueValues.push(value);
@@ -207,24 +227,24 @@ export const MapProvider = ({ children }) => {
                   });
 
                   // Apply sorting if specified
-                  if (filter.values.sort) {
-                    uniqueValues = sortValues(uniqueValues, filter.values.sort);
+                  if (filterWithId.values.sort) {
+                    uniqueValues = sortValues(uniqueValues, filterWithId.values.sort);
                   }
 
                   // Apply exclusion if specified
-                  if (filter.values.exclude) {
-                    uniqueValues = uniqueValues.filter(value => !filter.values.exclude.includes(value.paramValue));
+                  if (filterWithId.values.exclude) {
+                    uniqueValues = uniqueValues.filter(value => !filterWithId.values.exclude.includes(value.paramValue));
                   }
 
-                  filter.values.values = uniqueValues;
+                  filterWithId.values.values = uniqueValues;
                   filters.push(filterWithId);
                 } else {
-                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                  console.error(`Metadata table ${filterWithId.values.metadataTableName} not found or empty`);
                 }
                 break;
 
               default:
-                console.error('Unknown filter source:', filter.values.source);
+                console.error('Unknown filter source:', filterWithId.values.source);
             }
         }
 
@@ -351,7 +371,37 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise filters
-      const metadataTables = await fetchMetadataTables();
+      const { metadataTables, emptyTables } = await fetchMetadataTables();
+      
+      // Check if any required metadata tables are empty
+      if (emptyTables.length > 0) {
+        const message =
+          emptyTables.length === 1
+            ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
+            : `${emptyTables.length} metadata tables are empty or contain no valid data. This page requires valid metadata to function properly.`;
+
+          const technicalDetails =
+            emptyTables.length === 1
+              ? `Metadata table: ${emptyTables[0]}\nError: Table "${emptyTables[0]}" returned no data from the API.`
+              : `Empty metadata tables (${emptyTables.length}):\n${emptyTables.map((t) => `- ${t}`).join('\n')}`;
+
+          // Dispatch into ErrorContext reducer so MapContext sets SET_ERROR
+          errorDispatch({
+            type: errorActionTypes.SET_ERROR,
+            payload: {
+              title: 'Configuration Error',
+              subtitle: 'Unable to Load Page',
+              message,
+              supportMessage: 'Please contact support for assistance',
+              supportDetails: 'This issue typically indicates a data configuration problem that requires administrative attention.',
+              technicalDetails,
+            },
+          });
+
+        dispatch({ type: actionTypes.SET_LOADING_FINISHED });
+        return;
+      }
+      
       dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
       await initializeFilters(metadataTables);
 

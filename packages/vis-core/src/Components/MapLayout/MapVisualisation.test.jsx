@@ -89,6 +89,7 @@ let props = {
     getStyle: jest.fn(),
     addLayer: jest.fn(),
     on: jest.fn(),
+    isStyleLoaded: jest.fn(() => true),
   },
 };
 
@@ -126,6 +127,7 @@ describe("useFetchVisualisationData is called with the good params", () => {
         getStyle: expect.any(Function),
         addLayer: expect.any(Function),
         on: expect.any(Function),
+        isStyleLoaded: expect.any(Function),
       },
       "visualisationName",
       true
@@ -364,7 +366,8 @@ describe("reclassifyAndStyleMap is called", () => {
     reclassifyData.mockReturnValue("#More9Caracters");
 
     props.map.getStyle.mockReturnValue({ layers: [{ id: "firstLayersID" }] });
-    props.map.getLayer.mockReturnValue(true);
+    props.map.getLayer.mockReturnValue({ id: "mock-layer" });
+    props.map.isStyleLoaded.mockReturnValue(true);
   });
   afterEach(() => {
     jest.clearAllMocks();
