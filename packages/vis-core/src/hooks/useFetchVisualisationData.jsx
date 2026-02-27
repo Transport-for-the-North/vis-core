@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback, useContext } from 'react';
 import { debounce } from 'lodash';
 import { api } from 'services';
 
 import { DataFetchState } from 'enums';
+import { ErrorContext } from 'contexts';
+import { errorActionTypes } from 'reducers';
 
 // --- NEW HELPER FUNCTIONS FOR SPATIAL MATHS ---
 
@@ -182,6 +184,8 @@ export const useFetchVisualisationData = (
   // Track previous combined params (query + path) to avoid refetching unnecessarily.
   const prevParamsRef = useRef();
   const prevVisualisationNameRef = useRef();
+  // Access ErrorContext to display an overlay for missing parameters (if provider present)
+  const { state: errorState, dispatch: errorDispatch } = useContext(ErrorContext);
 
   /**
    * - React StrictMode (dev) mounts/unmounts quickly; a 400ms debounced call can be cancelled
@@ -474,6 +478,16 @@ export const useFetchVisualisationData = (
       areAllRequiredParamsPresent(queryParams) &&
       areAllRequiredParamsPresent(pathParams);
 
+    // If required params are missing, skip fetching.
+    if (!allRequiredParamsPresent) {
+      return;
+    }
+
+    // Clear any previously shown param-missing overlay.
+    if (errorDispatch) {
+      errorDispatch({ type: errorActionTypes.CLEAR_ERROR });
+    }
+
     // Track a combined signature of both param maps to detect changes.
     const currentParamsStr = JSON.stringify({ queryParams, pathParams });
 
@@ -500,6 +514,7 @@ export const useFetchVisualisationData = (
     visualisation?.queryParams,
     visualisation?.pathParams,
     fetchDataForVisualisation,
+    errorDispatch,
   ]);
 
   // When server-side viewport filtering is enabled, re-fetch data when the map viewport changes.
