@@ -24,6 +24,8 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
   const belowBarRef = useRef(null);
 
   useEffect(() => {
+    // Will be assigned after Map construction; transformRequest can still close over it.
+    let mapInstance = null;
     /**
      * Initializes the MapLibre map instance.
      */
@@ -55,9 +57,6 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       }
 
       const styleValue = typeof mapStyle === 'function' ? mapStyle() : (mapStyle || defaultMapStyle());
-
-      // Will be assigned after Map construction; transformRequest can still close over it.
-      let mapInstance = null;
 
       // Compute API base once for transformRequest
       let apiBaseOrigin = null;
@@ -208,13 +207,12 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       setMap(mapInstance);
     };
 
-    if (!map) {
-      initializeMap();
-    }
+    initializeMap();
 
     return () => {
-      if (map) {
-        map.remove();
+      if (mapInstance) {
+        console.log("Cleaning up map instance");
+        mapInstance.remove();
         setMap(null);
         setIsMapLoaded(false);
         setIsMapStyleLoaded(false);

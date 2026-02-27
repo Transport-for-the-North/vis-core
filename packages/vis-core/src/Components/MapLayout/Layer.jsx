@@ -70,6 +70,7 @@ export const Layer = ({ layer }) => {
     // If missingParams are present, remove the layer if it exists
     if (layer.missingParams?.length > 0) {
       targetMaps.forEach((mapInstance) => {
+        if (!mapInstance || !mapInstance.style) return;
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
         }
@@ -94,6 +95,8 @@ export const Layer = ({ layer }) => {
 
     // Check if the layer is already added to avoid duplicates
     targetMaps.forEach((mapInstance) => {
+      if (!mapInstance) return;
+
       if (!mapInstance.getSource(layer.name)) {
         let sourceConfig = {};
         let layerConfig = {
@@ -247,6 +250,8 @@ export const Layer = ({ layer }) => {
     // Cleanup function to remove layers and sources when the component unmounts
     return () => {
       targetMaps.forEach((mapInstance) => {
+        if (!mapInstance || !mapInstance.style) return;
+
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
         }
@@ -288,6 +293,8 @@ export const Layer = ({ layer }) => {
 
 
     targetMaps.forEach((mapInstance) => {
+      if (!mapInstance) return;
+
       const src = mapInstance.getSource(layer.name);
       if (!src) return;
 
