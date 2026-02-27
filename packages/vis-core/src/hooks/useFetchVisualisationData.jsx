@@ -282,7 +282,6 @@ export const useFetchVisualisationData = (
     visualisation?.queryParams,
     visualisation?.pathParams,
     fetchDataForVisualisation,
-    errorState,
     errorDispatch,
   ]);
 
