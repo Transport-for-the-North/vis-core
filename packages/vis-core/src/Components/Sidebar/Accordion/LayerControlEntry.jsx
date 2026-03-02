@@ -321,21 +321,31 @@ export const LayerControlEntry = memo(
     const hasExistingCustomBands = Array.isArray(state.layers?.[layer.id]?.customBands) && state.layers[layer.id].customBands.length > 0;
     const canEditBands = bandEditorData.length >= 2 || hasExistingCustomBands;
 
-    // Extract current bins from layer paint properties
+    const customBandsFromState = state.layers?.[layer.id]?.customBands;
+
+    // Extract current bins for BandEditor.
+    // Prefer the canonical state-driven custom bands (when in custom mode), because
+    // the `layer.paint` object often doesn't update in lockstep with runtime map
+    // paint changes and can lead to the editor snapping back after the first update.
     const currentBins = useMemo(() => {
+      if (currentClassMethod === "c") {
+        if (Array.isArray(customBandsFromState) && customBandsFromState.length > 0) {
+          return customBandsFromState;
+        }
+      }
+
       if (!maps.length || !maps[0].getLayer(layer.id)) {
         return hasDefaultBands?.values || [0, 1, 2, 3, 4];
       }
-      
+
       const paintProps = layer.paint;
-      const colorExpression = paintProps?.["line-color"] || 
-                              paintProps?.["circle-color"] || 
-                              paintProps?.["fill-color"];
-      
+      const colorExpression =
+        paintProps?.["line-color"] || paintProps?.["circle-color"] || paintProps?.["fill-color"];
+
       if (!colorExpression || !Array.isArray(colorExpression)) {
         return hasDefaultBands?.values || [0, 1, 2, 3, 4];
       }
-      
+
       // Extract bins from interpolate expression: ["interpolate", ["linear"], ["feature-state", "value"], bin1, color1, bin2, color2, ...]
       if (colorExpression[0] === "interpolate") {
         const stops = colorExpression.slice(3); // Skip ["interpolate", ["linear"], ["feature-state", "value"]]
@@ -345,9 +355,9 @@ export const LayerControlEntry = memo(
         }
         return bins.length > 0 ? bins : (hasDefaultBands?.values || [0, 1, 2, 3, 4]);
       }
-      
+
       return hasDefaultBands?.values || [0, 1, 2, 3, 4];
-    }, [maps, layer.id, layer.paint, hasDefaultBands]);
+    }, [currentClassMethod, customBandsFromState, maps, layer.id, layer.paint, hasDefaultBands]);
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
