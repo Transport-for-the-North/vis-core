@@ -1,7 +1,8 @@
 import { MapContext, AppContext } from "contexts";
 import { MapVisualisation } from "./MapVisualisation";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { actionTypes } from "reducers";
+import { DataFetchState } from "enums";
 
 jest.mock("hooks", () => ({
   ...jest.requireActual("hooks"),
@@ -88,6 +89,7 @@ let props = {
     getStyle: jest.fn(),
     addLayer: jest.fn(),
     on: jest.fn(),
+    isStyleLoaded: jest.fn(() => true),
   },
 };
 
@@ -98,6 +100,8 @@ describe("useFetchVisualisationData is called with the good params", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
     });
   });
   afterEach(() => {
@@ -123,6 +127,7 @@ describe("useFetchVisualisationData is called with the good params", () => {
         getStyle: expect.any(Function),
         addLayer: expect.any(Function),
         on: expect.any(Function),
+        isStyleLoaded: expect.any(Function),
       },
       "visualisationName",
       true
@@ -137,6 +142,8 @@ describe("Check dispatch function is well throw", () => {
       isLoading: true,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.LOADING,
+      resetFetchState: jest.fn(),
     });
   });
   afterEach(() => {
@@ -164,6 +171,8 @@ describe("Check dispatch function is well throw", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
     });
     render(
       <MapContext.Provider value={mockMapContext}>
@@ -184,6 +193,8 @@ describe("Case of no data", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.EMPTY,
+      resetFetchState: jest.fn(),
     });
   });
   afterEach(() => {
@@ -207,6 +218,8 @@ describe("Case of no data", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: true,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
     });
     render(
       <MapContext.Provider value={mockMapContext}>
@@ -224,6 +237,8 @@ describe("Case of no data", () => {
       isLoading: false,
       error: true,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.ERROR,
+      resetFetchState: jest.fn(),
     });
     render(
       <MapContext.Provider value={mockMapContext}>
@@ -244,6 +259,8 @@ describe("Updating data with UPDATE_ALL_DATA", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
     });
   });
   afterEach(() => {
@@ -279,6 +296,8 @@ describe("Tests of reclassifyAndStyleGeoJSONMap function", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
     });
 
     hasAnyGeometryNotNull.mockReturnValue(true);
@@ -320,6 +339,7 @@ describe("reclassifyAndStyleMap is called", () => {
           visualisationName: {
             ...mockMapContext.state.visualisations.visualisationName,
             type: "joinDataToMap",
+            joinLayer: "visualisationName",
           },
         },
       },
@@ -335,6 +355,8 @@ describe("reclassifyAndStyleMap is called", () => {
       isLoading: false,
       error: false,
       dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
     });
 
     hasAnyGeometryNotNull.mockReturnValue(true);
@@ -344,7 +366,8 @@ describe("reclassifyAndStyleMap is called", () => {
     reclassifyData.mockReturnValue("#More9Caracters");
 
     props.map.getStyle.mockReturnValue({ layers: [{ id: "firstLayersID" }] });
-    props.map.getLayer.mockReturnValue(true);
+    props.map.getLayer.mockReturnValue({ id: "mock-layer" });
+    props.map.isStyleLoaded.mockReturnValue(true);
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -357,15 +380,17 @@ describe("reclassifyAndStyleMap is called", () => {
         </MapContext.Provider>
       </AppContext.Provider>
     );
-    expect(reclassifyData).toHaveBeenCalledWith(
-      [{ feature_collection: '{"element":"first"}' }],
-      "line-continuous",
-      "d",
-      undefined,
-      { url: "/" },
-      undefined,
-      { trseLabel: false }
-    );
+    return waitFor(() => {
+      expect(reclassifyData).toHaveBeenCalledWith(
+        [{ feature_collection: '{"element":"first"}' }],
+        "line-continuous",
+        "d",
+        undefined,
+        { url: "/" },
+        undefined,
+        { trseLabel: false }
+      );
+    });
   });
 });
 

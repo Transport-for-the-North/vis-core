@@ -168,7 +168,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
                 break;
               case 'metadataTable':
                 const metadataTable = metadataTables[filter.values.metadataTableName];
-                if (metadataTable) {
+                if (metadataTable && Array.isArray(metadataTable) && metadataTable.length > 0) {
                   let uniqueValues = [];
                   metadataTable.forEach(option => {
                     const value = {
@@ -194,7 +194,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
                   filterWithId.values = { ...filter.values, values: uniqueValues };
                   updatedFilters.push(filterWithId);    
                 } else {
-                  console.error(`Metadata table ${filter.values.metadataTableName} not found`);
+                  console.error(`Metadata table ${filter.values.metadataTableName} not found or empty`);
                 }
                 break;
               default:

@@ -536,18 +536,19 @@ export const MapVisualisation = ({
       return;
     }
 
-    // Update the refs to the current data
-    prevCombinedDataRef.current = combinedData;
-    prevVisualisationDataRef.current = visualisationData;
-    prevColorRef.current[layerKey] = layerColorScheme;
-    prevClassMethodRef.current[layerKey] = classificationMethod;
-
     const dataToVisualise = visualisationData || [];
     const dataToClassify = combinedData;
 
     let cleanupFns = [];
 
     const performReclassification = () => {
+      
+      // Update the refs to the current data
+      prevCombinedDataRef.current = combinedData;
+      prevVisualisationDataRef.current = visualisationData;
+      prevColorRef.current[layerKey] = layerColorScheme;
+      prevClassMethodRef.current[layerKey] = classificationMethod;
+      
       switch (visualisation.type) {
         case "joinDataToMap": {
           if (
@@ -590,7 +591,7 @@ export const MapVisualisation = ({
       const checkLayerAndPerform = () => {
         if (isCleanedUp) return;
 
-        if (map.getLayer(layerKey)) {
+        if (map.isStyleLoaded() && map.getLayer(layerKey)) {
           performReclassification();
         } else if (retryCount < maxRetries) {
           retryCount++;
@@ -598,7 +599,7 @@ export const MapVisualisation = ({
           cleanupFns.push(() => clearTimeout(timeoutId));
         } else {
           const handleLayerReady = () => {
-            if (isCleanedUp || !map.getLayer(layerKey)) return;
+            if (isCleanedUp || !map.isStyleLoaded() || !map.getLayer(layerKey)) return;
             cleanup();
             performReclassification();
           };

@@ -78,6 +78,7 @@
     "build": "vite build",
     "build:watch": "vite build --watch",
     "test": "jest --passWithNoTests",
+    "test:output": "jest --passWithNoTests --outputFile=jest-results.json --json",
     "test:watch": "jest --watch --passWithNoTests"
   },
   "peerDependencies": {
@@ -100,7 +101,7 @@
     "@babel/preset-react": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
     "@heroicons/react": "^2.2.0",
-    "@mapcomponents/react-maplibre": "^1.6.0",
+    "@mapcomponents/react-maplibre": "1.6.0",
     "@ookla/mapbox-gl-draw-rectangle": "^1.2.2",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",

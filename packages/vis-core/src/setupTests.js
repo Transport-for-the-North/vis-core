@@ -22,3 +22,61 @@ global.importMeta = {
     VITE_PROD_OR_DEV: 'development',
   }
 };
+
+jest.mock('maplibre-gl', () => {
+  class Popup {
+    constructor(options) {
+      this.options = options;
+      this.remove = jest.fn(() => this);
+    }
+    setLngLat(coords) {
+      this.coords = coords;
+      return this;
+    }
+    setHTML(html) {
+      this.html = html;
+      return this;
+    }
+    addTo(map) {
+      this.map = map;
+      return this;
+    }
+  }
+
+  class LngLatBounds {
+    constructor() {
+      this.bounds = [];
+    }
+    extend(coord) {
+      this.bounds.push(coord);
+      return this;
+    }
+    getNorthEast() {
+      return { lng: 1, lat: 1 };
+    }
+    getSouthWest() {
+      return { lng: -1, lat: -1 };
+    }
+  }
+
+  const Map = jest.fn(() => ({
+    on: jest.fn(),
+    off: jest.fn(),
+    remove: jest.fn(),
+    addLayer: jest.fn(),
+    setStyle: jest.fn(),
+    flyTo: jest.fn(),
+    isStyleLoaded: jest.fn(() => true),
+    getLayer: jest.fn(() => true),
+    getZoom: jest.fn(() => 10),
+  }));
+
+  const api = { Popup, LngLatBounds, Map };
+
+  return {
+    __esModule: true,
+    default: api,   // supports: import maplibregl from 'maplibre-gl'
+    ...api,         // supports: import { Map } from 'maplibre-gl' AND import * as maplibregl ...
+  };
+});
+
