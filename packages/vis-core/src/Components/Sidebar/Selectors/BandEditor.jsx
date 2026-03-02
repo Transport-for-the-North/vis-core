@@ -173,13 +173,16 @@ export const BandEditor = ({
     if (numericBands.length < localBands.length) {
       return { valid: false, error: "All band values must be valid numbers" };
     }
-    
-    for (let i = 1; i < numericBands.length; i++) {
-      if (numericBands[i] <= numericBands[i - 1]) {
-        return { 
-          valid: false, 
-          error: `Band ${i + 1} (${numericBands[i]}) must be greater than Band ${i} (${numericBands[i - 1]})`,
-          errorIndex: i
+
+    // Bands are treated as *lower bounds* for each class.
+    // That means each band's lower bound must be strictly less than the next band's lower bound.
+    // If band i is >= band i+1, then band i is the one that must be adjusted.
+    for (let i = 0; i < numericBands.length - 1; i++) {
+      if (numericBands[i] >= numericBands[i + 1]) {
+        return {
+          valid: false,
+          error: `Band ${i + 1} (${numericBands[i]}) must be less than Band ${i + 2} (${numericBands[i + 1]})`,
+          errorIndex: i,
         };
       }
     }
@@ -286,7 +289,7 @@ export const BandEditor = ({
               step="any"
               value={band}
               onChange={e => handleBandChange(idx, e.target.value)}
-              $hasError={validation.errorIndex === idx || (validation.errorIndex === idx + 1)}
+              $hasError={validation.errorIndex === idx}
             />
           </BandInputWrapper>
         ))}
