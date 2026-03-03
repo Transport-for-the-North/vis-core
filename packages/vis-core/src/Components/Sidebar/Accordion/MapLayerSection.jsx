@@ -35,6 +35,8 @@ export const MapLayerSection = ({
             !layer.id.endsWith("-hover") &&
             !layer.id.endsWith("-select") &&
             !layer.id.endsWith("-label") &&
+            !layer.id.endsWith("-spider") &&
+            !layer.id.endsWith("-spider-links") &&
             layer.id !== "selected-feature-layer" &&
             !layer.id.startsWith("hide_") &&
             !layer.id.startsWith("gl-draw")
