@@ -1,10 +1,10 @@
 // Check if GitHub Actions is currently running on the main branch
-const isMain = process.env.GITHUB_REF_NAME === 'main';
+const isMain = process.env.GITHUB_REF_NAME === 'sandbox-main';
 
 export default {
   branches: [
-    "main",
-    { name: "dev", prerelease: "beta" }
+    "sandbox-main",
+    { name: "sandbox-dev", prerelease: "beta" }
   ],
   tagFormat: "v${version}",
   plugins: [
