@@ -103,6 +103,7 @@
     "@heroicons/react": "^2.2.0",
     "@mapcomponents/react-maplibre": "1.6.0",
     "@ookla/mapbox-gl-draw-rectangle": "^1.2.2",
+    "@semantic-release/changelog": "github:semantic-release/changelog",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.0",
