@@ -3,7 +3,7 @@ const isMain = process.env.GITHUB_REF_NAME === 'sandbox-main';
 
 export default {
   branches: [
-    "sandbox-main",
+    "sandbox-main", 
     { name: "sandbox-dev", prerelease: "beta" }
   ],
   tagFormat: "sandbox-v${version}",
