@@ -6,7 +6,7 @@ export default {
     "sandbox-main",
     { name: "sandbox-dev", prerelease: "beta" }
   ],
-  tagFormat: "v${version}",
+  tagFormat: "sandbox-v${version}",
   plugins: [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
