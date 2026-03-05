@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
@@ -9,6 +9,7 @@ import { api } from "services";
 import maplibregl from "maplibre-gl";
 import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from "./Layer";
+import { SpiderLayer } from "./SpiderLayer";
 import {
   getSourceLayer,
   getFeatureStateValue,
@@ -35,6 +36,41 @@ const StyledMapContainer = styled.div`
    height: auto;             /* let content dictate height */
   }
 `;
+
+/**
+ * When we add spider layers to the map, these are hoverable as they are 
+ * children/siblings of other layers.
+ * 
+ * This function returns spider layer ids for all point layers present on the map,
+ * to include in hover/click queries.
+ */
+function allSpiderOverlayLayerIds(map, stateLayers) {
+  const ids = [];
+  Object.keys(stateLayers).forEach((layerId) => {
+    const pointsId = `${layerId}-spider`;
+    const linksId = `${layerId}-spider-links`;
+    if (map.getLayer(pointsId)) ids.push(pointsId);
+    if (map.getLayer(linksId)) ids.push(linksId);
+  });
+  return ids;
+}
+
+/**
+ * Resolve the base layer of a spider layer.
+ * 
+ * Spider layers are automatically generated when spiderfyOverlappingPoints
+ * is true, and the layer is a point/circle layer.
+ * 
+ * This function is primarily useful for cascading custom hover functionality
+ * through to spider layers.
+ *
+ * @returns {string} The name of the parent layer for a spider layer.
+ */
+function resolveBaseLayerIdFromSpiderLayerId(layerId) {
+  if (layerId.endsWith("-spider")) return layerId.slice(0, -"-spider".length);
+  if (layerId.endsWith("-spider-links")) return layerId.slice(0, -"-spider-links".length);
+  return layerId;
+}
 
 /**
  * Map component that renders a map using MapLibre GL and handles layers,
@@ -299,9 +335,10 @@ const Map = (props) => {
           return;
         }
         
+        const spiderOverlayLayerIds = allSpiderOverlayLayerIds(map, state.layers); // Added so we can account for spider layers (dupe points)
         const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
-          layers: hoverableLayers,
-        });
+           layers: [...hoverableLayers, ...spiderOverlayLayerIds],
+         });
         
         // Filter out any features that don't have required properties
         const validFeatures = (featuresWithDuplicates || []).filter(
@@ -337,10 +374,10 @@ const Map = (props) => {
       }
 
       // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
+      // NB if it's a spider layer, we resolve to the base layer to get custom hover handling.
       const filteredFeatures = features.filter((feature) => {
-        const layerId = feature.layer?.id;
-        if (!layerId) return false;
-        
+        const rawLayerId = feature.layer.id;
+        const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
         const layerConfig = state.layers[layerId];
         if (!layerConfig) return false;
         
@@ -470,20 +507,18 @@ const Map = (props) => {
 
       let descriptions = [];
       // Track API requests and how they map back to description indexes so we can merge results precisely
-      const apiRequests = [];
+      // NB if it's a spider layer, we resolve to the base layer to get custom tooltip metadata.
+  const apiRequests = [];
       const requestIndexByDescriptionIndex = {};
 
       filteredFeatures.forEach((feature) => {
-        const layerId = feature.layer.id;
+        const rawLayerId = feature.layer.id;
+        const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
         const layerConfig = state.layers[layerId];
-        
-        // Skip if no layer config found
-        if (!layerConfig) return;
-        
-        const customTooltip = layerConfig.customTooltip;
-        const hoverNulls = layerConfig.hoverNulls ?? true;
-        const shouldIncludeMetadata = layerConfig.hoverTipShouldIncludeMetadata;
-        const shouldHaveHoverOnlyOnData = layerConfig.shouldHaveHoverOnlyOnData ?? false;
+        const customTooltip = layerConfig?.customTooltip;
+        const hoverNulls = layerConfig?.hoverNulls ?? true;
+        const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
+        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
         // Safely get feature value
         const featureValue = getFeatureStateValue(feature);
@@ -1375,7 +1410,13 @@ const Map = (props) => {
   return (
     <StyledMapContainer ref={mapContainerRef}>
       {Object.values(state.layers).map((layer) => (
+      <>
         <Layer key={layer.name} layer={layer} />
+        { /* Create a sibling 'spider' layer for all point layers, to deal with overlaps */}
+        {layer.type === 'tile' && layer.geometryType === 'point' && Boolean(layer.spiderfyOverlappingPoints) && (
+          <SpiderLayer key={`${layer.name}_spider`} baseLayerId={layer.name} />
+        )}
+      </>
       ))}
       {state.visualisations && <VisualisationManager
         visualisationConfigs={state.visualisations}

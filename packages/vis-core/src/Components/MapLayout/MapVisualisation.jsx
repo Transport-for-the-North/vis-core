@@ -1,6 +1,6 @@
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo, useState } from "react";
-import { useMapContext, useDataFetchState } from "hooks";
+import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
 import {
