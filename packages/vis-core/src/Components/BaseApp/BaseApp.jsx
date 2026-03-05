@@ -11,7 +11,7 @@ import {
   NotFound
 } from "../index";
 import { Dashboard } from "../../layouts";
-import { AppContext, AuthProvider, ErrorProvider } from "../../contexts";
+import { AppContext, AuthProvider } from "../../contexts";
 import { api } from "../../services";
 import {
   withWarning,
@@ -160,20 +160,18 @@ export function BaseApp({
   const appContent = (
     <div className={appCssClass}>
       <AuthProvider>
-        <ErrorProvider>
-          <ThemeProvider theme={theme}>
-            <AppContext.Provider value={appConfig}>
-              {beforeDashboard}
-              <Navbar />
-              <Dashboard>
-                <Routes>
-                  {standardRoutes}
-                </Routes>
-              </Dashboard>
-              {afterDashboard}
-            </AppContext.Provider>
-          </ThemeProvider>
-        </ErrorProvider>
+        <ThemeProvider theme={theme}>
+          <AppContext.Provider value={appConfig}>
+            {beforeDashboard}
+            <Navbar />
+            <Dashboard>
+              <Routes>
+                {standardRoutes}
+              </Routes>
+            </Dashboard>
+            {afterDashboard}
+          </AppContext.Provider>
+        </ThemeProvider>
       </AuthProvider>
     </div>
   );
