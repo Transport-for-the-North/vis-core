@@ -361,64 +361,33 @@ export function SVGGalleryManager({ config = {} }) {
    * Memo: Resolve which caveats should be shown for the current set of schematics.
    */
   const activeCaveatSections = useMemo(() => {
-    if (schematics.length === 0) {
-      return [];
-    }
-
-    if (configuredCaveats.length === 0) {
-      return caveatSections;
-    }
+    // Caveats are now unconditional: if caveats are configured, always show them.
+    // Falls back to legacy `caveatSections` if `caveats` is not provided.
+    const source = configuredCaveats.length > 0 ? configuredCaveats : caveatSections;
+    if (!Array.isArray(source) || source.length === 0) return [];
 
     const seen = new Set();
-    const resolved = [];
-    configuredCaveats.forEach((caveat) => {
-      const caveatText = caveat?.text;
-      if (!caveatText || seen.has(caveatText)) return;
-
-      if (!caveat?.filter) {
+    return source
+      .map((caveat) => {
+        const caveatText = caveat?.text;
+        if (!caveatText) return null;
+        if (seen.has(caveatText)) return null;
         seen.add(caveatText);
-        resolved.push({
+        return {
           name: caveat?.name || '',
           text: caveatText,
-        });
-        return;
-      }
-
-      const matchesAnySchematic = schematics.some((schematic) => {
-        const selectedLabel = schematic?.selectedFilterLabels?.[caveat.filter];
-        return ruleMatchesSelectedValue(caveat, selectedLabel);
-      });
-
-      if (!matchesAnySchematic) return;
-      seen.add(caveatText);
-      resolved.push({
-        name: caveat?.name || '',
-        text: caveatText,
-      });
-    });
-
-    return resolved;
-  }, [configuredCaveats, schematics, caveatSections]);
+        };
+      })
+      .filter(Boolean);
+  }, [configuredCaveats, caveatSections]);
 
   /**
    * Memo: Resolve which legends should be shown for the current set of schematics.
    */
   const activeLegends = useMemo(() => {
-    if (schematics.length === 0) {
-      return [];
-    }
-
-    if (legendsFromArray.length === 0) return [];
-
-    return legendsFromArray.filter((legend) => {
-      if (!legend?.filter) return true;
-
-      return schematics.some((schematic) => {
-        const selectedLabel = schematic?.selectedFilterLabels?.[legend.filter];
-        return ruleMatchesSelectedValue(legend, selectedLabel);
-      });
-    });
-  }, [legendsFromArray, schematics]);
+    // Legends are now unconditional: always show all configured legends.
+    return legendsFromArray;
+  }, [legendsFromArray]);
 
   const allRequiredFiltersSelected = filters.every((filter) => {
     const value = filterState?.[filter.id];
