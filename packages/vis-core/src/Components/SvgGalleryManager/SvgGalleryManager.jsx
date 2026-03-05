@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import Select from 'react-select';
 import styled, { useTheme } from 'styled-components';
 import { useFetchVisualisationData } from 'hooks';
@@ -33,6 +33,7 @@ const Title = styled.h1`
   font-weight: 600;
   color: #1a1a1a;
   font-family: inherit;
+  text-align: left;
 `;
 
 const Subtitle = styled.p`
@@ -41,6 +42,7 @@ const Subtitle = styled.p`
   color: #6b7280;
   line-height: 1.6;
   font-family: inherit;
+  text-align: left;
 `;
 
 const LegendSection = styled.div`
@@ -74,6 +76,7 @@ const LegendItemTitle = styled.h3`
   font-weight: 600;
   color: #1a1a1a;
   font-family: inherit;
+  text-align: left;
 `;
 
 const LegendWrapper = styled.div`
@@ -99,7 +102,6 @@ const CaveatSection = styled.div`
   border-left: 4px solid #ffa726;
   border-radius: 8px;
   padding: 12px 16px;
-  width: 100%;
   text-align: left;
 `;
 
@@ -127,8 +129,13 @@ const CaveatsContainer = styled.div`
 `;
 
 const CaveatItem = styled.div`
+  max-width: 100ch;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   & + & {
     margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 167, 38, 0.35);
   }
 `;
 
@@ -184,6 +191,7 @@ const CardTitleText = styled.h3`
   font-weight: 600;
   color: #1a1a1a;
   font-family: inherit;
+  text-align: left;
 `;
 
 const CardSubtitle = styled.p`
@@ -191,6 +199,7 @@ const CardSubtitle = styled.p`
   font-size: 13px;
   color: #6b7280;
   font-family: inherit;
+  text-align: left;
 `;
 
 const ImageWrapper = styled.div`
@@ -213,7 +222,7 @@ const ImageWrapper = styled.div`
 `;
 
 const CardActions = styled.div`
-  padding: 12px 20px;
+  padding: 12px 12px;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
   display: flex;
@@ -249,6 +258,7 @@ const ModalTitle = styled.h2`
   font-weight: 600;
   color: #1a1a1a;
   font-family: inherit;
+  text-align: left;
 `;
 
 const FormGroup = styled.div`
@@ -262,6 +272,7 @@ const Label = styled.label`
   color: #374151;
   font-size: 14px;
   font-family: inherit;
+  text-align: left;
 `;
 
 
@@ -270,6 +281,7 @@ const ErrorText = styled.p`
   font-size: 13px;
   color: #dc2626;
   font-family: inherit;
+  text-align: left;
 `;
 
 const filtersRowStyle = { width: '100%', maxWidth: '360px' };
@@ -432,6 +444,16 @@ export function SVGGalleryManager({ config = {} }) {
   } = useFetchVisualisationData(svgVisualisation);
 
   /**
+   * Reset the dropdown selections back to an unselected state.
+   * Useful after adding a card so the next card starts fresh.
+   */
+  const resetFilterSelections = useCallback(() => {
+    filters.forEach((filter) => {
+      onFilterChange(filter, null);
+    });
+  }, [filters, onFilterChange]);
+
+  /**
    * Update the selected filter value via FilterContext.
    * If a later filter depends on an earlier filter, reset it when the earlier value changes.
    *
@@ -569,9 +591,11 @@ export function SVGGalleryManager({ config = {} }) {
     }
 
     setSchematics((previous) => [...previous, ...newCards]);
+    resetFilterSelections();
   }, [
     filters,
     isAdding,
+    resetFilterSelections,
     svgData,
     svgError,
     svgFetchNonce,
@@ -591,9 +615,7 @@ export function SVGGalleryManager({ config = {} }) {
    * Clear current selections and any inline error message.
    */
   const handleInlineCancel = () => {
-    filters.forEach((filter) => {
-      onFilterChange(filter, null);
-    });
+    resetFilterSelections();
     setErrorMessage('');
   };
 
