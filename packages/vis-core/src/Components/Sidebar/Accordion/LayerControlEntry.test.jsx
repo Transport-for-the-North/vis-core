@@ -260,6 +260,47 @@ describe("LayerControlEntry component test", () => {
     });
     expect(screen.getByText("10.0")).toBeInTheDocument(); // rounded
   });
+
+  it("Does not render width factor slider when fixLineWidth is enabled", () => {
+    const mockGetLayer2 = jest.fn().mockReturnValue(true);
+    const mockGetPaintProperty2 = jest.fn().mockReturnValue(["interpolate", 100]);
+    const mockMap2 = {
+      getLayer: mockGetLayer2,
+      getPaintProperty: mockGetPaintProperty2,
+      setPaintProperty: jest.fn(),
+    };
+
+    const testProps = {
+      ...props,
+      maps: [mockMap2],
+      layer: {
+        id: "id",
+        type: "line",
+        layout: { visibility: false },
+        metadata: { path: "/", shouldHaveOpacityControl: true },
+      },
+      state: {
+        ...props.state,
+        layers: {
+          id: {
+            fixLineWidth: true,
+            fixedLineWidth: 3,
+          },
+        },
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry {...testProps} />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    expect(screen.queryByText("Width factor")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Width factor")).not.toBeInTheDocument();
+  });
   it("Test", () => {
     const mockMapContext = {
       state: {
