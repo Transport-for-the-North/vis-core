@@ -80,6 +80,7 @@ export const actionTypes = {
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
   UPDATE_CUSTOM_BANDS: "UPDATE_CUSTOM_BANDS",
   UPDATE_LAYER_WIDTH_FACTOR: "UPDATE_LAYER_WIDTH_FACTOR",
+  UPDATE_LAYER_FIXED_LINE_WIDTH: "UPDATE_LAYER_FIXED_LINE_WIDTH",
   UPDATE_METADATA_FILTER: "UPDATE_METADATA_FILTER",
   SET_METADATA_TABLES: "SET_METADATA_TABLES",
   SET_METADATA_ERROR: "SET_METADATA_ERROR",
@@ -293,6 +294,29 @@ export const mapReducer = (state, action) => {
             ...state.layers[layerName],
             widthFactor,
           },
+        },
+      };
+    }
+
+    case actionTypes.UPDATE_LAYER_FIXED_LINE_WIDTH: {
+      const { layerName, fixLineWidth, fixedLineWidth } = action.payload;
+      const nextLayer = { ...state.layers[layerName] };
+
+      if (typeof fixLineWidth === "boolean") {
+        nextLayer.fixLineWidth = fixLineWidth;
+      }
+
+      if (fixedLineWidth === null) {
+        nextLayer.fixedLineWidth = null;
+      } else if (typeof fixedLineWidth === "number" && Number.isFinite(fixedLineWidth)) {
+        nextLayer.fixedLineWidth = fixedLineWidth;
+      }
+
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: nextLayer,
         },
       };
     }

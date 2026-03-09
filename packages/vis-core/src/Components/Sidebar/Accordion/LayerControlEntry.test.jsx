@@ -300,6 +300,12 @@ describe("LayerControlEntry component test", () => {
 
     expect(screen.queryByText("Width factor")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Width factor")).not.toBeInTheDocument();
+
+    // Fixed-width UI is shown for line layers.
+    expect(screen.getByText("Fix line width")).toBeInTheDocument();
+    expect(screen.getByTestId("checkbox fix line width")).toBeChecked();
+    expect(screen.getByText("Fixed width")).toBeInTheDocument();
+    expect(screen.getByTestId("slider fixed line width")).toBeInTheDocument();
   });
   it("Test", () => {
     const mockMapContext = {
