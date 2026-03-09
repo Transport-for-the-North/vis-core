@@ -12,6 +12,8 @@ import { ColourSchemeDropdown, BandEditor, SelectorLabel } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
 import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map";
+import { useMapContext } from "hooks";
+import { actionTypes } from "reducers";
 
 /**
  * Styled container for the layer control entry.
@@ -194,6 +196,9 @@ export const LayerControlEntry = memo(
     handleCustomBandsChange,
     state,
   }) => {
+    const mapContext = useMapContext();
+    const dispatch = mapContext?.dispatch;
+
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
@@ -338,6 +343,16 @@ export const LayerControlEntry = memo(
     const enableZoomToFeature =
       layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
     const layerConfigFromState = state?.layers?.[layer.id];
+    const isLineLayer = layer.type === "line";
+    const isFixedLineWidth =
+      isLineLayer &&
+      (layerConfigFromState?.fixLineWidth ?? layer.metadata?.fixLineWidth) ===
+        true;
+    const fixedLineWidthFromState = layerConfigFromState?.fixedLineWidth;
+    const effectiveFixedLineWidth = Number.isFinite(fixedLineWidthFromState)
+      ? fixedLineWidthFromState
+      : 3;
+
     const effectiveDefaultLineOffset =
       layerConfigFromState?.defaultLineOffset ??
       layer.metadata?.defaultLineOffset ??
@@ -375,7 +390,8 @@ export const LayerControlEntry = memo(
       Array.isArray(currentWidthFactor) &&
       currentWidthFactor[0] === "interpolate";
     const isNodeLayer = layer.type === "circle"; // station nodes are circle layers
-    const showWidth = isFeatureStateWidthExpression || isNodeLayer;
+    const showWidth =
+      (isFeatureStateWidthExpression || isNodeLayer) && !isFixedLineWidth;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(
           currentWidthFactor[currentWidthFactor.length - 1],
@@ -396,6 +412,37 @@ export const LayerControlEntry = memo(
         : initialWidth || 1;
 
     const [widthFactor, setWidth] = useState(initialWidthForUI);
+
+    // Stores per-map original line-width paint so we can restore when toggling off.
+    const originalLineWidthByMapRef = useRef(new WeakMap());
+
+    const captureOriginalLineWidths = (map, ids) => {
+      if (!map) return;
+      const existing = originalLineWidthByMapRef.current.get(map) || {};
+      const next = { ...existing };
+      ids.forEach((id) => {
+        try {
+          next[id] = map.getPaintProperty(id, "line-width");
+        } catch {
+          // ignore
+        }
+      });
+      originalLineWidthByMapRef.current.set(map, next);
+    };
+
+    const restoreOriginalLineWidths = (map, ids) => {
+      if (!map) return;
+      const stored = originalLineWidthByMapRef.current.get(map);
+      if (!stored) return;
+      ids.forEach((id) => {
+        if (!(id in stored)) return;
+        try {
+          map.setPaintProperty(id, "line-width", stored[id]);
+        } catch {
+          // ignore
+        }
+      });
+    };
 
     const bandEditorData = useMemo(() => {
       if (
@@ -573,6 +620,52 @@ export const LayerControlEntry = memo(
       setWidth(nextFactor);
     };
 
+    const handleFixLineWidthToggle = (e) => {
+      const nextEnabled = Boolean(e.target.checked);
+
+      if (dispatch) {
+        dispatch({
+          type: actionTypes.UPDATE_LAYER_FIXED_LINE_WIDTH,
+          payload: {
+            layerName: layer.id,
+            fixLineWidth: nextEnabled,
+            fixedLineWidth: effectiveFixedLineWidth,
+          },
+        });
+      }
+
+      maps.forEach((map) => {
+        const ids = getLinkedLayerIds(map, layer.id);
+
+        if (nextEnabled) {
+          captureOriginalLineWidths(map, ids);
+          setPaintAcross(map, ids, "line-width", effectiveFixedLineWidth);
+        } else {
+          restoreOriginalLineWidths(map, ids);
+        }
+      });
+    };
+
+    const handleFixedLineWidthChange = (e) => {
+      const raw = parseFloat(e.target.value);
+      const nextWidth = Math.max(2, Math.min(12, Math.round(raw)));
+
+      if (dispatch) {
+        dispatch({
+          type: actionTypes.UPDATE_LAYER_FIXED_LINE_WIDTH,
+          payload: {
+            layerName: layer.id,
+            fixedLineWidth: nextWidth,
+          },
+        });
+      }
+
+      maps.forEach((map) => {
+        const ids = getLinkedLayerIds(map, layer.id);
+        setPaintAcross(map, ids, "line-width", nextWidth);
+      });
+    };
+
     const appliedNodeDefaultRef = useRef(false);
 
     useEffect(() => {
@@ -661,6 +754,47 @@ export const LayerControlEntry = memo(
             />
             <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
           </OpacityControl>
+        ),
+      });
+    }
+
+    if (isLineLayer) {
+      collapsibleSections.push({
+        key: "fixed-line-width",
+        node: (
+          <div>
+            <OpacityControl>
+              <input
+                id={`fix-line-width-${layer.id}`}
+                data-testid="checkbox fix line width"
+                type="checkbox"
+                checked={isFixedLineWidth}
+                onChange={handleFixLineWidthToggle}
+              />
+              <ControlLabel htmlFor={`fix-line-width-${layer.id}`}>
+                Fix line width
+              </ControlLabel>
+            </OpacityControl>
+
+            {isFixedLineWidth && (
+              <WidthControl>
+                <ControlLabel htmlFor={`fixed-width-${layer.id}`}>
+                  Fixed width
+                </ControlLabel>
+                <Slider
+                  id={`fixed-width-${layer.id}`}
+                  data-testid="slider fixed line width"
+                  type="range"
+                  min={2}
+                  max={12}
+                  step={1}
+                  value={effectiveFixedLineWidth}
+                  onChange={handleFixedLineWidthChange}
+                />
+                <SliderValue>{effectiveFixedLineWidth.toFixed(0)}</SliderValue>
+              </WidthControl>
+            )}
+          </div>
         ),
       });
     }
