@@ -13,6 +13,7 @@ import {
 import { Dashboard } from "../../layouts";
 import { AppContext, AuthProvider, ErrorProvider } from "../../contexts";
 import { api } from "../../services";
+import { loadBands } from "../../utils";
 import {
   withWarning,
   withRoleValidation,
@@ -76,30 +77,10 @@ export function BaseApp({
         const configModule = await configModules[configPath]();
         const initialAppConfig = configModule.appConfig;
 
-        // Load bands with fallback logic
-        let bands = null;
-        try {
-          if (bandModules[bandsPath]) {
-            const defaultBands = await bandModules[bandsPath]();
-            bands = defaultBands.bands;
-          } else {
-            throw new Error("Bands module not found");
-          }
-        } catch (bandError) {
-          console.warn(`Warning: ${appName} bands module not found. Attempting to load from appConfig...`);
-          // If the bands file is missing, use loadBands from appConfig
-          if (initialAppConfig.loadBands) {
-            try {
-              bands = await initialAppConfig.loadBands();
-            } catch (loadBandsError) {
-              console.warn(`Failed to load bands from appConfig.loadBands:`, loadBandsError);
-              bands = [];
-            }
-          } else {
-            console.warn("Bands module is missing, and appConfig.loadBands is not defined.");
-            bands = [];
-          }
-        }
+        // Load bands with fallback logic.
+        // Uses the shared loader, which is tolerant and returns [] if the module
+        // is missing/invalid/throws.
+        const bands = await loadBands({ bandModules, bandsPath, appName });
 
         const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
