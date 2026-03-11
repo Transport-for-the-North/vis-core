@@ -236,6 +236,15 @@ export const updateOpacityExpression = (existingExpr, newOpacity) => {
  */
 export function createPaintProperty(bins, style, colours, opacityValue, layerConfig = {}) {
   const shouldFixLineWidth = layerConfig?.shouldFixLineWidth === true;
+  if (
+    Number.isFinite(layerConfig?.fixedLineWidth) &&
+    layerConfig?.shouldFixLineWidth == null
+  ) {
+    console.warn(
+      `[vis-core] fixedLineWidth is set (${layerConfig.fixedLineWidth}) but shouldFixLineWidth is missing. ` +
+        `Set shouldFixLineWidth: true.`
+    );
+  }
   const fixedLineWidth =
     typeof layerConfig?.fixedLineWidth === "number" &&
     Number.isFinite(layerConfig.fixedLineWidth)
