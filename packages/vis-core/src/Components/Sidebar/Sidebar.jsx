@@ -284,6 +284,8 @@ export const Sidebar = ({
             <DownloadSection
               filters={additionalFeatures.download.filters}
               downloadPath={additionalFeatures.download.downloadPath}
+              downloadShapefilePath={additionalFeatures.download.downloadShapefilePath}
+              downloadShapefilePtPath={additionalFeatures.download.downloadShapefilePtPath}
               bgColor={bgColor}
               requestMethod={additionalFeatures.download.requestMethod || 'GET'}
             />

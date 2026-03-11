@@ -22,16 +22,15 @@ const NoDataParagraph = styled.p``;
 
 const DownloadButton = styled.button`
   cursor: pointer;
-  padding: 10px 5px; /* Increased padding for a larger button */
-  background-color: ${(props) => props.$bgColor}; /* Access the $bgColor prop */
+  padding: 10px 5px;
+  background-color: ${(props) => props.$bgColor};
   color: white;
   border-radius: 8px;
   border: 0.25px solid;
-  margin-right: 10px; /* Changed to margin-right to position it on the left */
-  width: 50%;
+  width: 100%;
   font-family: "Hanken Grotesk", sans-serif;
   display: flex;
-  align-items: center; /* Center align items vertically */
+  align-items: center;
   justify-content: center;
   
   &:hover {
@@ -70,11 +69,13 @@ const isDuplicateValue = (values, value) => {
   );
 };
 
-export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod = 'GET' }) => {
+export const DownloadSection = ({ filters, downloadPath, downloadShapefilePath, downloadShapefilePtPath, bgColor, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
   const pageContext = useContext(PageContext);
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingShapefile, setIsDownloadingShapefile] = useState(false);
+  const [isDownloadingShapefilePt, setIsDownloadingShapefilePt] = useState(false);
   const [requestError, setRequestError] = useState(null);
   const [isRequestTooLarge, setIsRequestTooLarge] = useState(false);
   const [processedFilters, setProcessedFilters] = useState([]);
@@ -321,6 +322,44 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
       setIsDownloading(false);
     }
   };
+
+  const handleDownloadShapefile = async () => {
+    setIsDownloadingShapefile(true);
+    setRequestError(null);
+    try {
+      const shapefileRequiresAuth = checkSecurityRequirements(apiSchema, downloadShapefilePath);
+      await api.downloadService.downloadFile(downloadShapefilePath, {
+        queryParams: filterState || {},
+        skipAuth: !shapefileRequiresAuth,
+        method: requestMethod,
+      });
+      window.clarity('event', 'download_shapefile_clicked');
+    } catch (error) {
+      console.error('Error downloading shapefile:', error);
+      setRequestError(error.message || "Error downloading shapefile");
+    } finally {
+      setIsDownloadingShapefile(false);
+    }
+  };
+
+  const handleDownloadShapefilePt = async () => {
+    setIsDownloadingShapefilePt(true);
+    setRequestError(null);
+    try {
+      const shapefilePtRequiresAuth = checkSecurityRequirements(apiSchema, downloadShapefilePtPath);
+      await api.downloadService.downloadFile(downloadShapefilePtPath, {
+        queryParams: filterState || {},
+        skipAuth: !shapefilePtRequiresAuth,
+        method: requestMethod,
+      });
+      window.clarity('event', 'download_shapefile_pt_clicked');
+    } catch (error) {
+      console.error('Error downloading PT shapefile:', error);
+      setRequestError(error.message || "Error downloading PT shapefile");
+    } finally {
+      setIsDownloadingShapefilePt(false);
+    }
+  };
   
   if (!isFiltersReady) {
     return (
@@ -420,7 +459,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
         <ErrorBox text={requestError}/>
       )}
       
-      {/* Always show download button */}
+      {/* CSV download button */}
       <DownloadButton 
         onClick={handleDownload} 
         $bgColor={bgColor}
@@ -432,6 +471,38 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
           isRequestTooLarge ? "Request Too Large" : "Download as CSV"
         )}
       </DownloadButton>
+
+      {/* Output area shapefile button — shown when a shapefile path is configured */}
+      {downloadShapefilePath && (
+        <DownloadButton
+          onClick={handleDownloadShapefile}
+          $bgColor={bgColor}
+          disabled={isDownloadingShapefile}
+          style={{ marginTop: '8px' }}
+        >
+          {isDownloadingShapefile ? (
+            <>Downloading <Spinner /></>
+          ) : (
+            "Download as Shapefile (Output Areas)"
+          )}
+        </DownloadButton>
+      )}
+
+      {/* PT point shapefile button — only shown when the "Include PT" checkbox is ticked */}
+      {downloadShapefilePtPath && filterState?.['includePtPoints'] && (
+        <DownloadButton
+          onClick={handleDownloadShapefilePt}
+          $bgColor={bgColor}
+          disabled={isDownloadingShapefilePt}
+          style={{ marginTop: '8px' }}
+        >
+          {isDownloadingShapefilePt ? (
+            <>Downloading <Spinner /></>
+          ) : (
+            "Download as Shapefile (PT Points)"
+          )}
+        </DownloadButton>
+      )}
     </AccordionSection>
   );
 };
