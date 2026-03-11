@@ -311,6 +311,10 @@ export function SVGGalleryManager({ config = {} }) {
   } = useMetadataDrivenFilters();
 
   const filters = Array.isArray(metadataDrivenFilters) ? metadataDrivenFilters : [];
+  const renderableFilters = useMemo(
+    () => filters.filter((filter) => filter?.type !== 'fixed'),
+    [filters]
+  );
   const pageTitle = typeof config?.pageTitle === 'string' ? config.pageTitle : '';
   const pageSubtitle = typeof config?.pageSubtitle === 'string' ? config.pageSubtitle : '';
   const valueField = config?.valueField;
@@ -417,7 +421,9 @@ export function SVGGalleryManager({ config = {} }) {
    * Useful after adding a card so the next card starts fresh.
    */
   const resetFilterSelections = useCallback(() => {
+    // Fixed filters are intentionally hidden and must keep their (default) value.
     filters.forEach((filter) => {
+      if (filter?.type === 'fixed') return;
       onFilterChange(filter, null);
     });
   }, [filters, onFilterChange]);
@@ -689,7 +695,7 @@ export function SVGGalleryManager({ config = {} }) {
             Add Card
           </PlaceholderText>
 
-          {filters.map((filter) => {
+          {renderableFilters.map((filter) => {
             const baseOptions = Array.isArray(filter?.values?.values)
               ? filter.values.values
               : [];
