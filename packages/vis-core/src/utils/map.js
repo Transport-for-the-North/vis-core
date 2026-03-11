@@ -235,7 +235,7 @@ export const updateOpacityExpression = (existingExpr, newOpacity) => {
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue, layerConfig = {}) {
-  const shouldFixLineWidth = layerConfig?.fixLineWidth === true;
+  const shouldFixLineWidth = layerConfig?.shouldFixLineWidth === true;
   const fixedLineWidth =
     typeof layerConfig?.fixedLineWidth === "number" &&
     Number.isFinite(layerConfig.fixedLineWidth)

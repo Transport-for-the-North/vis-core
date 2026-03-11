@@ -338,8 +338,11 @@ export const LayerControlEntry = memo(
     const enableZoomToFeature =
       layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
     const layerConfigFromState = state?.layers?.[layer.id];
+    const shouldFixLineWidth =
+      layer.metadata?.shouldFixLineWidth ??
+      false;
     const isFixedLineWidth =
-      layer.type === "line" && layer.metadata?.fixLineWidth === true;
+      layer.type === "line" && shouldFixLineWidth === true;
     const effectiveDefaultLineOffset =
       layerConfigFromState?.defaultLineOffset ??
       layer.metadata?.defaultLineOffset ??
@@ -377,7 +380,7 @@ export const LayerControlEntry = memo(
       Array.isArray(currentWidthFactor) &&
       currentWidthFactor[0] === "interpolate";
     const isNodeLayer = layer.type === "circle"; // station nodes are circle layers
-    const showWidth = (isFeatureStateWidthExpression || isNodeLayer) && !isFixedLineWidth;
+    const showWidth = isFeatureStateWidthExpression && !isFixedLineWidth;
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(
           currentWidthFactor[currentWidthFactor.length - 1],

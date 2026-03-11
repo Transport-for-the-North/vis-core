@@ -261,7 +261,7 @@ describe("LayerControlEntry component test", () => {
     expect(screen.getByText("10.0")).toBeInTheDocument(); // rounded
   });
 
-  it("Does not render width factor slider when fixLineWidth is enabled", () => {
+  it("Does not render width factor slider when shouldFixLineWidth is enabled", () => {
     const mockGetLayer2 = jest.fn().mockReturnValue(true);
     const mockGetPaintProperty2 = jest.fn().mockReturnValue(["interpolate", 100]);
     const mockMap2 = {
@@ -283,7 +283,7 @@ describe("LayerControlEntry component test", () => {
         ...props.state,
         layers: {
           id: {
-            fixLineWidth: true,
+            shouldFixLineWidth: true,
             fixedLineWidth: 3,
           },
         },
