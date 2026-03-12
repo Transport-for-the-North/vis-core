@@ -3,6 +3,8 @@ import Select from 'react-select';
 import styled, { useTheme } from 'styled-components';
 import { useFetchVisualisationData } from 'hooks';
 import { useMetadataDrivenFilters } from 'hooks/useMetadataDrivenFilters';
+import { AppContext } from 'contexts';
+import { Footer } from 'Components/HomePage/Footer';
 import {
   normaliseAssetPath,
   normaliseRows,
@@ -306,6 +308,8 @@ const ErrorText = styled.p`
 export function SVGGalleryManager({ config = {} }) {
   const theme = useTheme();
   const selectStyles = useMemo(() => makeSelectStyles(theme), [theme]);
+  const appContext = useContext(AppContext);
+  const footer = appContext?.footer;
 
   const {
     filters: metadataDrivenFilters,
@@ -746,6 +750,7 @@ export function SVGGalleryManager({ config = {} }) {
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
         </PlaceholderCard>
       </SchematicsGrid>
+      {footer && <Footer {...footer} />}
     </Container>
   );
 }
