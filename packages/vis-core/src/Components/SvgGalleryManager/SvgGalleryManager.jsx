@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useCallback, useContext } from 'react';
 import Select from 'react-select';
 import styled, { useTheme } from 'styled-components';
 import { useFetchVisualisationData } from 'hooks';
@@ -526,7 +526,7 @@ export function SVGGalleryManager({ config = {} }) {
         if (!svgUrl) return null;
 
         const selectedLabelParts = filters
-          .map((filter) => svgRequest.selectedFilterLabels[filter.filterName || filter.paramName])
+          .map((filter) => filter.type === 'fixed' ? null : svgRequest.selectedFilterLabels[filter.filterName || filter.paramName])
           .filter((entry) => entry !== null && entry !== undefined && `${entry}`.trim() !== '')
           .map((entry) => `${entry}`.trim());
 
