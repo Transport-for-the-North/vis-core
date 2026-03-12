@@ -262,7 +262,9 @@ const ModalTitle = styled.h2`
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  width: 100%;
+  max-width: 360px;
 `;
 
 const Label = styled.label`
@@ -275,6 +277,11 @@ const Label = styled.label`
   text-align: left;
 `;
 
+const ActionsRow = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+`;
 
 const ErrorText = styled.p`
   margin: 12px 0 0 0;
@@ -283,9 +290,6 @@ const ErrorText = styled.p`
   font-family: inherit;
   text-align: left;
 `;
-
-const filtersRowStyle = { width: '100%', maxWidth: '360px' };
-const actionsRowStyle = { display: 'flex', gap: '12px', marginTop: '20px' };
 
 /**
  * Renders a configuration-driven gallery of SVG schematics.
@@ -704,7 +708,7 @@ export function SVGGalleryManager({ config = {} }) {
             ) ?? null;
 
             return (
-              <FormGroup key={filter.paramName} style={filtersRowStyle}>
+              <FormGroup key={filter.paramName}>
                 <Label>{filter.filterName}</Label>
                 <Select
                   options={reactSelectOptions}
@@ -722,7 +726,7 @@ export function SVGGalleryManager({ config = {} }) {
             );
           })}
 
-          <div style={actionsRowStyle}>
+          <ActionsRow>
             <AppButton
               $bgColor={theme?.navText ?? theme?.activeBg ?? "#7317de"}
               $height="36px"
@@ -737,7 +741,7 @@ export function SVGGalleryManager({ config = {} }) {
             >
               {isAdding ? 'Adding...' : 'Add'}
             </AppButton>
-          </div>
+          </ActionsRow>
 
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
         </PlaceholderCard>
