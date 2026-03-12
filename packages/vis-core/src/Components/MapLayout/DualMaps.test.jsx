@@ -142,16 +142,37 @@ const on = jest.fn();
 const off = jest.fn();
 const getCanvas = jest.fn();
 const getLayer = jest.fn(true);
+
+const createMockMap = (overrides = {}) => ({
+  on: jest.fn(),
+  off: jest.fn(),
+  getCanvas: jest.fn(),
+  getLayer: jest.fn().mockReturnValue(true),
+  resize: jest.fn(),
+  dragPan: { enable: jest.fn() },
+  touchZoomRotate: { enable: jest.fn(), disableRotation: jest.fn() },
+  scrollZoom: { disable: jest.fn() },
+  doubleClickZoom: { disable: jest.fn() },
+  boxZoom: { disable: jest.fn() },
+  keyboard: { disable: jest.fn() },
+  ...overrides,
+});
+
 beforeEach(() => {
   useDualMaps.mockReturnValue({
-    leftMap: {
-      off: off,
-      on: on,
-      getCanvas: getCanvas,
-      getLayer: getLayer,
+    leftMap: createMockMap({
+      off,
+      on,
+      getCanvas,
+      getLayer,
       type: "left",
-    },
-    rightMap: { off: off, on: on, getLayer: getLayer, type: "right" },
+    }),
+    rightMap: createMockMap({
+      off,
+      on,
+      getLayer,
+      type: "right",
+    }),
     isMapStyleLoaded: "isMapStyleLoaded",
     isMapLoaded: "isMapLoaded",
     isMapReady: "isMapReady",
@@ -279,17 +300,14 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
         state: { value: 100 },
       },
     ];
-    const mockLeftMap = {
-      on: jest.fn(),
-      off: jest.fn(),
+    const mockLeftMap = createMockMap({
       project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
       queryRenderedFeatures: jest.fn().mockReturnValue(mockFeatures),
       setFeatureState: jest.fn(),
-      getLayer: jest.fn().mockReturnValue(true),
-    };
+    });
     useDualMaps.mockReturnValue({
       leftMap: mockLeftMap,
-      rightMap: { ...mockLeftMap },
+      rightMap: createMockMap({ ...mockLeftMap, type: "right" }),
       isMapReady: true,
     });
 
@@ -427,25 +445,25 @@ describe("Tests when apiRequest is not null", () => {
       },
     ]);
     useDualMaps.mockReturnValue({
-      leftMap: {
-        off: off,
-        on: on,
-        getCanvas: getCanvas,
-        getLayer: getLayer,
-        project: project,
-        queryRenderedFeatures: queryRenderedFeatures,
-        setFeatureState: setFeatureState,
+      leftMap: createMockMap({
+        off,
+        on,
+        getCanvas,
+        getLayer,
+        project,
+        queryRenderedFeatures,
+        setFeatureState,
         type: "left",
-      },
-      rightMap: {
-        off: off,
-        on: on,
-        getLayer: getLayer,
-        project: project,
-        queryRenderedFeatures: queryRenderedFeatures,
-        setFeatureState: setFeatureState,
+      }),
+      rightMap: createMockMap({
+        off,
+        on,
+        getLayer,
+        project,
+        queryRenderedFeatures,
+        setFeatureState,
         type: "right",
-      },
+      }),
       isMapStyleLoaded: "isMapStyleLoaded",
       isMapLoaded: "isMapLoaded",
       isMapReady: "isMapReady",
@@ -523,7 +541,7 @@ describe("Tests when features is null", () => {
     setFeatureState = jest.fn();
 
     useDualMaps.mockReturnValue({
-      leftMap: {
+      leftMap: createMockMap({
         off,
         on,
         getCanvas,
@@ -532,8 +550,8 @@ describe("Tests when features is null", () => {
         queryRenderedFeatures,
         setFeatureState,
         type: "left",
-      },
-      rightMap: {
+      }),
+      rightMap: createMockMap({
         off,
         on,
         getLayer,
@@ -541,7 +559,7 @@ describe("Tests when features is null", () => {
         queryRenderedFeatures,
         setFeatureState,
         type: "right",
-      },
+      }),
       isMapStyleLoaded: true,
       isMapLoaded: true,
       isMapReady: true,
