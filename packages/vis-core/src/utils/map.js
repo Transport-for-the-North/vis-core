@@ -235,6 +235,21 @@ export const updateOpacityExpression = (existingExpr, newOpacity) => {
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue, layerConfig = {}) {
+  const shouldFixLineWidth = layerConfig?.shouldFixLineWidth === true;
+  if (
+    Number.isFinite(layerConfig?.fixedLineWidth) &&
+    layerConfig?.shouldFixLineWidth == null
+  ) {
+    console.warn(
+      `[vis-core] fixedLineWidth is set (${layerConfig.fixedLineWidth}) but shouldFixLineWidth is missing. ` +
+        `Set shouldFixLineWidth: true.`
+    );
+  }
+  const fixedLineWidth =
+    typeof layerConfig?.fixedLineWidth === "number" &&
+    Number.isFinite(layerConfig.fixedLineWidth)
+      ? layerConfig.fixedLineWidth
+      : 3;
   let widthObject = [];
   let colors = [];
   let colorObject = [];
@@ -330,12 +345,14 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           ["feature-state", "value"],
           ...colors,
         ],
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "value"],
-          ...widthObject
-        ],
+        "line-width": shouldFixLineWidth
+          ? fixedLineWidth
+          : [
+              "interpolate",
+              ["linear"],
+              ["feature-state", "value"],
+              ...widthObject,
+            ],
         "line-opacity": [
           "case",
           ["in", ["feature-state", "value"], ["literal", [null]]],
@@ -360,21 +377,21 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           colours[colours.length - 1], // Blue for positive values
           "rgba(0, 0, 0, 1)",
         ],
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "valueAbs"],
-          ...widthObject
-        ],
+        "line-width": shouldFixLineWidth
+          ? fixedLineWidth
+          : [
+              "interpolate",
+              ["linear"],
+              ["feature-state", "valueAbs"],
+              ...widthObject,
+            ],
         "line-opacity": [
           "case",
           ["in", ["feature-state", "value"], ["literal", [null]]],
           0,
           opacityValue ?? 1,
         ],
-
-        "line-offset":
-          offsetExpression,
+        "line-offset": layerConfig.defaultLineOffset ?? offsetExpression,
 
       };
     case "line-categorical":
@@ -391,7 +408,7 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           0,
           opacityValue ?? 1,
         ],
-        "line-width": 3,
+        "line-width": shouldFixLineWidth ? fixedLineWidth : 3,
         "line-offset": layerConfig.defaultLineOffset !== undefined ? [
           "interpolate",
           ["linear"],
