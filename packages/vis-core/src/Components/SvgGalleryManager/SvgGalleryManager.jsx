@@ -360,13 +360,10 @@ export function SVGGalleryManager({ config = {} }) {
   const processedSvgNonceRef = useRef(0);
   const lastSvgDataRef = useRef(null);
 
-
   /**
    * Memo: Resolve which caveats should be shown for the current set of schematics.
    */
   const activeCaveatSections = useMemo(() => {
-    // Caveats are now unconditional: if caveats are configured, always show them.
-    // Falls back to legacy `caveatSections` if `caveats` is not provided.
     const source = configuredCaveats.length > 0 ? configuredCaveats : caveatSections;
     if (!Array.isArray(source) || source.length === 0) return [];
 
@@ -388,10 +385,7 @@ export function SVGGalleryManager({ config = {} }) {
   /**
    * Memo: Resolve which legends should be shown for the current set of schematics.
    */
-  const activeLegends = useMemo(() => {
-    // Legends are now unconditional: always show all configured legends.
-    return legendsFromArray;
-  }, [legendsFromArray]);
+  const activeLegends = useMemo(() => legendsFromArray, [legendsFromArray]);
 
   const allRequiredFiltersSelected = filters.every((filter) => {
     const value = filterState?.[filter.id];
@@ -583,7 +577,7 @@ export function SVGGalleryManager({ config = {} }) {
    * @param {string} id - Card id.
    */
   const handleRemove = (id) => {
-    setSchematics(schematics.filter(s => s.id !== id));
+    setSchematics(schematics.filter((s) => s.id !== id));
   };
 
   /**
@@ -603,7 +597,6 @@ export function SVGGalleryManager({ config = {} }) {
    * @param {object} schematic - The schematic/card model held in component state.
    * @returns {string} - A CSS aspect-ratio string, e.g. `3 / 2`.
    */
-
   const getSchematicAspectRatio = (schematic) => {
     if (!schematic) return defaultCardRatio;
     if (cardRatios.length === 0) return defaultCardRatio;
