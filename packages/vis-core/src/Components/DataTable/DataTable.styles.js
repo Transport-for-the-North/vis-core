@@ -43,14 +43,20 @@ export const Th = styled.th`
   top: 0;
   z-index: 1;
   text-align: left;
+  vertical-align: top;
   padding: 10px 8px;
   background: ${(p) => p.theme.activeBg};
   color: #fff;
   font-weight: 800;
   border-bottom: 1px solid #5b0fb5;
+  border-right: 2px solid rgba(255, 255, 255, 0.6);
   user-select: none;
   min-width: 0;
   overflow: hidden;
+
+  &:last-child {
+    border-right: none;
+  }
 `;
 
 export const ThInner = styled.div`
@@ -59,6 +65,30 @@ export const ThInner = styled.div`
   justify-content: flex-start;
   gap: 6px;
   min-width: 0;
+`;
+
+export const SelectHeaderInner = styled(ThInner)`
+  align-items: flex-start;
+`;
+
+export const SelectHeaderLabel = styled.span`
+  flex: 0 0 auto;
+  white-space: nowrap;
+  line-height: 1.2;
+`;
+
+export const SelectHeaderCheckbox = styled.input`
+  margin-top: 0;
+`;
+
+export const RowSelectCheckbox = styled.input`
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.25;
+    filter: grayscale(1);
+  }
 `;
 
 export const HeaderLabel = styled.span`
@@ -89,18 +119,15 @@ export const ResizerButton = styled.button`
   cursor: col-resize;
   border: none;
   background: transparent;
-  border-right: 2px solid rgba(255, 255, 255, 0.6);
   opacity: 0.85;
   padding: 0;
 
   &:hover {
     opacity: 1;
-    border-right-color: #fff;
   }
 
   &:focus-visible {
     opacity: 1;
-    border-right-color: #fff;
     outline: 2px solid rgba(255, 255, 255, 0.95);
     outline-offset: 2px;
     border-radius: 2px;
@@ -188,4 +215,23 @@ export const MeasureHost = styled.div`
   visibility: hidden;
   pointer-events: none;
   contain: layout style paint;
+`;
+
+export const InlineWarningWrap = styled.div`
+  /* MessageBox is designed as a full-width banner; make it compact here only. */
+  && > div {
+    margin-bottom: 0;
+    padding: 6px 8px;
+    font-size: 0.8em;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  }
+
+  && > div > div {
+    margin-right: 6px;
+  }
+
+  && > div svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
 `;
