@@ -16,195 +16,219 @@ import { AppButton } from '../AppButton';
 
 // Styled Components
 const Container = styled.div`
-  min-height: 100vh;
+  min-height: calc(100vh - 75px); /* 75px = Navbar height; prevents overflow below viewport */
   background: #f8f9fa;
-  padding: 24px;
-  width: 100%;
+  padding: 0;
   max-width: 100%;
-  margin: 0;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 `;
 
-const Header = styled.div`
-  margin-bottom: 32px;
+const ContentArea = styled.div`
+  flex: 1;
+  padding: 1rem 3vw 1rem;
 `;
 
-const Title = styled.h1`
-  margin: 0 0 8px 0;
-  font-size: 32px;
+const HeroBand = styled.section`
+  background: #ffffff;
+  border-bottom: 3px solid ${(p) => p.theme.activeBg || '#7317de'};
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+  padding: 1.5rem 3vw 1.5rem;
+`;
+
+const HeroTop = styled.div`
+  margin-bottom: 1.25rem;
+`;
+
+const Title = styled.h2`
+  margin: 0 0 0.4rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #0f172a;
   font-family: inherit;
+  line-height: 1.15;
   text-align: left;
 `;
 
 const Subtitle = styled.p`
-  margin: 0 0 24px 0;
-  font-size: 16px;
-  color: #6b7280;
-  line-height: 1.6;
-  font-family: inherit;
+  margin: 0;
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.4;
+  max-width: 900px;
   text-align: left;
 `;
 
+const HeroDivider = styled.hr`
+  margin: 1.25rem 0 1.25rem;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+`;
+
+/* Two-column body: caveats left, legends right */
+const HeroBody = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 860px) {
+    grid-template-columns: 1fr 1fr;
+  }
+`;
+
+/* Caveats — inline text, no card border */
+const CaveatColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const CaveatItem = styled.div`
+  overflow-wrap: anywhere;
+  word-break: break-word;
+`;
+
+const CaveatTitle = styled.h3`
+  margin: 0 0 3px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+    flex-shrink: 0;
+  }
+`;
+
+const CaveatText = styled.div`
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.4;
+  white-space: normal;
+  text-align: left;
+`;
+
+/* Legends — sits in the right column of the hero body, no card border */
 const LegendSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
 `;
 
 const LegendsRow = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch; /* All items in the row grow to the same height */
+  gap: 6px;
 `;
 
 const LegendItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 0;
+  gap: 3px;
+  flex: 1;
+  min-width: 160px;
 `;
 
 const LegendItemTitle = styled.h3`
-  margin: 0;
-  font-size: 14px;
+  margin: 0 0 5px;
+  font-size: 13px;
   font-weight: 600;
-  color: #1a1a1a;
-  font-family: inherit;
+  color: #0f172a;
   text-align: left;
 `;
 
 const LegendWrapper = styled.div`
+  flex: 1; /* Grow to fill remaining column height so all wrappers match */
   width: 100%;
   background: #f9fafb;
   border-radius: 8px;
   padding: 12px 16px;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 `;
 
 const LegendImage = styled.img`
   width: 100%;
-  height: auto;
+  height: 100%;
   max-height: 110px;
   object-fit: contain;
-`;
-
-const CaveatSection = styled.div`
-  background: #fff8e1;
-  border-left: 4px solid #ffa726;
-  border-radius: 8px;
-  padding: 12px 16px;
-  text-align: left;
-`;
-
-const CaveatText = styled.p`
-  margin: 0;
-  font-size: 13px;
-  color: #5f4e00;
-  line-height: 1.4;
-  font-family: inherit;
-  text-align: left;
-`;
-
-const CaveatTitle = styled.h3`
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #5f4e00;
-  font-family: inherit;
-  text-align: left;
-`;
-
-const CaveatsContainer = styled.div`
-  display: block;
-  margin-bottom: 24px;
-`;
-
-const CaveatItem = styled.div`
-  max-width: 100ch;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  & + & {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255, 167, 38, 0.35);
-  }
+  object-position: left top;
 `;
 
 const SchematicsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(800px, 1fr));
-  gap: 24px;
-  
-  @media (max-width: 768px) {
+  grid-auto-rows: 1fr; /* All rows the same height */
+  gap: 10px;
+
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    grid-auto-rows: auto;
   }
 `;
 
-const Card = styled.div`
-  background: white;
-  border-radius: 12px;
+const Card = styled.section`
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: ${(p) => p.theme.borderRadius || '8px'};
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 2px 5px rgba(0, 0, 0, 0.03);
   transition: box-shadow 0.3s ease;
-  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
 `;
 
 const PlaceholderCard = styled(Card)`
-  border: 2px dashed #d1d5db;
-  background: #fafbfc;
-  display: flex;
-  flex-direction: column;
+  border: 2px dashed #cbd5e1;
+  box-shadow: none;
+  background: #f8fafc;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
-  cursor: default;
-  transition: all 0.3s ease;
-  padding: 24px;
+  min-height: 360px;
+  padding: 32px 24px;
 `;
 
 const PlaceholderText = styled.p`
-  margin: 0;
+  margin: 0 0 20px 0;
   font-size: 16px;
-  font-weight: 500;
-  color: #6b7280;
-  font-family: inherit;
+  font-weight: 600;
+  color: #475569;
 `;
 
 const CardTitle = styled.div`
-  padding: 16px 20px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
 `;
 
 const CardTitleText = styled.h3`
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
-  font-family: inherit;
+  color: #0f172a;
   text-align: left;
 `;
 
 const CardSubtitle = styled.p`
-  margin: 4px 0 0 0;
-  font-size: 13px;
-  color: #6b7280;
-  font-family: inherit;
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #64748b;
   text-align: left;
 `;
 
 const ImageWrapper = styled.div`
+  flex: 1; /* Fill remaining card height so all cards in a row share the same image area */
+  min-height: 280px;
   width: 100%;
   aspect-ratio: ${({ $aspectRatio }) => $aspectRatio || '3 / 2'};
   background: #ffffff;
@@ -212,9 +236,9 @@ const ImageWrapper = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 0;
+  padding: 12px;
   box-sizing: border-box;
-  
+
   img, svg {
     width: 100%;
     height: 100%;
@@ -224,43 +248,12 @@ const ImageWrapper = styled.div`
 `;
 
 const CardActions = styled.div`
-  padding: 12px 12px;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
   display: flex;
   justify-content: flex-end;
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-`;
-
-const ModalTitle = styled.h2`
-  margin: 0 0 24px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
-  font-family: inherit;
-  text-align: left;
+  margin-top: auto;
 `;
 
 const FormGroup = styled.div`
@@ -271,11 +264,10 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 500;
-  color: #374151;
-  font-size: 14px;
-  font-family: inherit;
+  color: #334155;
+  font-size: 13px;
   text-align: left;
 `;
 
@@ -288,8 +280,8 @@ const ActionsRow = styled.div`
 const ErrorText = styled.p`
   margin: 12px 0 0 0;
   font-size: 13px;
-  color: #dc2626;
-  font-family: inherit;
+  font-weight: 500;
+  color: #ef4444;
   text-align: left;
 `;
 
@@ -627,47 +619,57 @@ export function SVGGalleryManager({ config = {} }) {
 
   return (
     <Container>
-      {(pageTitle || pageSubtitle) && (
-        <Header>
-          {pageTitle && <Title>{pageTitle}</Title>}
-          {pageSubtitle && <Subtitle>{pageSubtitle}</Subtitle>}
-        </Header>
-      )}
+      {(pageTitle || pageSubtitle || activeCaveatSections.length > 0 || activeLegends.length > 0) && (
+        <HeroBand>
+          {(pageTitle || pageSubtitle) && (
+            <HeroTop>
+              {pageTitle && <Title>{pageTitle}</Title>}
+              {pageSubtitle && <Subtitle>{pageSubtitle}</Subtitle>}
+            </HeroTop>
+          )}
 
-      {activeCaveatSections.length > 0 && (
-        <CaveatsContainer>
-          <CaveatSection>
-            {activeCaveatSections.map((caveat, index) => (
-              <CaveatItem key={`caveat-${index}`}>
-                {caveat?.name && <CaveatTitle>{caveat.name}</CaveatTitle>}
-                {typeof caveat.text === 'string' ? (
-                  <CaveatText dangerouslySetInnerHTML={{ __html: caveat.text }} />
-                ) : (
-                  <CaveatText>{`${caveat.text ?? ''}`}</CaveatText>
+          {(activeCaveatSections.length > 0 || activeLegends.length > 0) && (
+            <>
+              {(pageTitle || pageSubtitle) && <HeroDivider />}
+              <HeroBody>
+                {activeCaveatSections.length > 0 && (
+                  <CaveatColumn>
+                    {activeCaveatSections.map((caveat, index) => (
+                      <CaveatItem key={`caveat-${index}`}>
+                        {caveat?.name && <CaveatTitle>{caveat.name}</CaveatTitle>}
+                        {typeof caveat.text === 'string' ? (
+                          <CaveatText dangerouslySetInnerHTML={{ __html: caveat.text }} />
+                        ) : (
+                          <CaveatText>{`${caveat.text ?? ''}`}</CaveatText>
+                        )}
+                      </CaveatItem>
+                    ))}
+                  </CaveatColumn>
                 )}
-              </CaveatItem>
-            ))}
-          </CaveatSection>
-        </CaveatsContainer>
+
+                {activeLegends.length > 0 && (
+                  <LegendSection>
+                    <LegendsRow>
+                      {activeLegends.map((legend) => (
+                        <LegendItem key={legend.id}>
+                          <LegendItemTitle>{legend.name}</LegendItemTitle>
+                          <LegendWrapper>
+                            <LegendImage src={legend.src} alt={legend.name} />
+                          </LegendWrapper>
+                        </LegendItem>
+                      ))}
+                    </LegendsRow>
+                  </LegendSection>
+                )}
+              </HeroBody>
+            </>
+          )}
+        </HeroBand>
       )}
 
-      {activeLegends.length > 0 && (
-        <LegendSection>
-          <LegendsRow>
-            {activeLegends.map((legend) => (
-              <LegendItem key={legend.id}>
-                <LegendItemTitle>{legend.name}</LegendItemTitle>
-                <LegendWrapper>
-                  <LegendImage src={legend.src} alt={legend.name} />
-                </LegendWrapper>
-              </LegendItem>
-            ))}
-          </LegendsRow>
-        </LegendSection>
-      )}
-
+      <ContentArea>
       <SchematicsGrid>
-        {schematics.map(schematic => (
+        {schematics.map((schematic) => (
           <Card key={schematic.id}>
             <CardTitle>
               <CardTitleText>{schematic.title}</CardTitleText>
@@ -692,9 +694,7 @@ export function SVGGalleryManager({ config = {} }) {
         ))}
 
         <PlaceholderCard>
-          <PlaceholderText style={{ marginBottom: '24px', fontSize: '18px' }}>
-            Add Card
-          </PlaceholderText>
+          <PlaceholderText>Add Card</PlaceholderText>
 
           {renderableFilters.map((filter) => {
             const baseOptions = Array.isArray(filter?.values?.values)
@@ -750,6 +750,7 @@ export function SVGGalleryManager({ config = {} }) {
           {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
         </PlaceholderCard>
       </SchematicsGrid>
+      </ContentArea>
       {footer && <Footer {...footer} />}
     </Container>
   );
