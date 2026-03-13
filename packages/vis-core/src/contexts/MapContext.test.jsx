@@ -14,11 +14,6 @@ jest.mock("services", () => ({
   },
 }));
 
-jest.mock("uuid", () => ({
-  v4: jest.fn(() => "mocked-uuid-id"),
-  uuidv4: jest.fn(() => "mocked-uuid-id"),
-}));
-
 jest.mock("utils", () => ({
   ...jest.requireActual("utils"),
   hasRouteParameterOrQuery: jest.fn(() => true),
@@ -63,12 +58,10 @@ import {
   getDefaultLayerBufferSize,
   updateUrlParameters,
 } from "utils";
-import { v4 as uuidv4 } from "uuid";
 
 const mockDispatch = jest.fn();
 const mockUseReducer = React.useReducer;
 const mockGet = api.baseService.get;
-const mockUuid = uuidv4;
 const mockProcessParameters = processParameters;
 const mockHasRouteParameterOrQuery = hasRouteParameterOrQuery;
 const mockGetGetParameters = getGetParameters;
@@ -186,7 +179,6 @@ beforeEach(() => {
   jest.clearAllMocks();
   
   // Re-initialize mock implementations after clearAllMocks
-  mockUuid.mockReturnValue("mocked-uuid-id");
   mockGet.mockResolvedValue([{ id: 1 }]);
   mockUseReducer.mockReturnValue([
     {pageIsReady: true},
