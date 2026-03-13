@@ -248,7 +248,7 @@ describe("Firefox browser detection", () => {
     expect(sidebarContainer).toBeInTheDocument();
     // Check the style
     expect(sidebarContainer).toHaveStyle({
-      paddingRight: "calc(10px - 15px)",
+      paddingRight: "calc(-5px)",
     });
   });
   it("should not set scrollbar width for Chrome", async () => {
