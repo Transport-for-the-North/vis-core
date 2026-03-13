@@ -179,7 +179,6 @@ beforeEach(() => {
   jest.clearAllMocks();
   
   // Re-initialize mock implementations after clearAllMocks
-  mockUuid.mockReturnValue("mocked-uuid-id");
   mockGet.mockResolvedValue([{ id: 1 }]);
   mockUseReducer.mockReturnValue([
     {pageIsReady: true},
