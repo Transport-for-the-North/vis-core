@@ -14,6 +14,9 @@ const mockMapControls = {
   dragPan: { enable: jest.fn(), disable: jest.fn() },
   touchZoomRotate: { enable: jest.fn(), disableRotation: jest.fn() },
   scrollZoom: { enable: jest.fn(), disable: jest.fn() },
+  doubleClickZoom: { disable: jest.fn() },
+  boxZoom: { disable: jest.fn() },
+  keyboard: { disable: jest.fn() },
 };
 
 jest.mock("./VisualisationManager", () => ({
