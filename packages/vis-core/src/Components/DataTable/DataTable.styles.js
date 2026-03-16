@@ -53,6 +53,7 @@ export const Th = styled.th`
   user-select: none;
   min-width: 0;
   overflow: hidden;
+    position: relative;
 
   &:last-child {
     border-right: none;
@@ -111,23 +112,28 @@ export const HeaderLabel = styled.span`
 `;
 
 export const ResizerButton = styled.button`
-  margin-left: auto;
-  align-self: center;
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 10px;
-  height: 22px;
+  height: 100%;
   cursor: col-resize;
+  background: ${(p) => p.theme.activeBg};
+  color: #fff;
+  font-weight: 800;
   border: none;
-  background: transparent;
+  border-right: 2px solid rgba(255, 255, 255, 0.6);
   opacity: 0.85;
   padding: 0;
 
   &:hover {
     opacity: 1;
+    border-right-color: #fff;
   }
 
   &:focus-visible {
     opacity: 1;
+    border-right-color: #fff;
     outline: 2px solid rgba(255, 255, 255, 0.95);
     outline-offset: 2px;
     border-radius: 2px;
