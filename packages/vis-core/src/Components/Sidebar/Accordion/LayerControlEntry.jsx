@@ -334,6 +334,8 @@ export const LayerControlEntry = memo(
       layer.metadata?.enforceNoColourSchemeSelector ?? false;
     const enforceNoClassificationMethod =
       layer.metadata?.enforceNoClassificationMethod ?? false;
+    const enforceNoCustomBanding =
+      layer.metadata?.enforceNoCustomBanding ?? false;
     const widthProp = getWidthProperty(layer.type);
     const enableZoomToFeature =
       layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
@@ -618,6 +620,7 @@ export const LayerControlEntry = memo(
     const showBandEditor =
       layer.metadata?.isStylable &&
       canEditBands &&
+      !enforceNoCustomBanding &&
       (colorStyle === "continuous" || colorStyle === "diverging");
 
     const showClassificationDropdownStandalone =

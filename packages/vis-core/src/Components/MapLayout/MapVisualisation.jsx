@@ -466,6 +466,7 @@ export const MapVisualisation = ({
               isStylable: true,
               enforceNoColourSchemeSelector: visualisation?.enforceNoColourSchemeSelector ?? false,
               enforceNoClassificationMethod: visualisation?.enforceNoClassificationMethod ?? false,
+              enforceNoCustomBanding: visualisation?.enforceNoCustomBanding ?? false,
             },
           },
           beforeLayerId

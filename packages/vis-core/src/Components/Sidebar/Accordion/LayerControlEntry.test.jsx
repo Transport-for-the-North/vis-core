@@ -82,8 +82,14 @@ const mockPageContext = {
 const fakeHandleClassificationChange = jest.fn();
 const fakeHandleColorChange = jest.fn();
 const mockGetLayer = jest.fn().mockReturnValue(true);
+const mockGetPaintProperty = jest.fn((layerId, propertyName) => {
+  if (propertyName?.includes("opacity")) return 0.5;
+  if (propertyName?.includes("width") || propertyName === "circle-radius") return 1;
+  return 0.5;
+});
 const mockMap = {
   getLayer: mockGetLayer,
+  getPaintProperty: mockGetPaintProperty,
 };
 const props = {
   handleClassificationChange: fakeHandleClassificationChange,
@@ -342,5 +348,55 @@ describe("LayerControlEntry component test", () => {
     );
     expect(screen.getByText("Colour scheme")).toBeInTheDocument();
     expect(screen.getByText("Classification method")).toBeInTheDocument();
+  });
+
+  it("does not render edit banding when enforceNoCustomBanding is enabled", () => {
+    const props2 = {
+      ...props,
+      layer: {
+        ...props.layer,
+        metadata: {
+          ...props.layer.metadata,
+          isStylable: true,
+          enforceNoCustomBanding: true,
+        },
+      },
+      state: {
+        ...props.state,
+        visualisations: {
+          id: {
+            id: "id",
+            name: "Test Visualisation",
+            style: "line-continuous",
+            queryParams: {},
+            data: [{ value: 10 }, { value: 20 }, { value: 30 }],
+          },
+        },
+        layers: {
+          id: {
+            class_method: "d",
+          },
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider
+        value={{
+          state: props2.state,
+          dispatch: jest.fn(),
+        }}
+      >
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry {...props2} />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    expect(screen.getByText("Colour scheme")).toBeInTheDocument();
+    expect(screen.getByText("Classification method")).toBeInTheDocument();
+    expect(screen.queryByText("Edit banding")).not.toBeInTheDocument();
   });
 });
