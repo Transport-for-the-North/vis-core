@@ -23,9 +23,12 @@ import {
   SelectHeaderCheckbox,
   SelectHeaderInner,
   SelectHeaderLabel,
-  StickyControls,
   StyledTable,
   TablePane,
+  TableTopBar,
+  TableTopBarCenter,
+  TableTopBarLeft,
+  TableTopBarRight,
   Td,
   Th,
   ThInner,
@@ -53,7 +56,7 @@ import { WarningBox } from "Components/MessageBox";
  * @typedef {Object} DataTableProps
  * @property {DataTableColumn[]} columns
  * @property {any[]} data
- * @property {string} clickableAccessor - Row key; truthy values indicate rows are selectable/clickable.
+ * @property {string} clickableAccessor - Row key; true values indicate rows are selectable/clickable.
  * @property {(id: string|number, nextSelected: boolean) => void} onToggleSelect
  * @property {Set<string|number>} selectedIds
  * @property {(next: Set<string|number>) => void} setSelectedIds
@@ -544,17 +547,9 @@ export function DataTable({
 
   return (
     <TablePane>
-      <StickyControls>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <TableTopBar>
+        <TableTopBarLeft>
           <span style={{ fontSize: "0.8rem" }}>Filtered: {filtered.length}</span>
-          {visibleEligibleIds.length === 0 ? (
-            <InlineWarningWrap>
-              <WarningBox
-                text={`No records selectable (none have accessor "${clickableAccessor}" truthy)`}
-              />
-            </InlineWarningWrap>
-          ) : null}
-
           {/* Screen reader instructions shared by all column resizers. */}
           <span
             id={resizeHelpId}
@@ -573,17 +568,29 @@ export function DataTable({
             To resize a column: use Left and Right arrow keys. Hold Shift for larger steps.
             Press Home for minimum width and End for maximum width. Press Enter to auto-fit.
           </span>
-        </div>
+        </TableTopBarLeft>
 
-        <AppButton
-          type="button"
-          onClick={resetWidths}
-          title="Reset column widths"
-          aria-label="Reset column widths"
-        >
-          Reset Widths
-        </AppButton>
-      </StickyControls>
+        <TableTopBarCenter>
+          {visibleEligibleIds.length === 0 ? (
+            <InlineWarningWrap>
+              <WarningBox
+                text={`No records selectable (none have accessor "${clickableAccessor}" true)`}
+              />
+            </InlineWarningWrap>
+          ) : null}
+        </TableTopBarCenter>
+
+        <TableTopBarRight>
+          <AppButton
+            type="button"
+            onClick={resetWidths}
+            title="Reset column widths"
+            aria-label="Reset column widths"
+          >
+            Reset Widths
+          </AppButton>
+        </TableTopBarRight>
+      </TableTopBar>
 
       <MeasureHost ref={measureHostRef} />
 

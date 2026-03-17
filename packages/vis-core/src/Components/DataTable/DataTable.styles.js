@@ -9,17 +9,56 @@ export const TablePane = styled.div`
   max-width: 100%;
 `;
 
-export const StickyControls = styled.div`
+export const TableTopBar = styled.div`
   position: sticky;
   top: 0;
   z-index: 5;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
   padding: 6px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const TableTopBarLeft = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+
+  @media (max-width: 720px) {
+    width: 100%;
+  }
+`;
+
+export const TableTopBarCenter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
+`;
+
+export const TableTopBarRight = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
 `;
 
 export const ScrollX = styled.div`
@@ -224,12 +263,26 @@ export const MeasureHost = styled.div`
 `;
 
 export const InlineWarningWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+
   /* MessageBox is designed as a full-width banner; make it compact here only. */
   && > div {
+    display: flex;
+    align-items: center;
     margin-bottom: 0;
     padding: 6px 8px;
     font-size: 0.8em;
+    line-height: 1.2;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+    max-width: 100%;
+  }
+
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    width: 100%;
   }
 
   && > div > div {
