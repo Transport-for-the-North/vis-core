@@ -41,8 +41,8 @@ export const CustomValueContainer = ({ children, ...props }) => {
  * @returns {JSX.Element} The rendered FeatureSelect component.
  */
 export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, placeholder, isClearable = false }) => {
-  const { options, isLoading, handleInputChange } = useLayerFeatureMetadata(layerPath);
-  const [noOptionsMessage, setNoOptionsMessage] = useState('Start typing to search features');
+  const { options, isLoading, handleInputChange, handleMenuOpen, handleMenuScrollToBottom } = useLayerFeatureMetadata(layerPath);
+  const [noOptionsMessage, setNoOptionsMessage] = useState('No features found');
 
   useEffect(() => {
     let timer;
@@ -56,10 +56,6 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
 
     return () => clearTimeout(timer);
   }, [isLoading]);
-
-  const handleMenuOpen = () => {
-    setNoOptionsMessage('Start typing to search features');
-  };
 
   return (
     <Container>
@@ -100,6 +96,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
         }}
         menuPortalTarget={document.body}
         menuPosition="fixed"
+        onMenuScrollToBottom={handleMenuScrollToBottom}
       />
     </Container>
   );
