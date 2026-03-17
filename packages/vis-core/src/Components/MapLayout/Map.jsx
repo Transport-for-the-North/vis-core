@@ -14,7 +14,7 @@ import {
   getSourceLayer,
   getFeatureStateValue,
   isValidPoint,
-  numberWithCommas,
+  formatNumber,
   replacePlaceholders,
   buildDefaultTooltip,
   buildLoadingTooltip,
@@ -542,7 +542,7 @@ const Map = (props) => {
         const featureName = feature.properties?.name || "";
         const featureValueDisplay =
           !hideValueInTooltip && featureValue !== undefined && featureValue !== null
-            ? numberWithCommas(featureValue)
+            ? formatNumber(featureValue)
             : "";
         const layerVisualisationName = layerConfig.visualisationName;
         const legendText =
