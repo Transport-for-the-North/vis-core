@@ -692,7 +692,12 @@ export const reclassifyData = (
   queryParams,
   options = {}
 ) => {
-  const normalizeContinuousBins = (bins) => {
+  /**
+   * Normalises continuous-classification bins so the scale starts at zero.
+   * @param {Array<number>} bins - Computed continuous break values.
+   * @returns {Array<number>} The normalised bin array.
+   */
+  const normaliseContinuousBins = (bins) => {
     if (!Array.isArray(bins) || bins.length === 0) {
       return bins;
     }
@@ -731,13 +736,13 @@ export const reclassifyData = (
       Array.isArray(options.customBands) &&
       options.customBands.length > 0
     ) {
-      return normalizeContinuousBins(options.customBands);
+      return normaliseContinuousBins(options.customBands);
     }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
-        return normalizeContinuousBins(options.customBands);
+        return normaliseContinuousBins(options.customBands);
       }
       // Fallback to default method if no custom bands
       classificationMethod = "d";
@@ -746,7 +751,7 @@ export const reclassifyData = (
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
       if (metric) {
-        return normalizeContinuousBins(metric.values);
+        return normaliseContinuousBins(metric.values);
       }
       // Fallback to quantile method if no metric definition is found
       classificationMethod = "q";
@@ -784,7 +789,7 @@ export const reclassifyData = (
     if (classificationMethod === "l") {
       roundedBins = roundedBins.map(replaceZeroPointValues);
     }
-    return normalizeContinuousBins(roundedBins);
+    return normaliseContinuousBins(roundedBins);
   } else if (style.includes("categorical")) {
     let values = [...new Set(data.map((value) => value.value))];
     return values;

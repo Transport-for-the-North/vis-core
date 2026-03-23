@@ -72,16 +72,17 @@ export function numberWithCommas(x) {
 
   const s = String(x).trim();
 
-  if (/[eE]/.test(s)) {
-    const numericValue = Number(s.replace(/,/g, ""));
+  // Handle scientific notation by converting to a plain number first, then applying the existing formatting logic
+  if (/[eE]/.test(s)) { // if the string contains 'e' or 'E', it's likely in scientific notation
+    const numericValue = Number(s.replace(/,/g, "")); // remove commas before parsing
 
     if (!Number.isFinite(numericValue)) {
-      return s;
+      return s; // if it's not a valid number, return the original string
     }
 
     return plainNumberFormatter
       .format(numericValue)
-      .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+      .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","); // add commas to the plain number
   }
 
   // no decimal → just thousands separators
