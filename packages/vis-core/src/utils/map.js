@@ -692,6 +692,14 @@ export const reclassifyData = (
   queryParams,
   options = {}
 ) => {
+  const normalizeContinuousBins = (bins) => {
+    if (!Array.isArray(bins) || bins.length === 0) {
+      return bins;
+    }
+
+    return [0, ...bins.slice(1)];
+  };
+
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -723,13 +731,13 @@ export const reclassifyData = (
       Array.isArray(options.customBands) &&
       options.customBands.length > 0
     ) {
-      return options.customBands;
+      return normalizeContinuousBins(options.customBands);
     }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
-        return options.customBands;
+        return normalizeContinuousBins(options.customBands);
       }
       // Fallback to default method if no custom bands
       classificationMethod = "d";
@@ -738,7 +746,7 @@ export const reclassifyData = (
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
       if (metric) {
-        return metric.values;
+        return normalizeContinuousBins(metric.values);
       }
       // Fallback to quantile method if no metric definition is found
       classificationMethod = "q";
@@ -776,7 +784,7 @@ export const reclassifyData = (
     if (classificationMethod === "l") {
       roundedBins = roundedBins.map(replaceZeroPointValues);
     }
-    return roundedBins;
+    return normalizeContinuousBins(roundedBins);
   } else if (style.includes("categorical")) {
     let values = [...new Set(data.map((value) => value.value))];
     return values;

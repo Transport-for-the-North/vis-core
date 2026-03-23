@@ -1,5 +1,10 @@
 export const loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel risus ante. Donec eu molestie odio, quis dapibus ipsum. Quisque in erat aliquet, facilisis ante commodo, maximus erat. Cras convallis varius lectus, et imperdiet mi lobortis vel. Nunc a arcu enim. Fusce viverra ex porta est egestas sodales. Vestibulum lacus metus, imperdiet hendrerit libero non, gravida feugiat tortor. Sed nulla tortor, sodales id sem quis, auctor vehicula ante. Donec id ullamcorper velit. Pellentesque vel commodo quam. In sollicitudin nulla ac consectetur pharetra. "
 
+const plainNumberFormatter = new Intl.NumberFormat('en-GB', {
+  useGrouping: false,
+  maximumSignificantDigits: 21,
+});
+
 /**
  * Formats a number with commas for thousands separator.
  * @function numberWithCommas
@@ -65,7 +70,19 @@ export function numberWithCommas(x) {
   // guard against null/undefined
   if (x === null || x === undefined) return "";
 
-  const s = String(x);
+  const s = String(x).trim();
+
+  if (/[eE]/.test(s)) {
+    const numericValue = Number(s.replace(/,/g, ""));
+
+    if (!Number.isFinite(numericValue)) {
+      return s;
+    }
+
+    return plainNumberFormatter
+      .format(numericValue)
+      .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  }
 
   // no decimal → just thousands separators
   if (s.indexOf(".") === -1) {
