@@ -546,9 +546,12 @@ const Map = (props) => {
             : "";
         const layerVisualisationName = layerConfig.visualisationName;
         const legendText =
+          layerConfig.defaultTooltipLegendText ??
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
         const valueText =
-          state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
+           layerConfig.defaultTooltipValueName ??
+           state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ??
+           "Value";
 
         let description = "";
 
