@@ -15,6 +15,13 @@ import {
   toSeries,
 } from "./ChartRenderer.utils.jsx";
 
+/**
+ * Groups and aggregates data for pie/donut chart display.
+ *
+ * @param {Object} config - Chart configuration
+ * @param {Array} data - Data to visualise
+ * @returns {Array} Pie chart series
+ */
 const buildDynamicPieSeries = (config, data) => {
   const categoryKey = config.categoryKey || config.dimensionKey;
   const calc = config.calc || "count";
@@ -50,17 +57,32 @@ const buildDynamicPieSeries = (config, data) => {
   });
 };
 
+/**
+ * DonutPieChart renders a donut or pie chart using recharts, supporting custom colours and tooltips.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Chart configuration
+ * @param {Array|Object} props.data - Data to visualise
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const DonutPieChart = ({ config, data, formatters }) => {
+  // Build chart series from data
   const items = buildDynamicPieSeries(config, data);
+  // Value formatter
   const commify = getCommifyFormatter(formatters);
+  // Calculate legend rows for layout
   const legendRows = Math.max(1, Math.ceil(items.length / 3));
+  // Chart size, responsive to legend
   const size =
     config.size ??
     Math.min(
       340,
       Math.max(DEFAULTS.DIMENSIONS.pieSize, 180 + legendRows * 24)
     );
+  // Total value for percentage calculation
   const total = Math.max(0.00001, items.reduce((a, b) => a + b.value, 0));
+  // Format value as percentage of total
   const pctFmt = (v) =>
     total > 0 ? `${((v / total) * 100).toFixed(1)}%` : "0.0%";
 

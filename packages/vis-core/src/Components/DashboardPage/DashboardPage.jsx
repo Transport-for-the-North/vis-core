@@ -50,6 +50,15 @@ const DEFAULT_DESKTOP_CARD_WIDTH = 320;
 const EMPTY_CHARTS_MESSAGE = "No dashboard charts are configured for this page.";
 const EMPTY_DATA_MESSAGE = "No data available for the selected filters, please try different filters.";
 
+/**
+ * DashboardPage is the main dashboard container, handling layout, data fetching, and chart rendering.
+ *
+ * - Handles filter state, data loading, and error/warning display
+ * - Lays out dashboard charts and sidebar
+ * - Contains utility functions for grid/area allocation
+ */
+
+// Greatest common divisor for layout calculations
 const gcd = (left, right) => {
   let a = Math.abs(Number(left) || 0);
   let b = Math.abs(Number(right) || 0);
@@ -63,14 +72,17 @@ const gcd = (left, right) => {
   return a || 1;
 };
 
+// Least common multiple for layout calculations
 const lcm = (left, right) => Math.abs((left * right) / gcd(left, right || 1)) || left || right || 1;
 
+// Tokenize a whitespace-separated area row string
 const tokenizeAreaRow = (row = "") =>
   String(row)
     .trim()
     .split(/\s+/)
     .filter(Boolean);
 
+// Group consecutive area tokens for grid layout
 const groupAreaTokens = (tokens = []) => {
   const groups = [];
 
@@ -87,6 +99,7 @@ const groupAreaTokens = (tokens = []) => {
   return groups;
 };
 
+// Allocate grid slots to area groups for responsive layout
 const allocateSlots = (groups = [], targetColumns = groups.length) => {
   if (!groups.length) return [];
 

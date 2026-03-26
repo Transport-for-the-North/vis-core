@@ -227,53 +227,80 @@ const buildStackedSeries = (items) => {
   return Array.from(byCategory.values());
 };
 
+/**
+ * BarChartV2 renders a flexible bar chart (vertical or horizontal, grouped/stacked) using recharts.
+ *
+ * Supports grouping, stacking, custom colours, and dynamic axis configuration.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Chart configuration
+ * @param {Array|Object} props.data - Data to visualise
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const BarChartV2 = ({ config, data, formatters }) => {
+  // Ensure data is an array of rows
   const rows = Array.isArray(data) ? data : [];
+  // Compute axis configuration (category/value axis, keys, etc)
   const axisConfig = React.useMemo(() => resolveAxisConfig(config), [config]);
+  // Normalise rows if using sourceColumns
   const normalisedRows = React.useMemo(
     () => normaliseRowsForSourceColumns(rows, config, axisConfig),
     [rows, config, axisConfig]
   );
+  // Build grouped/aggregated items for chart
   const items = React.useMemo(
     () => buildGroupedItems(normalisedRows, config, axisConfig),
     [normalisedRows, config, axisConfig]
   );
+  // Determine if chart has groupings
   const hasGroupings = React.useMemo(
     () => new Set(items.map((item) => item.groupLabel)).size > 1,
     [items]
   );
+  // Build series for stacked/grouped bar chart
   const groupedSeries = React.useMemo(() => buildStackedSeries(items), [items]);
+  // Unique group labels for legend/series
   const groupLabels = React.useMemo(
     () => Array.from(new Set(items.map((item) => item.groupLabel))),
     [items]
   );
+  // Axis value formatter
   const axisFormatter = config.axisFormatter || formatters.axisFormatter || formatters.commify || defaultFormatters.commify;
+  // Tooltip value formatter
   const tooltipFormatter = (val) =>
     formatters.tooltipFormatter
       ? formatters.tooltipFormatter(val)
       : formatTwoDp(val);
+  // Axis label presence
   const hasXLabel = !!getAxisLabel(config, "x");
   const hasYLabel = !!getAxisLabel(config, "y");
+  // Compute X axis height
   const xAxisHeight = React.useMemo(
     () => computeXAxisHeight(config, items.map((item) => item.label)),
     [config, items]
   );
+  // Add space for X axis label if present
   const resolvedXAxisHeight = React.useMemo(
     () => xAxisHeight + (hasXLabel ? 18 : 0),
     [hasXLabel, xAxisHeight]
   );
+  // Compute category axis width
   const categoryAxisWidth = React.useMemo(
     () => getCategoryAxisWidth(items, config),
     [items, config]
   );
+  // Compute value axis width
   const valueAxisWidth = React.useMemo(
     () => getValueAxisWidth(items, config),
     [items, config]
   );
+  // Compute chart height based on data and configuration
   const chartHeight = React.useMemo(
     () => getChartHeight({ items, hasGroupings, config, categoryAxis: axisConfig.categoryAxis }),
     [items, hasGroupings, config, axisConfig]
   );
+  // Compute chart margin for axis/labels
   const chartMargin = React.useMemo(
     () =>
       getChartMargin({

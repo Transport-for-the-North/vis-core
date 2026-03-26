@@ -16,11 +16,25 @@ import {
   toSeries,
 } from "./ChartRenderer.utils.jsx";
 
+/**
+ * ScatterSeriesChart renders a scatter plot using recharts, supporting custom colours and tooltips.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Chart configuration
+ * @param {Array|Object} props.data - Data to visualise
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const ScatterSeriesChart = ({ config, data, formatters }) => {
+  // Convert input data to chart series format
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
+  // Extract labels for axis rendering
   const labels = React.useMemo(() => items.map((item) => item.label), [items]);
+  // Chart height, fallback to default
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  // Scatter point colour
   const fill = config.scatterColor || DEFAULTS.BRAND_COLOR;
+  // X axis properties (category axis)
   const xAxisProps = React.useMemo(
     () => ({
       ...getCategoryAxisProps({ config, labels }),
@@ -28,6 +42,7 @@ export const ScatterSeriesChart = ({ config, data, formatters }) => {
     }),
     [config, labels]
   );
+  // Y axis properties (value axis)
   const yAxisProps = React.useMemo(
     () => ({
       ...getValueAxisProps({ formatters }),
@@ -36,6 +51,7 @@ export const ScatterSeriesChart = ({ config, data, formatters }) => {
     }),
     [formatters]
   );
+  // Tooltip formatting
   const tooltipProps = React.useMemo(
     () => getTooltipProps(formatters),
     [formatters]

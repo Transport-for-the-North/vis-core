@@ -37,24 +37,40 @@ const getCellStyle = (cellMaxWidth) => ({
   ...(cellMaxWidth ? { maxWidth: cellMaxWidth } : {}),
 });
 
+/**
+ * TableChart renders a data table with optional sticky headers, maximum height, and custom cell formatting.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Table configuration
+ * @param {Array|Object} props.data - Data to display
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const TableChart = ({ config, data, formatters }) => {
+  // Table layout: 'rows' or other
   const tableLayout = config.tableLayout || "rows";
   const rowTableMinWidth = config.minWidth || "100%";
   const cellMaxWidth = config.cellMaxWidth;
+  // Memoise cell style for performance
   const baseCellStyle = React.useMemo(() => getCellStyle(cellMaxWidth), [cellMaxWidth]);
+  // Memoise section style for layout
   const sectionStyle = React.useMemo(
     () => getChartGridStyle(config.layout, config.fullWidth),
     [config]
   );
 
+  // Only support 'rows' layout for now
   if (tableLayout === "rows") {
     const cols = config.columns || [];
+    // Convert data to row array
     const rowData = toRows(data);
+    // Calculate visible rows and maximum height
     const visibleRows = Number(config.visibleRows ?? 0);
     const clippedTableHeightPx =
       visibleRows > 0 ? Math.max(220, visibleRows * 34 + 54) : null;
     const rowTableMaxHeight = config.maxHeight || (clippedTableHeightPx ? `${clippedTableHeightPx}px` : undefined);
 
+    // Show warning if no data or columns
     if (!rowData.length || !cols.length) {
       return (
         <Section aria-label={config.ariaLabel || "Table"} style={sectionStyle}>

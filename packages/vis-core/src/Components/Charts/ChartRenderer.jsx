@@ -71,17 +71,13 @@ const CHART_RENDERERS = {
 };
 
 /**
- * Main chart rendering component that supports multiple chart types
- * Renders different types of charts based on configuration including:
- * - Bar charts
- * - Line charts
- * - Area charts
- * - Scatter charts
- * - Pie/Donut charts
- * - Table charts
- * - Histogram (placeholder - not implemented)
+ * ChartRenderer is the main chart rendering component that supports multiple chart types.
  *
- * @param {Object} props - Component props
+ * Renders different types of charts based on configuration including:
+ * - Bar charts (BarChartV2, legacy BarChart/BarChartMultiple)
+ * - Line, Area, Scatter, Pie/Donut, Table, and Ranking charts
+ *
+ * @param {Object} props - Component properties
  * @param {Array} props.charts - Array of chart configuration objects
  * @param {Object} props.data - Data object containing values to chart
  * @param {Object} props.formatters - Custom formatting functions for values

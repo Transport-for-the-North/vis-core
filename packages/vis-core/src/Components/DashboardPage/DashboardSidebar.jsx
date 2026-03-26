@@ -53,11 +53,21 @@ const SelectorContainer = styled.div`
   margin-bottom: 10px;
 `;
 
+/**
+ * DashboardSidebarFilters renders filter controls (dropdowns, sliders, toggles, checkboxes) for the dashboard.
+ *
+ * @param {Object} props - Component properties
+ * @param {Array} props.filters - List of filter configuration objects
+ * @param {Function} props.onFilterChange - Callback for filter value changes
+ * @param {string} props.bgColor - Optional background colour for controls
+ * @returns {JSX.Element}
+ */
 function DashboardSidebarFilters({
   filters,
   onFilterChange,
   bgColor,
 }) {
+  // Render the appropriate filter control for each filter type
   const renderFilterControl = (filter) => {
     switch (filter.type) {
       case "dropdown":
@@ -73,6 +83,7 @@ function DashboardSidebarFilters({
     }
   };
 
+  // Only render non-fixed, non-hidden filters
   return (
     <AccordionSection title="Filtering and data selection" defaultValue={true}>
       {(filters || [])
@@ -91,6 +102,20 @@ function DashboardSidebarFilters({
   );
 }
 
+/**
+ * DashboardSidebar is the main sidebar for the dashboard, containing filters, glossary, downloads, and legal information.
+ *
+ * - Renders filter controls, glossary, download section, and legal text
+ * - Responsive for mobile/desktop
+ *
+ * @param {Object} props - Component properties
+ * @param {string} props.legalText - Optional legal disclaimer text
+ * @param {Array} props.filters - List of filter configuration objects
+ * @param {Function} props.onFilterChange - Callback for filter value changes
+ * @param {string} props.bgColor - Optional background colour for controls
+ * @param {Object} props.additionalFeatures - Optional features (glossary, download)
+ * @returns {JSX.Element}
+ */
 export function DashboardSidebar({
   legalText,
   filters,
@@ -98,9 +123,11 @@ export function DashboardSidebar({
   bgColor,
   additionalFeatures,
 }) {
+  // Show sidebar as hidden on mobile by default
   const initialMobile = typeof window !== "undefined" ? window.innerWidth <= 900 : false;
   const [isVisible, setIsVisible] = useState(!initialMobile);
 
+  // Sidebar layout with mobile toggle, filters, glossary, download, and legal information
   return (
     <SidebarShell>
       <MobileBar $bgColor={bgColor} onClick={() => setIsVisible((current) => !current)}>

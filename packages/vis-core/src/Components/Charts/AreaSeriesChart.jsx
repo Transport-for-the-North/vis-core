@@ -16,21 +16,36 @@ import {
   toSeries,
 } from "./ChartRenderer.utils.jsx";
 
+/**
+ * AreaSeriesChart renders an area chart using recharts, supporting custom colours and tooltips.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Chart configuration
+ * @param {Array|Object} props.data - Data to visualise
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const AreaSeriesChart = ({ config, data, formatters }) => {
+  // Convert input data to chart series format
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
+  // Extract labels for axis rendering
   const labels = React.useMemo(() => items.map((item) => item.label), [items]);
+  // Chart height, fallback to default
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const stroke =
-    config.areaStrokeColor || config.lineColor || DEFAULTS.BRAND_COLOR;
+  // Area and line colours
+  const stroke = config.areaStrokeColor || config.lineColor || DEFAULTS.BRAND_COLOR;
   const fill = config.areaFillColor || "rgba(75,62,145,0.25)";
+  // X axis properties (category axis)
   const xAxisProps = React.useMemo(
     () => getCategoryAxisProps({ config, labels }),
     [config, labels]
   );
+  // Y axis properties (value axis)
   const yAxisProps = React.useMemo(
     () => getValueAxisProps({ formatters }),
     [formatters]
   );
+  // Tooltip formatting
   const tooltipProps = React.useMemo(
     () => getTooltipProps(formatters),
     [formatters]

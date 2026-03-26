@@ -22,16 +22,29 @@ const sortRankingRows = (rows, ranks) => {
   });
 };
 
+/**
+ * RankingChart renders a ranked list/table with animated transitions and expandable rows.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Chart configuration (columns, ranks, etc)
+ * @param {Object} props.data - Data object with values keyed by column
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const RankingChart = ({ config, data, formatters }) => {
+  // State for expanding/collapsing the ranking list
   const [isOpen, setIsOpen] = useState(false);
   const cols = config.columns || [];
+  // Build row definitions from columns
   const rows = React.useMemo(
     () => cols.map((col) => ({ label: col.label ?? col.key, key: col.key })),
     [cols]
   );
+  // Ranks mapping and node references for animation
   const ranks = config?.ranks;
   const nodeRefs = useRef(new Map());
 
+  // Get or create a reference for a row (for animation)
   const getNodeRef = (key) => {
     if (!nodeRefs.current.has(key)) {
       nodeRefs.current.set(key, React.createRef());
@@ -39,12 +52,15 @@ export const RankingChart = ({ config, data, formatters }) => {
     return nodeRefs.current.get(key);
   };
 
+  // Sort rows by rank if provided
   const sortedRows = React.useMemo(() => {
     return sortRankingRows(rows, ranks);
   }, [rows, ranks]);
 
+  // Show all rows if open, otherwise only default visible
   const visibleRows = isOpen ? sortedRows : sortedRows.slice(0, DEFAULT_VISIBLE_ROWS);
 
+  // Value formatter
   const fmt = {
     commify:
       formatters?.commify || ((v) => Number(v ?? 0).toLocaleString("en-GB")),

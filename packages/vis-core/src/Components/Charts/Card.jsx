@@ -10,8 +10,6 @@ import {
   toRows,
 } from "./ChartRenderer.utils.jsx";
 
-
-
 const CardGrid = styled.div`
   display: flex;
   flex-direction: column;
@@ -229,17 +227,32 @@ const buildCardContent = ({ config, rows, formatters }) => {
   };
 };
 
+/**
+ * Card renders a summary card for a single metric or grouped aggregate, with optional title and meta.
+ *
+ * Supports aggregation (count, sum, mean, min, max, etc), grouping, and custom formatting.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Card configuration (title, calc, column, groupBy, etc)
+ * @param {Array|Object} props.data - Data to summarise
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
 export const Card = ({ config, data, formatters = {} }) => {
+  // Convert data to array of rows
   const rows = React.useMemo(() => toRows(data), [data]);
+  // Memoise section style for layout
   const sectionStyle = React.useMemo(
     () => getChartGridStyle(config.layout, config.fullWidth),
     [config]
   );
+  // Build card value and meta content
   const content = React.useMemo(
     () => buildCardContent({ config, rows, formatters }),
     [config, formatters, rows]
   );
 
+  // Show warning if no data
   if (!rows.length) {
     return (
       <Section aria-label={config.ariaLabel || config.title || "Card"} style={sectionStyle}>
@@ -262,7 +275,10 @@ export const Card = ({ config, data, formatters = {} }) => {
         )}
         <CenteredCardValue><CardValue>{content.value}</CardValue></CenteredCardValue>
         {content.meta ? (
-          <CardMeta>{content.meta}</CardMeta>
+          <>
+            <TitleSpacer />
+            <CardMeta>{content.meta}</CardMeta>
+          </>
         ) : null}
       </CardGrid>
     </Section>
