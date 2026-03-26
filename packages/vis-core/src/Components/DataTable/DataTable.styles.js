@@ -9,17 +9,56 @@ export const TablePane = styled.div`
   max-width: 100%;
 `;
 
-export const StickyControls = styled.div`
+export const TableTopBar = styled.div`
   position: sticky;
   top: 0;
   z-index: 5;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
   padding: 6px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const TableTopBarLeft = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+
+  @media (max-width: 720px) {
+    width: 100%;
+  }
+`;
+
+export const TableTopBarCenter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
+`;
+
+export const TableTopBarRight = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
 `;
 
 export const ScrollX = styled.div`
@@ -43,14 +82,21 @@ export const Th = styled.th`
   top: 0;
   z-index: 1;
   text-align: left;
+  vertical-align: top;
   padding: 10px 8px;
   background: ${(p) => p.theme.activeBg};
   color: #fff;
   font-weight: 800;
   border-bottom: 1px solid #5b0fb5;
+  border-right: 2px solid rgba(255, 255, 255, 0.6);
   user-select: none;
   min-width: 0;
   overflow: hidden;
+    position: relative;
+
+  &:last-child {
+    border-right: none;
+  }
 `;
 
 export const ThInner = styled.div`
@@ -59,6 +105,30 @@ export const ThInner = styled.div`
   justify-content: flex-start;
   gap: 6px;
   min-width: 0;
+`;
+
+export const SelectHeaderInner = styled(ThInner)`
+  align-items: flex-start;
+`;
+
+export const SelectHeaderLabel = styled.span`
+  flex: 0 0 auto;
+  white-space: nowrap;
+  line-height: 1.2;
+`;
+
+export const SelectHeaderCheckbox = styled.input`
+  margin-top: 0;
+`;
+
+export const RowSelectCheckbox = styled.input`
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.25;
+    filter: grayscale(1);
+  }
 `;
 
 export const HeaderLabel = styled.span`
@@ -81,14 +151,16 @@ export const HeaderLabel = styled.span`
 `;
 
 export const ResizerButton = styled.button`
-  margin-left: auto;
-  align-self: center;
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 10px;
-  height: 22px;
+  height: 100%;
   cursor: col-resize;
+  background: ${(p) => p.theme.activeBg};
+  color: #fff;
+  font-weight: 800;
   border: none;
-  background: transparent;
   border-right: 2px solid rgba(255, 255, 255, 0.6);
   opacity: 0.85;
   padding: 0;
@@ -188,4 +260,37 @@ export const MeasureHost = styled.div`
   visibility: hidden;
   pointer-events: none;
   contain: layout style paint;
+`;
+
+export const InlineWarningWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+
+  /* MessageBox is designed as a full-width banner; make it compact here only. */
+  && > div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 6px 8px;
+    font-size: 0.8em;
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+    max-width: 100%;
+  }
+
+  @media (max-width: 720px) {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  && > div > div {
+    margin-right: 6px;
+  }
+
+  && > div svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
 `;

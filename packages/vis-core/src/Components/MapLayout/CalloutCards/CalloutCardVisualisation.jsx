@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
 
 import { MapContext } from "contexts";
-import { replacePlaceholders } from "utils";
+import { replacePlaceholders, formatNumber } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
@@ -302,10 +302,7 @@ export const CalloutCardVisualisation = ({
 
   const formatNumberWithUnit = useCallback((value, unit = "") => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
-    if (Math.abs(value) >= 1e9) return (value / 1e9).toFixed(2) + "bn" + unit;
-    if (Math.abs(value) >= 1e6) return (value / 1e6).toFixed(2) + "M" + unit;
-    if (Math.abs(value) >= 1e3) return (value / 1e3).toFixed(2) + "K" + unit;
-    return Number(value).toFixed(2) + unit;
+    return formatNumber(Number(value)) + unit;
   }, []);
 
   let customFormattingFunctions = {
