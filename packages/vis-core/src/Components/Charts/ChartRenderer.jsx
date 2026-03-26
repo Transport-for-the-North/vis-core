@@ -1,6 +1,6 @@
 import React from "react";
 import { WarningBox } from "Components";
-import { Section, Title } from "./ChartRenderer.styles";
+import { Section } from "./ChartRenderer.styles";
 import { defaultFormatters, hasChartData } from "./ChartRenderer.utils.jsx";
 import { BarChart } from "./BarChart";
 import { BarChartMultiple } from "./BarChartMultiple";
@@ -9,6 +9,7 @@ import { LineSeriesChart } from "./LineSeriesChart";
 import { AreaSeriesChart } from "./AreaSeriesChart";
 import { ScatterSeriesChart } from "./ScatterSeriesChart";
 import { DonutPieChart } from "./DonutPieChart";
+import { Card } from "./Card";
 import { TableChart } from "./TableChart";
 import { RankingChart } from "./RankingChart";
 
@@ -52,6 +53,15 @@ export const ChartRenderer = ({
             ? cfg
             : { ...cfg, height: resolvedBarChartHeight };
         switch (type) {
+          case "card":
+            return (
+              <Card
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+              />
+            );
           case "bar":
             return (
               <BarChart

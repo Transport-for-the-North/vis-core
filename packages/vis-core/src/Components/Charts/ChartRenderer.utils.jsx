@@ -148,6 +148,12 @@ export const getAxisLabel = (config, axis) =>
 export const hasChartData = (config, data) => {
   const type = String(config?.type || "").toLowerCase();
 
+  if (type === "card") {
+    return Array.isArray(data)
+      ? data.length > 0
+      : !!data && Object.keys(data).length > 0;
+  }
+
   if (type === "table" && (config?.tableLayout || "rows") === "rows") {
     return Array.isArray(data)
       ? data.length > 0
