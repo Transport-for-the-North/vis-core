@@ -10,18 +10,43 @@ import {
   toRows,
 } from "./ChartRenderer.utils.jsx";
 
-const CardBody = styled.div`
+
+
+const CardGrid = styled.div`
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
-  justify-content: center;
-  gap: 6px;
+  height: 100%;
   min-height: 108px;
+`;
+
+const FixedTitle = styled.div`
+  min-height: 48px;
+  max-height: 48px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  padding-top: 0;
+`;
+
+const TitleSpacer = styled.div`
+  height: 12px;
+  width: 100%;
+`;
+
+const CenteredCardValue = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 56px;
+  width: 100%;
 `;
 
 const CardValue = styled.div`
   color: #2b2b2b;
-  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
+  font-size: clamp(1.5rem, 2vw, 2.1rem);
   font-weight: 700;
   line-height: 1.1;
   word-break: break-word;
@@ -226,11 +251,20 @@ export const Card = ({ config, data, formatters = {} }) => {
 
   return (
     <Section aria-label={config.ariaLabel || config.title || "Card"} style={sectionStyle}>
-      {config.title && <Title>{config.title}</Title>}
-      <CardBody>
-        <CardValue>{content.value}</CardValue>
-        {content.meta ? <CardMeta>{content.meta}</CardMeta> : null}
-      </CardBody>
+      <CardGrid>
+        {config.title && (
+          <>
+            <FixedTitle>
+              <Title>{config.title}</Title>
+            </FixedTitle>
+            <TitleSpacer />
+          </>
+        )}
+        <CenteredCardValue><CardValue>{content.value}</CardValue></CenteredCardValue>
+        {content.meta ? (
+          <CardMeta>{content.meta}</CardMeta>
+        ) : null}
+      </CardGrid>
     </Section>
   );
 };

@@ -22,7 +22,7 @@ export const Section = styled.section`
 
 export const Title = styled.h3`
   margin: 6px 0 8px;
-  font-size: 1.1em;
+  font-size: 0.9rem;
   color: #4b3e91;
 `;
 
