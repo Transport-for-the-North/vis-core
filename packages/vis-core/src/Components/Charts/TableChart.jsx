@@ -3,37 +3,61 @@ import { WarningBox } from "Components";
 import { Section, Title } from "./ChartRenderer.styles";
 import {
   DEFAULTS,
-  defaultFormatters,
+  getCommifyFormatter,
   getChartGridStyle,
   getValue,
+  toRows,
 } from "./ChartRenderer.utils.jsx";
+
+const BASE_CELL_STYLE = {
+  padding: 8,
+  textAlign: "left",
+  whiteSpace: "normal",
+  overflowWrap: "anywhere",
+  verticalAlign: "top",
+};
+
+const TABLE_STYLE = {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontSize: 12,
+  background: "white",
+  border: "1px solid #ddd",
+  borderRadius: 6,
+  overflow: "hidden",
+};
+
+const HEADER_ROW_STYLE = {
+  background: DEFAULTS.BRAND_COLOR,
+  color: "white",
+};
+
+const getCellStyle = (cellMaxWidth) => ({
+  ...BASE_CELL_STYLE,
+  ...(cellMaxWidth ? { maxWidth: cellMaxWidth } : {}),
+});
 
 export const TableChart = ({ config, data, formatters }) => {
   const tableLayout = config.tableLayout || "rows";
   const rowTableMinWidth = config.minWidth || "100%";
   const cellMaxWidth = config.cellMaxWidth;
-  const baseCellStyle = {
-    padding: 8,
-    textAlign: "left",
-    whiteSpace: "normal",
-    overflowWrap: "anywhere",
-    verticalAlign: "top",
-    ...(cellMaxWidth ? { maxWidth: cellMaxWidth } : {}),
-  };
+  const baseCellStyle = React.useMemo(() => getCellStyle(cellMaxWidth), [cellMaxWidth]);
+  const sectionStyle = React.useMemo(
+    () => getChartGridStyle(config.layout, config.fullWidth),
+    [config]
+  );
 
   if (tableLayout === "rows") {
     const cols = config.columns || [];
-    const rowData = Array.isArray(data) ? data : data ? [data] : [];
+    const rowData = toRows(data);
     const visibleRows = Number(config.visibleRows ?? 0);
-    const estimatedTableHeightPx = Math.max(220, Math.min(720, rowData.length * 34 + 52));
     const clippedTableHeightPx =
       visibleRows > 0 ? Math.max(220, visibleRows * 34 + 54) : null;
     const rowTableMaxHeight = config.maxHeight || (clippedTableHeightPx ? `${clippedTableHeightPx}px` : undefined);
-    const rowTableSectionStyle = getChartGridStyle(config.layout, config.fullWidth);
 
     if (!rowData.length || !cols.length) {
       return (
-        <Section aria-label={config.ariaLabel || "Table"} style={rowTableSectionStyle}>
+        <Section aria-label={config.ariaLabel || "Table"} style={sectionStyle}>
           {config.title && <Title>{config.title}</Title>}
           <WarningBox text="No data available for selection" />
         </Section>
@@ -41,7 +65,7 @@ export const TableChart = ({ config, data, formatters }) => {
     }
 
     return (
-      <Section aria-label={config.ariaLabel || "Table"} style={rowTableSectionStyle}>
+      <Section aria-label={config.ariaLabel || "Table"} style={sectionStyle}>
         {config.title && <Title>{config.title}</Title>}
         <div
           style={{
@@ -55,19 +79,13 @@ export const TableChart = ({ config, data, formatters }) => {
         >
           <table
             style={{
-              width: "100%",
+              ...TABLE_STYLE,
               minWidth: rowTableMinWidth,
-              borderCollapse: "collapse",
-              fontSize: 12,
-              background: "white",
-              border: "1px solid #ddd",
-              borderRadius: 6,
-              overflow: "hidden",
               tableLayout: config.fixedTableLayout ? "fixed" : "auto",
             }}
           >
             <thead>
-              <tr style={{ background: DEFAULTS.BRAND_COLOR, color: "white" }}>
+              <tr style={HEADER_ROW_STYLE}>
                 {cols.map((col) => (
                   <th
                     key={col.key}
@@ -140,28 +158,20 @@ export const TableChart = ({ config, data, formatters }) => {
     [keys, data]
   );
   const fmt = {
-    commify: formatters.commify || defaultFormatters.commify,
+    commify: getCommifyFormatter(formatters),
     percent: (v) => (total > 0 ? `${((v / total) * 100).toFixed(1)}%` : "0.0%"),
   };
   const firstColHeader = config.tableMetricName || "Metric";
 
   return (
-    <Section aria-label={config.ariaLabel || "Table"} style={getChartGridStyle(config.layout, config.fullWidth)}>
+    <Section aria-label={config.ariaLabel || "Table"} style={sectionStyle}>
       {config.title && <Title>{config.title}</Title>}
       <div style={{ overflowX: "auto", margin: "10px 0" }}>
         <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: 12,
-            background: "white",
-            border: "1px solid #ddd",
-            borderRadius: 6,
-            overflow: "hidden",
-          }}
+          style={TABLE_STYLE}
         >
           <thead>
-            <tr style={{ background: DEFAULTS.BRAND_COLOR, color: "white" }}>
+            <tr style={HEADER_ROW_STYLE}>
               <th style={{ padding: 8, textAlign: "left", fontWeight: 600 }}>
                 {firstColHeader}
               </th>

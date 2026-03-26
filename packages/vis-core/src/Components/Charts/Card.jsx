@@ -3,9 +3,11 @@ import styled from "styled-components";
 import { WarningBox } from "Components";
 import { Section, Title } from "./ChartRenderer.styles";
 import {
-  defaultFormatters,
   formatTwoDp,
+  getCommifyFormatter,
   getChartGridStyle,
+  toDisplayLabel,
+  toRows,
 } from "./ChartRenderer.utils.jsx";
 
 const CardBody = styled.div`
@@ -30,8 +32,6 @@ const CardMeta = styled.div`
   font-size: 0.95rem;
   line-height: 1.35;
 `;
-
-const toRows = (data) => (Array.isArray(data) ? data : data ? [data] : []);
 
 const toNumber = (value) => {
   const numericValue = Number(value);
@@ -88,10 +88,7 @@ const calculateGroupedAggregate = ({ rows, calc, column, groupBy, show }) => {
   const groupedRows = new Map();
 
   rows.forEach((row) => {
-    const rawLabel = row?.[groupBy];
-    const label = rawLabel === null || rawLabel === undefined || rawLabel === ""
-      ? "Unknown"
-      : String(rawLabel);
+    const label = toDisplayLabel(row?.[groupBy]);
 
     if (!groupedRows.has(label)) {
       groupedRows.set(label, []);
@@ -146,7 +143,7 @@ const formatMetricValue = ({ value, config, formatters, isCount }) => {
   }
 
   const fallbackFormatter = isCount
-    ? formatters?.commify || defaultFormatters.commify
+    ? getCommifyFormatter(formatters)
     : formatTwoDp;
   const formatter = resolveFormatter(config, formatters, fallbackFormatter);
   const formattedValue = formatter(value);

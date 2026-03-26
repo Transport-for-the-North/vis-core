@@ -11,10 +11,10 @@ export const Section = styled.section`
   display: flex;
   flex-direction: column;
   align-self: stretch;
-  background: #ffffff;
-  border: 1px solid #dbe4ee;
-  border-radius: ${(props) => props.theme.borderRadius};
-  padding: 12px;
+  background: var(--chart-surface-background, transparent);
+  border: var(--chart-surface-border, none);
+  border-radius: var(--chart-surface-radius, 0);
+  padding: var(--chart-surface-padding, 0);
   box-sizing: border-box;
   overflow: hidden;
   grid-column: var(--chart-grid-column, span 1);

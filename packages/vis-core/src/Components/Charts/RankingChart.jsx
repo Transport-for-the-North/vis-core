@@ -10,6 +10,18 @@ import {
   ToggleButton,
 } from "./ChartRenderer.styles";
 
+const DEFAULT_VISIBLE_ROWS = 5;
+
+const sortRankingRows = (rows, ranks) => {
+  if (!ranks) return rows;
+
+  return [...rows].sort((left, right) => {
+    const rankA = ranks[left.key] ?? Infinity;
+    const rankB = ranks[right.key] ?? Infinity;
+    return rankA - rankB;
+  });
+};
+
 export const RankingChart = ({ config, data, formatters }) => {
   const [isOpen, setIsOpen] = useState(false);
   const cols = config.columns || [];
@@ -28,17 +40,10 @@ export const RankingChart = ({ config, data, formatters }) => {
   };
 
   const sortedRows = React.useMemo(() => {
-    if (ranks) {
-      return [...rows].sort((a, b) => {
-        const rankA = ranks[a.key] ?? Infinity;
-        const rankB = ranks[b.key] ?? Infinity;
-        return rankA - rankB;
-      });
-    }
-    return rows;
+    return sortRankingRows(rows, ranks);
   }, [rows, ranks]);
 
-  const visibleRows = isOpen ? sortedRows : sortedRows.slice(0, 5);
+  const visibleRows = isOpen ? sortedRows : sortedRows.slice(0, DEFAULT_VISIBLE_ROWS);
 
   const fmt = {
     commify:
@@ -55,7 +60,7 @@ export const RankingChart = ({ config, data, formatters }) => {
         }}
       >
         <Title>{config.title}</Title>
-        {rows.length > 5 ? (
+        {rows.length > DEFAULT_VISIBLE_ROWS ? (
           <ToggleButton onClick={() => setIsOpen(!isOpen)}>
             <RotatingIcon $isOpen={isOpen} />
           </ToggleButton>
@@ -94,7 +99,7 @@ export const RankingChart = ({ config, data, formatters }) => {
             );
           })}
         </TransitionGroup>
-        {!isOpen && rows.length > 5 && (
+        {!isOpen && rows.length > DEFAULT_VISIBLE_ROWS && (
           <RowTr>
             <td colSpan={3} style={{ color: "#888", paddingLeft: 32 }}>
               ...

@@ -10,18 +10,28 @@ import {
 import {
   ChartSection,
   DEFAULTS,
-  computeXAxisHeight,
-  defaultFormatters,
+  getCategoryAxisProps,
+  getTooltipProps,
+  getValueAxisProps,
   toSeries,
 } from "./ChartRenderer.utils.jsx";
 
 export const LineSeriesChart = ({ config, data, formatters }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
+  const labels = React.useMemo(() => items.map((item) => item.label), [items]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
-  const xAxisHeight = React.useMemo(
-    () => computeXAxisHeight(config, items.map((item) => item.label)),
-    [config, items]
+  const xAxisProps = React.useMemo(
+    () => getCategoryAxisProps({ config, labels }),
+    [config, labels]
+  );
+  const yAxisProps = React.useMemo(
+    () => getValueAxisProps({ formatters }),
+    [formatters]
+  );
+  const tooltipProps = React.useMemo(
+    () => getTooltipProps(formatters),
+    [formatters]
   );
 
   return (
@@ -32,28 +42,9 @@ export const LineSeriesChart = ({ config, data, formatters }) => {
     >
       <RLineChart data={items} margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
-        <RXAxis
-          dataKey="label"
-          angle={DEFAULTS.DIMENSIONS.xAngle}
-          textAnchor="end"
-          height={xAxisHeight}
-          interval={0}
-          tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-        />
-        <RYAxis
-          allowDecimals={false}
-          tickFormatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
-          tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-          width={DEFAULTS.DIMENSIONS.yAxisWidth}
-        />
-        <RTooltip
-          formatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
-        />
+        <RXAxis {...xAxisProps} />
+        <RYAxis {...yAxisProps} />
+        <RTooltip {...tooltipProps} />
         <RLine
           type="monotone"
           dataKey="value"

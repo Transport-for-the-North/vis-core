@@ -13,6 +13,63 @@ import { Card } from "./Card";
 import { TableChart } from "./TableChart";
 import { RankingChart } from "./RankingChart";
 
+const renderUnsupportedChart = (cfg, key) => (
+  <Section key={key}>
+    <WarningBox text={`Unsupported chart type: ${cfg.type}`} />
+  </Section>
+);
+
+const getChartKey = (cfg, idx) => cfg?.id || cfg?.key || `${String(cfg?.type || "chart")}-${idx}`;
+
+const getChartConfigWithResolvedHeight = (cfg, barHeight) => {
+  const resolvedBarChartHeight = cfg?.height ?? cfg?.barHeight ?? barHeight;
+  return resolvedBarChartHeight === undefined
+    ? cfg
+    : { ...cfg, height: resolvedBarChartHeight };
+};
+
+const CHART_RENDERERS = {
+  card: ({ chartKey, config, data, formatters }) => (
+    <Card key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  bar: ({ chartKey, config, data, formatters }) => (
+    <BarChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  bar_vertical: ({ chartKey, config, data, formatters }) => (
+    <BarChart key={chartKey} config={config} data={data} formatters={formatters} type="vertical" />
+  ),
+  multiple_bar: ({ chartKey, config, data, formatters }) => (
+    <BarChartMultiple key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  multiple_bar_vertical: ({ chartKey, config, data, formatters }) => (
+    <BarChartMultiple key={chartKey} config={config} data={data} formatters={formatters} type="vertical" />
+  ),
+  barv2: ({ chartKey, config, data, formatters }) => (
+    <BarChartV2 key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  line: ({ chartKey, config, data, formatters }) => (
+    <LineSeriesChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  area: ({ chartKey, config, data, formatters }) => (
+    <AreaSeriesChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  scatter: ({ chartKey, config, data, formatters }) => (
+    <ScatterSeriesChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  pie: ({ chartKey, config, data, formatters }) => (
+    <DonutPieChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  donut: ({ chartKey, config, data, formatters }) => (
+    <DonutPieChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  table: ({ chartKey, config, data, formatters }) => (
+    <TableChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+  ranking: ({ chartKey, config, data, formatters }) => (
+    <RankingChart key={chartKey} config={config} data={data} formatters={formatters} />
+  ),
+};
+
 /**
  * Main chart rendering component that supports multiple chart types
  * Renders different types of charts based on configuration including:
@@ -47,120 +104,20 @@ export const ChartRenderer = ({
     <div>
       {charts.map((cfg, idx) => {
         const type = (cfg.type || "").toLowerCase();
-        const resolvedBarChartHeight = cfg?.height ?? cfg?.barHeight ?? barHeight;
-        const cfgWithResolvedHeight =
-          resolvedBarChartHeight === undefined
-            ? cfg
-            : { ...cfg, height: resolvedBarChartHeight };
-        switch (type) {
-          case "card":
-            return (
-              <Card
-                key={idx}
-                config={cfg}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "bar":
-            return (
-              <BarChart
-                key={idx}
-                config={cfgWithResolvedHeight}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "bar_vertical":
-            return (
-              <BarChart
-                key={idx}
-                config={cfgWithResolvedHeight}
-                data={data}
-                formatters={f}
-                type="vertical"
-              />
-            );
-          case "multiple_bar":
-            return (
-              <BarChartMultiple
-                key={idx}
-                config={cfgWithResolvedHeight}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "multiple_bar_vertical":
-            return (
-              <BarChartMultiple
-                key={idx}
-                config={cfgWithResolvedHeight}
-                data={data}
-                formatters={f}
-                type="vertical"
-              />
-            );
-          case "barv2":
-            return (
-              <BarChartV2
-                key={idx}
-                config={cfgWithResolvedHeight}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "line":
-            return (
-              <LineSeriesChart
-                key={idx}
-                config={cfg}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "area":
-            return (
-              <AreaSeriesChart
-                key={idx}
-                config={cfg}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "scatter":
-            return (
-              <ScatterSeriesChart
-                key={idx}
-                config={cfg}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "pie":
-          case "donut":
-            return (
-              <DonutPieChart
-                key={idx}
-                config={cfg}
-                data={data}
-                formatters={f}
-              />
-            );
-          case "table":
-            return (
-              <TableChart key={idx} config={cfg} data={data} formatters={f} />
-            );
-          case "ranking":
-            return (
-              <RankingChart key={idx} config={cfg} data={data} formatters={f} />
-            );
-          default:
-            return (
-              <Section key={idx}>
-                <WarningBox text={`Unsupported chart type: ${cfg.type}`} />
-              </Section>
-            );
+        const renderer = CHART_RENDERERS[type];
+        const chartKey = getChartKey(cfg, idx);
+        const resolvedConfig = getChartConfigWithResolvedHeight(cfg, barHeight);
+
+        if (!renderer) {
+          return renderUnsupportedChart(cfg, chartKey);
         }
+
+        return renderer({
+          chartKey,
+          config: resolvedConfig,
+          data,
+          formatters: f,
+        });
       })}
     </div>
   );

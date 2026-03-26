@@ -10,14 +10,10 @@ import {
   ChartSection,
   DEFAULTS,
   DEFAULT_COLORS,
-  defaultFormatters,
+  getCommifyFormatter,
+  toDisplayLabel,
   toSeries,
 } from "./ChartRenderer.utils.jsx";
-
-const toLabel = (value) => {
-  if (value === null || value === undefined || value === "") return "Unknown";
-  return String(value);
-};
 
 const buildDynamicPieSeries = (config, data) => {
   const categoryKey = config.categoryKey || config.dimensionKey;
@@ -30,7 +26,7 @@ const buildDynamicPieSeries = (config, data) => {
 
   const grouped = new Map();
   data.forEach((row) => {
-    const label = toLabel(row?.[categoryKey]);
+    const label = toDisplayLabel(row?.[categoryKey]);
     if (!grouped.has(label)) {
       grouped.set(label, []);
     }
@@ -56,6 +52,7 @@ const buildDynamicPieSeries = (config, data) => {
 
 export const DonutPieChart = ({ config, data, formatters }) => {
   const items = buildDynamicPieSeries(config, data);
+  const commify = getCommifyFormatter(formatters);
   const legendRows = Math.max(1, Math.ceil(items.length / 3));
   const size =
     config.size ??
@@ -77,7 +74,7 @@ export const DonutPieChart = ({ config, data, formatters }) => {
       <RPieChart>
         <RTooltip
           formatter={(value, name, props) => [
-            (formatters?.commify || defaultFormatters.commify)(value) +
+            commify(value) +
               ` (${pctFmt(value)})`,
             props?.payload?.label || name,
           ]}

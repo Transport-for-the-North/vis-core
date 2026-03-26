@@ -47,6 +47,8 @@ const ContentInner = styled.div`
 `;
 
 const DEFAULT_DESKTOP_CARD_WIDTH = 320;
+const EMPTY_CHARTS_MESSAGE = "No dashboard charts are configured for this page.";
+const EMPTY_DATA_MESSAGE = "No data available for the selected filters, please try different filters.";
 
 const gcd = (left, right) => {
   let a = Math.abs(Number(left) || 0);
@@ -175,6 +177,10 @@ const ChartsViewport = styled.div`
   width: 100%;
   overflow: visible;
   padding-right: 0;
+  --chart-surface-background: #ffffff;
+  --chart-surface-border: 1px solid #dbe4ee;
+  --chart-surface-radius: ${(props) => props.theme.borderRadius};
+  --chart-surface-padding: 12px;
 
   > div {
     width: 100%;
@@ -266,20 +272,6 @@ const Title = styled.h1`
   }
 `;
 
-const Subtitle = styled.p`
-  margin: 0;
-  color: #475569;
-  font-size: 0.9rem;
-  line-height: 1.35;
-  text-align: left;
-  white-space: normal;
-  flex: 0 0 auto;
-
-  @media ${(props) => props.theme.mq.mobile} {
-    margin: 0 0 6px;
-  }
-`;
-
 const AboutText = styled.div`
   margin: 0;
   color: #4b5563;
@@ -330,6 +322,91 @@ async function callMetadataEndpoint(endpoint) {
   return api.baseService.get(endpoint.path, opts);
 }
 
+async function fetchMetadataTables(configuredTables = []) {
+  if (configuredTables.length === 0) {
+    return {};
+  }
+
+  const tableEntries = await Promise.all(
+    configuredTables.map(async (table) => {
+      const response = await callMetadataEndpoint(table);
+      let rows = response;
+      if (Array.isArray(table.where) && table.where.length > 0) {
+        rows = applyWhereConditions(rows, table.where);
+      }
+
+      return [table.name, rows];
+    })
+  );
+
+  return Object.fromEntries(tableEntries);
+}
+
+function buildDashboardFilters(configuredFilters = [], metadataTables = {}) {
+  const usedIds = new Set();
+
+  return configuredFilters.map((sourceFilter) => {
+    const filter = { ...sourceFilter, id: buildDeterministicFilterId(sourceFilter, usedIds) };
+
+    if (filter.values?.source !== "metadataTable") {
+      return filter;
+    }
+
+    const table = metadataTables[filter.values.metadataTableName] || [];
+    const rows = filter.values.where
+      ? applyWhereConditions(table, filter.values.where)
+      : table;
+
+    let options = [];
+    const seenOptions = new Set();
+    rows.forEach((row) => {
+      const option = {
+        displayValue: row[filter.values.displayColumn],
+        paramValue: row[filter.values.paramColumn],
+        legendSubtitleText: row[filter.values?.legendSubtitleTextColumn] || null,
+        infoOnHover: row[filter.values?.infoOnHoverColumn] ?? null,
+        infoBelowOnChange: row[filter.values?.infoBelowOnChangeColumn] ?? null,
+      };
+
+      const optionKey = `${String(option.paramValue)}::${String(option.displayValue)}`;
+      if (!seenOptions.has(optionKey)) {
+        seenOptions.add(optionKey);
+        options.push(option);
+      }
+    });
+
+    if (filter.values.sort) {
+      options = sortValues(options, filter.values.sort);
+    }
+    if (filter.values.exclude) {
+      options = options.filter((item) => !filter.values.exclude.includes(item.paramValue));
+    }
+
+    return {
+      ...filter,
+      values: { ...filter.values, values: options },
+    };
+  });
+}
+
+function buildInitialFilterState(filters = []) {
+  return filters.reduce((initial, filter) => {
+    if (filter.shouldBeBlankOnInit) {
+      initial[filter.id] = null;
+      return initial;
+    }
+
+    if (filter.multiSelect && filter.shouldInitialSelectAllInMultiSelect) {
+      initial[filter.id] =
+        filter.defaultValue ?? filter.min ?? (filter.values?.values || []).map((value) => value.paramValue);
+      return initial;
+    }
+
+    initial[filter.id] = filter.defaultValue ?? filter.min ?? filter.values?.values?.[0]?.paramValue ?? null;
+    return initial;
+  }, {});
+}
+
 function useDashboardFilters() {
   const pageContext = useContext(PageContext);
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
@@ -347,28 +424,7 @@ function useDashboardFilters() {
 
     const loadTables = async () => {
       try {
-        const configuredTables = pageContext.config.metadataTables || [];
-        if (configuredTables.length === 0) {
-          if (!cancelled) {
-            setMetadataTables({});
-            setHasLoadedMetadata(true);
-          }
-          return;
-        }
-
-        const tableEntries = await Promise.all(
-          configuredTables.map(async (table) => {
-            const response = await callMetadataEndpoint(table);
-            let rows = response;
-            if (Array.isArray(table.where) && table.where.length > 0) {
-              rows = applyWhereConditions(rows, table.where);
-            }
-
-            return [table.name, rows];
-          })
-        );
-
-        const tables = Object.fromEntries(tableEntries);
+        const tables = await fetchMetadataTables(pageContext.config.metadataTables || []);
 
         if (!cancelled) {
           setMetadataTables(tables);
@@ -393,65 +449,13 @@ function useDashboardFilters() {
   useEffect(() => {
     if (!hasLoadedMetadata) return;
 
-    const usedIds = new Set();
-    const built = (pageContext.config.filters || []).map((sourceFilter) => {
-      const filter = { ...sourceFilter, id: buildDeterministicFilterId(sourceFilter, usedIds) };
-
-      if (filter.values?.source === "metadataTable") {
-        const table = metadataTables[filter.values.metadataTableName] || [];
-        const rows = filter.values.where
-          ? applyWhereConditions(table, filter.values.where)
-          : table;
-
-        let options = [];
-        const seenOptions = new Set();
-        rows.forEach((row) => {
-          const option = {
-            displayValue: row[filter.values.displayColumn],
-            paramValue: row[filter.values.paramColumn],
-            legendSubtitleText: row[filter.values?.legendSubtitleTextColumn] || null,
-            infoOnHover: row[filter.values?.infoOnHoverColumn] ?? null,
-            infoBelowOnChange: row[filter.values?.infoBelowOnChangeColumn] ?? null,
-          };
-
-          const optionKey = `${String(option.paramValue)}::${String(option.displayValue)}`;
-          if (!seenOptions.has(optionKey)) {
-            seenOptions.add(optionKey);
-            options.push(option);
-          }
-        });
-
-        if (filter.values.sort) {
-          options = sortValues(options, filter.values.sort);
-        }
-        if (filter.values.exclude) {
-          options = options.filter((item) => !filter.values.exclude.includes(item.paramValue));
-        }
-
-        filter.values = { ...filter.values, values: options };
-      }
-
-      return filter;
-    });
-
-    setFiltersWithIds(built);
+    setFiltersWithIds(buildDashboardFilters(pageContext.config.filters || [], metadataTables));
   }, [hasLoadedMetadata, metadataTables, pageContext]);
 
   useEffect(() => {
     if (!hasLoadedMetadata) return;
 
-    const initial = {};
-    filtersWithIds.forEach((filter) => {
-      if (filter.shouldBeBlankOnInit) {
-        initial[filter.id] = null;
-      } else if (filter.multiSelect && filter.shouldInitialSelectAllInMultiSelect) {
-        initial[filter.id] = filter.defaultValue ?? filter.min ?? (filter.values?.values || []).map((value) => value.paramValue);
-      } else {
-        initial[filter.id] = filter.defaultValue ?? filter.min ?? filter.values?.values?.[0]?.paramValue ?? null;
-      }
-    });
-
-    filterDispatch({ type: "INITIALIZE_FILTERS", payload: initial });
+    filterDispatch({ type: "INITIALIZE_FILTERS", payload: buildInitialFilterState(filtersWithIds) });
     setIsReady(true);
   }, [filterDispatch, filtersWithIds, hasLoadedMetadata]);
 
@@ -526,6 +530,61 @@ function buildVisualisation(pageContext, filters, filterState, apiSchema) {
   };
 }
 
+function hasInitialisedDashboardFilters(filters = [], filterState = {}, isReady = false) {
+  if (!isReady) return false;
+
+  return filters.every((filter) => Object.prototype.hasOwnProperty.call(filterState, filter.id));
+}
+
+function resolveDashboardAdditionalFeatures(config, filters) {
+  const configuredAdditionalFeatures = config.additionalFeatures || {};
+  if (configuredAdditionalFeatures.download || configuredAdditionalFeatures.glossary) {
+    return configuredAdditionalFeatures;
+  }
+
+  if (!config.download) return null;
+
+  return {
+    ...configuredAdditionalFeatures,
+    download: {
+      ...config.download,
+      filters: config.download.filters || filters,
+    },
+  };
+}
+
+function normaliseDashboardCharts(charts = []) {
+  return charts.map((chart) =>
+    String(chart?.type || "").toLowerCase() === "table" && (chart?.tableLayout || "rows") === "rows"
+      ? {
+          ...chart,
+          maxHeight: chart.maxHeight,
+          minWidth: chart.minWidth || "100%",
+          stickyHeader: chart.stickyHeader ?? true,
+        }
+      : chart
+  );
+}
+
+function getDashboardContentState({ endpoint, error, charts, data }) {
+  const fetchError = !endpoint?.path
+    ? "Dashboard data path is not configured for this page."
+    : String(endpoint?.requestMethod || "GET").toUpperCase() !== "GET"
+    ? "Dashboard currently supports GET data endpoints when using useFetchVisualisationData."
+    : error?.message || null;
+
+  const hasCharts = Array.isArray(charts) && charts.length > 0;
+  const hasData = Array.isArray(data)
+    ? data.length > 0
+    : !!data && Object.keys(data).length > 0;
+
+  return {
+    fetchError,
+    hasCharts,
+    hasData,
+  };
+}
+
 export function DashboardPage() {
   const pageContext = useContext(PageContext);
   const appContext = useContext(AppContext);
@@ -533,10 +592,10 @@ export function DashboardPage() {
   const dashboardLayout = config.layout || {};
   const { filters, filterState, onFilterChange, isReady } = useDashboardFilters();
   const aboutSummary = useMemo(() => summariseAboutText(pageContext.about || ""), [pageContext.about]);
-  const hasInitialisedFilterState = useMemo(() => {
-    if (!isReady) return false;
-    return (filters || []).every((filter) => Object.prototype.hasOwnProperty.call(filterState || {}, filter.id));
-  }, [filterState, filters, isReady]);
+  const hasInitialisedFilterState = useMemo(
+    () => hasInitialisedDashboardFilters(filters, filterState, isReady),
+    [filterState, filters, isReady]
+  );
 
   const endpoint = useMemo(
     () => resolveDashboardEndpoint(pageContext),
@@ -549,33 +608,11 @@ export function DashboardPage() {
   }, [appContext.apiSchema, filterState, filters, hasInitialisedFilterState, isReady, pageContext]);
 
   const additionalFeatures = useMemo(() => {
-    const configuredAdditionalFeatures = config.additionalFeatures || {};
-    if (configuredAdditionalFeatures.download || configuredAdditionalFeatures.glossary) {
-      return configuredAdditionalFeatures;
-    }
-
-    if (!config.download) return null;
-    return {
-      ...configuredAdditionalFeatures,
-      download: {
-        ...config.download,
-        filters: config.download.filters || filters,
-      },
-    };
+    return resolveDashboardAdditionalFeatures(config, filters);
   }, [config.additionalFeatures, config.download, filters]);
 
   const dashboardCharts = useMemo(
-    () =>
-      (config.charts || []).map((chart) =>
-        String(chart?.type || "").toLowerCase() === "table" && (chart?.tableLayout || "rows") === "rows"
-          ? {
-              ...chart,
-              maxHeight: chart.maxHeight,
-              minWidth: chart.minWidth || "100%",
-              stickyHeader: chart.stickyHeader ?? true,
-            }
-          : chart
-      ),
+    () => normaliseDashboardCharts(config.charts || []),
     [config.charts]
   );
 
@@ -589,18 +626,10 @@ export function DashboardPage() {
     data,
     error,
   } = useFetchVisualisationData(visualisation);
-
-  const rows = Array.isArray(data) ? data : data ? [data] : [];
-  const fetchError = !endpoint?.path
-    ? "Dashboard data path is not configured for this page."
-    : String(endpoint?.requestMethod || "GET").toUpperCase() !== "GET"
-    ? "Dashboard currently supports GET data endpoints when using useFetchVisualisationData."
-    : error?.message || null;
-
-  const hasCharts = Array.isArray(config.charts) && config.charts.length > 0;
-  const hasData = Array.isArray(data)
-    ? data.length > 0
-    : !!data && Object.keys(data).length > 0;
+  const { fetchError, hasCharts, hasData } = useMemo(
+    () => getDashboardContentState({ endpoint, error, charts: dashboardCharts, data }),
+    [dashboardCharts, data, endpoint, error]
+  );
 
   return (
     <LayoutContainer>
@@ -633,13 +662,13 @@ export function DashboardPage() {
 
           {!fetchError && !hasCharts ? (
             <EmptyState>
-              <WarningBox text="No dashboard charts are configured for this page." />
+              <WarningBox text={EMPTY_CHARTS_MESSAGE} />
             </EmptyState>
           ) : null}
 
           {!fetchError && hasCharts && !isLoading && !hasData ? (
             <EmptyState>
-              <WarningBox text="No data available for the selected filters, please try different filters." />
+              <WarningBox text={EMPTY_DATA_MESSAGE} />
             </EmptyState>
           ) : null}
 

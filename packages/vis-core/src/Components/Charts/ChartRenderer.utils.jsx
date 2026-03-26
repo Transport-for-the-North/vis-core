@@ -2,6 +2,8 @@ import React from "react";
 import { ResponsiveContainer } from "recharts";
 import { Section, Title } from "./ChartRenderer.styles";
 
+const UNKNOWN_LABEL = "Unknown";
+
 export const DEFAULTS = {
   BRAND_COLOR: "#4b3e91",
   DIMENSIONS: {
@@ -29,6 +31,13 @@ export const DEFAULT_COLORS = [
   "#ff9da7",
   "#4b3e91",
 ];
+
+export const toRows = (data) => (Array.isArray(data) ? data : data ? [data] : []);
+
+export const toDisplayLabel = (value) => {
+  if (value === null || value === undefined || value === "") return UNKNOWN_LABEL;
+  return String(value);
+};
 
 export const getValue = (data, key) => {
   const raw = data?.[key];
@@ -67,6 +76,30 @@ export const computeXAxisHeight = (config, labels) => {
   );
   return Math.max(DEFAULTS.DIMENSIONS.xAxisMinHeight, explicit, est);
 };
+
+export const getCommifyFormatter = (formatters = {}) =>
+  formatters.commify || defaultFormatters.commify;
+
+export const getCategoryAxisProps = ({ config, labels = [] }) => ({
+  dataKey: "label",
+  angle: DEFAULTS.DIMENSIONS.xAngle,
+  textAnchor: "end",
+  height: computeXAxisHeight(config, labels),
+  interval: 0,
+  tick: { fontSize: DEFAULTS.DIMENSIONS.tickFontSize },
+});
+
+export const getValueAxisProps = ({ formatters = {} }) => ({
+  allowDecimals: false,
+  tickFormatter: getCommifyFormatter(formatters),
+  tick: { fontSize: DEFAULTS.DIMENSIONS.tickFontSize },
+  width: DEFAULTS.DIMENSIONS.yAxisWidth,
+});
+
+export const getTooltipProps = (formatters = {}) => ({
+  formatter: getCommifyFormatter(formatters),
+  cursor: { stroke: "#ccc", strokeDasharray: "3 3" },
+});
 
 export const getChartGridStyle = (layout = {}, fullWidth = false) => {
   const style = {};
