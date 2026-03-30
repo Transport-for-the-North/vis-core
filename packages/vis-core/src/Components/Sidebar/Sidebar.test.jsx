@@ -244,11 +244,13 @@ describe("Firefox browser detection", () => {
     await waitFor(() => {
       expect(getScrollbarWidth).toHaveBeenCalledWith("thin");
     });
-    const sidebarContainer = container.firstChild;
+    // Sidebar renders <MobileBar /> first, so container.firstChild is not the SidebarContainer.
+    const sidebarContainer = screen.getByText("pageName").closest("div");
     expect(sidebarContainer).toBeInTheDocument();
     // Check the style
     expect(sidebarContainer).toHaveStyle({
-      paddingRight: "calc(10px - 15px)",
+      // jsdom normalizes calc(10px - 15px) to calc(-5px)
+      paddingRight: "calc(-5px)",
     });
   });
   it("should not set scrollbar width for Chrome", async () => {

@@ -430,32 +430,29 @@ describe("SET_DRAW_INSTANCE is dispatch with the draw instance", () => {
         </FilterContext.Provider>
       </ThemeProvider>
     );
-    expect(mockMapContext.dispatch).toHaveBeenCalledWith({
-      type: "SET_DRAW_INSTANCE",
-      payload: expect.objectContaining({
-        modes: expect.any(Object),
-        getFeatureIdsAt: expect.any(Function),
-        getSelectedIds: expect.any(Function),
-        getSelected: expect.any(Function),
-        getSelectedPoints: expect.any(Function),
-        set: expect.any(Function),
-        add: expect.any(Function),
-        get: expect.any(Function),
-        getAll: expect.any(Function),
-        delete: expect.any(Function),
-        deleteAll: expect.any(Function),
-        changeMode: expect.any(Function),
-        getMode: expect.any(Function),
-        trash: expect.any(Function),
-        combineFeatures: expect.any(Function),
-        uncombineFeatures: expect.any(Function),
-        setFeatureProperty: expect.any(Function),
-        onAdd: expect.any(Function),
-        onRemove: expect.any(Function),
-        types: expect.any(Object),
-        options: expect.any(Object),
-      }),
-    });
+
+    const setDrawAction = mockMapContext.dispatch.mock.calls
+      .map((call) => call[0])
+      .find((action) => action?.type === "SET_DRAW_INSTANCE");
+
+    expect(setDrawAction).toBeDefined();
+
+    const drawInstance = setDrawAction.payload;
+    // MapboxDraw is mocked in src/test-mocks/mapbox-gl-draw.js; verify the parts our code relies on.
+    expect(drawInstance).toBeDefined();
+    expect(drawInstance._opts).toEqual(
+      expect.objectContaining({
+        displayControlsDefault: false,
+        modes: expect.objectContaining({
+          draw_rectangle: expect.anything(),
+        }),
+      })
+    );
+    expect(typeof drawInstance.onAdd).toBe("function");
+    expect(typeof drawInstance.onRemove).toBe("function");
+    expect(typeof drawInstance.deleteAll).toBe("function");
+    expect(typeof drawInstance.changeMode).toBe("function");
+    expect(typeof drawInstance.getAll).toBe("function");
   });
 });
 
