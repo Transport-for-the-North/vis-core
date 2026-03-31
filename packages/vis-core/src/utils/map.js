@@ -770,8 +770,8 @@ export const reclassifyData = (
       if (metric) {
         return normaliseContinuousBins(metric.values);
       }
-      // Fallback to quantile method if no metric definition is found
-      classificationMethod = "q";
+      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {
       values = values.map(replaceZeroValues);
@@ -840,8 +840,8 @@ export const reclassifyData = (
           ? metric.differenceValues
           : metric.differenceValues.slice(metric.differenceValues.length / 2);
       }
-      // Fallback to quantile method if no metric definition is found
-      classificationMethod = "q";
+      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {
       absValues = absValues.map(replaceZeroValues);
@@ -852,24 +852,24 @@ export const reclassifyData = (
     // Apply the appropriate classification method
     switch (classificationMethod) {
       case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(absValues, 3);
+        unroundedBins = jenksBreaks(absValues, 6);
         break;
       
       case "s": // Standard Deviation
-        unroundedBins = standardDeviationBreaks(absValues, 3);
+        unroundedBins = standardDeviationBreaks(absValues, 6);
         break;
       
       case "h": // Head/Tail Breaks
         unroundedBins = headTailBreaks(absValues);
         // Limit to 3 classes for diverging
-        unroundedBins = unroundedBins.slice(0, Math.min(4, unroundedBins.length));
+        unroundedBins = unroundedBins.slice(0, Math.min(6, unroundedBins.length));
         break;
       
       case "q": // Quantile
       case "l": // Logarithmic
       case "k": // K-means
       default:
-        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
+        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 6))];
         break;
     }
 
@@ -878,6 +878,8 @@ export const reclassifyData = (
       roundedBins = roundedBins.map(replaceZeroPointValues);
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
+    roundedBins = [...new Set(roundedBins)]; 
+    roundedBins = roundedBins.slice(0, 4);  
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map((val) => -val);
     return [...negativeBins, 0, ...roundedBins];
