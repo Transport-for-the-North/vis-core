@@ -378,8 +378,8 @@ const DualMaps = (props) => {
               ? numberWithCommas(featureValue)
               : "";
           const layerVisualisationName = state.layers[layerId]?.visualisationName;
-          const legendText =
-            layerConfig.defaultTooltipLegendText ??
+          const unitText =
+            layerConfig.defaultTooltipUnitName ??
             state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
           const valueText =
             layerConfig.defaultTooltipValueName ??
@@ -392,7 +392,7 @@ const DualMaps = (props) => {
             description = buildDefaultTooltip({
               featureName,
               featureValueDisplay,
-              legendText,
+              unitText,
               valueText
             });
 
@@ -420,7 +420,7 @@ const DualMaps = (props) => {
               description = buildDefaultTooltip({
                 featureName,
                 featureValueDisplay,
-                legendText,
+                unitText,
                 valueText: customValueText
               });
 
