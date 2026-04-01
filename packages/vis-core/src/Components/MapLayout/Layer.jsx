@@ -133,6 +133,7 @@ export const Layer = ({ layer }) => {
             typeof layer.fixedLineWidth === "number" && Number.isFinite(layer.fixedLineWidth)
               ? layer.fixedLineWidth
               : null,
+          enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
         };
@@ -372,6 +373,7 @@ export const Layer = ({ layer }) => {
             typeof layer.fixedLineWidth === "number" && Number.isFinite(layer.fixedLineWidth)
               ? layer.fixedLineWidth
               : null,
+          enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY,
           bufferSize: layer.bufferSize,
