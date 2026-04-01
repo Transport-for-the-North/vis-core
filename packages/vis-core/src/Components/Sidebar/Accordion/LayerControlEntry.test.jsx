@@ -283,7 +283,12 @@ describe("LayerControlEntry component test", () => {
         id: "id",
         type: "line",
         layout: { visibility: false },
-        metadata: { path: "/", shouldHaveOpacityControl: true },
+        metadata: {
+          path: "/",
+          shouldHaveOpacityControl: true,
+          shouldFixLineWidth: true,
+          fixedLineWidth: 3,
+        },
       },
       state: {
         ...props.state,
