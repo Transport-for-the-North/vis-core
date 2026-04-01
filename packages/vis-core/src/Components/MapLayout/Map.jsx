@@ -545,10 +545,13 @@ const Map = (props) => {
             ? formatNumber(featureValue)
             : "";
         const layerVisualisationName = layerConfig.visualisationName;
-        const legendText =
+        const unitText =
+          layerConfig.defaultTooltipUnitName ??
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
         const valueText =
-          state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
+           layerConfig.defaultTooltipValueName ??
+           state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ??
+           "Value";
 
         let description = "";
 
@@ -557,7 +560,7 @@ const Map = (props) => {
           description = buildDefaultTooltip({
             featureName,
             featureValueDisplay,
-            legendText,
+            unitText,
             valueText
           });
 
@@ -584,7 +587,7 @@ const Map = (props) => {
             description = buildDefaultTooltip({
               featureName,
               featureValueDisplay,
-              legendText,
+              unitText,
               valueText: customValueText
             });
 
