@@ -235,6 +235,21 @@ export const updateOpacityExpression = (existingExpr, newOpacity) => {
  * @returns The paint property for the given geometries
  */
 export function createPaintProperty(bins, style, colours, opacityValue, layerConfig = {}) {
+  const shouldFixLineWidth = layerConfig?.shouldFixLineWidth === true;
+  if (
+    Number.isFinite(layerConfig?.fixedLineWidth) &&
+    layerConfig?.shouldFixLineWidth == null
+  ) {
+    console.warn(
+      `[vis-core] fixedLineWidth is set (${layerConfig.fixedLineWidth}) but shouldFixLineWidth is missing. ` +
+        `Set shouldFixLineWidth: true.`
+    );
+  }
+  const fixedLineWidth =
+    typeof layerConfig?.fixedLineWidth === "number" &&
+    Number.isFinite(layerConfig.fixedLineWidth)
+      ? layerConfig.fixedLineWidth
+      : 3;
   let widthObject = [];
   let colors = [];
   let colorObject = [];
@@ -330,12 +345,14 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           ["feature-state", "value"],
           ...colors,
         ],
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "value"],
-          ...widthObject
-        ],
+        "line-width": shouldFixLineWidth
+          ? fixedLineWidth
+          : [
+              "interpolate",
+              ["linear"],
+              ["feature-state", "value"],
+              ...widthObject,
+            ],
         "line-opacity": [
           "case",
           ["in", ["feature-state", "value"], ["literal", [null]]],
@@ -360,21 +377,21 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           colours[colours.length - 1], // Blue for positive values
           "rgba(0, 0, 0, 1)",
         ],
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["feature-state", "valueAbs"],
-          ...widthObject
-        ],
+        "line-width": shouldFixLineWidth
+          ? fixedLineWidth
+          : [
+              "interpolate",
+              ["linear"],
+              ["feature-state", "valueAbs"],
+              ...widthObject,
+            ],
         "line-opacity": [
           "case",
           ["in", ["feature-state", "value"], ["literal", [null]]],
           0,
           opacityValue ?? 1,
         ],
-
-        "line-offset":
-          offsetExpression,
+        "line-offset": layerConfig.defaultLineOffset ?? offsetExpression,
 
       };
     case "line-categorical":
@@ -391,7 +408,7 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
           0,
           opacityValue ?? 1,
         ],
-        "line-width": 3,
+        "line-width": shouldFixLineWidth ? fixedLineWidth : 3,
         "line-offset": layerConfig.defaultLineOffset !== undefined ? [
           "interpolate",
           ["linear"],
@@ -692,6 +709,19 @@ export const reclassifyData = (
   queryParams,
   options = {}
 ) => {
+  /**
+   * Normalises continuous-classification bins so the scale starts at zero.
+   * @param {Array<number>} bins - Computed continuous break values.
+   * @returns {Array<number>} The normalised bin array.
+   */
+  const normaliseContinuousBins = (bins) => {
+    if (!Array.isArray(bins) || bins.length === 0) {
+      return bins;
+    }
+
+    return [0, ...bins.slice(1)];
+  };
+
   // Helper function to round values and ensure successive values are not identical
   const roundValues = (values, sigFigs) => {
     let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
@@ -723,13 +753,13 @@ export const reclassifyData = (
       Array.isArray(options.customBands) &&
       options.customBands.length > 0
     ) {
-      return options.customBands;
+      return normaliseContinuousBins(options.customBands);
     }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
-        return options.customBands;
+        return normaliseContinuousBins(options.customBands);
       }
       // Fallback to default method if no custom bands
       classificationMethod = "d";
@@ -738,7 +768,7 @@ export const reclassifyData = (
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
       if (metric) {
-        return metric.values;
+        return normaliseContinuousBins(metric.values);
       }
       // Fallback to quantile method if no metric definition is found
       classificationMethod = "q";
@@ -776,7 +806,7 @@ export const reclassifyData = (
     if (classificationMethod === "l") {
       roundedBins = roundedBins.map(replaceZeroPointValues);
     }
-    return roundedBins;
+    return normaliseContinuousBins(roundedBins);
   } else if (style.includes("categorical")) {
     let values = [...new Set(data.map((value) => value.value))];
     return values;

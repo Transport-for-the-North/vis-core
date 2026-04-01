@@ -440,6 +440,11 @@ const isRenderableEntry = (e) => {
   return hasLabel || (hasKnownSwatch && hasSize);
 };
 
+const formatLegendLabelValue = (value) => {
+  const numericValue = convertStringToNumber(value);
+  return Number.isFinite(numericValue) ? numberWithCommas(numericValue) : value;
+};
+
 /**
  * Gets the width for a legend entry based on layer type and paint properties.
  * 
@@ -714,11 +719,14 @@ export const DynamicLegend = ({ map }) => {
               const widthStop = widthStops ? widthStops[idx] : null;
               const dashStop = dashStops ? dashStops.find(ds => ds.value === stop.value) : null;
               let label;
+              let rawLabel;
               if (customLabels && customLabels.length === length) {
-                label = customLabels[idx];
+                rawLabel = customLabels[idx];
+                label = rawLabel;
               } else if (trseLabel && nextStop) {
-                const startValue = stop.value;
-                const endValue = nextStop.value;
+                const startValue = formatLegendLabelValue(stop.value);
+                const endValue = formatLegendLabelValue(nextStop.value);
+                rawLabel = `${stop.value}-${nextStop.value}`;
                 if (idx === 0) {
                   label = `${startValue}-${endValue} (Lowest Risk of TRSE)`;
                 } else if (idx === length - 1) {
@@ -727,15 +735,16 @@ export const DynamicLegend = ({ map }) => {
                   label = `${startValue}-${endValue}`;
                 }
               } else {
-                label = stop.value;
+                rawLabel = stop.value;
+                label = formatLegendLabelValue(stop.value);
               }
               
               legendEntries.push({
                 color: stop.color,
-                width: getEntryWidth(widthStop, isMobile, layer, paintProps, label),
+                width: getEntryWidth(widthStop, isMobile, layer, paintProps, rawLabel),
                 label,
                 type: layer.type,
-                isDashed: getEntryDashStatus(dashStop, paintProps, label),
+                isDashed: getEntryDashStatus(dashStop, paintProps, rawLabel),
               });
             }
           }

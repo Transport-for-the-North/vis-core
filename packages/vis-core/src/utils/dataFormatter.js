@@ -1,3 +1,5 @@
+import { formatNumber } from './text.js';
+
 /**
  * dataFormatter.js
  *
@@ -84,9 +86,7 @@ export function formatDataValue(value, formatType, options = {}) {
       return String(value).toLowerCase();
     }
     case "number": {
-      // Format the value as a localized number.
-      const locale = options.locale || undefined;
-      return Number(value).toLocaleString(locale);
+      return formatNumber(Number(value));
     }
     case "json": {
       // Convert the value to a nicely formatted JSON string.
