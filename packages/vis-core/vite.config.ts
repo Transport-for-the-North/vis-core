@@ -35,6 +35,7 @@ export default defineConfig(({ command }) => ({
       formats: ["es", "cjs"],
       fileName: (format, entryName) =>
         `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
+      cssFileName: "style",
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime", "react-router-dom", "@mapbox/mapbox-gl-draw", 
@@ -44,8 +45,8 @@ export default defineConfig(({ command }) => ({
       ],
       output: {
         globals: { react: "React", "react-dom": "ReactDOM" },
-        assetFileNames: (asset) =>
-          asset.name?.endsWith('.css') ? '[name][extname]' : 'assets/[name][extname]'
+        // assetFileNames: (asset) =>
+        //   asset.name?.endsWith('.css') ? '[name][extname]' : 'assets/[name][extname]'
       }
     },
     sourcemap: true

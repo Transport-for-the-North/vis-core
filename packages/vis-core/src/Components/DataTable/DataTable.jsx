@@ -15,12 +15,20 @@ import {
   FilterInputWrap,
   FilterRowCell,
   HeaderLabel,
+  InlineWarningWrap,
   MeasureHost,
   ResizerButton,
   ScrollX,
-  StickyControls,
+  RowSelectCheckbox,
+  SelectHeaderCheckbox,
+  SelectHeaderInner,
+  SelectHeaderLabel,
   StyledTable,
   TablePane,
+  TableTopBar,
+  TableTopBarCenter,
+  TableTopBarLeft,
+  TableTopBarRight,
   Td,
   Th,
   ThInner,
@@ -31,8 +39,10 @@ import {
   computeReasonableWrapWidthsPx,
   makeTextMeasurer,
   mergeExpandOnly,
+  splitWords,
 } from "utils/dataTableSizing";
 import { AppButton } from "Components/AppButton";
+import { WarningBox } from "Components/MessageBox";
 
 /**
  * @typedef {Object} DataTableColumn
@@ -46,7 +56,7 @@ import { AppButton } from "Components/AppButton";
  * @typedef {Object} DataTableProps
  * @property {DataTableColumn[]} columns
  * @property {any[]} data
- * @property {string} clickableAccessor - Row key; truthy values indicate rows are selectable/clickable.
+ * @property {string} clickableAccessor - Row key; true values indicate rows are selectable/clickable.
  * @property {(id: string|number, nextSelected: boolean) => void} onToggleSelect
  * @property {Set<string|number>} selectedIds
  * @property {(next: Set<string|number>) => void} setSelectedIds
@@ -93,6 +103,9 @@ export function DataTable({
 
   const MIN_COL_WIDTH_PX = 30;
   const DEFAULT_MAX_COL_WIDTH_PX = 520;
+  const SELECT_COL_WIDTH_PX = 90;
+
+  const HEADER_RESIZER_OVERHEAD_PX = 28; // resizer + gap + divider + conservative buffer
 
   /** @type {React.MutableRefObject<HTMLInputElement|null>} */
   const selectAllRef = useRef(null);
@@ -102,10 +115,61 @@ export function DataTable({
   const measureHostRef = useRef(null);
 
   const [colWidthsPx, setColWidthsPx] = usePersistentState(`${storageKey}.px`, {});
+  const [colMinWidthsPx, setColMinWidthsPx] = useState({});
   const [localInputs, setLocalInputs] = useState({});
   const colFilters = useDebounced(localInputs, 200);
 
   const didInitialAutoSizeRef = useRef(false);
+
+  useEffect(() => {
+    if (!measureHostRef.current || !tableRef.current) return;
+
+    measureHostRef.current.innerHTML = "";
+    const { measureOneLinePx } = makeTextMeasurer(measureHostRef.current, tableRef.current);
+
+    /** @type {Record<number, number>} */
+    const next = {};
+    for (let i = 0; i < columns.length; i += 1) {
+      const c = columns[i];
+      const maxW = perColumnMaxPx?.[c.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
+
+      let longest = "";
+      for (const w of splitWords(c.header)) if (w.length > longest.length) longest = w;
+
+      const overhead = i < columns.length - 1 ? HEADER_RESIZER_OVERHEAD_PX : 0;
+      const minW = Math.ceil(measureOneLinePx(longest, true) + overhead);
+      next[i] = Math.max(MIN_COL_WIDTH_PX, Math.min(maxW, minW));
+    }
+
+    setColMinWidthsPx(next);
+  }, [columns, perColumnMaxPx]);
+
+  useEffect(() => {
+    // Clamp any persisted widths that are now below the calculated per-column minimum.
+    // (Prevents legacy saved widths from causing header clipping.)
+    if (!colMinWidthsPx || Object.keys(colMinWidthsPx).length === 0) return;
+
+    setColWidthsPx((prev) => {
+      let changed = false;
+      const next = { ...prev };
+
+      Object.entries(colMinWidthsPx).forEach(([idxStr, minW]) => {
+        const idx = Number(idxStr);
+        const prevW = prev?.[idx];
+        if (prevW != null && prevW < minW) {
+          next[idx] = minW;
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [colMinWidthsPx, setColWidthsPx]);
+
+  const getMinWidthPx = useCallback(
+    (idx) => colMinWidthsPx?.[idx] ?? MIN_COL_WIDTH_PX,
+    [colMinWidthsPx]
+  );
 
   const columnOptions = useMemo(() => {
     /** @type {Record<string, Array<{value:any,label:string}>>} */
@@ -214,7 +278,7 @@ export function DataTable({
     const container = tableRef.current.parentElement;
     if (container) {
       const availableWidth = container.clientWidth;
-      const selectColWidth = 75;
+      const selectColWidth = SELECT_COL_WIDTH_PX;
       
       // Calculate total base width (without spacer)
       const totalBaseWidth = Object.values(baseWidths).reduce((sum, w) => sum + w, 0);
@@ -307,7 +371,7 @@ export function DataTable({
     const container = tableRef.current.parentElement;
     if (container) {
       const availableWidth = container.clientWidth;
-      const selectColWidth = 75;
+      const selectColWidth = SELECT_COL_WIDTH_PX;
 
       // Calculate total required width (without spacer)
       const totalRequiredWidth = Object.values(requiredWidths).reduce((sum, w) => sum + w, 0);
@@ -357,7 +421,8 @@ export function DataTable({
     if (!ds) return;
 
     const deltaPx = e.clientX - ds.startX;
-    const nextW = Math.max(MIN_COL_WIDTH_PX, Math.round(ds.startW + deltaPx));
+    const minW = getMinWidthPx(ds.idx);
+    const nextW = Math.max(minW, Math.round(ds.startW + deltaPx));
     setColWidthsPx((prev) => ({ ...prev, [ds.idx]: nextW }));
   };
 
@@ -424,10 +489,11 @@ export function DataTable({
   const updateColumnWidth = (idx, computeNext) => {
     const maxW =
       perColumnMaxPx?.[columns[idx]?.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
+    const minW = getMinWidthPx(idx);
 
     setColWidthsPx((prev) => {
       const prevW = prev?.[idx] ?? 160;
-      const nextW = Math.max(MIN_COL_WIDTH_PX, Math.min(maxW, computeNext(prevW)));
+      const nextW = Math.max(minW, Math.min(maxW, computeNext(prevW)));
       return { ...prev, [idx]: nextW };
     });
   };
@@ -441,6 +507,7 @@ export function DataTable({
     const step = e.shiftKey ? 50 : 10;
     const maxW =
       perColumnMaxPx?.[columns[i]?.accessor] ?? DEFAULT_MAX_COL_WIDTH_PX;
+    const minW = getMinWidthPx(i);
 
     switch (e.key) {
       case "Enter":
@@ -456,7 +523,7 @@ export function DataTable({
         e.preventDefault();
         break;
       case "Home":
-        updateColumnWidth(i, () => MIN_COL_WIDTH_PX);
+        updateColumnWidth(i, () => minW);
         e.preventDefault();
         break;
       case "End":
@@ -474,15 +541,15 @@ export function DataTable({
    */
   const getColumnWidthStyle = (idx) => {
     const w = colWidthsPx[idx] ?? 160;
-    return { width: `${w}px` };
+    const minW = getMinWidthPx(idx);
+    return { width: `${w}px`, minWidth: `${minW}px` };
   };
 
   return (
     <TablePane>
-      <StickyControls>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <TableTopBar>
+        <TableTopBarLeft>
           <span style={{ fontSize: "0.8rem" }}>Filtered: {filtered.length}</span>
-
           {/* Screen reader instructions shared by all column resizers. */}
           <span
             id={resizeHelpId}
@@ -501,17 +568,29 @@ export function DataTable({
             To resize a column: use Left and Right arrow keys. Hold Shift for larger steps.
             Press Home for minimum width and End for maximum width. Press Enter to auto-fit.
           </span>
-        </div>
+        </TableTopBarLeft>
 
-        <AppButton
-          type="button"
-          onClick={resetWidths}
-          title="Reset column widths"
-          aria-label="Reset column widths"
-        >
-          Reset Widths
-        </AppButton>
-      </StickyControls>
+        <TableTopBarCenter>
+          {visibleEligibleIds.length === 0 ? (
+            <InlineWarningWrap>
+              <WarningBox
+                text={`No records selectable (none have accessor "${clickableAccessor}" true)`}
+              />
+            </InlineWarningWrap>
+          ) : null}
+        </TableTopBarCenter>
+
+        <TableTopBarRight>
+          <AppButton
+            type="button"
+            onClick={resetWidths}
+            title="Reset column widths"
+            aria-label="Reset column widths"
+          >
+            Reset Widths
+          </AppButton>
+        </TableTopBarRight>
+      </TableTopBar>
 
       <MeasureHost ref={measureHostRef} />
 
@@ -536,7 +615,7 @@ export function DataTable({
           ) : null}
 
           <colgroup>
-            <col style={{ width: "75px" }} />
+            <col style={{ width: `${SELECT_COL_WIDTH_PX}px` }} />
             {columns.map((_, idx) => (
               <col key={idx} style={getColumnWidthStyle(idx)} />
             ))}
@@ -546,9 +625,9 @@ export function DataTable({
 
           <thead>
             <tr>
-              <Th style={{ width: 75 }} scope="col">
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <input
+              <Th style={{ width: SELECT_COL_WIDTH_PX }} scope="col">
+                <SelectHeaderInner>
+                  <SelectHeaderCheckbox
                     ref={selectAllRef}
                     type="checkbox"
                     checked={
@@ -558,8 +637,8 @@ export function DataTable({
                     onChange={toggleSelectAll}
                     aria-label="Select all eligible rows"
                   />
-                  <span>Select</span>
-                </div>
+                  <SelectHeaderLabel>Select</SelectHeaderLabel>
+                </SelectHeaderInner>
               </Th>
 
               {columns.map((c, idx) => {
@@ -598,7 +677,7 @@ export function DataTable({
             </tr>
 
             <tr>
-              <FilterRowCell style={{ width: 75 }} />
+              <FilterRowCell style={{ width: SELECT_COL_WIDTH_PX }} />
               {columns.map((c, idx) => {
                 if (c.filter?.type === "dropdown") {
                   const ops = columnOptions[c.accessor] || [];
@@ -712,8 +791,8 @@ export function DataTable({
 
               return (
                 <Tr key={id ?? rIdx} $index={rIdx}>
-                  <Td onClick={(e) => e.stopPropagation()} style={{ width: 75 }}>
-                    <input
+                  <Td onClick={(e) => e.stopPropagation()} style={{ width: SELECT_COL_WIDTH_PX }}>
+                    <RowSelectCheckbox
                       type="checkbox"
                       checked={isSelected}
                       disabled={!isClickable}

@@ -6,6 +6,19 @@ import { ThemeProvider } from "styled-components";
 
 // TO CONTINUE
 
+/**
+ * Mocked map controls to prevent undefined errors when the component
+ * attempts to enable or disable touch/scroll interactions.
+ */
+const mockMapControls = {
+  dragPan: { enable: jest.fn(), disable: jest.fn() },
+  touchZoomRotate: { enable: jest.fn(), disableRotation: jest.fn() },
+  scrollZoom: { enable: jest.fn(), disable: jest.fn() },
+  doubleClickZoom: { disable: jest.fn() },
+  boxZoom: { disable: jest.fn() },
+  keyboard: { disable: jest.fn() },
+};
+
 jest.mock("./VisualisationManager", () => ({
   VisualisationManager: ({ visualisationConfigs, map, left }) => (
     <span>VisualisationManager: {left ? "left" : "right"}</span>
@@ -150,11 +163,12 @@ beforeEach(() => {
       getCanvas: getCanvas,
       getLayer: getLayer,
       type: "left",
+      ...mockMapControls,
     },
-    rightMap: { off: off, on: on, getLayer: getLayer, type: "right" },
+    rightMap: { off: off, on: on, getLayer: getLayer, type: "right", ...mockMapControls },
     isMapStyleLoaded: "isMapStyleLoaded",
     isMapLoaded: "isMapLoaded",
-    isMapReady: "isMapReady",
+    isMapReady: "isMapReady"
   });
   global.ResizeObserver = jest.fn().mockImplementation(() => ({
     observe: jest.fn().mockReturnValue(true),
@@ -286,6 +300,7 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
       queryRenderedFeatures: jest.fn().mockReturnValue(mockFeatures),
       setFeatureState: jest.fn(),
       getLayer: jest.fn().mockReturnValue(true),
+      ...mockMapControls,
     };
     useDualMaps.mockReturnValue({
       leftMap: mockLeftMap,
@@ -436,6 +451,7 @@ describe("Tests when apiRequest is not null", () => {
         queryRenderedFeatures: queryRenderedFeatures,
         setFeatureState: setFeatureState,
         type: "left",
+        ...mockMapControls,
       },
       rightMap: {
         off: off,
@@ -445,6 +461,7 @@ describe("Tests when apiRequest is not null", () => {
         queryRenderedFeatures: queryRenderedFeatures,
         setFeatureState: setFeatureState,
         type: "right",
+        ...mockMapControls,
       },
       isMapStyleLoaded: "isMapStyleLoaded",
       isMapLoaded: "isMapLoaded",
@@ -532,6 +549,7 @@ describe("Tests when features is null", () => {
         queryRenderedFeatures,
         setFeatureState,
         type: "left",
+        ...mockMapControls,
       },
       rightMap: {
         off,
@@ -541,6 +559,7 @@ describe("Tests when features is null", () => {
         queryRenderedFeatures,
         setFeatureState,
         type: "right",
+        ...mockMapControls,
       },
       isMapStyleLoaded: true,
       isMapLoaded: true,

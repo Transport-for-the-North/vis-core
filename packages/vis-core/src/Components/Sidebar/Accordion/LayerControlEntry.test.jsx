@@ -82,8 +82,14 @@ const mockPageContext = {
 const fakeHandleClassificationChange = jest.fn();
 const fakeHandleColorChange = jest.fn();
 const mockGetLayer = jest.fn().mockReturnValue(true);
+const mockGetPaintProperty = jest.fn((layerId, propertyName) => {
+  if (propertyName?.includes("opacity")) return 0.5;
+  if (propertyName?.includes("width") || propertyName === "circle-radius") return 1;
+  return 0.5;
+});
 const mockMap = {
   getLayer: mockGetLayer,
+  getPaintProperty: mockGetPaintProperty,
 };
 const props = {
   handleClassificationChange: fakeHandleClassificationChange,
@@ -260,6 +266,52 @@ describe("LayerControlEntry component test", () => {
     });
     expect(screen.getByText("10.0")).toBeInTheDocument(); // rounded
   });
+
+  it("Does not render width factor slider when shouldFixLineWidth is enabled", () => {
+    const mockGetLayer2 = jest.fn().mockReturnValue(true);
+    const mockGetPaintProperty2 = jest.fn().mockReturnValue(["interpolate", 100]);
+    const mockMap2 = {
+      getLayer: mockGetLayer2,
+      getPaintProperty: mockGetPaintProperty2,
+      setPaintProperty: jest.fn(),
+    };
+
+    const testProps = {
+      ...props,
+      maps: [mockMap2],
+      layer: {
+        id: "id",
+        type: "line",
+        layout: { visibility: false },
+        metadata: {
+          path: "/",
+          shouldHaveOpacityControl: true,
+          shouldFixLineWidth: true,
+          fixedLineWidth: 3,
+        },
+      },
+      state: {
+        ...props.state,
+        layers: {
+          id: {
+            shouldFixLineWidth: true,
+            fixedLineWidth: 3,
+          },
+        },
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry {...testProps} />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    expect(screen.queryByText("Width factor")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Width factor")).not.toBeInTheDocument();
+  });
   it("Test", () => {
     const mockMapContext = {
       state: {
@@ -342,5 +394,55 @@ describe("LayerControlEntry component test", () => {
     );
     expect(screen.getByText("Colour scheme")).toBeInTheDocument();
     expect(screen.getByText("Classification method")).toBeInTheDocument();
+  });
+
+  it("does not render edit banding when enforceNoCustomBanding is enabled", () => {
+    const props2 = {
+      ...props,
+      layer: {
+        ...props.layer,
+        metadata: {
+          ...props.layer.metadata,
+          isStylable: true,
+          enforceNoCustomBanding: true,
+        },
+      },
+      state: {
+        ...props.state,
+        visualisations: {
+          id: {
+            id: "id",
+            name: "Test Visualisation",
+            style: "line-continuous",
+            queryParams: {},
+            data: [{ value: 10 }, { value: 20 }, { value: 30 }],
+          },
+        },
+        layers: {
+          id: {
+            class_method: "d",
+          },
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider
+        value={{
+          state: props2.state,
+          dispatch: jest.fn(),
+        }}
+      >
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry {...props2} />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    expect(screen.getByText("Colour scheme")).toBeInTheDocument();
+    expect(screen.getByText("Classification method")).toBeInTheDocument();
+    expect(screen.queryByText("Edit banding")).not.toBeInTheDocument();
   });
 });

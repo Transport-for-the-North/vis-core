@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { api } from 'services';
 import { SelectorLabel } from '../Selectors/SelectorLabel';
@@ -28,6 +28,12 @@ export const LayerSearch = ({ map, layer }) => {
   const zoomToFeatureMaxZoom = layer.metadata?.zoomToFeatureMaxZoom ?? 14;
   const zoomToFeatureDuration = layer.metadata?.zoomToFeatureDuration ?? 1000;
   const zoomToFeatureLinear = layer.metadata?.zoomToFeatureLinear ?? false;
+  
+  // Reset selected option when layer path changes
+  useEffect(() => {
+    setSelectedOption(null);
+  }, [layer.metadata.path]);
+  
   /**
    * Handles the change event when a feature is selected.
    * Zooms to the selected feature on the map and adds a temporary label.

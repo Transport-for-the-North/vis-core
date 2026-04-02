@@ -17,6 +17,7 @@ export const MapLayerSection = ({
   handleColorChange,
   handleClassificationChange,
   handleWidthFactorChange,
+  handleCustomBandsChange,
 }) => {
   const { state } = useMapContext();
   const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
@@ -35,6 +36,8 @@ export const MapLayerSection = ({
             !layer.id.endsWith("-hover") &&
             !layer.id.endsWith("-select") &&
             !layer.id.endsWith("-label") &&
+            !layer.id.endsWith("-spider") &&
+            !layer.id.endsWith("-spider-links") &&
             layer.id !== "selected-feature-layer" &&
             !layer.id.startsWith("hide_") &&
             !layer.id.startsWith("gl-draw")
@@ -78,6 +81,7 @@ export const MapLayerSection = ({
           handleColorChange={handleColorChange}
           handleClassificationChange={handleClassificationChange}
           handleWidthFactorChange={handleWidthFactorChange}
+          handleCustomBandsChange={handleCustomBandsChange}
           state={state}
         />
       ))}

@@ -178,30 +178,35 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
     });
 
     await waitFor(() => {
-      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith({
-        id: "Accessibility",
-        bufferSize: 0,
-        type: "fill",
-        source: "Accessibility",
-        paint: {
-          "fill-color": "rgb(255, 255, 0, 0)",
-          "fill-outline-color": "rgba(195, 195, 195, 1)",
-          "fill-opacity": 1,
-        },
-        maxzoom: 24,
-        minzoom: 0,
-        layout: { visibility: "visible" },
-        metadata: {
-          isStylable: true,
-          defaultOpacity: 0.65,
-          path: "/api/vectortiles/zones/5/{z}/{x}/{y}",
-          shouldShowInLegend: true,
-          shouldHaveOpacityControl: true,
-          enforceNoColourSchemeSelector: false,
-          enforceNoClassificationMethod: false,
-          zoomToFeaturePlaceholderText: "",
-        },
-      });
+      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "Accessibility",
+          bufferSize: 0,
+          type: "fill",
+          source: "Accessibility",
+          paint: {
+            "fill-color": "rgb(255, 255, 0, 0)",
+            "fill-outline-color": "rgba(195, 195, 195, 1)",
+            "fill-opacity": 1,
+          },
+          maxzoom: 24,
+          minzoom: 0,
+          layout: { visibility: "visible" },
+          metadata: expect.objectContaining({
+            isStylable: true,
+            defaultOpacity: 0.65,
+            path: "/api/vectortiles/zones/5/{z}/{x}/{y}",
+            shouldShowInLegend: true,
+            shouldHaveOpacityControl: true,
+            enforceNoColourSchemeSelector: false,
+            enforceNoClassificationMethod: false,
+            enforceNoCustomBanding: false,
+            zoomToFeaturePlaceholderText: "",
+            shouldFixLineWidth: false,
+            fixedLineWidth: null,
+          }),
+        })
+      );
     });
 
     // isHoverable = true, test if this part is well throw
@@ -266,6 +271,35 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
           id: "Accessibility",
           metadata: expect.objectContaining({
             shouldShowInLegend: false,
+          }),
+        })
+      );
+    });
+  });
+
+  it("passes enforceNoCustomBanding into layer metadata", async () => {
+    props = {
+      ...props,
+      layer: {
+        ...props.layer,
+        type: "geojson",
+        enforceNoCustomBanding: true,
+      },
+    };
+    api.geodataService.getLayer.mockResolvedValue("getLayer returned");
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <Layer {...props} />
+      </MapContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "Accessibility",
+          metadata: expect.objectContaining({
+            enforceNoCustomBanding: true,
           }),
         })
       );

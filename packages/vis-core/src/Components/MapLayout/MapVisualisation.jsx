@@ -1,6 +1,6 @@
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo, useState } from "react";
-import { useMapContext, useDataFetchState } from "hooks";
+import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
 import {
@@ -26,18 +26,32 @@ const LAYER_RETRY_CONFIG = {
   retryDelay: 200,
 };
 
+const areNumericArraysEqual = (a, b) => {
+  if (a === b) return true;
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    // Normalise to numbers so ["1", 2] and [1, 2] compare equal.
+    if (Number(a[i]) !== Number(b[i])) return false;
+  }
+  return true;
+};
+
 /**
  * Calculates the colour palette based on the provided color scheme and number of bins.
  */
 const calculateColours = (colourScheme, bins, invert = false) => {
-  const minBins = 3;
   const maxBins = 9;
   
   let colors;
-  if (bins.length >= maxBins) {
+  // colorbrewer does not provide 1-2 class palettes for many schemes.
+  // For small bin counts (especially 2), use chroma to sample the full scheme.
+  if (bins.length > 0 && bins.length < 3) {
+    colors = chroma.scale(colourScheme).colors(bins.length);
+  } else if (bins.length >= maxBins) {
     colors = chroma.scale(colourScheme).colors(bins.length);
   } else {
-    const binCount = Math.min(Math.max(bins.length, minBins), maxBins);
+    const binCount = Math.min(Math.max(bins.length, 3), maxBins);
     colors = colorbrewer[colourScheme][binCount];
   }
   
@@ -68,6 +82,7 @@ export const MapVisualisation = ({
   const prevVisualisationDataRef = useRef();
   const prevColorRef = useRef({});
   const prevClassMethodRef = useRef({});
+  const prevCustomBandsRef = useRef({});
 
   // Ref to track pending updates during style resolution and timeouts
   const pendingUpdateRef = useRef(false);
@@ -284,9 +299,10 @@ export const MapVisualisation = ({
         (page) => page.url === window.location.pathname
       );
 
-      // Get trseLabel from state.layers
+      // Get trseLabel and customBands from state.layers
       const trseLabel =
         state.layers[layerKey]?.trseLabel === true;
+      const customBands = state.layers[layerKey]?.customBands;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -294,8 +310,8 @@ export const MapVisualisation = ({
         classMethod,
         appContext.defaultBands,
         currentPage,
-        visualisation?.queryParams,
-        { trseLabel }
+        visualisation.queryParams,
+        { trseLabel, customBands } // Pass trseLabel and customBands in options
       );
 
       // Get the metric definition for the current page/metric
@@ -450,6 +466,7 @@ export const MapVisualisation = ({
               isStylable: true,
               enforceNoColourSchemeSelector: visualisation?.enforceNoColourSchemeSelector ?? false,
               enforceNoClassificationMethod: visualisation?.enforceNoClassificationMethod ?? false,
+              enforceNoCustomBanding: visualisation?.enforceNoCustomBanding ?? false,
             },
           },
           beforeLayerId
@@ -497,11 +514,18 @@ export const MapVisualisation = ({
     const classificationHasChanged =
       classificationMethod !== prevClassificationMethod;
 
+    const currentCustomBands = layerConfig?.customBands;
+    const prevCustomBands = prevCustomBandsRef.current[layerKey];
+    const customBandsHasChanged =
+      prevCustomBands !== undefined &&
+      !areNumericArraysEqual(currentCustomBands, prevCustomBands);
+
     const needUpdate =
       dataHasChanged ||
       visualisationDataHasChanged ||
       colorHasChanged ||
-      classificationHasChanged;
+      classificationHasChanged ||
+      customBandsHasChanged;
 
     const previouslyHadNoData = 
       prevVisualisationDataRef.current !== undefined &&
@@ -544,6 +568,10 @@ export const MapVisualisation = ({
       prevVisualisationDataRef.current = visualisationData;
       prevColorRef.current[layerKey] = layerColorScheme;
       prevClassMethodRef.current[layerKey] = classificationMethod;
+      // Store a stable snapshot of bands to avoid false negatives from accidental mutation.
+      prevCustomBandsRef.current[layerKey] = Array.isArray(currentCustomBands)
+        ? [...currentCustomBands]
+        : currentCustomBands;
       
       switch (visualisation.type) {
         case "joinDataToMap": {

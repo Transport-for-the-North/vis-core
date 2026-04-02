@@ -128,6 +128,12 @@ export const Layer = ({ layer }) => {
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true, // opacity control should appear by default
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false, // colour scheme selector should appear if stylable, unless this is enforced
           enforceNoClassificationMethod: layer.enforceNoClassificationMethod ?? false, // classification method selector should appear if stylable, unless this is enforced
+          shouldFixLineWidth: layer.shouldFixLineWidth ?? false,
+          fixedLineWidth:
+            typeof layer.fixedLineWidth === "number" && Number.isFinite(layer.fixedLineWidth)
+              ? layer.fixedLineWidth
+              : null,
+          enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
         };
@@ -362,6 +368,12 @@ export const Layer = ({ layer }) => {
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true,
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false,
           enforceNoClassificationMethod: layer.enforceNoClassificationMethod ?? false,
+          shouldFixLineWidth: layer.shouldFixLineWidth ?? false,
+          fixedLineWidth:
+            typeof layer.fixedLineWidth === "number" && Number.isFinite(layer.fixedLineWidth)
+              ? layer.fixedLineWidth
+              : null,
+          enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY,
           bufferSize: layer.bufferSize,

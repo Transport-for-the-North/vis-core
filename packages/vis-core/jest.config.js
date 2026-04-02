@@ -40,6 +40,9 @@ export default {
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@turf|kdbush|geokdbush|tinyqueue|mapbox-gl|@mapbox/*|nanoid)/)',
+  ],
   testMatch: [
     '**/__tests__/**/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)'
