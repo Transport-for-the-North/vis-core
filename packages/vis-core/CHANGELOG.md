@@ -1,3 +1,10 @@
+## [0.9.1](https://github.com/Transport-for-the-North/vis-core/compare/v0.9.0...v0.9.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* improve navbar dropdown hover stability and transitions ([3bed942](https://github.com/Transport-for-the-North/vis-core/commit/3bed9423030eff630447a920a5fe1da5b96475d3))
+
 # [0.9.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.8.0...v0.9.0) (2026-04-02)
 
 
