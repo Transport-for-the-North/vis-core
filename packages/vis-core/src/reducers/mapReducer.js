@@ -1,7 +1,14 @@
 import { updateUrlParameters, normaliseParamValue } from "utils";
 
-// This function finds the first colourValue present in the state.filters in order to deduce the
-// starting map colour.
+/**
+ * Finds the first configured colour scheme value from filter options.
+ *
+ * Used during map initialisation to infer a starting colour scheme when one
+ * is not explicitly set on a visualisation.
+ *
+ * @param {Array<Object>} filters - State filters that may contain values/values[].colourValue.
+ * @returns {Object|null} The first discovered colourValue object, or null if none is found.
+ */
 const findFirstColourValue = (filters) => {
   for (const filter of filters) {
     if (filter.values && filter.values.values) {
@@ -47,6 +54,84 @@ function updateParamMap(visualisationsMap, visualisationNames, fieldName, paramN
   });
 
   return updatedVisualisations;
+}
+
+/**
+ * Resolves legend text from a rule set based on the selected filter option.
+ *
+ * Matching order:
+ * 1) rules.byDisplayValue against selectedValue.displayValue
+ * 2) rules.byParamValue against selectedValue.paramValue
+ * 3) rules.default
+ * 4) fallbackValue
+ *
+ * Matching is case-insensitive and trims leading/trailing whitespace.
+ *
+ * @param {Object|undefined} rules - Rule object containing byDisplayValue/byParamValue/default.
+ * @param {Object|undefined} selectedValue - Selected option ({ displayValue, paramValue }).
+ * @param {string|undefined|null} fallbackValue - Value to use when no rule matches.
+ * @returns {string|undefined|null} Resolved legend text.
+ */
+function resolveLegendTextByRules(rules, selectedValue, fallbackValue) {
+  if (!rules) {
+    return fallbackValue;
+  }
+
+  // Normalise incoming values so matching is resilient to case/spacing differences.
+  const normalise = (value) => String(value ?? "").trim().toLowerCase();
+  const selectedDisplayValue = normalise(selectedValue?.displayValue);
+  const selectedParamValue = normalise(selectedValue?.paramValue);
+
+  // Prefer display label matching when configured.
+  const byDisplayValue = rules.byDisplayValue || {};
+  for (const [displayValue, legendSubtitleText] of Object.entries(byDisplayValue)) {
+    if (normalise(displayValue) === selectedDisplayValue) {
+      return legendSubtitleText;
+    }
+  }
+
+  // Fall back to param-value matching when labels are unstable or not unique.
+  const byParamValue = rules.byParamValue || {};
+  for (const [paramValue, legendSubtitleText] of Object.entries(byParamValue)) {
+    if (normalise(paramValue) === selectedParamValue) {
+      return legendSubtitleText;
+    }
+  }
+
+  return rules.default ?? fallbackValue;
+}
+
+/**
+ * Extracts legend display/subtitle rules for a specific visualisation.
+ *
+ * Supports both the newer `legendValues` array style and legacy top-level
+ * rule fields on the filter object for backward compatibility.
+ *
+ * @param {Object} filter - Filter definition from page config.
+ * @param {string} visName - Visualisation name being updated.
+ * @returns {{displayRules: Object|undefined, subtitleRules: Object|undefined}} Rule pair for display/subtitle text.
+ */
+function getLegendRulesForVisualisation(filter, visName) {
+  const legendValues = Array.isArray(filter?.legendValues)
+    ? filter.legendValues
+    : [];
+
+  // Pick a visualisation-specific config when present, otherwise use first/default config.
+  const legendConfig =
+    legendValues.find((config) => config?.visualisationName === visName) ||
+    legendValues.find((config) => config?.visualisation === visName) ||
+    legendValues[0] ||
+    {};
+
+  return {
+    displayRules:
+      legendConfig.legendDisplayValueRules || filter?.legendDisplayValueRules,
+    subtitleRules:
+      legendConfig.legendSubtitleTextValueRules ||
+      legendConfig.legendSubtitleTextRules ||
+      filter?.legendSubtitleTextValueRules ||
+      filter?.legendSubtitleTextRules,
+  };
 }
 
 // TODO delineate actionTypes into separate namespaces
@@ -536,24 +621,40 @@ export const mapReducer = (state, action) => {
     case actionTypes.UPDATE_LEGEND_TEXT: {
       const visualisationNames = action.payload.filter.visualisations;
       const newParamValue = action.payload.value;
-      const values = action.payload.filter.values.values;
+      const values = action.payload.filter?.values?.values || [];
       const position = values.findIndex(
         (value) => value.paramValue === newParamValue
       );
       const required_values = values[position];
 
-      // Create a new visualisations object with updated legend text for the specified visualisation
       const updatedVisualisations = { ...state.visualisations };
 
       visualisationNames.forEach((visName) => {
         if (updatedVisualisations[visName]) {
+          const legendRules = getLegendRulesForVisualisation(
+            action.payload.filter,
+            visName
+          );
+          const currentLegendText = updatedVisualisations[visName]?.legendText?.[0] || {};
+          const resolvedDisplayValue = resolveLegendTextByRules(
+            legendRules.displayRules,
+            required_values,
+            required_values?.displayValue ?? currentLegendText.displayValue
+          );
+          const resolvedLegendSubtitleText = resolveLegendTextByRules(
+            legendRules.subtitleRules,
+            required_values,
+            required_values?.legendSubtitleText ?? currentLegendText.legendSubtitleText
+          );
+
           const newLegendText = {
-            displayValue: required_values?.displayValue,
-            legendSubtitleText: required_values?.legendSubtitleText,
+            displayValue: resolvedDisplayValue,
+            legendSubtitleText: resolvedLegendSubtitleText,
           };
 
           updatedVisualisations[visName] = {
             ...updatedVisualisations[visName],
+            // Replace legendText with a single resolved entry used by legend/map label components.
             legendText: [newLegendText], // Replace the existing legendText array with the new one
           };
         }
