@@ -54,6 +54,35 @@ describe("NavBarDropdown component test", () => {
       expect(fakeOnClick).toHaveBeenCalled();
     });
   });
+
+  it("NavBarDropdown should stay open for 150ms after mouse leaves", async () => {
+    jest.useFakeTimers();
+    render(
+      <MemoryRouter>
+        <NavBarDropdown {...props} />
+      </MemoryRouter>
+    );
+
+    const parent = screen.getByText("▾").parentElement;
+    fireEvent.mouseEnter(parent);
+
+    // Should be open immediately
+    expect(screen.getByText("pageName2")).toBeInTheDocument();
+
+    fireEvent.mouseLeave(parent);
+
+    // Should still be open before 150ms
+    jest.advanceTimersByTime(100);
+    expect(screen.queryByText("pageName2")).toBeInTheDocument();
+
+    // Should be closed after 150ms
+    jest.advanceTimersByTime(51);
+    await waitFor(() => {
+      expect(screen.queryByText("pageName2")).not.toBeInTheDocument();
+    });
+
+    jest.useRealTimers();
+  });
 });
 
 describe("NestedDropdownPortal component test", () => {
