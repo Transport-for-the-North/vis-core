@@ -132,7 +132,7 @@ describe("replacePlaceholders", () => {
     const data = { "a.b": 99 };
     const result = replacePlaceholders(html, data);
     expect(formatNumber).toHaveBeenCalledWith(99);
-    expect(result).toBe("<div>99</div>");
+    expect(result).toBe("<div>99.00</div>");
   });
 
   it("falls back to raw arg as string if function throws (colon syntax)", () => {
@@ -168,7 +168,7 @@ describe("replacePlaceholders", () => {
     const data = { "a.b": 77 };
     const result = replacePlaceholders(html, data);
     expect(numSpy).toHaveBeenCalledWith(77);
-    expect(result).toBe("<div>77</div>");
+    expect(result).toBe("<div>77.00</div>");
   });
 });
 

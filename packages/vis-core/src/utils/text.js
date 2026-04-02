@@ -90,11 +90,10 @@ export function numberWithCommas(x) {
     return s.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  // keep existing trimming logic, but use the local string
-  let cleaned = removeExcessiveZeros(s);
-  cleaned = removeRecurringDecimals(cleaned);
-
-  return String(cleaned).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  // Split integer and decimal parts to avoid applying comma regex to decimals (which shouldn't happen anyway with current regex but safer)
+  const parts = s.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
 }
 
 export const formatNumber = (value) => {
@@ -111,26 +110,26 @@ export const formatNumber = (value) => {
 
   // Under 1000 -- 2 decimal places
   if (abs < 999.995) {
-    return sign + abs.toFixed(2);
+    return sign + numberWithCommas(abs.toFixed(2));
   }
 
-  // 1000 to 9999 -- 0 decimal places, no suffix
+  // 1000 to 9999 -- 0 decimal places, no suffix, WITH commas
   if (abs < 10000) {
-    return sign + Math.round(abs).toString();
+    return sign + numberWithCommas(Math.round(abs));
   }
 
   // 10,000 to 999,999 -- K suffix
   if (abs < 1_000_000) {
-    return sign + (abs / 1_000).toFixed(2) + 'K';
+    return sign + numberWithCommas((abs / 1_000).toFixed(2)) + 'K';
   }
 
   // 1,000,000 to 999,999,999 -- M suffix
   if (abs < 1_000_000_000) {
-    return sign + (abs / 1_000_000).toFixed(2) + 'M';
+    return sign + numberWithCommas((abs / 1_000_000).toFixed(2)) + 'M';
   }
 
   // 1,000,000,000+ -- B suffix
-  return sign + (abs / 1_000_000_000).toFixed(2) + 'B';
+  return sign + numberWithCommas((abs / 1_000_000_000).toFixed(2)) + 'B';
 };
 
 export const formatOrdinal = (n) => {
