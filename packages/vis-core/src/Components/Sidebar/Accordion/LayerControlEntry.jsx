@@ -8,10 +8,10 @@ import {
 } from "@heroicons/react/20/solid";
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
-import { ColourSchemeDropdown, BandEditor } from "../Selectors";
+import { ColourSchemeDropdown, BandEditor, SelectorLabel } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
 import { AppContext, PageContext } from "contexts";
-import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map"
+import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map";
 
 /**
  * Styled container for the layer control entry.
@@ -32,7 +32,6 @@ const LayerHeader = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-
 
 /**
  * Container for the left section of the header.
@@ -164,6 +163,16 @@ const WidthSlider = styled.input`
 `;
 
 /**
+ * Styled divider for separating sections in the collapsible content.
+ */
+const SectionDivider = styled.hr`
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 0.75rem 0;
+  width: 100%;
+`;
+
+/**
  * LayerControlEntry component represents a single layer control entry in the map layer control panel.
  *
  * @component
@@ -172,6 +181,8 @@ const WidthSlider = styled.input`
  * @param {Array} props.maps - An array of MapLibre map instances.
  * @param {Function} props.handleColorChange - The function to handle color changes for the layer.
  * @param {Function} props.handleClassificationChange - The function to handle classification changes for the layer.
+ * @param {Function} props.handleCustomBandsChange - The function to handle custom band changes for the layer.
+ * @param {Object} props.state - The current application state.
  * @returns {JSX.Element} The rendered LayerControlEntry component.
  */
 export const LayerControlEntry = memo(
@@ -180,6 +191,7 @@ export const LayerControlEntry = memo(
     maps,
     handleColorChange,
     handleClassificationChange,
+    handleCustomBandsChange,
     state,
   }) => {
     const [visibility, setVisibility] = useState(
@@ -195,6 +207,86 @@ export const LayerControlEntry = memo(
       return storedState !== null ? JSON.parse(storedState) : true;
     });
 
+    /**
+     * Builds a list of "linked" layer IDs that should mirror the base layer's
+     * visibility and style changes (label + spider overlays).
+     *
+     * @param {maplibregl.Map} map - A MapLibre instance.
+     * @param {string} baseId - The base layer id.
+     * @returns {string[]} Array of linked layer ids present on the map.
+     */
+    function getLinkedLayerIds(map, baseId) {
+      const candidates = [
+        baseId,
+        `${baseId}-label`,
+        `${baseId}-spider`,
+        `${baseId}-spider-links`,
+      ];
+      return candidates.filter((id) => map.getLayer(id));
+    }
+
+    /**
+     * Sets a paint property across all linked layers if the property exists
+     * for that layer type. Falls back to the given value when an expression
+     * cannot be updated safely.
+     *
+     * @param {maplibregl.Map} map
+     * @param {string[]} ids - Layer ids to update.
+     * @param {string} prop - Paint property name (e.g., 'circle-opacity').
+     * @param {any} value - Value or expression to set.
+     */
+    function setPaintAcross(map, ids, prop, value) {
+      ids.forEach((id) => {
+        try {
+          const current = map.getPaintProperty(id, prop);
+          const next =
+            prop.endsWith("opacity") && current !== undefined
+              ? updateOpacityExpression(current, value)
+              : value;
+          map.setPaintProperty(id, prop, next);
+        } catch {
+          // silently ignore when a layer doesn't have that paint prop
+        }
+      });
+    }
+
+    /**
+     * Applies a width factor to any layer that has an 'interpolate' width expression.
+     * If the expression is not present, it falls back to setting a numeric width.
+     * Also updates line-offset when appropriate.
+     *
+     * @param {maplibregl.Map} map
+     * @param {string[]} ids - Layer ids to update.
+     * @param {string} paintProp - Width paint property (e.g., 'circle-radius'|'line-width').
+     * @param {number} factor - Desired width factor.
+     * @param {number|undefined} customOffset - Optional custom offset for line layers.
+     */
+    function setWidthAcross(map, ids, paintProp, factor, customOffset) {
+      ids.forEach((id) => {
+        try {
+          const currentExpr = map.getPaintProperty(id, paintProp);
+          if (Array.isArray(currentExpr) && currentExpr[0] === "interpolate") {
+            const { widthInterpolation, lineOffsetInterpolation } =
+              applyWidthFactor(currentExpr, factor, paintProp, customOffset);
+            map.setPaintProperty(id, paintProp, widthInterpolation);
+            if (paintProp === "line-width" && lineOffsetInterpolation) {
+              map.setPaintProperty(id, "line-offset", lineOffsetInterpolation);
+            }
+          } else if (typeof currentExpr === "number") {
+            // Simple numeric fallback: scale directly
+            const baseline = typeof currentExpr === "number" ? currentExpr : 1;
+            map.setPaintProperty(
+              id,
+              paintProp,
+              Math.max(0.5, baseline * factor)
+            );
+          }
+        } catch {
+          // ignore if layer doesn't have that prop or setPaintProperty throws
+        }
+      });
+    }
+
     // Update localStorage whenever isExpanded changes
     useEffect(() => {
       localStorage.setItem(
@@ -202,6 +294,7 @@ export const LayerControlEntry = memo(
         JSON.stringify(isExpanded)
       );
     }, [isExpanded, layer.id]);
+
     const currentPage = useContext(PageContext);
     const mapConfig = currentPage?.config?.map;
     const defaultNodeWidthFactorFromPage = mapConfig?.defaultNodeWidthFactor;
@@ -216,13 +309,17 @@ export const LayerControlEntry = memo(
     });
     const visualisation =
       currentPage.pageName.includes("Side-by-Side") ||
-        currentPage.pageName.includes("Side by Side")
+      currentPage.pageName.includes("Side by Side")
         ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
         : state.visualisations[Object.keys(state.visualisations)[0]];
 
     const colorStyle = useMemo(() => {
       // Use the resolved colorStyle from layer metadata if available, otherwise derive from visualization style
-      return layer.metadata?.colorStyle || visualisation?.style?.split("-")[1] || "continuous";
+      return (
+        layer.metadata?.colorStyle ||
+        visualisation?.style?.split("-")[1] ||
+        "continuous"
+      );
     }, [layer.metadata?.colorStyle, visualisation?.style]);
 
     const hasDefaultBands = selectedPageBands?.metric.find(
@@ -231,16 +328,38 @@ export const LayerControlEntry = memo(
         visualisation.queryParams[selectedMetricParamName.paramName]?.value
     );
 
-    const shouldHaveOpacityControl = layer.metadata?.shouldHaveOpacityControl ?? true;
-    const enforceNoColourSchemeSelector = layer.metadata?.enforceNoColourSchemeSelector ?? false;
-    const enforceNoClassificationMethod = layer.metadata?.enforceNoClassificationMethod ?? false;
+    const shouldHaveOpacityControl =
+      layer.metadata?.shouldHaveOpacityControl ?? true;
+    const enforceNoColourSchemeSelector =
+      layer.metadata?.enforceNoColourSchemeSelector ?? false;
+    const enforceNoClassificationMethod =
+      layer.metadata?.enforceNoClassificationMethod ?? false;
+    const enforceNoCustomBanding =
+      layer.metadata?.enforceNoCustomBanding ?? false;
     const widthProp = getWidthProperty(layer.type);
-    const enableZoomToFeature = layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
+    const enableZoomToFeature =
+      layer.metadata?.enableZoomToFeature ?? Boolean(layer.metadata?.path);
     const layerConfigFromState = state?.layers?.[layer.id];
+    const shouldFixLineWidth =
+      layer.metadata?.shouldFixLineWidth ??
+      false;
+    const isFixedLineWidth =
+      layer.type === "line" && shouldFixLineWidth === true;
     const effectiveDefaultLineOffset =
       layerConfigFromState?.defaultLineOffset ??
       layer.metadata?.defaultLineOffset ??
       layer.defaultLineOffset;
+
+    // Track the last non-custom classification method so BandEditor reset can restore it.
+    const currentClassMethod = state.layers?.[layer.id]?.class_method ?? "d";
+    const prevNonCustomClassMethodRef = useRef(
+      currentClassMethod !== "c" ? currentClassMethod : "d"
+    );
+    useEffect(() => {
+      if (currentClassMethod && currentClassMethod !== "c") {
+        prevNonCustomClassMethodRef.current = currentClassMethod;
+      }
+    }, [currentClassMethod]);
 
     let currentWidthFactor = null;
     let currentOpacity = null;
@@ -248,22 +367,27 @@ export const LayerControlEntry = memo(
     if (maps.length > 0 && maps[0].getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
       currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
-      currentWidthFactor = widthProp ? maps[0].getPaintProperty(layer.id, widthProp) : null;
+      currentWidthFactor = widthProp
+        ? maps[0].getPaintProperty(layer.id, widthProp)
+        : null;
     }
 
     const isFeatureStateExpression =
       Array.isArray(currentOpacity) && currentOpacity[0] === "case";
     const initialOpacity = isFeatureStateExpression
-      ? currentOpacity[currentOpacity.length - 1]
+      ? currentOpacity?.[currentOpacity.length - 1]
       : currentOpacity;
 
-
     const isFeatureStateWidthExpression =
-      Array.isArray(currentWidthFactor) && currentWidthFactor[0] === "interpolate";
-      const isNodeLayer = layer.type === "circle";  //station nodes are circle layers
-      const showWidth = isFeatureStateWidthExpression || isNodeLayer;
+      Array.isArray(currentWidthFactor) &&
+      currentWidthFactor[0] === "interpolate";
+    const isNodeLayer = layer.type === "circle"; // station nodes are circle layers
+    const showWidth = isFeatureStateWidthExpression && !isFixedLineWidth;
     const initialWidth = isFeatureStateWidthExpression
-      ? calculateMaxWidthFactor(currentWidthFactor[currentWidthFactor.length - 1], widthProp)
+      ? calculateMaxWidthFactor(
+          currentWidthFactor[currentWidthFactor.length - 1],
+          widthProp
+        )
       : currentWidthFactor;
 
     // State for opacity of the layer
@@ -276,9 +400,88 @@ export const LayerControlEntry = memo(
     const initialWidthForUI =
       isNodeLayer && desiredDefaultNodeWidth != null
         ? desiredDefaultNodeWidth
-        : (initialWidth || 1);
+        : initialWidth || 1;
 
     const [widthFactor, setWidth] = useState(initialWidthForUI);
+
+    const bandEditorData = useMemo(() => {
+      if (
+        !visualisation ||
+        !visualisation.data ||
+        !Array.isArray(visualisation.data)
+      ) {
+        return [];
+      }
+      return visualisation.data
+        .map((row) => {
+          if (typeof row === "number") return row;
+          if (typeof row === "object" && row !== null) {
+            if (typeof row.value === "number") return row.value;
+            if (typeof row.metric === "number") return row.metric;
+            const num = Object.values(row).find((v) => typeof v === "number");
+            if (typeof num === "number") return num;
+          }
+          return null;
+        })
+        .filter((v) => typeof v === "number" && !isNaN(v));
+    }, [visualisation]);
+
+    const hasExistingCustomBands =
+      Array.isArray(state.layers?.[layer.id]?.customBands) &&
+      state.layers[layer.id].customBands.length > 0;
+    const canEditBands = bandEditorData.length >= 2 || hasExistingCustomBands;
+
+    const customBandsFromState = state.layers?.[layer.id]?.customBands;
+
+    // Extract current bins for BandEditor.
+    // Prefer the canonical state-driven custom bands (when in custom mode), because
+    // the `layer.paint` object often doesn't update in lockstep with runtime map
+    // paint changes and can lead to the editor snapping back after the first update.
+    const currentBins = useMemo(() => {
+      if (currentClassMethod === "c") {
+        if (
+          Array.isArray(customBandsFromState) &&
+          customBandsFromState.length > 0
+        ) {
+          return customBandsFromState;
+        }
+      }
+
+      if (!maps.length || !maps[0].getLayer(layer.id)) {
+        return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      }
+
+      const paintProps = layer.paint;
+      const colorExpression =
+        paintProps?.["line-color"] ||
+        paintProps?.["circle-color"] ||
+        paintProps?.["fill-color"];
+
+      if (!colorExpression || !Array.isArray(colorExpression)) {
+        return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      }
+
+      // Extract bins from interpolate expression: ["interpolate", ["linear"], ["feature-state", "value"], bin1, color1, bin2, color2, ...]
+      if (colorExpression[0] === "interpolate") {
+        const stops = colorExpression.slice(3); // Skip ["interpolate", ["linear"], ["feature-state", "value"]]
+        const bins = [];
+        for (let i = 0; i < stops.length; i += 2) {
+          bins.push(stops[i]);
+        }
+        return bins.length > 0
+          ? bins
+          : hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      }
+
+      return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+    }, [
+      currentClassMethod,
+      customBandsFromState,
+      maps,
+      layer.id,
+      layer.paint,
+      hasDefaultBands,
+    ]);
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -288,30 +491,45 @@ export const LayerControlEntry = memo(
      */
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
-      const ids = [layer.id, `${layer.id}-label`];
 
       maps.forEach((map) => {
+        const ids = getLinkedLayerIds(map, layer.id);
         ids.forEach((id) => {
-          if (map.getLayer(id)) {
-            map.setLayoutProperty(id, "visibility", newVisibility);
-          }
+          map.setLayoutProperty(id, "visibility", newVisibility);
         });
       });
 
       setVisibility(newVisibility);
     };
 
+    /**
+     * Handles changes to the opacity slider.
+     * Applies the new opacity to the base layer and any linked layers.
+     *
+     * @param {Object} e - The event object from the slider input.
+     */
     const handleOpacityChange = (e) => {
       const newOpacity = parseFloat(e.target.value);
-      const opacityProp = getOpacityProperty(layer.type);
+      const baseOpacityProp = getOpacityProperty(layer.type);
 
       maps.forEach((map) => {
-        if (map.getLayer(layer.id)) {
-          const currentExpr = map.getPaintProperty(layer.id, opacityProp);
-          const updatedExpr = updateOpacityExpression(currentExpr, newOpacity);
-          map.setPaintProperty(layer.id, opacityProp, updatedExpr);
+        const ids = getLinkedLayerIds(map, layer.id);
+
+        // Update base type opacity across all linked layers that share the prop
+        setPaintAcross(map, ids, baseOpacityProp, newOpacity);
+
+        // Additionally, ensure spider link layer tracks opacity even if base is circle/fill
+        // (link layer uses 'line-opacity' for connector visibility)
+        if (ids.includes(`${layer.id}-spider-links`)) {
+          setPaintAcross(
+            map,
+            [`${layer.id}-spider-links`],
+            "line-opacity",
+            newOpacity
+          );
         }
       });
+
       setOpacity(newOpacity);
     };
 
@@ -326,41 +544,40 @@ export const LayerControlEntry = memo(
       }
     };
 
+    /**
+     * Handles changes to the width factor slider.
+     * Applies the new width factor to the base layer and any linked layers (e.g., spider links).
+     *
+     * @param {Object} e - The event object from the slider input.
+     */
     const handleWidthFactorChange = (e) => {
       const raw = parseFloat(e.target.value);
       const min = isNodeLayer ? 0.1 : 0.5;
       const max = isNodeLayer ? 2.5 : 10;
-      const widthFactor = Math.max(min, Math.min(max, raw));
-      let widthInterpolation, lineOffsetInterpolation, widthExpression;
-      const hasDefaultLineOffset = effectiveDefaultLineOffset !== undefined && effectiveDefaultLineOffset !== null;
+      const nextFactor = Math.max(min, Math.min(max, raw));
 
-      if (isFeatureStateWidthExpression) {
-        // Apply the width factor using the applyWidthFactor function
-        // Keep line-offset fixed to defaultLineOffset if provided
-        const result = applyWidthFactor(currentWidthFactor, widthFactor, widthProp);
-        widthInterpolation = result.widthInterpolation;
-        lineOffsetInterpolation = hasDefaultLineOffset ? null : result.lineOffsetInterpolation;
-      } else {
-        widthExpression = widthFactor; // Default width expression if not using feature-state
-      }
+      const baseWidthProp = getWidthProperty(layer.type);
+
+      const customOffset =
+        effectiveDefaultLineOffset !== undefined &&
+        effectiveDefaultLineOffset !== null
+          ? effectiveDefaultLineOffset
+          : undefined;
 
       maps.forEach((map) => {
-        if (map.getLayer(layer.id)) {
-          // Set the width property
-          map.setPaintProperty(layer.id, widthProp, widthInterpolation || widthExpression);
+        const ids = getLinkedLayerIds(map, layer.id);
 
-          // Set the line-offset property if applicable
-          if (widthProp.includes("line")) {
-            if (hasDefaultLineOffset) {
-              map.setPaintProperty(layer.id, "line-offset", effectiveDefaultLineOffset);
-            } else if (lineOffsetInterpolation) {
-              map.setPaintProperty(layer.id, "line-offset", lineOffsetInterpolation);
-            }
-          }
+        // Apply factor to all linked layers that share the same paint prop
+        setWidthAcross(map, ids, baseWidthProp, nextFactor, customOffset);
+
+        // Ensure spider link layer’s line-width follows too (for point layers with connectors)
+        const linkId = `${layer.id}-spider-links`;
+        if (ids.includes(linkId)) {
+          setWidthAcross(map, [linkId], "line-width", nextFactor, customOffset);
         }
       });
 
-      setWidth(widthFactor);
+      setWidth(nextFactor);
     };
 
     const appliedNodeDefaultRef = useRef(false);
@@ -391,6 +608,182 @@ export const LayerControlEntry = memo(
       desiredDefaultNodeWidth,
     ]);
 
+    const showLayerSearch = enableZoomToFeature && layer.metadata?.path;
+
+    const showColourSchemeDropdown =
+      layer.metadata?.isStylable &&
+      !enforceNoColourSchemeSelector &&
+      !(
+        (visualisation?.queryParams?.[selectedMetricParamName?.paramName]
+          ?.value === "Excess Seating" ||
+          visualisation?.queryParams?.[selectedMetricParamName?.paramName]
+            ?.value === "Passengers Over Seating Capacity") &&
+        (currentPage.pageName === "Link Totals" ||
+          currentPage.pageName === "Link Totals Side-by-Side")
+      );
+
+    const showBandEditor =
+      layer.metadata?.isStylable &&
+      canEditBands &&
+      !enforceNoCustomBanding &&
+      (colorStyle === "continuous" || colorStyle === "diverging");
+
+    const showClassificationDropdownStandalone =
+      layer.metadata?.isStylable &&
+      !enforceNoClassificationMethod &&
+      !showBandEditor;
+
+    const renderSectionList = (sections) =>
+      sections
+        .filter(Boolean)
+        .map((section, idx) => (
+          <React.Fragment key={section.key}>
+            {idx > 0 && <SectionDivider />}
+            {section.node}
+          </React.Fragment>
+        ));
+
+    const collapsibleSections = [];
+
+    if (showLayerSearch) {
+      collapsibleSections.push({
+        key: "search",
+        node: <LayerSearch map={maps[0]} layer={layer} />,
+      });
+    }
+
+    if (shouldHaveOpacityControl) {
+      collapsibleSections.push({
+        key: "opacity",
+        node: (
+          <OpacityControl>
+            <ControlLabel htmlFor={`opacity-${layer.id}`}>Opacity</ControlLabel>
+            <Slider
+              id={`opacity-${layer.id}`}
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={opacity}
+              onChange={handleOpacityChange}
+            />
+            <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
+          </OpacityControl>
+        ),
+      });
+    }
+
+    if (showWidth) {
+      collapsibleSections.push({
+        key: "width",
+        node: (
+          <WidthControl>
+            <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
+            <Slider
+              id={`width-${layer.id}`}
+              data-testid="slider width factor"
+              type="range"
+              min={isNodeLayer ? 0.1 : 0.5}
+              max={isNodeLayer ? 2.5 : 10} // 2.5 for nodes, 10 for links
+              step="0.1"
+              value={widthFactor}
+              onChange={handleWidthFactorChange}
+            />
+            <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
+          </WidthControl>
+        ),
+      });
+    }
+
+    if (layer.metadata?.isStylable) {
+      const stylableSections = [];
+
+      if (showColourSchemeDropdown) {
+        stylableSections.push({
+          key: "colour-scheme",
+          node: (
+            <ColourSchemeDropdown
+              colorStyle={colorStyle}
+              handleColorChange={handleColorChange}
+              layerName={layer.id}
+            />
+          ),
+        });
+      }
+
+      if (showBandEditor) {
+        stylableSections.push({
+          key: "band-editor",
+          node: (
+            <>
+              {!enforceNoClassificationMethod && (
+                <>
+                  <SelectorLabel text="Edit banding" />
+                  <ClassificationDropdown
+                    classType={{
+                      Default: "d",
+                      Custom: "c",
+                      Quantile: "q",
+                      Equidistant: "e",
+                      Logarithmic: "l",
+                      "K-Means": "k",
+                      "Jenks Natural Breaks": "j",
+                      "Standard Deviation": "s",
+                      "Head/Tail Breaks": "h",
+                    }}
+                    classification={state.layers[layer.id]?.class_method ?? "d"}
+                    onChange={(value) => handleClassificationChange(value, layer.id)}
+                  />
+                </>
+              )}
+              <BandEditor
+                showLabel={enforceNoClassificationMethod}
+                bands={currentBins}
+                onChange={(newBands) => {
+                  handleCustomBandsChange(newBands, layer.id);
+                }}
+                isDiverging={colorStyle === "diverging"}
+                isCustom={currentClassMethod === "c"}
+                data={bandEditorData}
+                defaultBandValues={hasDefaultBands?.values || null}
+                onReset={() => {
+                  const target = prevNonCustomClassMethodRef.current || "d";
+                  handleCustomBandsChange([], layer.id);
+                  handleClassificationChange(target, layer.id);
+                }}
+              />
+            </>
+          ),
+        });
+      }
+
+      if (showClassificationDropdownStandalone) {
+        stylableSections.push({
+          key: "classification",
+          node: (
+            <ClassificationDropdown
+              classType={{
+                Default: "d",
+                Quantile: "q",
+                Equidistant: "e",
+                Logarithmic: "l",
+                "K-Means": "k",
+                "Jenks Natural Breaks": "j",
+                "Standard Deviation": "s",
+                "Head/Tail Breaks": "h",
+              }}
+              classification={state.layers[layer.id]?.class_method ?? "d"}
+              onChange={(value) => handleClassificationChange(value, layer.id)}
+            />
+          ),
+        });
+      }
+
+      collapsibleSections.push({
+        key: "stylable",
+        node: <div style={{ marginTop: "1rem" }}>{renderSectionList(stylableSections)}</div>,
+      });
+    }
 
     return (
       <LayerControlContainer>
@@ -422,88 +815,7 @@ export const LayerControlEntry = memo(
         </LayerHeader>
         {/* Collapsible Content with Animation */}
         <CollapsibleContent isExpanded={isExpanded}>
-          {/* Layer Search (if applicable) */}
-          {enableZoomToFeature && layer.metadata?.path && (
-            <LayerSearch map={maps[0]} layer={layer} />
-          )}
-          {/* Opacity Control */}
-          {shouldHaveOpacityControl && (<OpacityControl>
-            <ControlLabel htmlFor={`opacity-${layer.id}`}>
-              Opacity
-            </ControlLabel>
-            <Slider
-              id={`opacity-${layer.id}`}
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={opacity}
-              onChange={handleOpacityChange}
-            />
-            <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
-          </OpacityControl>)}
-          {/* Width Control (if applicable) */}
-          {showWidth && (
-            <WidthControl>
-              <ControlLabel htmlFor={`width-${layer.id}`}>Width factor</ControlLabel>
-              <Slider
-                id={`width-${layer.id}`}
-                data-testid="slider width factor"
-                type="range"
-                min={isNodeLayer ? 0.1 : 0.5}
-                max={isNodeLayer ? 2.5 : 10}   // 2.5 for nodes, 10 for links
-                step="0.1"
-                value={widthFactor}
-                onChange={handleWidthFactorChange}
-              />
-              <SliderValue>{widthFactor.toFixed(1)}</SliderValue>
-            </WidthControl>
-          )}
-          {/* Color Scheme, Band Editor, and Classification (if stylable) */}
-          {layer.metadata?.isStylable && (
-            <div style={{ marginTop: "1rem" }}>
-              {!enforceNoColourSchemeSelector &&
-                !((visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Excess Seating" ||
-                  visualisation?.queryParams?.[selectedMetricParamName?.paramName]?.value === "Passengers Over Seating Capacity") &&
-                  (currentPage.pageName === "Link Totals" || currentPage.pageName === "Link Totals Side-by-Side")) &&
-                <ColourSchemeDropdown
-                  colorStyle={colorStyle}
-                  handleColorChange={handleColorChange}
-                  layerName={layer.id}
-                />}
-
-              {/* BandEditor for continuous/diverging only */}
-              {(colorStyle === "continuous" || colorStyle === "diverging") && hasDefaultBands && (
-                <BandEditor
-                  bands={hasDefaultBands.values}
-                  onChange={(newBands) => {
-                    // TODO: Implement update logic for bands in state and map/legend
-                    // Example: dispatch({ type: 'UPDATE_BANDS', layerId: layer.id, bands: newBands })
-                  }}
-                  isDiverging={colorStyle === "diverging"}
-                />
-              )}
-
-              {!enforceNoClassificationMethod && <ClassificationDropdown
-                classType={{
-                  ...(hasDefaultBands?.values && {Default: "d"}),
-                  Quantile: "q",
-                  Equidistant: "e",
-                  Logarithmic: "l",
-                  "K-Means": "k",
-                  "Jenks Natural Breaks": "j",
-                  "Standard Deviation": "s",
-                  "Head/Tail Breaks": "h",
-                }}
-                classification={
-                  state.layers[layer.id]?.class_method ?? "d"
-                }
-                onChange={(value) =>
-                  handleClassificationChange(value, layer.id)
-                }
-              />}
-            </div>
-          )}
+          {renderSectionList(collapsibleSections)}
         </CollapsibleContent>
       </LayerControlContainer>
     );

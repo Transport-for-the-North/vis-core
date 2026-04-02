@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import styled from "styled-components";
-import { MapLayout, IFrameEmbedPage, DynamicForm, CoordinatePreviewMap } from "Components";
+import { MapLayout, IFrameEmbedPage, DynamicForm, CoordinatePreviewMap, TableLayout, SVGGalleryManager, DirectoryScorecardsPage } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
 import { bngToWgs84 } from "../../utils/coordinates";
 
@@ -240,6 +240,20 @@ export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
               return customPageComponent;
             }
             return <div>Custom page component not provided</div>;
+          case "TableLayout":
+            return <TableLayout config={pageConfig.config} />;
+          case "DirectoryScorecards":
+            return (
+              <FilterProvider>
+                <DirectoryScorecardsPage/>
+              </FilterProvider>
+            );
+          case "SVGGalleryManager":
+            return (
+              <FilterProvider>
+                <SVGGalleryManager config={pageConfig.config} />
+              </FilterProvider>
+            );
           default:
             return <div>Nothing</div>;
         }

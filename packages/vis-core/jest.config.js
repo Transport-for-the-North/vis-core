@@ -33,11 +33,16 @@ export default {
     '^reducers$': '<rootDir>/src/reducers/index.js',
     '^utils/(.*)$': '<rootDir>/src/utils/$1',
     '^utils$': '<rootDir>/src/utils/index.js',
+    '^enums/(.*)$': '<rootDir>/src/enums/$1',
+    '^enums$': '<rootDir>/src/enums/index.js',
     '^defaults$': '<rootDir>/src/defaults.js',
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@turf|kdbush|geokdbush|tinyqueue|mapbox-gl|@mapbox/*|nanoid)/)',
+  ],
   testMatch: [
     '**/__tests__/**/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)'

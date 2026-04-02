@@ -51,7 +51,7 @@ export const ColourSchemeDropdown = ({
   const { state } = useMapContext();
 
   // Retrieve the color scheme for the specific layer
-  const layerColorScheme = state.colorSchemesByLayer[layerName];
+  const layerColorScheme = state?.colorSchemesByLayer?.[layerName];
 
   /**
    * Custom formatting for option label to include color swatches.

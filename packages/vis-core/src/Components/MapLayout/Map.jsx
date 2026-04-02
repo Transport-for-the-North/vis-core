@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
@@ -9,11 +9,12 @@ import { api } from "services";
 import maplibregl from "maplibre-gl";
 import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from "./Layer";
+import { SpiderLayer } from "./SpiderLayer";
 import {
   getSourceLayer,
   getFeatureStateValue,
   isValidPoint,
-  numberWithCommas,
+  formatNumber,
   replacePlaceholders,
   buildDefaultTooltip,
   buildLoadingTooltip,
@@ -25,6 +26,7 @@ import {
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
+import debounce from "lodash.debounce";
 import { mapKeys, uniq } from "lodash";
 
 const StyledMapContainer = styled.div`
@@ -34,6 +36,41 @@ const StyledMapContainer = styled.div`
    height: auto;             /* let content dictate height */
   }
 `;
+
+/**
+ * When we add spider layers to the map, these are hoverable as they are 
+ * children/siblings of other layers.
+ * 
+ * This function returns spider layer ids for all point layers present on the map,
+ * to include in hover/click queries.
+ */
+function allSpiderOverlayLayerIds(map, stateLayers) {
+  const ids = [];
+  Object.keys(stateLayers).forEach((layerId) => {
+    const pointsId = `${layerId}-spider`;
+    const linksId = `${layerId}-spider-links`;
+    if (map.getLayer(pointsId)) ids.push(pointsId);
+    if (map.getLayer(linksId)) ids.push(linksId);
+  });
+  return ids;
+}
+
+/**
+ * Resolve the base layer of a spider layer.
+ * 
+ * Spider layers are automatically generated when spiderfyOverlappingPoints
+ * is true, and the layer is a point/circle layer.
+ * 
+ * This function is primarily useful for cascading custom hover functionality
+ * through to spider layers.
+ *
+ * @returns {string} The name of the parent layer for a spider layer.
+ */
+function resolveBaseLayerIdFromSpiderLayerId(layerId) {
+  if (layerId.endsWith("-spider")) return layerId.slice(0, -"-spider".length);
+  if (layerId.endsWith("-spider-links")) return layerId.slice(0, -"-spider-links".length);
+  return layerId;
+}
 
 /**
  * Map component that renders a map using MapLibre GL and handles layers,
@@ -88,6 +125,8 @@ const Map = (props) => {
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
 
   const lastTouchTimeRef = useRef(0);
+
+  const lastViewportSignatureRef = useRef({});
 
   // Single feature picker for map clicks
   const pickFeatureAtPoint = useCallback(
@@ -296,9 +335,10 @@ const Map = (props) => {
           return;
         }
         
+        const spiderOverlayLayerIds = allSpiderOverlayLayerIds(map, state.layers); // Added so we can account for spider layers (dupe points)
         const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
-          layers: hoverableLayers,
-        });
+           layers: [...hoverableLayers, ...spiderOverlayLayerIds],
+         });
         
         // Filter out any features that don't have required properties
         const validFeatures = (featuresWithDuplicates || []).filter(
@@ -334,10 +374,10 @@ const Map = (props) => {
       }
 
       // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
+      // NB if it's a spider layer, we resolve to the base layer to get custom hover handling.
       const filteredFeatures = features.filter((feature) => {
-        const layerId = feature.layer?.id;
-        if (!layerId) return false;
-        
+        const rawLayerId = feature.layer.id;
+        const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
         const layerConfig = state.layers[layerId];
         if (!layerConfig) return false;
         
@@ -467,20 +507,18 @@ const Map = (props) => {
 
       let descriptions = [];
       // Track API requests and how they map back to description indexes so we can merge results precisely
-      const apiRequests = [];
+      // NB if it's a spider layer, we resolve to the base layer to get custom tooltip metadata.
+  const apiRequests = [];
       const requestIndexByDescriptionIndex = {};
 
       filteredFeatures.forEach((feature) => {
-        const layerId = feature.layer.id;
+        const rawLayerId = feature.layer.id;
+        const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
         const layerConfig = state.layers[layerId];
-        
-        // Skip if no layer config found
-        if (!layerConfig) return;
-        
-        const customTooltip = layerConfig.customTooltip;
-        const hoverNulls = layerConfig.hoverNulls ?? true;
-        const shouldIncludeMetadata = layerConfig.hoverTipShouldIncludeMetadata;
-        const shouldHaveHoverOnlyOnData = layerConfig.shouldHaveHoverOnlyOnData ?? false;
+        const customTooltip = layerConfig?.customTooltip;
+        const hoverNulls = layerConfig?.hoverNulls ?? true;
+        const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
+        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
         // Safely get feature value
         const featureValue = getFeatureStateValue(feature);
@@ -504,13 +542,16 @@ const Map = (props) => {
         const featureName = feature.properties?.name || "";
         const featureValueDisplay =
           !hideValueInTooltip && featureValue !== undefined && featureValue !== null
-            ? numberWithCommas(featureValue)
+            ? formatNumber(featureValue)
             : "";
         const layerVisualisationName = layerConfig.visualisationName;
-        const legendText =
+        const unitText =
+          layerConfig.defaultTooltipUnitName ??
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
         const valueText =
-          state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
+           layerConfig.defaultTooltipValueName ??
+           state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ??
+           "Value";
 
         let description = "";
 
@@ -519,7 +560,7 @@ const Map = (props) => {
           description = buildDefaultTooltip({
             featureName,
             featureValueDisplay,
-            legendText,
+            unitText,
             valueText
           });
 
@@ -546,7 +587,7 @@ const Map = (props) => {
             description = buildDefaultTooltip({
               featureName,
               featureValueDisplay,
-              legendText,
+              unitText,
               valueText: customValueText
             });
 
@@ -1124,6 +1165,32 @@ const Map = (props) => {
     }
   }, [isMapReady]);
 
+  // Keep `state.currentZoom` in sync with the actual map zoom.
+  // This is used by DynamicLegend and useLayerZoomMessage. Previously it was
+  // only updated when label layers were enabled, which caused zoom-gated UI to
+  // get stuck on pages without labels.
+  useEffect(() => {
+    if (!map) return;
+
+    const updateZoom = () => {
+      dispatch({
+        type: actionTypes.STORE_CURRENT_ZOOM,
+        payload: map.getZoom(),
+      });
+    };
+
+    map.on("zoom", updateZoom);
+    map.on("zoomend", updateZoom);
+
+    // Initial sync
+    updateZoom();
+
+    return () => {
+      map.off("zoom", updateZoom);
+      map.off("zoomend", updateZoom);
+    };
+  }, [map, dispatch]);
+
   // **Handle map clicks (for map filters)**
   useEffect(() => {
     if (isMapReady & state.filters.length > 0) {
@@ -1141,6 +1208,130 @@ const Map = (props) => {
       }
     };
   }, [isMapReady, map, handleMapClick]);
+
+  // **Capture viewport (bbox) into FilterContext + query params**
+  useEffect(() => {
+    // Don't wait for full style/layer readiness; bounds/zoom are available as soon as the map instance exists.
+    if (!map || !Array.isArray(state.filters) || state.filters.length === 0) return;
+
+    const viewportFilters = state.filters.filter((f) => f?.type === "mapViewport");
+    if (viewportFilters.length === 0) return;
+
+    const resolveViewportMinZoom = (filter) => {
+      // Prefer a per-filter minZoom if configured, otherwise infer from any join-layer(s)
+      // used by the visualisations this viewport targets.
+      if (typeof filter?.minZoom === "number") return filter.minZoom;
+
+      const visualisationNames = Array.isArray(filter?.visualisations) ? filter.visualisations : [];
+      const candidates = [];
+
+      visualisationNames.forEach((visName) => {
+        const vis = state.visualisations?.[visName];
+        const joinLayerName = vis?.joinLayer;
+        if (!joinLayerName) return;
+
+        const joinLayer = state.layers?.[joinLayerName];
+        if (typeof joinLayer?.minZoom === "number") {
+          candidates.push(joinLayer.minZoom);
+        }
+      });
+
+      if (candidates.length === 0) return null;
+      return Math.max(...candidates);
+    };
+
+    const debounceMs =
+      typeof viewportFilters[0]?.debounceMs === "number" && viewportFilters[0].debounceMs >= 0
+        ? viewportFilters[0].debounceMs
+        : 250;
+
+    const applyViewport = () => {
+      const zoom = map.getZoom();
+
+      viewportFilters.forEach((filter) => {
+        const minZoom = resolveViewportMinZoom(filter);
+        const isInValidZoomRange = minZoom === null || zoom >= minZoom;
+
+        if (!isInValidZoomRange) {
+          // Below minZoom: clear the stored bbox so consumers can treat it as unavailable.
+          if (lastViewportSignatureRef.current[filter.id] !== null) {
+            lastViewportSignatureRef.current[filter.id] = null;
+            filterDispatch({
+              type: "SET_FILTER_VALUE",
+              payload: { filterId: filter.id, value: null, filter },
+            });
+          }
+          return;
+        }
+
+        const bounds = map.getBounds();
+        const bbox = {
+          west: Number(bounds.getWest().toFixed(6)),
+          south: Number(bounds.getSouth().toFixed(6)),
+          east: Number(bounds.getEast().toFixed(6)),
+          north: Number(bounds.getNorth().toFixed(6)),
+          zoom: Number(zoom.toFixed(2)),
+        };
+
+        const signature = JSON.stringify(bbox);
+        const lastSignature = lastViewportSignatureRef.current[filter.id];
+        if (lastSignature === signature) return;
+
+        // Optional "small movement" thresholding to avoid excessive updates.
+        if (lastSignature) {
+          try {
+            const lastBbox = JSON.parse(lastSignature);
+            const zoomChanged = Math.abs(lastBbox.zoom - bbox.zoom) >= 0.25;
+            const bboxShifted =
+              Math.abs(lastBbox.west - bbox.west) > 0.05 ||
+              Math.abs(lastBbox.east - bbox.east) > 0.05 ||
+              Math.abs(lastBbox.north - bbox.north) > 0.05 ||
+              Math.abs(lastBbox.south - bbox.south) > 0.05;
+            if (!zoomChanged && !bboxShifted) return;
+          } catch {
+            // Continue if parsing fails
+          }
+        }
+
+        lastViewportSignatureRef.current[filter.id] = signature;
+
+        // Store bbox in FilterContext.
+        filterDispatch({
+          type: "SET_FILTER_VALUE",
+          payload: { filterId: filter.id, value: bbox, filter },
+        });
+
+        // Apply configured actions (if any), typically mapping bbox keys to query params.
+        (filter.actions || []).forEach((action) => {
+          const valueKey = action?.payload?.valueKey;
+          const value = valueKey ? bbox[valueKey] : bbox;
+          const paramName = action?.payload?.paramName || filter.paramName;
+          if (!paramName) return;
+          dispatch({
+            type: action.action,
+            payload: { filter, value, paramName, ...action.payload },
+          });
+        });
+      });
+    };
+
+    const debouncedApplyViewport = debounce(applyViewport, debounceMs);
+
+    const handleMoveEnd = () => debouncedApplyViewport();
+    const handleZoomEnd = () => debouncedApplyViewport();
+
+    map.on("moveend", handleMoveEnd);
+    map.on("zoomend", handleZoomEnd);
+
+    // Run once on mount so the viewport bbox is available immediately.
+    applyViewport();
+
+    return () => {
+      map.off("moveend", handleMoveEnd);
+      map.off("zoomend", handleZoomEnd);
+      debouncedApplyViewport.cancel?.();
+    };
+  }, [map, state.filters, state.layers, state.visualisations, dispatch, filterDispatch]);
 
   // **Apply layer filters**
   useEffect(() => {
@@ -1222,7 +1413,13 @@ const Map = (props) => {
   return (
     <StyledMapContainer ref={mapContainerRef}>
       {Object.values(state.layers).map((layer) => (
+      <>
         <Layer key={layer.name} layer={layer} />
+        { /* Create a sibling 'spider' layer for all point layers, to deal with overlaps */}
+        {layer.type === 'tile' && layer.geometryType === 'point' && Boolean(layer.spiderfyOverlappingPoints) && (
+          <SpiderLayer key={`${layer.name}_spider`} baseLayerId={layer.name} />
+        )}
+      </>
       ))}
       {state.visualisations && <VisualisationManager
         visualisationConfigs={state.visualisations}

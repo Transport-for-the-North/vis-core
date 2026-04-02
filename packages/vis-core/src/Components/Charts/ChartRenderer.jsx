@@ -23,6 +23,7 @@ import { WarningBox } from "Components";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CARD_CONSTANTS } from "defaults";
+import { formatNumber } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
@@ -226,7 +227,7 @@ const ChartSection = ({ ariaLabel, title, height, children }) => (
 const defaultFormatters = {
   commify: (v) => {
     const n = Number(v ?? 0);
-    return Number.isFinite(n) ? n.toLocaleString("en-GB") : String(v ?? "");
+    return Number.isFinite(n) ? formatNumber(n) : String(v ?? "");
   },
   percent: (value, data, keys) => {
     const total = (keys || Object.keys(data || {})).reduce(
@@ -236,15 +237,6 @@ const defaultFormatters = {
     const num = Number(value ?? 0);
     return total > 0 ? `${((num / total) * 100).toFixed(1)}%` : "0.0%";
   },
-};
-
-const formatTwoDp = (v) => {
-  const n = Number(v);
-  if (!Number.isFinite(n)) return String(v ?? "");
-  return n.toLocaleString("en-GB", {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  });
 };
 
 /**
@@ -276,12 +268,16 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const hasXLabel = !!config.x_axis_title;
   const hasYLabel = !!config.y_axis_title;
-  const formatter = (val) =>
-    (formatters.commify || defaultFormatters.commify)(val);
-  const tooltipFormatter = (val) =>
-  formatters.tooltipFormatter
-    ? formatters.tooltipFormatter(val)
-    : formatTwoDp(val);
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
+  const tooltipFormatter = (val) => {
+    if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
+
   const barFill = config.barColor || DEFAULTS.BRAND_COLOR;
   const xAxisHeight = React.useMemo(
     () =>
@@ -340,7 +336,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={items.length * 45} // Dynamic height, each line is equivalent to 45px
+      height={config.height ?? items.length * 45} // Allow explicit height override; otherwise keep dynamic height
     >
       <RBarChart
         data={items}
@@ -441,12 +437,15 @@ const BarChartMultiple = ({
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const hasXLabel = !!config.x_axis_title;
   const hasYLabel = !!config.y_axis_title;
-  const formatter = (val) =>
-    (formatters.commify || defaultFormatters.commify)(val);
-  const tooltipFormatter = (val) =>
-  formatters.tooltipFormatter
-    ? formatters.tooltipFormatter(val)
-    : formatTwoDp(val);
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
+  const tooltipFormatter = (val) => {
+    if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
   const truncateLabel = (label, maxLen = 7) =>
     label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
   const CustomTick = ({ x, y, payload, angle = 0 }) => (
@@ -461,7 +460,10 @@ const BarChartMultiple = ({
       {truncateLabel(payload.value)}
     </text>
   );
-  const yTickFormatter = (val) => Number(val).toFixed(2);
+  const yTickFormatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
   const chartMargin = { ...DEFAULTS.MARGIN };
   if (hasXLabel || hasYLabel) {
     chartMargin.bottom = 20;
@@ -579,6 +581,10 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
   const xAxisHeight = React.useMemo(
     () =>
       computeXAxisHeight(
@@ -606,16 +612,12 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         />
         <RYAxis
           allowDecimals={false}
-          tickFormatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
+          tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          formatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
+          formatter={formatter}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
         />
         <RLine
@@ -645,6 +647,10 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
   const stroke =
     config.areaStrokeColor || config.lineColor || DEFAULTS.BRAND_COLOR;
   const fill = config.areaFillColor || "rgba(75,62,145,0.25)";
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
   const xAxisHeight = React.useMemo(
     () =>
       computeXAxisHeight(
@@ -672,16 +678,12 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
         />
         <RYAxis
           allowDecimals={false}
-          tickFormatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
+          tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          formatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
+          formatter={formatter}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
         />
         <RArea
@@ -708,6 +710,10 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const fill = config.scatterColor || DEFAULTS.BRAND_COLOR;
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n) : "";
+  };
   const xAxisHeight = React.useMemo(
     () =>
       computeXAxisHeight(
@@ -738,17 +744,13 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
           dataKey="value"
           type="number"
           allowDecimals={false}
-          tickFormatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
+          tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
-          formatter={(v) =>
-            (formatters.commify || defaultFormatters.commify)(v)
-          }
+          formatter={formatter}
         />
         <RScatter data={items} fill={fill} />
       </RScatterChart>
@@ -782,11 +784,11 @@ const DonutPieChart = ({ config, data, formatters }) => {
     >
       <RPieChart>
         <RTooltip
-          formatter={(value, name, props) => [
-            (formatters?.commify || defaultFormatters.commify)(value) +
-              ` (${pctFmt(value)})`,
-            props?.payload?.label || name,
-          ]}
+          formatter={(value, name, props) => {
+            const n = Number(value);
+            const formatted = Number.isFinite(n) ? formatNumber(n) : "";
+            return [formatted + ` (${pctFmt(value)})`, props?.payload?.label || name];
+          }}
         />
         <RLegend
           verticalAlign="bottom"
@@ -834,7 +836,7 @@ const TableChart = ({ config, data, formatters }) => {
     [keys, data]
   );
   const fmt = {
-    commify: formatters.commify || defaultFormatters.commify,
+    commify: ((v) => formatNumber(Number(v ?? 0))),
     percent: (v) => (total > 0 ? `${((v / total) * 100).toFixed(1)}%` : "0.0%"),
   };
   const firstColHeader = config.tableMetricName || "Metric";
@@ -933,12 +935,9 @@ const RankingChart = ({ config, data, formatters }) => {
 
   // Display everything if isOpen, otherwise only the first 5
   const visibleRows = isOpen ? sortedRows : sortedRows.slice(0, 5);
-
   const fmt = {
-    commify:
-      formatters?.commify || ((v) => Number(v ?? 0).toLocaleString("en-GB")),
+    commify: ((v) => formatNumber(Number(v ?? 0))),
   };
-
   return (
     <div style={{ overflowX: "auto", margin: "10px 0" }}>
       <div
@@ -1044,16 +1043,17 @@ export const ChartRenderer = ({
     <div>
       {charts.map((cfg, idx) => {
         const type = (cfg.type || "").toLowerCase();
+        const resolvedBarChartHeight = cfg?.height ?? cfg?.barHeight ?? barHeight;
+        const cfgWithResolvedHeight =
+          resolvedBarChartHeight === undefined
+            ? cfg
+            : { ...cfg, height: resolvedBarChartHeight };
         switch (type) {
           case "bar":
             return (
               <BarChart
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
               />
@@ -1062,11 +1062,7 @@ export const ChartRenderer = ({
             return (
               <BarChart
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
                 type="vertical"
@@ -1076,11 +1072,7 @@ export const ChartRenderer = ({
             return (
               <BarChartMultiple
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
               />
@@ -1089,11 +1081,7 @@ export const ChartRenderer = ({
             return (
               <BarChartMultiple
                 key={idx}
-                config={{
-                  ...cfg,
-                  height:
-                    cfg.height ?? barHeight ?? DEFAULTS.DIMENSIONS.baseHeight,
-                }}
+                config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
                 type="vertical"

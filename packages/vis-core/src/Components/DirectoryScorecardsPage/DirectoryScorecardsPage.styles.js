@@ -4,7 +4,7 @@ import styled from "styled-components";
  * Page-level layout wrapper.
  */
 export const Page = styled.div`
-  padding: 0.5rem 3vw;
+  padding: 1.5rem 3vw 1.5rem;
   box-sizing: border-box;
   max-width: 100%;
 `;
