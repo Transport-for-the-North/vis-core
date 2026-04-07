@@ -321,4 +321,63 @@ describe("parameterisedLayers for each layer", () => {
       });
     });
   });
+
+  it("filters metadata rows when the endpoint returns string values", async () => {
+    const scenarioRows = [
+      { scenario_code: "QGK_2042", vis_description: "Scenario 1" },
+      { scenario_code: "QGM_2042", vis_description: "Scenario 2" },
+      { scenario_code: "QGN_2042", vis_description: "Scenario 3" },
+    ];
+
+    mockUseReducer.mockReturnValue([
+      {
+        pageIsReady: false,
+        filters: [],
+        visualisations: {
+          testVisualisation: { name: "testVisualisation" },
+        },
+        leftVisualisations: {
+          testVisualisation: { name: "testVisualisation" },
+        },
+        rightVisualisations: {
+          testVisualisation: { name: "testVisualisation" },
+        },
+      },
+      mockDispatch,
+    ]);
+
+    mockGet
+      .mockResolvedValueOnce(["QGK_2042", "QGN_2042"])
+      .mockResolvedValueOnce(scenarioRows);
+
+    const appContextWithMetadataFiltering = {
+      ...mockAppContexte,
+      visualiserAppName: "Sandbox",
+      metadataFiltering: {
+        path: "/api/norms-app-scenario",
+        queryParamName: "appName",
+        metadataTableName: "metadataTableName",
+        metadataColumn: "scenario_code",
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={appContextWithMetadataFiltering}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapProvider>
+              <p>ImAChildren</p>
+            </MapProvider>
+          </FilterContext.Provider>
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: actionTypes.SET_FILTERED_SCENARIOS,
+        payload: [scenarioRows[0], scenarioRows[2]],
+      });
+    });
+  });
 });

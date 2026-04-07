@@ -71,12 +71,16 @@ Only the configured metadata table is filtered. Other metadata tables are left u
 
 ## Expected API Shape
 
-The current implementation assumes the endpoint returns a flat JSON array of values.
+The current implementation assumes the endpoint returns a flat JSON array of primitive values.
 
-Example response:
+Example responses:
 
 ```json
 [2, 3, 11, 15, 24, 30, 37, 45, 0]
+```
+
+```json
+["QGK_2042", "QGN_2042"]
 ```
 
 This is intentionally simple. The code does not try to support nested objects or alternative response shapes.
@@ -96,7 +100,7 @@ As a result, the existing visualisation pipeline can continue to use the same st
 visualisation.filteredScenarios
 ```
 
-This avoids adding custom scenario-filter plumbing to individual map or card components.
+This avoids adding custom metadata-filter plumbing to individual map or card components.
 
 ## Current NoRMS Usage
 
@@ -114,19 +118,19 @@ With this configuration, the full `input_norms_scenario` metadata table is inter
 
 This implementation assumes:
 
-- the scenario endpoint returns a flat array of primitive IDs
-- the relevant scenario metadata lives in one known metadata table
-- the ID column in that table is stable
+- the metadata-filter endpoint returns a flat array of primitive values
+- the relevant metadata lives in one known metadata table
+- the metadata column used for comparison is stable
 
-If another app uses a different metadata table name or ID column, only the config should need to change.
+If another app uses a different metadata table name or metadata column, only the config should need to change.
 
 If the endpoint response shape changes away from a flat array, `MapContext` will need to be updated.
 
 ## Summary
 
-This feature keeps scenario filtering at the client boundary:
+This feature keeps metadata filtering at the client boundary:
 
-- app config declares the app name and scenario-filter settings
+- app config declares the app name and metadata-filter settings
 - `MapContext` performs the intersection once
 - reducer state exposes the filtered rows to existing visualisation configs
 
