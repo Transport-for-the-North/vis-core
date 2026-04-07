@@ -103,9 +103,11 @@ export function BaseApp({
 
         const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
+        const resolvedAppName = initialAppConfig.visualiserAppName ?? null;
 
         setAppConfig({
           ...initialAppConfig,
+          visualiserAppName: resolvedAppName,
           apiSchema: apiSchema,
           defaultBands: bands,
           authenticationRequired: authenticationRequired

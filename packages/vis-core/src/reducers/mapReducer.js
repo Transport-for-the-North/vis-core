@@ -15,6 +15,18 @@ const findFirstColourValue = (filters) => {
   return null;
 };
 
+const attachFilteredScenarios = (visualisations = {}, filteredScenarios = []) => {
+  return Object.fromEntries(
+    Object.entries(visualisations).map(([name, visualisation]) => [
+      name,
+      {
+        ...visualisation,
+        filteredScenarios,
+      },
+    ])
+  );
+};
+
 /**
  * Updates a params map (queryParams or pathParams) across a set of visualisations.
  *
@@ -84,6 +96,7 @@ export const actionTypes = {
   SET_METADATA_TABLES: "SET_METADATA_TABLES",
   SET_METADATA_ERROR: "SET_METADATA_ERROR",
   SET_FILTERS: "SET_FILTERS",
+  SET_FILTERED_SCENARIOS: "SET_FILTERED_SCENARIOS",
   RESET_CONTEXT: "RESET_CONTEXT",
   UPDATE_FILTER_VALUES: "UPDATE_FILTER_VALUES",
   SET_SELECTION_MODE: "SET_SELECTION_MODE",
@@ -158,6 +171,7 @@ export const mapReducer = (state, action) => {
         filters: {},
         leftVisualisations: {},
         rightVisualisations: {},
+        filteredScenarios: [],
         isLoading: true,
         pageIsReady: false,
         selectionMode: null,
@@ -299,10 +313,13 @@ export const mapReducer = (state, action) => {
 
     case actionTypes.ADD_VISUALISATION: {
       // Logic to add a visualisation
-      const visualisationContent = {
-        ...state.visualisations,
-        ...action.payload,
-      };
+      const visualisationContent = attachFilteredScenarios(
+        {
+          ...state.visualisations,
+          ...action.payload,
+        },
+        state.filteredScenarios
+      );
       return {
         ...state,
         visualisations: visualisationContent,
@@ -576,6 +593,15 @@ export const mapReducer = (state, action) => {
     }
     case actionTypes.SET_FILTERS: {
       return { ...state, filters: action.payload };
+    }
+    case actionTypes.SET_FILTERED_SCENARIOS: {
+      return {
+        ...state,
+        filteredScenarios: action.payload,
+        visualisations: attachFilteredScenarios(state.visualisations, action.payload),
+        leftVisualisations: attachFilteredScenarios(state.leftVisualisations, action.payload),
+        rightVisualisations: attachFilteredScenarios(state.rightVisualisations, action.payload),
+      };
     }
     case actionTypes.UPDATE_FILTER_VALUES: {
       return { ...state, filters: action.payload.updatedFilters };

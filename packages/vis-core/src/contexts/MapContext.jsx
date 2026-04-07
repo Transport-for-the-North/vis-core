@@ -38,6 +38,26 @@ const isDuplicateValue = (values, value) => {
   );
 };
 
+const normaliseMetadataFilterValue = (value) => {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  return String(value);
+};
+
+const extractMetadataFilterValuesFromResponse = (response) => {
+  if (!Array.isArray(response)) {
+    return null;
+  }
+
+  return new Set(
+    response
+      .map((filterValue) => normaliseMetadataFilterValue(filterValue))
+      .filter((filterValue) => filterValue !== null)
+  );
+};
+
 /**
  * MapProvider component to manage map-related state and context.
  * @function MapProvider
@@ -68,6 +88,7 @@ export const MapProvider = ({ children }) => {
     metadataTables: {},
     metadataFilters: [],
     filters: [],
+    filteredScenarios: [],
     map: null,
     isMapReady: false,
     isLoading: true,
@@ -102,6 +123,25 @@ export const MapProvider = ({ children }) => {
     const fetchMetadataTables = async () => {
       const metadataTables = {};
       const emptyTables = [];
+      let filteredScenarios = [];
+
+      const metadataFiltering = appContext.metadataFiltering;
+      let validMetadataFilterValues = null;
+
+      if (metadataFiltering?.path && appContext?.visualiserAppName) {
+        try {
+          const queryParamName = metadataFiltering.queryParamName ?? "appName";
+          const metadataFilterResponse = await api.baseService.get(metadataFiltering.path, {
+            queryParams: {
+              [queryParamName]: appContext.visualiserAppName,
+            },
+          });
+
+          validMetadataFilterValues = extractMetadataFilterValuesFromResponse(metadataFilterResponse);
+        } catch (error) {
+          console.error("Failed to fetch valid metadata filter values:", error);
+        }
+      }
       
       for (const table of pageContext.config.metadataTables) {
         try {
@@ -118,6 +158,24 @@ export const MapProvider = ({ children }) => {
             }
           }
 
+          const metadataFilterTableName = metadataFiltering?.metadataTableName;
+          const metadataFilterColumn = metadataFiltering?.metadataColumn ?? "id";
+          const isMetadataFilterTable = metadataFilterTableName && table.name === metadataFilterTableName;
+
+          if (
+            isMetadataFilterTable &&
+            validMetadataFilterValues instanceof Set &&
+            Array.isArray(filteredData)
+          ) {
+            filteredData = filteredData.filter((row) =>
+              validMetadataFilterValues.has(normaliseMetadataFilterValue(row?.[metadataFilterColumn]))
+            );
+          }
+
+          if (isMetadataFilterTable && Array.isArray(filteredData)) {
+            filteredScenarios = filteredData;
+          }
+
           metadataTables[table.name] = filteredData;
           
           // Check if table is empty
@@ -130,7 +188,7 @@ export const MapProvider = ({ children }) => {
         }
       }
 
-      return { metadataTables, emptyTables };
+      return { metadataTables, emptyTables, filteredScenarios };
     };
 
     /**
@@ -371,7 +429,7 @@ export const MapProvider = ({ children }) => {
       });
 
       // Initialise filters
-      const { metadataTables, emptyTables } = await fetchMetadataTables();
+      const { metadataTables, emptyTables, filteredScenarios } = await fetchMetadataTables();
       
       // Check if any required metadata tables are empty
       if (emptyTables.length > 0) {
@@ -403,6 +461,7 @@ export const MapProvider = ({ children }) => {
       }
       
       dispatch({ type: actionTypes.SET_METADATA_TABLES, payload: metadataTables });
+      dispatch({ type: actionTypes.SET_FILTERED_SCENARIOS, payload: filteredScenarios });
       await initializeFilters(metadataTables);
 
       dispatch({ type: actionTypes.SET_LOADING_FINISHED });

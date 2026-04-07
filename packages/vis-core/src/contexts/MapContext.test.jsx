@@ -50,6 +50,7 @@ jest.mock("defaults", () => ({
 import React from "react";
 import { AppContext, FilterContext, MapProvider, PageContext } from "contexts";
 import { api } from "services";
+import { actionTypes } from "reducers";
 import {
   hasRouteParameterOrQuery,
   processParameters,
@@ -181,7 +182,13 @@ beforeEach(() => {
   // Re-initialize mock implementations after clearAllMocks
   mockGet.mockResolvedValue([{ id: 1 }]);
   mockUseReducer.mockReturnValue([
-    {pageIsReady: true},
+    {
+      pageIsReady: true,
+      filters: [],
+      visualisations: {},
+      leftVisualisations: {},
+      rightVisualisations: {},
+    },
     jest.fn(),
   ]);
   mockProcessParameters.mockReturnValue({
@@ -216,7 +223,16 @@ describe("MapProvider component tests", () => {
 
 describe("parameterisedLayers for each layer", () => {
   beforeEach(() => {
-    mockUseReducer.mockReturnValue([{}, mockDispatch]);
+    mockUseReducer.mockReturnValue([
+      {
+        pageIsReady: false,
+        filters: [],
+        visualisations: {},
+        leftVisualisations: {},
+        rightVisualisations: {},
+      },
+      mockDispatch,
+    ]);
 
     mockProcessParameters.mockReturnValue({
       params: "params",
@@ -239,5 +255,70 @@ describe("parameterisedLayers for each layer", () => {
     );
 
     expect(mockDispatch).toHaveBeenCalled();
+  });
+
+  it("filters metadata rows using valid filter values and propagates filtered scenarios", async () => {
+    const scenarioRows = [
+      { id: 1, vis_description: "Scenario 1" },
+      { id: 2, vis_description: "Scenario 2" },
+      { id: 3, vis_description: "Scenario 3" },
+    ];
+
+    mockUseReducer.mockReturnValue([
+      {
+        pageIsReady: false,
+        filters: [],
+        visualisations: {
+          testVisualisation: { name: "testVisualisation" },
+        },
+        leftVisualisations: {
+          testVisualisation: { name: "testVisualisation" },
+        },
+        rightVisualisations: {
+          testVisualisation: { name: "testVisualisation" },
+        },
+      },
+      mockDispatch,
+    ]);
+
+    mockGet
+      .mockResolvedValueOnce([1, 3])
+      .mockResolvedValueOnce(scenarioRows);
+
+    const appContextWithMetadataFiltering = {
+      ...mockAppContexte,
+      visualiserAppName: "Sandbox",
+      metadataFiltering: {
+        path: "/api/norms-app-scenario",
+        queryParamName: "appName",
+        metadataTableName: "metadataTableName",
+        metadataColumn: "id",
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={appContextWithMetadataFiltering}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapProvider>
+              <p>ImAChildren</p>
+            </MapProvider>
+          </FilterContext.Provider>
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith("/api/norms-app-scenario", {
+        queryParams: { appName: "Sandbox" },
+      });
+    });
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: actionTypes.SET_FILTERED_SCENARIOS,
+        payload: [scenarioRows[0], scenarioRows[2]],
+      });
+    });
   });
 });
