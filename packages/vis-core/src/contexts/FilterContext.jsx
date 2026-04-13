@@ -10,6 +10,14 @@ export const FilterContext = createContext();
 
 const initialFilterState = {};
 
+// Multi-select filters often emit a new array instance with the same contents.
+// Compare by value so the reducer can ignore no-op updates.
+const areArraysEqual = (left, right) => {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false;
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => value === right[index]);
+};
+
 // Define action types
 const filterActionTypes = {
   SET_FILTER_VALUE: 'SET_FILTER_VALUE',
@@ -31,7 +39,17 @@ const filterReducer = (state, action) => {
       // Prevent null/undefined from being written into state
       if (value == null) {
         const isArray = Array.isArray(state[filterId]);
-        return { ...state, [filterId]: isArray ? [] : null };
+        const emptyValue = isArray ? [] : null;
+
+        // Repeated "clear" actions should not create fresh state objects.
+        if (
+          (emptyValue === null && state[filterId] == null) ||
+          (Array.isArray(emptyValue) && areArraysEqual(state[filterId], emptyValue))
+        ) {
+          return state;
+        }
+
+        return { ...state, [filterId]: emptyValue };
       }
 
       // Safe numeric coercion: avoid '' -> 0 and other isNaN quirks
@@ -56,7 +74,11 @@ const filterReducer = (state, action) => {
           : value;
 
       // Check if the value has actually changed
-      if (state[filterId] === parsedValue) {
+      if (
+        state[filterId] === parsedValue ||
+        // Arrays need value-based comparison because reference equality is too strict here.
+        (Array.isArray(state[filterId]) && Array.isArray(parsedValue) && areArraysEqual(state[filterId], parsedValue))
+      ) {
         return state; // No change in state
       }
 

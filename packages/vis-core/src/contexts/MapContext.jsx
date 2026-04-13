@@ -18,7 +18,8 @@ import {
   getInitialFilterValue
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext, FilterContext, ErrorContext } from "contexts";
+import { AppContext, PageContext, FilterContext } from "contexts";
+import { ErrorContext } from "./ErrorContext";
 import { api } from "services";
 
 // Create a context for the app configuration
@@ -50,7 +51,6 @@ export const MapProvider = ({ children }) => {
   const { dispatch: filterDispatch } = useContext(FilterContext);
   const errorContext = useContext(ErrorContext);
   const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
-  const errorState = errorContext?.state ?? null;
 
   // Initialize state within the provider function
   const initialState = {
@@ -142,6 +142,7 @@ export const MapProvider = ({ children }) => {
       const filters = [];
       const filterState = {};
       const paramNameToUuidMap = {};
+      const emptyMetadataFilters = [];
       const usedFilterIds = new Set();
 
       for (const filter of pageContext.config.filters) {
@@ -237,6 +238,15 @@ export const MapProvider = ({ children }) => {
                   }
 
                   filterWithId.values.values = uniqueValues;
+
+                  if (uniqueValues.length === 0) {
+                    emptyMetadataFilters.push({
+                      filterName: filterWithId.filterName,
+                      paramName: filterWithId.paramName,
+                      metadataTableName: filterWithId.values.metadataTableName,
+                    });
+                  }
+
                   filters.push(filterWithId);
                 } else {
                   console.error(`Metadata table ${filterWithId.values.metadataTableName} not found or empty`);
@@ -266,6 +276,44 @@ export const MapProvider = ({ children }) => {
         }
         return filter;
       });
+
+      if (emptyMetadataFilters.length > 0) {
+        console.warn('[MapContext] empty metadata filters detected', {
+          pageName: pageContext.pageName,
+          emptyMetadataFilters,
+          filterStateKeys: Object.keys(filterState),
+        });
+        console.log('[MapContext] ErrorContext availability before SET_ERROR', {
+          hasErrorContext: !!errorContext,
+          hasErrorDispatch: typeof errorContext?.dispatch === 'function',
+        });
+
+        const technicalDetails = emptyMetadataFilters
+          .map(
+            ({ filterName, paramName, metadataTableName }) =>
+              `Filter: ${filterName || paramName}\nParameter: ${paramName}\nMetadata table: ${metadataTableName}`
+          )
+          .join('\n\n');
+
+        errorDispatch({
+          type: errorActionTypes.SET_ERROR,
+          payload: {
+            title: 'No Filter Values Available',
+            subtitle: 'A metadata filter returned no values',
+            message:
+              emptyMetadataFilters.length === 1
+                ? `The filter "${emptyMetadataFilters[0].filterName || emptyMetadataFilters[0].paramName}" has no available values from the API for the current metadata query.`
+                : 'One or more filters have no available values from the API for the current metadata query.',
+            supportMessage: 'Please contact support if the issue persists.',
+            supportDetails: 'The filters listed below were built from metadata, but the filtered API result returned no options.',
+            technicalDetails,
+          },
+        });
+
+        console.warn('[MapContext] continuing initialization so the page can render behind the error overlay', {
+          pageName: pageContext.pageName,
+        });
+      }
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
@@ -375,6 +423,11 @@ export const MapProvider = ({ children }) => {
       
       // Check if any required metadata tables are empty
       if (emptyTables.length > 0) {
+        console.warn('[MapContext] aborting due to empty metadata tables', {
+          pageName: pageContext.pageName,
+          emptyTables,
+        });
+
         const message =
           emptyTables.length === 1
             ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`
