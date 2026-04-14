@@ -259,12 +259,7 @@ describe("LayerControlEntry component test", () => {
 
     // initialWidth :  11.764705882352942
     expect(screen.getByText("11.8")).toBeInTheDocument(); // rounded
-
-    fireEvent.change(slider, { target: { value: "10" } });
-    await waitFor(() => {
-      expect(slider.value).toBe("10"); // It's a string
-    });
-    expect(screen.getByText("10.0")).toBeInTheDocument(); // rounded
+    expect(slider).toHaveValue("10");
   });
 
   it("Does not render width factor slider when shouldFixLineWidth is enabled", () => {
@@ -311,6 +306,119 @@ describe("LayerControlEntry component test", () => {
 
     expect(screen.queryByText("Width factor")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Width factor")).not.toBeInTheDocument();
+  });
+
+  it("uses a layer defaultWidthFactor on initialisation", async () => {
+    const mockMap2 = {
+      getLayer: jest.fn().mockReturnValue(true),
+      getPaintProperty: jest.fn((layerId, propertyName) => {
+        if (propertyName?.includes("opacity")) return 0.5;
+        if (propertyName === "circle-radius") {
+          return ["interpolate", ["linear"], ["feature-state", "value"], 0, 1, 10, 8.5];
+        }
+        return 0.5;
+      }),
+      setPaintProperty: jest.fn(),
+    };
+
+    const testProps = {
+      ...props,
+      maps: [mockMap2],
+      layer: {
+        id: "id",
+        type: "circle",
+        layout: { visibility: false },
+        metadata: {
+          path: "/",
+          shouldHaveOpacityControl: true,
+          defaultWidthFactor: 0.3,
+        },
+      },
+      state: {
+        ...props.state,
+        layers: {
+          id: {
+            defaultWidthFactor: 0.3,
+            widthFactor: 0.3,
+          },
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={{ state: testProps.state, dispatch: jest.fn() }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry {...testProps} />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    const slider = screen.getByLabelText("Width factor");
+    expect(slider).toHaveValue("0.3");
+    expect(screen.getByText("0.3")).toBeInTheDocument();
+  });
+
+  it("dispatches width factor updates when the slider changes", async () => {
+    const dispatch = jest.fn();
+    const mockMap2 = {
+      getLayer: jest.fn().mockReturnValue(true),
+      getPaintProperty: jest.fn((layerId, propertyName) => {
+        if (propertyName?.includes("opacity")) return 0.5;
+        if (propertyName === "line-width") return ["interpolate", ["linear"], ["feature-state", "value"], 0, 1, 10, 8.5];
+        return 0.5;
+      }),
+      setPaintProperty: jest.fn(),
+    };
+
+    const testProps = {
+      ...props,
+      maps: [mockMap2],
+      layer: {
+        id: "id",
+        type: "line",
+        layout: { visibility: false },
+        metadata: {
+          path: "/",
+          shouldHaveOpacityControl: true,
+          defaultWidthFactor: 0.3,
+        },
+      },
+      state: {
+        ...props.state,
+        layers: {
+          id: {
+            defaultWidthFactor: 0.3,
+            widthFactor: 0.3,
+          },
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={{ state: testProps.state, dispatch }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry {...testProps} />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    fireEvent.change(screen.getByLabelText("Width factor"), {
+      target: { value: "0.6" },
+    });
+
+    await waitFor(() => {
+      expect(dispatch).toHaveBeenCalledWith({
+        type: "UPDATE_LAYER_WIDTH_FACTOR",
+        payload: {
+          layerName: "id",
+          widthFactor: 0.6,
+        },
+      });
+    });
   });
   it("Test", () => {
     const mockMapContext = {

@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { isValidPaintExpression, isValidPaintValue, applyPaintProperties } from 'utils/map';
+import {
+  isValidPaintExpression,
+  isValidPaintValue,
+  applyPaintProperties,
+  applyWidthFactor,
+  getWidthProperty,
+} from 'utils/map';
 
 // Constants
 const RETRY_CONFIG = {
@@ -106,6 +112,49 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
   return newStates;
 };
 
+const applyConfiguredWidthFactor = (map, layer) => {
+  const widthFactor = Number.isFinite(layer?.widthFactor)
+    ? layer.widthFactor
+    : Number.isFinite(layer?.defaultWidthFactor)
+    ? layer.defaultWidthFactor
+    : null;
+
+  if (!Number.isFinite(widthFactor)) {
+    return;
+  }
+
+  const mapLayer = map.getLayer(layer.name);
+  if (!mapLayer) {
+    return;
+  }
+
+  const widthProp = getWidthProperty(mapLayer.type);
+  if (!widthProp) {
+    return;
+  }
+
+  try {
+    const currentWidth = map.getPaintProperty(layer.name, widthProp);
+
+    if (Array.isArray(currentWidth) && currentWidth[0] === 'interpolate') {
+      const { widthInterpolation, lineOffsetInterpolation } = applyWidthFactor(
+        currentWidth,
+        widthFactor,
+        widthProp,
+        layer.defaultLineOffset
+      );
+
+      map.setPaintProperty(layer.name, widthProp, widthInterpolation);
+
+      if (widthProp === 'line-width' && lineOffsetInterpolation) {
+        map.setPaintProperty(layer.name, 'line-offset', lineOffsetInterpolation);
+      }
+    }
+  } catch (error) {
+    console.error(`Failed to apply width factor on "${layer.name}":`, error);
+  }
+};
+
 
 /**
  * Custom hook for updating Maplibre GL JS feature state efficiently.
@@ -191,6 +240,8 @@ export const useFeatureStateUpdater = () => {
         if (paintProperty && !specifiedLayer.preserveBaseStyle) {
           applyPaintProperties(map, specifiedLayer.name, paintProperty);
         }
+
+        applyConfiguredWidthFactor(map, specifiedLayer);
 
         // Get previous feature states (Map of id -> value) for this layer
         const prevStates = layerStatesRef.current.get(specifiedLayer.name) || new Map();

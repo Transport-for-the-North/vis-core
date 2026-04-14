@@ -10,7 +10,8 @@ import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown, BandEditor, SelectorLabel } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
-import { AppContext, PageContext } from "contexts";
+import { AppContext, MapContext, PageContext } from "contexts";
+import { actionTypes } from "reducers";
 import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map";
 
 /**
@@ -297,6 +298,8 @@ export const LayerControlEntry = memo(
 
     const currentPage = useContext(PageContext);
     const appConfig = useContext(AppContext);
+    const mapContext = useContext(MapContext);
+    const mapDispatch = mapContext?.dispatch;
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
@@ -343,6 +346,18 @@ export const LayerControlEntry = memo(
       false;
     const isFixedLineWidth =
       layer.type === "line" && shouldFixLineWidth === true;
+    const configuredDefaultWidthFactor = Number.isFinite(
+      layerConfigFromState?.defaultWidthFactor
+    )
+      ? layerConfigFromState.defaultWidthFactor
+      : Number.isFinite(layer.metadata?.defaultWidthFactor)
+      ? layer.metadata.defaultWidthFactor
+      : Number.isFinite(layer.defaultWidthFactor)
+      ? layer.defaultWidthFactor
+      : null;
+    const storedWidthFactor = Number.isFinite(layerConfigFromState?.widthFactor)
+      ? layerConfigFromState.widthFactor
+      : null;
     const effectiveDefaultLineOffset =
       layerConfigFromState?.defaultLineOffset ??
       layer.metadata?.defaultLineOffset ??
@@ -379,16 +394,33 @@ export const LayerControlEntry = memo(
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) &&
       currentWidthFactor[0] === "interpolate";
+    const isNodeLayer = layer.type === "circle";
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(
           currentWidthFactor[currentWidthFactor.length - 1],
           widthProp
         )
       : currentWidthFactor;
+    const showWidth = isFeatureStateWidthExpression && !isFixedLineWidth;
 
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [widthFactor, setWidth] = useState(initialWidth || 1);
+    const [widthFactor, setWidth] = useState(
+      storedWidthFactor ?? configuredDefaultWidthFactor ?? initialWidth ?? 1
+    );
+
+    useEffect(() => {
+      const nextWidthFactor =
+        storedWidthFactor ?? configuredDefaultWidthFactor ?? initialWidth;
+
+      if (
+        typeof nextWidthFactor === "number" &&
+        Number.isFinite(nextWidthFactor) &&
+        Math.abs(nextWidthFactor - widthFactor) > 0.001
+      ) {
+        setWidth(nextWidthFactor);
+      }
+    }, [storedWidthFactor, configuredDefaultWidthFactor, initialWidth, widthFactor]);
 
     const bandEditorData = useMemo(() => {
       if (
@@ -564,6 +596,13 @@ export const LayerControlEntry = memo(
       });
 
       setWidth(nextFactor);
+      mapDispatch?.({
+        type: actionTypes.UPDATE_LAYER_WIDTH_FACTOR,
+        payload: {
+          layerName: layer.id,
+          widthFactor: nextFactor,
+        },
+      });
     };
 
     const showLayerSearch = enableZoomToFeature && layer.metadata?.path;
