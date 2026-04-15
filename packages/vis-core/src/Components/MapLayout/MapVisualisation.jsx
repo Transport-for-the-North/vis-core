@@ -126,16 +126,6 @@ export const MapVisualisation = ({
       : visualisationName;
   }, [visualisation?.type, visualisation?.joinLayer, visualisationName]);
 
-  const currentPage = useMemo(() => 
-    appContext.appPages.find((page) => page.url === window.location.pathname),
-    [appContext.appPages]
-  );
-
-  const visualisationConfig = useMemo(() =>
-    currentPage?.config?.visualisations?.find((v) => v.name === visualisationName),
-    [currentPage, visualisationName]
-  );
-
   // Retrieve classificationMethod per layer
   const classificationMethod =
     state.layers[layerKey]?.class_method ?? "d";
@@ -165,18 +155,18 @@ export const MapVisualisation = ({
   // Initialise classification method from visualisation config if not already set in state
   useEffect(() => {
     if (
-      visualisationConfig?.defaultClassification &&
+      visualisation?.defaultClassification &&
       !state.layers[layerKey]?.class_method
     ) {
       dispatch({
         type: "UPDATE_CLASSIFICATION_METHOD",
         payload: {
-          class_method: visualisationConfig.defaultClassification,
+          class_method: visualisation.defaultClassification,
           layerName: layerKey,
         },
       });
     }
-  }, [layerKey, visualisationConfig?.defaultClassification, state.layers, dispatch]);
+  }, [layerKey, visualisation?.defaultClassification, state.layers, dispatch]);
 
   // Reset fetch state when visualisation changes (page navigation)
   useEffect(() => {
@@ -320,13 +310,18 @@ export const MapVisualisation = ({
         return;
       }
 
+      // Reclassify data using combinedData
+      const currentPage = appContext.appPages.find(
+        (page) => page.url === window.location.pathname
+      );
+
       // Get trseLabel and customBands from state.layers
       const trseLabel =
         state.layers[layerKey]?.trseLabel === true;
       const customBands = state.layers[layerKey]?.customBands;
 
-      // Get defaultClassification from visualisationConfig
-      const defaultClassification = visualisationConfig?.defaultClassification;
+      // Get defaultClassification from visualisation
+      const defaultClassification = visualisation?.defaultClassification;
 
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
@@ -395,14 +390,12 @@ export const MapVisualisation = ({
       state.layers,
       resolvedStyle,
       appContext,
-      visualisation?.queryParams,
+      visualisation, 
       layerColorScheme,
       layerKey,
       // calculateColours,
       colorStyle,
       addFeaturesToMap,
-      currentPage,
-      visualisationConfig,
     ]
   );
 
