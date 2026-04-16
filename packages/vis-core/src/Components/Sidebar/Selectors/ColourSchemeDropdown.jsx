@@ -1,39 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { useMapContext } from "hooks";
-import { useMemo } from "react";
+import { useTheme } from "styled-components";
 import { colorSchemes } from "utils";
 import { SelectorLabel } from "./SelectorLabel";
-
-// Custom style for the react-select options
-const colourStyles = {
-  menuPortal: (base) => ({
-    ...base,
-    zIndex: 9999, // Adjust zIndex to be higher than everything else
-  }),
-  option: (styles, { isFocused }) => {
-    return {
-      ...styles,
-      display: "flex",
-      alignItems: "center",
-      borderBottom: "1px solid #eee",
-      padding: "5px 10px",
-      backgroundColor: isFocused ? "lightgray" : "white",
-      color: "black",
-      ":active": {
-        ...styles[":active"],
-        backgroundColor: "lightgray",
-      },
-    };
-  },
-  singleValue: (styles) => ({
-    ...styles,
-    display: "flex",
-    alignItems: "center",
-  }),
-};
+import { makeSelectStyles } from "utils/selectStyles";
 
 /**
  * Dropdown component for selecting color schemes.
@@ -47,6 +20,7 @@ export const ColourSchemeDropdown = ({
   handleColorChange,
   layerName,
 }) => {
+  const theme = useTheme();
   const animatedComponents = makeAnimated();
   const { state } = useMapContext();
 
@@ -112,7 +86,23 @@ export const ColourSchemeDropdown = ({
         options={options}
         value={selectedOption}
         formatOptionLabel={formatOptionLabel}
-        styles={colourStyles}
+        styles={useMemo(() => {
+          const base = makeSelectStyles(theme);
+          return {
+            ...base,
+            option: (provided, state) => ({
+              ...base.option(provided, state),
+              borderBottom: '1px solid #eee',
+              padding: '5px 10px',
+            }),
+            singleValue: (provided) => ({
+              ...provided,
+              display: 'flex',
+              alignItems: 'center',
+            }),
+          };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [theme])}
         menuPlacement="auto"
         menuPortalTarget={document.body} // Use a portal to render the menu
         onChange={(selectedOption) => handleColorChange(selectedOption, layerName)}

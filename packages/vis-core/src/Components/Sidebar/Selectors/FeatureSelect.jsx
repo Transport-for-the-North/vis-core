@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Select, { components } from 'react-select';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useLayerFeatureMetadata } from 'hooks/useLayerFeatureMetadata';
+import { makeSelectStyles } from 'utils/selectStyles';
 
 // Styled components
 const Container = styled.div`
@@ -41,6 +42,28 @@ export const CustomValueContainer = ({ children, ...props }) => {
  * @returns {JSX.Element} The rendered FeatureSelect component.
  */
 export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, placeholder, isClearable = false }) => {
+  const theme = useTheme();
+  const selectStyles = useMemo(() => {
+    const base = makeSelectStyles(theme);
+    return {
+      ...base,
+      valueContainer: (provided) => ({
+        ...base.valueContainer(provided),
+        maxHeight: '10rem',
+        overflowY: 'auto',
+      }),
+      menuList: (provided) => ({
+        ...provided,
+        maxHeight: '10rem',
+        overflowY: 'auto',
+      }),
+      clearIndicator: (provided) => ({
+        ...provided,
+        alignSelf: 'flex-start',
+      }),
+    };
+  }, [theme]);
+
   const { options, isLoading, handleInputChange, handleMenuOpen, handleMenuScrollToBottom } = useLayerFeatureMetadata(layerPath);
   const [noOptionsMessage, setNoOptionsMessage] = useState('No features found');
 
@@ -71,29 +94,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
         noOptionsMessage={() => noOptionsMessage}
         onMenuOpen={handleMenuOpen}
         components={{ ValueContainer: CustomValueContainer }}
-        styles={{
-          control: (base) => ({
-            ...base,
-            minHeight: '1rem',
-            maxHeight: '10rem',
-            overflowY: 'auto', // Ensure control itself can scroll if needed
-          }),
-          menu: (base) => ({
-            ...base,
-            maxHeight: '10rem',
-            overflowY: 'auto', // Enable scrolling for dropdown menu
-          }),
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-          menuList: (base) => ({
-            ...base,
-            maxHeight: '10rem',
-            overflowY: 'auto', // Ensure menu list is scrollable
-          }),
-          clearIndicator: (base) => ({
-            ...base,
-            alignSelf: 'flex-start', // Position clear control at top
-          }),
-        }}
+        styles={selectStyles}
         menuPortalTarget={document.body}
         menuPosition="fixed"
         onMenuScrollToBottom={handleMenuScrollToBottom}
