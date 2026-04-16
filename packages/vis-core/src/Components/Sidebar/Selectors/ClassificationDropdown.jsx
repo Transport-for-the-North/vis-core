@@ -3,36 +3,14 @@ import { SelectorLabel } from "./SelectorLabel";
 import { useMemo } from "react";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
+import { useTheme } from "styled-components";
+import { makeSelectStyles } from "utils/selectStyles";
 
 const StyledDropdown = styled.select`
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;
 `;
-const customStyles = {
-  menuPortal: (base) => ({
-    ...base,
-    zIndex: 9999, // Adjust zIndex to be higher than everything else
-  }),
-  option: (styles, { isFocused }) => ({
-    ...styles,
-    display: 'flex',
-    fontSize: '0.9rem',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px',
-    backgroundColor: isFocused ? 'lightgray' : 'white',
-    color: 'black',
-    cursor: 'pointer', // Change cursor to pointer
-    ':active': {
-      ...styles[':active'],
-      backgroundColor: 'lightgray',
-    },
-    ':hover': {
-      backgroundColor: 'lightgray', // Highlight on hover
-    },
-  }),
-};
 
 /**
  * Dropdown component for selecting options.
@@ -48,6 +26,8 @@ export const ClassificationDropdown = ({
   onChange,
   classification,
 }) => {
+  const theme = useTheme();
+  const selectStyles = useMemo(() => makeSelectStyles(theme), [theme]);
   const animatedComponents = makeAnimated();
   const options = useMemo(
     () =>
@@ -70,7 +50,7 @@ export const ClassificationDropdown = ({
         value={
           options.find((e) => e.value === classification) || options[0]
         }
-        styles={customStyles}
+        styles={selectStyles}
         menuPlacement="auto"
         menuPortalTarget={document.body}
         onChange={classification => onChange(classification.value)}

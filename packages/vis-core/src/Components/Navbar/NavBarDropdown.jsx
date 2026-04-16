@@ -288,13 +288,17 @@ export function RecursiveDropdownItem({
     }
   }, [subOpen, parentRect, direction, dropdownWidth]);
 
+  // Notify parent when the overall hover state of this item (header or child) changes.
+  useEffect(() => {
+    onChildHoverChange(hovered);
+  }, [hovered, onChildHoverChange]);
+
   /**
    * Called when the mouse enters the item region.
    * If the item has children, the submenu is prepared and shown.
    */
   const handleMouseEnter = () => {
     setHeaderHovered(true);
-    onChildHoverChange(true); // Notify parent that this item is hovered
     if (hasChildren && itemRef.current) {
       setParentRect(itemRef.current.getBoundingClientRect());
       setSubOpen(true);
@@ -307,7 +311,6 @@ export function RecursiveDropdownItem({
    */
   const handleMouseLeave = () => {
     setHeaderHovered(false);
-    onChildHoverChange(false); // Notify parent that this item is no longer hovered
   };
 
   /**
@@ -361,11 +364,9 @@ export function RecursiveDropdownItem({
           direction={direction}
           onPortalMouseEnter={() => {
             setChildHovered(true);
-            onChildHoverChange(true);
           }}
           onPortalMouseLeave={() => {
             setChildHovered(false);
-            onChildHoverChange(false);
           }}
         >
           <div ref={dropdownRef}>
@@ -412,10 +413,13 @@ export function NavBarDropdown({
   const [containerHovered, setContainerHovered] = useState(false);
   const anchorRef = useRef(null);
 
-  // whenever both are false, close
+  // whenever both are false, close after a short delay
   useEffect(() => {
     if (!containerHovered && !navChildHovered) {
-      setOpen(false);
+      const timeout = setTimeout(() => {
+        setOpen(false);
+      }, 50);
+      return () => clearTimeout(timeout);
     }
   }, [containerHovered, navChildHovered]);
 
@@ -442,8 +446,8 @@ export function NavBarDropdown({
   return (
     <DropdownContainer
       ref={anchorRef}
-      onMouseOver={() => handleHoverChange(true)}
-      onMouseOut={() => handleHoverChange(false)}
+      onMouseEnter={() => handleHoverChange(true)}
+      onMouseLeave={() => handleHoverChange(false)}
       $bgColor={$bgColor}
       $isActive={isActive}
       $hovered={navChildHovered}
@@ -453,8 +457,8 @@ export function NavBarDropdown({
       {open && (
         <DropdownMenuWrapper>
           <DropdownMenuScroll
-            onMouseOver={() => handleHoverChange(true)}
-            onMouseOut={() => handleHoverChange(false)}
+            onMouseEnter={() => handleHoverChange(true)}
+            onMouseLeave={() => handleHoverChange(false)}
           >
             {dropdownItems.map((item) => (
               <RecursiveDropdownItem

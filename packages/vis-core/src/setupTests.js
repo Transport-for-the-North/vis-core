@@ -23,6 +23,17 @@ global.importMeta = {
   }
 };
 
+jest.mock('styled-components', () => {
+  const actual = jest.requireActual('styled-components');
+  const styled = actual.default ?? actual;
+  return {
+    __esModule: true,
+    ...actual,
+    default: styled,
+    useTheme: () => ({ borderRadius: '4px', activeBg: '#6b46c1' }),
+  };
+});
+
 jest.mock('maplibre-gl', () => {
   class Popup {
     constructor(options) {
