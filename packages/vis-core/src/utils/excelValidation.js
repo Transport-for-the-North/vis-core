@@ -18,6 +18,22 @@ const EXCEL_MIME_TYPES = [
 ];
 
 /**
+ * Reads the value of a single cell from a parsed workbook.
+ *
+ * @param {import('xlsx').WorkBook} workbook
+ * @param {string} sheetName - e.g. 'LPA Info'
+ * @param {string} cellAddress - Excel-style address, e.g. 'A3'
+ * @returns {string|number|boolean|null} The cell value, or null if the cell is empty / not found.
+ */
+export function extractCellValue(workbook, sheetName, cellAddress) {
+  const sheet = workbook.Sheets[sheetName];
+  if (!sheet) return null;
+  const cell = sheet[cellAddress.toUpperCase()];
+  if (!cell || cell.v === undefined || cell.v === null || cell.v === '') return null;
+  return cell.v instanceof Date ? cell.v.toISOString().split('T')[0] : cell.v;
+}
+
+/**
  * Returns true when the File object is an Excel workbook.
  * @param {File} file
  * @returns {boolean}
@@ -71,9 +87,11 @@ export function parseExcelWorkbook(file) {
  *
  * @param {import('xlsx').WorkBook} workbook - Previously parsed workbook.
  * @param {string} sheetName - Name of the sheet to extract.
+ * @param {number} [headerRowIndex=0] - Zero-based index of the row containing column headers.
+ *   Use this when a workbook has legend/key rows above the real header (e.g. headerRowIndex: 7).
  * @returns {{ data: Object[], headers: string[] }}
  */
-export function extractSheetData(workbook, sheetName) {
+export function extractSheetData(workbook, sheetName, headerRowIndex = 0) {
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) {
     throw new Error(`Sheet "${sheetName}" not found in workbook.`);
@@ -86,8 +104,10 @@ export function extractSheetData(workbook, sheetName) {
     return { data: [], headers: [] };
   }
 
-  const headers = rows[0].map((h) => String(h ?? '').trim());
-  const data = rows.slice(1).map((row) => {
+  const headerRow = rows[headerRowIndex] ?? rows[0];
+  const headers = headerRow.map((h) => String(h ?? '').trim()).filter(Boolean);
+
+  const data = rows.slice(headerRowIndex + 1).map((row) => {
     const obj = {};
     headers.forEach((header, idx) => {
       const raw = row[idx];
@@ -111,11 +131,12 @@ export function extractSheetData(workbook, sheetName) {
  * @param {File} file - The Excel file.
  * @param {string} sheetName - Sheet to validate.
  * @param {Object} schema - Validation schema (same format as csvValidation).
+ *   Optionally include `headerRowIndex` (number) to specify which row holds column headers.
  * @returns {Promise<Object>} Validation result with isValid, errors, warnings, stats, parsedData, headers.
  */
 export async function validateExcelSheet(file, sheetName, schema) {
   const { workbook } = await parseExcelWorkbook(file);
-  const { data, headers } = extractSheetData(workbook, sheetName);
+  const { data, headers } = extractSheetData(workbook, sheetName, schema?.headerRowIndex ?? 0);
 
   if (data.length === 0) {
     return {

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CloudArrowUpIcon, XMarkIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { api } from '../../services';
 import { validateCSVFile, validateCSVSchema, parseCSV } from '../../utils/csvValidation';
-import { isExcelFile, parseExcelWorkbook, extractSheetData } from '../../utils/excelValidation';
+import { isExcelFile, parseExcelWorkbook, extractSheetData, extractCellValue } from '../../utils/excelValidation';
 import { ValidationErrors } from './ValidationErrors';
 import { ValidationPreview } from './ValidationPreview';
 
@@ -269,6 +269,10 @@ const SheetSelectorSelect = styled.select`
  * @param {Function} props.onUploadError           - Callback when upload fails
  * @param {Function} props.onValidationChange      - Callback when validation status changes
  * @param {Function} props.onDataChange            - Callback when parsed data / validation result changes
+ * @param {Array}    props.extractCells            - Cells to extract from the workbook on load.
+ *   Each entry: { sheet: string, cell: string, key: string }
+ *   e.g. [{ sheet: 'LPA Info', cell: 'A3', key: 'lpaName' }]
+ *   Extracted values are passed to onDataChange as workbookMeta: { [key]: value }.
  * @param {boolean}  props.disabled               - Disable the component
  */
 export const FileUpload = ({
@@ -279,6 +283,7 @@ export const FileUpload = ({
   maxPreviewRows = 10,
   maxFileSize = 10,
   acceptedFileTypes = ['text/csv', 'application/vnd.ms-excel'],
+  extractCells = [],
   onUploadSuccess = null,
   onUploadError = null,
   onValidationChange = null,
@@ -299,6 +304,7 @@ export const FileUpload = ({
   const [sheetNames, setSheetNames] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState(null);
   const [excelWorkbook, setExcelWorkbook] = useState(null);
+  const [workbookMeta, setWorkbookMeta] = useState(null);
 
   const fileInputRef = useRef(null);
 
@@ -402,10 +408,23 @@ export const FileUpload = ({
     }
   }, [validationSchema, validateBeforeUpload, onValidationChange, onDataChange, parsedData]);
 
+  // ─── Schema helpers ──────────────────────────────────────────────────────────
+
+  // Returns the schema to use for a given sheet name.
+  // If validationSchema has a `sheetSchemas` map, use the sheet-specific entry.
+  // Otherwise fall back to the top-level validationSchema for all sheets.
+  const getSchemaForSheet = useCallback((sheetName) => {
+    if (!validationSchema) return null;
+    if (validationSchema.sheetSchemas) {
+      return validationSchema.sheetSchemas[sheetName] ?? null;
+    }
+    return validationSchema;
+  }, [validationSchema]);
+
   // ─── Excel helpers ───────────────────────────────────────────────────────────
 
-  const applySheetData = useCallback((workbook, sheetName) => {
-    const { data, headers } = extractSheetData(workbook, sheetName);
+  const applySheetData = useCallback((workbook, sheetName, headerRowIndex = 0) => {
+    const { data, headers } = extractSheetData(workbook, sheetName, headerRowIndex);
     const preview = {
       parsedData: data,
       headers,
@@ -424,18 +443,18 @@ export const FileUpload = ({
     return { data, headers, preview };
   }, []);
 
-  const validateExcelSheetData = useCallback((data, headers, preview) => {
-    if (!validationSchema || !validateBeforeUpload) return;
+  const validateExcelSheetData = useCallback((data, headers, preview, activeSchema) => {
+    if (!activeSchema || !validateBeforeUpload) return;
 
     setIsValidating(true);
     setUploadStatus({ type: 'validating', message: 'Validating sheet...' });
 
     try {
-      const result = validateCSVSchema(data, validationSchema);
+      const result = validateCSVSchema(data, activeSchema);
       const finalResult = { ...result, parsedData: data, headers };
       setValidationResult(finalResult);
       if (onValidationChange) onValidationChange(finalResult.isValid, finalResult.errors, finalResult.warnings);
-      if (onDataChange) onDataChange({ parsedData: preview, validationResult: finalResult });
+      if (onDataChange) onDataChange({ parsedData: preview, validationResult: finalResult, workbookMeta });
       setUploadStatus(
         finalResult.isValid
           ? { type: 'success', message: 'Sheet validation passed!' }
@@ -453,11 +472,11 @@ export const FileUpload = ({
       setValidationResult(errorResult);
       setUploadStatus({ type: 'error', message: `Validation error: ${err.message}` });
       if (onValidationChange) onValidationChange(false, errorResult.errors, []);
-      if (onDataChange) onDataChange({ parsedData: preview, validationResult: errorResult });
+      if (onDataChange) onDataChange({ parsedData: preview, validationResult: errorResult, workbookMeta });
     } finally {
       setIsValidating(false);
     }
-  }, [validationSchema, validateBeforeUpload, onValidationChange, onDataChange]);
+  }, [validationSchema, validateBeforeUpload, onValidationChange, onDataChange, workbookMeta]);
 
   const handleSheetSelect = useCallback((sheetName) => {
     if (!excelWorkbook || !sheetName) return;
@@ -465,9 +484,11 @@ export const FileUpload = ({
     setValidationResult(null);
     setUploadStatus(null);
 
-    const { data, headers, preview } = applySheetData(excelWorkbook, sheetName);
-    validateExcelSheetData(data, headers, preview);
-  }, [excelWorkbook, applySheetData, validateExcelSheetData]);
+    const activeSchema = getSchemaForSheet(sheetName);
+    const headerRowIndex = activeSchema?.headerRowIndex ?? 0;
+    const { data, headers, preview } = applySheetData(excelWorkbook, sheetName, headerRowIndex);
+    validateExcelSheetData(data, headers, preview, activeSchema);
+  }, [excelWorkbook, applySheetData, validateExcelSheetData, getSchemaForSheet]);
 
   // ─── Shared file selection ────────────────────────────────────────────────
 
@@ -513,11 +534,23 @@ export const FileUpload = ({
         setExcelWorkbook(workbook);
         setSheetNames(names);
 
+        // Extract any configured cell values (e.g. LPA name from LPA Info!A3)
+        if (extractCells && extractCells.length > 0) {
+          const meta = {};
+          extractCells.forEach(({ sheet, cell, key }) => {
+            meta[key] = extractCellValue(workbook, sheet, cell);
+          });
+          setWorkbookMeta(meta);
+          if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: meta });
+        }
+
         // Auto-select when there is only one sheet
         if (names.length === 1) {
           setSelectedSheet(names[0]);
-          const { data, headers, preview } = applySheetData(workbook, names[0]);
-          validateExcelSheetData(data, headers, preview);
+          const activeSchema = getSchemaForSheet(names[0]);
+          const headerRowIndex = activeSchema?.headerRowIndex ?? 0;
+          const { data, headers, preview } = applySheetData(workbook, names[0], headerRowIndex);
+          validateExcelSheetData(data, headers, preview, activeSchema);
         }
       } catch (err) {
         setUploadStatus({ type: 'error', message: err.message });
@@ -574,9 +607,10 @@ export const FileUpload = ({
     setSheetNames([]);
     setSelectedSheet(null);
     setExcelWorkbook(null);
+    setWorkbookMeta(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (onValidationChange) onValidationChange(true, [], []);
-    if (onDataChange) onDataChange({ parsedData: null, validationResult: null });
+    if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: null });
   }, [onValidationChange, onDataChange]);
 
   const handleUpload = useCallback(async () => {
@@ -639,13 +673,17 @@ export const FileUpload = ({
 
   const fileIsExcel = file ? isExcelFile(file) : false;
   const excelNeedsSheet = fileIsExcel && sheetNames.length > 1 && !selectedSheet;
+  const activeSheetSchema = selectedSheet ? getSchemaForSheet(selectedSheet) : null;
+  const schemaRequiresValidation = fileIsExcel
+    ? (activeSheetSchema != null && validateBeforeUpload)
+    : (validationSchema != null && validateBeforeUpload);
   const canUpload =
     file &&
     !isValidating &&
     !isParsing &&
     !isUploading &&
     !excelNeedsSheet &&
-    (!validationSchema || !validateBeforeUpload || (validationResult?.isValid ?? true));
+    (!schemaRequiresValidation || (validationResult?.isValid ?? true));
 
   const acceptAttr = [
     ...acceptedFileTypes,
