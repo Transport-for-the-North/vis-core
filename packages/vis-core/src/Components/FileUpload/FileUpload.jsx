@@ -165,7 +165,11 @@ const StatusMessage = styled.div`
 
 const UploadButton = styled.button`
   padding: 12px 20px;
-  background-color: ${props => props.$disabled ? '#ccc' : '#007bff'};
+  background-color: ${props => {
+    if (props.$variant === 'error') return '#c62828';
+    if (props.$disabled) return '#ccc';
+    return '#007bff';
+  }};
   color: white;
   border: none;
   border-radius: ${CONTROL_BORDER_RADIUS}px;
@@ -181,7 +185,62 @@ const UploadButton = styled.button`
   width: 100%;
 
   &:hover:not(:disabled) {
-    background-color: ${props => props.$disabled ? '#ccc' : '#0056b3'};
+    background-color: ${props => {
+      if (props.$variant === 'error') return '#b71c1c';
+      if (props.$disabled) return '#ccc';
+      return '#0056b3';
+    }};
+  }
+`;
+
+const SuccessPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  text-align: center;
+`;
+
+const SuccessTitle = styled.h2`
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1b5e20;
+`;
+
+const SuccessFileName = styled.div`
+  font-size: 0.9rem;
+  color: #388e3c;
+  font-weight: 500;
+`;
+
+const SuccessMessage = styled.p`
+  margin: 0;
+  font-size: 0.95rem;
+  color: #2e7d32;
+  max-width: 480px;
+  line-height: 1.5;
+`;
+
+const SuccessResetButton = styled.button`
+  margin-top: 8px;
+  padding: 10px 20px;
+  background-color: transparent;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  font-size: 0.9rem;
+  font-family: 'Hanken Grotesk', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #2e7d32;
+    color: #fff;
   }
 `;
 
@@ -289,6 +348,8 @@ export const FileUpload = ({
   onValidationChange = null,
   onDataChange = null,
   disabled = false,
+  successTitle = 'Upload Successful',
+  successMessage = 'Your file has been received and is being processed. You will be notified once it is ready.',
 }) => {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -308,7 +369,15 @@ export const FileUpload = ({
   // Tracks per-sheet validation results so all sheets must pass before upload
   const [sheetValidationResults, setSheetValidationResults] = useState({});
 
+  // Post-upload success state
+  const [uploadComplete, setUploadComplete] = useState(false);
+  const [uploadCompleteFile, setUploadCompleteFile] = useState(null);
+
   const fileInputRef = useRef(null);
+  // Prevents concurrent submissions and rapid re-clicks (debounce)
+  const uploadInProgressRef = useRef(false);
+  const lastUploadTimeRef = useRef(0);
+  const UPLOAD_DEBOUNCE_MS = 500;
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
@@ -645,13 +714,27 @@ export const FileUpload = ({
     setExcelWorkbook(null);
     setWorkbookMeta(null);
     setSheetValidationResults({});
+    setUploadComplete(false);
+    setUploadCompleteFile(null);
+    uploadInProgressRef.current = false;
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (onValidationChange) onValidationChange(true, [], []);
     if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: null });
   }, [onValidationChange, onDataChange]);
 
+  const handleReset = useCallback(() => {
+    handleRemoveFile();
+  }, [handleRemoveFile]);
+
   const handleUpload = useCallback(async () => {
     if (!file) return;
+
+    // Prevent concurrent submissions and rapid re-clicks
+    if (uploadInProgressRef.current) return;
+    const now = Date.now();
+    if (now - lastUploadTimeRef.current < UPLOAD_DEBOUNCE_MS) return;
+    uploadInProgressRef.current = true;
+    lastUploadTimeRef.current = now;
 
     const fileIsExcel = isExcelFile(file);
 
@@ -697,14 +780,16 @@ export const FileUpload = ({
         onProgress: (progress) => setUploadProgress(progress),
       });
 
-      setUploadStatus({ type: 'success', message: 'File uploaded successfully!' });
       setUploadProgress(100);
+      setUploadCompleteFile(file);
+      setUploadComplete(true);
       if (onUploadSuccess) onUploadSuccess(response, file);
     } catch (error) {
       setUploadStatus({ type: 'error', message: `Upload failed: ${error.message}` });
       if (onUploadError) onUploadError(error, file);
     } finally {
       setIsUploading(false);
+      uploadInProgressRef.current = false;
     }
   }, [
     file,
@@ -723,10 +808,7 @@ export const FileUpload = ({
 
   const fileIsExcel = file ? isExcelFile(file) : false;
   const excelNeedsSheet = fileIsExcel && sheetNames.length > 1 && !selectedSheet;
-  const activeSheetSchema = selectedSheet ? getSchemaForSheet(selectedSheet) : null;
-  const schemaRequiresValidation = fileIsExcel
-    ? (validationSchema != null && validateBeforeUpload)
-    : (validationSchema != null && validateBeforeUpload);
+  const schemaRequiresValidation = validationSchema != null && validateBeforeUpload;
 
   // For Excel every sheet that has a schema must have a passing result
   const allExcelSheetsValid = !fileIsExcel || !validationSchema || !validateBeforeUpload
@@ -737,6 +819,13 @@ export const FileUpload = ({
         return sheetValidationResults[name]?.isValid === true;
       });
 
+  // True when validation has run and found errors (blocks upload and drives button colour)
+  const validationFailed = schemaRequiresValidation && (
+    fileIsExcel
+      ? (Object.keys(sheetValidationResults).length > 0 && !allExcelSheetsValid)
+      : (validationResult !== null && !validationResult.isValid)
+  );
+
   const canUpload =
     file &&
     !isValidating &&
@@ -745,6 +834,24 @@ export const FileUpload = ({
     !excelNeedsSheet &&
     (!schemaRequiresValidation || (fileIsExcel ? allExcelSheetsValid : (validationResult?.isValid ?? true)));
 
+  // Button appearance
+  const buttonVariant = validationFailed ? 'error' : 'default';
+  const failingSheetCount = fileIsExcel
+    ? sheetNames.filter((name) => {
+        const schema = getSchemaForSheet(name);
+        return schema && sheetValidationResults[name]?.isValid === false;
+      }).length
+    : 0;
+  const buttonLabel = isUploading
+    ? `Uploading… ${Math.round(uploadProgress)}%`
+    : excelNeedsSheet
+    ? 'Select a sheet to continue'
+    : validationFailed
+    ? fileIsExcel
+      ? `${failingSheetCount} sheet${failingSheetCount !== 1 ? 's' : ''} failed validation — cannot upload`
+      : `${validationResult?.errors?.length ?? 0} validation error${(validationResult?.errors?.length ?? 0) !== 1 ? 's' : ''} — cannot upload`
+    : 'Upload File';
+
   const acceptAttr = [
     ...acceptedFileTypes,
     '.csv',
@@ -752,6 +859,24 @@ export const FileUpload = ({
     '.xlsm',
     '.xls',
   ].join(',');
+
+  if (uploadComplete) {
+    return (
+      <Container>
+        <SuccessPanel>
+          <CheckCircleIcon style={{ width: 56, height: 56, color: '#2e7d32' }} />
+          <SuccessTitle>{successTitle}</SuccessTitle>
+          {uploadCompleteFile && (
+            <SuccessFileName>
+              {uploadCompleteFile.name} &mdash; {formatFileSize(uploadCompleteFile.size)}
+            </SuccessFileName>
+          )}
+          <SuccessMessage>{successMessage}</SuccessMessage>
+          <SuccessResetButton onClick={handleReset}>Upload another file</SuccessResetButton>
+        </SuccessPanel>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -878,16 +1003,21 @@ export const FileUpload = ({
           <UploadButton
             onClick={handleUpload}
             disabled={!canUpload || disabled}
+            $variant={buttonVariant}
+            $disabled={!canUpload || disabled}
           >
             {isUploading ? (
               <>
                 <Spinner />
-                Uploading... {Math.round(uploadProgress)}%
+                {buttonLabel}
               </>
-            ) : excelNeedsSheet ? (
-              'Select a sheet to continue'
+            ) : validationFailed ? (
+              <>
+                <ExclamationCircleIcon style={{ width: 18, height: 18 }} />
+                {buttonLabel}
+              </>
             ) : (
-              'Upload File'
+              buttonLabel
             )}
           </UploadButton>
         </>
