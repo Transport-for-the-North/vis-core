@@ -66,7 +66,7 @@ const UploadIcon = styled.div`
   }};
 `;
 
-const UploadText = styled.div`
+const UploadText = styled.div`f
   font-size: 1rem;
   color: #333;
   margin-bottom: 8px;
@@ -305,6 +305,8 @@ export const FileUpload = ({
   const [selectedSheet, setSelectedSheet] = useState(null);
   const [excelWorkbook, setExcelWorkbook] = useState(null);
   const [workbookMeta, setWorkbookMeta] = useState(null);
+  // Tracks per-sheet validation results so all sheets must pass before upload
+  const [sheetValidationResults, setSheetValidationResults] = useState({});
 
   const fileInputRef = useRef(null);
 
@@ -478,6 +480,35 @@ export const FileUpload = ({
     }
   }, [validationSchema, validateBeforeUpload, onValidationChange, onDataChange, workbookMeta]);
 
+  // Validates every sheet that has a matching schema and stores results in
+  // sheetValidationResults. Called once after the workbook is parsed so that
+  // the upload gate can require ALL sheets to pass, not just the selected one.
+  const validateAllExcelSheets = useCallback((workbook, names) => {
+    if (!validationSchema || !validateBeforeUpload) return;
+    const results = {};
+    names.forEach((name) => {
+      const schema = getSchemaForSheet(name);
+      if (!schema) return;
+      const headerRowIndex = schema?.headerRowIndex ?? 0;
+      const { data, headers } = extractSheetData(workbook, name, headerRowIndex);
+      try {
+        const result = validateCSVSchema(data, schema);
+        results[name] = { ...result, parsedData: data, headers };
+      } catch (err) {
+        results[name] = {
+          isValid: false,
+          errors: [{ type: 'validation_error', message: err.message }],
+          warnings: [],
+          stats: {},
+          parsedData: data,
+          headers,
+        };
+      }
+    });
+    setSheetValidationResults(results);
+    return results;
+  }, [validationSchema, validateBeforeUpload, getSchemaForSheet]);
+
   const handleSheetSelect = useCallback((sheetName) => {
     if (!excelWorkbook || !sheetName) return;
     setSelectedSheet(sheetName);
@@ -544,6 +575,10 @@ export const FileUpload = ({
           if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: meta });
         }
 
+        // Validate all sheets up front so the upload gate can require every
+        // sheet with a schema to pass (not just the currently selected one).
+        validateAllExcelSheets(workbook, names);
+
         // Auto-select when there is only one sheet
         if (names.length === 1) {
           setSelectedSheet(names[0]);
@@ -572,6 +607,7 @@ export const FileUpload = ({
     onUploadError,
     applySheetData,
     validateExcelSheetData,
+    validateAllExcelSheets,
     parseCSVForPreview,
   ]);
 
@@ -608,6 +644,7 @@ export const FileUpload = ({
     setSelectedSheet(null);
     setExcelWorkbook(null);
     setWorkbookMeta(null);
+    setSheetValidationResults({});
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (onValidationChange) onValidationChange(true, [], []);
     if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: null });
@@ -619,10 +656,20 @@ export const FileUpload = ({
     const fileIsExcel = isExcelFile(file);
 
     if (fileIsExcel) {
-      // For Excel, validation already ran on sheet selection — just check the result
-      if (validationSchema && validateBeforeUpload && !validationResult?.isValid) {
-        setUploadStatus({ type: 'error', message: 'Please fix validation errors before uploading' });
-        return;
+      // All sheets with a schema must have passed validation
+      if (validationSchema && validateBeforeUpload) {
+        const failingSheet = sheetNames.find((name) => {
+          const schema = getSchemaForSheet(name);
+          if (!schema) return false;
+          return sheetValidationResults[name]?.isValid !== true;
+        });
+        if (failingSheet) {
+          setUploadStatus({
+            type: 'error',
+            message: `Please fix validation errors on all sheets before uploading (sheet "${failingSheet}" has errors)`,
+          });
+          return;
+        }
       }
     } else {
       // Re-validate CSV before upload
@@ -667,6 +714,9 @@ export const FileUpload = ({
     validateCSV,
     validationResult,
     selectedSheet,
+    sheetNames,
+    sheetValidationResults,
+    getSchemaForSheet,
     onUploadSuccess,
     onUploadError,
   ]);
@@ -675,15 +725,25 @@ export const FileUpload = ({
   const excelNeedsSheet = fileIsExcel && sheetNames.length > 1 && !selectedSheet;
   const activeSheetSchema = selectedSheet ? getSchemaForSheet(selectedSheet) : null;
   const schemaRequiresValidation = fileIsExcel
-    ? (activeSheetSchema != null && validateBeforeUpload)
+    ? (validationSchema != null && validateBeforeUpload)
     : (validationSchema != null && validateBeforeUpload);
+
+  // For Excel every sheet that has a schema must have a passing result
+  const allExcelSheetsValid = !fileIsExcel || !validationSchema || !validateBeforeUpload
+    ? true
+    : sheetNames.every((name) => {
+        const schema = getSchemaForSheet(name);
+        if (!schema) return true;
+        return sheetValidationResults[name]?.isValid === true;
+      });
+
   const canUpload =
     file &&
     !isValidating &&
     !isParsing &&
     !isUploading &&
     !excelNeedsSheet &&
-    (!schemaRequiresValidation || (validationResult?.isValid ?? true));
+    (!schemaRequiresValidation || (fileIsExcel ? allExcelSheetsValid : (validationResult?.isValid ?? true)));
 
   const acceptAttr = [
     ...acceptedFileTypes,
