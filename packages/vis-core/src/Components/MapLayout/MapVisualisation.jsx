@@ -152,6 +152,22 @@ export const MapVisualisation = ({
     shouldFilterDataToViewport,
   );
 
+  // Initialise classification method from visualisation config if not already set in state
+  useEffect(() => {
+    if (
+      visualisation?.defaultClassification &&
+      !state.layers[layerKey]?.class_method
+    ) {
+      dispatch({
+        type: "UPDATE_CLASSIFICATION_METHOD",
+        payload: {
+          class_method: visualisation.defaultClassification,
+          layerName: layerKey,
+        },
+      });
+    }
+  }, [layerKey, visualisation?.defaultClassification, state.layers, dispatch]);
+
   // Reset fetch state when visualisation changes (page navigation)
   useEffect(() => {
     hasStyledLayerRef.current = false;
@@ -304,6 +320,9 @@ export const MapVisualisation = ({
         state.layers[layerKey]?.trseLabel === true;
       const customBands = state.layers[layerKey]?.customBands;
 
+      // Get defaultClassification from visualisation
+      const defaultClassification = visualisation?.defaultClassification;
+
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
         style,
@@ -311,7 +330,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { trseLabel, customBands } // Pass trseLabel and customBands in options
+        { trseLabel, customBands, defaultClassification } // Pass trseLabel, customBands and defaultClassification in options
       );
 
       // Get the metric definition for the current page/metric
@@ -371,7 +390,7 @@ export const MapVisualisation = ({
       state.layers,
       resolvedStyle,
       appContext,
-      visualisation?.queryParams,
+      visualisation, 
       layerColorScheme,
       layerKey,
       // calculateColours,
