@@ -1,5 +1,5 @@
 import React from "react";
-import { MapLayout, IFrameEmbedPage, TableLayout, SVGGalleryManager } from "Components";
+import { MapLayout, IFrameEmbedPage, TableLayout, SVGGalleryManager, DashboardPage } from "Components";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
 import { DirectoryScorecardsPage } from "Components";
 
@@ -34,6 +34,12 @@ export const PageSwitch = ({ pageConfig }) => {
             return (
               <FilterProvider>
                 <DirectoryScorecardsPage/>
+              </FilterProvider>
+            );
+          case "Dashboard":
+            return (
+              <FilterProvider>
+                <DashboardPage />
               </FilterProvider>
             );
           case "SVGGalleryManager":
