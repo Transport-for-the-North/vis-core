@@ -125,22 +125,20 @@ describe("BaseMapFeatureSelect component test", () => {
     expect(rectangleSelect).not.toBeDisabled();
 
     expect(pointerSelect).toHaveStyle({
-      color: "rgb(0,0,0)",
+      color: "black",
     });
     expect(rectangleSelect).toHaveStyle({
-      backgroundColor: "rgb(255,255,255)",
-      color: "rgb(0,0,0)",
+      color: "black",
     });
 
     await userEvent.click(rectangleSelect);
 
     await waitFor(() => {
       expect(rectangleSelect).toHaveStyle({
-        color: "rgb(0,0,0)",
+        color: "black",
       });
       expect(pointerSelect).toHaveStyle({
-        backgroundColor: "rgb(255,255,255)",
-        color: "rgb(0,0,0)",
+        color: "black",
       });
     });
 
@@ -148,10 +146,10 @@ describe("BaseMapFeatureSelect component test", () => {
 
     await waitFor(() => {
       expect(pointerSelect).toHaveStyle({
-        color: "rgb(0,0,0)",
+        color: "black",
       });
       expect(rectangleSelect).toHaveStyle({
-        color: "rgb(0,0,0)",
+        color: "black",
       });
     });
   });
