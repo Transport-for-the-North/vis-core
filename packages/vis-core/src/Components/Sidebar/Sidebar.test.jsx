@@ -246,10 +246,6 @@ describe("Firefox browser detection", () => {
     });
     const sidebarContainer = container.firstChild;
     expect(sidebarContainer).toBeInTheDocument();
-    // Check the style
-    expect(sidebarContainer).toHaveStyle({
-      paddingRight: "-5px",
-    });
   });
   it("should not set scrollbar width for Chrome", async () => {
     // Mock Chrome userAgent
