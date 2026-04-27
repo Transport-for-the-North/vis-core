@@ -142,7 +142,11 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
 
     if (!filter.multiSelect) {
       const currentlyHidden = options.find((o) => o.paramValue === current)?.isHidden;
-      if (currentlyHidden) {
+      const shouldAutoSelectOnlyVisible = current == null && visibleOptions.length === 1;
+
+      // Commit the only visible value when nothing has been written yet, and
+      // also recover if the current value becomes hidden after validation.
+      if (currentlyHidden || shouldAutoSelectOnlyVisible) {
         const fallback = visibleOptions[0]?.paramValue ?? null;
         onChange(filter, fallback);
         setSelectedButtons(fallback);
