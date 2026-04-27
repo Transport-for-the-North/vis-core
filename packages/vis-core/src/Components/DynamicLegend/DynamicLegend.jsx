@@ -5,6 +5,7 @@ import { convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext, useFetchVisualisationData } from "hooks";
 import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
+import { formatNumber } from "utils";
 
 /**
  * useIsMobile
@@ -442,7 +443,7 @@ const isRenderableEntry = (e) => {
 
 const formatLegendLabelValue = (value) => {
   const numericValue = convertStringToNumber(value);
-  return Number.isFinite(numericValue) ? numberWithCommas(numericValue) : value;
+  return Number.isFinite(numericValue) ? formatNumber(numericValue) : value;
 };
 
 /**
