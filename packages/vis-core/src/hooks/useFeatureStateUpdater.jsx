@@ -149,7 +149,7 @@ export const useFeatureStateUpdater = () => {
    * @param {string} layerName - The target layer name.
    */
   const addFeaturesToMap = useCallback(
-    (map, paintProperty, layers, data, colorStyle, layerName) => {
+    (map, paintProperty, layers, data, colorStyle, layerName, legendMetadata = {}) => {
       const { maxRetries, baseDelay } = RETRY_CONFIG;
       const retryManager = retryManagerRef.current;
 
@@ -185,6 +185,7 @@ export const useFeatureStateUpdater = () => {
         layerFromMap.metadata = {
           ...layerFromMap.metadata,
           colorStyle,
+          ...legendMetadata,
         };
 
         // Apply paint properties if not preserving base style

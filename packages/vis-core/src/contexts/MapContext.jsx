@@ -15,7 +15,8 @@ import {
   getDefaultLayerBufferSize,
   applyWhereConditions,
   buildDeterministicFilterId,
-  getInitialFilterValue
+  getInitialFilterValue,
+  buildCategoricalLegendKey
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
 import { AppContext, PageContext, FilterContext } from "contexts";
@@ -37,6 +38,38 @@ const isDuplicateValue = (values, value) => {
     existingValue.paramValue === value.paramValue &&
     existingValue.displayValue === value.displayValue
   );
+};
+
+const buildCacheSeedFromFilters = (filters = []) => {
+  return filters.reduce((cacheSeed, filter) => {
+    const filterValues = filter?.values?.values;
+    if (!Array.isArray(filterValues)) {
+      return cacheSeed;
+    }
+
+    const fieldName = filter.legendCacheField || filter.valueField || filter.paramName;
+
+    filterValues.forEach((valueItem) => {
+      if (typeof valueItem?.colourValue !== "string" || valueItem.colourValue.trim() === "") {
+        return;
+      }
+
+      const value = valueItem.paramValue ?? valueItem.value ?? valueItem.displayValue;
+      const legendCacheKey = buildCategoricalLegendKey({ fieldName, value });
+      if (!legendCacheKey) {
+        return;
+      }
+
+      cacheSeed[legendCacheKey] = {
+        label: valueItem.displayValue ?? String(value ?? "").trim(),
+        colour: valueItem.colourValue,
+        fieldName: String(fieldName ?? "").trim() || "value",
+        schemeName: filter.schemeName ?? null,
+      };
+    });
+
+    return cacheSeed;
+  }, {});
 };
 
 /**
@@ -74,6 +107,7 @@ export const MapProvider = ({ children }) => {
     isDynamicStylingLoading: false,
     pageIsReady: false,
     metadataError: null,
+    categoricalLegendCache: {},
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
@@ -316,6 +350,13 @@ export const MapProvider = ({ children }) => {
       }
 
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
+      const categoricalLegendSeed = buildCacheSeedFromFilters(updatedFilters);
+      if (Object.keys(categoricalLegendSeed).length > 0) {
+        dispatch({
+          type: actionTypes.MERGE_CATEGORICAL_LEGEND_CACHE,
+          payload: categoricalLegendSeed,
+        });
+      }
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
       dispatch({ type: actionTypes.SET_PARAM_NAME_TO_UUID_MAP, payload: paramNameToUuidMap });
 
