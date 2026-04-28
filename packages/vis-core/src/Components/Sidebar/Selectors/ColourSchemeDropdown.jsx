@@ -4,7 +4,7 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { useMapContext } from "hooks";
 import { useTheme } from "styled-components";
-import { colorSchemes } from "utils";
+import { colorSchemes, colourBlindFriendlySchemes } from "utils";
 import { SelectorLabel } from "./SelectorLabel";
 import { makeSelectStyles } from "utils/selectStyles";
 
@@ -35,24 +35,40 @@ export const ColourSchemeDropdown = ({
    * @returns {JSX.Element} The formatted option label.
    */
   const formatOptionLabel = ({ value, label }) => {
-    const colors = chroma.brewer[value];
-    return (
-      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-        <div style={{ width: "30%", paddingRight: "10px" }}>{label}</div>
-        <div style={{ width: "70%", display: "flex" }}>
-          {colors.map((color) => (
-            <div
-              key={color}
-              style={{
-                backgroundColor: color,
-                width: `${100 / colors.length}%`,
-                height: "20px",
-              }}
-            />
-          ))}
-        </div>
+  const colors = chroma.brewer[value];
+  const isColourBlindFriendly = colourBlindFriendlySchemes.has(value);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+      {/* Label + flag */}
+      <div style={{ width: "30%", paddingRight: "10px", display: "flex", alignItems: "center", gap: 6 }}>
+        <span>{label}</span>
+        {isColourBlindFriendly && (
+          <span
+            title="Colour-blind friendly"
+            aria-label="Colour-blind friendly"
+            style={{ fontSize: "0.9em" }}
+          >
+            👁️
+          </span>
+        )}
       </div>
-    );
+
+      {/* Swatches */}
+      <div style={{ width: "70%", display: "flex" }}>
+        {colors.map((color) => (
+          <div
+            key={color}
+            style={{
+              backgroundColor: color,
+              width: `${100 / colors.length}%`,
+              height: "20px",
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
   };
 
   const options = useMemo(
@@ -107,6 +123,25 @@ export const ColourSchemeDropdown = ({
         menuPortalTarget={document.body} // Use a portal to render the menu
         onChange={(selectedOption) => handleColorChange(selectedOption, layerName)}
       />
+      {/* Legend */}
+        <div
+          style={{
+            marginTop: "6px",
+            fontSize: "12px",
+            color: "#666",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{ fontSize: "16px", lineHeight: 1 }}
+          >
+            👁️
+          </span>
+          <span> = Colour‑blind friendly</span>
+        </div>
     </>
   );
 };
