@@ -825,6 +825,97 @@ const DonutPieChart = ({ config, data, formatters }) => {
  * @returns {JSX.Element} - Styled table component with headers and data rows
  */
 const TableChart = ({ config, data, formatters }) => {
+  const tableLayout = config.tableLayout || "rows";
+
+  if (tableLayout === "rows") {
+    const cols = config.columns || [];
+    const rowData = Array.isArray(data) ? data : data ? [data] : [];
+
+    if (!rowData.length || !cols.length) {
+      return (
+        <Section aria-label={config.ariaLabel || "Table"}>
+          {config.title && <Title>{config.title}</Title>}
+          <WarningBox text="No data available for selection" />
+        </Section>
+      );
+    }
+
+    return (
+      <Section aria-label={config.ariaLabel || "Table"}>
+        {config.title && <Title>{config.title}</Title>}
+        <div style={{ overflowX: "auto", margin: "10px 0" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: 12,
+              background: "white",
+              border: "1px solid #ddd",
+              borderRadius: 6,
+              overflow: "hidden",
+            }}
+          >
+            <thead>
+              <tr style={{ background: DEFAULTS.BRAND_COLOR, color: "white" }}>
+                {cols.map((col) => (
+                  <th
+                    key={col.key}
+                    style={{
+                      padding: 8,
+                      textAlign: "left",
+                      fontWeight: 600,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {col.label ?? col.key}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rowData.map((row, rowIndex) => (
+                <tr
+                  key={row.id ?? row.reference_id ?? rowIndex}
+                  style={{
+                    borderBottom:
+                      rowIndex === rowData.length - 1 ? "none" : "1px solid #eee",
+                  }}
+                >
+                  {cols.map((col, colIndex) => {
+                    const value = row?.[col.key];
+                    return (
+                      <td
+                        key={col.key}
+                        style={{
+                          padding: 8,
+                          textAlign: "left",
+                          borderRight:
+                            colIndex === cols.length - 1 ? "none" : "1px solid #eee",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {value ?? ""}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+    );
+  }
+
+  if (tableLayout !== "perc" && tableLayout !== "perc-table") {
+    return (
+      <Section aria-label={config.ariaLabel || "Table"}>
+        {config.title && <Title>{config.title}</Title>}
+        <WarningBox text={`Unsupported table layout: ${tableLayout}`} />
+      </Section>
+    );
+  }
+
   const cols = config.columns || [];
   const keys = React.useMemo(() => cols.map((c) => c.key), [cols]);
   const rows = React.useMemo(
@@ -1026,16 +1117,25 @@ export const ChartRenderer = ({
 }) => {
   if (!charts.length) return null;
   const f = { ...defaultFormatters, ...formatters };
+  const hasRowTable = charts.some(
+    (cfg) =>
+      String(cfg?.type || "").toLowerCase() === "table" &&
+      (cfg?.tableLayout || "rows") === "rows"
+  );
 
   // Determine if data has values
-  const hasAny = Array.isArray(data)
-    ? data.length > 0 &&
-      data.some((row) =>
-        Object.entries(row)
-          .filter(([k]) => k !== (charts[0]?.xKey || "label"))
-          .some(([, v]) => Number(v) > 0)
-      )
-    : data && Object.values(data).some((v) => (Number(v) || 0) > 0);
+  const hasAny = hasRowTable
+    ? Array.isArray(data)
+      ? data.length > 0
+      : !!data && Object.keys(data).length > 0
+    : Array.isArray(data)
+      ? data.length > 0 &&
+        data.some((row) =>
+          Object.entries(row)
+            .filter(([k]) => k !== (charts[0]?.xKey || "label"))
+            .some(([, v]) => Number(v) > 0)
+        )
+      : data && Object.values(data).some((v) => (Number(v) || 0) > 0);
 
   if (!hasAny) return null;
 
