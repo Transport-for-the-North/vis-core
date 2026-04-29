@@ -1,3 +1,25 @@
+# [0.10.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.9.1...v0.10.0) (2026-04-29)
+
+
+### Bug Fixes
+
+* allow single selection to feed through to filterState. ([f5f840f](https://github.com/Transport-for-the-North/vis-core/commit/f5f840fdc21e953388fc82109dfcaafe24eb3b83))
+* change text colours to rgb so that tests pass. ([d62b236](https://github.com/Transport-for-the-North/vis-core/commit/d62b236b1089c2718226fba34fd7959fb8321042))
+* needed a commit message so made a note of TODO in readme ([bd5acd5](https://github.com/Transport-for-the-North/vis-core/commit/bd5acd5b14594f22f2e58f658321dab3a584bcf0))
+* prevent undefined prefix on burger button image src ([d133112](https://github.com/Transport-for-the-North/vis-core/commit/d1331122504d7f545132dc9d4cc003458aba55e0))
+* remove uncomputable style assertion in Sidebar Firefox test ([3321067](https://github.com/Transport-for-the-North/vis-core/commit/3321067fd13873411dcd2779e3f2163ef14548da))
+* update style assertions in MapFeatureSelect test to match jsdom output ([50f2286](https://github.com/Transport-for-the-North/vis-core/commit/50f228694b41a51d8e090257e81d81724d6e5520))
+
+
+### Features
+
+* add error overlay where filters are empty. remove clearing of error context in useFetchVisualisationData. ([e1e4009](https://github.com/Transport-for-the-North/vis-core/commit/e1e40099909d4f37c697f91a0924ab079e97a51e))
+* Add unit tests for Base App ([103f5d3](https://github.com/Transport-for-the-North/vis-core/commit/103f5d338d9434508ecb4b6cd61d2a6e90e00c7a))
+* categorical colour states added with tests. ([24f3e58](https://github.com/Transport-for-the-North/vis-core/commit/24f3e58cc30fa7341e0643cd802c2aefdbc73fca))
+* support defaultClassification in visualisation config ([52000ab](https://github.com/Transport-for-the-North/vis-core/commit/52000ab20c6a572ea1284fc98e2b5674fbd18616))
+* update to baseapp which now uses the loadBands from the util. ([807e406](https://github.com/Transport-for-the-North/vis-core/commit/807e406eca79710e0260d5fd8ee2ceb5c40911c5))
+* use formatNumber for legends ([5d5d060](https://github.com/Transport-for-the-North/vis-core/commit/5d5d060c224791c439743d590acf00f929c23555))
+
 ## [0.9.1](https://github.com/Transport-for-the-North/vis-core/compare/v0.9.0...v0.9.1) (2026-04-02)
 
 
