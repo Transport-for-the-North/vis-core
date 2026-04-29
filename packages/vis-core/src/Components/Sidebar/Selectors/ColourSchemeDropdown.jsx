@@ -1,39 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { useMapContext } from "hooks";
-import { useMemo } from "react";
-import { colorSchemes } from "utils";
+import { useTheme } from "styled-components";
+import { colorSchemes, colourBlindFriendlySchemes } from "utils";
 import { SelectorLabel } from "./SelectorLabel";
-
-// Custom style for the react-select options
-const colourStyles = {
-  menuPortal: (base) => ({
-    ...base,
-    zIndex: 9999, // Adjust zIndex to be higher than everything else
-  }),
-  option: (styles, { isFocused }) => {
-    return {
-      ...styles,
-      display: "flex",
-      alignItems: "center",
-      borderBottom: "1px solid #eee",
-      padding: "5px 10px",
-      backgroundColor: isFocused ? "lightgray" : "white",
-      color: "black",
-      ":active": {
-        ...styles[":active"],
-        backgroundColor: "lightgray",
-      },
-    };
-  },
-  singleValue: (styles) => ({
-    ...styles,
-    display: "flex",
-    alignItems: "center",
-  }),
-};
+import { makeSelectStyles } from "utils/selectStyles";
 
 /**
  * Dropdown component for selecting color schemes.
@@ -47,6 +20,7 @@ export const ColourSchemeDropdown = ({
   handleColorChange,
   layerName,
 }) => {
+  const theme = useTheme();
   const animatedComponents = makeAnimated();
   const { state } = useMapContext();
 
@@ -61,24 +35,40 @@ export const ColourSchemeDropdown = ({
    * @returns {JSX.Element} The formatted option label.
    */
   const formatOptionLabel = ({ value, label }) => {
-    const colors = chroma.brewer[value];
-    return (
-      <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-        <div style={{ width: "30%", paddingRight: "10px" }}>{label}</div>
-        <div style={{ width: "70%", display: "flex" }}>
-          {colors.map((color) => (
-            <div
-              key={color}
-              style={{
-                backgroundColor: color,
-                width: `${100 / colors.length}%`,
-                height: "20px",
-              }}
-            />
-          ))}
-        </div>
+  const colors = chroma.brewer[value];
+  const isColourBlindFriendly = colourBlindFriendlySchemes.has(value);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+      {/* Label + flag */}
+      <div style={{ width: "30%", paddingRight: "10px", display: "flex", alignItems: "center", gap: 6 }}>
+        <span>{label}</span>
+        {isColourBlindFriendly && (
+          <span
+            title="Colour-blind friendly"
+            aria-label="Colour-blind friendly"
+            style={{ fontSize: "0.9em" }}
+          >
+            👁️
+          </span>
+        )}
       </div>
-    );
+
+      {/* Swatches */}
+      <div style={{ width: "70%", display: "flex" }}>
+        {colors.map((color) => (
+          <div
+            key={color}
+            style={{
+              backgroundColor: color,
+              width: `${100 / colors.length}%`,
+              height: "20px",
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
   };
 
   const options = useMemo(
@@ -112,11 +102,46 @@ export const ColourSchemeDropdown = ({
         options={options}
         value={selectedOption}
         formatOptionLabel={formatOptionLabel}
-        styles={colourStyles}
+        styles={useMemo(() => {
+          const base = makeSelectStyles(theme);
+          return {
+            ...base,
+            option: (provided, state) => ({
+              ...base.option(provided, state),
+              borderBottom: '1px solid #eee',
+              padding: '5px 10px',
+            }),
+            singleValue: (provided) => ({
+              ...provided,
+              display: 'flex',
+              alignItems: 'center',
+            }),
+          };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [theme])}
         menuPlacement="auto"
         menuPortalTarget={document.body} // Use a portal to render the menu
         onChange={(selectedOption) => handleColorChange(selectedOption, layerName)}
       />
+      {/* Legend */}
+        <div
+          style={{
+            marginTop: "6px",
+            fontSize: "12px",
+            color: "#666",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{ fontSize: "16px", lineHeight: 1 }}
+          >
+            👁️
+          </span>
+          <span> = Colour‑blind friendly</span>
+        </div>
     </>
   );
 };

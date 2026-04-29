@@ -1,54 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Select from "react-select";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
+import { makeSelectStyles } from "utils/selectStyles";
 
 const DropdownWrapper = styled.div`
   min-width: 200px;
   width: 100%;
-  
-  .react-select__control {
-    min-height: 32px;
-    border-color: #d1d5db;
-    font-size: 0.875rem;
-    background-color: #fff;
-  }
-  
-  .react-select__single-value {
-    color: #1f2937;
-  }
-  
-  .react-select__menu {
-    font-size: 0.875rem;
-    background-color: #fff;
-    max-height: 300px;
-    min-width: 200px;
-    width: max-content;
-  }
-  
-  .react-select__menu-list {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  
-  .react-select__option {
-    color: #1f2937;
-    background-color: #fff;
-    white-space: nowrap;
-    padding: 8px 12px;
-  }
-  
-  .react-select__option:hover {
-    background-color: #f3f4f6;
-  }
-  
-  .react-select__option--is-selected {
-    background-color: #6b46c1;
-    color: #fff;
-  }
-  
-  .react-select__placeholder {
-    color: #9ca3af;
-  }
 `;
 
 /**
@@ -64,6 +21,30 @@ const DropdownWrapper = styled.div`
  * @returns {JSX.Element} The rendered SimpleDropdown component.
  */
 export const SimpleDropdown = ({ options, value, onChange, placeholder = "Filter..." }) => {
+  const theme = useTheme();
+  const selectStyles = useMemo(() => {
+    const base = makeSelectStyles(theme, { minHeight: 32, fontSize: '0.875rem', borderColor: '#d1d5db' });
+    return {
+      ...base,
+      menu: (provided) => ({
+        ...provided,
+        minWidth: 200,
+        width: 'max-content',
+        maxHeight: 300,
+      }),
+      menuList: (provided) => ({
+        ...provided,
+        maxHeight: 300,
+        overflowY: 'auto',
+      }),
+      option: (provided, state) => ({
+        ...base.option(provided, state),
+        whiteSpace: 'nowrap',
+        padding: '8px 12px',
+      }),
+    };
+  }, [theme]);
+
   const formattedOptions = options.map(opt => ({
     value: opt,
     label: opt
@@ -74,12 +55,13 @@ export const SimpleDropdown = ({ options, value, onChange, placeholder = "Filter
   return (
     <DropdownWrapper>
       <Select
-        classNamePrefix="react-select"
+        styles={selectStyles}
         options={formattedOptions}
         value={selectedValue}
         onChange={(selected) => onChange(selected?.value || "")}
         isClearable
         placeholder={placeholder}
+        menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
       />
     </DropdownWrapper>
   );

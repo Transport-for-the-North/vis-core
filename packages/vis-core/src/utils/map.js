@@ -41,6 +41,126 @@ export const getMetricDefinition = (
 };
 
 /**
+ * Builds a stable cache key for a categorical legend value.
+ *
+ * @param {Object} params - The key parts.
+ * @param {string} params.fieldName - The field the category belongs to.
+ * @param {string|number|null|undefined} params.value - The category value.
+ * @returns {string|null} A normalised cache key, or null if either part is empty.
+ */
+export const buildCategoricalLegendKey = ({ fieldName, value }) => {
+  const normalisedFieldName = String(fieldName ?? "").trim().toLowerCase();
+  const normalisedValue = String(value ?? "").trim().toLowerCase();
+
+  if (!normalisedFieldName || !normalisedValue) {
+    return null;
+  }
+
+  return `${normalisedFieldName}::${normalisedValue}`;
+};
+
+/**
+ * Sorts categorical bins into a stable order for paint and legend generation.
+ *
+ * @param {Array<string|number>} bins - The categorical bins to sort.
+ * @returns {Array<string|number>} A sorted copy of the bins.
+ */
+export const sortCategoricalBins = (bins = []) => {
+  const safeBins = Array.isArray(bins) ? [...bins] : [];
+
+  if (safeBins.length === 2 && safeBins.includes(0) && safeBins.includes(1)) {
+    return [1, 0];
+  }
+
+  if (safeBins.every((value) => typeof value === "number")) {
+    return safeBins.sort((a, b) => a - b);
+  }
+
+  return safeBins.sort((leftValue, rightValue) =>
+    String(leftValue).localeCompare(String(rightValue))
+  );
+};
+
+/**
+ * Resolves categorical colours using existing cache entries before assigning new palette values.
+ *
+ * @param {Object} params - Colour resolution settings.
+ * @param {Array<string|number>} [params.bins=[]] - The categorical bins to colour.
+ * @param {string[]} [params.colours=[]] - The available palette colours.
+ * @param {Object} [params.cache={}] - Existing categorical cache entries.
+ * @param {string} [params.fieldName="value"] - The field name used for cache keys.
+ * @param {string|null} [params.schemeName=null] - The colour scheme name for new cache entries.
+ * @returns {{resolvedBins: Array<string|number>, resolvedColours: string[], newCacheEntries: Object}} The resolved bins, colours, and any new cache entries.
+ */
+export const resolveCategoricalColours = ({
+  bins = [],
+  colours = [],
+  cache = {},
+  fieldName = "value",
+  schemeName = null,
+}) => {
+  const resolvedBins = sortCategoricalBins(bins);
+  const resolvedColours = [];
+  const newCacheEntries = {};
+  const safeFieldName = String(fieldName ?? "").trim() || "value";
+  const fallbackColour = colours[colours.length - 1] ?? "#bdbdbd";
+  const usedColours = new Set(
+    resolvedBins
+      .map((bin) =>
+        cache?.[
+          buildCategoricalLegendKey({
+            fieldName: safeFieldName,
+            value: bin,
+          })
+        ]?.colour
+      )
+      .filter(Boolean)
+  );
+  let paletteIndex = 0;
+
+  resolvedBins.forEach((bin) => {
+    const legendCacheKey = buildCategoricalLegendKey({
+      fieldName: safeFieldName,
+      value: bin,
+    });
+    const cachedEntry = legendCacheKey ? cache?.[legendCacheKey] : null;
+
+    if (cachedEntry?.colour) {
+      resolvedColours.push(cachedEntry.colour);
+      return;
+    }
+
+    while (paletteIndex < colours.length && usedColours.has(colours[paletteIndex])) {
+      paletteIndex += 1;
+    }
+
+    const nextColour = colours[paletteIndex] ?? fallbackColour;
+    resolvedColours.push(nextColour);
+    usedColours.add(nextColour);
+    if (paletteIndex < colours.length) {
+      paletteIndex += 1;
+    }
+
+    if (!legendCacheKey) {
+      return;
+    }
+
+    newCacheEntries[legendCacheKey] = {
+      label: String(bin ?? "").trim(),
+      colour: nextColour,
+      fieldName: safeFieldName,
+      schemeName,
+    };
+  });
+
+  return {
+    resolvedBins,
+    resolvedColours,
+    newCacheEntries,
+  };
+};
+
+/**
  * Returns the opacity property name for a given layer type.
  * @function getOpacityProperty
  * @param {string} layerType - The type of the layer. Expected values are 'line', 'fill', or 'circle'.
@@ -255,6 +375,9 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
   let colorObject = [];
   let functionType = "";
   let width = "";
+  const workingBins = style.includes("categorical")
+    ? sortCategoricalBins(bins)
+    : bins;
   // gets end of current path 
   const path = window.location.pathname;
   
@@ -264,18 +387,6 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
 
   // determines whether to use linear or root function for width 
   functionType = chooseLinearOrRootFunction(bins, appName, lastSegment);
-
-  // If categorical, we want to order for consistency.
-  if (style.includes("categorical")) {
-    // If the only values are 0 and 1, we want to ensure 1 is first and 0 is last for consistency.
-    if (bins.length === 2 && bins.includes(0) && bins.includes(1)) {
-      bins = [1, 0];
-    } else if (bins.every(value => typeof value === 'number')) { // If all values are numbers, sort numerically.
-      bins.sort((a, b) => a - b);
-    } else {
-      bins.sort(); // Otherwise, sort alphabetically.
-    }
-  }
 
   // For continuous styles with only negative values to zero, reverse color mapping
   // so that the most negative (largest magnitude) gets the "hottest" color
@@ -289,16 +400,16 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
     }
   }
 
-  for (var i = 0; i < bins.length; i++) {
-    colors.push(bins[i]);
+  for (var i = 0; i < workingBins.length; i++) {
+    colors.push(workingBins[i]);
     colors.push(colours[i]);
-    widthObject.push(bins[i]);
+    widthObject.push(workingBins[i]);
 
     // either linear or root function used for line-width as appropriate 
-    width = calculateLineWidth(bins, functionType, bins[i]);
+    width = calculateLineWidth(workingBins, functionType, workingBins[i]);
 
     widthObject.push(width);
-    colorObject.push({ value: bins[i], color: colours[i] });
+    colorObject.push({ value: workingBins[i], color: colours[i] });
   }
 
   // line offset expression determined and allocated to line-diverging expression 
@@ -328,8 +439,8 @@ export function createPaintProperty(bins, style, colours, opacityValue, layerCon
     case "polygon-categorical":
       // Assuming 'bins' is an array of category values and 'colours' is an array of corresponding colors
       let categoricalColors = [];
-      for (let i = 0; i < bins.length; i++) {
-        categoricalColors.push(bins[i]); // Category value
+      for (let i = 0; i < workingBins.length; i++) {
+        categoricalColors.push(workingBins[i]); // Category value
         categoricalColors.push(colours[i]); // Color for the category
       }
       categoricalColors.push(colours[colours.length - 1]); // Default color if no match is found
@@ -770,8 +881,8 @@ export const reclassifyData = (
       if (metric) {
         return normaliseContinuousBins(metric.values);
       }
-      // Fallback to quantile method if no metric definition is found
-      classificationMethod = "q";
+      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {
       values = values.map(replaceZeroValues);
@@ -840,8 +951,8 @@ export const reclassifyData = (
           ? metric.differenceValues
           : metric.differenceValues.slice(metric.differenceValues.length / 2);
       }
-      // Fallback to quantile method if no metric definition is found
-      classificationMethod = "q";
+      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {
       absValues = absValues.map(replaceZeroValues);
@@ -852,24 +963,24 @@ export const reclassifyData = (
     // Apply the appropriate classification method
     switch (classificationMethod) {
       case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(absValues, 3);
+        unroundedBins = jenksBreaks(absValues, 6);
         break;
       
       case "s": // Standard Deviation
-        unroundedBins = standardDeviationBreaks(absValues, 3);
+        unroundedBins = standardDeviationBreaks(absValues, 6);
         break;
       
       case "h": // Head/Tail Breaks
         unroundedBins = headTailBreaks(absValues);
         // Limit to 3 classes for diverging
-        unroundedBins = unroundedBins.slice(0, Math.min(4, unroundedBins.length));
+        unroundedBins = unroundedBins.slice(0, Math.min(6, unroundedBins.length));
         break;
       
       case "q": // Quantile
       case "l": // Logarithmic
       case "k": // K-means
       default:
-        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 3))];
+        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 6))];
         break;
     }
 
@@ -878,6 +989,8 @@ export const reclassifyData = (
       roundedBins = roundedBins.map(replaceZeroPointValues);
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
+    roundedBins = [...new Set(roundedBins)]; 
+    roundedBins = roundedBins.slice(0, 4);  
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map((val) => -val);
     return [...negativeBins, 0, ...roundedBins];

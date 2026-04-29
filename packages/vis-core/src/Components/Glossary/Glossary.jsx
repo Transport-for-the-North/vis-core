@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Select from 'react-select';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Modal from 'react-modal';
+import { makeSelectStyles } from 'utils/selectStyles';
 
 const bgColour = '#e6e6e6';
 const fontColour = '#333';
@@ -42,30 +43,7 @@ const ImageWrapper = styled.div`
   margin-top: 10px;
 `;
 
-const customStyles = {
-  menuPortal: (base) => ({
-    ...base,
-    zIndex: 9999,
-  }),
-  option: (styles, { isFocused }) => ({
-    ...styles,
-    display: 'flex',
-    fontSize: '0.9rem',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px',
-    backgroundColor: isFocused ? 'lightgray' : 'white',
-    color: 'black',
-    cursor: 'pointer',
-    ':active': {
-      ...styles[':active'],
-      backgroundColor: 'lightgray',
-    },
-    ':hover': {
-      backgroundColor: 'lightgray',
-    },
-  }),
-};
+
 
 const ModalImage = styled.img`
   max-width: 75vw;
@@ -98,6 +76,9 @@ const ClickableImage = styled.img`
  * @returns {JSX.Element} The rendered Glossary component.
  */
 export const Glossary = ({ dataDictionary, bgColor, fontColor, location }) => {
+  const theme = useTheme();
+  const selectStyles = useMemo(() => makeSelectStyles(theme), [theme]);
+
   const [selectedTerm, setSelectedTerm] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
@@ -176,7 +157,7 @@ export const Glossary = ({ dataDictionary, bgColor, fontColor, location }) => {
     <GlossaryContainer>
       Get help/explanation using the search box:
       <Select
-        styles={customStyles}
+        styles={selectStyles}
         options={options}
         placeholder="Search glossary..."
         menuPortalTarget={document.body}

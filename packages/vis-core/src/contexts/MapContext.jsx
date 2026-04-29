@@ -15,10 +15,12 @@ import {
   getDefaultLayerBufferSize,
   applyWhereConditions,
   buildDeterministicFilterId,
-  getInitialFilterValue
+  getInitialFilterValue,
+  buildCategoricalLegendKey
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext, FilterContext, ErrorContext } from "contexts";
+import { AppContext, PageContext, FilterContext } from "contexts";
+import { ErrorContext } from "./ErrorContext";
 import { api } from "services";
 
 // Create a context for the app configuration
@@ -39,6 +41,44 @@ const isDuplicateValue = (values, value) => {
 };
 
 /**
+ * Builds initial categorical cache entries from filter values that define explicit colours.
+ *
+ * @param {Array} filters - The configured filters for the page.
+ * @returns {Object} A cache seed keyed by categorical legend key.
+ */
+const buildCacheSeedFromFilters = (filters = []) => {
+  return filters.reduce((cacheSeed, filter) => {
+    const filterValues = filter?.values?.values;
+    if (!Array.isArray(filterValues)) {
+      return cacheSeed;
+    }
+
+    const fieldName = filter.legendCacheField || filter.valueField || filter.paramName;
+
+    filterValues.forEach((valueItem) => {
+      if (typeof valueItem?.colourValue !== "string" || valueItem.colourValue.trim() === "") {
+        return;
+      }
+
+      const value = valueItem.paramValue ?? valueItem.value ?? valueItem.displayValue;
+      const legendCacheKey = buildCategoricalLegendKey({ fieldName, value });
+      if (!legendCacheKey) {
+        return;
+      }
+
+      cacheSeed[legendCacheKey] = {
+        label: valueItem.displayValue ?? String(value ?? "").trim(),
+        colour: valueItem.colourValue,
+        fieldName: String(fieldName ?? "").trim() || "value",
+        schemeName: filter.schemeName ?? null,
+      };
+    });
+
+    return cacheSeed;
+  }, {});
+};
+
+/**
  * MapProvider component to manage map-related state and context.
  * @function MapProvider
  * @property {React.ReactNode} children - Child components to be wrapped by the context provider.
@@ -50,7 +90,6 @@ export const MapProvider = ({ children }) => {
   const { dispatch: filterDispatch } = useContext(FilterContext);
   const errorContext = useContext(ErrorContext);
   const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
-  const errorState = errorContext?.state ?? null;
 
   // Initialize state within the provider function
   const initialState = {
@@ -74,6 +113,7 @@ export const MapProvider = ({ children }) => {
     isDynamicStylingLoading: false,
     pageIsReady: false,
     metadataError: null,
+    categoricalLegendCache: {},
     selectionMode: null,
     selectionLayer: null,
     selectedFeatures: [],
@@ -142,6 +182,7 @@ export const MapProvider = ({ children }) => {
       const filters = [];
       const filterState = {};
       const paramNameToUuidMap = {};
+      const emptyMetadataFilters = [];
       const usedFilterIds = new Set();
 
       for (const filter of pageContext.config.filters) {
@@ -237,6 +278,15 @@ export const MapProvider = ({ children }) => {
                   }
 
                   filterWithId.values.values = uniqueValues;
+
+                  if (uniqueValues.length === 0) {
+                    emptyMetadataFilters.push({
+                      filterName: filterWithId.filterName,
+                      paramName: filterWithId.paramName,
+                      metadataTableName: filterWithId.values.metadataTableName,
+                    });
+                  }
+
                   filters.push(filterWithId);
                 } else {
                   console.error(`Metadata table ${filterWithId.values.metadataTableName} not found or empty`);
@@ -267,7 +317,52 @@ export const MapProvider = ({ children }) => {
         return filter;
       });
 
+      if (emptyMetadataFilters.length > 0) {
+        console.warn('[MapContext] empty metadata filters detected', {
+          pageName: pageContext.pageName,
+          emptyMetadataFilters,
+          filterStateKeys: Object.keys(filterState),
+        });
+        console.log('[MapContext] ErrorContext availability before SET_ERROR', {
+          hasErrorContext: !!errorContext,
+          hasErrorDispatch: typeof errorContext?.dispatch === 'function',
+        });
+
+        const technicalDetails = emptyMetadataFilters
+          .map(
+            ({ filterName, paramName, metadataTableName }) =>
+              `Filter: ${filterName || paramName}\nParameter: ${paramName}\nMetadata table: ${metadataTableName}`
+          )
+          .join('\n\n');
+
+        errorDispatch({
+          type: errorActionTypes.SET_ERROR,
+          payload: {
+            title: 'No Filter Values Available',
+            subtitle: 'A metadata filter returned no values',
+            message:
+              emptyMetadataFilters.length === 1
+                ? `The filter "${emptyMetadataFilters[0].filterName || emptyMetadataFilters[0].paramName}" has no available values from the API for the current metadata query.`
+                : 'One or more filters have no available values from the API for the current metadata query.',
+            supportMessage: 'Please contact support if the issue persists.',
+            supportDetails: 'The filters listed below were built from metadata, but the filtered API result returned no options.',
+            technicalDetails,
+          },
+        });
+
+        console.warn('[MapContext] continuing initialization so the page can render behind the error overlay', {
+          pageName: pageContext.pageName,
+        });
+      }
+
       dispatch({ type: actionTypes.SET_FILTERS, payload: updatedFilters });
+      const categoricalLegendSeed = buildCacheSeedFromFilters(updatedFilters);
+      if (Object.keys(categoricalLegendSeed).length > 0) {
+        dispatch({
+          type: actionTypes.MERGE_CATEGORICAL_LEGEND_CACHE,
+          payload: categoricalLegendSeed,
+        });
+      }
       filterDispatch({ type: 'INITIALIZE_FILTERS', payload: filterState });
       dispatch({ type: actionTypes.SET_PARAM_NAME_TO_UUID_MAP, payload: paramNameToUuidMap });
 
@@ -375,6 +470,11 @@ export const MapProvider = ({ children }) => {
       
       // Check if any required metadata tables are empty
       if (emptyTables.length > 0) {
+        console.warn('[MapContext] aborting due to empty metadata tables', {
+          pageName: pageContext.pageName,
+          emptyTables,
+        });
+
         const message =
           emptyTables.length === 1
             ? `The metadata table is empty or contains no valid data. This page requires valid metadata to function properly.`

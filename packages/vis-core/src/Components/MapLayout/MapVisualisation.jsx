@@ -4,8 +4,10 @@ import { useMapContext } from "hooks";
 import { AppContext } from "contexts";
 import { actionTypes } from "reducers";
 import {
+  buildCategoricalLegendKey,
   colorSchemes,
   createPaintProperty,
+  resolveCategoricalColours,
   reclassifyData,
   reclassifyGeoJSONData,
   resetPaintProperty,
@@ -56,6 +58,73 @@ const calculateColours = (colourScheme, bins, invert = false) => {
   }
   
   return invert ? colors.slice().reverse() : colors;
+};
+
+/**
+ * Builds cache entries for selected filter values that define explicit categorical colours.
+ *
+ * @param {Object} params - The values needed to build the overrides.
+ * @param {Array} params.filters - The current filter definitions.
+ * @param {Object} params.queryParams - The current visualisation query params.
+ * @param {string} params.fieldName - The field name used for cache keys.
+ * @param {string|null} params.schemeName - The current colour scheme name.
+ * @returns {Object} Cache-style colour overrides keyed by categorical legend key.
+ */
+const buildSelectedCategoricalColourOverrides = ({
+  filters,
+  queryParams,
+  fieldName,
+  schemeName,
+}) => {
+  if (!Array.isArray(filters) || !queryParams) {
+    return {};
+  }
+
+  return filters.reduce((overrides, filter) => {
+    const selectedValue = queryParams?.[filter.paramName]?.value;
+    if (selectedValue == null) {
+      return overrides;
+    }
+
+    const selectedValues = Array.isArray(selectedValue)
+      ? selectedValue
+      : [selectedValue];
+    const availableValues = filter?.values?.values;
+    if (!Array.isArray(availableValues)) {
+      return overrides;
+    }
+
+    selectedValues.forEach((currentValue) => {
+      const matchedValue = availableValues.find(
+        (valueItem) => String(valueItem.paramValue) === String(currentValue)
+      );
+
+      if (
+        !matchedValue ||
+        typeof matchedValue.colourValue !== "string" ||
+        matchedValue.colourValue.trim() === ""
+      ) {
+        return;
+      }
+
+      const legendCacheKey = buildCategoricalLegendKey({
+        fieldName,
+        value: matchedValue.paramValue ?? matchedValue.displayValue,
+      });
+      if (!legendCacheKey) {
+        return;
+      }
+
+      overrides[legendCacheKey] = {
+        label: matchedValue.displayValue ?? String(currentValue),
+        colour: matchedValue.colourValue,
+        fieldName: String(fieldName ?? "").trim() || "value",
+        schemeName,
+      };
+    });
+
+    return overrides;
+  }, {});
 };
 
 /**
@@ -151,6 +220,22 @@ export const MapVisualisation = ({
     layerKey,
     shouldFilterDataToViewport,
   );
+
+  // Initialise classification method from visualisation config if not already set in state
+  useEffect(() => {
+    if (
+      visualisation?.defaultClassification &&
+      !state.layers[layerKey]?.class_method
+    ) {
+      dispatch({
+        type: "UPDATE_CLASSIFICATION_METHOD",
+        payload: {
+          class_method: visualisation.defaultClassification,
+          layerName: layerKey,
+        },
+      });
+    }
+  }, [layerKey, visualisation?.defaultClassification, state.layers, dispatch]);
 
   // Reset fetch state when visualisation changes (page navigation)
   useEffect(() => {
@@ -304,6 +389,9 @@ export const MapVisualisation = ({
         state.layers[layerKey]?.trseLabel === true;
       const customBands = state.layers[layerKey]?.customBands;
 
+      // Get defaultClassification from visualisation
+      const defaultClassification = visualisation?.defaultClassification;
+
       const reclassifiedData = reclassifyData(
         combinedDataForClassification,
         style,
@@ -311,7 +399,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { trseLabel, customBands } // Pass trseLabel and customBands in options
+        { trseLabel, customBands, defaultClassification } // Pass trseLabel, customBands and defaultClassification in options
       );
 
       // Get the metric definition for the current page/metric
@@ -340,6 +428,57 @@ export const MapVisualisation = ({
         colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
       }
 
+      const layerConfig = state.layers[layerKey];
+      let paintBins = reclassifiedData;
+      let paintColours = colourPalette;
+      let legendMetadata = {};
+
+      if (colorStyle === "categorical") {
+        const legendCacheField =
+          visualisation?.legendCacheField || layerConfig?.legendCacheField || visualisation?.valueField || "value";
+        const resolvedCategoricalColours = resolveCategoricalColours({
+          bins: reclassifiedData,
+          colours: colourPalette,
+          cache: state.categoricalLegendCache,
+          fieldName: legendCacheField,
+          schemeName: currentColor,
+        });
+        const selectedColourOverrides = buildSelectedCategoricalColourOverrides({
+          filters: state.filters,
+          queryParams: visualisation?.queryParams,
+          fieldName: legendCacheField,
+          schemeName: currentColor,
+        });
+
+        resolvedCategoricalColours.resolvedBins.forEach((binValue, index) => {
+          const legendCacheKey = buildCategoricalLegendKey({
+            fieldName: legendCacheField,
+            value: binValue,
+          });
+          const selectedOverride = legendCacheKey
+            ? selectedColourOverrides[legendCacheKey]
+            : null;
+
+          if (selectedOverride && resolvedCategoricalColours.newCacheEntries[legendCacheKey]) {
+            resolvedCategoricalColours.newCacheEntries[legendCacheKey] = selectedOverride;
+            resolvedCategoricalColours.resolvedColours[index] = selectedOverride.colour;
+          }
+        });
+
+        if (Object.keys(resolvedCategoricalColours.newCacheEntries).length > 0) {
+          dispatch({
+            type: actionTypes.REGISTER_CATEGORICAL_LEGEND_ITEMS,
+            payload: resolvedCategoricalColours.newCacheEntries,
+          });
+        }
+
+        paintBins = resolvedCategoricalColours.resolvedBins;
+        paintColours = resolvedCategoricalColours.resolvedColours;
+        legendMetadata = {
+          legendCacheField,
+        };
+      }
+
       // Update the map style
       const opacityValue = document.getElementById(`opacity-${layerKey}`)?.value;
 
@@ -347,12 +486,10 @@ export const MapVisualisation = ({
       const layerObject = mapItem.getLayer(layer);
       const defaultOpacity = layerObject?.metadata?.defaultOpacity ?? DEFAULT_OPACITY;
 
-      const layerConfig = state.layers[layerKey];
-      
       const paintProperty = createPaintProperty(
-        reclassifiedData,
+        paintBins,
         resolvedStyle,
-        colourPalette,
+        paintColours,
         opacityValue ? parseFloat(opacityValue) : defaultOpacity,
         layerConfig
       );
@@ -364,14 +501,18 @@ export const MapVisualisation = ({
         state.layers,
         visualisationDataForMap,
         colorStyle,
-        layer
+        layer,
+        legendMetadata
       );
     },
     [
+      dispatch,
+      state.categoricalLegendCache,
+      state.filters,
       state.layers,
       resolvedStyle,
       appContext,
-      visualisation?.queryParams,
+      visualisation, 
       layerColorScheme,
       layerKey,
       // calculateColours,
@@ -437,13 +578,41 @@ export const MapVisualisation = ({
         : defaultMapColourMapper[colorStyle]?.value;
 
       const colourPalette = calculateColours(currentColor, reclassifiedData);
+      let paintBins = reclassifiedData;
+      let paintColours = colourPalette;
+      let legendMetadata = {};
+
+      if (colorStyle === "categorical") {
+        const legendCacheField =
+          visualisation?.legendCacheField || state.layers[layerKey]?.legendCacheField || visualisation?.valueField || "category";
+        const resolvedCategoricalColours = resolveCategoricalColours({
+          bins: reclassifiedData,
+          colours: colourPalette,
+          cache: state.categoricalLegendCache,
+          fieldName: legendCacheField,
+          schemeName: currentColor,
+        });
+
+        if (Object.keys(resolvedCategoricalColours.newCacheEntries).length > 0) {
+          dispatch({
+            type: actionTypes.REGISTER_CATEGORICAL_LEGEND_ITEMS,
+            payload: resolvedCategoricalColours.newCacheEntries,
+          });
+        }
+
+        paintBins = resolvedCategoricalColours.resolvedBins;
+        paintColours = resolvedCategoricalColours.resolvedColours;
+        legendMetadata = {
+          legendCacheField,
+        };
+      }
 
       const opacityValue = document.getElementById(`opacity-${layerKey}`)?.value;
       
       const paintProperty = createPaintProperty(
-        reclassifiedData,
+        paintBins,
         style,
-        colourPalette,
+        paintColours,
         opacityValue ? parseFloat(opacityValue) : DEFAULT_OPACITY,
         state.layers[layerKey]
       );
@@ -463,6 +632,7 @@ export const MapVisualisation = ({
             paint: paintProperty,
             metadata: {
               colorStyle: colorStyle,
+              ...legendMetadata,
               isStylable: true,
               enforceNoColourSchemeSelector: visualisation?.enforceNoColourSchemeSelector ?? false,
               enforceNoClassificationMethod: visualisation?.enforceNoClassificationMethod ?? false,
@@ -480,12 +650,29 @@ export const MapVisualisation = ({
           },
         });
       } else {
+        const existingLayer = map.getLayer(visualisationName);
+        if (existingLayer) {
+          existingLayer.metadata = {
+            ...existingLayer.metadata,
+            ...legendMetadata,
+          };
+        }
         for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintProperty)) {
           map.setPaintProperty(visualisationName, paintPropertyName, paintPropertyArray);
         }
       }
     },
-    [map, visualisationName, layerColorScheme, colorStyle, dispatch, layerKey, state.layers, visualisation]
+    [
+      map,
+      visualisationName,
+      layerColorScheme,
+      colorStyle,
+      dispatch,
+      layerKey,
+      state.layers,
+      state.categoricalLegendCache,
+      visualisation,
+    ]
   );
 
   /**
