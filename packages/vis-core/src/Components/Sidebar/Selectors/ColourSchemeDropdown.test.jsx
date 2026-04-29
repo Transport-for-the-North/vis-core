@@ -45,6 +45,7 @@ jest.mock("../../../utils", () => ({
     default: ["red", "green", "blue"],
     custom: ["yellow", "purple", "orange"],
   },
+  colourBlindFriendlySchemes: new Set(["yellow", "purple", "orange"]),
 }));
 jest.mock("chroma-js", () => ({
   brewer: {
