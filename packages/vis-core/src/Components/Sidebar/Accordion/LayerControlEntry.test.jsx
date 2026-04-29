@@ -314,7 +314,9 @@ describe("LayerControlEntry component test", () => {
       getPaintProperty: jest.fn((layerId, propertyName) => {
         if (propertyName?.includes("opacity")) return 0.5;
         if (propertyName === "circle-radius") {
-          return ["interpolate", ["linear"], ["feature-state", "value"], 0, 1, 10, 8.5];
+          // Simulate useFeatureStateUpdater having already applied defaultWidthFactor: 0.3
+          // calculateMaxWidthFactor(7.5, 'circle-radius') = 7.5 / 25 = 0.3
+          return ["interpolate", ["linear"], ["feature-state", "value"], 0, 2, 10, 7.5];
         }
         return 0.5;
       }),
@@ -336,12 +338,6 @@ describe("LayerControlEntry component test", () => {
       },
       state: {
         ...props.state,
-        layers: {
-          id: {
-            defaultWidthFactor: 0.3,
-            widthFactor: 0.3,
-          },
-        },
       },
     };
 
@@ -387,12 +383,6 @@ describe("LayerControlEntry component test", () => {
       },
       state: {
         ...props.state,
-        layers: {
-          id: {
-            defaultWidthFactor: 0.3,
-            widthFactor: 0.3,
-          },
-        },
       },
     };
 

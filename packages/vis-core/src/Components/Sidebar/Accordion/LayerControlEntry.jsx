@@ -346,18 +346,6 @@ export const LayerControlEntry = memo(
       false;
     const isFixedLineWidth =
       layer.type === "line" && shouldFixLineWidth === true;
-    const configuredDefaultWidthFactor = Number.isFinite(
-      layerConfigFromState?.defaultWidthFactor
-    )
-      ? layerConfigFromState.defaultWidthFactor
-      : Number.isFinite(layer.metadata?.defaultWidthFactor)
-      ? layer.metadata.defaultWidthFactor
-      : Number.isFinite(layer.defaultWidthFactor)
-      ? layer.defaultWidthFactor
-      : null;
-    const storedWidthFactor = Number.isFinite(layerConfigFromState?.widthFactor)
-      ? layerConfigFromState.widthFactor
-      : null;
     const effectiveDefaultLineOffset =
       layerConfigFromState?.defaultLineOffset ??
       layer.metadata?.defaultLineOffset ??
@@ -405,22 +393,7 @@ export const LayerControlEntry = memo(
 
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const [widthFactor, setWidth] = useState(
-      storedWidthFactor ?? configuredDefaultWidthFactor ?? initialWidth ?? 1
-    );
-
-    useEffect(() => {
-      const nextWidthFactor =
-        storedWidthFactor ?? configuredDefaultWidthFactor ?? initialWidth;
-
-      if (
-        typeof nextWidthFactor === "number" &&
-        Number.isFinite(nextWidthFactor) &&
-        Math.abs(nextWidthFactor - widthFactor) > 0.001
-      ) {
-        setWidth(nextWidthFactor);
-      }
-    }, [storedWidthFactor, configuredDefaultWidthFactor, initialWidth, widthFactor]);
+    const [widthFactor, setWidth] = useState(initialWidth ?? 1);
 
     const bandEditorData = useMemo(() => {
       if (

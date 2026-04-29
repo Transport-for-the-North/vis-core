@@ -113,9 +113,7 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
 };
 
 const applyConfiguredWidthFactor = (map, layer) => {
-  const widthFactor = Number.isFinite(layer?.widthFactor)
-    ? layer.widthFactor
-    : Number.isFinite(layer?.defaultWidthFactor)
+  const widthFactor = Number.isFinite(layer?.defaultWidthFactor)
     ? layer.defaultWidthFactor
     : null;
 
@@ -169,6 +167,9 @@ export const useFeatureStateUpdater = () => {
   // Changed from tracking Sets to tracking Maps (id -> value) for diffing
   const layerStatesRef = useRef(new Map());
   const retryManagerRef = useRef(createRetryManager());
+  // Tracks layers that have already had their defaultWidthFactor applied,
+  // so data reloads don't reset the user's slider changes.
+  const defaultWidthAppliedRef = useRef(new Set());
 
   // Cleanup on unmount
   useEffect(() => {
@@ -241,7 +242,10 @@ export const useFeatureStateUpdater = () => {
           applyPaintProperties(map, specifiedLayer.name, paintProperty);
         }
 
-        applyConfiguredWidthFactor(map, specifiedLayer);
+        if (!defaultWidthAppliedRef.current.has(specifiedLayer.name)) {
+          applyConfiguredWidthFactor(map, specifiedLayer);
+          defaultWidthAppliedRef.current.add(specifiedLayer.name);
+        }
 
         // Get previous feature states (Map of id -> value) for this layer
         const prevStates = layerStatesRef.current.get(specifiedLayer.name) || new Map();
