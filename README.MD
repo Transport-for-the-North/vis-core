@@ -10,6 +10,8 @@ vis-core uses **Jest** and **React Testing Library** for unit and component test
 
 For full details see [Testing Documentation](./packages/vis-core/docs/Testing%20Documentation.md).
 
+## TODO Create Contributing file
+
 ## Maintainers
 
  - Mangai Ramakrishnan (Mangaiy) - Senior Developer @ Transport for the North
