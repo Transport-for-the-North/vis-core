@@ -60,6 +60,16 @@ const calculateColours = (colourScheme, bins, invert = false) => {
   return invert ? colors.slice().reverse() : colors;
 };
 
+/**
+ * Builds cache entries for selected filter values that define explicit categorical colours.
+ *
+ * @param {Object} params - The values needed to build the overrides.
+ * @param {Array} params.filters - The current filter definitions.
+ * @param {Object} params.queryParams - The current visualisation query params.
+ * @param {string} params.fieldName - The field name used for cache keys.
+ * @param {string|null} params.schemeName - The current colour scheme name.
+ * @returns {Object} Cache-style colour overrides keyed by categorical legend key.
+ */
 const buildSelectedCategoricalColourOverrides = ({
   filters,
   queryParams,

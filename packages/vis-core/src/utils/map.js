@@ -40,6 +40,14 @@ export const getMetricDefinition = (
   return null;
 };
 
+/**
+ * Builds a stable cache key for a categorical legend value.
+ *
+ * @param {Object} params - The key parts.
+ * @param {string} params.fieldName - The field the category belongs to.
+ * @param {string|number|null|undefined} params.value - The category value.
+ * @returns {string|null} A normalised cache key, or null if either part is empty.
+ */
 export const buildCategoricalLegendKey = ({ fieldName, value }) => {
   const normalisedFieldName = String(fieldName ?? "").trim().toLowerCase();
   const normalisedValue = String(value ?? "").trim().toLowerCase();
@@ -51,6 +59,12 @@ export const buildCategoricalLegendKey = ({ fieldName, value }) => {
   return `${normalisedFieldName}::${normalisedValue}`;
 };
 
+/**
+ * Sorts categorical bins into a stable order for paint and legend generation.
+ *
+ * @param {Array<string|number>} bins - The categorical bins to sort.
+ * @returns {Array<string|number>} A sorted copy of the bins.
+ */
 export const sortCategoricalBins = (bins = []) => {
   const safeBins = Array.isArray(bins) ? [...bins] : [];
 
@@ -67,6 +81,17 @@ export const sortCategoricalBins = (bins = []) => {
   );
 };
 
+/**
+ * Resolves categorical colours using existing cache entries before assigning new palette values.
+ *
+ * @param {Object} params - Colour resolution settings.
+ * @param {Array<string|number>} [params.bins=[]] - The categorical bins to colour.
+ * @param {string[]} [params.colours=[]] - The available palette colours.
+ * @param {Object} [params.cache={}] - Existing categorical cache entries.
+ * @param {string} [params.fieldName="value"] - The field name used for cache keys.
+ * @param {string|null} [params.schemeName=null] - The colour scheme name for new cache entries.
+ * @returns {{resolvedBins: Array<string|number>, resolvedColours: string[], newCacheEntries: Object}} The resolved bins, colours, and any new cache entries.
+ */
 export const resolveCategoricalColours = ({
   bins = [],
   colours = [],

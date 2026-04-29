@@ -40,6 +40,12 @@ const isDuplicateValue = (values, value) => {
   );
 };
 
+/**
+ * Builds initial categorical cache entries from filter values that define explicit colours.
+ *
+ * @param {Array} filters - The configured filters for the page.
+ * @returns {Object} A cache seed keyed by categorical legend key.
+ */
 const buildCacheSeedFromFilters = (filters = []) => {
   return filters.reduce((cacheSeed, filter) => {
     const filterValues = filter?.values?.values;

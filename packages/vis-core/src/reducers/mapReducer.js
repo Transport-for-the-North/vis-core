@@ -102,6 +102,13 @@ export const actionTypes = {
   CLEAR_CATEGORICAL_LEGEND_CACHE: "CLEAR_CATEGORICAL_LEGEND_CACHE",
 };
 
+/**
+ * Merges new categorical legend entries into the existing cache.
+ *
+ * @param {Object} currentCache - The current categorical legend cache.
+ * @param {Object} nextEntries - The entries to merge into the cache.
+ * @returns {Object} The merged cache.
+ */
 const mergeCategoricalLegendEntries = (currentCache = {}, nextEntries = {}) => {
   if (!nextEntries || typeof nextEntries !== "object") {
     return currentCache;
