@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
 import React, { useEffect, useState, useRef, useContext } from "react";
 import styled from "styled-components";
-import { convertStringToNumber, numberWithCommas } from "utils";
+import { buildCategoricalLegendKey, convertStringToNumber, numberWithCommas } from "utils";
 import { useMapContext, useFetchVisualisationData } from "hooks";
 import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
@@ -739,9 +739,19 @@ export const DynamicLegend = ({ map }) => {
                 rawLabel = stop.value;
                 label = formatLegendLabelValue(stop.value);
               }
+
+              const cachedLegendColour =
+                isCategorical && layer.metadata?.legendCacheField
+                  ? state.categoricalLegendCache?.[
+                      buildCategoricalLegendKey({
+                        fieldName: layer.metadata.legendCacheField,
+                        value: stop.value,
+                      })
+                    ]?.colour
+                  : null;
               
               legendEntries.push({
-                color: stop.color,
+                color: cachedLegendColour || stop.color,
                 width: getEntryWidth(widthStop, isMobile, layer, paintProps, rawLabel),
                 label,
                 type: layer.type,
@@ -749,6 +759,7 @@ export const DynamicLegend = ({ map }) => {
               });
             }
           }
+
           // If no legend entries or exactly one, consider this a default style scenario.
           let noStyle = false;
           if (legendEntries.length < 1) {
@@ -818,7 +829,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [state.filters, map, state.visualisations, state.currentZoom, currentPage]);
+  }, [state.filters, state.categoricalLegendCache, map, state.visualisations, state.currentZoom, currentPage]);
   
   // This effect forces the container's width to update after legendItems change,
   // working around Firefox's flex-wrap column bug.
