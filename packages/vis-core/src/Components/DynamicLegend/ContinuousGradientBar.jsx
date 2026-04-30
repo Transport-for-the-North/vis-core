@@ -180,11 +180,9 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
-          {/* Loop over ALL stops to render every tick mark */}
+          {/* Render tick marks at every stop, including the start (0 %) and end (100 %) */}
           {stopsWithPercentages.map((stop, i) => (
-            stop.percent > 0 && stop.percent < 100 && (
-              <TickMark key={`tick-${i}`} style={{ left: `${stop.percent}%` }} />
-            )
+            <TickMark key={`tick-${i}`} style={{ left: `${stop.percent}%` }} />
           ))}
         </GradientBar>
         {hoverInfo && (
@@ -200,7 +198,9 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
       </GradientContainer>
       
       <LabelsContainer>
-        {/* Loop over the FILTERED list to only render non-overlapping text labels */}
+        {/* Loop over the FILTERED list to only render non-overlapping text labels.
+             Each label is anchored by its LEFT edge at the tick (left: percent%),
+             then shifted left by its own width so the RIGHT edge lands on the tick. */}
         {labelsToShow.map((stop) => (
           <TickLabel 
             key={`label-${stop.index}`} 

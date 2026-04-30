@@ -66,7 +66,6 @@ export const TickMark = styled.div`
 export const LabelsContainer = styled.div`
   position: relative;
   height: 22px;
-  margin-top: 11px;
   width: 100%;
 `;
 
@@ -77,9 +76,13 @@ export const TickLabel = styled.span`
   color: #555;
   top: 0;
   white-space: nowrap;
-  /* Consistent transform for all labels */
-  transform-origin: top center;
-  transform: translateX(-50%) rotate(-45deg);
+  text-align: right;
+  /* Anchor: left edge at the tick (via left: percent% in JSX).
+     translateX(-100%) shifts the element left by its own width so the RIGHT
+     edge lands on the tick, then rotate(-45deg) pivots around that top-right
+     corner, sweeping the text downward-left away from the gradient bar. */
+  transform-origin: top right;
+  transform: translateX(-100%) rotate(-45deg);
 `;
 
 /**
