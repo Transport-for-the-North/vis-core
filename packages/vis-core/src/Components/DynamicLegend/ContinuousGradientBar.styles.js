@@ -77,6 +77,17 @@ export const TickLabel = styled.span`
 `;
 
 /**
+ * SVG element used to render the line-width or circle-size track above the gradient bar.
+ * Height is set via the `height` HTML attribute to accommodate the widest stop.
+ */
+export const WidthTrackSvg = styled.svg`
+  display: block;
+  width: 100%;
+  overflow: visible;
+  margin-bottom: 2px;
+`;
+
+/**
  * Mouse-hover tooltip shown above the gradient bar indicating the hovered value.
  *
  * @prop {number} $left - Horizontal position in pixels from the left edge of the bar.

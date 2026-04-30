@@ -9,6 +9,7 @@ import {
   LabelsContainer,
   TickLabel,
 } from "./ContinuousGradientBar.styles";
+import { LineWidthTrack, CircleTrack } from "./WidthTrack";
 
 /**
  * ContinuousGradientBar
@@ -64,8 +65,16 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
     const percent = scaleMode === 'color' || !Number.isFinite(val)
       ? (i / (entries.length - 1)) * 100
       : (range === 0 ? 0 : ((val - min) / range) * 100);
-    return { ...entry, val, percent };
+    return { ...entry, val, percent, width: entry.width ?? null };
   });
+
+  // Gate: only show a width track when width is data-driven (varies across stops).
+  const finiteWidths = stopsWithPercentages
+    .map(s => s.width)
+    .filter(w => Number.isFinite(w) && w > 0);
+  const widthVaries = finiteWidths.length >= 2 &&
+    finiteWidths.some(w => w !== finiteWidths[0]);
+  const layerType = entries[0]?.type;
 
   const gradientColors = stopsWithPercentages
     .map((stop) => `${stop.color} ${stop.percent}%`)
@@ -79,6 +88,7 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
     const mousePercent = (x / rect.width) * 100;
 
     let hoveredValue = min;
+    let hoveredWidth = null;
     for (let i = 0; i < stopsWithPercentages.length - 1; i++) {
       const curr = stopsWithPercentages[i];
       const next = stopsWithPercentages[i + 1];
@@ -86,10 +96,17 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
         const segmentRange = next.percent - curr.percent;
         const localPercent = segmentRange === 0 ? 0 : (mousePercent - curr.percent) / segmentRange;
         hoveredValue = curr.val + localPercent * (next.val - curr.val);
+        if (widthVaries && Number.isFinite(curr.width) && Number.isFinite(next.width)) {
+          hoveredWidth = curr.width + localPercent * (next.width - curr.width);
+        }
         break;
       }
     }
-    setHoverInfo({ x, value: formatNumber(parseFloat(hoveredValue.toFixed(maxPrecision))) });
+    setHoverInfo({
+      x,
+      value: formatNumber(parseFloat(hoveredValue.toFixed(maxPrecision))),
+      width: hoveredWidth !== null ? formatNumber(parseFloat(hoveredWidth.toFixed(1))) : null,
+    });
   };
 
   const handleMouseLeave = () => setHoverInfo(null);
@@ -131,6 +148,12 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
 
   return (
     <ContinuousScaleContainer>
+      {widthVaries && layerType === 'line' && (
+        <LineWidthTrack stops={stopsWithPercentages} />
+      )}
+      {widthVaries && layerType === 'circle' && (
+        <CircleTrack stops={stopsWithPercentages} />
+      )}
       <GradientContainer>
         <GradientBar
           ref={barRef}
@@ -145,7 +168,16 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
             )
           ))}
         </GradientBar>
-        {hoverInfo && <Tooltip $left={hoverInfo.x}>{hoverInfo.value}</Tooltip>}
+        {hoverInfo && (
+          <Tooltip $left={hoverInfo.x}>
+            {hoverInfo.value}
+            {hoverInfo.width !== null && (
+              <span style={{ opacity: 0.75, marginLeft: '4px', fontSize: '10px' }}>
+                ({hoverInfo.width}px)
+              </span>
+            )}
+          </Tooltip>
+        )}
       </GradientContainer>
       
       <LabelsContainer>
