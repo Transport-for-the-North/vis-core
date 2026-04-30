@@ -88,13 +88,15 @@ export const DynamicLegend = ({ map }) => {
           return shouldShowInLegend && isWithinZoomRange;
         })
         .map((layer, index) => {
-          // Get the visualisation associated with this layer via joinLayer
+          // --- Resolve display text ---
+          // Find the visualisation record for this layer and derive the title and
+          // optional subtitle shown at the top of the legend group. Stylable layers
+          // pull their text from the active filter's legendText; non-stylable layers
+          // fall back to the raw layer ID.
           const visualisationKey = Object.keys(state.visualisations).find(key => {
             return state.visualisations[key].joinLayer === layer.id;
           });
           const visualisation = state.visualisations[visualisationKey];
-          
-          // Get legendText from visualisation
           const legendText = visualisation?.legendText || [];
 
           const title = layer.id;
@@ -149,10 +151,10 @@ export const DynamicLegend = ({ map }) => {
             }
           }
           
+          // --- Interpret paint expressions ---
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;
           const trseLabel = state.layers[layer.id]?.trseLabel === true;
           const paintProps = layer.paint;
-          // Interpret expressions
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
             paintProps["circle-color"] ||
@@ -165,7 +167,9 @@ export const DynamicLegend = ({ map }) => {
             paintProps["line-dasharray"]
           );
 
-          // Determine whether current style is categorical. For categorical we should not scale circle sizes.
+          // --- Normalise stops ---
+          // Detect categorical styling, apply colour inversion if toggled, and
+          // reconcile any mismatch between the number of colour stops and width stops.
           const colorStyle = layer.metadata?.colorStyle;
           const isCategorical =
             colorStyle === "categorical" ||
@@ -277,12 +281,13 @@ export const DynamicLegend = ({ map }) => {
             }
           }
 
-          // If no legend entries or exactly one, consider this a default style scenario.
+          // --- No-style fallback ---
+          // A layer with no data-driven stops produces a single swatch using the
+          // layer's base paint colour, labelled with the layer ID.
           let noStyle = false;
-          if (legendEntries.length < 1) {
+          if (legendEntries.length === 0) {
             noStyle = true;
-            if (legendEntries.length === 0) {
-              const defaultColor =
+            const defaultColor =
                 paintProps["line-color"] ||
                 paintProps["circle-color"] ||
                 paintProps["fill-color"] ||
@@ -304,10 +309,6 @@ export const DynamicLegend = ({ map }) => {
                 type: layer.type,
                 isDashed: getEntryDashStatus(null, paintProps, title),
               });
-            } else {
-              // If there is exactly one entry, force the label to be the layer name.
-              legendEntries[0].label = title;
-            }
           }
 
           const filteredEntries = (legendEntries || []).filter(isRenderableEntry);
@@ -332,6 +333,7 @@ export const DynamicLegend = ({ map }) => {
             
           };
         })
+        // Layers that produced no renderable entries return null from the map above.
         .filter(Boolean);
       setLegendItems(items);
     };
@@ -367,13 +369,10 @@ export const DynamicLegend = ({ map }) => {
     legendRef.current.style.width = `${newWidth}px`;
   }, [legendItems, isMobile]);
   
-  // If there are no legend items, render nothing.
-  
   if (legendItems.length === 0) {
     return null;
   }
-  
-  
+
   const content = (
     <LegendContainer ref={legendRef} $outside={isMobile}>
       {legendItems.map((item, index) => (

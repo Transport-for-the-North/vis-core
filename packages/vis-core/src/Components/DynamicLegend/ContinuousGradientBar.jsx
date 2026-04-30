@@ -54,6 +54,9 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
   const max = Math.max(...finiteVals);
   const range = max - min;
 
+  // Determine the maximum number of decimal places present across all stops.
+  // Hover interpolation is then rounded to this precision rather than a fixed value,
+  // so integer datasets display as integers and decimal datasets remain accurate.
   const maxPrecision = finiteVals.reduce((maxPrec, num) => {
     const str = num.toString();
     const decimalIndex = str.indexOf('.');
@@ -112,7 +115,9 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
   const handleMouseLeave = () => setHoverInfo(null);
 
   // --- Smart Collision Detection ---
-  const MIN_DISTANCE_PERCENT = 12; // Increased distance for a cleaner look
+  // Minimum % distance between adjacent axis labels before the inner one is suppressed.
+  // Prevents labels from overlapping when stops are clustered close together.
+  const MIN_DISTANCE_PERCENT = 12;
   const labelsToShow = [];
   
   const mustHaveIndices = new Set([0, stopsWithPercentages.length - 1]);

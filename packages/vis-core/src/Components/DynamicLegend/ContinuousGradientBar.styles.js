@@ -11,10 +11,10 @@ export const ContinuousScaleContainer = styled.div`
   margin-bottom: 12px;
 `;
 
-/** Relative-positioned wrapper around the gradient bar, used to anchor tick marks. */
+/** Relative-positioned wrapper around the gradient bar, used to anchor tick marks and the hover tooltip. */
 export const GradientContainer = styled.div`
   position: relative;
-  width: 100%; /* Now 100% of the padded area */
+  width: 100%;
 `;
 
 /**
@@ -61,7 +61,7 @@ export const LabelsContainer = styled.div`
   position: relative;
   height: 22px;
   margin-top: 11px;
-  width: 100%; /* Now 100% of the padded area */
+  width: 100%;
 `;
 
 /** Individually positioned, rotated label beneath a tick mark on the gradient bar. */

@@ -82,6 +82,9 @@ const LegendLayerGroup = ({
     const data = visualisationDataByLayer[item.layerId];
 
     if (Array.isArray(data) && data.length > 0 && minBand !== null && maxBand !== null) {
+      // Extract a numeric value from each data row using a best-effort heuristic:
+      // prefer the `value` or `metric` key, fall back to the first numeric property
+      // found on the object, and accept plain numbers for flat data arrays.
       const values = data.map(row => {
         if (typeof row === 'object' && row !== null) {
           let v = row.value ?? row.metric;
@@ -106,6 +109,8 @@ const LegendLayerGroup = ({
   }
 
   // --- Display mode resolution ---
+  // Continuous display requires at least two numeric stops to form a gradient
+  // range. Categorical layers always fall back to discrete swatches.
   const canBeContinuous =
     item.style !== "categorical" &&
     item.legendEntriesNumeric &&
