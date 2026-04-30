@@ -74,14 +74,8 @@ export const CircleTrack = ({ stops }) => {
   const diameters = stops.map(s => (Number.isFinite(s.width) && s.width > 0 ? s.width : 2));
   const maxDiameter = Math.max(...diameters);
 
-  // Inset the container's content area by each endpoint circle's radius so that
-  // left: 0% and left: 100% resolve to positions where the circle sits fully inside
-  // the box. box-sizing: border-box keeps the outer width at 100%.
-  const leftPad = diameters[0] / 2;
-  const rightPad = diameters[diameters.length - 1] / 2;
-
-  // The container must be tall enough to hold the largest circle without clipping.
-  // Use actual pixel diameters — no scaling — so circles match their on-map sizes.
+  // The container height accommodates the largest circle plus vertical clearance.
+  // Circle sizes are used as-is to match on-map sizing exactly.
   const trackHeight = maxDiameter + TRACK_PAD * 2;
 
   return (
@@ -90,9 +84,6 @@ export const CircleTrack = ({ stops }) => {
       width: '100%',
       height: `${trackHeight}px`,
       marginBottom: '2px',
-      paddingLeft: `${leftPad}px`,
-      paddingRight: `${rightPad}px`,
-      boxSizing: 'border-box',
     }}>
       {stops.map((s, i) => {
         const d = diameters[i];
@@ -101,9 +92,11 @@ export const CircleTrack = ({ stops }) => {
             key={i}
             style={{
               position: 'absolute',
-              left: `${s.percent}%`,
+              // Place the circle's left edge so its centre lands at s.percent% of the
+              // container width. ContinuousScaleContainer's 16 px side padding provides
+              // room for the half-circles that extend beyond the 0 % and 100 % edges.
+              left: `calc(${s.percent}% - ${d / 2}px)`,
               bottom: `${TRACK_PAD}px`,
-              transform: 'translateX(-50%)',
               width: `${d}px`,
               height: `${d}px`,
               borderRadius: '50%',

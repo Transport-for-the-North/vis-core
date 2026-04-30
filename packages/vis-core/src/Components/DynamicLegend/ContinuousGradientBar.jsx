@@ -79,6 +79,20 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
     finiteWidths.some(w => w !== finiteWidths[0]);
   const layerType = entries[0]?.type;
 
+  // Compute horizontal padding: at least 16 px (safe zone for slanted labels),
+  // extended to cover the radius of the largest endpoint circle so its half does
+  // not overflow the legend box at the 0 % and 100 % positions.
+  let sidePad = 16;
+  if (widthVaries && layerType === 'circle') {
+    const firstW = stopsWithPercentages[0]?.width;
+    const lastW = stopsWithPercentages[stopsWithPercentages.length - 1]?.width;
+    const maxEndpointRadius = Math.max(
+      Number.isFinite(firstW) && firstW > 0 ? firstW / 2 : 0,
+      Number.isFinite(lastW) && lastW > 0 ? lastW / 2 : 0,
+    );
+    sidePad = Math.max(16, Math.ceil(maxEndpointRadius));
+  }
+
   const gradientColors = stopsWithPercentages
     .map((stop) => `${stop.color} ${stop.percent}%`)
     .join(", ");
@@ -152,7 +166,7 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
   }
 
   return (
-    <ContinuousScaleContainer>
+    <ContinuousScaleContainer $sidePad={sidePad}>
       {widthVaries && layerType === 'line' && (
         <LineWidthTrack stops={stopsWithPercentages} />
       )}

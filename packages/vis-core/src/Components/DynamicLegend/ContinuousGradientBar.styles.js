@@ -1,11 +1,17 @@
 import styled from "styled-components";
 
-/** Outer wrapper for the continuous gradient bar section of a legend group. */
+/**
+ * Outer wrapper for the continuous gradient bar section of a legend group.
+ *
+ * @prop {number} [$sidePad] - Horizontal padding in px. Defaults to 16 (safe zone
+ *   for slanted tick labels). Expanded dynamically when endpoint circles are wider
+ *   than 16 px so their halves do not overflow the legend box.
+ */
 export const ContinuousScaleContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 0 16px; /* Safe zone for the slanted text */
+  padding: 0 ${(p) => p.$sidePad ?? 16}px;
   box-sizing: border-box;
   margin-top: 16px;
   margin-bottom: 12px;
