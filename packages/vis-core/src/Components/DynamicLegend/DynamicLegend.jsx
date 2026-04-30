@@ -30,7 +30,17 @@ export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
   const { defaultBands } = useAppContext();
-  const [layerPrefs, setLayerPrefs] = useState({});
+  // Initialise from localStorage so the user's display/scale preferences survive
+  // page refreshes and navigation. Falls back to an empty object if storage is
+  // unavailable (private browsing, quota exceeded, etc.).
+  const [layerPrefs, setLayerPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem('dynamicLegend_layerPrefs');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
   const [openPopoverId, setOpenPopoverId] = useState(null);
   const popoverRef = useRef(null);
   const legendRef = useRef(null);
@@ -68,8 +78,17 @@ export const DynamicLegend = ({ map }) => {
   const updateLayerPref = (layerId, key, value) => {
     setLayerPrefs(prev => {
       const currentPref = prev[layerId] || { displayMode: 'continuous', scaleMode: 'value' };
-      return { ...prev, [layerId]: { ...currentPref, [key]: value } };
+      const next = { ...prev, [layerId]: { ...currentPref, [key]: value } };
+      // Persist to localStorage so preferences survive page refreshes.
+      try {
+        localStorage.setItem('dynamicLegend_layerPrefs', JSON.stringify(next));
+      } catch {
+        // Silently ignore if localStorage is unavailable.
+      }
+      return next;
     });
+    // Close the options popover as soon as the user selects a preference.
+    setOpenPopoverId(null);
   };
 
   useEffect(() => {
