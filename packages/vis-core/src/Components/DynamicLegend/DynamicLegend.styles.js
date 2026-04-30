@@ -36,7 +36,9 @@ export const LegendContainer = styled.div`
   padding-left: calc(15px - var(--scrollbar-width)); /* For WebKit browsers */
   box-sizing: border-box; /* Include padding and border in width */
   border-radius: 10px;
-  z-index: 10;
+  /* Sit above CalloutCard panels (z-index 1000) so the hover tooltip is never
+     occluded by a card that happens to render on top of the legend. */
+  z-index: 1100;
   min-width: 0;
   max-height: none;
   max-width: 80vw;
