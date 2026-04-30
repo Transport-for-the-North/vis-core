@@ -10,7 +10,8 @@ import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown, BandEditor, SelectorLabel } from "../Selectors";
 import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
-import { AppContext, PageContext } from "contexts";
+import { AppContext, MapContext, PageContext } from "contexts";
+import { actionTypes } from "reducers";
 import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map";
 
 /**
@@ -296,9 +297,9 @@ export const LayerControlEntry = memo(
     }, [isExpanded, layer.id]);
 
     const currentPage = useContext(PageContext);
-    const mapConfig = currentPage?.config?.map;
-    const defaultNodeWidthFactorFromPage = mapConfig?.defaultNodeWidthFactor;
     const appConfig = useContext(AppContext);
+    const mapContext = useContext(MapContext);
+    const mapDispatch = mapContext?.dispatch;
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
@@ -381,28 +382,18 @@ export const LayerControlEntry = memo(
     const isFeatureStateWidthExpression =
       Array.isArray(currentWidthFactor) &&
       currentWidthFactor[0] === "interpolate";
-    const isNodeLayer = layer.type === "circle"; // station nodes are circle layers
-    const showWidth = isFeatureStateWidthExpression && !isFixedLineWidth;
+    const isNodeLayer = layer.type === "circle";
     const initialWidth = isFeatureStateWidthExpression
       ? calculateMaxWidthFactor(
           currentWidthFactor[currentWidthFactor.length - 1],
           widthProp
         )
       : currentWidthFactor;
+    const showWidth = isFeatureStateWidthExpression && !isFixedLineWidth;
 
     // State for opacity of the layer
     const [opacity, setOpacity] = useState(initialOpacity || 0.5);
-    const desiredDefaultNodeWidth =
-      typeof defaultNodeWidthFactorFromPage === "number"
-        ? defaultNodeWidthFactorFromPage
-        : null;
-
-    const initialWidthForUI =
-      isNodeLayer && desiredDefaultNodeWidth != null
-        ? desiredDefaultNodeWidth
-        : initialWidth || 1;
-
-    const [widthFactor, setWidth] = useState(initialWidthForUI);
+    const [widthFactor, setWidth] = useState(initialWidth ?? 1);
 
     const bandEditorData = useMemo(() => {
       if (
@@ -578,35 +569,14 @@ export const LayerControlEntry = memo(
       });
 
       setWidth(nextFactor);
-    };
-
-    const appliedNodeDefaultRef = useRef(false);
-
-    useEffect(() => {
-      if (appliedNodeDefaultRef.current) return;
-      if (!maps?.length) return;
-      if (!isNodeLayer) return;
-      if (!widthProp) return;
-      if (isFeatureStateWidthExpression) return;
-
-      if (typeof desiredDefaultNodeWidth !== "number") return;
-
-      maps.forEach((map) => {
-        if (map?.getLayer?.(layer.id)) {
-          map.setPaintProperty(layer.id, widthProp, desiredDefaultNodeWidth);
-        }
+      mapDispatch?.({
+        type: actionTypes.UPDATE_LAYER_WIDTH_FACTOR,
+        payload: {
+          layerName: layer.id,
+          widthFactor: nextFactor,
+        },
       });
-
-      setWidth(desiredDefaultNodeWidth);
-      appliedNodeDefaultRef.current = true;
-    }, [
-      maps,
-      layer.id,
-      isNodeLayer,
-      widthProp,
-      isFeatureStateWidthExpression,
-      desiredDefaultNodeWidth,
-    ]);
+    };
 
     const showLayerSearch = enableZoomToFeature && layer.metadata?.path;
 
