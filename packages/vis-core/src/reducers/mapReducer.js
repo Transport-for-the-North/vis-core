@@ -97,6 +97,27 @@ export const actionTypes = {
   STORE_CURRENT_ZOOM: "STORE_CURRENT_ZOOM",
   UPDATE_LAYER_TOOLTIP_URL: 'UPDATE_LAYER_TOOLTIP_URL',
   SET_PARAM_NAME_TO_UUID_MAP: 'SET_PARAM_NAME_TO_UUID_MAP',
+  REGISTER_CATEGORICAL_LEGEND_ITEMS: "REGISTER_CATEGORICAL_LEGEND_ITEMS",
+  MERGE_CATEGORICAL_LEGEND_CACHE: "MERGE_CATEGORICAL_LEGEND_CACHE",
+  CLEAR_CATEGORICAL_LEGEND_CACHE: "CLEAR_CATEGORICAL_LEGEND_CACHE",
+};
+
+/**
+ * Merges new categorical legend entries into the existing cache.
+ *
+ * @param {Object} currentCache - The current categorical legend cache.
+ * @param {Object} nextEntries - The entries to merge into the cache.
+ * @returns {Object} The merged cache.
+ */
+const mergeCategoricalLegendEntries = (currentCache = {}, nextEntries = {}) => {
+  if (!nextEntries || typeof nextEntries !== "object") {
+    return currentCache;
+  }
+
+  return {
+    ...currentCache,
+    ...nextEntries,
+  };
 };
 
 /**
@@ -155,7 +176,7 @@ export const mapReducer = (state, action) => {
         layers: {},
         colorSchemesByLayer: {},
         visualisations: {},
-        filters: {},
+        filters: [],
         leftVisualisations: {},
         rightVisualisations: {},
         isLoading: true,
@@ -165,6 +186,20 @@ export const mapReducer = (state, action) => {
         selectedFeatures: [],
         isFeatureSelectActive: false,
         visualisedFeatureIds: null,
+      };
+    case actionTypes.REGISTER_CATEGORICAL_LEGEND_ITEMS:
+    case actionTypes.MERGE_CATEGORICAL_LEGEND_CACHE:
+      return {
+        ...state,
+        categoricalLegendCache: mergeCategoricalLegendEntries(
+          state.categoricalLegendCache,
+          action.payload
+        ),
+      };
+    case actionTypes.CLEAR_CATEGORICAL_LEGEND_CACHE:
+      return {
+        ...state,
+        categoricalLegendCache: {},
       };
     case actionTypes.SET_PAGE_INFO:
       return { ...state, pageInfo: action.payload };

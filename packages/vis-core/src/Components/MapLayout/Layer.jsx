@@ -124,6 +124,7 @@ export const Layer = ({ layer }) => {
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
           path: layer.path ?? null,
+          legendCacheField: layer.legendCacheField ?? null,
           shouldShowInLegend: layer.shouldShowInLegend ?? (layer.isStylable ? true : false),
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true, // opacity control should appear by default
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false, // colour scheme selector should appear if stylable, unless this is enforced

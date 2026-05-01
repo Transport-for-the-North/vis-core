@@ -38,6 +38,12 @@ jest.mock("maplibre-gl", () => ({
   })),
 }));
 
+beforeEach(() => {
+  mockMap.on.mockClear();
+  mockMap.off.mockClear();
+  mockMap.getStyle.mockClear();
+});
+
 describe("interpretWidthExpression", () => {
   it("interprets a simple numeric width expression", () => {
     const expression = 5;
@@ -202,5 +208,187 @@ describe("DynamicLegend", () => {
     });
 
     expect(screen.queryByText("network")).not.toBeInTheDocument();
+  });
+
+  it("prefers cached categorical colours over the current paint expression", () => {
+    const mockMapWithGetStyle = {
+      ...mockMap,
+      getStyle: jest.fn(() => ({
+        layers: [
+          {
+            id: "zones",
+            type: "fill",
+            metadata: {
+              isStylable: true,
+              colorStyle: "categorical",
+              legendCacheField: "value",
+            },
+            paint: {
+              "fill-color": [
+                "match",
+                ["get", "category"],
+                "A",
+                "#111111",
+                "B",
+                "#222222",
+                "#333333",
+              ],
+            },
+          },
+        ],
+      })),
+    };
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {},
+      currentZoom: 10,
+      categoricalLegendCache: {
+        "value::a": {
+          label: "A",
+          colour: "#ff0000",
+          fieldName: "value",
+          schemeName: "test",
+        },
+        "value::b": {
+          label: "B",
+          colour: "#00ff00",
+          fieldName: "value",
+          schemeName: "test",
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={mockMapWithGetStyle} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = mockMapWithGetStyle.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    const labelA = screen.getByText("A");
+    const labelB = screen.getByText("B");
+
+    expect(window.getComputedStyle(labelA.previousSibling).backgroundColor).toBe("rgb(255, 0, 0)");
+    expect(window.getComputedStyle(labelB.previousSibling).backgroundColor).toBe("rgb(0, 255, 0)");
+  });
+
+  it("rebuilds categorical legend entries on page-like changes while reusing cached colours", () => {
+    const mockMapWithMutableStyle = {
+      ...mockMap,
+      getStyle: jest.fn(),
+    };
+
+    mockMapWithMutableStyle.getStyle.mockReturnValue({
+      layers: [
+        {
+          id: "level-crossings",
+          type: "fill",
+          metadata: {
+            isStylable: true,
+            colorStyle: "categorical",
+            legendCacheField: "value",
+          },
+          paint: {
+            "fill-color": [
+              "match",
+              ["get", "category"],
+              "A",
+              "#abcdef",
+              "#333333",
+            ],
+          },
+        },
+      ],
+    });
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {},
+      currentZoom: 10,
+      categoricalLegendCache: {
+        "value::a": {
+          label: "A",
+          colour: "#ff8800",
+          fieldName: "value",
+          schemeName: "test",
+        },
+      },
+    };
+
+    const { rerender } = render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "first-page" }}>
+            <DynamicLegend map={mockMapWithMutableStyle} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = mockMapWithMutableStyle.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    mockMapWithMutableStyle.getStyle.mockReturnValue({
+      layers: [
+        {
+          id: "page-two-layer",
+          type: "fill",
+          metadata: {
+            isStylable: true,
+            colorStyle: "categorical",
+            legendCacheField: "value",
+          },
+          paint: {
+            "fill-color": [
+              "match",
+              ["get", "category"],
+              "A",
+              "#123456",
+              "#333333",
+            ],
+          },
+        },
+      ],
+    });
+
+    rerender(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "second-page" }}>
+            <DynamicLegend map={mockMapWithMutableStyle} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleDataCalls = mockMapWithMutableStyle.on.mock.calls.filter(
+        (call) => call[0] === "styledata"
+      );
+      const styleChangeHandler = styleDataCalls[styleDataCalls.length - 1][1];
+      styleChangeHandler();
+    });
+
+    expect(screen.getByText("page-two-layer")).toBeInTheDocument();
+    expect(window.getComputedStyle(screen.getByText("A").previousSibling).backgroundColor).toBe("rgb(255, 136, 0)");
   });
 });
