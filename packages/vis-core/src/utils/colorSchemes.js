@@ -84,3 +84,38 @@ export const colourSchemeSelectionColour = {
   "Set2": "red",
   "Set3": "red",
 };
+
+// colorSchemes.js
+export const colourBlindFriendlySchemes = new Set([
+  // Continuous
+  "Blues",
+  "BuGn",
+  "BuPu",
+  "GnBu",
+  "Greens",
+  "Greys",
+  "OrRd",
+  "PuBu",
+  "PuBuGn",
+  "PuRd",
+  "Purples",
+  "RdPu",
+  "Reds",
+  "YlGn",
+  "YlGnBu",
+  "YlOrBr",
+  "YlOrRd",
+
+  // Diverging
+  "BrBG",
+  "PiYG",
+  "PRGn",
+  "PuOr",
+  "RdBu",
+  "RdYlBu",
+
+  // Categorical
+  "Dark2",
+  "Paired",
+  "Set2",
+]);

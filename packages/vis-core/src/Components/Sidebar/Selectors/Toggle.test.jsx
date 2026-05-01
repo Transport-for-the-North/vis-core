@@ -56,6 +56,34 @@ let props = {
   onChange: jest.fn(),
 };
 describe("Toggle component tests", () => {
+  beforeEach(() => {
+    props = {
+      filter: {
+        values: {
+          values: [
+            {
+              paramValue: "paramValue",
+              displayValue: "displayValue",
+              isValid: true,
+            },
+            {
+              paramValue: "paramValue1",
+              displayValue: "displayValue1",
+              isValid: true,
+            },
+            {
+              paramValue: "paramValue2",
+              displayValue: "displayValue2",
+              isValid: true,
+            },
+          ],
+        },
+        multiSelect: true,
+      },
+      onChange: jest.fn(),
+    };
+  });
+
   it("Click on the displayValue button with multiselect", async () => {
     render(
       <FilterContext.Provider value={mockFilterContext}>
@@ -208,6 +236,42 @@ describe("Toggle component tests", () => {
         multiSelect: false,
       },
       "paramValue" // Because it's not a multiselect button
+    );
+  });
+
+  it("auto-selects the only visible option for single-select toggles", () => {
+    const singleOptionProps = {
+      filter: {
+        id: "single-visible-toggle",
+        values: {
+          values: [
+            {
+              paramValue: "only-option",
+              displayValue: "Only Option",
+              isValid: true,
+            },
+            {
+              paramValue: "hidden-option",
+              displayValue: "Hidden Option",
+              isValid: true,
+              isHidden: true,
+            },
+          ],
+        },
+        multiSelect: false,
+      },
+      onChange: jest.fn(),
+    };
+
+    render(
+      <FilterContext.Provider value={{ ...mockFilterContext, state: {} }}>
+        <Toggle {...singleOptionProps} />
+      </FilterContext.Provider>
+    );
+
+    expect(singleOptionProps.onChange).toHaveBeenCalledWith(
+      singleOptionProps.filter,
+      "only-option"
     );
   });
 });

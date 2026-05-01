@@ -5,7 +5,9 @@ This document provides comprehensive information about testing in the vis-core p
 ## Table of Contents
 
 - [Overview](#overview)
+- [Dev Install](#dev-install)
 - [Running Tests](#running-tests)
+- [CI/CD Integration](#cicd-integration)
 - [Testing Stack](#testing-stack)
 - [Test Structure](#test-structure)
 - [Writing Tests](#writing-tests)
@@ -16,6 +18,13 @@ This document provides comprehensive information about testing in the vis-core p
 ## Overview
 
 The vis-core package uses Jest as the test runner along with React Testing Library for component testing. All tests are located alongside their source files with the `.test.jsx` or `.test.js` extension.
+
+## Dev Install
+Before running tests locally, ensure all dependencies are installed:
+```bash
+npm install
+```
+Jest and React Testing Library are included as dev dependencies — no separate install is required.
 
 ## Running Tests
 
@@ -47,6 +56,14 @@ npm test -- src/Components/MapLayout/CalloutCards/CalloutCardVisualisation.test.
 # Run tests with coverage
 npm test -- --coverage
 ```
+
+## CI/CD Integration
+Tests run automatically via GitHub Actions on every push and pull request to `main` and `dev`.
+The pipeline:
+1. Installs dependencies (`npm ci`)
+2. Runs the full test suite (`npm test`)
+3. Only proceeds to publish if all tests pass
+Pull requests with failing tests will be blocked from merging. You can view test results in the **Actions** tab on GitHub.
 
 ## Testing Stack
 

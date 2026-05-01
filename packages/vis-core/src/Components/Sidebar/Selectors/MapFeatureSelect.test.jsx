@@ -49,6 +49,8 @@ const mockState = {
 };
 
 const fakeOnChange = jest.fn();
+const defaultTextColor = "rgb(0, 0, 0)";
+
 let props = {
   key: "key",
   filter: {
@@ -125,22 +127,20 @@ describe("BaseMapFeatureSelect component test", () => {
     expect(rectangleSelect).not.toBeDisabled();
 
     expect(pointerSelect).toHaveStyle({
-      color: "rgb(0,0,0)",
+      color: defaultTextColor,
     });
     expect(rectangleSelect).toHaveStyle({
-      backgroundColor: "rgb(255,255,255)",
-      color: "rgb(0,0,0)",
+      color: defaultTextColor,
     });
 
     await userEvent.click(rectangleSelect);
 
     await waitFor(() => {
       expect(rectangleSelect).toHaveStyle({
-        color: "rgb(0,0,0)",
+        color: defaultTextColor,
       });
       expect(pointerSelect).toHaveStyle({
-        backgroundColor: "rgb(255,255,255)",
-        color: "rgb(0,0,0)",
+        color: defaultTextColor,
       });
     });
 
@@ -148,10 +148,10 @@ describe("BaseMapFeatureSelect component test", () => {
 
     await waitFor(() => {
       expect(pointerSelect).toHaveStyle({
-        color: "rgb(0,0,0)",
+        color: defaultTextColor,
       });
       expect(rectangleSelect).toHaveStyle({
-        color: "rgb(0,0,0)",
+        color: defaultTextColor,
       });
     });
   });

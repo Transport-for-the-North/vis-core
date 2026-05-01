@@ -3,8 +3,6 @@ import { debounce } from 'lodash';
 import { api } from 'services';
 
 import { DataFetchState } from 'enums';
-import { ErrorContext } from 'contexts';
-import { errorActionTypes } from 'reducers';
 
 // --- NEW HELPER FUNCTIONS FOR SPATIAL MATHS ---
 
@@ -185,11 +183,6 @@ export const useFetchVisualisationData = (
   const prevParamsRef = useRef();
   const prevVisualisationNameRef = useRef();
   
-  // Access ErrorContext to display an overlay for missing parameters (if provider present)
-  const errorContext = useContext(ErrorContext);
-  const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
-  const errorState = errorContext?.state ?? null;
-
   /**
    * - React StrictMode (dev) mounts/unmounts quickly; a 400ms debounced call can be cancelled
    *   before it fires, so params signature would still be consumed.
@@ -486,11 +479,6 @@ export const useFetchVisualisationData = (
       return;
     }
 
-    // Clear any previously shown param-missing overlay.
-    if (errorDispatch) {
-      errorDispatch({ type: errorActionTypes.CLEAR_ERROR });
-    }
-
     // Track a combined signature of both param maps to detect changes.
     const currentParamsStr = JSON.stringify({ queryParams, pathParams });
 
@@ -517,7 +505,6 @@ export const useFetchVisualisationData = (
     visualisation?.queryParams,
     visualisation?.pathParams,
     fetchDataForVisualisation,
-    errorDispatch,
   ]);
 
   // When server-side viewport filtering is enabled, re-fetch data when the map viewport changes.
