@@ -120,9 +120,7 @@ export const LegendLabel = styled.span`
 export const LegendDivider = styled.div`
   height: 1px;
   background-color: #ccc;
-  margin: 4px;
-  max-width: 80%;
-  width: 80px;
+  margin: 12px 0;
 `;
 
 /** Red banner shown when some data values fall outside the manually-set band range. */
