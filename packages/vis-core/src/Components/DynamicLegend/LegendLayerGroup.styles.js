@@ -116,6 +116,19 @@ export const LegendLabel = styled.span`
   font-size: small;
 `;
 
+/**
+ * Italic annotation appended after the label on the first and last discrete
+ * swatch rows, communicating the scale direction (e.g. "Lowest Risk of TRSE").
+ * Mirrors the AnnotationRow used in the continuous gradient bar.
+ */
+export const SwatchAnnotation = styled.span`
+  font-size: 10px;
+  color: #666;
+  font-style: italic;
+  margin-left: 6px;
+  white-space: nowrap;
+`;
+
 /** Thin horizontal rule used to separate consecutive legend groups. */
 export const LegendDivider = styled.div`
   height: 1px;

@@ -13,7 +13,6 @@ export const ContinuousScaleContainer = styled.div`
   width: 100%;
   padding: 0 ${(p) => p.$sidePad ?? 16}px;
   box-sizing: border-box;
-  margin-top: 16px;
   margin-bottom: 12px;
 `;
 
@@ -83,6 +82,21 @@ export const TickLabel = styled.span`
      corner, sweeping the text downward-left away from the gradient bar. */
   transform-origin: top right;
   transform: translateX(-100%) rotate(-45deg);
+`;
+
+/**
+ * A row rendered ABOVE the gradient bar showing scale-direction annotations
+ * (e.g. "Lowest Risk" on the left, "Highest Risk" on the right). Placing it
+ * above means the labels frame the scale before the user reads the numeric axis,
+ * and the tick labels below have clear space without collision.
+ */
+export const AnnotationRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: #666;
+  font-style: italic;
 `;
 
 /**
