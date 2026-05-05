@@ -262,6 +262,61 @@ export const formatLegendLabelValue = (value) => {
 };
 
 /**
+ * Controls how numeric labels are displayed in both discrete swatches and the
+ * continuous gradient bar. Set on a layer via `legendNumberFormat`.
+ *
+ * @typedef {Object} LegendNumberFormat
+ * @property {number} [decimals] - Fixed decimal places. When omitted the bar
+ *   auto-detects an appropriate precision from the data values, or falls back
+ *   to the generic `formatLegendLabelValue` behaviour for discrete swatches.
+ * @property {string} [prefix=''] - String prepended to the formatted number
+ *   (e.g. `'£'`, `'$'`).
+ * @property {string} [suffix=''] - String appended to the formatted number
+ *   (e.g. `'%'`, `' km'`).
+ */
+
+/**
+ * Formats a legend value according to a {@link LegendNumberFormat} config object.
+ *
+ * This is the single extension point for label formatting. Both the discrete
+ * swatch labels (DynamicLegend.jsx) and the continuous-bar axis / hover tooltip
+ * (ContinuousGradientBar.jsx) call this function, so adding a new format option
+ * only ever requires changing this one place.
+ *
+ * @param {string|number}       value                    - The raw value to format.
+ * @param {LegendNumberFormat}  [legendFormat={}]        - The legendNumberFormat config from the layer.
+ * @param {number|null}         [fallbackPrecision=null] - Auto-detected decimal precision used
+ *                                                         when `legendFormat.decimals` is not set.
+ *                                                         Pass the bar's auto-detected maxPrecision
+ *                                                         here so the hover tooltip stays consistent
+ *                                                         with the axis ticks.
+ * @returns {string} The formatted display string.
+ */
+export const formatLegendNumber = (value, legendFormat = {}, fallbackPrecision = null) => {
+  const num = convertStringToNumber(value);
+  if (!Number.isFinite(num)) return String(value ?? '');
+
+  const { decimals, prefix = '', suffix = '' } = legendFormat;
+
+  // Resolve precision: explicit config wins, then the caller's auto-detected
+  // fallback, then fall back to the generic formatLegendLabelValue behaviour.
+  const precision = Number.isFinite(decimals) ? decimals
+    : Number.isFinite(fallbackPrecision) ? fallbackPrecision
+    : null;
+
+  let core;
+  if (precision === 0) {
+    core = numberWithCommas(Math.round(num));
+  } else if (precision !== null) {
+    core = formatNumber(parseFloat(num.toFixed(precision)));
+  } else {
+    core = formatLegendLabelValue(num);
+  }
+
+  return `${prefix}${core}${suffix}`;
+};
+
+/**
  * Gets the width for a legend entry based on layer type and paint properties.
  *
  * This function determines the appropriate width/diameter for legend swatches by:
