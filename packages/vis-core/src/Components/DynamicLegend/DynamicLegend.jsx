@@ -11,6 +11,7 @@ import {
   interpretDashArrayExpression,
   isRenderableEntry,
   formatLegendLabelValue,
+  formatLegendNumber,
   getEntryWidth,
   getEntryDashStatus,
 } from "./DynamicLegend.utils";
@@ -172,7 +173,25 @@ export const DynamicLegend = ({ map }) => {
           
           // --- Interpret paint expressions ---
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;
-          const trseLabel = state.layers[layer.id]?.trseLabel === true;
+
+          // legendAnnotations: optional { start, end } strings rendered in the
+          // AnnotationRow below the continuous gradient bar. "start" appears on
+          // the left (low end of the bar), "end" on the right (high end).
+          // These are display-position terms, not array-index terms, so they
+          // remain unambiguous regardless of whether the colour scheme is inverted.
+          const legendAnnotations = state.layers[layer.id]?.legendAnnotations;
+
+          // legendNumberFormat: optional LegendNumberFormat controlling decimal
+          // precision, prefix, and suffix on continuous-bar axis ticks AND on
+          // discrete swatch labels. Both views show consistent values.
+          // Defaults to auto-detecting the precision of the stop values.
+          const legendNumberFormat = state.layers[layer.id]?.legendNumberFormat;
+
+          // Formats a stop value for the discrete legend swatch label.
+          // Delegates entirely to formatLegendNumber — the single extension point
+          // for all label formatting options (decimals, prefix, suffix, …).
+          // No format logic lives here; add options to formatLegendNumber instead.
+          const formatEntryLabel = (value) => formatLegendNumber(value, legendNumberFormat ?? {});
           const paintProps = layer.paint;
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
@@ -247,10 +266,13 @@ export const DynamicLegend = ({ map }) => {
               // If there's only one width stop, apply it to all color stops. This should only occur with custom paint definiton (not data-driven).
               widthStops = Array(colorStops.length).fill(widthStops[0]);
             }
-            const length = trseLabel ? colorStops.length - 1 : colorStops.length;
+            // All colour stops are included as entries. Each stop represents a
+            // point value on the scale, not a range between stops. The continuous
+            // bar then places tick marks at those point values and the collision-
+            // detection system selects which labels to show.
+            const length = colorStops.length;
             for (let idx = 0; idx < length; idx++) {
               const stop = colorStops[idx];
-              const nextStop = colorStops[idx + 1];
               const widthStop = widthStops ? widthStops[idx] : null;
               const dashStop = dashStops ? dashStops.find(ds => ds.value === stop.value) : null;
               let label;
@@ -260,22 +282,12 @@ export const DynamicLegend = ({ map }) => {
                 rawLabel = customLabels[idx];
                 label = rawLabel;
                 numericValue = NaN;
-              } else if (trseLabel && nextStop) {
-                const startValue = formatLegendLabelValue(stop.value);
-                const endValue = formatLegendLabelValue(nextStop.value);
-                rawLabel = `${stop.value}-${nextStop.value}`;
-                numericValue = NaN;
-                if (idx === 0) {
-                  label = `${startValue}-${endValue} (Lowest Risk of TRSE)`;
-                } else if (idx === length - 1) {
-                  label = `${startValue}-${endValue} (Highest Risk of TRSE)`;
-                } else {
-                  label = `${startValue}-${endValue}`;
-                }
               } else {
                 rawLabel = stop.value;
                 numericValue = convertStringToNumber(stop.value);
-                label = formatLegendLabelValue(stop.value);
+                // Apply legendNumberFormat so the discrete swatch label matches the
+                // continuous bar axis (e.g. "100" not "100.00" for decimals: 0).
+                label = formatEntryLabel(stop.value);
               }
 
               const cachedLegendColour =
@@ -345,11 +357,15 @@ export const DynamicLegend = ({ map }) => {
             subtitle: legendSubtitleText,
             legendEntries: filteredEntries,
             legendEntriesNumeric: legendNumericEntries,
-            trseLabel,
+            // legendAnnotations: { start, end } — positional (left/right) annotation
+            // strings for the continuous gradient bar. Present only when the layer
+            // config declares them; undefined otherwise.
+            legendAnnotations,
+            // legendNumberFormat: { decimals } — tick label precision override.
+            legendNumberFormat,
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
-            
           };
         })
         // Layers that produced no renderable entries return null from the map above.

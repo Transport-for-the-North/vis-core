@@ -14,6 +14,7 @@ import {
   LegendDivider,
   OutOfBandMessage,
   DiscreteSwatchesContainer,
+  SwatchAnnotation,
   CogMenuContainer,
   CogButton,
   OptionsPopover,
@@ -211,18 +212,31 @@ const LegendLayerGroup = ({
             {/* Swatch area: discrete swatches or continuous gradient bar */}
             {useDiscreteSwatches ? (
               <DiscreteSwatchesContainer>
-                {item.legendEntries.map((entry, idx) => (
-                  <LegendItem key={idx} style={{ marginBottom: 0 }}>
-                    {entry.type === "circle" ? (
-                      <CircleSwatch diameter={entry.width || 10} color={entry.color} />
-                    ) : entry.type === "line" ? (
-                      <LineSwatch height={entry.width || 2} color={entry.color} isDashed={entry.isDashed || false} />
-                    ) : entry.type === "fill" ? (
-                      <PolygonSwatch color={entry.color} />
-                    ) : null}
-                    <LegendLabel>{entry.label}</LegendLabel>
-                  </LegendItem>
-                ))}
+                {item.legendEntries.map((entry, idx) => {
+                  const isFirst = idx === 0;
+                  const isLast = idx === item.legendEntries.length - 1;
+                  // Align scale-direction annotation with the first and last swatch
+                  // rows so the label sits beside the value it describes, matching
+                  // the vertical stacking of swatches.
+                  const annotation = isFirst
+                    ? item.legendAnnotations?.start
+                    : isLast
+                    ? item.legendAnnotations?.end
+                    : null;
+                  return (
+                    <LegendItem key={idx} style={{ marginBottom: 0 }}>
+                      {entry.type === "circle" ? (
+                        <CircleSwatch diameter={entry.width || 10} color={entry.color} />
+                      ) : entry.type === "line" ? (
+                        <LineSwatch height={entry.width || 2} color={entry.color} isDashed={entry.isDashed || false} />
+                      ) : entry.type === "fill" ? (
+                        <PolygonSwatch color={entry.color} />
+                      ) : null}
+                      <LegendLabel>{entry.label}</LegendLabel>
+                      {annotation && <SwatchAnnotation>{annotation}</SwatchAnnotation>}
+                    </LegendItem>
+                  );
+                })}
               </DiscreteSwatchesContainer>
             ) : (
               <ContinuousGradientBar item={item} scaleMode={pref.scaleMode} />

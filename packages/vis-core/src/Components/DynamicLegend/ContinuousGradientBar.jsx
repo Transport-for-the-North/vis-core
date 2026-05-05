@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
-import { formatNumber } from "utils";
+import { formatNumber, numberWithCommas } from "utils";
+import { formatLegendNumber } from "./DynamicLegend.utils";
 import {
   ContinuousScaleContainer,
   GradientContainer,
@@ -8,6 +9,7 @@ import {
   Tooltip,
   LabelsContainer,
   TickLabel,
+  AnnotationRow,
 } from "./ContinuousGradientBar.styles";
 import { LineWidthTrack, CircleTrack } from "./WidthTrack";
 
@@ -24,12 +26,23 @@ import { LineWidthTrack, CircleTrack } from "./WidthTrack";
  * - Tick marks at every colour stop position.
  * - Smart collision-detection to suppress overlapping axis labels, always
  *   preserving the first, last, and (for diverging scales) zero labels.
+ * - Descending value support: when `invertedColorScheme` is active the colour
+ *   stops arrive in descending value order (highest first). The bar detects this
+ *   and flips the position formula so the CSS gradient remains valid and labels
+ *   appear at their correct visual positions.
+ * - Optional annotation row (`item.legendAnnotations`) rendered below the axis
+ *   showing scale-direction text at the left (`start`) and right (`end`) edges.
  *
  * @param {Object} props
- * @param {Object} props.item - The legend item configuration object. Must contain
- *   `legendEntries` (array of `{ color, val, ... }`) and `legendEntriesNumeric`
- *   (sorted array of the corresponding numeric values). Also uses `item.style`
- *   to detect diverging scales.
+ * @param {Object} props.item - The legend item produced by `DynamicLegend`.
+ *   - `legendEntries`        {Array}  colour/width entries for each stop.
+ *   - `legendEntriesNumeric` {Array}  numeric value for each entry.
+ *   - `style`                {string} `'diverging'` enables the zero-tick guarantee.
+ *   - `legendNumberFormat`   {LegendNumberFormat} optional precision / prefix / suffix override.
+ *   - `legendAnnotations`    {Object} optional `{ start: string, end: string }` — text
+ *     shown left-aligned (`start`) and right-aligned (`end`) below the axis. These are
+ *     visual-position labels: `start` is always the left edge, `end` always the right,
+ *     regardless of whether the colour scheme is inverted.
  * @param {string} props.scaleMode - `'value'` positions stops proportionally to
  *   their numeric value; `'color'` spaces them evenly.
  * @returns {JSX.Element|null} The rendered gradient bar, or `null` when there is
@@ -54,20 +67,50 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
   const max = Math.max(...finiteVals);
   const range = max - min;
 
+  // Detect whether the stops are ordered from highest to lowest value.
+  // This happens when `invertedColorScheme: true` is set on the layer, which
+  // reverses the colourStops array in DynamicLegend so that the highest data
+  // value maps to the darkest colour. Without correction the CSS gradient string
+  // would have stops in descending percentage order, which browsers clamp to
+  // produce a flat, single-colour bar.
+  const isDescending = finiteVals[0] > finiteVals[finiteVals.length - 1];
+
   // Determine the maximum number of decimal places present across all stops.
   // Hover interpolation is then rounded to this precision rather than a fixed value,
   // so integer datasets display as integers and decimal datasets remain accurate.
-  const maxPrecision = finiteVals.reduce((maxPrec, num) => {
-    const str = num.toString();
-    const decimalIndex = str.indexOf('.');
-    return decimalIndex === -1 ? maxPrec : Math.max(maxPrec, str.length - decimalIndex - 1);
-  }, 0);
+  // A legendNumberFormat override takes precedence when supplied.
+  const maxPrecision = item.legendNumberFormat && Number.isFinite(item.legendNumberFormat.decimals)
+    ? item.legendNumberFormat.decimals
+    : finiteVals.reduce((maxPrec, num) => {
+        const str = num.toString();
+        const decimalIndex = str.indexOf('.');
+        return decimalIndex === -1 ? maxPrec : Math.max(maxPrec, str.length - decimalIndex - 1);
+      }, 0);
+
+  // Formats a numeric value for axis tick labels and hover tooltips.
+  // Delegates to formatLegendNumber — the single extension point for all
+  // label formatting. maxPrecision (auto-detected from the data) is passed
+  // as the fallback so the hover tooltip stays consistent with tick labels
+  // when no explicit legendNumberFormat.decimals override is configured.
+  const formatAxisValue = (val) => formatLegendNumber(val, item.legendNumberFormat ?? {}, maxPrecision);
 
   const stopsWithPercentages = entries.map((entry, i) => {
     const val = numericEntries[i];
-    const percent = scaleMode === 'color' || !Number.isFinite(val)
-      ? (i / (entries.length - 1)) * 100
-      : (range === 0 ? 0 : ((val - min) / range) * 100);
+    let percent;
+    if (scaleMode === 'color' || !Number.isFinite(val)) {
+      // Even spacing: ignore numeric values and distribute stops uniformly.
+      percent = (i / (entries.length - 1)) * 100;
+    } else if (range === 0) {
+      percent = 0;
+    } else if (isDescending) {
+      // Inverted scheme: values run high → low across the stops array.
+      // Flip the formula so the HIGHEST value sits at 0 % (left) and the
+      // LOWEST at 100 % (right), keeping CSS gradient stops in ascending order.
+      percent = ((max - val) / range) * 100;
+    } else {
+      // Standard ascending scheme.
+      percent = ((val - min) / range) * 100;
+    }
     return { ...entry, val, percent, width: entry.width ?? null };
   });
 
@@ -121,7 +164,7 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
     }
     setHoverInfo({
       x,
-      value: formatNumber(parseFloat(hoveredValue.toFixed(maxPrecision))),
+      value: formatAxisValue(hoveredValue),
       width: hoveredWidth !== null ? formatNumber(parseFloat(hoveredWidth.toFixed(1))) : null,
     });
   };
@@ -167,6 +210,12 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
 
   return (
     <ContinuousScaleContainer $sidePad={sidePad}>
+      {item.legendAnnotations?.start || item.legendAnnotations?.end ? (
+        <AnnotationRow>
+          <span>{item.legendAnnotations.start ?? ''}</span>
+          <span>{item.legendAnnotations.end ?? ''}</span>
+        </AnnotationRow>
+      ) : null}
       {widthVaries && layerType === 'line' && (
         <LineWidthTrack stops={stopsWithPercentages} />
       )}
@@ -198,15 +247,12 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
       </GradientContainer>
       
       <LabelsContainer>
-        {/* Loop over the FILTERED list to only render non-overlapping text labels.
-             Each label is anchored by its LEFT edge at the tick (left: percent%),
-             then shifted left by its own width so the RIGHT edge lands on the tick. */}
-        {labelsToShow.map((stop) => (
-          <TickLabel 
-            key={`label-${stop.index}`} 
+        {labelsToShow.map((stop, i) => (
+          <TickLabel
+            key={`label-${stop.index}`}
             style={{ left: `${stop.percent}%` }}
           >
-            {formatNumber(stop.val)}
+            {formatAxisValue(stop.val)}
           </TickLabel>
         ))}
       </LabelsContainer>
