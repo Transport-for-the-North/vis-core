@@ -11,10 +11,16 @@ import {
  * Returns an object that includes values, differenceValues, and colours for the metric,
  * or null if nothing is found.
  *
- * @param {Array} defaultBands - The bands array from defaults.
- * @param {Object} currentPage - The current app page (used to resolve the page category).
- * @param {Object} queryParams - The URL query parameters.
- * @param {Object} options - Additional options; for example, { trseLabel: true }.
+ * @param {Array}  defaultBands              - The bands array from defaults.
+ * @param {Object} currentPage              - The current app page (used to resolve the page category).
+ * @param {Object} queryParams              - The URL query parameters.
+ * @param {Object} [options={}]             - Additional options.
+ * @param {string} [options.bandMetricName] - Pins the lookup to a specific metric name,
+ *                                           bypassing the active filter. If the name
+ *                                           resolves it is returned immediately; if it
+ *                                           does not match any metric the function falls
+ *                                           through to the filter-based path so callers
+ *                                           without a matching entry are unaffected.
  * @returns {Object|null} The metric definition or null.
  */
 export const getMetricDefinition = (
@@ -25,18 +31,29 @@ export const getMetricDefinition = (
 ) => {
   const pageCategory = currentPage.category || currentPage.pageName;
   const selectedPageBands = defaultBands?.find((band) => band.name === pageCategory);
-  let metricName = null;
-  if (options.trseLabel) {
-    metricName = "trse";
-  } else if (currentPage.config && currentPage.config.filters) {
+
+  // 1. Prefer the explicit bandMetricName override (e.g. TRSE layers that pin
+  //    to a fixed metric regardless of the active filter). If it resolves,
+  //    return early; if not, fall through so callers without a matching metric
+  //    entry are not silently broken.
+  if (options.bandMetricName && selectedPageBands) {
+    const found = selectedPageBands.metric.find((m) => m.name === options.bandMetricName);
+    if (found) return found;
+  }
+
+  // 2. Filter-based resolution: derive the metric name from the page filter
+  //    whose containsLegendInfo flag is set. This is the original path used
+  //    by all layers that do not pin a metric.
+  if (currentPage.config && currentPage.config.filters) {
     const selectedMetricFilter = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
-    metricName = queryParams[selectedMetricFilter?.paramName]?.value;
+    const metricName = queryParams[selectedMetricFilter?.paramName]?.value;
+    if (selectedPageBands && metricName) {
+      return selectedPageBands.metric.find((m) => m.name === metricName) || null;
+    }
   }
-  if (selectedPageBands && metricName) {
-    return selectedPageBands.metric.find((m) => m.name === metricName) || null;
-  }
+
   return null;
 };
 
@@ -808,7 +825,7 @@ export const resetPaintProperty = (style) => {
  * @param {Array} defaultBands - Default bands for classification.
  * @param {Object} currentPage - The current page configuration.
  * @param {Object} queryParams - Query parameters from the visualisation.
- * @param {Object} options - Additional options, e.g., { trseLabel: true }
+ * @param {Object} options - Additional options, e.g., { bandMetricName: 'trse' }
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
 export const reclassifyData = (
