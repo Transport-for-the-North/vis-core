@@ -193,6 +193,18 @@ export const DynamicLegend = ({ map }) => {
           // No format logic lives here; add options to formatLegendNumber instead.
           const formatEntryLabel = (value) => formatLegendNumber(value, legendNumberFormat ?? {});
           const paintProps = layer.paint;
+          
+          // Determine the opacity based on the layer type
+          const layerOpacity = 
+            paintProps["fill-opacity"] ?? 
+            paintProps["line-opacity"] ?? 
+            paintProps["circle-opacity"];
+
+          // If the layer is explicitly hidden (opacity is exactly 0), skip the legend
+          if (layerOpacity === 0 || layerOpacity === 0.0) {
+            return null;
+          }
+
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
             paintProps["circle-color"] ||
