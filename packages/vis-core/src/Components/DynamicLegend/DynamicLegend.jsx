@@ -416,6 +416,7 @@ export const DynamicLegend = ({ map }) => {
           item={item}
           index={index}
           isLast={index === legendItems.length - 1}
+          isMobile={isMobile}
           openPopoverId={openPopoverId}
           togglePopover={togglePopover}
           layerPrefs={layerPrefs}

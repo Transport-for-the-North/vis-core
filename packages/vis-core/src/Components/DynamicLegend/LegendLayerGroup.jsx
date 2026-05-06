@@ -39,6 +39,7 @@ import {
  *                                                   future use / keying).
  * @param {boolean}  props.isLast                  - When `false`, a `LegendDivider` is
  *                                                   rendered below the group.
+ * @param {boolean}  props.isMobile                - When `true`, the `LegendDivider` is omitted.
  * @param {string|null} props.openPopoverId        - The `layerId` of the currently open
  *                                                   options popover, or `null`.
  * @param {Function} props.togglePopover           - Callback `(layerId: string) => void`
@@ -60,6 +61,7 @@ const LegendLayerGroup = ({
   item,
   index,
   isLast,
+  isMobile,
   openPopoverId,
   togglePopover,
   layerPrefs,
@@ -68,6 +70,9 @@ const LegendLayerGroup = ({
   classMethod,
   popoverRef,
 }) => {
+  // LegendDivider is omitted on mobile because legend groups are rendered separately already.
+  const shouldRenderDivider = !isLast && !isMobile;
+  
   // --- Out-of-band calculation ---
   let outOfBand = false;
 
@@ -250,7 +255,7 @@ const LegendLayerGroup = ({
           </>
         )}
       </LegendItemContainer>
-      {!isLast && <LegendDivider />}
+      {shouldRenderDivider && <LegendDivider />}
     </LegendGroup>
   );
 };
