@@ -114,6 +114,8 @@ export const PolygonSwatch = styled.div`
 /** Small text label displayed alongside each legend swatch. */
 export const LegendLabel = styled.span`
   font-size: small;
+  text-align: left;
+  flex: 1;
 `;
 
 /**
@@ -152,7 +154,6 @@ export const DiscreteSwatchesContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 8px;
 `;
 
 /** Wrapper that positions the cog button relative to the popover it controls. */
