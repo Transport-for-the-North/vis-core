@@ -305,10 +305,14 @@ export const formatLegendNumber = (value, legendFormat = {}, fallbackPrecision =
     : null;
 
   let core;
-  if (precision === 0) {
+  // If the number is large (>= 10,000), delegate to formatNumber to get K/M/B suffixes.
+  // formatNumber automatically handles the decimal places for these large suffixes.
+  if (Math.abs(num) >= 10000) {
+    core = formatNumber(num);
+  } else if (precision === 0) {
     core = numberWithCommas(Math.round(num));
   } else if (precision !== null) {
-    core = formatNumber(parseFloat(num.toFixed(precision)));
+    core = numberWithCommas(num.toFixed(precision));
   } else {
     core = formatLegendLabelValue(num);
   }
