@@ -28,9 +28,8 @@ export const GradientContainer = styled.div`
  * @prop {string} $gradient - A CSS `linear-gradient(...)` string.
  */
 export const GradientBar = styled.div`
-  height: 16px; /* Thicker, more prominent bar */
+  height: 22px;
   width: 100%;
-  border-radius: 4px;
   background: ${(props) => props.$gradient};
   border: 1px solid #bbb;
   cursor: crosshair;
@@ -64,7 +63,7 @@ export const TickMark = styled.div`
 /** Relative-positioned strip beneath the gradient bar that holds tick labels. */
 export const LabelsContainer = styled.div`
   position: relative;
-  height: 22px;
+  height: ${(props) => props.$height ?? 22}px;
   width: 100%;
 `;
 

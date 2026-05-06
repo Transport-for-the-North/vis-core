@@ -136,6 +136,16 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
     sidePad = Math.max(16, Math.ceil(maxEndpointRadius));
   }
 
+  // --- Dynamic side padding for first label ---
+  // Ensure the first label doesn't overflow the left edge when rotated.
+  // We use the same trigonometry (sin 45) as the height calculation below.
+  const isFirstLabelLong = (belowMin || (isDescending && aboveMax));
+  const firstBaseLabel = formatAxisValue(stopsWithPercentages[0].val);
+  const firstLabelText = isFirstLabelLong ? `\u2264${firstBaseLabel}` : firstBaseLabel;
+  const requiredLeftPad = Math.ceil(firstLabelText.length * 2.3 + 2); // 2.3 px per char at 45 degrees, +2 px for padding
+  
+  sidePad = Math.max(sidePad, requiredLeftPad);
+
   const gradientColors = stopsWithPercentages
     .map((stop) => `${stop.color} ${stop.percent}%`)
     .join(", ");
@@ -207,6 +217,18 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
   if (labelsToShow[labelsToShow.length - 1].index !== stopsWithPercentages.length - 1) {
     labelsToShow.push({ ...stopsWithPercentages[stopsWithPercentages.length - 1], index: stopsWithPercentages.length - 1 });
   }
+  // --- Dynamic Label Height Calculation ---
+  // Find the longest string length among the labels we are about to render
+  const maxLabelLength = Math.max(
+    ...labelsToShow.map((stop) => {
+      const baseLabel = formatAxisValue(stop.val);
+      return baseLabel.length + 1; // +1 to account for potential '+' or '≤' symbols
+    })
+  );
+  
+  // Font size is 11px (approx 6.5px width per char). Rotated at 45 degrees (sin 45 ≈ 0.707).
+  // Vertical height = (charCount * 6.5 * 0.707) + (11 * 0.707) ≈ (charCount * 4.6) + 8
+  const dynamicLabelHeight = Math.max(22, Math.ceil(maxLabelLength * 4.6));
 
   return (
     <ContinuousScaleContainer $sidePad={sidePad}>
@@ -246,7 +268,7 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
         )}
       </GradientContainer>
       
-      <LabelsContainer>
+      <LabelsContainer $height={dynamicLabelHeight}>
         {labelsToShow.map((stop) => {
           const isFirstStop = stop.index === 0;
           const isLastStop = stop.index === stopsWithPercentages.length - 1;
