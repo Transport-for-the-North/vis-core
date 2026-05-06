@@ -138,15 +138,20 @@ export const LegendDivider = styled.div`
   margin: 12px 0;
 `;
 
-/** Red banner shown when some data values fall outside the manually-set band range. */
-export const OutOfBandMessage = styled.div`
-  color: #d32f2f;
-  font-size: 0.85em;
-  margin: 6px 0 0 0;
-  padding: 6px 8px;
-  background-color: #ffebee;
-  border-radius: 4px;
-  border-left: 3px solid #d32f2f;
+/**
+ * Wrapper for the InfoBox shown when data falls outside the band range.
+ * Controls spacing within the legend panel and resets the InfoBox's own
+ * default margins so the layout stays compact.
+ */
+export const OutOfBandWrapper = styled.div`
+  width: 0;
+  min-width: 100%;
+  
+  // TODO implement custom styling for the InfoBox itself and remove this wrapper -- it's a bit hacky but avoids coupling the InfoBox styles to the legend's layout needs for now
+  && > * {
+    margin: 0;
+    box-sizing: border-box;
+  }
 `;
 
 /** Flex column container for discrete swatch rows in non-continuous display mode. */
@@ -154,6 +159,7 @@ export const DiscreteSwatchesContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-bottom: 12px;
 `;
 
 /** Wrapper that positions the cog button relative to the popover it controls. */

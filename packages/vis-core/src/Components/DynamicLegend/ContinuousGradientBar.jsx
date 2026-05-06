@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { formatNumber, numberWithCommas } from "utils";
-import { formatLegendNumber } from "./DynamicLegend.utils";
+import { formatLegendNumber, decorateLegendLabel } from "./DynamicLegend.utils";
 import {
   ContinuousScaleContainer,
   GradientContainer,
@@ -48,7 +48,7 @@ import { LineWidthTrack, CircleTrack } from "./WidthTrack";
  * @returns {JSX.Element|null} The rendered gradient bar, or `null` when there is
  *   insufficient data to display.
  */
-const ContinuousGradientBar = ({ item, scaleMode }) => {
+const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = false }) => {
   const [hoverInfo, setHoverInfo] = useState(null);
   const barRef = useRef(null);
 
@@ -247,14 +247,30 @@ const ContinuousGradientBar = ({ item, scaleMode }) => {
       </GradientContainer>
       
       <LabelsContainer>
-        {labelsToShow.map((stop, i) => (
-          <TickLabel
-            key={`label-${stop.index}`}
-            style={{ left: `${stop.percent}%` }}
-          >
-            {formatAxisValue(stop.val)}
-          </TickLabel>
-        ))}
+        {labelsToShow.map((stop) => {
+          const isFirstStop = stop.index === 0;
+          const isLastStop = stop.index === stopsWithPercentages.length - 1;
+          const baseLabel = formatAxisValue(stop.val);
+          
+          const tickLabel = decorateLegendLabel({
+            label: baseLabel,
+            isFirst: isFirstStop,
+            isLast: isLastStop,
+            belowMin,
+            aboveMax,
+            isDescending,
+            hasCustomLabels: item.hasCustomLabels
+          });
+
+          return (
+            <TickLabel
+              key={`label-${stop.index}`}
+              style={{ left: `${stop.percent}%` }}
+            >
+              {tickLabel}
+            </TickLabel>
+          );
+        })}
       </LabelsContainer>
     </ContinuousScaleContainer>
   );

@@ -273,6 +273,7 @@ export const DynamicLegend = ({ map }) => {
 
           // Process legend entries
           let legendEntries = [];
+          let hasCustomLabels = false;
           if (colorStops && colorStops.length > 0) {
             if (widthStops && widthStops.length == 1) {
               // If there's only one width stop, apply it to all color stops. This should only occur with custom paint definiton (not data-driven).
@@ -293,7 +294,12 @@ export const DynamicLegend = ({ map }) => {
               if (customLabels && customLabels.length === length) {
                 rawLabel = customLabels[idx];
                 label = rawLabel;
-                numericValue = NaN;
+                // The underlying stop value is still numeric (e.g. 0, 20, 40, 60, 80)
+                // and drives continuous bar positioning. hasCustomLabels is set so
+                // ContinuousGradientBar can decorate the extreme ticks with ≤ / +
+                // to communicate the open-ended nature of the boundary bins.
+                numericValue = convertStringToNumber(stop.value);
+                hasCustomLabels = true;
               } else {
                 rawLabel = stop.value;
                 numericValue = convertStringToNumber(stop.value);
@@ -378,6 +384,7 @@ export const DynamicLegend = ({ map }) => {
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
+            hasCustomLabels, // True when bands.js-style range labels (e.g. "0-20 (Very low)") are applied.
           };
         })
         // Layers that produced no renderable entries return null from the map above.

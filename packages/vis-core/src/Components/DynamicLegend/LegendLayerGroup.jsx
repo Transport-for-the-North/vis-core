@@ -1,5 +1,7 @@
 import React from "react";
 import ContinuousGradientBar from "./ContinuousGradientBar";
+import { extractDataValues, getOutOfBandFlags, decorateLegendLabel } from "./DynamicLegend.utils";
+import { InfoBox } from "Components";
 import {
   LegendGroup,
   LegendItemContainer,
@@ -12,7 +14,7 @@ import {
   PolygonSwatch,
   LegendLabel,
   LegendDivider,
-  OutOfBandMessage,
+  OutOfBandWrapper,
   DiscreteSwatchesContainer,
   SwatchAnnotation,
   CogMenuContainer,
@@ -73,44 +75,24 @@ const LegendLayerGroup = ({
   // LegendDivider is omitted on mobile because legend groups are rendered separately already.
   const shouldRenderDivider = !isLast && !isMobile;
   
-  // --- Out-of-band calculation ---
-  let outOfBand = false;
+  // --- Out-of-band flags ---
+  // belowMin / aboveMax: whether data extends beyond the displayed scale at
+  // either end. Used to decorate swatch / tick labels with ≤ / +.
+  const layerData = visualisationDataByLayer[item.layerId];
+  const { belowMin, aboveMax } = getOutOfBandFlags(layerData, item.legendEntriesNumeric);
 
-  if (
-    classMethod === 'c' &&
-    item.legendEntriesNumeric &&
-    Array.isArray(item.legendEntriesNumeric) &&
-    item.legendEntriesNumeric.length > 1
-  ) {
-    const bandEdges = item.legendEntriesNumeric.filter(v => !isNaN(v));
+  // --- Out-of-band warning (manual classification only) ---
+  let outOfBand = false;
+  if (classMethod === 'c' && item.legendEntriesNumeric?.length > 1) {
+    const bandEdges = item.legendEntriesNumeric.filter(Number.isFinite);
     const minBand = Math.min(...bandEdges);
     const maxBand = Math.max(...bandEdges);
-    const data = visualisationDataByLayer[item.layerId];
-
-    if (Array.isArray(data) && data.length > 0 && minBand !== null && maxBand !== null) {
-      // Extract a numeric value from each data row using a best-effort heuristic:
-      // prefer the `value` or `metric` key, fall back to the first numeric property
-      // found on the object, and accept plain numbers for flat data arrays.
-      const values = data.map(row => {
-        if (typeof row === 'object' && row !== null) {
-          let v = row.value ?? row.metric;
-          if (v === undefined) {
-            for (const k in row) {
-              if (typeof row[k] === 'number') return row[k];
-            }
-          }
-          return v;
-        } else if (typeof row === 'number') {
-          return row;
-        }
-        return null;
-      }).filter(v => v !== null && !isNaN(v));
-
+    const values = extractDataValues(layerData);
+    if (values.length > 0) {
       const dataMin = Math.min(...values);
       const dataMax = Math.max(...values);
-      const bandsManuallySet = (minBand < dataMin || maxBand < dataMax);
+      const bandsManuallySet = minBand < dataMin || maxBand < dataMax;
       outOfBand = bandsManuallySet && values.some(v => v < minBand || v > maxBand);
-      if (!bandsManuallySet) outOfBand = false;
     }
   }
 
@@ -120,7 +102,11 @@ const LegendLayerGroup = ({
   const canBeContinuous =
     item.style !== "categorical" &&
     item.legendEntriesNumeric &&
-    item.legendEntriesNumeric.length > 1;
+    item.legendEntriesNumeric.filter(Number.isFinite).length > 1;
+
+  // Colour gradient and numbers may be opposing, so detect directionality for annotations
+  const numericVals = item.legendEntriesNumeric?.filter(Number.isFinite) || [];
+  const isDescending = numericVals.length >= 2 && numericVals[0] > numericVals[numericVals.length - 1];
 
   const pref = layerPrefs[item.layerId] || { displayMode: 'continuous', scaleMode: 'value' };
   const useDiscreteSwatches = !canBeContinuous || pref.displayMode === 'discrete';
@@ -228,6 +214,17 @@ const LegendLayerGroup = ({
                     : isLast
                     ? item.legendAnnotations?.end
                     : null;
+                    
+                  const decoratedLabel = decorateLegendLabel({
+                    label: entry.label,
+                    isFirst,
+                    isLast,
+                    belowMin,
+                    aboveMax,
+                    isDescending,
+                    hasCustomLabels: item.hasCustomLabels
+                  });
+
                   return (
                     <LegendItem key={idx} style={{ marginBottom: 0 }}>
                       {entry.type === "circle" ? (
@@ -237,20 +234,20 @@ const LegendLayerGroup = ({
                       ) : entry.type === "fill" ? (
                         <PolygonSwatch color={entry.color} />
                       ) : null}
-                      <LegendLabel>{entry.label}</LegendLabel>
+                      <LegendLabel>{decoratedLabel}</LegendLabel>
                       {annotation && <SwatchAnnotation>{annotation}</SwatchAnnotation>}
                     </LegendItem>
                   );
                 })}
               </DiscreteSwatchesContainer>
             ) : (
-              <ContinuousGradientBar item={item} scaleMode={pref.scaleMode} />
+              <ContinuousGradientBar item={item} scaleMode={pref.scaleMode} belowMin={belowMin} aboveMax={aboveMax} />
             )}
 
-            {outOfBand && (
-              <OutOfBandMessage>
-                Some data is outside the specified bands.<br />It will not be shown in the legend.
-              </OutOfBandMessage>
+            {(belowMin || aboveMax) && (
+              <OutOfBandWrapper>
+                <InfoBox text="Some data is outside the specified range and has been capped to the nearest band." />
+              </OutOfBandWrapper>
             )}
           </>
         )}

@@ -404,3 +404,86 @@ export const getEntryDashStatus = (dashStop, paintProps, label) => {
   
   return false;
 };
+
+/**
+ * Extracts a flat array of finite numeric values from a visualisation data array.
+ * Uses a best-effort heuristic: prefers `value` or `metric` keys on objects,
+ * falls back to the first numeric property found, and accepts plain numbers.
+ *
+ * @param {Array} data - Raw data rows from visualisationDataByLayer.
+ * @returns {number[]} Finite numeric values.
+ */
+export const extractDataValues = (data) => {
+  if (!Array.isArray(data) || data.length === 0) return [];
+  return data.map(row => {
+    if (typeof row === 'object' && row !== null) {
+      let v = row.value ?? row.metric;
+      if (v === undefined) {
+        for (const k in row) {
+          if (typeof row[k] === 'number') return row[k];
+        }
+      }
+      return v;
+    } else if (typeof row === 'number') {
+      return row;
+    }
+    return null;
+  }).filter(v => v !== null && Number.isFinite(v));
+};
+
+/**
+ * Returns flags indicating whether the data extends beyond the displayed scale.
+ *
+ * @param {Array}    data           - Raw data rows from visualisationDataByLayer.
+ * @param {number[]} numericEntries - The numeric stop values from the legend.
+ * @returns {{ belowMin: boolean, aboveMax: boolean }}
+ */
+export const getOutOfBandFlags = (data, numericEntries) => {
+  const bandEdges = (numericEntries || []).filter(Number.isFinite);
+  if (bandEdges.length < 2) return { belowMin: false, aboveMax: false };
+  const bandMin = Math.min(...bandEdges);
+  const bandMax = Math.max(...bandEdges);
+  const values = extractDataValues(data);
+  if (values.length === 0) return { belowMin: false, aboveMax: false };
+  return {
+    belowMin: Math.min(...values) < bandMin,
+    aboveMax: Math.max(...values) > bandMax,
+  };
+};
+
+
+/**
+ * Applies out-of-band decorations (≤ and +) to the first and last legend labels.
+ * Accounts for inverted color schemes where the first item represents the maximum value.
+ *
+ * @param {Object} params
+ * @param {string|number} params.label - The base label to decorate.
+ * @param {boolean} params.isFirst - Whether this is the first stop/swatch in the legend.
+ * @param {boolean} params.isLast - Whether this is the last stop/swatch in the legend.
+ * @param {boolean} params.belowMin - Whether data exists below the minimum band.
+ * @param {boolean} params.aboveMax - Whether data exists above the maximum band.
+ * @param {boolean} params.isDescending - Whether the scale is inverted (highest to lowest).
+ * @param {boolean} params.hasCustomLabels - Whether the legend uses explicit string labels (bypasses decoration).
+ * @returns {string} The decorated label.
+ */
+export const decorateLegendLabel = ({
+  label,
+  isFirst,
+  isLast,
+  belowMin,
+  aboveMax,
+  isDescending,
+  hasCustomLabels
+}) => {
+  if (hasCustomLabels) return label;
+
+  if (isDescending) {
+    if (isFirst && aboveMax) return `\u2264${label}`;
+    if (isLast && belowMin) return `\u2264${label}`;
+  } else {
+    if (isFirst && belowMin) return `\u2264${label}`;
+    if (isLast && aboveMax) return `\u2265${label}`;
+  }
+
+  return label;
+};
