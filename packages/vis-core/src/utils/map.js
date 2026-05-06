@@ -887,7 +887,9 @@ export const reclassifyData = (
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
-        return normaliseContinuousBins(options.customBands);
+        // TODO decide whether to reinstate normalisation here -- what if user wants a non-zero floor?
+        return options.customBands;
+        // return normaliseContinuousBins(options.customBands);
       }
       // Fallback to default method if no custom bands
       classificationMethod = "d";
@@ -896,7 +898,9 @@ export const reclassifyData = (
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
       if (metric) {
-        return normaliseContinuousBins(metric.values);
+        // Return explicit band values as-is; the user configured these intentionally
+        // (e.g. values: [5, 20, 40, 60, 80]) and normalising to 0 would discard that.
+        return metric.values;
       }
       // Fallback to page-level defaultClassification if specified, otherwise quantile
       classificationMethod = options.defaultClassification ?? "q";
