@@ -75,24 +75,12 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
   // produce a flat, single-colour bar.
   const isDescending = finiteVals[0] > finiteVals[finiteVals.length - 1];
 
-  // Determine the maximum number of decimal places present across all stops.
-  // Hover interpolation is then rounded to this precision rather than a fixed value,
-  // so integer datasets display as integers and decimal datasets remain accurate.
-  // A legendNumberFormat override takes precedence when supplied.
-  const maxPrecision = item.legendNumberFormat && Number.isFinite(item.legendNumberFormat.decimals)
-    ? item.legendNumberFormat.decimals
-    : finiteVals.reduce((maxPrec, num) => {
-        const str = num.toString();
-        const decimalIndex = str.indexOf('.');
-        return decimalIndex === -1 ? maxPrec : Math.max(maxPrec, str.length - decimalIndex - 1);
-      }, 0);
-
   // Formats a numeric value for axis tick labels and hover tooltips.
   // Delegates to formatLegendNumber — the single extension point for all
   // label formatting. maxPrecision (auto-detected from the data) is passed
   // as the fallback so the hover tooltip stays consistent with tick labels
   // when no explicit legendNumberFormat.decimals override is configured.
-  const formatAxisValue = (val) => formatLegendNumber(val, item.legendNumberFormat ?? {}, maxPrecision);
+  const formatAxisValue = (val) => formatLegendNumber(val, item.legendNumberFormat ?? {});
 
   const stopsWithPercentages = entries.map((entry, i) => {
     const val = numericEntries[i];
