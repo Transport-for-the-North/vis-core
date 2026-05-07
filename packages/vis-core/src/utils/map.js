@@ -850,13 +850,36 @@ export const reclassifyData = (
     return [0, ...bins.slice(1)];
   };
 
-  // Helper function to round values and ensure successive values are not identical
+  /**
+   * Helper function to round values and ensure successive values are not identical.
+   * It preserves the exact absolute minimum and maximum bounds of the dataset by 
+   * skipping rounding for the first and last elements.
+   * 
+   * @param {Array<number>} values - The array of break values to round.
+   * @param {number} sigFigs - The starting number of significant figures.
+   * @returns {Array<number>} The array of rounded values with exact min/max bounds.
+   */
   const roundValues = (values, sigFigs) => {
-    let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
+    let roundedValues = values.map((value, index) => {
+      // Skip rounding for the absolute minimum (first) and maximum (last) bounds
+      if (index === 0 || index === values.length - 1) {
+        return value;
+      }
+      return roundToSignificantFigures(value, sigFigs);
+    });
+
     for (let i = 1; i < roundedValues.length; i++) {
-      while (roundedValues[i] === roundedValues[i - 1] && sigFigs < 10) {
+      // Only increase sigFigs if the original values are different to prevent 
+      // artificially inflating precision for identical break values (e.g., 0.0000000)
+      while (values[i] !== values[i - 1] && roundedValues[i] === roundedValues[i - 1] && sigFigs < 10) {
         sigFigs++;
-        roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
+        roundedValues = values.map((value, index) => {
+          // Ensure we continue to skip rounding for min/max bounds during recalculation
+          if (index === 0 || index === values.length - 1) {
+            return value;
+          }
+          return roundToSignificantFigures(value, sigFigs);
+        });
       }
     }
     return roundedValues;
