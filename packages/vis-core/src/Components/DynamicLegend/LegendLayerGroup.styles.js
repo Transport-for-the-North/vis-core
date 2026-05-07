@@ -146,12 +146,6 @@ export const LegendDivider = styled.div`
 export const OutOfBandWrapper = styled.div`
   width: 0;
   min-width: 100%;
-  
-  // TODO implement custom styling for the InfoBox itself and remove this wrapper -- it's a bit hacky but avoids coupling the InfoBox styles to the legend's layout needs for now
-  && > * {
-    margin: 0;
-    box-sizing: border-box;
-  }
 `;
 
 /** Flex column container for discrete swatch rows in non-continuous display mode. */
