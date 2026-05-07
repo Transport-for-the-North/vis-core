@@ -3,11 +3,12 @@ import styled, { css } from 'styled-components';
 import { InformationCircleIcon, ExclamationTriangleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 // Base styled component for the message box
+// Accepts $margin and $fontSize transient props to override defaults
 const MessageBoxContainer = styled.div`
   padding: 10px;
   border-radius: 5px;
-  margin-bottom: 10px;
-  font-size: 0.9em;
+  margin: ${(props) => props.$margin ?? '10px'};
+  font-size: ${(props) => props.$fontSize ?? '0.9em'};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
@@ -47,6 +48,17 @@ const IconWrapper = styled.div`
   margin-right: 8px; /* Space between icon and text */
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+`;
+
+// Ensures long text wraps within whatever container the box appears in.
+// 'anywhere' (vs 'break-word') also reduces the element's min-content size to 0,
+// which prevents inline-flex parents from growing to fit the unbroken text.
+const MessageText = styled.span`
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 `;
 
 /**
@@ -56,10 +68,12 @@ const IconWrapper = styled.div`
  * @param {Object} props - The properties object.
  * @param {string} props.text - The text to display inside the message box.
  * @param {string} props.type - The type of message box ('info', 'warning', 'error').
- * @param {boolean} props.isSticky - Whether the message box should be sticky positioned.
+ * @param {boolean} [props.isSticky] - Whether the message box should be sticky positioned.
+ * @param {string} [props.margin] - Custom margin for the message box container.
+ * @param {string} [props.fontSize] - Custom font size for the message text.
  * @returns {JSX.Element} The rendered MessageBox component.
  */
-const MessageBox = ({ text, type, isSticky }) => {
+const MessageBox = ({ text, type, isSticky, margin, fontSize }) => {
   let Icon;
 
   switch (type) {
@@ -76,11 +90,11 @@ const MessageBox = ({ text, type, isSticky }) => {
   }
 
   const messageContent = (
-    <MessageBoxContainer type={type}>
+    <MessageBoxContainer type={type} $margin={margin} $fontSize={fontSize}>
       <IconWrapper>
         <Icon style={{ width: '20px', height: '20px', color: 'inherit' }} />
       </IconWrapper>
-      {text}
+      <MessageText>{text}</MessageText>
     </MessageBoxContainer>
   );
 
@@ -91,7 +105,42 @@ const MessageBox = ({ text, type, isSticky }) => {
   return messageContent;
 };
 
-// Specific components for each type of message box
-export const InfoBox = ({ text }) => <MessageBox text={text} type="info" />;
-export const WarningBox = ({ text, isSticky }) => <MessageBox text={text} type="warning" isSticky={isSticky} />;
-export const ErrorBox = ({ text }) => <MessageBox text={text} type="error" />;
+/**
+ * InfoBox component for displaying informational messages.
+ * 
+ * @param {Object} props - The properties object.
+ * @param {string} props.text - The text to display.
+ * @param {string} [props.margin] - Custom margin override.
+ * @param {string} [props.fontSize] - Custom font size override.
+ * @returns {JSX.Element}
+ */
+export const InfoBox = ({ text, isSticky, margin, fontSize }) => (
+  <MessageBox text={text} type="info" isSticky={isSticky} margin={margin} fontSize={fontSize} />
+);
+
+/**
+ * WarningBox component for displaying warning messages.
+ * 
+ * @param {Object} props - The properties object.
+ * @param {string} props.text - The text to display.
+ * @param {boolean} [props.isSticky] - Whether the box should be sticky.
+ * @param {string} [props.margin] - Custom margin override.
+ * @param {string} [props.fontSize] - Custom font size override.
+ * @returns {JSX.Element}
+ */
+export const WarningBox = ({ text, isSticky, margin, fontSize }) => (
+  <MessageBox text={text} type="warning" isSticky={isSticky} margin={margin} fontSize={fontSize} />
+);
+
+/**
+ * ErrorBox component for displaying error messages.
+ * 
+ * @param {Object} props - The properties object.
+ * @param {string} props.text - The text to display.
+ * @param {string} [props.margin] - Custom margin override.
+ * @param {string} [props.fontSize] - Custom font size override.
+ * @returns {JSX.Element}
+ */
+export const ErrorBox = ({ text, isSticky, margin, fontSize }) => (
+  <MessageBox text={text} type="error" isSticky={isSticky} margin={margin} fontSize={fontSize} />
+);
