@@ -7,7 +7,7 @@ import { InformationCircleIcon, ExclamationTriangleIcon, XCircleIcon } from "@he
 const MessageBoxContainer = styled.div`
   padding: 10px;
   border-radius: 5px;
-  margin: ${(props) => props.$margin ?? '10px'};
+  margin: ${(props) => props.$margin ?? '10px 0'};
   font-size: ${(props) => props.$fontSize ?? '0.9em'};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   display: flex;
