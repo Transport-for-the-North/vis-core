@@ -896,16 +896,17 @@ export const reclassifyData = (
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
 
-    // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
-    // prefer the provided bands so the band count matches the editor.
-    if (
-      classificationMethod === "e" &&
-      options.customBands &&
-      Array.isArray(options.customBands) &&
-      options.customBands.length > 0
-    ) {
-      return normaliseContinuousBins(options.customBands);
-    }
+    //* NB BELOW COMMENTED OUT AS YIELDS BUGGY/SEEMING BROKEN RESULTS.
+    // // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
+    // // prefer the provided bands so the band count matches the editor.
+    // if (
+    //   classificationMethod === "e" &&
+    //   options.customBands &&
+    //   Array.isArray(options.customBands) &&
+    //   options.customBands.length > 0
+    // ) {
+    //   return normaliseContinuousBins(options.customBands);
+    // }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
@@ -968,16 +969,17 @@ export const reclassifyData = (
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
 
-    // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
-    // prefer the provided bands so the band count matches the editor.
-    if (
-      classificationMethod === "e" &&
-      options.customBands &&
-      Array.isArray(options.customBands) &&
-      options.customBands.length > 0
-    ) {
-      return options.customBands;
-    }
+    //* NB BELOW COMMENTED OUT AS YIELDS BUGGY/SEEMING BROKEN RESULTS.
+    // // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
+    // // prefer the provided bands so the band count matches the editor.
+    // if (
+    //   classificationMethod === "e" &&
+    //   options.customBands &&
+    //   Array.isArray(options.customBands) &&
+    //   options.customBands.length > 0
+    // ) {
+    //   return options.customBands;
+    // }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
@@ -1007,7 +1009,7 @@ export const reclassifyData = (
     // Apply the appropriate classification method
     switch (classificationMethod) {
       case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(absValues, 6);
+        unroundedBins = jenksBreaks(absValues, 4);
         break;
       
       case "s": // Standard Deviation
@@ -1024,7 +1026,7 @@ export const reclassifyData = (
       case "l": // Logarithmic
       case "k": // K-means
       default:
-        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 6))];
+        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 4))];
         break;
     }
 
@@ -1087,9 +1089,9 @@ export const getLayerStyle = (geometryType) => {
         type: "fill",
         source: "",
         paint: {
-          "fill-color": "rgb(255, 255, 0, 0)",
+          "fill-color": "rgba(255, 255, 0, 0)",
           "fill-outline-color": "rgba(195, 195, 195, 1)",
-          "fill-opacity": 1
+          "fill-opacity": 0
         },
       };
     case "line":
