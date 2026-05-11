@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ContinuousGradientBar from "./ContinuousGradientBar";
 import { extractDataValues, getOutOfBandFlags, decorateLegendLabel } from "./DynamicLegend.utils";
 import { InfoBox } from "Components";
@@ -79,22 +79,28 @@ const LegendLayerGroup = ({
   // belowMin / aboveMax: whether data extends beyond the displayed scale at
   // either end. Used to decorate swatch / tick labels with ≤ / +.
   const layerData = visualisationDataByLayer[item.layerId];
-  const { belowMin, aboveMax } = getOutOfBandFlags(layerData, item.legendEntriesNumeric);
+  const { belowMin: rawBelowMin, aboveMax: rawAboveMax } = getOutOfBandFlags(layerData, item.legendEntriesNumeric);
+  
+  // Debounce the out-of-band flags to prevent flashing when data and map styles
+  // are momentarily out of step during cache loads or rapid filter changes.
+  const [oobFlags, setOobFlags] = useState({ belowMin: false, aboveMax: false });  
 
-  // --- Out-of-band warning (manual classification only) ---
-  let outOfBand = false;
-  if (classMethod === 'c' && item.legendEntriesNumeric?.length > 1) {
-    const bandEdges = item.legendEntriesNumeric.filter(Number.isFinite);
-    const minBand = Math.min(...bandEdges);
-    const maxBand = Math.max(...bandEdges);
-    const values = extractDataValues(layerData);
-    if (values.length > 0) {
-      const dataMin = Math.min(...values);
-      const dataMax = Math.max(...values);
-      const bandsManuallySet = minBand < dataMin || maxBand < dataMax;
-      outOfBand = bandsManuallySet && values.some(v => v < minBand || v > maxBand);
+  // Only apply debounce for non-custom classification, where OOB flashing is most likely
+  const timeoutLimit = classMethod === 'c' ? 0 : 600; 
+  useEffect(() => {
+    if (rawBelowMin || rawAboveMax) {
+      // Wait for MapLibre to finish painting the new classification and sync the legend
+      const timer = setTimeout(() => {
+        setOobFlags({ belowMin: rawBelowMin, aboveMax: rawAboveMax });
+      }, timeoutLimit);
+      return () => clearTimeout(timer);
+    } else {
+      // If we are back in bounds, clear the warning immediately
+      setOobFlags({ belowMin: false, aboveMax: false });
     }
-  }
+  }, [rawBelowMin, rawAboveMax, timeoutLimit]);
+
+  const { belowMin, aboveMax } = oobFlags;
 
   // --- Display mode resolution ---
   // Continuous display requires at least two numeric stops to form a gradient
