@@ -178,13 +178,16 @@ jest.mock("Components", () => ({
       </>
     );
   },
-  MapLayerSection: ({ handleColorChange, handleClassificationChange }) => {
+  MapLayerSection: ({ handleColorChange, handleClassificationChange, handleCustomBandsChange }) => {
     return (
       <>
         <span>MapLayerSection</span>
         <button onClick={handleColorChange}>handleColorChange</button>
         <button onClick={handleClassificationChange}>
           handleClassificationChange
+        </button>
+        <button onClick={handleCustomBandsChange}>
+          handleCustomBandsChange
         </button>
       </>
     );
@@ -240,6 +243,16 @@ describe("MapLayout component test", () => {
     expect(mockMapContext.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "UPDATE_CLASSIFICATION_METHOD",
+      })
+    );
+    // handleCustomBandsChange is called
+    const handleCustomBandsChangeButton = screen.getByRole("button", {
+      name: "handleCustomBandsChange",
+    });
+    await userEvent.click(handleCustomBandsChangeButton);
+    expect(mockMapContext.dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "UPDATE_CUSTOM_BANDS",
       })
     );
   });

@@ -754,6 +754,7 @@ export const DynamicLegend = ({ map }) => {
                 color: cachedLegendColour || stop.color,
                 width: getEntryWidth(widthStop, isMobile, layer, paintProps, rawLabel),
                 label,
+                rawValue: Number(stop.value),
                 type: layer.type,
                 isDashed: getEntryDashStatus(dashStop, paintProps, rawLabel),
               });
@@ -800,9 +801,10 @@ export const DynamicLegend = ({ map }) => {
             return null;
           }
 
-          // Parse legend entry labels, remove commas, convert to float
+          // Use raw numeric stop values for band-edge comparisons.
+          // Parsing formatted labels (e.g. "10.00K") yields incorrect numbers.
           const legendNumericEntries = filteredEntries
-            .map(e => parseFloat(String(e.label).replace(/,/g, '')))
+            .map(e => (e.rawValue !== undefined && !isNaN(e.rawValue) ? e.rawValue : parseFloat(String(e.label).replace(/,/g, ''))))
             .filter(v => !isNaN(v));
           
           return {
@@ -854,7 +856,6 @@ export const DynamicLegend = ({ map }) => {
   }, [legendItems, isMobile]);
   
   // If there are no legend items, render nothing.
-  
   if (legendItems.length === 0) {
     return null;
   }
@@ -865,44 +866,41 @@ export const DynamicLegend = ({ map }) => {
         // Out-of-band check: only for continuous/diverging bands
         let outOfBand = false;
         let minBand = null, maxBand = null;
-        let bandsManuallySet = false;
         
         const classMethod = state.layers?.[item.layerId]?.class_method;
+        // Only show this warning when the user has explicitly saved custom bands.
+        const layerHasCustomBands =
+          Array.isArray(state.layers?.[item.layerId]?.customBands) &&
+          state.layers[item.layerId].customBands.length > 0;
 
-        // Only show this warning for explicit custom banding.
-        if (classMethod === 'c' && item.legendEntriesNumeric && Array.isArray(item.legendEntriesNumeric) && item.legendEntriesNumeric.length > 1) {
-          // Use actual band values from item.visualisation.bands for min/max
-          const bandEdges = item.legendEntriesNumeric.filter(v => !isNaN(v));
-          minBand = Math.min(...bandEdges);
-          maxBand = Math.max(...bandEdges);
-          // Get data for this layer
-          const data = visualisationDataByLayer[item.layerId];
-          if (Array.isArray(data) && data.length > 0 && minBand !== null && maxBand !== null) {
-            // Extract all metric values
-            const values = data.map(row => {
-              if (typeof row === 'object' && row !== null) {
-                let v = row.value ?? row.metric;
-                if (v === undefined) {
-                  for (const k in row) {
-                    if (typeof row[k] === 'number') return row[k];
+        if (classMethod === 'c' && layerHasCustomBands) {
+          // Use the raw custom bands directly from state — avoids parsing
+          // formatted label strings (e.g. "10.00K") which would truncate to 10.
+          const customBands = state.layers[item.layerId].customBands.map(Number).filter(v => !isNaN(v));
+          if (customBands.length > 1) {
+            minBand = Math.min(...customBands);
+            maxBand = Math.max(...customBands);
+            // Retrieve data for this layer
+            const data = visualisationDataByLayer[item.layerId];
+            if (Array.isArray(data) && data.length > 0) {
+              // Extract all metric values
+              const values = data.map(row => {
+                if (typeof row === 'object' && row !== null) {
+                  let v = row.value ?? row.metric;
+                  if (v === undefined) {
+                    for (const k in row) {
+                      if (typeof row[k] === 'number') return row[k];
+                    }
                   }
+                  return v;
+                } else if (typeof row === 'number') {
+                  return row;
                 }
-                return v;
-              } else if (typeof row === 'number') {
-                return row;
-              }
-              return null;
-            }).filter(v => v !== null && !isNaN(v));
-            // Determine if bands are manually set (not default)
-            // If bands exactly match min/max of data, treat as default
-            const dataMin = Math.min(...values);
-            const dataMax = Math.max(...values);
-            // Debug log for band/data min/max
-            bandsManuallySet = (minBand < dataMin || maxBand < dataMax);
-            // Only set outOfBand if there are actual data values outside the band range
-            outOfBand = bandsManuallySet && values.some(v => v < minBand || v > maxBand);
-            // If bands are not manually set, never show OutOfBandMessage
-            if (!bandsManuallySet) outOfBand = false;
+                return null;
+              }).filter(v => v !== null && !isNaN(v));
+              // Only show the message when data values genuinely fall outside the custom band range
+              outOfBand = values.some(v => v < minBand || v > maxBand);
+            }
           }
         }
         return (
