@@ -482,7 +482,7 @@ export const decorateLegendLabel = ({
   if (hasCustomLabels) return label;
 
   if (isDescending) {
-    if (isFirst && aboveMax) return `\u2264${label}`;
+    if (isFirst && aboveMax) return `\u2265${label}`;
     if (isLast && belowMin) return `\u2264${label}`;
   } else {
     if (isFirst && belowMin) return `\u2264${label}`;

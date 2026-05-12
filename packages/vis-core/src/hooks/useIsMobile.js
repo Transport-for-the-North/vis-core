@@ -14,11 +14,11 @@ import { useEffect, useState } from "react";
  * @returns {boolean} isMobile - `true` when `window.innerWidth <= 900`, else `false`.
  */
 export const useIsMobile = () => {
-  const [m, setM] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 900 : false));
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 900 : false));
   useEffect(() => {
-    const onResize = () => setM(window.innerWidth <= 900);
+    const onResize = () => setIsMobile(window.innerWidth <= 900);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
-  return m;
+  return isMobile;
 };

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { formatNumber, numberWithCommas } from "utils";
+import { formatNumber } from "utils";
 import { formatLegendNumber, decorateLegendLabel } from "./DynamicLegend.utils";
 import {
   ContinuousScaleContainer,
