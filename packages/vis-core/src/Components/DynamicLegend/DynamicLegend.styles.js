@@ -1,4 +1,4 @@
-﻿import styled from "styled-components";
+import styled from "styled-components";
 
 /** Media query string for mobile breakpoint (max-width: 900px). */
 export const MOBILE_Q = '(max-width: 900px)';

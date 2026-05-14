@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { createPortal } from 'react-dom';
 import { buildCategoricalLegendKey, convertStringToNumber } from "utils";
 import { useMapContext, useFetchVisualisationData, useIsMobile } from "hooks";
