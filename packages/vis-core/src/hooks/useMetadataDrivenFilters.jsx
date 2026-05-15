@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { PageContext, FilterContext } from "contexts";
 import { api } from "services";
-import { updateFilterValidity } from "utils";
+import { updateFilterValidity, correctInitialCrossFilterValues, correctRuntimeCrossFilterValues } from "utils";
 import { applyWhereConditions, sortValues, buildDeterministicFilterId } from "utils";
 
 /**
@@ -27,11 +27,11 @@ async function callMetadataEndpoint(endpoint) {
 /**
  * useMetadataDrivenFilters
  * Canonical filter initialisation pipeline. Handles metadata table fetching, filter option
- * building, FilterContext initialisation, and runtime option hiding.
+ * building, FilterContext initialisation, cross-filter correction, and runtime option hiding.
  *
  * Params:
- * - getInitialValue: optional function (filter) => value. Enables injected functions to override
- *   the default config-driven value resolution. This is particularly useful for using
+ * - getInitialValue: optional function (filter) => value. Enables injected functions to override 
+ *   the default config-driven value resolution. This is particularly useful for using 
  *  `filterPersistence` in map pages. Non-map pages omit this and use the default, though this
  *  can be overridden.
  *
@@ -171,7 +171,13 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
     const initial = {};
     filtersWithIds.forEach((f) => { initial[f.id] = computeDefault(f); });
 
-    filterDispatch({ type: "INITIALIZE_FILTERS", payload: initial });
+    // Enforce cross-filter constraints on the initial values before dispatching.
+    // Each filter's default is computed independently, so a shouldBeFiltered filter's
+    // default may be invalid given the shouldFilterOthers filter's default selection.
+    // Correcting here prevents the first fetch from using an invalid combination.
+    const correctedInitial = correctInitialCrossFilterValues(filtersWithIds, metadataTables, initial);
+
+    filterDispatch({ type: "INITIALIZE_FILTERS", payload: correctedInitial });
 
     setIsReady(true);
   }, [filtersWithIds, metadataTables, filterDispatch, getInitialValue]);
@@ -182,6 +188,13 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
     const stateLike = { filters: filtersWithIds, metadataTables };
     return updateFilterValidity(stateLike, filterState);
   }, [filtersWithIds, metadataTables, filterState, isReady]);
+
+  // 5) Auto-correct shouldBeFiltered filter values at runtime when a
+  //    shouldFilterOthers filter changes and invalidates another filter's selection.
+  useEffect(() => {
+    if (!isReady) return;
+    correctRuntimeCrossFilterValues(validatedFilters, filterState, filterDispatch);
+  }, [validatedFilters, filterState, filterDispatch, isReady]);
 
   /**
    * onFilterChange
