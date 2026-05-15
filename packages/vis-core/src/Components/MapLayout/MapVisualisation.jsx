@@ -16,7 +16,7 @@ import {
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData, useFeatureStateUpdater, useVisualisationLoadingCounter } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 
@@ -165,6 +165,7 @@ export const MapVisualisation = ({
   // State for tracking resolved dynamic styles
   const [resolvedStyle, setResolvedStyle] = useState(null);
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
+  const [isApplyingStyle, setIsApplyingStyle] = useState(false);
 
   const { addFeaturesToMap } = useFeatureStateUpdater();
 
@@ -299,13 +300,14 @@ export const MapVisualisation = ({
     };
   }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, isLoading, dispatch]);
 
-  // Handle loading state
+  // Register this visualisation's fetch state with the shared loading counter so
+  // the layout Dimmer stays on until every visualisation on the page has finished.
+  const isFullyLoading = isLoading || isResolvingStyle || isApplyingStyle;
+  useVisualisationLoadingCounter(isFullyLoading, dispatch);
+
   useEffect(() => {
     if (isLoading) {
-      dispatch({ type: actionTypes.SET_IS_LOADING });
       dispatch({ type: actionTypes.SET_DATA_REQUESTED, payload: true });
-    } else {
-      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
   }, [isLoading, dispatch]);
 
@@ -858,6 +860,7 @@ export const MapVisualisation = ({
     reclassifyAndStyleMap,
     reclassifyAndStyleGeoJSONMap,
   ]);
+
 
   // Trigger update when style resolution completes if there was a pending update
   useEffect(() => {

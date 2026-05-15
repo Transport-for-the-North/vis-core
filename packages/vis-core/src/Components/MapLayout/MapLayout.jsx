@@ -59,7 +59,7 @@ const MobileLegendSlot = styled.section`
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
-  const isLoading = state.isLoading;
+  const isLoading = state.isLoading || state.visualisationLoadingCount > 0;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);

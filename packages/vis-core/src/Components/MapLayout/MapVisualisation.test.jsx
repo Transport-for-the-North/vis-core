@@ -149,7 +149,7 @@ describe("Check dispatch function is well throw", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-  it("SET_IS_LOADING", () => {
+  it("INCREMENT_VISUALISATION_LOADING", () => {
     render(
       <MapContext.Provider value={mockMapContext}>
         <MapVisualisation {...props} />
@@ -157,7 +157,7 @@ describe("Check dispatch function is well throw", () => {
     );
 
     expect(mockMapContext.dispatch).toHaveBeenCalledWith({
-      type: actionTypes.SET_IS_LOADING,
+      type: actionTypes.INCREMENT_VISUALISATION_LOADING,
     });
     expect(mockMapContext.dispatch).toHaveBeenCalledWith({
       type: actionTypes.SET_DATA_REQUESTED,
@@ -165,7 +165,7 @@ describe("Check dispatch function is well throw", () => {
     });
   });
 
-  it("SET_LOADING_FINISHED", () => {
+  it("does not decrement on first render when isLoading starts false", () => {
     useFetchVisualisationData.mockReturnValue({
       data: {},
       isLoading: false,
@@ -180,8 +180,8 @@ describe("Check dispatch function is well throw", () => {
       </MapContext.Provider>
     );
 
-    expect(mockMapContext.dispatch).toHaveBeenCalledWith({
-      type: actionTypes.SET_LOADING_FINISHED,
+    expect(mockMapContext.dispatch).not.toHaveBeenCalledWith({
+      type: actionTypes.DECREMENT_VISUALISATION_LOADING,
     });
   });
 });

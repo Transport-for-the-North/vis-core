@@ -207,6 +207,7 @@ export const useFetchVisualisationData = (
 
   // Track abort controller for request cancellation
   const abortControllerRef = useRef(null);
+  const cacheTimeoutRef = useRef(null);
 
   /**
    * Resets the fetch state - useful when visualisation changes (e.g., page navigation).
@@ -215,6 +216,9 @@ export const useFetchVisualisationData = (
     // Cancel any pending request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+    }
+    if (cacheTimeoutRef.current) {
+      clearTimeout(cacheTimeoutRef.current);
     }
     
     // Clear cache for this visualisation
@@ -240,7 +244,7 @@ export const useFetchVisualisationData = (
   useEffect(() => {
     const currentName = visualisation?.name;
     
-    if (prevVisualisationNameRef.current !== undefined && 
+    if (prevVisualisationNameRef.current !== undefined &&
         prevVisualisationNameRef.current !== currentName) {
       resetFetchState();
     }
@@ -319,7 +323,7 @@ export const useFetchVisualisationData = (
                 return; 
               }
 
-              // If we made it here, we need new data, but since filters haven't changed 
+              // If we made it here, we need new data, but since filters haven't changed
               // and we already have some data, we can do this silently in the background.
               if (accumulatedDataRef.current.size > 0) {
                 isBackgroundFetch = true;
@@ -341,7 +345,8 @@ export const useFetchVisualisationData = (
           }
         }
 
-        // Only trigger the blocking loading state if this is NOT a background fetch
+        // Only trigger the blocking loading state for actual network requests
+        // (not cache hits, and not background fetches when we already have data).
         if (!isBackgroundFetch) {
           setLoading(true);
         }
@@ -352,30 +357,41 @@ export const useFetchVisualisationData = (
         // Create a cache key based on the request (including bbox when present)
         const cacheKey = JSON.stringify({ path, queryParamsForApi, pathParamsForApi });
 
-        // Check cache first
+        // Check cache first — BEFORE setting loading state.
+        // Setting loading(true) before this check and then clearing it after 50ms (via
+        // setTimeout) would cause the global isLoading flag to flicker true→false
+        // while other visualisations are still mid-fetch, prematurely hiding the Dimmer.
+        // Cache hits are near-instant, so they don't warrant a loading indicator.
         if (responseCache.current.has(cacheKey)) {
           const cachedData = responseCache.current.get(cacheKey);
           
-          // If we hit the cache, we still need to merge it into our accumulated data
-          if (shouldFilterDataToViewport && Array.isArray(cachedData)) {
-            lastFetchedBboxRef.current = fetchBbox;
-            lastFetchedZoomRef.current = currentZoom;
+          // Use a small async gap so React can paint the current frame before we
+          // swap data in. This avoids a visible tile-swap flash on cache hits without
+          // affecting the shared loading state.
+          cacheTimeoutRef.current = setTimeout(() => {
+            // If we hit the cache, we still need to merge it into our accumulated data
+            if (shouldFilterDataToViewport && Array.isArray(cachedData)) {
+              lastFetchedBboxRef.current = fetchBbox;
+              lastFetchedZoomRef.current = currentZoom;
+              
+              cachedData.forEach(item => {
+                if (item.id !== undefined && item.id !== null) {
+                  accumulatedDataRef.current.set(item.id, item);
+                }
+              });
+              
+              const mergedData = Array.from(accumulatedDataRef.current.values());
+              setRawData(mergedData);
+              if (!map || !mapLayerId) setFilteredData(mergedData);
+            } else {
+              setRawData(cachedData);
+              if (!map || !mapLayerId || !shouldFilterDataToViewport) setFilteredData(cachedData);
+            }
             
-            cachedData.forEach(item => {
-              if (item.id !== undefined && item.id !== null) {
-                accumulatedDataRef.current.set(item.id, item);
-              }
-            });
-            
-            const mergedData = Array.from(accumulatedDataRef.current.values());
-            setRawData(mergedData);
-            if (!map || !mapLayerId) setFilteredData(mergedData);
-          } else {
-            setRawData(cachedData);
-            if (!map || !mapLayerId || !shouldFilterDataToViewport) setFilteredData(cachedData);
-          }
+            // Ensure loading is cleared in case a previous real fetch left it true.
+            setLoading(false);
+          }, 50);
           
-          setLoading(false);
           return;
         }
 
@@ -383,21 +399,24 @@ export const useFetchVisualisationData = (
         if (abortControllerRef.current) {
           abortControllerRef.current.abort();
         }
+        if (cacheTimeoutRef.current) {
+          clearTimeout(cacheTimeoutRef.current);
+        }
 
         // Create new abort controller for this request
         abortControllerRef.current = new AbortController();
+        const currentSignal = abortControllerRef.current.signal;
 
         try {
           const responseData = await api.baseService.get(path, {
             pathParams: pathParamsForApi,
             queryParams: queryParamsForApi,
             skipAuth: !requiresAuth,
-            signal: abortControllerRef.current.signal,
+            signal: currentSignal,
           });
 
           // Only set data if request wasn't aborted
-          if (abortControllerRef.current.signal.aborted) {
-            console.log('[Data Fetch] Request was aborted, ignoring response');
+          if (currentSignal.aborted) {
             return;
           }
 
@@ -444,12 +463,15 @@ export const useFetchVisualisationData = (
         } catch (e) {
           // Don't log abort errors
           if (e.name !== 'AbortError') {
-            console.error('Error fetching data for visualisation:', e);
+            console.error('Error fetching data for visualisation:', visualisationName, e);
             setError(e);
           }
         } finally {
-          // Always ensure loading is turned off when the request finishes
-          setLoading(false);
+          // Only turn off loading if THIS specific request wasn't aborted.
+          // If it was aborted, a new request has likely already set loading to true.
+          if (!currentSignal.aborted) {
+            setLoading(false);
+          }
         }
       }, 400),
     [map, mapLayerId, shouldFilterDataToViewport]
@@ -461,6 +483,9 @@ export const useFetchVisualisationData = (
       fetchDataForVisualisation.cancel();
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
+      }
+      if (cacheTimeoutRef.current) {
+        clearTimeout(cacheTimeoutRef.current);
       }
     };
   }, [fetchDataForVisualisation]);
