@@ -13,24 +13,33 @@ describe("MessageBox test component", () => {
     render(<WarningBox text="This is a warning message" />);
     const el = screen.getByText("This is a warning message");
     expect(el).toBeInTheDocument();
-    expect(el).toHaveStyle("background-color: rgba(255, 255, 153, 0.9);");
-    expect(el).toHaveStyle("color: rgb(102, 60, 0);");
+    
+    // Assert on the parent element (MessageBoxContainer) instead of the text span
+    expect(el.parentElement).toHaveStyle("background-color: rgba(255, 255, 153, 0.9);");
+    expect(el.parentElement).toHaveStyle("color: rgb(102, 60, 0);");
+    
     expect(screen.getByText("IconWarning")).toBeInTheDocument();
   });
+  
   it("Type error", () => {
     render(<ErrorBox text="This is an error message" />);
     const el = screen.getByText("This is an error message");
     expect(el).toBeInTheDocument();
-    expect(el).toHaveStyle("background-color: #ffebee;");
-    expect(el).toHaveStyle("color: #d32f2f;");
+    
+    expect(el.parentElement).toHaveStyle("background-color: #ffebee;");
+    expect(el.parentElement).toHaveStyle("color: #d32f2f;");
+    
     expect(screen.getByText("IconError")).toBeInTheDocument();
   });
+
   it("Type info", () => {
     render(<InfoBox text="This is an info message" />);
     const el = screen.getByText("This is an info message");
     expect(el).toBeInTheDocument();
-    expect(el).toHaveStyle("background-color: rgba(0, 222, 198, 0.9);");
-    expect(el).toHaveStyle("color: rgb(13, 15, 61);");
+    
+    expect(el.parentElement).toHaveStyle("background-color: rgba(0, 222, 198, 0.9);");
+    expect(el.parentElement).toHaveStyle("color: rgb(13, 15, 61);");
+    
     expect(screen.getByText("IconInfo")).toBeInTheDocument();
   });
 });
