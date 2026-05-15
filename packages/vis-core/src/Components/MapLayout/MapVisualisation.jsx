@@ -804,11 +804,14 @@ export const MapVisualisation = ({
       let retryCount = 0;
       let isCleanedUp = false;
 
+      setIsApplyingStyle(true);
+
       const checkLayerAndPerform = () => {
         if (isCleanedUp) return;
 
         if (map.isStyleLoaded() && map.getLayer(layerKey)) {
           performReclassification();
+          setIsApplyingStyle(false);
         } else if (retryCount < maxRetries) {
           retryCount++;
           const timeoutId = setTimeout(checkLayerAndPerform, retryDelay);
@@ -818,6 +821,7 @@ export const MapVisualisation = ({
             if (isCleanedUp || !map.isStyleLoaded() || !map.getLayer(layerKey)) return;
             cleanup();
             performReclassification();
+            setIsApplyingStyle(false);
           };
 
           const cleanup = () => {
@@ -831,7 +835,10 @@ export const MapVisualisation = ({
         }
       };
 
-      cleanupFns.push(() => { isCleanedUp = true; });
+      cleanupFns.push(() => { 
+        isCleanedUp = true; 
+        setIsApplyingStyle(false);
+      });
       checkLayerAndPerform();
     } else {
       performReclassification();
