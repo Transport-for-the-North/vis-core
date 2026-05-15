@@ -688,6 +688,13 @@ export const MapVisualisation = ({
       return;
     }
 
+    // If the layer has missing parameters, it will not be added to the map by Layer.jsx.
+    // Abort the styling process immediately to prevent infinite waiting.
+    if (layerConfig.missingParams && layerConfig.missingParams.length > 0) {
+      setIsApplyingStyle(false);
+      return;
+    }
+
     // Determine if reclassification is needed
     const dataHasChanged =
       combinedData !== prevCombinedDataRef.current &&
