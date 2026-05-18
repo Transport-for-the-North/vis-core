@@ -60,7 +60,8 @@ export const BaseCalloutCardVisualisation = ({
   const [isTransition, setIsTransition] = useState(false);
 
   // ========== Data Fetching ==========
-  const response = useFetchVisualisationData(visualisation);
+  // visualisation comes from state.visualisations — already gated by MapLayout's debouncedFilterState
+  const response = useFetchVisualisationData(visualisation, { debounceMs: 0 });
   const responseData = response.data;
   const remoteIsLoading = response.isLoading;
 

@@ -153,9 +153,14 @@ const determineFetchState = ({
  * @param {Object} [visualisation.pathParams] - The path parameters to include in the API request (shape: {key: {value, required}}).
  * @param {boolean} visualisation.requiresAuth - Indicates if the request requires authentication.
  * @param {string} visualisation.name - The name of the visualisation.
- * @param {Object} [map] - (Optional) The map instance used for filtering by viewport.
- * @param {string} [mapLayerId] - (Optional) The map layer ID that contains the rendered features.
- * @param {boolean} [shouldFilterDataToViewport=false] - Whether to filter the returned data against the visible map viewport.
+ * @param {Object} [options] - Optional configuration.
+ * @param {Object} [options.map] - The map instance used for filtering by viewport.
+ * @param {string} [options.mapLayerId] - The map layer ID that contains the rendered features.
+ * @param {boolean} [options.shouldFilterDataToViewport=false] - Whether to filter returned data to the visible map viewport.
+ * @param {number} [options.debounceMs=400] - Milliseconds to debounce the fetch. Pass `0` when the caller is already
+ *   behind an upstream debounce (e.g. MapLayout's `debouncedFilterState`) — the params will only arrive after that
+ *   gate has settled, so no additional delay is needed. Pass a positive value for consumers that construct their own
+ *   visualisation object directly from filter state with no upstream rate-limiting (e.g. `SvgGalleryManager`).
  *
  * @returns {{
  *   isLoading: boolean,
@@ -168,9 +173,12 @@ const determineFetchState = ({
  */
 export const useFetchVisualisationData = (
   visualisation,
-  map,
-  mapLayerId,
-  shouldFilterDataToViewport = false
+  {
+    map = null,
+    mapLayerId = null,
+    shouldFilterDataToViewport = false,
+    debounceMs = 400,
+  } = {}
 ) => {
   const [isLoading, setLoading] = useState(false);
   const [rawData, setRawData] = useState(null);
@@ -473,8 +481,8 @@ export const useFetchVisualisationData = (
             setLoading(false);
           }
         }
-      }, 400),
-    [map, mapLayerId, shouldFilterDataToViewport]
+      }, debounceMs),
+    [map, mapLayerId, shouldFilterDataToViewport, debounceMs]
   );
 
   // Cancel any pending debounced call on unmount to avoid setting state after unmount.
@@ -519,9 +527,15 @@ export const useFetchVisualisationData = (
 
       fetchDataForVisualisation(visualisation);
 
-      // CONDITIONAL FLUSH: Only bypass the debounce if it's the very first load
-      if (isFirstFetchRef.current) {
+      // When debounceMs === 0 the debounce is purely a same-tick batch guard, so
+      // flush immediately to ensure the call isn't lost in React StrictMode
+      // double-mount cycles. When debounceMs > 0 the caller relies on the delay
+      // for rate-limiting — flushing here would defeat that purpose.
+      if (debounceMs === 0) {
         fetchDataForVisualisation.flush?.();
+      }
+
+      if (isFirstFetchRef.current) {
         isFirstFetchRef.current = false;
       }
     }

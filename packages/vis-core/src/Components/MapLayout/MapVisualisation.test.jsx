@@ -121,16 +121,19 @@ describe("useFetchVisualisationData is called with the good params", () => {
         type: "geojson",
       },
       {
-        getLayer: expect.any(Function),
-        getSource: expect.any(Function),
-        addSource: expect.any(Function),
-        getStyle: expect.any(Function),
-        addLayer: expect.any(Function),
-        on: expect.any(Function),
-        isStyleLoaded: expect.any(Function),
-      },
-      "visualisationName",
-      true
+        map: {
+          getLayer: expect.any(Function),
+          getSource: expect.any(Function),
+          addSource: expect.any(Function),
+          getStyle: expect.any(Function),
+          addLayer: expect.any(Function),
+          on: expect.any(Function),
+          isStyleLoaded: expect.any(Function),
+        },
+        mapLayerId: "visualisationName",
+        shouldFilterDataToViewport: true,
+        debounceMs: 0,
+      }
     );
   });
 });

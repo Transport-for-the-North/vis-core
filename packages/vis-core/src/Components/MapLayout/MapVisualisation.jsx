@@ -215,12 +215,12 @@ export const MapVisualisation = ({
     dataWasReturnedButFiltered,
     fetchState,
     resetFetchState,
-  } = useFetchVisualisationData(
-    visualisation,
+  } = useFetchVisualisationData(visualisation, {
     map,
-    layerKey,
+    mapLayerId: layerKey,
     shouldFilterDataToViewport,
-  );
+    debounceMs: 0, // visualisation comes from state.visualisations — already gated by MapLayout's debouncedFilterState
+  });
 
   // Initialise classification method from visualisation config if not already set in state
   useEffect(() => {
