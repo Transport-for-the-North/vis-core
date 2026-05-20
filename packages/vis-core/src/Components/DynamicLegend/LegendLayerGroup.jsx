@@ -253,7 +253,7 @@ const LegendLayerGroup = ({
             {(belowMin || aboveMax) && (
               <OutOfBandWrapper>
                 <InfoBox 
-                  text="Some data is outside the specified range and has been capped to the nearest band."
+                  text="Some data is outside the specified bands and has been capped to the nearest band."
                   fontSize="0.75em"
                   margin="0"
                 />
