@@ -11,10 +11,16 @@ import {
  * Returns an object that includes values, differenceValues, and colours for the metric,
  * or null if nothing is found.
  *
- * @param {Array} defaultBands - The bands array from defaults.
- * @param {Object} currentPage - The current app page (used to resolve the page category).
- * @param {Object} queryParams - The URL query parameters.
- * @param {Object} options - Additional options; for example, { trseLabel: true }.
+ * @param {Array}  defaultBands              - The bands array from defaults.
+ * @param {Object} currentPage              - The current app page (used to resolve the page category).
+ * @param {Object} queryParams              - The URL query parameters.
+ * @param {Object} [options={}]             - Additional options.
+ * @param {string} [options.bandMetricName] - Pins the lookup to a specific metric name,
+ *                                           bypassing the active filter. If the name
+ *                                           resolves it is returned immediately; if it
+ *                                           does not match any metric the function falls
+ *                                           through to the filter-based path so callers
+ *                                           without a matching entry are unaffected.
  * @returns {Object|null} The metric definition or null.
  */
 export const getMetricDefinition = (
@@ -25,18 +31,29 @@ export const getMetricDefinition = (
 ) => {
   const pageCategory = currentPage.category || currentPage.pageName;
   const selectedPageBands = defaultBands?.find((band) => band.name === pageCategory);
-  let metricName = null;
-  if (options.trseLabel) {
-    metricName = "trse";
-  } else if (currentPage.config && currentPage.config.filters) {
+
+  // 1. Prefer the explicit bandMetricName override (e.g. TRSE layers that pin
+  //    to a fixed metric regardless of the active filter). If it resolves,
+  //    return early; if not, fall through so callers without a matching metric
+  //    entry are not silently broken.
+  if (options.bandMetricName && selectedPageBands) {
+    const found = selectedPageBands.metric.find((m) => m.name === options.bandMetricName);
+    if (found) return found;
+  }
+
+  // 2. Filter-based resolution: derive the metric name from the page filter
+  //    whose containsLegendInfo flag is set. This is the original path used
+  //    by all layers that do not pin a metric.
+  if (currentPage.config && currentPage.config.filters) {
     const selectedMetricFilter = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
-    metricName = queryParams[selectedMetricFilter?.paramName]?.value;
+    const metricName = queryParams[selectedMetricFilter?.paramName]?.value;
+    if (selectedPageBands && metricName) {
+      return selectedPageBands.metric.find((m) => m.name === metricName) || null;
+    }
   }
-  if (selectedPageBands && metricName) {
-    return selectedPageBands.metric.find((m) => m.name === metricName) || null;
-  }
+
   return null;
 };
 
@@ -808,7 +825,7 @@ export const resetPaintProperty = (style) => {
  * @param {Array} defaultBands - Default bands for classification.
  * @param {Object} currentPage - The current page configuration.
  * @param {Object} queryParams - Query parameters from the visualisation.
- * @param {Object} options - Additional options, e.g., { trseLabel: true }
+ * @param {Object} options - Additional options, e.g., { bandMetricName: 'trse' }
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
 export const reclassifyData = (
@@ -833,13 +850,36 @@ export const reclassifyData = (
     return [0, ...bins.slice(1)];
   };
 
-  // Helper function to round values and ensure successive values are not identical
+  /**
+   * Helper function to round values and ensure successive values are not identical.
+   * It preserves the exact absolute minimum and maximum bounds of the dataset by 
+   * skipping rounding for the first and last elements.
+   * 
+   * @param {Array<number>} values - The array of break values to round.
+   * @param {number} sigFigs - The starting number of significant figures.
+   * @returns {Array<number>} The array of rounded values with exact min/max bounds.
+   */
   const roundValues = (values, sigFigs) => {
-    let roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
+    let roundedValues = values.map((value, index) => {
+      // Skip rounding for the absolute minimum (first) and maximum (last) bounds
+      if (index === 0 || index === values.length - 1) {
+        return value;
+      }
+      return roundToSignificantFigures(value, sigFigs);
+    });
+
     for (let i = 1; i < roundedValues.length; i++) {
-      while (roundedValues[i] === roundedValues[i - 1] && sigFigs < 10) {
+      // Only increase sigFigs if the original values are different to prevent 
+      // artificially inflating precision for identical break values (e.g., 0.0000000)
+      while (values[i] !== values[i - 1] && roundedValues[i] === roundedValues[i - 1] && sigFigs < 10) {
         sigFigs++;
-        roundedValues = values.map((value) => roundToSignificantFigures(value, sigFigs));
+        roundedValues = values.map((value, index) => {
+          // Ensure we continue to skip rounding for min/max bounds during recalculation
+          if (index === 0 || index === values.length - 1) {
+            return value;
+          }
+          return roundToSignificantFigures(value, sigFigs);
+        });
       }
     }
     return roundedValues;
@@ -856,21 +896,24 @@ export const reclassifyData = (
   if (style.includes("continuous")) {
     let values = data.map((value) => value.value);
 
-    // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
-    // prefer the provided bands so the band count matches the editor.
-    if (
-      classificationMethod === "e" &&
-      options.customBands &&
-      Array.isArray(options.customBands) &&
-      options.customBands.length > 0
-    ) {
-      return normaliseContinuousBins(options.customBands);
-    }
+    //* NB BELOW COMMENTED OUT AS YIELDS BUGGY/SEEMING BROKEN RESULTS.
+    // // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
+    // // prefer the provided bands so the band count matches the editor.
+    // if (
+    //   classificationMethod === "e" &&
+    //   options.customBands &&
+    //   Array.isArray(options.customBands) &&
+    //   options.customBands.length > 0
+    // ) {
+    //   return normaliseContinuousBins(options.customBands);
+    // }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
       if (options.customBands && Array.isArray(options.customBands) && options.customBands.length > 0) {
-        return normaliseContinuousBins(options.customBands);
+        // TODO decide whether to reinstate normalisation here -- what if user wants a non-zero floor?
+        return options.customBands;
+        // return normaliseContinuousBins(options.customBands);
       }
       // Fallback to default method if no custom bands
       classificationMethod = "d";
@@ -879,7 +922,9 @@ export const reclassifyData = (
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
       if (metric) {
-        return normaliseContinuousBins(metric.values);
+        // Return explicit band values as-is; the user configured these intentionally
+        // (e.g. values: [5, 20, 40, 60, 80]) and normalising to 0 would discard that.
+        return metric.values;
       }
       // Fallback to page-level defaultClassification if specified, otherwise quantile
       classificationMethod = options.defaultClassification ?? "q";
@@ -924,16 +969,17 @@ export const reclassifyData = (
   } else if (style.includes("diverging")) {
     let absValues = data.map((value) => Math.abs(value.value));
 
-    // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
-    // prefer the provided bands so the band count matches the editor.
-    if (
-      classificationMethod === "e" &&
-      options.customBands &&
-      Array.isArray(options.customBands) &&
-      options.customBands.length > 0
-    ) {
-      return options.customBands;
-    }
+    //* NB BELOW COMMENTED OUT AS YIELDS BUGGY/SEEMING BROKEN RESULTS.
+    // // If equidistant is selected but explicit bands were provided (e.g. from BandEditor reset),
+    // // prefer the provided bands so the band count matches the editor.
+    // if (
+    //   classificationMethod === "e" &&
+    //   options.customBands &&
+    //   Array.isArray(options.customBands) &&
+    //   options.customBands.length > 0
+    // ) {
+    //   return options.customBands;
+    // }
 
     if (classificationMethod === "c") {
       // Use custom bands if provided
@@ -963,7 +1009,7 @@ export const reclassifyData = (
     // Apply the appropriate classification method
     switch (classificationMethod) {
       case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(absValues, 6);
+        unroundedBins = jenksBreaks(absValues, 4);
         break;
       
       case "s": // Standard Deviation
@@ -980,7 +1026,7 @@ export const reclassifyData = (
       case "l": // Logarithmic
       case "k": // K-means
       default:
-        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 6))];
+        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 4))];
         break;
     }
 
@@ -1043,9 +1089,9 @@ export const getLayerStyle = (geometryType) => {
         type: "fill",
         source: "",
         paint: {
-          "fill-color": "rgb(255, 255, 0, 0)",
+          "fill-color": "rgba(255, 255, 0, 0)",
           "fill-outline-color": "rgba(195, 195, 195, 1)",
-          "fill-opacity": 1
+          "fill-opacity": 0
         },
       };
     case "line":
