@@ -394,6 +394,82 @@ describe("reclassifyAndStyleMap is called", () => {
   });
 });
 
+describe("customBandsHasChanged triggers reclassification", () => {
+  const baseVisualisationData = [
+    { feature_collection: JSON.stringify({ element: "first" }) },
+  ];
+
+  const baseVisualisation = {
+    shouldFilterDataToViewport: true,
+    style: "line-continuous",
+    type: "joinDataToMap",
+    joinLayer: "visualisationName",
+  };
+
+  beforeEach(() => {
+    useFetchVisualisationData.mockReturnValue({
+      data: baseVisualisationData,
+      isLoading: false,
+      error: false,
+      dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
+    });
+    hasAnyGeometryNotNull.mockReturnValue(true);
+    reclassifyData.mockReturnValue("#More9Caracters");
+    props.map.getStyle.mockReturnValue({ layers: [{ id: "firstLayersID" }] });
+    props.map.getLayer.mockReturnValue({ id: "mock-layer" });
+    props.map.isStyleLoaded.mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("triggers reclassification when customBands are set for the first time", async () => {
+    const contextNoCustomBands = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        visualisations: { visualisationName: baseVisualisation },
+        layers: { visualisationName: {} },
+      },
+    };
+
+    const { rerender } = render(
+      <AppContext.Provider value={mockAppContext}>
+        <MapContext.Provider value={contextNoCustomBands}>
+          <MapVisualisation {...props} />
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    // Wait for the initial reclassification to complete, then reset mocks.
+    await waitFor(() => expect(reclassifyData).toHaveBeenCalled());
+    jest.clearAllMocks();
+    reclassifyData.mockReturnValue("#More9Caracters");
+
+    // Re-render with customBands set for the first time.
+    const contextWithCustomBands = {
+      ...contextNoCustomBands,
+      state: {
+        ...contextNoCustomBands.state,
+        layers: { visualisationName: { customBands: [0, 5000] } },
+      },
+    };
+
+    rerender(
+      <AppContext.Provider value={mockAppContext}>
+        <MapContext.Provider value={contextWithCustomBands}>
+          <MapVisualisation {...props} />
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    await waitFor(() => expect(reclassifyData).toHaveBeenCalled());
+  });
+});
+
 describe("the props left is equal to true", () => {
   beforeEach(() => {
     props = {

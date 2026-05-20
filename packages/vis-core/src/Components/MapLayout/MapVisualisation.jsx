@@ -702,8 +702,11 @@ export const MapVisualisation = ({
 
     const currentCustomBands = layerConfig?.customBands;
     const prevCustomBands = prevCustomBandsRef.current[layerKey];
+    // Use `in` to distinguish "never initialised" (key absent) from "initialised but
+    // no custom bands yet" (key present with undefined/null). This ensures the
+    // transition from no custom bands to the first custom bands assignment is detected.
     const customBandsHasChanged =
-      prevCustomBands !== undefined &&
+      (layerKey in prevCustomBandsRef.current) &&
       !areNumericArraysEqual(currentCustomBands, prevCustomBands);
 
     const needUpdate =
