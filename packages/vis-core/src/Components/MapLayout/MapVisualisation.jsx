@@ -384,9 +384,8 @@ export const MapVisualisation = ({
         (page) => page.url === window.location.pathname
       );
 
-      // Get trseLabel and customBands from state.layers
-      const trseLabel =
-        state.layers[layerKey]?.trseLabel === true;
+      // Get bandMetricName and customBands from state.layers
+      const bandMetricName = state.layers[layerKey]?.bandMetricName;
       const customBands = state.layers[layerKey]?.customBands;
 
       // Get defaultClassification from visualisation
@@ -399,7 +398,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { trseLabel, customBands, defaultClassification } // Pass trseLabel, customBands and defaultClassification in options
+        { bandMetricName, customBands, defaultClassification } // Pass bandMetricName, customBands and defaultClassification in options
       );
 
       // Get the metric definition for the current page/metric
@@ -407,7 +406,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation?.queryParams,
-        { trseLabel }
+        { bandMetricName }
       );
 
       // Determine the current color scheme
@@ -703,8 +702,11 @@ export const MapVisualisation = ({
 
     const currentCustomBands = layerConfig?.customBands;
     const prevCustomBands = prevCustomBandsRef.current[layerKey];
+    // Use `in` to distinguish "never initialised" (key absent) from "initialised but
+    // no custom bands yet" (key present with undefined/null). This ensures the
+    // transition from no custom bands to the first custom bands assignment is detected.
     const customBandsHasChanged =
-      prevCustomBands !== undefined &&
+      (layerKey in prevCustomBandsRef.current) &&
       !areNumericArraysEqual(currentCustomBands, prevCustomBands);
 
     const needUpdate =

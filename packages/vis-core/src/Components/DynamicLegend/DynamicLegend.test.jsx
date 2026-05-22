@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, waitFor } from "@testing-library/react";
 import {
   DynamicLegend,
   interpretWidthExpression,
@@ -390,5 +390,151 @@ describe("DynamicLegend", () => {
 
     expect(screen.getByText("page-two-layer")).toBeInTheDocument();
     expect(window.getComputedStyle(screen.getByText("A").previousSibling).backgroundColor).toBe("rgb(255, 136, 0)");
+  });
+});
+
+describe("OutOfBandMessage", () => {
+  const LAYER_ID = "out-of-band-layer";
+
+  // Paint with two numeric interpolation stops, giving a non-empty legend with noStyle=false.
+  const INTERPOLATE_PAINT = {
+    "fill-color": [
+      "interpolate",
+      ["linear"],
+      ["feature-state", "value"],
+      0,
+      "#aabbcc",
+      5000,
+      "#ddeeff",
+    ],
+  };
+
+  const makeMapWithLayer = (layerId, paint) => ({
+    on: jest.fn(),
+    off: jest.fn(),
+    getStyle: jest.fn(() => ({
+      layers: [
+        {
+          id: layerId,
+          type: "fill",
+          metadata: { isStylable: true },
+          paint,
+        },
+      ],
+    })),
+  });
+
+  const renderWithState = (mockMap, state) =>
+    render(
+      <MapContext.Provider value={{ state }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={mockMap} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+  const triggerStyledata = (mockMap) => {
+    act(() => {
+      const handler = mockMap.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      handler();
+    });
+  };
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("renders when class_method is 'c', customBands are set, and data has out-of-band values", async () => {
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const state = {
+      filters: [],
+      currentZoom: 10,
+      visualisations: {
+        testVis: { joinLayer: LAYER_ID, data: [{ value: 7000 }] },
+      },
+      layers: {
+        [LAYER_ID]: { class_method: "c", customBands: [0, 5000] },
+      },
+    };
+
+    renderWithState(map, state);
+    triggerStyledata(map);
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(/some data is outside the specified bands/i)
+      ).toBeInTheDocument()
+    );
+  });
+
+  it("does not render when all data values are within the custom band range", () => {
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const state = {
+      filters: [],
+      currentZoom: 10,
+      visualisations: {
+        testVis: { joinLayer: LAYER_ID, data: [{ value: 3000 }] },
+      },
+      layers: {
+        [LAYER_ID]: { class_method: "c", customBands: [0, 5000] },
+      },
+    };
+
+    renderWithState(map, state);
+    triggerStyledata(map);
+
+    expect(
+      screen.queryByText(/some data is outside the specified bands/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders when class_method is not 'c' and data has out-of-band values", async () => {
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const state = {
+      filters: [],
+      currentZoom: 10,
+      visualisations: {
+        testVis: { joinLayer: LAYER_ID, data: [{ value: 7000 }] },
+      },
+      layers: {
+        [LAYER_ID]: { class_method: "d" },
+      },
+    };
+
+    renderWithState(map, state);
+    triggerStyledata(map);
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(/some data is outside the specified bands/i)
+      ).toBeInTheDocument()
+    );
+  });
+
+  it("renders when class_method is 'c' but no customBands are set and data is out-of-band", async () => {
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const state = {
+      filters: [],
+      currentZoom: 10,
+      visualisations: {
+        testVis: { joinLayer: LAYER_ID, data: [{ value: 7000 }] },
+      },
+      layers: {
+        [LAYER_ID]: { class_method: "c" },
+      },
+    };
+
+    renderWithState(map, state);
+    triggerStyledata(map);
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(/some data is outside the specified bands/i)
+      ).toBeInTheDocument()
+    );
   });
 });
