@@ -1,3 +1,35 @@
+# [0.11.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.10.0...v0.11.0) (2026-05-22)
+
+
+### Bug Fixes
+
+* **classificationMethods:** ensure Jenks is mathematically possible to prevent error ([bbd9e7f](https://github.com/Transport-for-the-North/vis-core/commit/bbd9e7fa79a40d72a9f910964780dd4a54cffce7))
+* **DynamicLegend:** address snags ([f4bd30a](https://github.com/Transport-for-the-North/vis-core/commit/f4bd30a2b0a48d64de6faa186dc26645e2a03077))
+* **DynamicLegend:** allow custombands below 0 ([7c7fe0c](https://github.com/Transport-for-the-North/vis-core/commit/7c7fe0c8f2f00ef9de8f81443db379e4285e0811))
+* **DynamicLegend:** debounce out-of-band flags to prevent flashing during rapid updates ([07b5f4c](https://github.com/Transport-for-the-North/vis-core/commit/07b5f4ce04e93a48644b676cd49278e058e7f68b))
+* **DynamicLegend:** ensure no LegendDivider on mobile ([4e556d7](https://github.com/Transport-for-the-North/vis-core/commit/4e556d7ee3a8a031a2bcf02f85b2d1f003505aaa))
+* **DynamicLegend:** improve rounding to prevent data going out of bounds ([ea47fcb](https://github.com/Transport-for-the-North/vis-core/commit/ea47fcbd06d8b62102d08be0552b5d2dca6dce93))
+* **DynamicLegend:** improve tick mark rendering and label positioning in ContinuousGradientBar ([b49bd36](https://github.com/Transport-for-the-North/vis-core/commit/b49bd36d54a9f422d2a1edd94c22ad764aa07f8b))
+* **DynamicLegend:** increase z-index of LegendContainer to prevent tooltip occlusion by CalloutCard panels ([d92eb5e](https://github.com/Transport-for-the-North/vis-core/commit/d92eb5e5e136b0cf9e8a3f8e74437ba83c78fe0a))
+* **DynamicLegend:** remove maxPrecision from axis labels to prevent 10dp ([39380fb](https://github.com/Transport-for-the-North/vis-core/commit/39380fb45b879ba5a2fe1f568aa36cda5f959941))
+* fix custom banding to not trigger out of band message when it is within range (this was due to upgrade to formatNumber therefore it was assuming 150K was 150 etc). also fix so when manually selecting custom, the user can updating banding. ([95e9379](https://github.com/Transport-for-the-North/vis-core/commit/95e9379ae655fd235db5043d498043120a01da84))
+* **reclassifyData:** comment out buggy handling of custom bands for continuous classification ([a62b3e1](https://github.com/Transport-for-the-North/vis-core/commit/a62b3e132d753261fc16f925317aae3009da5afd))
+* remove functionality that should not exist in layer control entry (was a previously attempt at implementation) ([10f7704](https://github.com/Transport-for-the-North/vis-core/commit/10f7704ed7f13cbe83c1fd711efac7aac6a59cca))
+
+
+### Features
+
+* **DynamicLegend:** add AnnotationRow and SwatchAnnotation styled components ([e2c5a7b](https://github.com/Transport-for-the-North/vis-core/commit/e2c5a7b5148efc886dd99178bd4832b5576d026c))
+* **DynamicLegend:** add dynamic width tracks for circles and lines in ContinuousGradientBar ([24e2045](https://github.com/Transport-for-the-North/vis-core/commit/24e2045e20cf2e2e6a2b83a897a160a9ef5ef5a7))
+* **DynamicLegend:** Add gradient colour bar for legend ([#206](https://github.com/Transport-for-the-North/vis-core/issues/206)). ([2a6ed8e](https://github.com/Transport-for-the-North/vis-core/commit/2a6ed8eca105b2d6ee1b444f335173c25253761b))
+* **DynamicLegend:** add LegendNumberFormat typedef and formatLegendNumber utility ([bf7ac20](https://github.com/Transport-for-the-North/vis-core/commit/bf7ac20204176470c1b148f786aecd7601c9dde3))
+* **DynamicLegend:** add suffix and prefix to value labels to signify values outside bands ([7462329](https://github.com/Transport-for-the-North/vis-core/commit/7462329a9d7db6369579ebd23fed97e083797a47))
+* **DynamicLegend:** enhance ContinuousGradientBar with dynamic side padding and update CircleTrack positioning ([8e65de3](https://github.com/Transport-for-the-North/vis-core/commit/8e65de3525873ccc1df199f4f16cf85e5cb7586a))
+* **DynamicLegend:** persist user display preferences in localStorage and close popover on selection ([bdc7445](https://github.com/Transport-for-the-North/vis-core/commit/bdc7445c7b1539742d9470c58db7dcffcb34bec1))
+* **DynamicLegend:** render annotations and apply formatLegendNumber across legend views ([fdc3d77](https://github.com/Transport-for-the-North/vis-core/commit/fdc3d77c3523af0211a35121f211dbe9ce94da03))
+* implement default width factor with tests, successful and working. ([cad6656](https://github.com/Transport-for-the-North/vis-core/commit/cad665609ceaca46141d5d924a06367ff668fd7f))
+* **MessageBox:** add overrides for MessageBox derivatives for margin and text size ([51443e1](https://github.com/Transport-for-the-North/vis-core/commit/51443e151d5208e90186ece204fa287d36c7eda4))
+
 # [0.10.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.9.1...v0.10.0) (2026-04-29)
 
 
