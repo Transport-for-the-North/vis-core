@@ -138,15 +138,24 @@ export class DownloadService extends BaseService {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const blob = await response.blob();
-    
-    // Assign file name based on url
+
+    // Default file name based on the response Content-Type (and URL hints as a fallback).
+    // The server's Content-Disposition wins when present.
+    const responseType = (response.headers.get("Content-Type") || "").toLowerCase();
     let filename = null;
-    if (url.includes("shapefile")) {
+    if (url.includes("shapefile") || responseType.includes("zip")) {
       filename = "downloads.zip";
+    } else if (
+      responseType.includes("vnd.ms-excel.sheet.macroenabled") ||
+      responseType.includes("spreadsheetml") ||
+      url.toLowerCase().includes("xlsm") ||
+      url.toLowerCase().includes("xlsx")
+    ) {
+      filename = "downloads.xlsm";
     } else {
       filename = "downloads.csv";
     }
-    
+
     // Extract filename from Content-Disposition header, if available
     const disposition = response.headers.get("Content-Disposition");
     if (disposition && disposition.indexOf("attachment") !== -1) {

@@ -157,4 +157,19 @@ export class FileUploadService extends BaseService {
   async getUploadHistory(subPath = "/api/files/upload/history", options = {}) {
     return this.get(subPath, options);
   }
+
+  /**
+   * Fetches the list of LPA names available for D-Log export.
+   *
+   * Calls the .NET API's `/api/files/lpas` endpoint, which queries
+   * `d_log_data.lookup_lpa2023.name` and returns the list alphabetically.
+   * Used to populate the LPA dropdown on the bulk-upload page.
+   *
+   * @param {string} [subPath="/api/files/lpas"] - The API endpoint path.
+   * @param {Object} [options={}] - Additional options forwarded to BaseService.get.
+   * @returns {Promise<string[]>} Array of LPA names.
+   */
+  async getLpas(subPath = "/api/files/lpas", options = {}) {
+    return this.get(subPath, options);
+  }
 }
