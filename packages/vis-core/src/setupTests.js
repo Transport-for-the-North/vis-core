@@ -9,6 +9,58 @@ import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
+class ResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+  }
+
+  observe(target) {
+    this.callback([
+      {
+        target,
+        contentRect: {
+          width: 800,
+          height: 600,
+        },
+      },
+    ]);
+  }
+
+  unobserve() {}
+
+  disconnect() {}
+}
+
+global.ResizeObserver = ResizeObserver;
+
+Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+  configurable: true,
+  get() {
+    return 800;
+  },
+});
+
+Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+  configurable: true,
+  get() {
+    return 600;
+  },
+});
+
+if (!HTMLElement.prototype.getBoundingClientRect) {
+  HTMLElement.prototype.getBoundingClientRect = () => ({
+    width: 800,
+    height: 600,
+    top: 0,
+    left: 0,
+    bottom: 600,
+    right: 800,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  });
+}
+
 // Mock import.meta for Jest
 global.importMeta = {
   env: {

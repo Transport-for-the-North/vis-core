@@ -1,0 +1,130 @@
+import React, { useRef, useState } from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import {
+  NameCell,
+  RankBadge,
+  RotatingIcon,
+  RowTr,
+  ScoreCell,
+  Title,
+  ToggleButton,
+} from "./ChartRenderer.styles";
+
+const DEFAULT_VISIBLE_ROWS = 5;
+
+const sortRankingRows = (rows, ranks) => {
+  if (!ranks) return rows;
+
+  return [...rows].sort((left, right) => {
+    const rankA = ranks[left.key] ?? Infinity;
+    const rankB = ranks[right.key] ?? Infinity;
+    return rankA - rankB;
+  });
+};
+
+/**
+ * RankingChart renders a ranked list/table with animated transitions and expandable rows.
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.config - Chart configuration (columns, ranks, etc)
+ * @param {Object} props.data - Data object with values keyed by column
+ * @param {Object} props.formatters - Optional value formatters
+ * @returns {JSX.Element}
+ */
+export const RankingChart = ({ config, data, formatters }) => {
+  // State for expanding/collapsing the ranking list
+  const [isOpen, setIsOpen] = useState(false);
+  const cols = config.columns || [];
+  // Build row definitions from columns
+  const rows = React.useMemo(
+    () => cols.map((col) => ({ label: col.label ?? col.key, key: col.key })),
+    [cols]
+  );
+  // Ranks mapping and node references for animation
+  const ranks = config?.ranks;
+  const nodeRefs = useRef(new Map());
+
+  // Get or create a reference for a row (for animation)
+  const getNodeRef = (key) => {
+    if (!nodeRefs.current.has(key)) {
+      nodeRefs.current.set(key, React.createRef());
+    }
+    return nodeRefs.current.get(key);
+  };
+
+  // Sort rows by rank if provided
+  const sortedRows = React.useMemo(() => {
+    return sortRankingRows(rows, ranks);
+  }, [rows, ranks]);
+
+  // Show all rows if open, otherwise only default visible
+  const visibleRows = isOpen ? sortedRows : sortedRows.slice(0, DEFAULT_VISIBLE_ROWS);
+
+  // Value formatter
+  const fmt = {
+    commify:
+      formatters?.commify || ((v) => Number(v ?? 0).toLocaleString("en-GB")),
+  };
+
+  return (
+    <div style={{ overflowX: "auto", margin: "10px 0" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Title>{config.title}</Title>
+        {rows.length > DEFAULT_VISIBLE_ROWS ? (
+          <ToggleButton onClick={() => setIsOpen(!isOpen)}>
+            <RotatingIcon $isOpen={isOpen} />
+          </ToggleButton>
+        ) : null}
+      </div>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontSize: 14,
+          background: "transparent",
+          border: "none",
+        }}
+      >
+        <thead>
+          <tr>
+            <th style={{ width: 32 }}></th>
+            <th style={{ textAlign: "left", fontWeight: 600 }}>Name</th>
+            <th style={{ textAlign: "right", fontWeight: 600 }}>Score</th>
+          </tr>
+        </thead>
+        <TransitionGroup component="tbody">
+          {visibleRows.map((row, idx) => {
+            const val = data[row.key];
+            const nodeRef = getNodeRef(row.key);
+            return (
+              <CSSTransition key={row.key} timeout={300} classNames="row" nodeRef={nodeRef}>
+                <RowTr ref={nodeRef}>
+                  <td>
+                    <RankBadge>{ranks ? ranks[row.key] : idx + 1}</RankBadge>
+                  </td>
+                  <NameCell>{row.label}</NameCell>
+                  <ScoreCell>{fmt.commify(val)}</ScoreCell>
+                </RowTr>
+              </CSSTransition>
+            );
+          })}
+        </TransitionGroup>
+        {!isOpen && rows.length > DEFAULT_VISIBLE_ROWS && (
+          <RowTr>
+            <td colSpan={3} style={{ color: "#888", paddingLeft: 32 }}>
+              ...
+            </td>
+          </RowTr>
+        )}
+      </table>
+    </div>
+  );
+};
+
+export default RankingChart;
