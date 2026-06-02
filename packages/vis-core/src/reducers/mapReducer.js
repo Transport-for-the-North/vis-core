@@ -185,6 +185,7 @@ export const actionTypes = {
   REGISTER_CATEGORICAL_LEGEND_ITEMS: "REGISTER_CATEGORICAL_LEGEND_ITEMS",
   MERGE_CATEGORICAL_LEGEND_CACHE: "MERGE_CATEGORICAL_LEGEND_CACHE",
   CLEAR_CATEGORICAL_LEGEND_CACHE: "CLEAR_CATEGORICAL_LEGEND_CACHE",
+  TOGGLE_INVERTED_COLOR_SCHEME: "TOGGLE_INVERTED_COLOR_SCHEME",
 };
 
 /**
@@ -291,15 +292,23 @@ export const mapReducer = (state, action) => {
     case actionTypes.INITIALISE_SIDEBAR:
       return { ...state, filters: action.payload };
     case actionTypes.ADD_LAYER: {
-      const newLayers = { ...state.layers, ...action.payload };
+      const newLayers = { ...state.layers };
       const newColorSchemes = { ...state.colorSchemesByLayer };
-    
+
       Object.keys(action.payload).forEach(layerName => {
+        const layerData = action.payload[layerName];
+        // invertColourOnLaunch (page config) seeds the runtime invertedColorScheme flag.
+        // Fall back to any pre-existing invertedColorScheme on the layer object.
+        const invertedColorScheme =
+          layerData.invertColourOnLaunch !== undefined
+            ? Boolean(layerData.invertColourOnLaunch)
+            : Boolean(layerData.invertedColorScheme);
+        newLayers[layerName] = { ...layerData, invertedColorScheme };
         if (!newColorSchemes[layerName]) {
-          newColorSchemes[layerName] = { value: "YlGnBu", label: "YlGnBu" }; // Default color scheme
+          newColorSchemes[layerName] = { value: "YlGnBu", label: "YlGnBu" };
         }
       });
-    
+
       return {
         ...state,
         layers: newLayers,
@@ -412,6 +421,20 @@ export const mapReducer = (state, action) => {
           [layerName]: {
             ...state.layers[layerName],
             widthFactor,
+          },
+        },
+      };
+    }
+
+    case actionTypes.TOGGLE_INVERTED_COLOR_SCHEME: {
+      const { layerName } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            invertedColorScheme: !state.layers[layerName]?.invertedColorScheme,
           },
         },
       };
