@@ -28,6 +28,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
 import debounce from "lodash.debounce";
 import { mapKeys, uniq } from "lodash";
+import MapStyleToggle from "./MapStyleToggle";
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -36,6 +37,16 @@ const StyledMapContainer = styled.div`
    height: auto;             /* let content dictate height */
   }
 `;
+
+/**
+ * Safely get a source id from a MapLibre style layer.
+ *
+ * @param {Object} layer - MapLibre style layer definition.
+ * @returns {string|null} The source id if present, otherwise null.
+ */
+function getLayerSourceId(layer) {
+  return typeof layer?.source === "string" ? layer.source : null;
+}
 
 /**
  * When we add spider layers to the map, these are hoverable as they are 
@@ -80,14 +91,17 @@ function resolveBaseLayerIdFromSpiderLayerId(layerId) {
  */
 const Map = (props) => {
   const mapContainerRef = useRef(null);
+  const appliedMapStyleRef = useRef(null);
+  const hasDispatchedInitialBaseSourceIdsRef = useRef(false);
+
   const { state, dispatch } = useMapContext();
   const { mapStyle, mapCentre, mapZoom } = state;
-  const { map, isMapReady } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom, props.extraCopyrightText);
+  const { map, isMapReady, knownBaseSourceIds } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom, props.extraCopyrightText);
   const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
   const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({});
-  const sidebarIsOpen = props.sidebarIsOpen
+  const sidebarIsOpen = props.sidebarIsOpen;
   
   /**
    * Generates HTML for metadata section of tooltips
@@ -128,6 +142,24 @@ const Map = (props) => {
 
   const lastViewportSignatureRef = useRef({});
 
+  /**
+   * Push the initial base source ids captured by useMap into context state.
+   */
+  useEffect(() => {
+    if (!map || !knownBaseSourceIds?.current) return;
+    if (hasDispatchedInitialBaseSourceIdsRef.current) return;
+
+    const ids = Array.from(knownBaseSourceIds.current);
+
+    dispatch({
+      type: actionTypes.SET_BASE_SOURCE_IDS,
+      payload: ids,
+    });
+
+    hasDispatchedInitialBaseSourceIdsRef.current = true;
+
+  }, [map, knownBaseSourceIds, dispatch]);
+
   // Single feature picker for map clicks
   const pickFeatureAtPoint = useCallback(
     (point) => {
@@ -158,6 +190,104 @@ const Map = (props) => {
     },
     [map, memoizedFilters, state.layers]
   );
+
+  /**
+   * Handles map style switching while preserving custom app sources and layers.
+   *
+   * Uses transformStyle to merge the existing custom layers/sources from the
+   * previous style into the next basemap style.
+   */
+  useEffect(() => {
+    if (!map || !state.mapStyle) return;
+
+    const nextMapStyle =
+      typeof state.mapStyle === "function" ? state.mapStyle() : state.mapStyle;
+
+    if (appliedMapStyleRef.current === null) {
+      appliedMapStyleRef.current = nextMapStyle;
+      return;
+    }
+
+    if (appliedMapStyleRef.current === nextMapStyle) return;
+
+    appliedMapStyleRef.current = nextMapStyle;
+
+    map.setStyle(nextMapStyle, {
+      diff: true,
+      transformStyle: (previousStyle, nextStyle) => {
+        const previousBaseSourceIds =
+          knownBaseSourceIds?.current ??
+          new Set(state.baseSourceIds ?? []);
+
+        /**
+         * Custom sources are anything in the current/previous style that was
+         * NOT part of the previous basemap.
+         */
+        const customSourceEntries = Object.entries(
+          previousStyle.sources ?? {}
+        ).filter(([sourceId]) => !previousBaseSourceIds.has(sourceId));
+
+        const customSources = Object.fromEntries(customSourceEntries);
+        const customSourceIds = new Set(
+          customSourceEntries.map(([sourceId]) => sourceId)
+        );
+
+        /**
+         * Custom layers are layers attached to custom sources.
+         */
+        const customLayers = (previousStyle.layers ?? []).filter((layer) => {
+          const sourceId = getLayerSourceId(layer);
+          if (!sourceId) return false;
+
+          return (
+            customSourceIds.has(sourceId) ||
+            !previousBaseSourceIds.has(sourceId)
+          );
+        });
+
+        /**
+         * The incoming style is now the new basemap. Store its source ids as
+         * the latest known base source ids.
+         */
+        const nextBaseSourceIds = new Set(
+          Object.keys(nextStyle.sources ?? {})
+        );
+
+        knownBaseSourceIds.current = nextBaseSourceIds;
+
+        dispatch({
+          type: actionTypes.SET_BASE_SOURCE_IDS,
+          payload: Array.from(nextBaseSourceIds),
+        });
+
+        /**
+         * Avoid duplicate layer IDs if the incoming basemap has any layer with
+         * the same ID as one of our custom layers.
+         */
+        const nextLayerIds = new Set(
+          (nextStyle.layers ?? []).map((layer) => layer.id)
+        );
+
+        const safeCustomLayers = customLayers.filter(
+          (layer) => !nextLayerIds.has(layer.id)
+        );
+
+        const mergedStyle = {
+          ...nextStyle,
+          sources: {
+            ...(nextStyle.sources ?? {}),
+            ...customSources,
+          },
+          layers: [
+            ...(nextStyle.layers ?? []),
+            ...safeCustomLayers,
+          ],
+        };
+
+        return mergedStyle;
+      },
+    });
+  }, [map, state.mapStyle, state.baseSourceIds, knownBaseSourceIds, dispatch,]);
 
   // **Draw control logic
   useEffect(() => {
@@ -239,12 +369,12 @@ const Map = (props) => {
     });
 
     map.addControl(drawInstance);
-    dispatch(
-      { type: 'SET_DRAW_INSTANCE', payload: drawInstance }
-    );
-    
-  }, [map]); 
 
+    dispatch({
+      type: actionTypes.SET_DRAW_INSTANCE,
+      payload: drawInstance,
+    });
+  }, [map, dispatch]);
 
   /**
    * Handles hover events on the map and displays a single popup with information about all hovered features.
@@ -508,7 +638,7 @@ const Map = (props) => {
       let descriptions = [];
       // Track API requests and how they map back to description indexes so we can merge results precisely
       // NB if it's a spider layer, we resolve to the base layer to get custom tooltip metadata.
-  const apiRequests = [];
+      const apiRequests = [];
       const requestIndexByDescriptionIndex = {};
 
       filteredFeatures.forEach((feature) => {
@@ -817,7 +947,7 @@ const Map = (props) => {
       const mapZoomLevel = map.getZoom();
       
       dispatch({
-        type: "STORE_CURRENT_ZOOM",
+        type: actionTypes.STORE_CURRENT_ZOOM,
         payload: mapZoomLevel,
       });
 
@@ -869,7 +999,7 @@ const Map = (props) => {
         }
       }
     },
-    [map]
+    [map, dispatch]
   );
   
   
@@ -919,9 +1049,9 @@ const Map = (props) => {
           state.layers[layerId].shouldHaveTooltipOnClick
         ) {
           const { clickCallback, zoomHandler } =
-            listenerCallbackRef.current[layerId];
+            listenerCallbackRef.current[layerId] || {};
           if (clickCallback) {map.off("click", clickCallback)};
-          map.off('zoomend', zoomHandler);
+          if (zoomHandler) {map.off('zoomend', zoomHandler);}
 
           // Clean up hover info
           if (hoverInfoRef.current[layerId]) {
@@ -935,11 +1065,11 @@ const Map = (props) => {
         }
         if (state.layers[layerId].shouldHaveLabel) {
           const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-          map.off('zoomend', zoomHandler);
+          if (zoomHandler) {map.off('zoomend', zoomHandler);}
         }
       });
     };
-  }, [map, handleLayerLeave, state.layers, state.visualisations]);
+  }, [map, handleLayerLeave, state.layers, state.visualisations, handleZoom]);
 
   /**
    * Handles map click events and dispatches actions based on the clicked feature.
@@ -1131,7 +1261,7 @@ const Map = (props) => {
       map.off('click', onTap);
       map.off('touchend', onTap);
     };
-  }, [map, handleMapHover, handleMapClick, state.layers, memoizedFilters]);
+  }, [map, handleMapHover, handleMapClick, state.layers, memoizedFilters, pickFeatureAtPoint]);
 
 
   // Fallback for touch devices that do support hover
@@ -1158,12 +1288,14 @@ const Map = (props) => {
   // Run once to set the state of the map
   useEffect(() => {
     if (isMapReady) {
+      window.__debugMap = map;
+
       dispatch({
         type: "SET_MAP",
         payload: { map },
       });
     }
-  }, [isMapReady]);
+  }, [isMapReady, map, dispatch]);
 
   // Keep `state.currentZoom` in sync with the actual map zoom.
   // This is used by DynamicLegend and useLayerZoomMessage. Previously it was
@@ -1193,7 +1325,7 @@ const Map = (props) => {
 
   // **Handle map clicks (for map filters)**
   useEffect(() => {
-    if (isMapReady & state.filters.length > 0) {
+    if (isMapReady && state.filters.length > 0) {
       const hasMapFilter = state.filters.some(
         (filter) => filter.type === "map"
       );
@@ -1207,7 +1339,7 @@ const Map = (props) => {
         map.off("click", handleMapClick);
       }
     };
-  }, [isMapReady, map, handleMapClick]);
+  }, [isMapReady, map, handleMapClick, state.filters]);
 
   // **Capture viewport (bbox) into FilterContext + query params**
   useEffect(() => {
@@ -1336,6 +1468,7 @@ const Map = (props) => {
   // **Apply layer filters**
   useEffect(() => {
     if (!map) return;
+    if (!state.visualisedFeatureIds) return;
 
     Object.keys(state.layers).forEach((layerId) => {
       if (map.getLayer(layerId)) {
@@ -1356,7 +1489,7 @@ const Map = (props) => {
         }
       }
     });
-  }, [map, state.visualisedFeatureIds]);
+  }, [map, state.layers, state.visualisedFeatureIds]);
 
   // **Pan and centre map**
   useEffect(() => {
@@ -1412,14 +1545,16 @@ const Map = (props) => {
   
   return (
     <StyledMapContainer ref={mapContainerRef}>
+      <MapStyleToggle />
+
       {Object.values(state.layers).map((layer) => (
-      <>
+      <React.Fragment key={layer.name}>
         <Layer key={layer.name} layer={layer} />
         { /* Create a sibling 'spider' layer for all point layers, to deal with overlaps */}
         {layer.type === 'tile' && layer.geometryType === 'point' && Boolean(layer.spiderfyOverlappingPoints) && (
           <SpiderLayer key={`${layer.name}_spider`} baseLayerId={layer.name} />
         )}
-      </>
+      </React.Fragment>
       ))}
       {state.visualisations && <VisualisationManager
         visualisationConfigs={state.visualisations}
