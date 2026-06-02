@@ -152,6 +152,7 @@ export const MapVisualisation = ({
   const prevColorRef = useRef({});
   const prevClassMethodRef = useRef({});
   const prevCustomBandsRef = useRef({});
+  const prevInvertRef = useRef({});
 
   // Ref to track pending updates during style resolution and timeouts
   const pendingUpdateRef = useRef(false);
@@ -243,6 +244,7 @@ export const MapVisualisation = ({
     hasStyledLayerRef.current = false;
     prevCombinedDataRef.current = undefined;
     prevVisualisationDataRef.current = undefined;
+    delete prevInvertRef.current[layerKey];
   }, [visualisationName, resetFetchState]);
 
   // Effect to resolve dynamic styling when visualisation data is available
@@ -718,12 +720,17 @@ export const MapVisualisation = ({
       (layerKey in prevCustomBandsRef.current) &&
       !areNumericArraysEqual(currentCustomBands, prevCustomBands);
 
+    const invertHasChanged =
+      (layerKey in prevInvertRef.current) &&
+      Boolean(state.layers[layerKey]?.invertedColorScheme) !== Boolean(prevInvertRef.current[layerKey]);
+
     const needUpdate =
       dataHasChanged ||
       visualisationDataHasChanged ||
       colorHasChanged ||
       classificationHasChanged ||
-      customBandsHasChanged;
+      customBandsHasChanged ||
+      invertHasChanged;
 
     const previouslyHadNoData = 
       prevVisualisationDataRef.current !== undefined &&
@@ -766,6 +773,7 @@ export const MapVisualisation = ({
       prevVisualisationDataRef.current = visualisationData;
       prevColorRef.current[layerKey] = layerColorScheme;
       prevClassMethodRef.current[layerKey] = classificationMethod;
+      prevInvertRef.current[layerKey] = state.layers[layerKey]?.invertedColorScheme;
       // Store a stable snapshot of bands to avoid false negatives from accidental mutation.
       prevCustomBandsRef.current[layerKey] = Array.isArray(currentCustomBands)
         ? [...currentCustomBands]
