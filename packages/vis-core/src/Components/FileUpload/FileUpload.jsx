@@ -39,8 +39,9 @@ const UploadArea = styled.div`
   transition: all 0.2s ease;
   cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   opacity: ${props => props.$disabled ? 0.6 : 1};
+  pointer-events: ${props => (props.$disabled ? 'none' : 'auto')};
 
-  &:hover:not([disabled]) {
+  &:hover {
     border-color: ${props => {
       if (props.$hasError) return '#d32f2f';
       if (props.$isValid) return '#2e7d32';
