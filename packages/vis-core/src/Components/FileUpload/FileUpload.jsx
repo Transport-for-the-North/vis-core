@@ -66,7 +66,12 @@ const UploadIcon = styled.div`
   }};
 `;
 
-const UploadText = styled.div`f
+const UploadText = styled.div`
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 500;
+`;
   font-size: 1rem;
   color: #333;
   margin-bottom: 8px;
