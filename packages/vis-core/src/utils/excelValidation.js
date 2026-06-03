@@ -105,7 +105,16 @@ export function extractSheetData(workbook, sheetName, headerRowIndex = 0) {
   }
 
   const headerRow = rows[headerRowIndex] ?? rows[0];
-  const headers = headerRow.map((h) => String(h ?? '').trim()).filter(Boolean);
+  const maxCols = Math.max(
+    headerRow.length,
+    ...rows.slice(headerRowIndex + 1).map((row) => row.length)
+  );
+
+  // Preserve column indices; blank header cells get stable synthetic keys.
+  const headers = Array.from({ length: maxCols }, (_, idx) => {
+    const label = String(headerRow[idx] ?? '').trim();
+    return label || `Column_${idx + 1}`;
+  });
 
   const data = rows.slice(headerRowIndex + 1).map((row) => {
     const obj = {};

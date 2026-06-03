@@ -73,11 +73,6 @@ const UploadText = styled.div`
   margin-bottom: 8px;
   font-weight: 500;
 `;
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 8px;
-  font-weight: 500;
-`;
 
 const UploadSubtext = styled.div`
   font-size: 0.85rem;
@@ -372,6 +367,12 @@ export const FileUpload = ({
   const [selectedSheet, setSelectedSheet] = useState(null);
   const [excelWorkbook, setExcelWorkbook] = useState(null);
   const [workbookMeta, setWorkbookMeta] = useState(null);
+  const workbookMetaRef = useRef(null);
+
+  const syncWorkbookMeta = useCallback((meta) => {
+    workbookMetaRef.current = meta;
+    setWorkbookMeta(meta);
+  }, []);
   // Tracks per-sheet validation results so all sheets must pass before upload
   const [sheetValidationResults, setSheetValidationResults] = useState({});
 
@@ -531,7 +532,13 @@ export const FileUpload = ({
       const finalResult = { ...result, parsedData: data, headers };
       setValidationResult(finalResult);
       if (onValidationChange) onValidationChange(finalResult.isValid, finalResult.errors, finalResult.warnings);
-      if (onDataChange) onDataChange({ parsedData: preview, validationResult: finalResult, workbookMeta });
+      if (onDataChange) {
+        onDataChange({
+          parsedData: preview,
+          validationResult: finalResult,
+          workbookMeta: workbookMetaRef.current,
+        });
+      }
       setUploadStatus(
         finalResult.isValid
           ? { type: 'success', message: 'Sheet validation passed!' }
@@ -549,11 +556,17 @@ export const FileUpload = ({
       setValidationResult(errorResult);
       setUploadStatus({ type: 'error', message: `Validation error: ${err.message}` });
       if (onValidationChange) onValidationChange(false, errorResult.errors, []);
-      if (onDataChange) onDataChange({ parsedData: preview, validationResult: errorResult, workbookMeta });
+      if (onDataChange) {
+        onDataChange({
+          parsedData: preview,
+          validationResult: errorResult,
+          workbookMeta: workbookMetaRef.current,
+        });
+      }
     } finally {
       setIsValidating(false);
     }
-  }, [validationSchema, validateBeforeUpload, onValidationChange, onDataChange, workbookMeta]);
+  }, [validateBeforeUpload, onValidationChange, onDataChange]);
 
   // Validates every sheet that has a matching schema and stores results in
   // sheetValidationResults. Called once after the workbook is parsed so that
@@ -632,6 +645,7 @@ export const FileUpload = ({
     setSheetNames([]);
     setSelectedSheet(null);
     setExcelWorkbook(null);
+    syncWorkbookMeta(null);
 
     if (isExcel) {
       setIsParsing(true);
@@ -646,7 +660,7 @@ export const FileUpload = ({
           extractCells.forEach(({ sheet, cell, key }) => {
             meta[key] = extractCellValue(workbook, sheet, cell);
           });
-          setWorkbookMeta(meta);
+          syncWorkbookMeta(meta);
           if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: meta });
         }
 
@@ -684,6 +698,10 @@ export const FileUpload = ({
     validateExcelSheetData,
     validateAllExcelSheets,
     parseCSVForPreview,
+    extractCells,
+    syncWorkbookMeta,
+    onDataChange,
+    getSchemaForSheet,
   ]);
 
   const handleDrop = useCallback((e) => {
@@ -718,7 +736,7 @@ export const FileUpload = ({
     setSheetNames([]);
     setSelectedSheet(null);
     setExcelWorkbook(null);
-    setWorkbookMeta(null);
+    syncWorkbookMeta(null);
     setSheetValidationResults({});
     setUploadComplete(false);
     setUploadCompleteFile(null);
@@ -726,7 +744,7 @@ export const FileUpload = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (onValidationChange) onValidationChange(true, [], []);
     if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: null });
-  }, [onValidationChange, onDataChange]);
+  }, [onValidationChange, onDataChange, syncWorkbookMeta]);
 
   const handleReset = useCallback(() => {
     handleRemoveFile();

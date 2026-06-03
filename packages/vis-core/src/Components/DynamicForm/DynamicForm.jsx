@@ -331,8 +331,9 @@ const validateField = (value, field) => {
 
   switch (field.type) {
     case 'integer': {
-      const num = parseInt(value, 10);
-      if (isNaN(num)) {
+      const stringValue = String(value).trim();
+      const num = parseInt(stringValue, 10);
+      if (isNaN(num) || String(num) !== stringValue) {
         return { isValid: false, error: 'Must be a valid integer' };
       }
       if (field.min !== undefined && num < field.min) {
@@ -697,12 +698,13 @@ export const DynamicForm = ({
     try {
       const data = buildSubmissionData();
       
-      if (submitMethod.toUpperCase() === 'POST') {
-        await apiService.post(submitEndpoint, data);
-      } else {
-        // For PUT or other methods, you may need to extend BaseService
-        await apiService.post(submitEndpoint, data);
+      const method = submitMethod.toUpperCase();
+      if (method !== 'POST') {
+        throw new Error(
+          `DynamicForm only supports POST submission (configured method: ${submitMethod})`
+        );
       }
+      await apiService.post(submitEndpoint, data);
 
       setSubmittedData(getDisplayData());
       onSubmitSuccess?.(data);

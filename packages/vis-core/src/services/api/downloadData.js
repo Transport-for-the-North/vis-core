@@ -158,8 +158,6 @@ export class DownloadService extends BaseService {
     } else {
       filename = "downloads.csv";
     }
-      filename = "downloads.csv";
-    }
 
     // Extract filename from Content-Disposition header, if available
     const disposition = response.headers.get("Content-Disposition");
