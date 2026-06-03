@@ -185,9 +185,9 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
           type: "fill",
           source: "Accessibility",
           paint: {
-            "fill-color": "rgb(255, 255, 0, 0)",
+            "fill-color": "rgba(255, 255, 0, 0)",
             "fill-outline-color": "rgba(195, 195, 195, 1)",
-            "fill-opacity": 1,
+            "fill-opacity": 0,
           },
           maxzoom: 24,
           minzoom: 0,
@@ -204,6 +204,7 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
             zoomToFeaturePlaceholderText: "",
             shouldFixLineWidth: false,
             fixedLineWidth: null,
+            legendCacheField: null,
           }),
         })
       );

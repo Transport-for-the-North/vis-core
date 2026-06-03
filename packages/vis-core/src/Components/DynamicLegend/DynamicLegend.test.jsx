@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, waitFor } from "@testing-library/react";
 import {
   DynamicLegend,
   interpretWidthExpression,
@@ -448,7 +448,7 @@ describe("OutOfBandMessage", () => {
     jest.clearAllMocks();
   });
 
-  it("renders when class_method is 'c', customBands are set, and data has out-of-band values", () => {
+  it("renders when class_method is 'c', customBands are set, and data has out-of-band values", async () => {
     const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
     const state = {
       filters: [],
@@ -464,9 +464,11 @@ describe("OutOfBandMessage", () => {
     renderWithState(map, state);
     triggerStyledata(map);
 
-    expect(
-      screen.getByText(/some data is outside the specified bands/i)
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByText(/some data is outside the specified bands/i)
+      ).toBeInTheDocument()
+    );
   });
 
   it("does not render when all data values are within the custom band range", () => {
@@ -490,7 +492,7 @@ describe("OutOfBandMessage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("does not render when class_method is not 'c'", () => {
+  it("renders when class_method is not 'c' and data has out-of-band values", async () => {
     const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
     const state = {
       filters: [],
@@ -506,12 +508,14 @@ describe("OutOfBandMessage", () => {
     renderWithState(map, state);
     triggerStyledata(map);
 
-    expect(
-      screen.queryByText(/some data is outside the specified bands/i)
-    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByText(/some data is outside the specified bands/i)
+      ).toBeInTheDocument()
+    );
   });
 
-  it("does not render when class_method is 'c' but no customBands are set", () => {
+  it("renders when class_method is 'c' but no customBands are set and data is out-of-band", async () => {
     const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
     const state = {
       filters: [],
@@ -527,8 +531,10 @@ describe("OutOfBandMessage", () => {
     renderWithState(map, state);
     triggerStyledata(map);
 
-    expect(
-      screen.queryByText(/some data is outside the specified bands/i)
-    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByText(/some data is outside the specified bands/i)
+      ).toBeInTheDocument()
+    );
   });
 });

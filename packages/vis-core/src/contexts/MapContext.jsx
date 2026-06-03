@@ -111,6 +111,7 @@ export const MapProvider = ({ children }) => {
     isMapReady: false,
     isLoading: true,
     isDynamicStylingLoading: false,
+    visualisationLoadingCount: 0,
     pageIsReady: false,
     metadataError: null,
     categoricalLegendCache: {},

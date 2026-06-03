@@ -1,6 +1,7 @@
 import {
   buildCategoricalLegendKey,
   resolveCategoricalColours,
+  getMetricDefinition,
 } from "./map";
 
 describe("buildCategoricalLegendKey", () => {
@@ -103,5 +104,117 @@ describe("resolveCategoricalColours", () => {
     expect(result.resolvedBins).toEqual(["Alpha", "Beta", "Gamma"]);
     expect(result.resolvedColours).toEqual(["#222222", "#333333", "#111111"]);
     expect(new Set(result.resolvedColours).size).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getMetricDefinition
+// ---------------------------------------------------------------------------
+
+/** Minimal defaultBands fixture used across getMetricDefinition tests. */
+const makeDefaultBands = () => [
+  {
+    name: "trse",
+    metric: [
+      { name: "trse", values: [0, 10, 20, 30], colours: ["#fff", "#ccc", "#999", "#333"] },
+      { name: "other", values: [1, 2, 3], colours: ["#aaa", "#bbb", "#ccc"] },
+    ],
+  },
+];
+
+/** Minimal currentPage with a category matching the bands fixture. */
+const makeCurrentPage = (overrides = {}) => ({
+  category: "trse",
+  pageName: "trse-page",
+  ...overrides,
+});
+
+describe("getMetricDefinition", () => {
+  describe("bandMetricName option (primary API)", () => {
+    it("returns the matching metric when bandMetricName resolves", () => {
+      const result = getMetricDefinition(
+        makeDefaultBands(),
+        makeCurrentPage(),
+        {},
+        { bandMetricName: "trse" }
+      );
+      expect(result).toMatchObject({ name: "trse" });
+    });
+
+    it("falls through to filter-based resolution when bandMetricName does not match any metric", () => {
+      const currentPage = makeCurrentPage({
+        config: {
+          filters: [{ containsLegendInfo: true, paramName: "metric" }],
+        },
+      });
+      const queryParams = { metric: { value: "other" } };
+
+      const result = getMetricDefinition(
+        makeDefaultBands(),
+        currentPage,
+        queryParams,
+        { bandMetricName: "nonexistent" }
+      );
+
+      // Should fall through and resolve via the filter path.
+      expect(result).toMatchObject({ name: "other" });
+    });
+
+    it("returns null when bandMetricName does not match and there is no filter path", () => {
+      const result = getMetricDefinition(
+        makeDefaultBands(),
+        makeCurrentPage(),
+        {},
+        { bandMetricName: "nonexistent" }
+      );
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("filter-based resolution (no bandMetricName)", () => {
+    it("resolves via the containsLegendInfo filter when no bandMetricName is given", () => {
+      const currentPage = makeCurrentPage({
+        config: {
+          filters: [{ containsLegendInfo: true, paramName: "metric" }],
+        },
+      });
+      const queryParams = { metric: { value: "other" } };
+
+      const result = getMetricDefinition(makeDefaultBands(), currentPage, queryParams);
+      expect(result).toMatchObject({ name: "other" });
+    });
+
+    it("returns null when the filter param value does not match any metric", () => {
+      const currentPage = makeCurrentPage({
+        config: {
+          filters: [{ containsLegendInfo: true, paramName: "metric" }],
+        },
+      });
+      const queryParams = { metric: { value: "unknown" } };
+
+      const result = getMetricDefinition(makeDefaultBands(), currentPage, queryParams);
+      expect(result).toBeNull();
+    });
+
+    it("returns null when defaultBands is empty", () => {
+      const result = getMetricDefinition([], makeCurrentPage(), {}, { bandMetricName: "trse" });
+      expect(result).toBeNull();
+    });
+
+    it("returns null when defaultBands is undefined", () => {
+      const result = getMetricDefinition(undefined, makeCurrentPage(), {});
+      expect(result).toBeNull();
+    });
+
+    it("resolves page category via pageName when category is absent", () => {
+      const currentPage = { pageName: "trse" };
+      const result = getMetricDefinition(
+        makeDefaultBands(),
+        currentPage,
+        {},
+        { bandMetricName: "trse" }
+      );
+      expect(result).toMatchObject({ name: "trse" });
+    });
   });
 });

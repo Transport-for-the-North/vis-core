@@ -1,539 +1,21 @@
-import { forEach } from "lodash";
 import React, { useEffect, useState, useRef, useContext } from "react";
-import styled from "styled-components";
-import { buildCategoricalLegendKey, convertStringToNumber, numberWithCommas } from "utils";
-import { useMapContext, useFetchVisualisationData } from "hooks";
-import { PageContext, useAppContext } from "contexts";
 import { createPortal } from 'react-dom';
-import { formatNumber } from "utils";
-
-/**
- * useIsMobile
- *
- * Returns a boolean that tracks whether the viewport is currently at or below
- * a mobile breakpoint (≤ 900px). It reads the width on mount and updates on
- * window resize.
- *
- * - Guards all direct `window` access.
- * - Cleans up the resize listener on unmount.
- * - Keep the 900px value in sync with your theme’s `mq.mobile` if you change it.
- *
- * @returns {boolean} isMobile - `true` when `window.innerWidth <= 900`, else `false`.
- */
-
-const useIsMobile = () => {
-  const [m, setM] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 900 : false));
-  useEffect(() => {
-    const onResize = () => setM(window.innerWidth <= 900);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-  return m;
-};
-
-const MOBILE_Q = '(max-width: 900px)';
-const mobileMQ = (p) => p.theme?.mq?.mobile || MOBILE_Q;
-
-// Styled components for the legend UI
-const LegendContainer = styled.div`
-  --scrollbar-width: 4px; /* Default scrollbar width for Webkit browsers */
-  --firefox-scrollbar-width: 4px; /* Approximate scrollbar width for Firefox */  
-  
-  display: inline-flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  gap: 0 15px;
-  position: absolute;
-  bottom: 40px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 15px;
-  /* Adjust padding-right to account for scrollbar width */
-  padding-right: calc(15px - var(--scrollbar-width)); /* For WebKit browsers */
-  box-sizing: border-box; /* Include padding and border in width */
-  border-radius: 10px;
-  z-index: 10;
-  min-width: 0;
-  max-height: none;
-  max-width: 80vw;
-  overflow: visible;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  font-family: "Hanken Grotesk", sans-serif;
-  font-size: medium;
-  
-  /* Custom scrollbar styling for Webkit-based browsers */
-  &::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: transparent; /* Default color */
-    border-radius: 10px;
-    background-clip: padding-box;
-    transition: background-color 0.3s ease-in-out;
-  }
-  &:hover::-webkit-scrollbar-thumb {
-    background-color: darkgrey; /* Color when hovered */
-  }
-
-  /* Firefox-specific styles */
-  @-moz-document url-prefix() {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent; /* Default color */
-    padding-right: calc(15px - var(--firefox-scrollbar-width)); /* Adjust padding for Firefox */
-    &:hover {
-      scrollbar-color: darkgrey transparent; /* Color when hovered */
-    }
-  }
-
-  
-  @media ${mobileMQ} {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0 10px;
-  }
-
-  ${({ $outside }) => $outside && `
-    position: static;
-    display: block;
-    bottom: auto;
-    right: auto;
-    width: 100%;
-    max-width: 100%;
-    max-height: none;
-    box-shadow: none;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.95);
-    margin: 8px 0 0;
-    padding: 12px 16px;
-  `}
-`;
-
-const LegendItemContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-`;
-
-const LegendGroup = styled.div`
-  width: max-content;
-  min-width: 0;
-  @media ${mobileMQ} {
-    border: 1px solid #ccc;
-    padding: 8px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  }
-`;
-
-const LegendTitle = styled.div`
-  font-weight: bold;
-  text-align: left;
-  margin-bottom: 2px;
-  max-width: 150px;
-  font-size: 0.9em;
-`;
-
-const LegendSubtitle = styled.h2`
-  font-weight: normal;
-  text-align: left;
-  margin-top: 2px;
-  margin-bottom: 2px;
-  font-size: small;
-  font-style: italic;
-`;
-
-const LegendItem = styled.div`
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  font-size: medium;
-`;
-
-const CircleSwatch = styled.div`
-  width: ${(props) => props.diameter}px;
-  height: ${(props) => props.diameter}px;
-  background-color: ${(props) => props.color};
-  border: 1px solid #333;
-  border-radius: 50%;
-  margin-right: 5px;
-`;
-
-const LineSwatch = styled.div`
-  width: 50px;
-  height: ${(props) => props.height}px;
-  ${(props) => props.isDashed 
-    ? `border-top: ${props.height}px dashed ${props.color}; background-color: transparent;`
-    : `background-color: ${props.color};`
-  }
-  margin-right: 5px;
-`;
-
-const PolygonSwatch = styled.div`
-  width: 15px;
-  height: 15px;
-  background-color: ${(props) => props.color};
-  border: 1px solid #333;
-  margin-right: 5px;
-`;
-
-const LegendLabel = styled.span`
-  font-size: small;
-`;
-
-const LegendDivider = styled.div`
-  height: 1px;
-  background-color: #ccc;
-  margin: 4px;
-  max-width: 80%;
-  width: 80px;
-`;
-
-const OutOfBandMessage = styled.div`
-  color: #d32f2f;
-  font-size: 0.85em;
-  margin: 6px 0 0 0;
-  padding: 6px 8px;
-  background-color: #ffebee;
-  border-radius: 4px;
-  border-left: 3px solid #d32f2f;
-`;
-
-/**
-* Interpolates widths for color stops based on width stops.
-*
-* @param {Array} colorStops - An array of color stop objects, each with a `value` property.
-* @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
-* @param {string} type - The type of the layer (e.g., 'circle', 'line').
-* @returns {Array} An array of objects with `value` and `width` properties, where `width` is the interpolated diameter.
-* @throws Will throw an error if less than two color stops or width stops are provided.
-*/
-function interpolateWidths(colorStops, widthStops, type) {
-
-  // Validate input
-  if (!colorStops || colorStops.length === 0) {
-    throw new Error('At least one color stop is required.');
-  }
-  if (!widthStops || widthStops.length === 0) {
-    throw new Error('At least one width stop is required.');
-  }
-
-  // If the number of color stops matches width stops, map directly
-  if (colorStops.length === widthStops.length) {
-    return colorStops.map((cs, i) => ({
-      value: cs.value,
-      width: type === 'circle' ? widthStops[i].width * 2 : widthStops[i].width
-    }));
-  }
-
-  // If only one width stop, apply it to all color stops
-  if (widthStops.length === 1) {
-    const width = widthStops[0].width;
-    return colorStops.map(cs => ({ value: cs.value, width: type === 'circle' ? width * 2 : width }));
-  }
-
-  const convertedWidthStops = widthStops.map(stop => ({
-    width: stop.width,
-    value: convertStringToNumber(stop.value)
-  }));
-
-  const widths = [];
-  for (let i = 0; i < colorStops.length; i++) {
-    const value = colorStops[i].value;
-    const convertedValue = convertStringToNumber(value);
-    const width = interpolateWidthAtValue(convertedWidthStops, Math.abs(convertedValue));
-    widths.push({ value, width: type === 'circle' ? width * 2 : width });
-  }
-
-  return widths;
-}
-
-/**
-* Interpolates the width at a given value based on width stops.
-*
-* @param {Array} widthStops - An array of width stop objects, each with a `value` and `width` property.
-* @param {number} value - The value at which to interpolate the width.
-* @returns {number} The interpolated width.
-*/
-function interpolateWidthAtValue(widthStops, value) {
-  if (value <= widthStops[0].value) {
-    return widthStops[0].width;
-  }
-
-  if (value >= widthStops[widthStops.length - 1].value) {
-    return widthStops[widthStops.length - 1].width;
-  }
-
-  for (let i = 0; i < widthStops.length - 1; i++) {
-    const startStop = widthStops[i];
-    const endStop = widthStops[i + 1];
-
-    if (value >= startStop.value && value <= endStop.value) {
-      const ratio =
-        (value - startStop.value) / (endStop.value - startStop.value);
-      const width =
-        startStop.width + ratio * (endStop.width - startStop.width);
-      return width;
-    }
-  }
-
-  return widthStops[widthStops.length - 1].width;
-}
-
-/**
-* Interprets a color expression from a map style specification and returns a list of color stops.
- * A color expression can be a simple string representing a color, or an array that defines
- * a color interpolation or match expression.
-*
- * @param {string|array} expression - The color expression to interpret. This can be a simple
- *                                    color string or an array representing an 'interpolate',
- *                                    'step', or 'match' expression.
- * @returns {array|null} An array of objects with 'value' and 'color' properties representing
- *                       the color stops, or null if the expression cannot be interpreted.
-*/
-export const interpretColorExpression = (expression) => {
-  if (!expression) return null;
-  if (typeof expression === "string") {
-    return [{ color: expression }];
-  } else if (Array.isArray(expression)) {
-    // Handle different types of expressions
-    switch (expression[0]) {
-      case "interpolate":
-      case "step":
-        // Extract stops from the expression
-        const stops = expression.slice(3);
-        const colorStops = [];
-        for (let i = 0; i < stops.length; i += 2) {
-          colorStops.push({
-            value: numberWithCommas(stops[i]),
-            color: stops[i + 1],
-          });
-        }
-        return colorStops;
-      case "case":
-        // Extract pairs of case values and colors
-        const caseValues = expression.slice(2);
-        caseValues.splice(1, 1);
-        const stop = [-1, 1, 0];
-        const caseColorStops = [];
-        forEach(caseValues, (value, index) => {
-          caseColorStops.push({
-            value: stop[index],
-            color: value,
-          });
-        });
-        return caseColorStops;
-      case "match":
-        // Extract pairs of match values and colors
-        const matchValues = expression.slice(2, -1);
-        const matchColorStops = [];
-        for (let i = 0; i < matchValues.length; i += 2) {
-          matchColorStops.push({
-            value: matchValues[i],
-            color: matchValues[i + 1],
-          });
-        }
-        return matchColorStops;
-      default:
-        return null;
-    }
-  }
-  return null;
-};
-
-/**
- * Interprets a width expression from a map style specification and calculates
- * intermediate width stops. The function assumes linear interpolation between stops.
- * The number of intermediate stops is dynamic and can be specified.
-*
-* @param {Array|number} expression - The width expression from the map style.
-* @returns {Array|null} - An array of width stops or null if the expression is invalid.
-*/
-export const interpretWidthExpression = (expression) => {
-  if (!expression) return null;
-  if (typeof expression === "number") {
-    const arr = [{ width: expression }];
-    arr._styleValue = expression;
-    return arr;
-  } else if (Array.isArray(expression)) {
-    if (expression.some((item) => Array.isArray(item) && item.includes("zoom"))) {
-      return [];
-    }
-    switch (expression[0]) {
-      case "interpolate":
-      case "step":
-        const stops = expression.slice(3);
-        const widthStops = [];
-        for (let i = 0; i < stops.length; i += 2) {
-          widthStops.push({
-            value: numberWithCommas(stops[i]),
-            width: stops[i + 1],
-          });
-        }
-        return widthStops;
-      default:
-        return [];
-    }
-  }
-  return null;
-};
-
-/**
- * Interprets a line-dasharray expression from a map style specification and 
- * determines which values should have dashed lines in the legend.
-*
-* @param {Array|Array<number>} expression - The line-dasharray expression from the map style.
-* @returns {Array|null} - An array of dash stops or null if the expression is invalid.
-*/
-export const interpretDashArrayExpression = (expression) => {
-  if (!expression) return null;
-  
-  if (Array.isArray(expression) && expression.length > 0) {
-    // Handle data-driven styling with 'match' expressions
-    if (expression[0] === "match") {
-      const matchValues = expression.slice(2, -1); // Remove 'match', property, and default value
-      const dashStops = [];
-      
-      for (let i = 0; i < matchValues.length; i += 2) {
-        const value = matchValues[i];
-        const dashArrayValue = matchValues[i + 1];
-        
-        // Check if it's a literal array
-        let isDashed = false;
-        if (Array.isArray(dashArrayValue) && dashArrayValue[0] === 'literal') {
-          const actualDashArray = dashArrayValue[1];
-          // Consider it dashed if it's not [1, 0] (solid) and not empty
-          isDashed = Array.isArray(actualDashArray) && 
-                    actualDashArray.length > 0 && 
-                    !(actualDashArray.length === 2 && actualDashArray[0] === 1 && actualDashArray[1] === 0);
-        }
-        
-        dashStops.push({
-          value: value,
-          isDashed: isDashed,
-        });
-      }
-      
-      return dashStops;
-    }
-    
-    // Handle simple array (legacy or static dasharray)
-    if (typeof expression[0] === 'number') {
-      // Simple dash array like [2, 2] - consider it dashed if not [1, 0]
-      const isDashed = !(expression.length === 2 && expression[0] === 1 && expression[1] === 0);
-      return [{ isDashed }];
-    }
-  }
-  
-  return null;
-};
-
-const isRenderableEntry = (e) => {
-  if (!e) return false;
-  const hasLabel = e.label != null && String(e.label).trim() !== '';
-  const hasKnownSwatch = ['circle', 'line', 'fill'].includes(e.type);
-  const hasSize = e.type === 'fill' ? true : Number(e.width) > 0;
-  return hasLabel || (hasKnownSwatch && hasSize);
-};
-
-const formatLegendLabelValue = (value) => {
-  const numericValue = convertStringToNumber(value);
-  return Number.isFinite(numericValue) ? formatNumber(numericValue) : value;
-};
-
-/**
- * Gets the width for a legend entry based on layer type and paint properties.
- * 
- * This function determines the appropriate width/diameter for legend swatches by:
- * 1. Using the widthStop value if available (from data-driven styling)
- * 2. Returning null for mobile devices to allow CSS handling
- * 3. For circle layers: using circle-radius * 2 or defaulting to 10px
- * 4. For line layers: searching paintProps["line-width"] array for the label 
- *    and returning the next index value, or defaulting to 2px
- * 5. For other layer types: defaulting to 10px
- * 
- * @param {Object|null} widthStop - Width stop object with a width property from data-driven styling
- * @param {boolean} isMobile - Whether the current viewport is mobile (≤ 900px)
- * @param {Object} layer - The map layer object containing type and other metadata
- * @param {Object} paintProps - The layer's paint properties containing style definitions
- * @param {string|number} label - The current legend entry label used for line width lookup
- * @returns {number|null} The calculated width in pixels, or null for mobile devices
- */
-const getEntryWidth = (widthStop, isMobile, layer, paintProps, label) => {
-  if (widthStop) return widthStop.width;
-  if (isMobile) return null;
-  
-  if (layer.type === "circle") {
-    return typeof paintProps["circle-radius"] === "number" ? paintProps["circle-radius"] * 2 : 10;
-  }
-  
-  if (layer.type === "line") {
-    const lineWidthArray = paintProps["line-width"];
-    if (Array.isArray(lineWidthArray)) {
-      const labelIndex = lineWidthArray.indexOf(label);
-      return labelIndex !== -1 && labelIndex < lineWidthArray.length - 1 
-        ? lineWidthArray[labelIndex + 1] 
-        : 2;
-    }
-    return 2;
-  }
-  
-  return 10;
-};
-
-/**
- * Gets the dash information for a legend entry based on dash stops and current label value.
- * 
- * This function determines whether a legend entry should display as dashed by:
- * 1. Using the dashStop value if available (from data-driven styling)
- * 2. Falling back to checking the raw paintProps["line-dasharray"] for legacy support
- * 3. Considering a line dashed if the dash array is not [1, 0] (solid line indicator)
- * 
- * @param {Object|null} dashStop - Dash stop object with isDashed property from data-driven styling
- * @param {Object} paintProps - The layer's paint properties containing style definitions
- * @param {string|number} label - The current legend entry label used for dash lookup
- * @returns {boolean} Whether the legend entry should be displayed as dashed
- */
-const getEntryDashStatus = (dashStop, paintProps, label) => {
-  if (dashStop && typeof dashStop.isDashed === 'boolean') {
-    return dashStop.isDashed;
-  }
-  
-  // Fallback for legacy or non-data-driven dash arrays
-  const dashArray = paintProps["line-dasharray"];
-  if (Array.isArray(dashArray)) {
-    // For simple arrays, check if it's not [1, 0] (solid)
-    if (typeof dashArray[0] === 'number') {
-      return !(dashArray.length === 2 && dashArray[0] === 1 && dashArray[1] === 0);
-    }
-    
-    // For match expressions in legacy format, find the value for this label
-    if (dashArray[0] === 'match') {
-      const matchValues = dashArray.slice(2, -1);
-      for (let i = 0; i < matchValues.length; i += 2) {
-        if (matchValues[i] === label) {
-          const value = matchValues[i + 1];
-          if (Array.isArray(value) && value[0] === 'literal') {
-            const actualArray = value[1];
-            return Array.isArray(actualArray) && 
-                   actualArray.length > 0 && 
-                   !(actualArray.length === 2 && actualArray[0] === 1 && actualArray[1] === 0);
-          }
-          return Array.isArray(value) && 
-                 value.length > 0 && 
-                 !(value.length === 2 && value[0] === 1 && value[1] === 0);
-        }
-      }
-    }
-  }
-  
-  return false;
-};
+import { buildCategoricalLegendKey, convertStringToNumber } from "utils";
+import { useMapContext, useFetchVisualisationData, useIsMobile } from "hooks";
+import { PageContext, useAppContext } from "contexts";
+import { LegendContainer } from "./DynamicLegend.styles";
+import {
+  interpolateWidths,
+  interpretColorExpression,
+  interpretWidthExpression,
+  interpretDashArrayExpression,
+  isRenderableEntry,
+  formatLegendLabelValue,
+  formatLegendNumber,
+  getEntryWidth,
+  getEntryDashStatus,
+} from "./DynamicLegend.utils";
+import LegendLayerGroup from "./LegendLayerGroup";
 
 /**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
@@ -549,6 +31,19 @@ export const DynamicLegend = ({ map }) => {
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
   const { defaultBands } = useAppContext();
+  // Initialise from localStorage so the user's display/scale preferences survive
+  // page refreshes and navigation. Falls back to an empty object if storage is
+  // unavailable (private browsing, quota exceeded, etc.).
+  const [layerPrefs, setLayerPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem('dynamicLegend_layerPrefs');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [openPopoverId, setOpenPopoverId] = useState(null);
+  const popoverRef = useRef(null);
   const legendRef = useRef(null);
   const currentPage = useContext(PageContext);
   const pageCategory = currentPage.category || currentPage.pageName;
@@ -560,6 +55,42 @@ export const DynamicLegend = ({ map }) => {
       visualisationDataByLayer[vis.joinLayer] = vis.data;
     }
   });
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      // Close if clicking outside the CogMenuContainer
+      if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+        setOpenPopoverId(null);
+      }
+    };
+
+    if (openPopoverId !== null) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [openPopoverId]);
+
+  const togglePopover = (layerId) => {
+    setOpenPopoverId(prev => prev === layerId ? null : layerId);
+  };
+
+  const updateLayerPref = (layerId, key, value) => {
+    setLayerPrefs(prev => {
+      const currentPref = prev[layerId] || { displayMode: 'continuous', scaleMode: 'value' };
+      const next = { ...prev, [layerId]: { ...currentPref, [key]: value } };
+      // Persist to localStorage so preferences survive page refreshes.
+      try {
+        localStorage.setItem('dynamicLegend_layerPrefs', JSON.stringify(next));
+      } catch {
+        // Silently ignore if localStorage is unavailable.
+      }
+      return next;
+    });
+    // Close the options popover as soon as the user selects a preference.
+    setOpenPopoverId(null);
+  };
 
   useEffect(() => {
     if (!map) return;
@@ -577,13 +108,15 @@ export const DynamicLegend = ({ map }) => {
           return shouldShowInLegend && isWithinZoomRange;
         })
         .map((layer, index) => {
-          // Get the visualisation associated with this layer via joinLayer
+          // --- Resolve display text ---
+          // Find the visualisation record for this layer and derive the title and
+          // optional subtitle shown at the top of the legend group. Stylable layers
+          // pull their text from the active filter's legendText; non-stylable layers
+          // fall back to the raw layer ID.
           const visualisationKey = Object.keys(state.visualisations).find(key => {
             return state.visualisations[key].joinLayer === layer.id;
           });
           const visualisation = state.visualisations[visualisationKey];
-          
-          // Get legendText from visualisation
           const legendText = visualisation?.legendText || [];
 
           const title = layer.id;
@@ -638,10 +171,40 @@ export const DynamicLegend = ({ map }) => {
             }
           }
           
+          // --- Interpret paint expressions ---
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;
-          const trseLabel = state.layers[layer.id]?.trseLabel === true;
+
+          // legendAnnotations: optional { start, end } strings rendered in the
+          // AnnotationRow below the continuous gradient bar. "start" appears on
+          // the left (low end of the bar), "end" on the right (high end).
+          // These are display-position terms, not array-index terms, so they
+          // remain unambiguous regardless of whether the colour scheme is inverted.
+          const legendAnnotations = state.layers[layer.id]?.legendAnnotations;
+
+          // legendNumberFormat: optional LegendNumberFormat controlling decimal
+          // precision, prefix, and suffix on continuous-bar axis ticks AND on
+          // discrete swatch labels. Both views show consistent values.
+          // Defaults to auto-detecting the precision of the stop values.
+          const legendNumberFormat = state.layers[layer.id]?.legendNumberFormat;
+
+          // Formats a stop value for the discrete legend swatch label.
+          // Delegates entirely to formatLegendNumber — the single extension point
+          // for all label formatting options (decimals, prefix, suffix, …).
+          // No format logic lives here; add options to formatLegendNumber instead.
+          const formatEntryLabel = (value) => formatLegendNumber(value, legendNumberFormat ?? {});
           const paintProps = layer.paint;
-          // Interpret expressions
+          
+          // Determine the opacity based on the layer type
+          const layerOpacity = 
+            paintProps["fill-opacity"] ?? 
+            paintProps["line-opacity"] ?? 
+            paintProps["circle-opacity"];
+
+          // If the layer is explicitly hidden (opacity is exactly 0), skip the legend
+          if (layerOpacity === 0 || layerOpacity === 0.0) {
+            return null;
+          }
+
           let colorStops = interpretColorExpression(
             paintProps["line-color"] ||
             paintProps["circle-color"] ||
@@ -654,7 +217,9 @@ export const DynamicLegend = ({ map }) => {
             paintProps["line-dasharray"]
           );
 
-          // Determine whether current style is categorical. For categorical we should not scale circle sizes.
+          // --- Normalise stops ---
+          // Detect categorical styling, apply colour inversion if toggled, and
+          // reconcile any mismatch between the number of colour stops and width stops.
           const colorStyle = layer.metadata?.colorStyle;
           const isCategorical =
             colorStyle === "categorical" ||
@@ -708,36 +273,39 @@ export const DynamicLegend = ({ map }) => {
 
           // Process legend entries
           let legendEntries = [];
+          let hasCustomLabels = false;
           if (colorStops && colorStops.length > 0) {
             if (widthStops && widthStops.length == 1) {
               // If there's only one width stop, apply it to all color stops. This should only occur with custom paint definiton (not data-driven).
               widthStops = Array(colorStops.length).fill(widthStops[0]);
             }
-            const length = trseLabel ? colorStops.length - 1 : colorStops.length;
+            // All colour stops are included as entries. Each stop represents a
+            // point value on the scale, not a range between stops. The continuous
+            // bar then places tick marks at those point values and the collision-
+            // detection system selects which labels to show.
+            const length = colorStops.length;
             for (let idx = 0; idx < length; idx++) {
               const stop = colorStops[idx];
-              const nextStop = colorStops[idx + 1];
               const widthStop = widthStops ? widthStops[idx] : null;
               const dashStop = dashStops ? dashStops.find(ds => ds.value === stop.value) : null;
               let label;
               let rawLabel;
+              let numericValue;
               if (customLabels && customLabels.length === length) {
                 rawLabel = customLabels[idx];
                 label = rawLabel;
-              } else if (trseLabel && nextStop) {
-                const startValue = formatLegendLabelValue(stop.value);
-                const endValue = formatLegendLabelValue(nextStop.value);
-                rawLabel = `${stop.value}-${nextStop.value}`;
-                if (idx === 0) {
-                  label = `${startValue}-${endValue} (Lowest Risk of TRSE)`;
-                } else if (idx === length - 1) {
-                  label = `${startValue}-${endValue} (Highest Risk of TRSE)`;
-                } else {
-                  label = `${startValue}-${endValue}`;
-                }
+                // The underlying stop value is still numeric (e.g. 0, 20, 40, 60, 80)
+                // and drives continuous bar positioning. hasCustomLabels is set so
+                // ContinuousGradientBar can decorate the extreme ticks with ≤ / +
+                // to communicate the open-ended nature of the boundary bins.
+                numericValue = convertStringToNumber(stop.value);
+                hasCustomLabels = true;
               } else {
                 rawLabel = stop.value;
-                label = formatLegendLabelValue(stop.value);
+                numericValue = convertStringToNumber(stop.value);
+                // Apply legendNumberFormat so the discrete swatch label matches the
+                // continuous bar axis (e.g. "100" not "100.00" for decimals: 0).
+                label = formatEntryLabel(stop.value);
               }
 
               const cachedLegendColour =
@@ -754,19 +322,21 @@ export const DynamicLegend = ({ map }) => {
                 color: cachedLegendColour || stop.color,
                 width: getEntryWidth(widthStop, isMobile, layer, paintProps, rawLabel),
                 label,
-                rawValue: Number(stop.value),
+                rawLabel,
+                numericValue,
                 type: layer.type,
                 isDashed: getEntryDashStatus(dashStop, paintProps, rawLabel),
               });
             }
           }
 
-          // If no legend entries or exactly one, consider this a default style scenario.
+          // --- No-style fallback ---
+          // A layer with no data-driven stops produces a single swatch using the
+          // layer's base paint colour, labelled with the layer ID.
           let noStyle = false;
-          if (legendEntries.length < 1) {
+          if (legendEntries.length === 0) {
             noStyle = true;
-            if (legendEntries.length === 0) {
-              const defaultColor =
+            const defaultColor =
                 paintProps["line-color"] ||
                 paintProps["circle-color"] ||
                 paintProps["fill-color"] ||
@@ -788,10 +358,6 @@ export const DynamicLegend = ({ map }) => {
                 type: layer.type,
                 isDashed: getEntryDashStatus(null, paintProps, title),
               });
-            } else {
-              // If there is exactly one entry, force the label to be the layer name.
-              legendEntries[0].label = title;
-            }
           }
 
           const filteredEntries = (legendEntries || []).filter(isRenderableEntry);
@@ -801,11 +367,7 @@ export const DynamicLegend = ({ map }) => {
             return null;
           }
 
-          // Use raw numeric stop values for band-edge comparisons.
-          // Parsing formatted labels (e.g. "10.00K") yields incorrect numbers.
-          const legendNumericEntries = filteredEntries
-            .map(e => (e.rawValue !== undefined && !isNaN(e.rawValue) ? e.rawValue : parseFloat(String(e.label).replace(/,/g, ''))))
-            .filter(v => !isNaN(v));
+          const legendNumericEntries = filteredEntries.map(e => e.numericValue);
           
           return {
             layerId: layer.id,
@@ -813,13 +375,19 @@ export const DynamicLegend = ({ map }) => {
             subtitle: legendSubtitleText,
             legendEntries: filteredEntries,
             legendEntriesNumeric: legendNumericEntries,
-            trseLabel,
+            // legendAnnotations: { start, end } — positional (left/right) annotation
+            // strings for the continuous gradient bar. Present only when the layer
+            // config declares them; undefined otherwise.
+            legendAnnotations,
+            // legendNumberFormat: { decimals } — tick label precision override.
+            legendNumberFormat,
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
-            
+            hasCustomLabels, // True when bands.js-style range labels (e.g. "0-20 (Very low)") are applied.
           };
         })
+        // Layers that produced no renderable entries return null from the map above.
         .filter(Boolean);
       setLegendItems(items);
     };
@@ -855,112 +423,28 @@ export const DynamicLegend = ({ map }) => {
     legendRef.current.style.width = `${newWidth}px`;
   }, [legendItems, isMobile]);
   
-  // If there are no legend items, render nothing.
   if (legendItems.length === 0) {
     return null;
   }
-  
+
   const content = (
     <LegendContainer ref={legendRef} $outside={isMobile}>
-      {legendItems.map((item, index) => {
-        // Out-of-band check: only for continuous/diverging bands
-        let outOfBand = false;
-        let minBand = null, maxBand = null;
-        
-        const classMethod = state.layers?.[item.layerId]?.class_method;
-        // Only show this warning when the user has explicitly saved custom bands.
-        const layerHasCustomBands =
-          Array.isArray(state.layers?.[item.layerId]?.customBands) &&
-          state.layers[item.layerId].customBands.length > 0;
-
-        if (classMethod === 'c' && layerHasCustomBands) {
-          // Use the raw custom bands directly from state — avoids parsing
-          // formatted label strings (e.g. "10.00K") which would truncate to 10.
-          const customBands = state.layers[item.layerId].customBands.map(Number).filter(v => !isNaN(v));
-          if (customBands.length > 1) {
-            minBand = Math.min(...customBands);
-            maxBand = Math.max(...customBands);
-            // Retrieve data for this layer
-            const data = visualisationDataByLayer[item.layerId];
-            if (Array.isArray(data) && data.length > 0) {
-              // Extract all metric values
-              const values = data.map(row => {
-                if (typeof row === 'object' && row !== null) {
-                  let v = row.value ?? row.metric;
-                  if (v === undefined) {
-                    for (const k in row) {
-                      if (typeof row[k] === 'number') return row[k];
-                    }
-                  }
-                  return v;
-                } else if (typeof row === 'number') {
-                  return row;
-                }
-                return null;
-              }).filter(v => v !== null && !isNaN(v));
-              // Only show the message when data values genuinely fall outside the custom band range
-              outOfBand = values.some(v => v < minBand || v > maxBand);
-            }
-          }
-        }
-        return (
-          <LegendGroup key={item.layerId}>
-            <LegendItemContainer>
-              {item.noStyle ? (
-                item.legendEntries.map((entry, idx) => (
-                  <LegendItem key={idx}>
-                    {item.type === "circle" ? (
-                      <CircleSwatch diameter={entry.width || 10} color={entry.color} />
-                    ) : item.type === "line" ? (
-                      <LineSwatch 
-                        height={entry.width || 2} 
-                        color={entry.color} 
-                        isDashed={entry.isDashed || false}
-                      />
-                    ) : item.type === "fill" ? (
-                      <PolygonSwatch color={entry.color} />
-                    ) : null}
-                    <LegendLabel>{entry.label}</LegendLabel>
-                  </LegendItem>
-                ))
-              ) : (
-                <>
-                  <LegendTitle>{item.title}</LegendTitle>
-                  {item.subtitle && <LegendSubtitle>{item.subtitle}</LegendSubtitle>}
-                  {item.legendEntries.map((entry, idx) => (
-                    <LegendItem key={idx}>
-                      {entry.type === "circle" ? (
-                        <CircleSwatch
-                          diameter={entry.width || 10}
-                          color={entry.color}
-                        />
-                      ) : entry.type === "line" ? (
-                        <LineSwatch
-                          height={entry.width || 2}
-                          color={entry.color}
-                          isDashed={entry.isDashed || false}
-                        />
-                      ) : entry.type === "fill" ? (
-                        <PolygonSwatch
-                          color={entry.color}
-                        />
-                      ) : null}
-                      <LegendLabel>{entry.label}</LegendLabel>
-                    </LegendItem>
-                  ))}
-                  {outOfBand && (
-                    <OutOfBandMessage>
-                      Some data is outside the specified bands.<br />It will not be shown in the legend.
-                    </OutOfBandMessage>
-                  )}
-                </>
-              )}
-            </LegendItemContainer>
-            {/* Render divider within the group, if not the last group */}
-            {index < legendItems.length - 1 && <LegendDivider />}
-          </LegendGroup>
-        );
-      })}
+      {legendItems.map((item, index) => (
+        <LegendLayerGroup
+          key={item.layerId}
+          item={item}
+          index={index}
+          isLast={index === legendItems.length - 1}
+          isMobile={isMobile}
+          openPopoverId={openPopoverId}
+          togglePopover={togglePopover}
+          layerPrefs={layerPrefs}
+          updateLayerPref={updateLayerPref}
+          visualisationDataByLayer={visualisationDataByLayer}
+          classMethod={state.layers?.[item.layerId]?.class_method}
+          popoverRef={popoverRef}
+        />
+      ))}
     </LegendContainer>
   );
 

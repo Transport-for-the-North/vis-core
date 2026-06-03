@@ -9,11 +9,16 @@
 export function jenksBreaks(data, numClasses) {
   // Sort data in ascending order
   const sortedData = [...data].sort((a, b) => a - b);
-  const n = sortedData.length;
+  
+  // Extract unique values to determine if Jenks is mathematically possible
+  const uniqueData = [...new Set(sortedData)];
 
-  if (n <= numClasses) {
-    return [...new Set(sortedData)];
+  // If there are fewer unique values than requested classes, just return the unique values
+  if (uniqueData.length <= numClasses) {
+    return uniqueData;
   }
+
+  const n = sortedData.length;
 
   // Initialize matrices
   const mat1 = Array(n + 1).fill(null).map(() => Array(numClasses + 1).fill(0));
