@@ -147,12 +147,17 @@ export class DownloadService extends BaseService {
       filename = "downloads.zip";
     } else if (
       responseType.includes("vnd.ms-excel.sheet.macroenabled") ||
-      responseType.includes("spreadsheetml") ||
-      url.toLowerCase().includes("xlsm") ||
-      url.toLowerCase().includes("xlsx")
+      url.toLowerCase().includes("xlsm")
     ) {
       filename = "downloads.xlsm";
+    } else if (
+      responseType.includes("spreadsheetml") ||
+      url.toLowerCase().includes("xlsx")
+    ) {
+      filename = "downloads.xlsx";
     } else {
+      filename = "downloads.csv";
+    }
       filename = "downloads.csv";
     }
 
