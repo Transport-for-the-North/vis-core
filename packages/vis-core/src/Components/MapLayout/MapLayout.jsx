@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
-import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
+import { useMapContext, useFilterContext, useLayerZoomMessage, useDebounced } from "hooks";
 import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
 import { defaultBgColour } from "defaults";
 import DualMaps from "./DualMaps";
@@ -59,13 +59,18 @@ const MobileLegendSlot = styled.section`
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
-  const isLoading = state.isLoading;
+  const isLoading = state.isLoading || state.visualisationLoadingCount > 0;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+
+  // Debounced copy of filterState used to gate map-action dispatches (UPDATE_PARAMETERISED_LAYER,
+  // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
+  // immediately on each selector interaction. Selector UI still updates from the live filterState.
+  const debouncedFilterState = useDebounced(filterState, 400);
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -104,7 +109,8 @@ export const MapLayout = () => {
   };
 
   /**
-   * Keep derived filters in sync with their source selection and metadata.
+   * Effect A (immediate): keep derived filters in sync with their source selection and metadata.
+   * Fires on every filterState change so the UI responds without waiting for the debounce.
    * For every filter that declares `deriveFromFilter`, we:
    * - read the current value of its source filter (`sourceParamName`)
    * - optionally apply override rules driven by other controller filters
@@ -200,8 +206,17 @@ export const MapLayout = () => {
         return;
       }
     }
+  }, [filterState, state.metadataTables, state.filters, filterDispatch]);
 
-    const validatedFilters = updateFilterValidity(state, filterState);
+  /**
+   * Effect B (debounced): validate filter options and dispatch all map actions
+   * (UPDATE_PARAMETERISED_LAYER, UPDATE_COLOR_SCHEME, etc.) after the debounce
+   * window settles. Because useFetchVisualisationData fires immediately when
+   * visualisation params change, this single debounce point ensures repaints and
+   * new data fetches are triggered together rather than immediately on each keystroke.
+   */
+  useEffect(() => {
+    const validatedFilters = updateFilterValidity(state, debouncedFilterState);
 
     if (JSON.stringify(validatedFilters) !== JSON.stringify(state.filters)) {
       dispatch({
@@ -214,7 +229,7 @@ export const MapLayout = () => {
       let selectedValue
       if (filter.values?.values && Array.isArray(filter.values.values)) {
         selectedValue = filter.values?.values.find(
-          (value) => value.paramValue === filterState[filter.id]
+          (value) => value.paramValue === debouncedFilterState[filter.id]
         );
       }
       if (!filter.visualisations[0].includes("Side")) {
@@ -226,13 +241,13 @@ export const MapLayout = () => {
           }
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], ...action.payload, ...additionalPayload },
+            payload: { filter, value: debouncedFilterState[filter.id], ...action.payload, ...additionalPayload },
           });
         });
       } else {
         filter.actions.forEach((action) => {
           let sides = "";
-          
+
           // Add the colour scheme to the payload
           let additionalPayload
           if (action.action === "UPDATE_COLOR_SCHEME") {
@@ -243,12 +258,12 @@ export const MapLayout = () => {
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], sides, ...action.payload, ...additionalPayload },
+            payload: { filter, value: debouncedFilterState[filter.id], sides, ...action.payload, ...additionalPayload },
           });
         });
       }
     });
-  }, [filterState, state.metadataTables, state.filters, dispatch, filterDispatch]);
+  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
