@@ -1,0 +1,1051 @@
+import React, { useState, useCallback, useRef } from 'react';
+import styled from 'styled-components';
+import { CloudArrowUpIcon, XMarkIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { api } from '../../services';
+import { validateCSVFile, validateCSVSchema, parseCSV } from '../../utils/csvValidation';
+import { isExcelFile, parseExcelWorkbook, extractSheetData, extractCellValue } from '../../utils/excelValidation';
+import { ValidationErrors } from './ValidationErrors';
+import { ValidationPreview } from './ValidationPreview';
+
+const CONTROL_COLOUR = 'rgb(220, 220, 220)';
+const CONTROL_BORDER_RADIUS = 6;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const UploadArea = styled.div`
+  border: 2px dashed ${props => {
+    if (props.$isDragging) return '#007bff';
+    if (props.$hasError) return '#d32f2f';
+    if (props.$isValid) return '#2e7d32';
+    return CONTROL_COLOUR;
+  }};
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  padding: 32px;
+  text-align: center;
+  background-color: ${props => {
+    if (props.$isDragging) return '#f0f7ff';
+    if (props.$hasError) return '#ffebee';
+    if (props.$isValid) return '#e8f5e9';
+    return '#fafafa';
+  }};
+  transition: all 0.2s ease;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.$disabled ? 0.6 : 1};
+  pointer-events: ${props => (props.$disabled ? 'none' : 'auto')};
+
+  &:hover {
+    border-color: ${props => {
+      if (props.$hasError) return '#d32f2f';
+      if (props.$isValid) return '#2e7d32';
+      return '#007bff';
+    }};
+    background-color: ${props => {
+      if (props.$isDragging) return '#e6f2ff';
+      if (props.$hasError) return '#ffcdd2';
+      if (props.$isValid) return '#c8e6c9';
+      return '#f5f5f5';
+    }};
+  }
+`;
+
+const UploadIcon = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: ${props => {
+    if (props.$hasError) return '#d32f2f';
+    if (props.$isValid) return '#2e7d32';
+    return '#666';
+  }};
+`;
+
+const UploadText = styled.div`
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 500;
+`;
+
+const UploadSubtext = styled.div`
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
+`;
+
+const FileInput = styled.input`
+  display: none;
+`;
+
+const FileInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  margin-top: 12px;
+`;
+
+const FileDetails = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+`;
+
+const FileName = styled.div`
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+`;
+
+const FileSize = styled.div`
+  font-size: 0.85rem;
+  color: #666;
+`;
+
+const RemoveButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-color: transparent;
+  color: #666;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #e0e0e0;
+    color: #d32f2f;
+  }
+`;
+
+const StatusMessage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  font-size: 0.9rem;
+  ${props => {
+    if (props.$type === 'success') {
+      return `
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+      `;
+    }
+    if (props.$type === 'error') {
+      return `
+        background-color: #ffebee;
+        color: #d32f2f;
+        border: 1px solid #ffcdd2;
+      `;
+    }
+    if (props.$type === 'validating') {
+      return `
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffc107;
+      `;
+    }
+    return '';
+  }}
+`;
+
+const UploadButton = styled.button`
+  padding: 12px 20px;
+  background-color: ${props => {
+    if (props.$variant === 'error') return '#c62828';
+    if (props.$disabled) return '#ccc';
+    return '#007bff';
+  }};
+  color: white;
+  border: none;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  font-size: 1rem;
+  font-family: 'Hanken Grotesk', sans-serif;
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  margin-top: 8px;
+  width: 100%;
+
+  &:hover:not(:disabled) {
+    background-color: ${props => {
+      if (props.$variant === 'error') return '#b71c1c';
+      if (props.$disabled) return '#ccc';
+      return '#0056b3';
+    }};
+  }
+`;
+
+const SuccessPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  text-align: center;
+`;
+
+const SuccessTitle = styled.h2`
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1b5e20;
+`;
+
+const SuccessFileName = styled.div`
+  font-size: 0.9rem;
+  color: #388e3c;
+  font-weight: 500;
+`;
+
+const SuccessMessage = styled.p`
+  margin: 0;
+  font-size: 0.95rem;
+  color: #2e7d32;
+  max-width: 480px;
+  line-height: 1.5;
+`;
+
+const SuccessResetButton = styled.button`
+  margin-top: 8px;
+  padding: 10px 20px;
+  background-color: transparent;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+  font-size: 0.9rem;
+  font-family: 'Hanken Grotesk', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #2e7d32;
+    color: #fff;
+  }
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+`;
+
+const ProgressFill = styled.div`
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.3s ease;
+  width: ${props => props.$progress || 0}%;
+`;
+
+const Spinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const SheetSelectorWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background-color: #f0f4ff;
+  border: 1px solid #c7d7f9;
+  border-radius: ${CONTROL_BORDER_RADIUS}px;
+`;
+
+const SheetSelectorLabel = styled.label`
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3b4a6b;
+`;
+
+const SheetSelectorHint = styled.span`
+  font-size: 0.8rem;
+  color: #6b7a99;
+  font-weight: 400;
+  margin-left: 6px;
+`;
+
+const SheetSelectorSelect = styled.select`
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #c7d7f9;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #222;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+
+  &:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+  }
+`;
+
+/**
+ * FileUpload component with CSV and Excel validation support.
+ *
+ * @param {Object} props
+ * @param {string}   props.endpoint               - API endpoint for file upload (default: '/api/files/upload')
+ * @param {Object}   props.validationSchema        - Validation schema (shared by CSV and Excel)
+ * @param {boolean}  props.validateBeforeUpload    - Enable pre-upload validation (default: true)
+ * @param {boolean}  props.showValidationPreview   - Show preview of data (default: true)
+ * @param {number}   props.maxPreviewRows          - Maximum rows to show in preview (default: 10)
+ * @param {number}   props.maxFileSize             - Maximum file size in MB (default: 10)
+ * @param {Array}    props.acceptedFileTypes       - Accepted MIME types
+ * @param {Function} props.onUploadSuccess         - Callback when upload succeeds
+ * @param {Function} props.onUploadError           - Callback when upload fails
+ * @param {Function} props.onValidationChange      - Callback when validation status changes
+ * @param {Function} props.onDataChange            - Callback when parsed data / validation result changes
+ * @param {Array}    props.extractCells            - Cells to extract from the workbook on load.
+ *   Each entry: { sheet: string, cell: string, key: string }
+ *   e.g. [{ sheet: 'LPA Info', cell: 'A3', key: 'lpaName' }]
+ *   Extracted values are passed to onDataChange as workbookMeta: { [key]: value }.
+ * @param {boolean}  props.disabled               - Disable the component
+ */
+export const FileUpload = ({
+  endpoint = '/api/files/upload',
+  validationSchema = null,
+  validateBeforeUpload = true,
+  showValidationPreview = true,
+  maxPreviewRows = 10,
+  maxFileSize = 10,
+  acceptedFileTypes = ['text/csv', 'application/vnd.ms-excel'],
+  extractCells = [],
+  onUploadSuccess = null,
+  onUploadError = null,
+  onValidationChange = null,
+  onDataChange = null,
+  disabled = false,
+  successTitle = 'Upload Successful',
+  successMessage = 'Your file has been received and is being processed. You will be notified once it is ready.',
+}) => {
+  const [file, setFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState(null);
+  const [parsedData, setParsedData] = useState(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState(null);
+
+  // Excel-specific state
+  const [sheetNames, setSheetNames] = useState([]);
+  const [selectedSheet, setSelectedSheet] = useState(null);
+  const [excelWorkbook, setExcelWorkbook] = useState(null);
+  const [workbookMeta, setWorkbookMeta] = useState(null);
+  const workbookMetaRef = useRef(null);
+
+  const syncWorkbookMeta = useCallback((meta) => {
+    workbookMetaRef.current = meta;
+    setWorkbookMeta(meta);
+  }, []);
+  // Tracks per-sheet validation results so all sheets must pass before upload
+  const [sheetValidationResults, setSheetValidationResults] = useState({});
+
+  // Post-upload success state
+  const [uploadComplete, setUploadComplete] = useState(false);
+  const [uploadCompleteFile, setUploadCompleteFile] = useState(null);
+
+  const fileInputRef = useRef(null);
+  // Prevents concurrent submissions and rapid re-clicks (debounce)
+  const uploadInProgressRef = useRef(false);
+  const lastUploadTimeRef = useRef(0);
+  const UPLOAD_DEBOUNCE_MS = 500;
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  // ─── CSV helpers ────────────────────────────────────────────────────────────
+
+  const parseCSVForPreview = useCallback(async (fileToParse) => {
+    setIsParsing(true);
+    try {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const csvContent = e.target.result;
+            const result = parseCSV(csvContent, { hasHeader: true });
+            const previewData = {
+              parsedData: result.data,
+              headers: result.headers,
+              errors: [],
+              warnings: [],
+              stats: {
+                totalRows: result.data.length,
+                validRows: result.data.length,
+                invalidRows: 0,
+                totalColumns: result.headers.length,
+                validColumns: result.headers.length,
+                invalidColumns: 0,
+              },
+            };
+            setParsedData(previewData);
+            if (onDataChange) onDataChange({ parsedData: previewData, validationResult: null });
+            resolve(previewData);
+          } catch (error) {
+            reject(new Error(`Failed to parse CSV: ${error.message}`));
+          }
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsText(fileToParse);
+      });
+    } catch (error) {
+      console.error('Parse error:', error);
+      setParsedData(null);
+      return null;
+    } finally {
+      setIsParsing(false);
+    }
+  }, [onDataChange]);
+
+  const validateCSV = useCallback(async (fileToValidate) => {
+    if (!validationSchema || !validateBeforeUpload) {
+      return { isValid: true, errors: [], warnings: [], stats: {} };
+    }
+    setIsValidating(true);
+    setUploadStatus({ type: 'validating', message: 'Validating file...' });
+    try {
+      const result = await validateCSVFile(fileToValidate, validationSchema);
+      const finalResult = {
+        ...result,
+        parsedData: result.parsedData || parsedData?.parsedData,
+        headers: result.headers || parsedData?.headers,
+      };
+      setValidationResult(finalResult);
+      if (onValidationChange) onValidationChange(finalResult.isValid, finalResult.errors, finalResult.warnings);
+      if (onDataChange) {
+        onDataChange({
+          parsedData: finalResult.parsedData
+            ? { parsedData: finalResult.parsedData, headers: finalResult.headers }
+            : parsedData,
+          validationResult: finalResult,
+        });
+      }
+      setUploadStatus(
+        finalResult.isValid
+          ? { type: 'success', message: 'File validation passed!' }
+          : { type: 'error', message: `Validation failed: ${finalResult.errors.length} error(s) found` }
+      );
+      return finalResult;
+    } catch (error) {
+      const errorResult = {
+        isValid: false,
+        errors: [{ type: 'validation_error', message: error.message }],
+        warnings: [],
+        stats: {},
+        parsedData: parsedData?.parsedData,
+        headers: parsedData?.headers,
+      };
+      setValidationResult(errorResult);
+      setUploadStatus({ type: 'error', message: `Validation error: ${error.message}` });
+      if (onValidationChange) onValidationChange(false, errorResult.errors, []);
+      if (onDataChange) onDataChange({ parsedData, validationResult: errorResult });
+      return errorResult;
+    } finally {
+      setIsValidating(false);
+    }
+  }, [validationSchema, validateBeforeUpload, onValidationChange, onDataChange, parsedData]);
+
+  // ─── Schema helpers ──────────────────────────────────────────────────────────
+
+  // Returns the schema to use for a given sheet name.
+  // If validationSchema has a `sheetSchemas` map, use the sheet-specific entry.
+  // Otherwise fall back to the top-level validationSchema for all sheets.
+  const getSchemaForSheet = useCallback((sheetName) => {
+    if (!validationSchema) return null;
+    if (validationSchema.sheetSchemas) {
+      return validationSchema.sheetSchemas[sheetName] ?? null;
+    }
+    return validationSchema;
+  }, [validationSchema]);
+
+  // ─── Excel helpers ───────────────────────────────────────────────────────────
+
+  const applySheetData = useCallback((workbook, sheetName, headerRowIndex = 0) => {
+    const { data, headers } = extractSheetData(workbook, sheetName, headerRowIndex);
+    const preview = {
+      parsedData: data,
+      headers,
+      errors: [],
+      warnings: [],
+      stats: {
+        totalRows: data.length,
+        validRows: data.length,
+        invalidRows: 0,
+        totalColumns: headers.length,
+        validColumns: headers.length,
+        invalidColumns: 0,
+      },
+    };
+    setParsedData(preview);
+    return { data, headers, preview };
+  }, []);
+
+  const validateExcelSheetData = useCallback((data, headers, preview, activeSchema) => {
+    if (!activeSchema || !validateBeforeUpload) return;
+
+    setIsValidating(true);
+    setUploadStatus({ type: 'validating', message: 'Validating sheet...' });
+
+    try {
+      const result = validateCSVSchema(data, activeSchema);
+      const finalResult = { ...result, parsedData: data, headers };
+      setValidationResult(finalResult);
+      if (onValidationChange) onValidationChange(finalResult.isValid, finalResult.errors, finalResult.warnings);
+      if (onDataChange) {
+        onDataChange({
+          parsedData: preview,
+          validationResult: finalResult,
+          workbookMeta: workbookMetaRef.current,
+        });
+      }
+      setUploadStatus(
+        finalResult.isValid
+          ? { type: 'success', message: 'Sheet validation passed!' }
+          : { type: 'error', message: `Validation failed: ${finalResult.errors.length} error(s) found` }
+      );
+    } catch (err) {
+      const errorResult = {
+        isValid: false,
+        errors: [{ type: 'validation_error', message: err.message }],
+        warnings: [],
+        stats: {},
+        parsedData: data,
+        headers,
+      };
+      setValidationResult(errorResult);
+      setUploadStatus({ type: 'error', message: `Validation error: ${err.message}` });
+      if (onValidationChange) onValidationChange(false, errorResult.errors, []);
+      if (onDataChange) {
+        onDataChange({
+          parsedData: preview,
+          validationResult: errorResult,
+          workbookMeta: workbookMetaRef.current,
+        });
+      }
+    } finally {
+      setIsValidating(false);
+    }
+  }, [validateBeforeUpload, onValidationChange, onDataChange]);
+
+  // Validates every sheet that has a matching schema and stores results in
+  // sheetValidationResults. Called once after the workbook is parsed so that
+  // the upload gate can require ALL sheets to pass, not just the selected one.
+  const validateAllExcelSheets = useCallback((workbook, names) => {
+    if (!validationSchema || !validateBeforeUpload) return;
+    const results = {};
+    names.forEach((name) => {
+      const schema = getSchemaForSheet(name);
+      if (!schema) return;
+      const headerRowIndex = schema?.headerRowIndex ?? 0;
+      const { data, headers } = extractSheetData(workbook, name, headerRowIndex);
+      try {
+        const result = validateCSVSchema(data, schema);
+        results[name] = { ...result, parsedData: data, headers };
+      } catch (err) {
+        results[name] = {
+          isValid: false,
+          errors: [{ type: 'validation_error', message: err.message }],
+          warnings: [],
+          stats: {},
+          parsedData: data,
+          headers,
+        };
+      }
+    });
+    setSheetValidationResults(results);
+    return results;
+  }, [validationSchema, validateBeforeUpload, getSchemaForSheet]);
+
+  const handleSheetSelect = useCallback((sheetName) => {
+    if (!excelWorkbook || !sheetName) return;
+    setSelectedSheet(sheetName);
+    setValidationResult(null);
+    setUploadStatus(null);
+
+    const activeSchema = getSchemaForSheet(sheetName);
+    const headerRowIndex = activeSchema?.headerRowIndex ?? 0;
+    const { data, headers, preview } = applySheetData(excelWorkbook, sheetName, headerRowIndex);
+    validateExcelSheetData(data, headers, preview, activeSchema);
+  }, [excelWorkbook, applySheetData, validateExcelSheetData, getSchemaForSheet]);
+
+  // ─── Shared file selection ────────────────────────────────────────────────
+
+  const handleFileSelect = useCallback(async (selectedFile) => {
+    if (!selectedFile) return;
+
+    const fileSizeMB = selectedFile.size / (1024 * 1024);
+    if (fileSizeMB > maxFileSize) {
+      const error = new Error(`File size exceeds maximum of ${maxFileSize}MB`);
+      setUploadStatus({ type: 'error', message: error.message });
+      if (onUploadError) onUploadError(error);
+      return;
+    }
+
+    const fileExtension = selectedFile.name.split('.').pop()?.toLowerCase();
+    const excelExtensions = ['xlsx', 'xlsm', 'xls'];
+    const isExcel = isExcelFile(selectedFile);
+    const isValidType =
+      isExcel ||
+      acceptedFileTypes.includes(selectedFile.type) ||
+      fileExtension === 'csv';
+
+    if (!isValidType) {
+      const error = new Error(`Invalid file type. Accepted types: ${acceptedFileTypes.join(', ')}, .xlsx, .xlsm, .xls`);
+      setUploadStatus({ type: 'error', message: error.message });
+      if (onUploadError) onUploadError(error);
+      return;
+    }
+
+    setFile(selectedFile);
+    setUploadStatus(null);
+    setValidationResult(null);
+    setParsedData(null);
+    setUploadProgress(0);
+    setSheetNames([]);
+    setSelectedSheet(null);
+    setExcelWorkbook(null);
+    syncWorkbookMeta(null);
+
+    if (isExcel) {
+      setIsParsing(true);
+      try {
+        const { workbook, sheetNames: names } = await parseExcelWorkbook(selectedFile);
+        setExcelWorkbook(workbook);
+        setSheetNames(names);
+
+        // Extract any configured cell values (e.g. LPA name from LPA Info!A3)
+        if (extractCells && extractCells.length > 0) {
+          const meta = {};
+          extractCells.forEach(({ sheet, cell, key }) => {
+            meta[key] = extractCellValue(workbook, sheet, cell);
+          });
+          syncWorkbookMeta(meta);
+          if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: meta });
+        }
+
+        // Validate all sheets up front so the upload gate can require every
+        // sheet with a schema to pass (not just the currently selected one).
+        validateAllExcelSheets(workbook, names);
+
+        // Auto-select when there is only one sheet
+        if (names.length === 1) {
+          setSelectedSheet(names[0]);
+          const activeSchema = getSchemaForSheet(names[0]);
+          const headerRowIndex = activeSchema?.headerRowIndex ?? 0;
+          const { data, headers, preview } = applySheetData(workbook, names[0], headerRowIndex);
+          validateExcelSheetData(data, headers, preview, activeSchema);
+        }
+      } catch (err) {
+        setUploadStatus({ type: 'error', message: err.message });
+      } finally {
+        setIsParsing(false);
+      }
+    } else {
+      await parseCSVForPreview(selectedFile);
+      if (validationSchema && validateBeforeUpload) {
+        await validateCSV(selectedFile);
+      }
+    }
+  }, [
+    maxFileSize,
+    acceptedFileTypes,
+    validationSchema,
+    validateBeforeUpload,
+    validateCSV,
+    onUploadError,
+    applySheetData,
+    validateExcelSheetData,
+    validateAllExcelSheets,
+    parseCSVForPreview,
+    extractCells,
+    syncWorkbookMeta,
+    onDataChange,
+    getSchemaForSheet,
+  ]);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (disabled) return;
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile) handleFileSelect(droppedFile);
+  }, [disabled, handleFileSelect]);
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    if (!disabled) setIsDragging(true);
+  }, [disabled]);
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleFileInputChange = useCallback((e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) handleFileSelect(selectedFile);
+  }, [handleFileSelect]);
+
+  const handleRemoveFile = useCallback(() => {
+    setFile(null);
+    setValidationResult(null);
+    setParsedData(null);
+    setUploadStatus(null);
+    setUploadProgress(0);
+    setSheetNames([]);
+    setSelectedSheet(null);
+    setExcelWorkbook(null);
+    syncWorkbookMeta(null);
+    setSheetValidationResults({});
+    setUploadComplete(false);
+    setUploadCompleteFile(null);
+    uploadInProgressRef.current = false;
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (onValidationChange) onValidationChange(true, [], []);
+    if (onDataChange) onDataChange({ parsedData: null, validationResult: null, workbookMeta: null });
+  }, [onValidationChange, onDataChange, syncWorkbookMeta]);
+
+  const handleReset = useCallback(() => {
+    handleRemoveFile();
+  }, [handleRemoveFile]);
+
+  const handleUpload = useCallback(async () => {
+    if (!file) return;
+
+    // Prevent concurrent submissions and rapid re-clicks
+    if (uploadInProgressRef.current) return;
+    const now = Date.now();
+    if (now - lastUploadTimeRef.current < UPLOAD_DEBOUNCE_MS) return;
+    uploadInProgressRef.current = true;
+    lastUploadTimeRef.current = now;
+
+    const fileIsExcel = isExcelFile(file);
+
+    if (fileIsExcel) {
+      // All sheets with a schema must have passed validation
+      if (validationSchema && validateBeforeUpload) {
+        const failingSheet = sheetNames.find((name) => {
+          const schema = getSchemaForSheet(name);
+          if (!schema) return false;
+          return sheetValidationResults[name]?.isValid !== true;
+        });
+        if (failingSheet) {
+          setUploadStatus({
+            type: 'error',
+            message: `Please fix validation errors on all sheets before uploading (sheet "${failingSheet}" has errors)`,
+          });
+          return;
+        }
+      }
+    } else {
+      // Re-validate CSV before upload
+      if (validationSchema && validateBeforeUpload) {
+        const result = await validateCSV(file);
+        if (!result.isValid) {
+          setUploadStatus({ type: 'error', message: 'Please fix validation errors before uploading' });
+          return;
+        }
+      }
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+    setUploadStatus({ type: 'validating', message: 'Uploading file...' });
+
+    try {
+      const response = await api.fileUploadService.uploadFile(endpoint, file, {
+        metadata: {
+          fileName: file.name,
+          fileSize: file.size,
+          validationPassed: validationResult?.isValid ?? true,
+          ...(selectedSheet ? { selectedSheet } : {}),
+        },
+        onProgress: (progress) => setUploadProgress(progress),
+      });
+
+      setUploadProgress(100);
+      setUploadCompleteFile(file);
+      setUploadComplete(true);
+      if (onUploadSuccess) onUploadSuccess(response, file);
+    } catch (error) {
+      setUploadStatus({ type: 'error', message: `Upload failed: ${error.message}` });
+      if (onUploadError) onUploadError(error, file);
+    } finally {
+      setIsUploading(false);
+      uploadInProgressRef.current = false;
+    }
+  }, [
+    file,
+    endpoint,
+    validationSchema,
+    validateBeforeUpload,
+    validateCSV,
+    validationResult,
+    selectedSheet,
+    sheetNames,
+    sheetValidationResults,
+    getSchemaForSheet,
+    onUploadSuccess,
+    onUploadError,
+  ]);
+
+  const fileIsExcel = file ? isExcelFile(file) : false;
+  const excelNeedsSheet = fileIsExcel && sheetNames.length > 1 && !selectedSheet;
+  const schemaRequiresValidation = validationSchema != null && validateBeforeUpload;
+
+  // For Excel every sheet that has a schema must have a passing result
+  const allExcelSheetsValid = !fileIsExcel || !validationSchema || !validateBeforeUpload
+    ? true
+    : sheetNames.every((name) => {
+        const schema = getSchemaForSheet(name);
+        if (!schema) return true;
+        return sheetValidationResults[name]?.isValid === true;
+      });
+
+  // True when validation has run and found errors (blocks upload and drives button colour)
+  const validationFailed = schemaRequiresValidation && (
+    fileIsExcel
+      ? (Object.keys(sheetValidationResults).length > 0 && !allExcelSheetsValid)
+      : (validationResult !== null && !validationResult.isValid)
+  );
+
+  const canUpload =
+    file &&
+    !isValidating &&
+    !isParsing &&
+    !isUploading &&
+    !excelNeedsSheet &&
+    (!schemaRequiresValidation || (fileIsExcel ? allExcelSheetsValid : (validationResult?.isValid ?? true)));
+
+  // Button appearance
+  const buttonVariant = validationFailed ? 'error' : 'default';
+  const failingSheetCount = fileIsExcel
+    ? sheetNames.filter((name) => {
+        const schema = getSchemaForSheet(name);
+        return schema && sheetValidationResults[name]?.isValid === false;
+      }).length
+    : 0;
+  const buttonLabel = isUploading
+    ? `Uploading… ${Math.round(uploadProgress)}%`
+    : excelNeedsSheet
+    ? 'Select a sheet to continue'
+    : validationFailed
+    ? fileIsExcel
+      ? `${failingSheetCount} sheet${failingSheetCount !== 1 ? 's' : ''} failed validation — cannot upload`
+      : `${validationResult?.errors?.length ?? 0} validation error${(validationResult?.errors?.length ?? 0) !== 1 ? 's' : ''} — cannot upload`
+    : 'Upload File';
+
+  const acceptAttr = [
+    ...acceptedFileTypes,
+    '.csv',
+    '.xlsx',
+    '.xlsm',
+    '.xls',
+  ].join(',');
+
+  if (uploadComplete) {
+    return (
+      <Container>
+        <SuccessPanel>
+          <CheckCircleIcon style={{ width: 56, height: 56, color: '#2e7d32' }} />
+          <SuccessTitle>{successTitle}</SuccessTitle>
+          {uploadCompleteFile && (
+            <SuccessFileName>
+              {uploadCompleteFile.name} &mdash; {formatFileSize(uploadCompleteFile.size)}
+            </SuccessFileName>
+          )}
+          <SuccessMessage>{successMessage}</SuccessMessage>
+          <SuccessResetButton onClick={handleReset}>Upload another file</SuccessResetButton>
+        </SuccessPanel>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      {!file ? (
+        <UploadArea
+          $isDragging={isDragging}
+          $hasError={uploadStatus?.type === 'error'}
+          $isValid={false}
+          $disabled={disabled}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => !disabled && fileInputRef.current?.click()}
+        >
+          <UploadIcon $hasError={false} $isValid={false}>
+            <CloudArrowUpIcon style={{ width: 48, height: 48 }} />
+          </UploadIcon>
+          <UploadText>Drag and drop your file here</UploadText>
+          <UploadSubtext>CSV or Excel (.xlsx, .xlsm, .xls) — or click to browse</UploadSubtext>
+          <UploadSubtext style={{ marginTop: '8px', fontSize: '0.8rem' }}>
+            Maximum file size: {maxFileSize}MB
+          </UploadSubtext>
+          <FileInput
+            ref={fileInputRef}
+            type="file"
+            accept={acceptAttr}
+            onChange={handleFileInputChange}
+            disabled={disabled}
+          />
+        </UploadArea>
+      ) : (
+        <>
+          <FileInfo>
+            <FileDetails>
+              <UploadIcon $hasError={validationResult && !validationResult.isValid} $isValid={validationResult?.isValid}>
+                {validationResult?.isValid ? (
+                  <CheckCircleIcon style={{ width: 24, height: 24 }} />
+                ) : validationResult && !validationResult.isValid ? (
+                  <ExclamationCircleIcon style={{ width: 24, height: 24 }} />
+                ) : (
+                  <CloudArrowUpIcon style={{ width: 24, height: 24 }} />
+                )}
+              </UploadIcon>
+              <div>
+                <FileName>{file.name}</FileName>
+                <FileSize>{formatFileSize(file.size)}</FileSize>
+              </div>
+            </FileDetails>
+            <RemoveButton onClick={handleRemoveFile} disabled={isUploading}>
+              <XMarkIcon style={{ width: 20, height: 20 }} />
+            </RemoveButton>
+          </FileInfo>
+
+          {/* Sheet selector — shown only for Excel files with multiple sheets */}
+          {fileIsExcel && sheetNames.length > 0 && (
+            <SheetSelectorWrapper>
+              <SheetSelectorLabel>
+                Select sheet to validate
+                {sheetNames.length > 1 && (
+                  <SheetSelectorHint>({sheetNames.length} sheets found)</SheetSelectorHint>
+                )}
+              </SheetSelectorLabel>
+              <SheetSelectorSelect
+                value={selectedSheet ?? ''}
+                onChange={(e) => handleSheetSelect(e.target.value)}
+                disabled={isValidating || isUploading}
+              >
+                {sheetNames.length > 1 && (
+                  <option value="" disabled>— choose a sheet —</option>
+                )}
+                {sheetNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </SheetSelectorSelect>
+            </SheetSelectorWrapper>
+          )}
+
+          {uploadStatus && (
+            <StatusMessage $type={uploadStatus.type}>
+              {uploadStatus.type === 'validating' && <Spinner />}
+              {uploadStatus.type === 'success' && <CheckCircleIcon style={{ width: 20, height: 20 }} />}
+              {uploadStatus.type === 'error' && <ExclamationCircleIcon style={{ width: 20, height: 20 }} />}
+              {uploadStatus.message}
+            </StatusMessage>
+          )}
+
+          {isUploading && (
+            <ProgressBar>
+              <ProgressFill $progress={uploadProgress} />
+            </ProgressBar>
+          )}
+
+          {showValidationPreview && (
+            validationResult?.parsedData ? (
+              <ValidationPreview
+                data={validationResult.parsedData}
+                headers={validationResult.headers}
+                errors={validationResult.errors}
+                maxRows={maxPreviewRows}
+              />
+            ) : parsedData ? (
+              <ValidationPreview
+                data={parsedData.parsedData}
+                headers={parsedData.headers}
+                errors={[]}
+                maxRows={maxPreviewRows}
+              />
+            ) : isParsing ? (
+              <StatusMessage $type="validating">
+                <Spinner />
+                Parsing file for preview...
+              </StatusMessage>
+            ) : null
+          )}
+
+          {validationResult && (
+            <ValidationErrors
+              errors={validationResult.errors}
+              warnings={validationResult.warnings}
+              stats={validationResult.stats}
+            />
+          )}
+
+          <UploadButton
+            onClick={handleUpload}
+            disabled={!canUpload || disabled}
+            $variant={buttonVariant}
+            $disabled={!canUpload || disabled}
+          >
+            {isUploading ? (
+              <>
+                <Spinner />
+                {buttonLabel}
+              </>
+            ) : validationFailed ? (
+              <>
+                <ExclamationCircleIcon style={{ width: 18, height: 18 }} />
+                {buttonLabel}
+              </>
+            ) : (
+              buttonLabel
+            )}
+          </UploadButton>
+        </>
+      )}
+    </Container>
+  );
+};
