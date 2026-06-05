@@ -134,9 +134,9 @@ export const ValidationErrors = ({ errors = [], warnings = [], stats = {} }) => 
             </ErrorTitle>
             <ToggleIcon>
               {isExpanded ? (
-                <ChevronUpIcon style={{ width: 20, height: 20 }} />
+                <ChevronUpIcon style={{ width: 25, height: 25 }} />
               ) : (
-                <ChevronDownIcon style={{ width: 20, height: 20 }} />
+                <ChevronDownIcon style={{ width: 25, height: 25 }} />
               )}
             </ToggleIcon>
           </ErrorHeader>
