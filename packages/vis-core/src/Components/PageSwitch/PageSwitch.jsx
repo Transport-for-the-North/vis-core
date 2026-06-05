@@ -234,6 +234,13 @@ export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
             );
           case "IFrameEmbed":
             return <IFrameEmbedPage config={pageConfig.config} />;
+          case "FormPage":
+            return <FormPageContent pageConfig={pageConfig} />;
+          case "CustomPage":
+            if (customPageComponent) {
+              return customPageComponent;
+            }
+            return <div>Custom page component not provided</div>;
           case "TableLayout":
             return <TableLayout config={pageConfig.config} />;
           case "DirectoryScorecards":
