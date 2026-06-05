@@ -217,7 +217,8 @@ const FormPageContent = ({ pageConfig }) => {
  * @property {string} pageConfig.type - The type of page layout to render.
  * @returns {JSX.Element} The rendered PageSwitch component.
  */
-export const PageSwitch = ({ pageConfig }) => {
+export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
+
   return (
     <PageContext.Provider value={pageConfig}>
       {(() => {
@@ -233,8 +234,6 @@ export const PageSwitch = ({ pageConfig }) => {
             );
           case "IFrameEmbed":
             return <IFrameEmbedPage config={pageConfig.config} />;
-          case "FormPage":
-            return <FormPageContent pageConfig={pageConfig} />;
           case "TableLayout":
             return <TableLayout config={pageConfig.config} />;
           case "DirectoryScorecards":
