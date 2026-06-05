@@ -11,7 +11,7 @@ import { DirectoryScorecardsPage } from "Components";
  * @property {string} pageConfig.type - The type of page layout to render.
  * @returns {JSX.Element} The rendered PageSwitch component.
  */
-export const PageSwitch = ({ pageConfig }) => {
+export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
 
   return (
     <PageContext.Provider value={pageConfig}>
@@ -28,6 +28,11 @@ export const PageSwitch = ({ pageConfig }) => {
             );
           case "IFrameEmbed":
             return <IFrameEmbedPage config={pageConfig.config} />;
+          case "CustomPage":
+            if (customPageComponent) {
+              return customPageComponent;
+            }
+            return <div>Custom page component not provided</div>;
           case "TableLayout":
             return <TableLayout config={pageConfig.config} />;
           case "DirectoryScorecards":
