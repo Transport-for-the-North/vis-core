@@ -326,6 +326,47 @@ class BaseService {
     const path = params ? `${withPathParams}?${params}` : withPathParams;
     return await this._post(path, data, {}, options.skipAuth);
   }
+
+  /**
+   * Makes a DELETE request to the specified path.
+   *
+   * @param {string} path - The path for the DELETE request.
+   * @param {Object} [addOptions={}] - Additional fetch options.
+   * @param {boolean} [skipAuth=false] - Flag to skip adding Authorization header.
+   * @returns {Promise<Object|null>} The response data, or null if no body.
+   */
+  async _delete(path, addOptions = {}, skipAuth = false) {
+    const url = this._buildUrl(path);
+    const jwtToken = skipAuth ? null : Cookies.get("token");
+    const options = {
+      method: "DELETE",
+      headers: {
+        ...(jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {}),
+        ...addOptions.headers,
+      },
+      ...addOptions,
+    };
+    const result = await fetch(url, options).catch((error) => console.log(error));
+    if (!result.ok) {
+      throw new Error(`HTTP error! status: ${result.status}`);
+    }
+    const text = await result.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  /**
+   * Makes a DELETE request to the specified sub-path with optional path parameters.
+   *
+   * @param {string} [subPath=""] - The sub-path for the DELETE request.
+   * @param {Object} [options={}] - Additional options.
+   * @property {Object} [options.pathParams={}] - Values for path placeholders.
+   * @property {boolean} [options.skipAuth=false] - Flag to skip Authorization header.
+   * @returns {Promise<Object|null>} The response data, or null if no body.
+   */
+  async delete(subPath = "", options = { pathParams: {}, skipAuth: false }) {
+    const withPathParams = this._applyPathParams(subPath, options?.pathParams || {});
+    return await this._delete(withPathParams, {}, options?.skipAuth ?? false);
+  }
 }
 
 export default BaseService;
