@@ -8,6 +8,7 @@ import { Login } from "Components/Login";
 import { Unauthorized } from "Components/Login/Unauthorised";
 import { TermsOfUse } from "Components/TermsOfUse";
 import { NotFound } from "Components/NotFoundPage/NotFoundPage";
+import { AdminPage } from "Components/AdminPage";
 import { Dashboard } from "layouts";
 import { AppContext, AuthProvider, ErrorProvider } from "contexts";
 import { api } from "services";
@@ -83,8 +84,15 @@ export function BaseApp({
         const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
 
+        // Extract AdminPage from appPages so it sits at appConfig.adminPage instead.
+        // This lets apps configure it via the template without polluting appPages.
+        const adminPageEntry = initialAppConfig.appPages?.find(p => p.type === 'AdminPage');
+        const filteredAppPages = initialAppConfig.appPages?.filter(p => p.type !== 'AdminPage') ?? [];
+
         setAppConfig({
           ...initialAppConfig,
+          appPages: filteredAppPages,
+          adminPage: adminPageEntry?.config ?? initialAppConfig.adminPage ?? null,
           apiSchema: apiSchema,
           defaultBands: bands,
           authenticationRequired: authenticationRequired
@@ -108,6 +116,9 @@ export function BaseApp({
   const NotFoundWithRoleValidation = isAuthRequired
     ? withRoleValidation(NotFound)
     : NotFound;
+  const AdminPageWithAuth = isAuthRequired
+    ? withRoleValidation(AdminPage, { adminOnly: true })
+    : AdminPage;
 
   // Standard routes
   const standardRoutes = (
@@ -115,10 +126,16 @@ export function BaseApp({
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<HomePageWithRoleValidation />} />
+      {appConfig.adminPage && (
+        <Route path="/admin" element={<AdminPageWithAuth />} />
+      )}
       {appConfig.appPages.map((page) => {
-        const PageComponent = isAuthRequired
-          ? withRoleValidation(PageSwitch)
-          : PageSwitch;
+        let PageComponent;
+        if (!isAuthRequired) {
+          PageComponent = PageSwitch;
+        } else {
+          PageComponent = withRoleValidation(PageSwitch, { adminOnly: page.adminOnly ?? false });
+        }
         const WrappedPageComponent = composeHOCs(
           withWarning,
           withTermsOfUse

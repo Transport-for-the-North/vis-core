@@ -7,6 +7,7 @@ import { CoordinatePreviewMap } from "Components/CoordinatePreviewMap/Coordinate
 import { TableLayout } from "Components/TableLayout/TableLayout";
 import { SVGGalleryManager } from "Components/SvgGalleryManager/SvgGalleryManager";
 import { DirectoryScorecardsPage } from "Components/DirectoryScorecardsPage/DirectoryScorecardsPage";
+import { AdminPage } from "Components/AdminPage";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
 import { bngToWgs84 } from "utils/coordinates";
 
@@ -261,6 +262,8 @@ export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
                 <SVGGalleryManager config={pageConfig.config} />
               </FilterProvider>
             );
+          case "AdminPage":
+            return <AdminPage />;
           default:
             return <div>Nothing</div>;
         }
