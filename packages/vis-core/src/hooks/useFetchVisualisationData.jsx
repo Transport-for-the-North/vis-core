@@ -92,7 +92,7 @@ const toSimpleParamsMap = (paramsMap = {}) => {
  * @param {Array|Object} response - The raw API response.
  * @returns {Array} - The unwrapped data array, or the original response if not a recognised envelope.
  */
-const unwrapApiResponse = (response) => {
+export const unwrapApiResponse = (response) => {
   if (
     response !== null &&
     typeof response === 'object' &&
