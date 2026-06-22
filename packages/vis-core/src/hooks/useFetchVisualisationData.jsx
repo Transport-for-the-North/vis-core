@@ -86,6 +86,25 @@ const toSimpleParamsMap = (paramsMap = {}) => {
 };
 
 /**
+ * Unwraps a `{ data, metadata }` API response envelope if present.
+ * Returns the inner `data` array directly. Plain array responses are passed through as-is.
+ *
+ * @param {Array|Object} response - The raw API response.
+ * @returns {Array} - The unwrapped data array, or the original response if not a recognised envelope.
+ */
+export const unwrapApiResponse = (response) => {
+  if (
+    response !== null &&
+    typeof response === 'object' &&
+    !Array.isArray(response) &&
+    Array.isArray(response.data)
+  ) {
+    return response.data;
+  }
+  return response;
+};
+
+/**
  * Helper: Checks whether all required params in a map have a non-null/undefined value.
  *
  * @param {Object<string, {value:any, required?:boolean}>} paramsMap - Map of param definitions.
@@ -416,12 +435,14 @@ export const useFetchVisualisationData = (
         const currentSignal = abortControllerRef.current.signal;
 
         try {
-          const responseData = await api.baseService.get(path, {
+          const rawResponse = await api.baseService.get(path, {
             pathParams: pathParamsForApi,
             queryParams: queryParamsForApi,
             skipAuth: !requiresAuth,
             signal: currentSignal,
           });
+
+          const responseData = unwrapApiResponse(rawResponse);
 
           // Only set data if request wasn't aborted
           if (currentSignal.aborted) {
