@@ -266,6 +266,7 @@ const toTimeSeries = (data) =>
   (data || []).map((point) => ({
     label: String(point.year),
     value: point.value,
+    dmValue: point.dmValue ?? null,
   }));
 
 /**
@@ -598,6 +599,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   );
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
+  const dmStroke = config.dmLineColor || "#999999";
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n) : "";
@@ -609,6 +611,11 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         items.map((i) => i.label)
       ),
     [config, items]
+  );
+
+  // Check if any point has a dmValue, so we know whether to render the second line
+  const hasDmValues = items.some(
+    (i) => i.dmValue !== null && i.dmValue !== undefined
   );
 
   return (
@@ -637,14 +644,32 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           formatter={formatter}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
         />
+        {hasDmValues && (
+          <RLegend
+            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+          />
+        )}
         <RLine
           type="monotone"
           dataKey="value"
+          name={hasDmValues ? "DS" : (config.title || "Value")}
           stroke={stroke}
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
         />
+        {hasDmValues && (
+          <RLine
+            type="monotone"
+            dataKey="dmValue"
+            name="DM"
+            stroke={dmStroke}
+            strokeWidth={2}
+            strokeDasharray="4 4"
+            dot={false}
+            activeDot={{ r: 4 }}
+          />
+        )}
       </RLineChart>
     </ChartSection>
   );
