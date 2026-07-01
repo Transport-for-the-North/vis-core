@@ -1,6 +1,10 @@
 import { forEach } from "lodash";
 import { convertStringToNumber, numberWithCommas, formatNumber } from "utils";
 
+// Module-scope, monomorphic reducers for min/max
+const minReducer = (min, v) => (v < min ? v : min);
+const maxReducer = (max, v) => (v > max ? v : max);
+
 /**
  * Interpolates widths for color stops based on width stops.
  *
@@ -445,13 +449,13 @@ export const extractDataValues = (data) => {
 export const getOutOfBandFlags = (data, numericEntries) => {
   const bandEdges = (numericEntries || []).filter(Number.isFinite);
   if (bandEdges.length < 2) return { belowMin: false, aboveMax: false };
-  const bandMin = Math.min(...bandEdges);
-  const bandMax = Math.max(...bandEdges);
+  const bandMin = bandEdges.reduce(minReducer, Infinity);
+  const bandMax = bandEdges.reduce(maxReducer, -Infinity);
   const values = extractDataValues(data);
   if (values.length === 0) return { belowMin: false, aboveMax: false };
   return {
-    belowMin: Math.min(...values) < bandMin,
-    aboveMax: Math.max(...values) > bandMax,
+    belowMin: values.reduce(minReducer, Infinity) < bandMin,
+    aboveMax: values.reduce(maxReducer, -Infinity) > bandMax,
   };
 };
 
