@@ -7,7 +7,6 @@ import { CoordinatePreviewMap } from "Components/CoordinatePreviewMap/Coordinate
 import { TableLayout } from "Components/TableLayout/TableLayout";
 import { SVGGalleryManager } from "Components/SvgGalleryManager/SvgGalleryManager";
 import { DirectoryScorecardsPage } from "Components/DirectoryScorecardsPage/DirectoryScorecardsPage";
-import { AdminPage } from "Components/AdminPage";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
 import { bngToWgs84 } from "utils/coordinates";
 
@@ -262,8 +261,9 @@ export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
                 <SVGGalleryManager config={pageConfig.config} />
               </FilterProvider>
             );
-          case "AdminPage":
-            return <AdminPage />;
+          // Note: "AdminPage" is intentionally not handled here. BaseApp removes it from
+          // appPages and mounts it directly at /admin (via withRoleValidation), so it never
+          // flows through PageSwitch.
           default:
             return <div>Nothing</div>;
         }
