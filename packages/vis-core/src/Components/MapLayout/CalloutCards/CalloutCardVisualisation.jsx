@@ -508,6 +508,8 @@ export const CalloutCardVisualisation = ({
                         label: network,
                       }));
                       configs.xKey = "label";
+                    } else if (chart.type === "line") {
+                      chartData = chart.values;
                     } else {
                       // Data formatted for single bar
                       configs.columns = chart.values.map((obj) => ({

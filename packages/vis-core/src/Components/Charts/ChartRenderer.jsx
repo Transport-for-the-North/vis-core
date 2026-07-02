@@ -255,6 +255,21 @@ const toSeries = (config, data) =>
   }));
 
 /**
+ * Transforms a time-series array (e.g. [{year, value}, ...]) into chart items.
+ * Used for line charts plotting continuous data over time, as opposed to
+ * toSeries which handles a fixed set of category columns.
+ *
+ * @param {Array<{year: number|string, value: number}>} data - Array of time-series points
+ * @returns {Array} - Array of series objects with label and value
+ */
+const toTimeSeries = (data) =>
+  (data || []).map((point) => ({
+    label: String(point.year),
+    value: point.value,
+    dmValue: point.dmValue ?? null,
+  }));
+
+/**
  * Renders a responsive bar chart using Recharts
  * @param {Object} props - Component props
  * @param {Object} props.config - Chart configuration object
@@ -578,9 +593,13 @@ const BarChartMultiple = ({
  * @returns {JSX.Element} - Line chart component with X/Y axes, grid, and tooltip
  */
 const LineSeriesChart = ({ config, data, formatters }) => {
-  const items = React.useMemo(() => toSeries(config, data), [config, data]);
+  const items = React.useMemo(
+    () => (Array.isArray(data) ? toTimeSeries(data) : toSeries(config, data)),
+    [config, data]
+  );
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
+  const dmStroke = config.dmLineColor || "#999999";
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n) : "";
@@ -592,6 +611,11 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         items.map((i) => i.label)
       ),
     [config, items]
+  );
+
+  // Check if any point has a dmValue, so we know whether to render the second line
+  const hasDmValues = items.some(
+    (i) => i.dmValue !== null && i.dmValue !== undefined
   );
 
   return (
@@ -607,7 +631,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           angle={DEFAULTS.DIMENSIONS.xAngle}
           textAnchor="end"
           height={xAxisHeight}
-          interval={0}
+          interval={Array.isArray(data) ? "preserveStartEnd" : 0}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
         />
         <RYAxis
@@ -620,14 +644,32 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           formatter={formatter}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
         />
+        {hasDmValues && (
+          <RLegend
+            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+          />
+        )}
         <RLine
           type="monotone"
           dataKey="value"
+          name={hasDmValues ? "DS" : (config.title || "Value")}
           stroke={stroke}
           strokeWidth={2}
-          dot={{ r: 2 }}
+          dot={false}
           activeDot={{ r: 4 }}
         />
+        {hasDmValues && (
+          <RLine
+            type="monotone"
+            dataKey="dmValue"
+            name="DM"
+            stroke={dmStroke}
+            strokeWidth={2}
+            strokeDasharray="4 4"
+            dot={false}
+            activeDot={{ r: 4 }}
+          />
+        )}
       </RLineChart>
     </ChartSection>
   );
