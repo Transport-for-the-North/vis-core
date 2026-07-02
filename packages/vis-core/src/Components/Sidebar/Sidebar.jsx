@@ -271,7 +271,7 @@ export const Sidebar = ({
         {filters && Array.isArray(filters) && filters.length > 0 && (
           <SelectorSection
             filters={filters}
-            onFilterChange={(filter, value) => onFilterChange(filter, value)}
+            onFilterChange={onFilterChange}
             bgColor={bgColor}
             downloadPath={downloadPath}
             downloadShapefilePath = {downloadShapefilePath}

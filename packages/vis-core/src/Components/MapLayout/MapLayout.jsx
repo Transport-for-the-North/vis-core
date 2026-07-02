@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
@@ -101,12 +101,12 @@ export const MapLayout = () => {
     }
   }, [pageContext, filterDispatch]);
 
-  const handleFilterChange = (filter, value) => {
+  const handleFilterChange = useCallback((filter, value) => {
     filterDispatch({
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value, filter },
     });
-  };
+  }, [filterDispatch]);
 
   /**
    * Effect A (immediate): keep derived filters in sync with their source selection and metadata.

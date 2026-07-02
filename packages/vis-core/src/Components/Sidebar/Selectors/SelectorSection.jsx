@@ -7,7 +7,7 @@ import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 import { AppContext } from "contexts";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from "./MapFeatureSelect";
 import { CheckboxSelector, MapFeatureSelectAndPan } from ".";
 import { api } from "services";
@@ -73,7 +73,7 @@ const NoDataParagraph = styled.p``;
 export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, downloadShapefilePath, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
   const { state: mapState } = useMapContext();
-  const { state: filterState } = useFilterContext();
+  const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const [isDownloading, setIsDownloading] = useState(false);
   const [isShapefileDownloading, setIsShapefileDownloading] = useState(false);
   const [requestError, setRequestError] = useState(null);
@@ -86,9 +86,9 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
   const apiRouteShapefile = downloadShapefilePath;
   const requiresAuthShapefile = checkSecurityRequirements(apiSchema, apiRouteShapefile);
 
-  const handleFilterChange = (filter, value) => {
+  const handleFilterChange = useCallback((filter, value) => {
     onFilterChange(filter, value);
-  };
+  }, [filterDispatch]);
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -264,7 +264,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                     />
                   )}
                   {filter.type === "slider" && (
@@ -272,7 +272,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id] || filter.min || filter.values[0]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                     />
                   )}
                   {filter.type === "toggle" && (
@@ -283,7 +283,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                         filterState[filter.id] ||
                         filter.values.values[0].paramValue
                       }
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -295,7 +295,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                         filterState[filter.id] ||
                         filter.values.values[0].paramValue
                       }
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -304,7 +304,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -313,7 +313,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -322,7 +322,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
