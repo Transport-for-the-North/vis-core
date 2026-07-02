@@ -89,8 +89,13 @@ export function Navbar() {
     : [];
   if (typeof navUserRoles === 'string') navUserRoles = [navUserRoles];
   const lowerNavRoles = navUserRoles.map(r => r.toLowerCase());
-  const navAppName = getAppName();
-  const isAdmin = lowerNavRoles.some(r => r.endsWith('_admin'));
+  const navAppName = (getAppName() || '').toLowerCase();
+  // Show admin-only nav/pages to admins (`<app>_admin`/`all_admin`) and superusers
+  // (`<app>_superuser`/`all_superuser`) of THIS app. Another app's roles are not accepted.
+  const isAdmin = lowerNavRoles.some(r =>
+    r === `${navAppName}_admin` || r === 'all_admin' ||
+    r === `${navAppName}_superuser` || r === 'all_superuser'
+  );
 
   const navAppContext = {
     ...appContext,

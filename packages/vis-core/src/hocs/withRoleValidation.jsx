@@ -28,10 +28,20 @@ export const withRoleValidation = (WrappedComponent, { adminOnly = false } = {})
         const isAuthenticated = !!token;
         const lowerCaseUserRoles = userRoles.map(role => role.toLowerCase());
 
-        const appRoles = [`${appName}_user`, `${appName}_admin`, `all_user`, `all_admin`];
+        // appName is lower-cased to match the (already lower-cased) user roles.
+        const lowerAppName = (appName || '').toLowerCase();
+        // Admins (full access) and superusers (view-only) of THIS app, plus their cross-app
+        // equivalents. Another app's roles are NOT accepted.
+        const adminRoles = [`${lowerAppName}_admin`, 'all_admin'];
+        const superuserRoles = [`${lowerAppName}_superuser`, 'all_superuser'];
+        // Admin-only pages admit admins and superusers of this app.
+        const adminAccessRoles = [...adminRoles, ...superuserRoles];
+        // General (non-admin) app access allows this app's user/admin/superuser plus the
+        // cross-app `all_*` roles.
+        const appRoles = [`${lowerAppName}_user`, 'all_user', ...adminAccessRoles];
 
         const hasRequiredRole = adminOnly
-            ? lowerCaseUserRoles.some(role => role.endsWith('_admin'))
+            ? lowerCaseUserRoles.some(role => adminAccessRoles.includes(role))
             : lowerCaseUserRoles.some(role => appRoles.includes(role));
 
         if (!isAuthenticated) {
