@@ -55,6 +55,7 @@ jest.mock("Components", () => ({
     showOnMobile,
     hideCardHandleOnMobile,
     updatedCardNames = [],
+    updatedCardExpiresAtByName = {},
     onUpdatedCardsClicked,
   }) => {
     return (
@@ -64,6 +65,7 @@ jest.mock("Components", () => ({
       >
         Mock ScrollableContainer - {showOnMobile.toString()} - {hideCardHandleOnMobile.toString()}
         <span data-testid="updated-card-names">{updatedCardNames.join(",")}</span>
+        <span data-testid="updated-card-expiries">{JSON.stringify(updatedCardExpiresAtByName)}</span>
         <button onClick={onUpdatedCardsClicked}>clear all updates</button>
         {children}
       </div>
@@ -185,6 +187,31 @@ describe("Test to render a CalloutVisualisationCard", () => {
 
     await user.click(screen.getByText("clear all updates"));
     expect(screen.getByTestId("updated-card-names")).toHaveTextContent("");
+  });
+
+  it("preserves existing update expiry when another card updates", async () => {
+    const user = userEvent.setup();
+    let now = 0;
+    const nowSpy = jest.spyOn(Date, "now").mockImplementation(() => now);
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...props} />
+      </MapContext.Provider>
+    );
+
+    await user.click(screen.getByRole("button", { name: "updated: Test Card" }));
+    expect(screen.getByTestId("updated-card-expiries")).toHaveTextContent(
+      JSON.stringify({ calloutCard: 2800 })
+    );
+
+    now = 1000;
+    await user.click(screen.getByRole("button", { name: "updated: Test Card1" }));
+    expect(screen.getByTestId("updated-card-expiries")).toHaveTextContent(
+      JSON.stringify({ calloutCard: 2800, calloutCard1: 3800 })
+    );
+
+    nowSpy.mockRestore();
   });
 });
 

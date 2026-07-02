@@ -16,6 +16,8 @@ const { PADDING } = CARD_CONSTANTS;
 
 const MOBILE_Q = "(max-width: 900px)";
 const EMPTY_UPDATED_CARD_NAMES = [];
+const EMPTY_UPDATED_CARD_EXPIRIES = {};
+const UPDATE_MARKER_TIMEOUT_MS = 2800;
 
 /**
  * Resolves the mobile media query from theme when supplied, with a local fallback.
@@ -203,6 +205,7 @@ const normaliseUpdatedNames = (updatedCardNames) => {
  * @param {boolean} [props.hideCardHandleOnMobile=true]
  * @param {boolean} [props.showOnMobile=true]
  * @param {string[]|Set<string>} [props.updatedCardNames=[]]
+ * @param {Object<string, number>} [props.updatedCardExpiresAtByName] - Fixed auto-clear expiry times by card name.
  * @param {Function} [props.onUpdatedCardSeen]
  * @param {Function} [props.onUpdatedCardsClicked]
  * @param {Function} [props.onOverflowHintClick]
@@ -215,6 +218,7 @@ export const ScrollableContainer = ({
   hideCardHandleOnMobile = true,
   showOnMobile = true,
   updatedCardNames = EMPTY_UPDATED_CARD_NAMES,
+  updatedCardExpiresAtByName = EMPTY_UPDATED_CARD_EXPIRIES,
   onUpdatedCardSeen,
   onUpdatedCardsClicked,
   onOverflowHintClick,
@@ -422,19 +426,33 @@ export const ScrollableContainer = ({
     const isInView = isElementInScrollView(element);
 
     /**
-     * Keep the marker if the updated card is out of view or collapsed.
-     * If it is open and visible, clear after a short timeout.
+     * Keep the marker if the updated card is out of view or collapsed. If it is
+     * open and visible, clear when the card-level marker reaches the same expiry.
      */
     if (isOpen && isInView) {
+      const autoClearAt = updatedCardExpiresAtByName[name];
+      const timeoutMs =
+        typeof autoClearAt === "number"
+          ? Math.max(0, autoClearAt - Date.now())
+          : UPDATE_MARKER_TIMEOUT_MS;
+
       updatedSeenTimerRef.current = setTimeout(() => {
-        onUpdatedCardSeen?.(name);
-      }, 2800);
+        const currentElement = getCardElementByName(name);
+        const isStillOpen =
+          currentElement?.getAttribute("data-callout-card-open") === "true";
+
+        if (isStillOpen && isElementInScrollView(currentElement)) {
+          onUpdatedCardSeen?.(name);
+        }
+      }, timeoutMs);
     }
   }, [
     clearUpdatedSeenTimer,
+    getCardElementByName,
     getFirstUpdatedCardElement,
     isElementInScrollView,
     onUpdatedCardSeen,
+    updatedCardExpiresAtByName,
     updatedNames,
   ]);
 

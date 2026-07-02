@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapVisualisation } from "./MapVisualisation";
 import { ScrollableContainer } from "Components";
 import { BaseCalloutCardVisualisation } from "./CalloutCards/BaseCalloutCardVisualisation";
 
+const UPDATE_MARKER_TIMEOUT_MS = 2800;
 
 /**
  * VisualisationManager component that renders the appropriate visualizations
@@ -51,7 +52,12 @@ export const VisualisationManager = ({
   const firstVisibleCardsRef = useRef(new Set());
 
   const [visibleCount, setVisibleCount] = useState(0);
-  const [updatedCardNames, setUpdatedCardNames] = useState(() => new Set());
+  const [updatedCardExpiries, setUpdatedCardExpiries] = useState({});
+
+  const updatedCardNames = useMemo(
+    () => Object.keys(updatedCardExpiries),
+    [updatedCardExpiries]
+  );
 
   /**
    * Tracks whether a callout card currently has renderable data and refreshes
@@ -96,14 +102,26 @@ export const VisualisationManager = ({
 
   /**
    * Marks a card as updated until the card or stack-level marker is acknowledged.
+   * Stores each card's fixed auto-clear expiry so unrelated interactions do not
+   * restart existing card timers.
    *
    * @param {string} name - Visualisation/card identifier.
+   * @param {Object} [updateInfo] - Timing details from the updated card.
+   * @param {number} [updateInfo.autoClearAt] - Epoch time when the marker should clear.
    */
-  const handleCardUpdated = useCallback((name) => {
-    setUpdatedCardNames((prev) => {
-      const next = new Set(prev);
-      next.add(name);
-      return next;
+  const handleCardUpdated = useCallback((name, updateInfo = {}) => {
+    const autoClearAt =
+      typeof updateInfo.autoClearAt === "number"
+        ? updateInfo.autoClearAt
+        : Date.now() + UPDATE_MARKER_TIMEOUT_MS;
+
+    setUpdatedCardExpiries((prev) => {
+      if (prev[name] === autoClearAt) return prev;
+
+      return {
+        ...prev,
+        [name]: autoClearAt,
+      };
     });
   }, []);
 
@@ -115,11 +133,11 @@ export const VisualisationManager = ({
   const clearUpdatedCardMarker = useCallback((name) => {
     if (!name) return;
 
-    setUpdatedCardNames((prev) => {
-      if (!prev.has(name)) return prev;
+    setUpdatedCardExpiries((prev) => {
+      if (!(name in prev)) return prev;
 
-      const next = new Set(prev);
-      next.delete(name);
+      const next = { ...prev };
+      delete next[name];
       return next;
     });
   }, []);
@@ -128,7 +146,7 @@ export const VisualisationManager = ({
    * Clears all stack-level update markers after the user clicks the update hint.
    */
   const clearUpdatedCardMarkers = useCallback(() => {
-    setUpdatedCardNames(new Set());
+    setUpdatedCardExpiries({});
   }, []);
 
   const showOnMobile = visibleCount > 0;
@@ -162,8 +180,10 @@ export const VisualisationManager = ({
       )
     );
 
-    setUpdatedCardNames((prev) => {
-      return new Set([...prev].filter((name) => newOrder.includes(name)));
+    setUpdatedCardExpiries((prev) => {
+      return Object.fromEntries(
+        Object.entries(prev).filter(([name]) => newOrder.includes(name))
+      );
     });
   }, [visualisationConfigs]);
 
@@ -173,7 +193,8 @@ export const VisualisationManager = ({
       <ScrollableContainer
         showOnMobile={showOnMobile}
         hideCardHandleOnMobile
-        updatedCardNames={[...updatedCardNames]}
+        updatedCardNames={updatedCardNames}
+        updatedCardExpiresAtByName={updatedCardExpiries}
         onUpdatedCardSeen={clearUpdatedCardMarker}
         onUpdatedCardsClicked={clearUpdatedCardMarkers}
       >
@@ -193,7 +214,7 @@ export const VisualisationManager = ({
               onVisibilityChange={(isVisible) =>
                 handleCardVisibility(name, isVisible)
               }
-              onCardUpdated={() => handleCardUpdated(name)}
+              onCardUpdated={(updateInfo) => handleCardUpdated(name, updateInfo)}
               onCardUpdateAcknowledged={() => clearUpdatedCardMarker(name)}
             />
           );

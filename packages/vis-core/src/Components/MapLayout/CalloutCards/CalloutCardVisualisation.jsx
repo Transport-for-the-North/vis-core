@@ -18,6 +18,7 @@ import { CARD_CONSTANTS } from "defaults";
 
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
+const UPDATE_MARKER_TIMEOUT_MS = 2800;
 
 /**
  * Styled component for the parent container.
@@ -315,7 +316,7 @@ const safeStringify = (value) => {
  * @param {string} [props.cardName] - Optional name for the card.
  * @param {Function} [props.onUpdate] - Backwards-compatible function to call when the card first becomes visible.
  * @param {Function} [props.onFirstVisible] - Function to call when the card first becomes visible.
- * @param {Function} [props.onCardUpdated] - Callback fired when hydrated card data changes.
+ * @param {Function} [props.onCardUpdated] - Callback fired with update expiry details when hydrated card data changes.
  * @param {Function} [props.onCardUpdateAcknowledged] - Callback fired when the user opens an updated card.
  * @param {Object} props.data - Data used by the card.
  * @param {boolean} props.isLoading- Whether this is the initial loading state.
@@ -422,8 +423,10 @@ export const CalloutCardVisualisation = ({
 
     previousDataSignatureRef.current = dataUpdateSignature;
 
+    const autoClearAt = Date.now() + UPDATE_MARKER_TIMEOUT_MS;
+
     setRecentlyUpdated(true);
-    onCardUpdated?.();
+    onCardUpdated?.({ autoClearAt, timeoutMs: UPDATE_MARKER_TIMEOUT_MS });
 
     if (updatePingTimerRef.current) {
       clearTimeout(updatePingTimerRef.current);
@@ -438,7 +441,7 @@ export const CalloutCardVisualisation = ({
       if (isVisibleRef.current) {
         setRecentlyUpdated(false);
       }
-    }, 2800);
+    }, Math.max(0, autoClearAt - Date.now()));
   }, [actuallyVisible, dataUpdateSignature, onCardUpdated]);
 
   /**

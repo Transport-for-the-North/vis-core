@@ -49,6 +49,7 @@ describe("ScrollableContainer component test", () => {
 
     it("marks an open visible updated card as seen after the timeout", () => {
         jest.useFakeTimers();
+        jest.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
         const onUpdatedCardSeen = jest.fn();
         const rectSpy = jest.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
             top: 0,
@@ -76,6 +77,108 @@ describe("ScrollableContainer component test", () => {
         });
 
         expect(onUpdatedCardSeen).toHaveBeenCalledWith("card-a");
+
+        rectSpy.mockRestore();
+        jest.useRealTimers();
+    });
+
+    it("does not restart an unchanged card's seen timer when rerendered", () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+        const onUpdatedCardSeen = jest.fn();
+        const rectSpy = jest.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+            top: 0,
+            bottom: 20,
+            left: 0,
+            right: 20,
+            width: 20,
+            height: 20,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
+        });
+        const expiresAt = Date.now() + 2800;
+
+        const { rerender } = render(
+            <ScrollableContainer
+                updatedCardNames={["card-a"]}
+                updatedCardExpiresAtByName={{ "card-a": expiresAt }}
+                onUpdatedCardSeen={onUpdatedCardSeen}
+            >
+                <div data-callout-card-name="card-a" data-callout-card-open="true">Card A</div>
+            </ScrollableContainer>
+        );
+
+        act(() => {
+            jest.advanceTimersByTime(1000);
+        });
+
+        rerender(
+            <ScrollableContainer
+                updatedCardNames={["card-a"]}
+                updatedCardExpiresAtByName={{ "card-a": expiresAt }}
+                onUpdatedCardSeen={onUpdatedCardSeen}
+            >
+                <div data-callout-card-name="card-a" data-callout-card-open="true">Card A</div>
+            </ScrollableContainer>
+        );
+
+        act(() => {
+            jest.advanceTimersByTime(1799);
+        });
+        expect(onUpdatedCardSeen).not.toHaveBeenCalled();
+
+        act(() => {
+            jest.advanceTimersByTime(1);
+        });
+        expect(onUpdatedCardSeen).toHaveBeenCalledWith("card-a");
+
+        rectSpy.mockRestore();
+        jest.useRealTimers();
+    });
+
+    it("does not clear the pill if the card closes before its shared expiry", () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+        const onUpdatedCardSeen = jest.fn();
+        const rectSpy = jest.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+            top: 0,
+            bottom: 20,
+            left: 0,
+            right: 20,
+            width: 20,
+            height: 20,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
+        });
+        const expiresAt = Date.now() + 2800;
+
+        const { rerender } = render(
+            <ScrollableContainer
+                updatedCardNames={["card-a"]}
+                updatedCardExpiresAtByName={{ "card-a": expiresAt }}
+                onUpdatedCardSeen={onUpdatedCardSeen}
+            >
+                <div data-callout-card-name="card-a" data-callout-card-open="true">Card A</div>
+            </ScrollableContainer>
+        );
+
+        rerender(
+            <ScrollableContainer
+                updatedCardNames={["card-a"]}
+                updatedCardExpiresAtByName={{ "card-a": expiresAt }}
+                onUpdatedCardSeen={onUpdatedCardSeen}
+            >
+                <div data-callout-card-name="card-a" data-callout-card-open="false">Card A</div>
+            </ScrollableContainer>
+        );
+
+        act(() => {
+            jest.advanceTimersByTime(2800);
+        });
+
+        expect(onUpdatedCardSeen).not.toHaveBeenCalled();
 
         rectSpy.mockRestore();
         jest.useRealTimers();

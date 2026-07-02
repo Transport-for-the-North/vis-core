@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { MapContext } from "contexts";
 import userEvent from "@testing-library/user-event";
@@ -188,6 +188,56 @@ describe("Tests when useFetchVisualisationData return valid values", () => {
     await user.click(screen.getByRole("button", { name: /show cardName/i }));
 
     expect(onCardUpdateAcknowledged).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the same expiry timestamp for the update callback and local badge", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+    const onCardUpdated = jest.fn();
+
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} onCardUpdated={onCardUpdated} />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    });
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation
+            {...props}
+            data={{ ...props.data, label: "updated label" }}
+            onCardUpdated={onCardUpdated}
+          />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(onCardUpdated).toHaveBeenCalledWith({
+        autoClearAt: Date.now() + 2800,
+        timeoutMs: 2800,
+      });
+      expect(screen.getByRole("status")).toHaveTextContent("Updated");
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(2799);
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("Updated");
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    jest.useRealTimers();
   });
 });
 
