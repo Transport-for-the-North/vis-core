@@ -26,7 +26,7 @@ export const VisualisationManager = ({
   maps,
   ...props
 }) => {
-  const sidebarIsOpen = props.sidebarIsOpen
+  const sidebarIsOpen = props.sidebarIsOpen;
   // Convert visualisationConfigs object to an array of entries
   const visualisationEntries = Object.entries(visualisationConfigs);
   // Separate visualizations by type
@@ -49,7 +49,9 @@ export const VisualisationManager = ({
 
   const visibleMapRef = useRef({});
   const firstVisibleCardsRef = useRef(new Set());
+
   const [visibleCount, setVisibleCount] = useState(0);
+  const [updatedCardNames, setUpdatedCardNames] = useState(() => new Set());
 
 /**
  * Track visibility for a single card and refresh the aggregate count.
@@ -82,6 +84,32 @@ export const VisualisationManager = ({
     [moveCardToTop]
   );
 
+  const handleCardUpdated = useCallback((name) => {
+    setUpdatedCardNames((prev) => {
+      const next = new Set(prev);
+      next.add(name);
+      return next;
+    });
+  }, []);
+
+  const clearUpdatedCardMarker = useCallback((name) => {
+    if (!name) return;
+
+    setUpdatedCardNames((prev) => {
+      if (!prev.has(name)) return prev;
+
+      const next = new Set(prev);
+      next.delete(name);
+      return next;
+    });
+  }, []);
+
+  const clearUpdatedCardMarkers = useCallback(() => {
+    setUpdatedCardNames(new Set());
+  }, []);
+
+  
+
   const showOnMobile = visibleCount > 0;
 
   // Update cardOrder when visualisationConfigs change AND on first card render
@@ -109,12 +137,22 @@ export const VisualisationManager = ({
         newOrder.includes(name)
       )
     );
+
+    setUpdatedCardNames((prev) => {
+      return new Set([...prev].filter((name) => newOrder.includes(name)));
+    });
   }, [visualisationConfigs]);
 
   return (
     <>
       {/* Render all calloutCard visualisations inside ScrollableContainer */}
-      <ScrollableContainer showOnMobile={showOnMobile} hideCardHandleOnMobile>
+      <ScrollableContainer
+        showOnMobile={showOnMobile}
+        hideCardHandleOnMobile
+        updatedCardNames={[...updatedCardNames]}
+        onUpdatedCardSeen={clearUpdatedCardMarker}
+        onUpdatedCardsClicked={clearUpdatedCardMarkers}
+      >
         {cardOrder.map((name) => {
           const config = calloutCardConfigByName[name];
 
@@ -131,6 +169,8 @@ export const VisualisationManager = ({
               onVisibilityChange={(isVisible) =>
                 handleCardVisibility(name, isVisible)
               }
+              onCardUpdated={() => handleCardUpdated(name)}
+              onCardUpdateAcknowledged={() => clearUpdatedCardMarker(name)}
             />
           );
         })}

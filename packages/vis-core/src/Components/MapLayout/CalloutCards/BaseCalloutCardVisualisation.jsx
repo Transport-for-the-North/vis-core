@@ -22,16 +22,19 @@ import { api } from "services";
  * - Keeps previous data visible during refreshes after first hydration.
  * - Sends onFirstVisible through to the small callout card so the manager can move it
  *   to the top once, without reordering on every later data update.
+ * - Sends onCardUpdated through so updated cards can show a per-card ping and stack hint.
  *
  * @component
- * @param {Object} props - The component props
+ * @param {Object} props
  * @param {'small' | 'fullscreen'} [props.type='small'] - Display type of the card
  * @param {string} props.visualisationName - Name of the visualization from context
  * @param {string} props.cardName - Unique name identifier for the card
  * @param {Function} [props.onUpdate] - Backwards-compatible callback when card data updates
  * @param {Function} [props.onFirstVisible] - Callback fired once when the card first renders with data
  * @param {Function} [props.onVisibilityChange] - Callback fired when the card becomes visible/hidden
+ * @param {Function} [props.onCardUpdated]
  * @param {string} [props.locationFilterId] - Optional explicit filter id to drive navigation
+ * @param {Function} [props.getAllColors]
  *
  * @returns {JSX.Element|null} The rendered card component or null if loading/hidden
  */
@@ -42,6 +45,8 @@ export const BaseCalloutCardVisualisation = ({
   onUpdate,
   onFirstVisible,
   onVisibilityChange,
+  onCardUpdated,
+  onCardUpdateAcknowledged,
   locationFilterId,
   getAllColors,
   ...props
@@ -287,7 +292,9 @@ export const BaseCalloutCardVisualisation = ({
 
     if (byField) return byField;
 
-    return filters.find((f) => Array.isArray(f.actions) && f.actions.length) || null;
+    return (
+      filters.find((f) => Array.isArray(f.actions) && f.actions.length) || null
+    );
   };
 
   /**
@@ -399,6 +406,8 @@ export const BaseCalloutCardVisualisation = ({
       onUpdate={onUpdate}
       onFirstVisible={onFirstVisible}
       onVisibilityChange={onVisibilityChange}
+      onCardUpdated={onCardUpdated}
+      onCardUpdateAcknowledged={onCardUpdateAcknowledged}
       data={displayData}
       isLoading={showInitialLoading}
       isUpdating={showUpdating}
