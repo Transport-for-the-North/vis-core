@@ -209,10 +209,37 @@ const CardContent = styled.div`
   }
 `;
 
-const UpdatingText = styled.p`
-  font-size: 0.85em !important;
-  margin: 0 0 6px !important;
-  color: #666 !important;
+const CardHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px;
+  align-items: start;
+  gap: 8px;
+`;
+
+const UpdatingSlot = styled.div`
+  min-width: 82px;
+  min-height: 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 4px;
+`;
+
+const UpdatingBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 82px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(240, 240, 247, 0.95);
+  color: #4b3e91;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 `;
 
 /**
@@ -429,13 +456,25 @@ export const CalloutCardVisualisation = ({
       </>
     ) : null;
 
+  const renderCardHeader = (title, { showUpdating = true } = {}) => (
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+
+      <UpdatingSlot aria-live="polite">
+        {showUpdating && isUpdating ? (
+          <UpdatingBadge role="status">Updating…</UpdatingBadge>
+        ) : null}
+      </UpdatingSlot>
+    </CardHeader>
+  );
+
   // Loading shell: initial load only. After hydration, BaseCalloutCardVisualisation
   // keeps previous data visible and sends isUpdating instead.
   if (isLoading) {
     return (
       <ParentContainer $isVisible={isVisible}>
         <CardContainer $isVisible={isVisible}>
-          <CardTitle>Loading...</CardTitle>
+          {renderCardHeader("Loading...", { showUpdating: false })}
           <CardContent>
             <h3>Loading...</h3>
           </CardContent>
@@ -454,13 +493,7 @@ export const CalloutCardVisualisation = ({
     return (
       <ParentContainer $isVisible={isVisible}>
         <CardContainer $isVisible={isVisible}>
-          <CardTitle>{cardName}</CardTitle>
-
-          {isUpdating && (
-            <CardContent>
-              <UpdatingText>Updating…</UpdatingText>
-            </CardContent>
-          )}
+          {renderCardHeader(cardName)}
 
           {recordSelector}
 
@@ -625,13 +658,7 @@ export const CalloutCardVisualisation = ({
   return (
     <ParentContainer $isVisible={isVisible}>
       <CardContainer $isVisible={isVisible}>
-        <CardTitle>{cardName}</CardTitle>
-
-        {isUpdating && (
-          <CardContent>
-            <UpdatingText>Updating…</UpdatingText>
-          </CardContent>
-        )}
+        {renderCardHeader(cardName)}
 
         {recordSelector}
 
