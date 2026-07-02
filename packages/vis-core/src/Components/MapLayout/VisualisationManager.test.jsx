@@ -15,11 +15,24 @@ jest.mock("maplibre-gl", () => ({
 }));
 
 jest.mock("./CalloutCards/BaseCalloutCardVisualisation", () => ({
-  BaseCalloutCardVisualisation: ({ visualisationName, cardName, onUpdate, type, sidebarIsOpen }) => {
+  BaseCalloutCardVisualisation: ({
+    visualisationName,
+    cardName,
+    onFirstVisible,
+    onVisibilityChange,
+    onCardUpdated,
+    onCardUpdateAcknowledged,
+    type,
+    sidebarIsOpen,
+  }) => {
     return (
-      <div data-testid="callout-card-visualisation">
+      <div data-testid="callout-card-visualisation" data-name={visualisationName}>
         Mock BaseCalloutCardVisualisation - {visualisationName} - {cardName} - {type} - {sidebarIsOpen}
-        <button onClick={onUpdate}>button: {cardName}</button>
+        <button onClick={onFirstVisible}>first visible: {cardName}</button>
+        <button onClick={() => onVisibilityChange(true)}>visible: {cardName}</button>
+        <button onClick={() => onVisibilityChange(false)}>hidden: {cardName}</button>
+        <button onClick={onCardUpdated}>updated: {cardName}</button>
+        <button onClick={onCardUpdateAcknowledged}>acknowledged: {cardName}</button>
       </div>
     );
   },
@@ -37,10 +50,21 @@ jest.mock("./MapVisualisation", () => ({
 }));
 
 jest.mock("Components", () => ({
-  ScrollableContainer: ({ children, showOnMobile, hideCardHandleOnMobile }) => {
+  ScrollableContainer: ({
+    children,
+    showOnMobile,
+    hideCardHandleOnMobile,
+    updatedCardNames = [],
+    onUpdatedCardsClicked,
+  }) => {
     return (
-      <div data-testid="scrollable-container">
+      <div
+        data-testid="scrollable-container"
+        data-show-on-mobile={showOnMobile.toString()}
+      >
         Mock ScrollableContainer - {showOnMobile.toString()} - {hideCardHandleOnMobile.toString()}
+        <span data-testid="updated-card-names">{updatedCardNames.join(",")}</span>
+        <button onClick={onUpdatedCardsClicked}>clear all updates</button>
         {children}
       </div>
     );
@@ -87,14 +111,80 @@ describe("Test to render a CalloutVisualisationCard", () => {
     expect(cardName).toBeInTheDocument();
     expect(cardName1).toBeInTheDocument();
   });
-  it("Click on the onUpdate button", async () => {
+  it("tracks visible cards for mobile summary visibility", async () => {
+    const user = userEvent.setup();
+
     render(
       <MapContext.Provider value={mockMapContext}>
         <VisualisationManager {...props} />
       </MapContext.Provider>
     );
-    const onUpdateButton = screen.getByText(/button: Test Card1/);
-    userEvent.click(onUpdateButton);
+    expect(screen.getByTestId("scrollable-container")).toHaveAttribute(
+      "data-show-on-mobile",
+      "false"
+    );
+
+    await user.click(screen.getByRole("button", { name: "visible: Test Card1" }));
+    expect(screen.getByTestId("scrollable-container")).toHaveAttribute(
+      "data-show-on-mobile",
+      "true"
+    );
+
+    await user.click(screen.getByRole("button", { name: "hidden: Test Card1" }));
+    expect(screen.getByTestId("scrollable-container")).toHaveAttribute(
+      "data-show-on-mobile",
+      "false"
+    );
+  });
+
+  it("moves a card to the top only the first time it becomes visible", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...props} />
+      </MapContext.Provider>
+    );
+
+    expect(screen.getAllByTestId("callout-card-visualisation").map((el) => el.dataset.name)).toEqual([
+      "calloutCard",
+      "calloutCard1",
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "first visible: Test Card1" }));
+    expect(screen.getAllByTestId("callout-card-visualisation").map((el) => el.dataset.name)).toEqual([
+      "calloutCard1",
+      "calloutCard",
+    ]);
+
+    await user.click(screen.getByRole("button", { name: "first visible: Test Card1" }));
+    expect(screen.getAllByTestId("callout-card-visualisation").map((el) => el.dataset.name)).toEqual([
+      "calloutCard1",
+      "calloutCard",
+    ]);
+  });
+
+  it("tracks and clears updated card markers", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...props} />
+      </MapContext.Provider>
+    );
+
+    await user.click(screen.getByRole("button", { name: "updated: Test Card1" }));
+    expect(screen.getByTestId("updated-card-names")).toHaveTextContent("calloutCard1");
+
+    await user.click(screen.getByRole("button", { name: "acknowledged: Test Card1" }));
+    expect(screen.getByTestId("updated-card-names")).toHaveTextContent("");
+
+    await user.click(screen.getByRole("button", { name: "updated: Test Card" }));
+    await user.click(screen.getByRole("button", { name: "updated: Test Card1" }));
+    expect(screen.getByTestId("updated-card-names")).toHaveTextContent("calloutCard,calloutCard1");
+
+    await user.click(screen.getByText("clear all updates"));
+    expect(screen.getByTestId("updated-card-names")).toHaveTextContent("");
   });
 });
 
