@@ -1,12 +1,19 @@
 # Admin Page
 
-The Admin Page is a fully config-driven administration screen for NoRMS-workstream apps.
+The Admin Page is a fully config-driven administration screen for any application.
 It renders three kinds of section — **audit cards**, **editable tables**, and **read-only
 tables** — arranged in a configurable grid. Everything on the page is described in the app
 configuration; the component contains no table-, column-, or app-specific logic.
 
-- **Component:** `vis-core/packages/vis-core/src/Components/AdminPage/AdminPage.jsx`
-- **API:** `TFN_Web_API` — `EditTableController` (`/api/admin/edit-table/*`) and
+- **Components:** `src/Components/AdminPage/` — a thin `AdminPage.jsx` shell plus one file
+  per section (`AuditSection`, `ViewTable`, `EditTable`, `LookupSelect`, `LayoutCell`) and
+  `styles.js`. Pure helpers live in `src/utils/adminPage.js`; the data hooks + admin-API
+  context in `src/hooks/useAdminTables.js`.
+- **Backend abstraction:** the page never calls the API directly — all backend
+  interaction goes through the admin API service (`src/services/api/AdminApi.js`,
+  `createAdminApi`), the single place that knows the endpoint paths and request shapes.
+- **API:** the endpoints are **configurable** (see [endpoints](#endpoints)); the defaults
+  target `TFN_Web_API` — `EditTableController` (`/api/admin/edit-table/*`) and
   `MaintenanceController` (`/api/admin/maintenance/table-audit`)
 - **Config (per app):** the `AdminPage` page produced by
   `src/configs/_templates/norms-workstream/pages/AdminPage.js`
@@ -22,6 +29,7 @@ configuration; the component contains no table-, column-, or app-specific logic.
    - [editTables](#edittables)
    - [viewTables](#viewtables)
    - [layout](#layout)
+   - [endpoints](#endpoints)
 4. [Lookups (dropdowns and friendly labels)](#lookups-dropdowns-and-friendly-labels)
 5. [Audit writes on add/delete](#audit-writes-on-adddelete)
 6. [Row limits and scrolling](#row-limits-and-scrolling)
@@ -33,17 +41,24 @@ configuration; the component contains no table-, column-, or app-specific logic.
 
 ## Availability and access
 
-The Admin Page is intended for the `nortms-dev-partner`, `rmap` and `tfn-internal` apps and
-is **not** present in `norms`. It is added to an app by including `PageId.ADMIN_PAGE` in the
-app's `enabledPages`; the template factory `createAdminPage` then produces the page.
+Access is **scoped to the specific app**. Two role families grant access, and another app's
+roles never do (e.g. `rmap_admin` cannot reach a NoRMS app):
 
-Access is gated two ways:
+| Role family    | Roles                                        | Rights                    |
+| -------------- | -------------------------------------------- | ------------------------- |
+| **Admin**      | `<appName>_admin`, `all_admin`               | View **and** edit         |
+| **Superuser**  | `<appName>_superuser`, `all_superuser`       | View only (no add/delete) |
 
-- **Route/navigation** — `BaseApp` promotes the page's `config` to `appConfig.adminPage` and
-  wraps the route in `withRoleValidation(AdminPage, { adminOnly: true })`. The navbar link
-  only appears for users with an `*_admin` role.
-- **API** — both controllers are decorated with `[Authorize(Policy = "AdminPolicy")]`, which
-  requires one of the admin roles (e.g. `All_Admin`, `NoRMS_Admin`).
+Gated in two places:
+
+- **Route/navigation** — `BaseApp` wraps the route in
+  `withRoleValidation(AdminPage, { adminOnly: true })`, which admits any of the four roles
+  above. The navbar Admin link and any `adminOnly` pages are shown on the same condition.
+- **API** — read endpoints require an admin **or** superuser of the app; write endpoints
+  (add/delete) require an **admin** only. The controllers verify this per request against the
+  `app` named in the body (see [The API](#the-api) and [Security model](#security-model)); the
+  frontend sends `app` automatically. Superusers also see the page with the Add form and
+  Remove buttons hidden.
 
 ---
 
@@ -68,12 +83,25 @@ const layout      = adminPage.layout ?? defaultLayout();
 
 ## Page configuration
 
-The page `config` has four keys, all optional: `auditTables`, `editTables`, `viewTables` and
-`layout`.
+The page `config` keys are all optional: `auditTables`, `editTables`, `viewTables`,
+`layout`, `endpoints` and `warning`.
 
 ### auditTables
 
-Read-only summary cards showing the most recent modified/created dates and users for a table.
+Read-only summary cards for a table. Each card shows, all scoped by the optional `filter`:
+
+- **Last modified / Created** — the latest-modified row's dates and users, each with a
+  relative "· 3 days ago" suffix.
+- **Records** — total row count.
+- **Uploads** — number of distinct load events (`COUNT(DISTINCT created_date)`).
+- **Modifications** — records changed since upload (`modified_date IS DISTINCT FROM
+  created_date`), plus an expandable **"Changes by user"** breakdown (click to reveal every
+  user's modification count).
+- A **stale** amber highlight (and "Stale" badge) when the data hasn't been modified within
+  `staleAfterDays` days.
+
+The counts and breakdown are all derived from the mapped `auditColumns`, so no per-table
+code is needed. Metrics whose required column isn't mapped are simply omitted.
 
 ```js
 {
@@ -87,16 +115,18 @@ Read-only summary cards showing the most recent modified/created dates and users
         createdBy:    "created_by",
     },
     filter: { column: "app_id", value: 2 }, // optional — restrict to matching rows
+    staleAfterDays: 30,                      // optional — amber highlight past this age
 }
 ```
 
-| Field          | Required | Description                                                       |
-| -------------- | -------- | ----------------------------------------------------------------- |
-| `tableName`    | yes      | Table to audit; must be whitelisted server-side.                  |
-| `schema`       | no       | Schema name (defaults to `public`).                               |
-| `displayName`  | yes      | Card heading.                                                     |
-| `auditColumns` | yes      | Maps the four audit fields to the real column names.              |
-| `filter`       | no       | `{ column, value }` to scope the audit to matching rows.          |
+| Field            | Required | Description                                                       |
+| ---------------- | -------- | ----------------------------------------------------------------- |
+| `tableName`      | yes      | Table to audit; must be whitelisted server-side.                  |
+| `schema`         | no       | Schema name (defaults to `public`).                               |
+| `displayName`    | yes      | Card heading.                                                     |
+| `auditColumns`   | yes      | Maps the four audit fields to the real column names.              |
+| `filter`         | no       | `{ column, value }` to scope the audit (and all counts) to matching rows. |
+| `staleAfterDays` | no       | Age (days) past which the card is highlighted amber as stale.     |
 
 A table whose `auditColumns` is omitted is skipped server-side.
 
@@ -127,6 +157,7 @@ automatically.
 | `displayName` | yes      | Section heading.                                                                         |
 | `filter`      | no       | `{ column, value }` restricting which rows are shown (and used by `excludeRegistered`).  |
 | `fixedValues` | no       | Values submitted on add but **not** shown as inputs (e.g. `app_id`). Pre-seed the form.  |
+| `hiddenColumns` | no     | Column names to omit from the table (e.g. an app-identifier column fixed to the current app). |
 | `lookups`     | no       | Per-column dropdown/label configuration. See [Lookups](#lookups-dropdowns-and-friendly-labels). |
 | `auditWrite`  | no       | Secondary insert on add/delete. See [Audit writes](#audit-writes-on-adddelete).          |
 | `maxRows`     | no       | Rows shown before the table scrolls (defaults to `8`).                                   |
@@ -139,7 +170,7 @@ additionally casts values into user-defined types (e.g. Postgres enums) on inser
 
 A read-only table showing every column of the configured table. View tables support the same
 `lookups`/`addToTable` mechanism as edit tables (useful for showing a friendly label column),
-and the same `maxRows`.
+plus the same `maxRows` and `hiddenColumns`.
 
 ```js
 {
@@ -192,6 +223,52 @@ third / two thirds. A bare array defaults to `width: 1`.
 Removing `layout` entirely falls back to the default: audit cards on the left; edit tables then
 view tables stacked on the right.
 
+### endpoints
+
+The page hardcodes no API paths. Each request the page makes resolves its path from an
+`endpoints` map, which **defaults** to the `TFN_Web_API` admin routes. Supply `endpoints`
+in the config to point any subset of these at a different backend; the keys you omit keep
+their defaults.
+
+```js
+endpoints: {
+    tableAudit: "/api/admin/maintenance/table-audit", // audit cards
+    rows:       "/api/admin/edit-table/rows",         // table rows
+    columns:    "/api/admin/edit-table/columns",      // column metadata
+    lookup:     "/api/admin/edit-table/lookup",       // lookup option lists
+    add:        "/api/admin/edit-table/add",          // insert (with optional alsoInsert)
+    remove:     "/api/admin/edit-table/delete",       // delete (with optional alsoInsert)
+}
+```
+
+| Key          | Used by                                    | Default                                  |
+| ------------ | ------------------------------------------ | ---------------------------------------- |
+| `tableAudit` | audit cards (`AuditSection`)               | `/api/admin/maintenance/table-audit`     |
+| `rows`       | view/edit table rows (`useTableData`)      | `/api/admin/edit-table/rows`             |
+| `columns`    | view/edit column metadata (`useTableData`) | `/api/admin/edit-table/columns`          |
+| `lookup`     | lookup option lists (`useLookups`)         | `/api/admin/edit-table/lookup`           |
+| `add`        | edit-table add                             | `/api/admin/edit-table/add`              |
+| `remove`     | edit-table delete                          | `/api/admin/edit-table/delete`           |
+
+The defaults live in `DEFAULT_ADMIN_ENDPOINTS` (`src/utils/adminPage.js`); the resolved map
+is used to build the admin API service (`createAdminApi`) that the hooks and sections call.
+
+### warning
+
+An optional string rendered as a yellow warning banner pinned to the top of the page (the
+shared `WarningBox` — the same style as the map's "no data" message). The token `{app}` is
+replaced with the current app name. Use it to remind admins that app-scoped tables only show
+the current app's data:
+
+```js
+warning:
+    "Any tables shown here to edit/view that have application identifier columns are " +
+    "fixed and only show data for the current application. In this case any registrations " +
+    "and logs shown are for this current app: {app}.",
+```
+
+Omit `warning` to show no banner.
+
 ---
 
 ## Lookups (dropdowns and friendly labels)
@@ -208,7 +285,11 @@ lookups: {
         labelColumn: "scenario_code", // shown in the dropdown / label column
         filter: { column: "is_deleted", value: false }, // optional source filter
         excludeRegistered: true,      // hide values already present in this table
-        addToTable: true,             // add a read-only label column next to the source column
+        addToTable: true,             // show the friendly label in the table (replacing the raw id)
+        // headerLabel: "Scenario",   // optional: override the label column's header
+        // showValueColumn: true,     // optional: also show the raw id column
+        // placeholder: "Please select scenario code…", // optional: add-form dropdown prompt
+        // descriptionColumns: ["vis_description", "network_desc"], // optional: extra detail per option
     },
 }
 ```
@@ -221,10 +302,21 @@ lookups: {
 | `labelColumn`       | yes      | Column shown to the user (in the dropdown and, with `addToTable`, in the table).                  |
 | `filter`            | no       | `{ column, value }` restricting which options are offered.                                        |
 | `excludeRegistered` | no       | When `true`, omit options whose value is already present in this table (edit tables only).        |
-| `addToTable`        | no       | When `true`, insert a read-only column showing `labelColumn` immediately after the source column. |
+| `addToTable`        | no       | When `true`, show the `labelColumn` in the table **in place of** the raw id/value column.          |
+| `headerLabel`       | no       | Overrides the label column's header. Defaults to the humanised source column name with a trailing `_id` removed (e.g. `scenario_id` → "Scenario"). |
+| `showValueColumn`   | no       | When `true`, keep the raw id/value column alongside the friendly label instead of replacing it.    |
+| `placeholder`       | no       | Custom prompt for the add-form dropdown (defaults to the humanised column name).                   |
+| `descriptionColumns`| no       | Extra source columns fetched per option and shown as muted secondary lines under the label in the dropdown menu (e.g. `["vis_description", "network_desc"]`). Must be plain column identifiers. |
 
 **Behaviour notes:**
 
+- Column headers throughout the page are humanised for readability — underscores become
+  spaces and each word is title-cased (e.g. `modified_by` → "Modified By", `target_app_id`
+  → "Target App ID"). This applies to table headers and add-form field placeholders.
+- A raw id column with a configured label (`addToTable`) is hidden by default, since the
+  friendly label makes the id redundant. Set `showValueColumn: true` to show both.
+- Empty cell values (null or blank) render as a greyed **"Empty"** placeholder, so blank
+  cells read clearly instead of appearing as gaps.
 - The full option list (without exclusion) is fetched once and used both to render labels for
   existing rows and to build the dropdown.
 - `excludeRegistered` is applied client-side against the currently displayed rows, which are
@@ -292,11 +384,15 @@ per table to override the default.
 
 ## The API
 
-All endpoints are under `/api/admin` and require `AdminPolicy`.
+All endpoints are under `/api/admin`. Every request body carries an **`app`** field naming
+the app being administered; the server checks the caller's roles for that app before doing
+anything (400 if `app` is missing, 403 if not permitted). Reads require an admin **or**
+superuser of the app; the writes (`add`/`delete`) require an **admin**. The frontend adds
+`app` automatically — the admin API service (`createAdminApi`) stamps it onto every request.
 
 | Method & path                              | Purpose                                                                 |
 | ------------------------------------------ | ----------------------------------------------------------------------- |
-| `POST /api/admin/maintenance/table-audit`  | Returns the latest audit row (modified/created date and user) per table.|
+| `POST /api/admin/maintenance/table-audit`  | Returns per table: last modified/created (date + user), row/upload/modification counts, and modifications-per-user. |
 | `POST /api/admin/edit-table/rows`          | Returns the rows of a table, optionally filtered.                       |
 | `POST /api/admin/edit-table/columns`       | Returns column metadata (type, nullability, generated, primary key).    |
 | `POST /api/admin/edit-table/lookup`        | Returns value/label options from a metadata table, with optional exclusion. |
@@ -313,8 +409,21 @@ against a server-side whitelist. Values are always parameterised.
 
 ## Security model
 
-The `EditTableFacade` maintains four whitelists, and every request is validated against the
-relevant one before any SQL runs:
+Authorisation is **per app**. Each admin controller derives from
+`AppScopedAdminControllerBase`. Read actions call `RequireAppView(request)` and write actions
+call `RequireAppEdit(request)` at the top of the action:
+
+- `RequireAppView` — allows an **admin** (`ClaimsPrincipal.IsAppAdmin`: `<app>_admin` or
+  `all_admin`) **or** a **superuser** (`IsAppSuperuser`: `<app>_superuser` or `all_superuser`)
+  of the request's `app`.
+- `RequireAppEdit` — allows an **admin** only. Superusers are view-only and are rejected.
+
+No *other* app's role grants access — so a user of one app can neither read nor mutate
+another app's data, even by calling the API directly.
+
+On top of the per-app check, the `EditTableFacade` maintains four table whitelists (an
+anti-injection safety net, since table/column names are interpolated into SQL), and every
+request is validated against the relevant one before any SQL runs:
 
 | Whitelist                      | Used by                                   | Example members                   |
 | ------------------------------ | ----------------------------------------- | --------------------------------- |
@@ -325,6 +434,12 @@ relevant one before any SQL runs:
 
 Schemas are also whitelisted (`public`, `rail_data`). A view table can never be written to,
 because the add/delete paths validate against `AllowedEditTables` only.
+
+> **Note:** the table whitelist is currently global (not scoped per app). The per-app
+> **authorisation** check is the security boundary; the whitelist is an additional
+> anti-injection guard. If multiple apps ever share this controller with disjoint table
+> sets, make the whitelist per-app too (or move to a capabilities endpoint that returns the
+> allowed tables/actions for the user+app).
 
 ---
 
