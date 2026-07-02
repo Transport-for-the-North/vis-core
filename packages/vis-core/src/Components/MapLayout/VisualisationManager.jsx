@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MapVisualisation } from "./MapVisualisation";
 import { ScrollableContainer } from "Components";
 import { BaseCalloutCardVisualisation } from "./CalloutCards/BaseCalloutCardVisualisation";
@@ -7,6 +7,12 @@ import { BaseCalloutCardVisualisation } from "./CalloutCards/BaseCalloutCardVisu
 /**
  * VisualisationManager component that renders the appropriate visualizations
  * based on the types specified in the visualisation configurations.
+ *
+ * Behaviour:
+ * - Callout card order is stable during normal data updates.
+ * - A callout card moves to the top only once: the first time it becomes visible
+ *   with real data.
+ * - Mobile summary visibility is tracked via onVisibilityChange.
  *
  * @param {Object} props - The component props.
  * @param {Object} props.visualisationConfigs - Object of configuration objects for the visualizations.
@@ -42,8 +48,9 @@ export const VisualisationManager = ({
   );
 
   const visibleMapRef = useRef({});
+  const firstVisibleCardsRef = useRef(new Set());
   const [visibleCount, setVisibleCount] = useState(0);
-  
+
 /**
  * Track visibility for a single card and refresh the aggregate count.
  * @name handleCardVisibility
@@ -52,34 +59,57 @@ export const VisualisationManager = ({
  * @param {string} name - The visualisation/card identifier.
  * @param {boolean} isVisible - Whether the card is currently visible.
  */
-  const handleCardVisibility = (name, isVisible) => {
+  const handleCardVisibility = useCallback((name, isVisible) => {
     const next = { ...visibleMapRef.current, [name]: !!isVisible };
     visibleMapRef.current = next;
     setVisibleCount(Object.values(next).filter(Boolean).length);
-  };
+  }, []);
+
+  const moveCardToTop = useCallback((name) => {
+    setCardOrder((prevOrder) => [
+      name,
+      ...prevOrder.filter((existingName) => existingName !== name),
+    ]);
+  }, []);
+
+  const handleCardFirstVisible = useCallback(
+    (name) => {
+      if (firstVisibleCardsRef.current.has(name)) return;
+
+      firstVisibleCardsRef.current.add(name);
+      moveCardToTop(name);
+    },
+    [moveCardToTop]
+  );
 
   const showOnMobile = visibleCount > 0;
 
-  // Update cardOrder when visualisationConfigs change
+  // Update cardOrder when visualisationConfigs change AND on first card render
   useEffect(() => {
     const newOrder = calloutCardVisualisations.map(([name]) => name);
-    setCardOrder((prevOrder) => {
-      // Keep existing order as much as possible
-      const newPrevOrder = prevOrder.filter((name) => newOrder.includes(name));
-      const addedNames = newOrder.filter(
-        (name) => !newPrevOrder.includes(name)
-      );
-      return [...newPrevOrder, ...addedNames];
-    });
-  }, [visualisationConfigs]);
 
-  // Handler when a card is updated
-  const handleCardUpdate = (updatedName) => {
-    setCardOrder((prevOrder) => [
-      updatedName,
-      ...prevOrder.filter((name) => name !== updatedName),
-    ]);
-  };
+    setCardOrder((prevOrder) => {
+      const retained = prevOrder.filter((name) => newOrder.includes(name));
+      const addedNames = newOrder.filter((name) => !retained.includes(name));
+      return [...retained, ...addedNames];
+    });
+
+    visibleMapRef.current = Object.fromEntries(
+      Object.entries(visibleMapRef.current).filter(([name]) =>
+        newOrder.includes(name)
+      )
+    );
+
+    setVisibleCount(
+      Object.values(visibleMapRef.current).filter(Boolean).length
+    );
+
+    firstVisibleCardsRef.current = new Set(
+      [...firstVisibleCardsRef.current].filter((name) =>
+        newOrder.includes(name)
+      )
+    );
+  }, [visualisationConfigs]);
 
   return (
     <>
@@ -87,14 +117,20 @@ export const VisualisationManager = ({
       <ScrollableContainer showOnMobile={showOnMobile} hideCardHandleOnMobile>
         {cardOrder.map((name) => {
           const config = calloutCardConfigByName[name];
+
+          if (!config) return null;
+
           return (
             <BaseCalloutCardVisualisation
               type={config.cardType || "small"}
               key={name}
               visualisationName={name}
               cardName={config.cardName || name}
-              onUpdate={() => handleCardUpdate(name)}
               sidebarIsOpen={sidebarIsOpen}
+              onFirstVisible={() => handleCardFirstVisible(name)}
+              onVisibilityChange={(isVisible) =>
+                handleCardVisibility(name, isVisible)
+              }
             />
           );
         })}
