@@ -53,20 +53,24 @@ export const VisualisationManager = ({
   const [visibleCount, setVisibleCount] = useState(0);
   const [updatedCardNames, setUpdatedCardNames] = useState(() => new Set());
 
-/**
- * Track visibility for a single card and refresh the aggregate count.
- * @name handleCardVisibility
- * @function
- * @global
- * @param {string} name - The visualisation/card identifier.
- * @param {boolean} isVisible - Whether the card is currently visible.
- */
+  /**
+   * Tracks whether a callout card currently has renderable data and refreshes
+   * the aggregate mobile-summary visibility count.
+   *
+   * @param {string} name - Visualisation/card identifier.
+   * @param {boolean} isVisible - Whether the card has renderable data.
+   */
   const handleCardVisibility = useCallback((name, isVisible) => {
     const next = { ...visibleMapRef.current, [name]: !!isVisible };
     visibleMapRef.current = next;
     setVisibleCount(Object.values(next).filter(Boolean).length);
   }, []);
 
+  /**
+   * Moves a card to the front of the rendered callout stack.
+   *
+   * @param {string} name - Visualisation/card identifier.
+   */
   const moveCardToTop = useCallback((name) => {
     setCardOrder((prevOrder) => [
       name,
@@ -74,6 +78,12 @@ export const VisualisationManager = ({
     ]);
   }, []);
 
+  /**
+   * Moves a card once, when it first becomes visible with real data.
+   * Later data updates are surfaced as update markers instead of reordering.
+   *
+   * @param {string} name - Visualisation/card identifier.
+   */
   const handleCardFirstVisible = useCallback(
     (name) => {
       if (firstVisibleCardsRef.current.has(name)) return;
@@ -84,6 +94,11 @@ export const VisualisationManager = ({
     [moveCardToTop]
   );
 
+  /**
+   * Marks a card as updated until the card or stack-level marker is acknowledged.
+   *
+   * @param {string} name - Visualisation/card identifier.
+   */
   const handleCardUpdated = useCallback((name) => {
     setUpdatedCardNames((prev) => {
       const next = new Set(prev);
@@ -92,6 +107,11 @@ export const VisualisationManager = ({
     });
   }, []);
 
+  /**
+   * Clears one card's update marker after it has been seen or opened.
+   *
+   * @param {string} name - Visualisation/card identifier.
+   */
   const clearUpdatedCardMarker = useCallback((name) => {
     if (!name) return;
 
@@ -104,15 +124,19 @@ export const VisualisationManager = ({
     });
   }, []);
 
+  /**
+   * Clears all stack-level update markers after the user clicks the update hint.
+   */
   const clearUpdatedCardMarkers = useCallback(() => {
     setUpdatedCardNames(new Set());
   }, []);
 
-  
-
   const showOnMobile = visibleCount > 0;
 
-  // Update cardOrder when visualisationConfigs change AND on first card render
+  /**
+   * Keeps card order, visibility, first-visible tracking, and update markers in
+   * sync with the currently configured callout cards.
+   */
   useEffect(() => {
     const newOrder = calloutCardVisualisations.map(([name]) => name);
 

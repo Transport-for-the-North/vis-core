@@ -15,6 +15,14 @@ import { CARD_CONSTANTS } from "defaults";
 const { PADDING } = CARD_CONSTANTS;
 
 const MOBILE_Q = "(max-width: 900px)";
+const EMPTY_UPDATED_CARD_NAMES = [];
+
+/**
+ * Resolves the mobile media query from theme when supplied, with a local fallback.
+ *
+ * @param {Object} p - Styled-component props.
+ * @returns {string} CSS media query.
+ */
 const mobileMQ = (p) => p.theme?.mq?.mobile || MOBILE_Q;
 
 const StyledScrollableContainer = styled.div`
@@ -165,6 +173,12 @@ const Chevron = styled.span`
   margin-top: ${({ $direction }) => ($direction === "up" ? "3px" : "-3px")};
 `;
 
+/**
+ * Converts supported updated-card inputs into an array for rendering and lookup.
+ *
+ * @param {string[]|Set<string>} updatedCardNames - Updated card identifiers.
+ * @returns {string[]} Normalised card identifiers.
+ */
 const normaliseUpdatedNames = (updatedCardNames) => {
   if (!updatedCardNames) return [];
   if (updatedCardNames instanceof Set) return [...updatedCardNames];
@@ -200,7 +214,7 @@ export const ScrollableContainer = ({
   mobileBarColor,
   hideCardHandleOnMobile = true,
   showOnMobile = true,
-  updatedCardNames = [],
+  updatedCardNames = EMPTY_UPDATED_CARD_NAMES,
   onUpdatedCardSeen,
   onUpdatedCardsClicked,
   onOverflowHintClick,
@@ -229,6 +243,9 @@ export const ScrollableContainer = ({
 
   const [firstUpdatedCardName, setFirstUpdatedCardName] = useState(null);
 
+  /**
+   * Clears the delayed "updated card seen" acknowledgement timer.
+   */
   const clearUpdatedSeenTimer = useCallback(() => {
     if (updatedSeenTimerRef.current) {
       clearTimeout(updatedSeenTimerRef.current);
@@ -236,6 +253,12 @@ export const ScrollableContainer = ({
     }
   }, []);
 
+  /**
+   * Finds a rendered callout card in the scroll stack by its visualisation name.
+   *
+   * @param {string} name - Card/visualisation identifier.
+   * @returns {HTMLElement|null} Matching card element, if rendered.
+   */
   const getCardElementByName = useCallback((name) => {
     const container = scrollRef.current;
     if (!container || !name) return null;
@@ -247,6 +270,11 @@ export const ScrollableContainer = ({
     );
   }, []);
 
+  /**
+   * Resolves the first updated card and its DOM element when available.
+   *
+   * @returns {{name: string|null, element: HTMLElement|null}} Updated card lookup result.
+   */
   const getFirstUpdatedCardElement = useCallback(() => {
     for (const name of updatedNames) {
       const element = getCardElementByName(name);
@@ -259,6 +287,12 @@ export const ScrollableContainer = ({
     };
   }, [updatedNames, getCardElementByName]);
 
+  /**
+   * Checks whether any part of an element intersects the visible stack viewport.
+   *
+   * @param {HTMLElement|null} element - Card element to inspect.
+   * @returns {boolean} True when the element is at least partly visible.
+   */
   const isElementInScrollView = useCallback((element) => {
     const container = scrollRef.current;
     if (!container || !element) return false;
@@ -275,6 +309,8 @@ export const ScrollableContainer = ({
   /**
    * Only report overflow when another callout card is completely outside the
    * visible area. A merely clipped/partially visible card no longer counts.
+   *
+   * @returns {{canScroll: boolean, canScrollUp: boolean, canScrollDown: boolean}} Overflow state.
    */
   const getCardOverflowState = useCallback(() => {
     const container = scrollRef.current;
@@ -324,6 +360,8 @@ export const ScrollableContainer = ({
   /**
    * Scrolls within the callout stack only. Avoids browser scrollIntoView()
    * bubbling up and scrolling the page/map layout.
+   *
+   * @param {HTMLElement|null} cardElement - Card to centre in the stack.
    */
   const scrollCardIntoView = useCallback((cardElement) => {
     const container = scrollRef.current;
@@ -346,6 +384,11 @@ export const ScrollableContainer = ({
     });
   }, []);
 
+  /**
+   * Opens a collapsed callout card before scrolling to it.
+   *
+   * @param {HTMLElement|null} cardElement - Card element to open.
+   */
   const openCardIfClosed = useCallback((cardElement) => {
     if (!cardElement) return;
 
@@ -358,6 +401,10 @@ export const ScrollableContainer = ({
     }
   }, []);
 
+  /**
+   * Tracks the first updated card and schedules acknowledgement when it is both
+   * open and visible to the user.
+   */
   const evaluateUpdatedCardVisibility = useCallback(() => {
     clearUpdatedSeenTimer();
 
@@ -391,6 +438,9 @@ export const ScrollableContainer = ({
     updatedNames,
   ]);
 
+  /**
+   * Tracks mobile breakpoint changes and keeps desktop stacks open.
+   */
   useEffect(() => {
     if (
       typeof window === "undefined" ||
@@ -401,6 +451,11 @@ export const ScrollableContainer = ({
 
     const mql = window.matchMedia(MOBILE_Q);
 
+    /**
+     * Applies a media-query change event to local mobile/open state.
+     *
+     * @param {MediaQueryList|MediaQueryListEvent} event - Current media query state.
+     */
     const onChange = (event) => {
       setIsMobile(event.matches);
       if (!event.matches) setOpen(true);
@@ -414,14 +469,24 @@ export const ScrollableContainer = ({
     };
   }, []);
 
+  /**
+   * Reopens the mobile summary automatically when cards become available again.
+   */
   useEffect(() => {
     if (isMobile && showOnMobile) setOpen(true);
   }, [isMobile, showOnMobile]);
 
+  /**
+   * Recomputes overflow and update visibility on scroll, resize, content, and
+   * open-state changes.
+   */
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return undefined;
 
+    /**
+     * Refreshes overflow direction and updated-card visibility state.
+     */
     const updateOverflowState = () => {
       setOverflowState(getCardOverflowState());
       evaluateUpdatedCardVisibility();
@@ -453,6 +518,10 @@ export const ScrollableContainer = ({
     getCardOverflowState,
   ]);
 
+  /**
+   * Re-evaluates updated-card visibility when the updated-card list changes and
+   * clears pending timers on cleanup.
+   */
   useEffect(() => {
     evaluateUpdatedCardVisibility();
 
@@ -473,6 +542,11 @@ export const ScrollableContainer = ({
     ? "up"
     : null;
 
+  /**
+   * Builds the stack hint label from updated-card state before ordinary overflow.
+   *
+   * @returns {string} Button text for the stack hint.
+   */
   const overflowHintText = (() => {
     if (hasUpdatedCards) {
       return `${updatedNames.length} card${
@@ -490,6 +564,10 @@ export const ScrollableContainer = ({
     (overflowState.canScroll &&
       (overflowState.canScrollDown || overflowState.canScrollUp));
 
+  /**
+   * Handles the stack hint click, prioritising updated-card navigation before
+   * ordinary up/down overflow scrolling.
+   */
   const handleOverflowHintClick = () => {
     const container = scrollRef.current;
     if (!container) return;
@@ -539,6 +617,13 @@ export const ScrollableContainer = ({
     onOverflowHintClick?.();
   };
 
+  /**
+   * Renders children, hiding individual card handles for mobile stack content
+   * when the mobile bar is responsible for disclosure.
+   *
+   * @param {boolean} forMobile - Whether children are being rendered into mobile UI.
+   * @returns {React.ReactNode} Rendered children.
+   */
   const renderChildren = (forMobile) =>
     React.Children.map(children, (child) =>
       hideCardHandleOnMobile && forMobile && React.isValidElement(child)
@@ -546,6 +631,11 @@ export const ScrollableContainer = ({
         : child
     );
 
+  /**
+   * Renders the status dot or directional chevron for the stack hint.
+   *
+   * @returns {JSX.Element} Leading icon.
+   */
   const renderLeadingIcon = () => {
     if (hasUpdatedCards) {
       return <OverflowDot $hasUpdates aria-hidden="true" />;
@@ -558,6 +648,11 @@ export const ScrollableContainer = ({
     return <Chevron $direction={overflowDirection} aria-hidden="true" />;
   };
 
+  /**
+   * Renders the sticky stack hint for updated cards or fully hidden overflow.
+   *
+   * @returns {JSX.Element} Overflow hint control.
+   */
   const renderOverflowHint = () => (
     <OverflowHintWrap $visible={shouldShowOverflowHint}>
       <OverflowHint

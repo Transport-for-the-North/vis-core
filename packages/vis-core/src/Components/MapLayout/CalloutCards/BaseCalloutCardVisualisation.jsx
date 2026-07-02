@@ -32,7 +32,8 @@ import { api } from "services";
  * @param {Function} [props.onUpdate] - Backwards-compatible callback when card data updates
  * @param {Function} [props.onFirstVisible] - Callback fired once when the card first renders with data
  * @param {Function} [props.onVisibilityChange] - Callback fired when the card becomes visible/hidden
- * @param {Function} [props.onCardUpdated]
+ * @param {Function} [props.onCardUpdated] - Callback fired when hydrated card data changes.
+ * @param {Function} [props.onCardUpdateAcknowledged] - Callback fired when the user opens an updated card.
  * @param {string} [props.locationFilterId] - Optional explicit filter id to drive navigation
  * @param {Function} [props.getAllColors]
  *
@@ -80,7 +81,10 @@ export const BaseCalloutCardVisualisation = ({
   const responseData = response.data;
   const remoteIsLoading = response.isLoading;
 
-  // Capture current data for rehydration
+  /**
+   * Keeps the latest rendered data available so refreshes can show the previous
+   * card content while the next response is loading.
+   */
   useEffect(() => {
     if (data !== null && data !== undefined) {
       previousDataRef.current = data;
@@ -362,7 +366,7 @@ export const BaseCalloutCardVisualisation = ({
     const locationFilter = resolveLocationFilter(state.filters);
     const ranFilterActions = runFilterActions(locationFilter, targetLocationId);
 
-    // Fallback preserves previous implementation 
+    // Fallback preserves previous implementation
     if (!ranFilterActions) {
       dispatch({
         type: actionTypes.UPDATE_PATH_PARAMS,

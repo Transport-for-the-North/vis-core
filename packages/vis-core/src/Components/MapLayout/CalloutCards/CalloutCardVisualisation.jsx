@@ -293,6 +293,12 @@ const TogglePing = styled.span`
   pointer-events: none;
 `;
 
+/**
+ * Serialises a value for comparison without throwing on unusual inputs.
+ *
+ * @param {any} value - Value to serialise.
+ * @returns {string} JSON output when possible, otherwise `String(value)`.
+ */
 const safeStringify = (value) => {
   try {
     return JSON.stringify(value);
@@ -309,12 +315,13 @@ const safeStringify = (value) => {
  * @param {string} [props.cardName] - Optional name for the card.
  * @param {Function} [props.onUpdate] - Backwards-compatible function to call when the card first becomes visible.
  * @param {Function} [props.onFirstVisible] - Function to call when the card first becomes visible.
- * @param {Function} [props.onCardUpdated]
+ * @param {Function} [props.onCardUpdated] - Callback fired when hydrated card data changes.
+ * @param {Function} [props.onCardUpdateAcknowledged] - Callback fired when the user opens an updated card.
  * @param {Object} props.data - Data used by the card.
  * @param {boolean} props.isLoading- Whether this is the initial loading state.
  * @param {boolean} props.isUpdating - Whether data is refreshing after first hydration.
  * @param {boolean} [props.hideHandleOnMobile]
- * @param {Function} [props.onVisibilityChange]
+ * @param {Function} [props.onVisibilityChange] - Callback fired when real card data becomes renderable or hidden.
  * @param {React.ReactNode} [props.recordSelector]
  * @param {Function} [props.toggleVisibility]
  * @param {Function} [props.getAllColors]
@@ -378,19 +385,28 @@ export const CalloutCardVisualisation = ({
 
   const dataUpdateSignature = useMemo(() => {
     if (!data) return "";
-
-    try {
-      return JSON.stringify(data);
-    } catch {
-      return String(data);
-    }
+    return safeStringify(data);
   }, [data]);
 
+  /**
+   * Mirrors React state into a ref so delayed update-ping timers can tell
+   * whether the card is open without closing over stale state.
+   */
   useEffect(() => {
     isVisibleRef.current = isVisible;
   }, [isVisible]);
 
-  // Effect to ping user with timeout if updated and visible
+  /**
+   * Reports whether this card currently has renderable data.
+   */
+  useEffect(() => {
+    onVisibilityChange?.(actuallyVisible);
+  }, [actuallyVisible, onVisibilityChange]);
+
+  /**
+   * Detects post-hydration data changes, raises the per-card update marker, and
+   * only auto-clears it when the card is open and visible.
+   */
   useEffect(() => {
     if (!actuallyVisible) return;
     if (!dataUpdateSignature) return;
@@ -425,7 +441,9 @@ export const CalloutCardVisualisation = ({
     }, 2800);
   }, [actuallyVisible, dataUpdateSignature, onCardUpdated]);
 
-  // Effect to (for example) shoot to top of the list if first render
+  /**
+   * Fires the first-visible callbacks once, after the card has real data.
+   */
   useEffect(() => {
     if (!actuallyVisible) return;
     if (hasFiredFirstVisibleRef.current) return;
@@ -443,41 +461,10 @@ export const CalloutCardVisualisation = ({
     }
   }, [actuallyVisible, onFirstVisible, onUpdate]);
 
-  useEffect(() => {
-    if (!actuallyVisible) return;
-    if (!dataUpdateSignature) return;
-
-    if (previousDataSignatureRef.current === null) {
-      previousDataSignatureRef.current = dataUpdateSignature;
-      return;
-    }
-
-    if (previousDataSignatureRef.current === dataUpdateSignature) {
-      return;
-    }
-
-    previousDataSignatureRef.current = dataUpdateSignature;
-
-    setRecentlyUpdated(true);
-    onCardUpdated?.();
-
-    if (updatePingTimerRef.current) {
-      clearTimeout(updatePingTimerRef.current);
-    }
-
-    updatePingTimerRef.current = setTimeout(() => {
-      setRecentlyUpdated(false);
-    }, 2800);
-  }, [actuallyVisible, dataUpdateSignature, onCardUpdated]);
-
-  useEffect(() => {
-    return () => {
-      if (updatePingTimerRef.current) {
-        clearTimeout(updatePingTimerRef.current);
-      }
-    };
-  }, []);
-
+  /**
+   * Opens the card on the next animation frame once data is available so the
+   * slide-in transition can run instead of jumping directly to the open state.
+   */
   useEffect(() => {
     if (actuallyVisible) {
       // next frame ensures CSS transition fires
@@ -488,13 +475,16 @@ export const CalloutCardVisualisation = ({
     return undefined;
   }, [actuallyVisible]);
 
-  // Respect hideHandleOnMobile: when true, ensure the card is visible (still slides in on first actual visibility)
+  /**
+   * Keeps mobile-rendered cards open when their handle is intentionally hidden.
+   */
   useEffect(() => {
     if (hideHandleOnMobile) setIsVisible(true);
   }, [hideHandleOnMobile]);
 
   /**
-   * Toggles the visibility of the card.
+   * Toggles the visibility of the card and acknowledges pending update markers
+   * when the user opens a collapsed card.
    */
   const toggleVisibility = () => {
     if (externalToggleVisibility) {
@@ -525,6 +515,9 @@ export const CalloutCardVisualisation = ({
     setIsHovered(false);
   };
 
+  /**
+   * Clears any pending update-ping timer when the card unmounts.
+   */
   useEffect(() => {
     return () => {
       if (updatePingTimerRef.current) {
@@ -533,6 +526,13 @@ export const CalloutCardVisualisation = ({
     };
   }, []);
 
+  /**
+   * Formats numeric placeholder values and appends an optional unit.
+   *
+   * @param {number|string|null|undefined} value - Value to format.
+   * @param {string} [unit=""] - Unit suffix to append.
+   * @returns {string} Formatted value or "N/A" for invalid input.
+   */
   const formatNumberWithUnit = useCallback((value, unit = "") => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
     return formatNumber(Number(value)) + unit;
@@ -546,7 +546,10 @@ export const CalloutCardVisualisation = ({
     [visualisation?.customFormattingFunctions, formatNumberWithUnit]
   );
 
-  // Batch compute the sanitised HTML and dynamic title together to avoid multi-step updates
+  /**
+   * Builds the sanitised HTML fragment and dynamic title in one memoised step to
+   * avoid intermediate renders with mismatched content.
+   */
   const { sanitizedHtml, safeDynamicTitle } = useMemo(() => {
     if (!data || !visualisation) {
       return { sanitizedHtml: "", safeDynamicTitle: "" };
@@ -596,6 +599,11 @@ export const CalloutCardVisualisation = ({
       ? "Updated"
       : "";
 
+  /**
+   * Renders the transient loading/update status badge in the reserved header slot.
+   *
+   * @returns {JSX.Element|null} Status badge when active.
+   */
   const renderStatusBadge = () => {
     if (!statusKind) return null;
 
@@ -606,6 +614,14 @@ export const CalloutCardVisualisation = ({
     );
   };
 
+  /**
+   * Renders a stable two-column header so status changes do not shift the title.
+   *
+   * @param {string} title - Card title text.
+   * @param {Object} [options] - Header render options.
+   * @param {boolean} [options.showStatus=true] - Whether to show update status.
+   * @returns {JSX.Element} Card header.
+   */
   const renderCardHeader = (title, { showStatus = true } = {}) => (
     <CardHeader>
       <CardTitle>{title}</CardTitle>
@@ -615,6 +631,11 @@ export const CalloutCardVisualisation = ({
     </CardHeader>
   );
 
+  /**
+   * Renders the collapse/expand handle and update ping for desktop cards.
+   *
+   * @returns {JSX.Element|null} Toggle handle when enabled.
+   */
   const renderHandle = () =>
     showHandle ? (
       <>
