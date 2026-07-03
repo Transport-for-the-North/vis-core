@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus, RegisterScenariosButton } from "Components";
+import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage, useDebounced } from "hooks";
 import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
@@ -314,7 +314,6 @@ export const MapLayout = () => {
       {pageContext.type === "MapLayout" && (
         <MapContainer>
           <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} sidebarIsOpen={sidebarIsOpen}/>
-          <RegisterScenariosButton />
         </MapContainer>
       )}
       {pageContext.type === "DualMapLayout" && (

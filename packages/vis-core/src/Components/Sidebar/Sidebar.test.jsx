@@ -50,7 +50,8 @@ jest.mock("../MobileBar/MobileBar", () => ({
 }));
 jest.mock("Components", () => ({
   Hovertip: ({isVisible, displayText, side, refElement, alignVertical}) => <span>Hovertip - {displayText} - side: {side}</span>,
-  InfoBox: ({text}) => <span>InfoBox - {text}</span>
+  InfoBox: ({text}) => <span>InfoBox - {text}</span>,
+  RegisterScenariosButton: () => <span>RegisterScenariosButton</span>
 }));
 
 let mockMapContext = {

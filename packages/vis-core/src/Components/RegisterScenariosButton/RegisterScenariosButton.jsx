@@ -6,14 +6,11 @@ import { AppButton } from "../AppButton";
 import { api } from "services";
 import { getAppName } from "../../runtime";
 
-const ButtonOverlay = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 100;
+const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin: 10px 0;
 `;
 
 const AlreadyRegisteredButton = styled(AppButton)`
@@ -26,16 +23,29 @@ const AlreadyRegisteredButton = styled(AppButton)`
   }
 `;
 
+const SuccessButton = styled(AppButton)`
+  background-color: #27ae60;
+  border-color: #27ae60;
+  &:hover,
+  &:focus {
+    background-color: #27ae60;
+    border-color: #27ae60;
+  }
+`;
+
 const RegisterScenarioItem = ({ config, filterState, mapState }) => {
   const { apps, targetAppName, filter: filterParamName, path, appId } = config;
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [justRegistered, setJustRegistered] = useState(false);
 
   const matchedFilter = mapState.filters?.find((f) => f.paramName === filterParamName);
   const filterValue = matchedFilter ? filterState[matchedFilter.id] : null;
 
   useEffect(() => {
+    // Reset the fresh-registration message whenever the selected scenario changes.
+    setJustRegistered(false);
     if (!filterValue || !appId || !path) {
       setIsRegistered(false);
       return;
@@ -55,9 +65,17 @@ const RegisterScenarioItem = ({ config, filterState, mapState }) => {
   if (!config.render) return null;
   if (apps && !apps.includes(getAppName())) return null;
 
+  if (justRegistered) {
+    return (
+      <SuccessButton disabled $width="100%" $height="auto">
+        Successfully registered {filterValue} to {targetAppName}
+      </SuccessButton>
+    );
+  }
+
   if (isRegistered) {
     return (
-      <AlreadyRegisteredButton disabled>
+      <AlreadyRegisteredButton disabled $width="100%" $height="auto">
         Selected scenario already registered to {targetAppName}
       </AlreadyRegisteredButton>
     );
@@ -71,6 +89,7 @@ const RegisterScenarioItem = ({ config, filterState, mapState }) => {
       await api.baseService.post(path, null, { queryParams: { appId, [filterParamName]: filterValue } });
       setStatus("success");
       setIsRegistered(true);
+      setJustRegistered(true);
     } catch {
       setStatus("error");
     } finally {
@@ -86,6 +105,8 @@ const RegisterScenarioItem = ({ config, filterState, mapState }) => {
     <AppButton
       onClick={handleClick}
       disabled={isLoading || !filterValue}
+      $width="100%"
+      $height="auto"
     >
       {label}
     </AppButton>
@@ -103,7 +124,7 @@ export const RegisterScenariosButton = () => {
   const configs = Array.isArray(rawConfig) ? rawConfig : [rawConfig];
 
   return (
-    <ButtonOverlay>
+    <ButtonContainer>
       {configs.map((config, i) => (
         <RegisterScenarioItem
           key={i}
@@ -112,6 +133,6 @@ export const RegisterScenariosButton = () => {
           mapState={mapState}
         />
       ))}
-    </ButtonOverlay>
+    </ButtonContainer>
   );
 };
