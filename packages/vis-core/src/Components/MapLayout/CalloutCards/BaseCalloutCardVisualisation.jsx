@@ -391,7 +391,7 @@ export const BaseCalloutCardVisualisation = ({
       ? data ?? previousDataRef.current
       : data;
 
-  const showInitialLoading = remoteIsLoading && !hasHydrated;
+  const showInitialLoading = remoteIsLoading && !hasHydrated && !displayData;
   const showUpdating = remoteIsLoading && hasHydrated;
 
   return type === "fullscreen" ? (

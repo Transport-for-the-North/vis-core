@@ -230,6 +230,16 @@ export const ScrollableContainer = ({
 
   const [isMobile, setIsMobile] = useState(initialIsMobile);
   const [open, setOpen] = useState(!initialIsMobile);
+  const [mobilePortalSlot, setMobilePortalSlot] = useState(null);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobilePortalSlot(null);
+      return;
+    }
+    if (typeof document === "undefined") return;
+    setMobilePortalSlot(document.getElementById("mobile-cards-slot"));
+  }, [isMobile]);
 
   const scrollRef = useRef(null);
   const updatedSeenTimerRef = useRef(null);
@@ -694,11 +704,7 @@ export const ScrollableContainer = ({
   );
 
   if (isMobile) {
-    const slot =
-      typeof document !== "undefined" &&
-      document.getElementById("mobile-cards-slot");
-
-    if (slot) {
+    if (mobilePortalSlot) {
       return createPortal(
         <>
           {showOnMobile && (
@@ -723,9 +729,10 @@ export const ScrollableContainer = ({
             {renderOverflowHint()}
           </StyledScrollableContainer>
         </>,
-        slot
+        mobilePortalSlot
       );
     }
+    return null;
   }
 
   return (

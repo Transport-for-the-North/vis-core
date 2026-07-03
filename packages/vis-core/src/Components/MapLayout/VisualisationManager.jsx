@@ -149,7 +149,7 @@ export const VisualisationManager = ({
     setUpdatedCardExpiries({});
   }, []);
 
-  const showOnMobile = visibleCount > 0;
+  const showOnMobile = calloutCardVisualisations.length > 0;
 
   /**
    * Keeps card order, visibility, first-visible tracking, and update markers in
