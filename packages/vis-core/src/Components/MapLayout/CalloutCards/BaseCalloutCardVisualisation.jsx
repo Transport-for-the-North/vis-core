@@ -34,6 +34,7 @@ import { api } from "services";
  * @param {Function} [props.onVisibilityChange] - Callback fired when the card becomes visible/hidden
  * @param {Function} [props.onCardUpdated] - Callback fired when hydrated card data changes.
  * @param {Function} [props.onCardUpdateAcknowledged] - Callback fired when the user opens an updated card.
+ * @param {boolean} [props.hideHandleOnMobile] - Hide the desktop card toggle in mobile stacked layout.
  * @param {string} [props.locationFilterId] - Optional explicit filter id to drive navigation
  * @param {Function} [props.getAllColors]
  *
@@ -48,6 +49,7 @@ export const BaseCalloutCardVisualisation = ({
   onVisibilityChange,
   onCardUpdated,
   onCardUpdateAcknowledged,
+  hideHandleOnMobile,
   locationFilterId,
   getAllColors,
   ...props
@@ -415,6 +417,7 @@ export const BaseCalloutCardVisualisation = ({
       data={displayData}
       isLoading={showInitialLoading}
       isUpdating={showUpdating}
+      hideHandleOnMobile={hideHandleOnMobile}
       getAllColors={getAllColors ?? injectedGetAllColors}
       recordSelector={
         hasMultipleRecords ? (

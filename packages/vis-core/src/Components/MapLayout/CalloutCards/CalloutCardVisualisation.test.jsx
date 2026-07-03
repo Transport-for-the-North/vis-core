@@ -263,6 +263,18 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
     expect(h2Element).toBeInTheDocument();
     expect(h3Element).toBeInTheDocument();
   });
+  it("hides the desktop toggle while loading in mobile stack mode", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...propsWithLoading} hideHandleOnMobile />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getAllByText("Loading...")).toHaveLength(2);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
   it("Click on the toggle button", async () => {
     render(
       <ThemeProvider theme={theme}>
@@ -280,6 +292,26 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
     await waitFor(() => {
       expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
     });
+  });
+});
+
+describe("Tests for mobile stacked cards", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("renders loaded card content without the desktop toggle", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} hideHandleOnMobile />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText("cardName")).toBeInTheDocument();
+    expect(screen.getByText("1-label-location_id-text_with_placeholders")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 });
 
