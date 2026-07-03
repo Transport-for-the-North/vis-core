@@ -588,6 +588,13 @@ const BarChartMultiple = ({
  * Renders a responsive line chart using Recharts
  * @param {Object} props - Component props
  * @param {Object} props.config - Chart configuration object
+ * @param {string} [props.config.x_axis_title] - Optional X axis label
+ * @param {string} [props.config.y_axis_title] - Optional Y axis label
+ * @param {string} [props.config.primaryLabel] - Label for the primary line (default: "Value")
+ * @param {string} [props.config.comparatorKey] - Data key for the comparator line (default: "dmValue")
+ * @param {string} [props.config.comparatorLabel] - Label for the comparator line (default: "Comparator")
+ * @param {string} [props.config.comparatorColor] - Stroke colour for the comparator line (default: "#999999")
+ * @param {string} [props.config.lineColor] - Stroke colour for the primary line
  * @param {Object} props.data - Data object containing values to chart
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Line chart component with X/Y axes, grid, and tooltip
@@ -599,7 +606,14 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   );
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
-  const dmStroke = config.dmLineColor || "#999999";
+  const hasXLabel = !!config.x_axis_title;
+  const hasYLabel = !!config.y_axis_title;
+
+  const comparatorKey = config.comparatorKey || "dmValue";
+  const comparatorLabel = config.comparatorLabel || "Comparator";
+  const primaryLabel = config.primaryLabel || "Value";
+  const comparatorStroke = config.comparatorColor || "#999999";
+
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n) : "";
@@ -613,10 +627,16 @@ const LineSeriesChart = ({ config, data, formatters }) => {
     [config, items]
   );
 
-  // Check if any point has a dmValue, so we know whether to render the second line
-  const hasDmValues = items.some(
-    (i) => i.dmValue !== null && i.dmValue !== undefined
+  // Check if any point has a value for the comparator key
+  const hasComparator = items.some(
+    (i) => i[comparatorKey] !== null && i[comparatorKey] !== undefined
   );
+
+  const chartMargin = { ...DEFAULTS.MARGIN };
+  if (hasXLabel || hasYLabel) {
+    chartMargin.bottom = 20;
+    chartMargin.left = 40;
+  }
 
   return (
     <ChartSection
@@ -624,7 +644,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
       title={config.title}
       height={height}
     >
-      <RLineChart data={items} margin={DEFAULTS.MARGIN}>
+      <RLineChart data={items} margin={chartMargin}>
         <RCartesianGrid {...DEFAULTS.GRID} />
         <RXAxis
           dataKey="label"
@@ -633,18 +653,39 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           height={xAxisHeight}
           interval={Array.isArray(data) ? "preserveStartEnd" : 0}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+          label={
+            hasXLabel
+              ? {
+                  value: config.x_axis_title,
+                  position: "insideBottom",
+                  offset: -5,
+                  fontSize: 14,
+                }
+              : undefined
+          }
         />
         <RYAxis
           allowDecimals={false}
           tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
+          label={
+            hasYLabel
+              ? {
+                  value: config.y_axis_title,
+                  position: "left",
+                  offset: 20,
+                  fontSize: 14,
+                  angle: -90,
+                }
+              : undefined
+          }
         />
         <RTooltip
           formatter={formatter}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
         />
-        {hasDmValues && (
+        {hasComparator && (
           <RLegend
             wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           />
@@ -652,18 +693,18 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         <RLine
           type="monotone"
           dataKey="value"
-          name={hasDmValues ? "DS" : (config.title || "Value")}
+          name={hasComparator ? primaryLabel : (config.title || "Value")}
           stroke={stroke}
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
         />
-        {hasDmValues && (
+        {hasComparator && (
           <RLine
             type="monotone"
-            dataKey="dmValue"
-            name="DM"
-            stroke={dmStroke}
+            dataKey={comparatorKey}
+            name={comparatorLabel}
+            stroke={comparatorStroke}
             strokeWidth={2}
             strokeDasharray="4 4"
             dot={false}
