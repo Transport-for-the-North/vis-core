@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
-import { PageContext } from "contexts";
+import { PageContext, ToastProvider } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage, useDebounced } from "hooks";
 import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
 import { defaultBgColour } from "defaults";
@@ -316,7 +316,8 @@ export const MapLayout = () => {
   };
 
   return (
-    <LayoutContainer>
+    <ToastProvider>
+      <LayoutContainer>
       <Dimmer dimmed={isLoading} showLoader={true} />
       <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
@@ -354,7 +355,8 @@ export const MapLayout = () => {
       {/* Mobile-only: where summary cards will be portaled into */}
       <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
       
-      <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
-    </LayoutContainer>
+        <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
+      </LayoutContainer>
+    </ToastProvider>
   );
 };

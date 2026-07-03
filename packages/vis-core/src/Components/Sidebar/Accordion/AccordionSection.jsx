@@ -39,9 +39,10 @@ const AccordionContent = styled.div`
  * @property {string} title - The title of the accordion section.
  * @property {ReactNode} children - The content of the accordion section.
  * @property {boolean} [defaultValue=false] - The default state of the accordion section (open or closed). Defaults to false (closed).
+ * @property {ReactNode} [statusNode] - Optional node rendered in the header, usually for status icons or warnings.
  * @returns {JSX.Element} The rendered AccordionSection component.
  */
-export const AccordionSection = ({ title, children, defaultValue }) => {
+export const AccordionSection = ({ title, children, defaultValue, statusNode }) => {
   const [isOpen, setIsOpen] = useState(defaultValue);
 
   const toggleAccordion = () => {
@@ -51,8 +52,13 @@ export const AccordionSection = ({ title, children, defaultValue }) => {
   return (
     <>
       <AccordionHeader onClick={toggleAccordion} $isOpen={isOpen}>
-        {title}
-        <AccordionIcon $isOpen={isOpen} />
+        <div>{title}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {statusNode}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', transform: isOpen ? 'translateY(-2px)' : 'translateX(-2px)' }}>
+            <AccordionIcon $isOpen={isOpen} />
+          </div>
+        </div>
       </AccordionHeader>
       <AccordionContent $isOpen={isOpen} className="selectable-text">
         {isOpen && children}
