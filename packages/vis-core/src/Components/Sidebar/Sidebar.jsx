@@ -51,12 +51,25 @@ const SidebarContainer = styled.div`
     top: auto;
     max-width: 100%;
     width: 100%;
-    max-haight: none;
+    max-height: none;
     border-radius: 0;
     box-shadow: none;
-    overflow-y: auto;
     z-index: 1001;
-    display: ${({ $isVisible }) => ($isVisible ? 'block' : 'none')};
+    display: block;
+    
+    ${({ $isVisible }) => !$isVisible ? `
+      height: 0;
+      overflow: hidden;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin: 0;
+      border: none;
+      opacity: 0;
+    ` : `
+      height: auto;
+      overflow-y: auto;
+      opacity: 1;
+    `}
   }
 
   /* Custom Scrollbar Styles for non-Firefox browsers */
