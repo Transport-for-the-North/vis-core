@@ -108,6 +108,33 @@ export const MapLayout = () => {
     });
   }, [filterDispatch]);
 
+  const getSelectedFilterOptions = useCallback((filter, value) => {
+    const values = filter.values?.values;
+    if (!Array.isArray(values)) return [];
+
+    if (Array.isArray(value)) {
+      const selected = new Set(value);
+      return values.filter((item) => selected.has(item.paramValue));
+    }
+
+    const selected = values.find((item) => item.paramValue === value);
+    return selected ? [selected] : [];
+  }, []);
+
+  const buildFilterActionPayload = useCallback((filter, action, value, sides) => {
+    const selectedOptions = getSelectedFilterOptions(filter, value);
+    const payload = { filter, value, ...action.payload };
+
+    if (sides) payload.sides = sides;
+
+    if (action.action === "UPDATE_COLOR_SCHEME") {
+      const colourValue = selectedOptions.find((option) => option.colourValue)?.colourValue;
+      if (colourValue) payload.color_scheme = colourValue;
+    }
+
+    return payload;
+  }, [getSelectedFilterOptions]);
+
   /**
    * Effect A (immediate): keep derived filters in sync with their source selection and metadata.
    * Fires on every filterState change so the UI responds without waiting for the debounce.
@@ -226,44 +253,30 @@ export const MapLayout = () => {
     }
 
     state.filters.forEach((filter) => {
-      let selectedValue
-      if (filter.values?.values && Array.isArray(filter.values.values)) {
-        selectedValue = filter.values?.values.find(
-          (value) => value.paramValue === debouncedFilterState[filter.id]
-        );
-      }
+      const filterValue = debouncedFilterState[filter.id];
+
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
-          // Add the colour scheme to the payload
-          let additionalPayload
-          if (action.action === "UPDATE_COLOR_SCHEME") {
-            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
-          }
           dispatch({
             type: action.action,
-            payload: { filter, value: debouncedFilterState[filter.id], ...action.payload, ...additionalPayload },
+            payload: buildFilterActionPayload(filter, action, filterValue),
           });
         });
       } else {
         filter.actions.forEach((action) => {
           let sides = "";
 
-          // Add the colour scheme to the payload
-          let additionalPayload
-          if (action.action === "UPDATE_COLOR_SCHEME") {
-            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
-          }
           if (filter.filterName.includes("Left")) sides = "left";
           else if (filter.filterName.includes("Right")) sides = "right";
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: debouncedFilterState[filter.id], sides, ...action.payload, ...additionalPayload },
+            payload: buildFilterActionPayload(filter, action, filterValue, sides),
           });
         });
       }
     });
-  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch]);
+  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch, buildFilterActionPayload]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
