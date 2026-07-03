@@ -113,26 +113,24 @@ describe("Test to render a CalloutVisualisationCard", () => {
     expect(cardName).toBeInTheDocument();
     expect(cardName1).toBeInTheDocument();
   });
-  it("tracks visible cards for mobile summary visibility", async () => {
-    const user = userEvent.setup();
-
-    render(
+  it("sets show-on-mobile based on presence of configured cards", () => {
+    const { rerender } = render(
       <MapContext.Provider value={mockMapContext}>
         <VisualisationManager {...props} />
       </MapContext.Provider>
     );
     expect(screen.getByTestId("scrollable-container")).toHaveAttribute(
       "data-show-on-mobile",
-      "false"
-    );
-
-    await user.click(screen.getByRole("button", { name: "visible: Test Card1" }));
-    expect(screen.getByTestId("scrollable-container")).toHaveAttribute(
-      "data-show-on-mobile",
       "true"
     );
 
-    await user.click(screen.getByRole("button", { name: "hidden: Test Card1" }));
+    // Re-render with no cards
+    rerender(
+      <MapContext.Provider value={mockMapContext}>
+        <VisualisationManager {...props} visualisationConfigs={{}} />
+      </MapContext.Provider>
+    );
+    
     expect(screen.getByTestId("scrollable-container")).toHaveAttribute(
       "data-show-on-mobile",
       "false"
