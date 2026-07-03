@@ -108,6 +108,13 @@ export const MapLayout = () => {
     });
   }, [filterDispatch]);
 
+  /**
+   * Retrieves the full option objects corresponding to a filter's selected value(s).
+   *
+   * @param {Object} filter - The filter configuration object, containing a `values` property with an array of options.
+   * @param {any|any[]} value - The currently selected value (scalar for single-select) or array of values (for multi-select).
+   * @returns {Object[]} An array of matching option objects from the filter's configuration. Returns an empty array if no matches are found or if the filter lacks options.
+   */
   const getSelectedFilterOptions = useCallback((filter, value) => {
     const values = filter.values?.values;
     if (!Array.isArray(values)) return [];
@@ -121,6 +128,15 @@ export const MapLayout = () => {
     return selected ? [selected] : [];
   }, []);
 
+  /**
+   * Constructs the payload for dispatching map reducer actions triggered by filter changes.
+   *
+   * @param {Object} filter - The filter configuration object triggering the action.
+   * @param {Object} action - The action definition, including its base `payload` and action type (e.g., `UPDATE_COLOR_SCHEME`).
+   * @param {any|any[]} value - The currently selected value(s) for the filter.
+   * @param {string[]} [sides] - Optional list of panel sides the action applies to, used in dual-map layouts.
+   * @returns {Object} The enriched payload containing the filter, selected value(s), original action payload parameters, and potentially resolved colour schemes.
+   */
   const buildFilterActionPayload = useCallback((filter, action, value, sides) => {
     const selectedOptions = getSelectedFilterOptions(filter, value);
     const payload = { filter, value, ...action.payload };
