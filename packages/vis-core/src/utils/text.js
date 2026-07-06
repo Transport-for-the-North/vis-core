@@ -96,6 +96,15 @@ export function numberWithCommas(x) {
   return parts.join(".");
 }
 
+/**
+ * Formats a number with commas and specific suffix rules (K, M, B) depending on its magnitude.
+ * By default, integers under 1000 retain trailing decimals (e.g. 150.00).
+ *
+ * @param {number|string} value - The numerical value to format.
+ * @param {Object} [options={}] - Formatting options.
+ * @param {boolean} [options.stripTrailingZeroes=false] - If true, strips trailing zeroes from decimals for numbers under 1000.
+ * @returns {string|number} The formatted number string, or the original value if invalid.
+ */
 export const formatNumber = (value, options = {}) => {
   const { stripTrailingZeroes = false } = options;
   if (typeof value !== 'number' || isNaN(value)) return value;
