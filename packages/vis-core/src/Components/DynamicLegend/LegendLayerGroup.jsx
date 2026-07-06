@@ -114,7 +114,7 @@ const LegendLayerGroup = ({
   const numericVals = item.legendEntriesNumeric?.filter(Number.isFinite) || [];
   const isDescending = numericVals.length >= 2 && numericVals[0] > numericVals[numericVals.length - 1];
 
-  const pref = layerPrefs[item.layerId] || { displayMode: 'continuous', scaleMode: 'value' };
+  const pref = layerPrefs[item.layerId] || { displayMode: 'continuous', scaleMode: 'color' };
   const useDiscreteSwatches = !canBeContinuous || pref.displayMode === 'discrete';
 
   const isPopoverOpen = openPopoverId === item.layerId;
