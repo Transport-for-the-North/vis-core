@@ -27,9 +27,8 @@ import { formatNumber } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
-// Shared styles
 const Section = styled.section`
-  margin-bottom: 8px;
+  margin-bottom: 24px;
 `;
 
 const Title = styled.h3`
@@ -409,7 +408,14 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const hasPositive = items.some((i) => Number(i.value) > 0);
   const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
 
-
+  const yCategoryWidth = React.useMemo(() => {
+    if (type !== "vertical") return 0;
+    const maxLineLength = Math.max(0, ...items.map(i => {
+      const lines = wrapLabel(i.label || "", 15).split("\n");
+      return Math.max(0, ...lines.map(l => l.length));
+    }));
+    return Math.max(60, maxLineLength * 6.5 + 5);
+  }, [items, type]);
 
   return (
     <ChartSection
@@ -440,7 +446,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
             <RYAxis
               type="category"
               dataKey="label"
-              width={100}
+              width={yCategoryWidth}
               tick={<CategoryTick />}
               tickLine={false}
               interval={0}
@@ -515,6 +521,15 @@ const BarChartMultiple = ({
   const hasPositive = items.some((i) => config.columns.some((c) => Number(i[c.key]) > 0));
   const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
 
+  const yCategoryWidth = React.useMemo(() => {
+    if (type !== "vertical") return 0;
+    const maxLineLength = Math.max(0, ...items.map(i => {
+      const lines = wrapLabel(i[config.xKey || "label"] || "", 15).split("\n");
+      return Math.max(0, ...lines.map(l => l.length));
+    }));
+    return Math.max(60, maxLineLength * 6.5 + 5);
+  }, [items, type, config]);
+
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
@@ -543,7 +558,7 @@ const BarChartMultiple = ({
             <RYAxis
               type="category"
               dataKey={config.xKey || "label"}
-              width={100}
+              width={yCategoryWidth}
               tick={<CategoryTick />}
               tickLine={false}
               interval={0}
