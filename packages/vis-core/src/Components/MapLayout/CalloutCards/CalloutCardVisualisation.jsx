@@ -467,6 +467,10 @@ export const CalloutCardVisualisation = ({
                       title: chart.header || "Title",
                       x_axis_title: chart?.x_axis_title,
                       y_axis_title: chart?.y_axis_title,
+                      primaryLabel: chart?.primaryLabel,
+                      comparatorLabel: chart?.comparatorLabel,
+                      comparatorKey: chart?.comparatorKey,
+                      comparatorColor: chart?.comparatorColor,
                       colors: networkColorMap
                     };
 
