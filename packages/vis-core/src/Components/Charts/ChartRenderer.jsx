@@ -345,6 +345,10 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     [config, items]
   );
 
+  const hasNegative = items.some((i) => Number(i.value) < 0);
+  const hasPositive = items.some((i) => Number(i.value) > 0);
+  const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
+
   // Function to wrap long labels into multiple lines after a certain length and a space
   const wrapLabel = (label, maxLen = 15) => {
     const words = label.split(" ");
@@ -403,7 +407,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
           <>
             <RXAxis
               type="number"
-              domain={[(min) => Math.min(0, min), (max) => Math.max(0, max)]}
+              domain={dataDomain}
               allowDecimals={false}
               tickCount={6}
               tickFormatter={formatter}
@@ -429,7 +433,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
               tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
             />
             <RYAxis
-              domain={[(min) => Math.min(0, min), (max) => Math.max(0, max)]}
+              domain={dataDomain}
               allowDecimals={false}
               tickFormatter={formatter}
               tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
@@ -495,6 +499,11 @@ const BarChartMultiple = ({
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n) : "";
   };
+
+  const hasNegative = items.some((i) => config.columns.some((c) => Number(i[c.key]) < 0));
+  const hasPositive = items.some((i) => config.columns.some((c) => Number(i[c.key]) > 0));
+  const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
+
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
@@ -515,7 +524,7 @@ const BarChartMultiple = ({
           <>
             <RXAxis
               type="number"
-              domain={[(min) => Math.min(0, min), (max) => Math.max(0, max)]}
+              domain={dataDomain}
               allowDecimals={false}
               tickFormatter={formatter}
               tick={<CustomTick />}
@@ -537,7 +546,7 @@ const BarChartMultiple = ({
               interval={0}
             />
             <RYAxis
-              domain={[(min) => Math.min(0, min), (max) => Math.max(0, max)]}
+              domain={dataDomain}
               allowDecimals={false}
               tickFormatter={yTickFormatter}
               width={DEFAULTS.DIMENSIONS.yAxisWidth}
