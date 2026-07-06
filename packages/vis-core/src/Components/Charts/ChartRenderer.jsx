@@ -29,7 +29,7 @@ const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
 
 // Shared styles
 const Section = styled.section`
-  margin: 8px 0 12px;
+  margin-bottom: 8px;
 `;
 
 const Title = styled.h3`
@@ -284,6 +284,66 @@ const defaultFormatters = {
   },
 };
 
+// Function to wrap long labels into multiple lines after a certain length and a space
+const wrapLabel = (label, maxLen = 15) => {
+  const words = String(label || "").split(" ");
+  let lines = [];
+  let currentLine = "";
+  words.forEach((word) => {
+    if ((currentLine + " " + word).trim().length > maxLen) {
+      lines.push(currentLine.trim());
+      currentLine = word;
+    } else {
+      currentLine += " " + word;
+    }
+  });
+  if (currentLine) lines.push(currentLine.trim());
+  return lines.join("\n");
+};
+
+/**
+ * Shared tick component for category axes.
+ * Handles both wrapped multi-line Y-axis labels and rotated X-axis labels consistently.
+ */
+const CategoryTick = ({ x, y, payload, angle = 0 }) => {
+  if (angle !== 0) {
+    // For rotated X-axis labels, don't overly truncate since they have diagonal space
+    const label = String(payload.value || "");
+    const displayLabel = label.length > 25 ? label.slice(0, 25) + "…" : label;
+    return (
+      <text
+        x={x}
+        y={y}
+        dy={16}
+        textAnchor="end"
+        fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+        transform={`rotate(${angle}, ${x}, ${y})`}
+      >
+        {displayLabel}
+      </text>
+    );
+  }
+
+  // For vertical Y-axis labels, wrap text into multiple lines
+  const lines = wrapLabel(payload.value, 15).split("\n");
+  const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2;
+
+  return (
+    <text
+      x={x}
+      y={startY}
+      textAnchor="end"
+      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+    >
+      {lines.map((line, i) => (
+        <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize + 2} key={i}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+};
+
 /**
  * Transforms configuration columns and data into series format for Recharts
  * @param {Object} config - Chart configuration containing columns definition
@@ -349,43 +409,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const hasPositive = items.some((i) => Number(i.value) > 0);
   const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
 
-  // Function to wrap long labels into multiple lines after a certain length and a space
-  const wrapLabel = (label, maxLen = 15) => {
-    const words = label.split(" ");
-    let lines = [];
-    let currentLine = "";
-    words.forEach((word) => {
-      if ((currentLine + " " + word).trim().length > maxLen) {
-        lines.push(currentLine.trim());
-        currentLine = word;
-      } else {
-        currentLine += " " + word;
-      }
-    });
-    if (currentLine) lines.push(currentLine.trim());
-    return lines.join("\n");
-  };
 
-  const CustomTick = (props) => {
-    const { x, y, payload } = props;
-    const lines = wrapLabel(payload.value, 20).split("\n"); // Cut the label after a space and 20 characters and create an array
-    const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2; // adjust to center
-
-    return (
-      <text
-        x={x}
-        y={startY}
-        textAnchor="end"
-        fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
-      >
-        {lines.map((line, i) => (
-          <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize} key={i}>
-            {line}
-          </tspan>
-        ))}
-      </text>
-    );
-  };
 
   return (
     <ChartSection
@@ -417,7 +441,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
               type="category"
               dataKey="label"
               width={100}
-              tick={<CustomTick />}
+              tick={<CategoryTick />}
               tickLine={false}
               interval={0}
             />
@@ -481,20 +505,7 @@ const BarChartMultiple = ({
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n) : "";
   };
-  const truncateLabel = (label, maxLen = 7) =>
-    label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
-  const CustomTick = ({ x, y, payload, angle = 0 }) => (
-    <text
-      x={x}
-      y={y}
-      dy={angle ? 16 : 4}
-      textAnchor="end"
-      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
-      transform={angle ? `rotate(${angle}, ${x}, ${y})` : undefined}
-    >
-      {truncateLabel(payload.value)}
-    </text>
-  );
+
   const yTickFormatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n) : "";
@@ -527,13 +538,13 @@ const BarChartMultiple = ({
               domain={dataDomain}
               allowDecimals={false}
               tickFormatter={formatter}
-              tick={<CustomTick />}
+              tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
             />
             <RYAxis
               type="category"
               dataKey={config.xKey || "label"}
               width={100}
-              tick={<CustomTick />}
+              tick={<CategoryTick />}
               tickLine={false}
               interval={0}
             />
@@ -542,7 +553,7 @@ const BarChartMultiple = ({
           <>
             <RXAxis
               dataKey={config.xKey || "label"}
-              tick={<CustomTick angle={-45} />}
+              tick={<CategoryTick angle={-45} />}
               interval={0}
             />
             <RYAxis
