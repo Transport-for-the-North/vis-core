@@ -271,7 +271,7 @@ const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, childr
 const defaultFormatters = {
   commify: (v) => {
     const n = Number(v ?? 0);
-    return Number.isFinite(n) ? formatNumber(n) : String(v ?? "");
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : String(v ?? "");
   },
   percent: (value, data, keys) => {
     const total = (keys || Object.keys(data || {})).reduce(
@@ -387,12 +387,12 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const tooltipFormatter = (val) => {
     if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
 
   const xAxisHeight = React.useMemo(
@@ -504,17 +504,17 @@ const BarChartMultiple = ({
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const tooltipFormatter = (val) => {
     if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
 
   const yTickFormatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
 
   const hasNegative = items.some((i) => config.columns.some((c) => Number(i[c.key]) < 0));
@@ -630,7 +630,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
 
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const xAxisHeight = React.useMemo(
     () =>
@@ -725,7 +725,7 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
   const fill = config.areaFillColor || "rgba(75,62,145,0.25)";
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const xAxisHeight = React.useMemo(
     () =>
@@ -788,7 +788,7 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
   const fill = config.scatterColor || DEFAULTS.BRAND_COLOR;
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const xAxisHeight = React.useMemo(
     () =>
@@ -862,7 +862,7 @@ const DonutPieChart = ({ config, data, formatters }) => {
         <RTooltip
           formatter={(value, name, props) => {
             const n = Number(value);
-            const formatted = Number.isFinite(n) ? formatNumber(n) : "";
+            const formatted = Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
             return [formatted + ` (${pctFmt(value)})`, props?.payload?.label || name];
           }}
         />

@@ -96,7 +96,8 @@ export function numberWithCommas(x) {
   return parts.join(".");
 }
 
-export const formatNumber = (value) => {
+export const formatNumber = (value, options = {}) => {
+  const { stripTrailingZeroes = false } = options;
   if (typeof value !== 'number' || isNaN(value)) return value;
 
   const abs = Math.abs(value);
@@ -108,8 +109,11 @@ export const formatNumber = (value) => {
     return sign + sig2.toString();
   }
 
-  // Under 1000 -- 2 decimal places
+  // Under 1000 -- 2 decimal places (optional trailing zero removal)
   if (abs < 999.995) {
+    if (stripTrailingZeroes) {
+      return sign + numberWithCommas(parseFloat(abs.toFixed(2)));
+    }
     return sign + numberWithCommas(abs.toFixed(2));
   }
 
