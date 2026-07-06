@@ -1,6 +1,6 @@
 import React from "react";
 import { DEFAULT_MAX_ROWS, buildDisplayFields } from "utils";
-import { useTableData, useLookups } from "hooks";
+import { useTableData, useLookups, useTableScrollCap } from "hooks";
 import { CellValue } from "./CellValue";
 import {
   SectionTitle, StatusMessage, ErrorMessage, TableWrap, Table, Th, Td,
@@ -20,6 +20,8 @@ export function ViewTable({ table }) {
   const { lookups, lookupLabels } = useLookups(table);
   const displayFields = buildDisplayFields(columns, lookups, lookupLabels, table.hiddenColumns);
   const maxRows = table.maxRows ?? DEFAULT_MAX_ROWS;
+  // Cap the table at exactly maxRows visible rows, scrolling beyond that.
+  const { scrollRef, maxHeight } = useTableScrollCap(maxRows, rows.length, displayFields.length);
 
   return (
     <div>
@@ -28,7 +30,7 @@ export function ViewTable({ table }) {
       {loading ? (
         <StatusMessage>Loading…</StatusMessage>
       ) : (
-        <TableWrap $scroll={rows.length > maxRows} $maxRows={maxRows}>
+        <TableWrap ref={scrollRef} $scroll={rows.length > maxRows} $maxRows={maxRows} $maxHeight={maxHeight}>
           <Table>
             <thead>
               <tr>{displayFields.map((f) => <Th key={f.key}>{f.header}</Th>)}</tr>

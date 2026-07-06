@@ -3,7 +3,8 @@
 // knowing endpoint paths directly. Pure helpers live in utils/adminPage; the service
 // lives in services/api/AdminApi.
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ROW_HEIGHT_PX, HEADER_HEIGHT_PX } from "utils";
 
 /**
  * Carries the admin API service (see `createAdminApi`) down to the data hooks and
@@ -30,6 +31,23 @@ export const AdminCanEditContext = createContext(true);
 export const useAdminCanEdit = () => useContext(AdminCanEditContext);
 
 /**
+ * Cross-section refresh bus. Sections fetch independently, so a mutation in one (e.g.
+ * adding a registration) must be able to trigger a reload of another that it affects
+ * (e.g. the pipeline audit log). Holds a per-table-name counter; `requestRefresh` bumps
+ * the counter for the named table(s), and `useTableData` refetches when its table's
+ * counter changes. AdminPage supplies the value.
+ *
+ * @type {React.Context<{signals: Object<string, number>, requestRefresh: (tables: string|string[]) => void}>}
+ */
+export const AdminRefreshContext = createContext({ signals: {}, requestRefresh: () => {} });
+
+/**
+ * Reads the cross-section refresh bus.
+ * @returns {{signals: Object<string, number>, requestRefresh: (tables: string|string[]) => void}}
+ */
+export const useAdminRefresh = () => useContext(AdminRefreshContext);
+
+/**
  * Shared data hook for view/edit tables. Fetches the table's rows and column metadata
  * together and exposes a refetch for use after mutations.
  *
@@ -39,10 +57,15 @@ export const useAdminCanEdit = () => useContext(AdminCanEditContext);
  */
 export function useTableData(table) {
   const adminApi = useAdminApi();
+  const { signals } = useAdminRefresh();
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Refetch when another section requests a refresh of this table (e.g. an audit log
+  // reloaded after a registration is added/removed elsewhere on the page).
+  const refreshSignal = signals?.[table.tableName] ?? 0;
 
   /**
    * (Re)loads the table's rows and column metadata from the API.
@@ -63,7 +86,7 @@ export function useTableData(table) {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table.tableName]);
+  }, [table.tableName, refreshSignal]);
 
   return { rows, columns, loading, error, setError, refetch: fetchData };
 }
@@ -106,4 +129,38 @@ export function useLookups(table) {
   }, [lookups, lookupOptions]);
 
   return { lookups, lookupOptions, lookupLabels };
+}
+
+/**
+ * Computes the height at which a table should stop growing and start scrolling so that
+ * exactly `maxRows` rows stay visible. It measures the rendered header and first data-row
+ * heights rather than assuming a fixed row height, because rows vary (e.g. edit tables are
+ * taller due to the row action button). Falls back to the px approximations until measured.
+ *
+ * Attach the returned `scrollRef` to the scroll container (which must contain the
+ * `<thead>`/`<tbody>`), and apply `maxHeight` as its cap.
+ *
+ * @param {number} maxRows - Rows to keep visible before scrolling.
+ * @param {number} rowCount - Current row count (re-measures when it changes).
+ * @param {number} colCount - Current column count (re-measures when it changes).
+ * @returns {{scrollRef: React.RefObject<HTMLDivElement>, maxHeight: number}}
+ */
+export function useTableScrollCap(maxRows, rowCount, colCount) {
+  const scrollRef = useRef(null);
+  const [maxHeight, setMaxHeight] = useState(ROW_HEIGHT_PX * maxRows + HEADER_HEIGHT_PX);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    const header = el?.querySelector("thead");
+    const firstRow = el?.querySelector("tbody tr");
+    if (!header || !firstRow) return;
+
+    const headerHeight = header.getBoundingClientRect().height;
+    const rowHeight = firstRow.getBoundingClientRect().height;
+    if (rowHeight > 0) {
+      setMaxHeight(Math.round(headerHeight + rowHeight * maxRows));
+    }
+  }, [maxRows, rowCount, colCount]);
+
+  return { scrollRef, maxHeight };
 }

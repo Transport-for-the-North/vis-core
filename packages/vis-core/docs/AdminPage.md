@@ -160,6 +160,7 @@ automatically.
 | `hiddenColumns` | no     | Column names to omit from the table (e.g. an app-identifier column fixed to the current app). |
 | `lookups`     | no       | Per-column dropdown/label configuration. See [Lookups](#lookups-dropdowns-and-friendly-labels). |
 | `auditWrite`  | no       | Secondary insert on add/delete. See [Audit writes](#audit-writes-on-adddelete).          |
+| `refreshTables` | no     | Names of other sections' tables to reload after an add/delete here (e.g. `["pipeline_audit_log"]` so the audit log refreshes once `auditWrite` appends an entry). |
 | `maxRows`     | no       | Rows shown before the table scrolls (defaults to `8`).                                   |
 
 **Add-form value typing.** Inputs always yield strings, so before submitting, each value is
@@ -361,6 +362,11 @@ auditWrite: {
 Both `auditWrite` itself and each of `onAdd`/`onDelete` are **optional** — most edit tables
 will omit `auditWrite` entirely, and you may define just one direction if you only want to
 audit adds or only deletes.
+
+Sections fetch their data independently, so when the audit table is also shown on the page
+(e.g. a `pipeline_audit_log` view), add `refreshTables: ["pipeline_audit_log"]` to this edit
+table so that view reloads after each add/delete and shows the new entry without a page
+reload.
 
 **Value templates.** Each entry is either:
 

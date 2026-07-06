@@ -8,7 +8,7 @@ import {
   coerceValues,
   buildAlsoInsert,
 } from "utils";
-import { useTableData, useLookups, useAdminApi, useAdminCanEdit } from "hooks";
+import { useTableData, useLookups, useAdminApi, useAdminCanEdit, useAdminRefresh, useTableScrollCap } from "hooks";
 import { LookupSelect } from "./LookupSelect";
 import { CellValue } from "./CellValue";
 import {
@@ -29,8 +29,12 @@ import {
 export function EditTable({ table }) {
   const adminApi = useAdminApi();
   const canEdit = useAdminCanEdit();
+  const { requestRefresh } = useAdminRefresh();
   const fixedValues = table.fixedValues ?? {};
   const auditWrite = table.auditWrite ?? null;
+  // Other sections (by table name) to reload after a mutation here — e.g. the audit log,
+  // which this table's auditWrite appends to on add/delete.
+  const refreshTables = table.refreshTables ?? [];
   const { rows, columns, loading, error, setError, refetch } = useTableData(table);
   const { lookups, lookupOptions, lookupLabels } = useLookups(table);
   const [fieldValues, setFieldValues] = useState(fixedValues);
@@ -66,6 +70,11 @@ export function EditTable({ table }) {
   const maxRows = table.maxRows ?? DEFAULT_MAX_ROWS;
   // View-only users (e.g. cross-app super admins) see the table but no delete/add controls.
   const showActions = canEdit && primaryKeys.length > 0;
+  // Cap the table at exactly maxRows visible rows (edit rows are taller than the default
+  // estimate because of the action button), scrolling beyond that.
+  const { scrollRef, maxHeight } = useTableScrollCap(
+    maxRows, rows.length, displayFields.length + (showActions ? 1 : 0)
+  );
 
   const canAdd =
     addColumns.length > 0 &&
@@ -98,6 +107,7 @@ export function EditTable({ table }) {
       });
       resetForm();
       refetch();
+      requestRefresh(refreshTables);
     } catch {
       setError("Failed to add row.");
     } finally {
@@ -124,6 +134,7 @@ export function EditTable({ table }) {
         alsoInsert: buildAlsoInsert(auditWrite, "onDelete", row),
       });
       refetch();
+      requestRefresh(refreshTables);
     } catch {
       setError("Failed to delete row.");
     } finally {
@@ -139,7 +150,7 @@ export function EditTable({ table }) {
         <StatusMessage>Loading…</StatusMessage>
       ) : (
         <>
-          <TableWrap $scroll={rows.length > maxRows} $maxRows={maxRows}>
+          <TableWrap ref={scrollRef} $scroll={rows.length > maxRows} $maxRows={maxRows} $maxHeight={maxHeight}>
             <Table>
               <thead>
                 <tr>

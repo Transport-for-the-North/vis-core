@@ -237,15 +237,37 @@ export const ErrorMessage = styled(StatusMessage)`
 `;
 
 // Caps the table at $maxRows rows; taller content scrolls vertically with the header
-// kept in view via sticky <Th>.
+// kept in view via sticky <Th>. $maxHeight is the measured cap (header + maxRows rows);
+// it falls back to the px approximation until measured.
 export const TableWrap = styled.div`
   overflow-x: auto;
-  ${({ $scroll, $maxRows }) =>
+  ${({ $scroll, $maxRows, $maxHeight }) =>
     $scroll &&
     `
-    max-height: ${ROW_HEIGHT_PX * $maxRows + HEADER_HEIGHT_PX}px;
-    overflow-y: auto;
+    max-height: ${$maxHeight ?? ROW_HEIGHT_PX * $maxRows + HEADER_HEIGHT_PX}px;
+    /* Always render the scrollbar (not overlay/auto-hidden) so it's clear the table
+       continues beyond what's visible, and reserve its gutter to avoid a layout shift. */
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
   `}
+
+  /* Make the scrollbar clearly visible across browsers. */
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 5px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 5px;
+  }
+  scrollbar-color: #cbd5e1 #f1f5f9;
 `;
 
 export const Table = styled.table`

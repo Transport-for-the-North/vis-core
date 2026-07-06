@@ -1,10 +1,10 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useMemo, useState, useCallback } from "react";
 import { AppContext } from "contexts";
 import { WarningBox } from "Components";
 import { api, createAdminApi } from "services";
 import { getAppName } from "../../runtime";
 import { resolveAdminEndpoints, defaultLayout, normaliseColumn, isAppAdmin } from "utils";
-import { AdminApiContext, AdminCanEditContext } from "hooks";
+import { AdminApiContext, AdminCanEditContext, AdminRefreshContext } from "hooks";
 import { LayoutCell } from "./LayoutCell";
 import { Page, LayoutContainer, Column, CellStack } from "./styles";
 
@@ -50,8 +50,27 @@ export const AdminPage = () => {
     ? adminPage.warning.replace(/\{app\}/g, app)
     : null;
 
+  // Cross-section refresh bus: a mutation in one section (e.g. adding a registration, which
+  // also writes an audit-log entry) can request other sections that display affected tables
+  // to reload. Each request bumps a per-table counter that `useTableData` watches.
+  const [refreshSignals, setRefreshSignals] = useState({});
+  const requestRefresh = useCallback((tables) => {
+    const names = (Array.isArray(tables) ? tables : [tables]).filter(Boolean);
+    if (names.length === 0) return;
+    setRefreshSignals((prev) => {
+      const next = { ...prev };
+      names.forEach((name) => { next[name] = (next[name] ?? 0) + 1; });
+      return next;
+    });
+  }, []);
+  const refreshBus = useMemo(
+    () => ({ signals: refreshSignals, requestRefresh }),
+    [refreshSignals, requestRefresh]
+  );
+
   return (
     <AdminApiContext.Provider value={adminApi}>
+      <AdminRefreshContext.Provider value={refreshBus}>
       <AdminCanEditContext.Provider value={canEdit}>
         <Page>
           {warningMessage && <WarningBox text={warningMessage} isSticky />}
@@ -73,6 +92,7 @@ export const AdminPage = () => {
           </LayoutContainer>
         </Page>
       </AdminCanEditContext.Provider>
+      </AdminRefreshContext.Provider>
     </AdminApiContext.Provider>
   );
 };
