@@ -788,7 +788,6 @@ export const CalloutCardVisualisation = ({
                     };
 
                   // Dynamic title for ranking charts
-                  let chartData;
 
                   if (
                     (chart.type === "ranking" &&
