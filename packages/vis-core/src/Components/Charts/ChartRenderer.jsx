@@ -28,7 +28,14 @@ const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
 const Section = styled.section`
-  margin-bottom: 24px;
+  margin: 0;
+`;
+
+const ChartContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
 `;
 
 const Title = styled.h3`
@@ -1116,7 +1123,7 @@ export const ChartRenderer = ({
   if (!hasAny) return null;
 
   return (
-    <div>
+    <ChartContainer>
       {charts.map((cfg, idx) => {
         const type = (cfg.type || "").toLowerCase();
         const resolvedBarChartHeight = cfg?.height ?? cfg?.barHeight ?? barHeight;
@@ -1225,7 +1232,7 @@ export const ChartRenderer = ({
             );
         }
       })}
-    </div>
+    </ChartContainer>
   );
 };
 
