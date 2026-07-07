@@ -115,10 +115,13 @@ export const roundValue = (value) => {
  */
 export const sortValues = (values, order) => {
   return values.sort((a, b) => {
+    const valA = a.sortValue !== undefined ? a.sortValue : a.displayValue;
+    const valB = b.sortValue !== undefined ? b.sortValue : b.displayValue;
+
     if (order === 'ascending') {
-      return a.displayValue > b.displayValue ? 1 : -1;
+      return valA > valB ? 1 : (valA < valB ? -1 : 0);
     } else if (order === 'descending') {
-      return a.displayValue < b.displayValue ? 1 : -1;
+      return valA < valB ? 1 : (valA > valB ? -1 : 0);
     }
     return 0;
   });
