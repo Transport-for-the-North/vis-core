@@ -114,7 +114,7 @@ const LegendLayerGroup = ({
   const numericVals = item.legendEntriesNumeric?.filter(Number.isFinite) || [];
   const isDescending = numericVals.length >= 2 && numericVals[0] > numericVals[numericVals.length - 1];
 
-  const pref = layerPrefs[item.layerId] || { displayMode: 'continuous', scaleMode: 'color' };
+  const pref = layerPrefs[item.layerId] || { displayMode: 'continuous', scaleMode: 'colour' };
   const useDiscreteSwatches = !canBeContinuous || pref.displayMode === 'discrete';
 
   const isPopoverOpen = openPopoverId === item.layerId;
@@ -193,8 +193,8 @@ const LegendLayerGroup = ({
                           <label>
                             <input
                               type="radio"
-                              checked={pref.scaleMode === 'color'}
-                              onChange={() => updateLayerPref(item.layerId, 'scaleMode', 'color')}
+                              checked={pref.scaleMode === 'colour'}
+                              onChange={() => updateLayerPref(item.layerId, 'scaleMode', 'colour')}
                             />
                             Evenly spaced colours
                           </label>

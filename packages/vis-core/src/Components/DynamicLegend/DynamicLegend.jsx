@@ -78,7 +78,7 @@ export const DynamicLegend = ({ map }) => {
 
   const updateLayerPref = (layerId, key, value) => {
     setLayerPrefs(prev => {
-      const currentPref = prev[layerId] || { displayMode: 'continuous', scaleMode: 'color' };
+      const currentPref = prev[layerId] || { displayMode: 'continuous', scaleMode: 'colour' };
       const next = { ...prev, [layerId]: { ...currentPref, [key]: value } };
       // Persist to localStorage so preferences survive page refreshes.
       try {

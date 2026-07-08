@@ -19,7 +19,7 @@ import { LineWidthTrack, CircleTrack } from "./WidthTrack";
  * Renders an interactive continuous gradient bar for sequential and diverging
  * legend data. The bar maps each colour stop to a horizontal position that is
  * either proportional to its numeric value (`scaleMode === 'value'`) or evenly
- * spaced across the bar (`scaleMode === 'color'`).
+ * spaced across the bar (`scaleMode === 'colour'`).
  *
  * Features:
  * - Hover tooltip showing the interpolated numeric value at the cursor position.
@@ -44,7 +44,7 @@ import { LineWidthTrack, CircleTrack } from "./WidthTrack";
  *     visual-position labels: `start` is always the left edge, `end` always the right,
  *     regardless of whether the colour scheme is inverted.
  * @param {string} props.scaleMode - `'value'` positions stops proportionally to
- *   their numeric value; `'color'` spaces them evenly.
+ *   their numeric value; `'colour'` spaces them evenly.
  * @returns {JSX.Element|null} The rendered gradient bar, or `null` when there is
  *   insufficient data to display.
  */
@@ -85,7 +85,7 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
   const stopsWithPercentages = entries.map((entry, i) => {
     const val = numericEntries[i];
     let percent;
-    if (scaleMode === 'color' || !Number.isFinite(val)) {
+    if (scaleMode === 'colour' || !Number.isFinite(val)) {
       // Even spacing: ignore numeric values and distribute stops uniformly.
       percent = (i / (entries.length - 1)) * 100;
     } else if (range === 0) {
