@@ -42,6 +42,13 @@ export const BaseCalloutCardVisualisation = ({
   const injectedGetAllColors = state?.appConfig?.getAllColors;
   const { dispatch: filterDispatch } = useFilterContext();
   const visualisation = state.visualisations[visualisationName];
+  const shouldRenderArrayAsTableRows =
+    Array.isArray(visualisation?.charts) &&
+    visualisation.charts.some(
+      (chart) =>
+        String(chart?.type || "").toLowerCase() === "table" &&
+        (chart?.tableLayout || "rows") === "rows"
+    );
 
   const [data, setData] = useState(null);
   const [hasHydrated, setHasHydrated] = useState(false);
@@ -74,6 +81,13 @@ export const BaseCalloutCardVisualisation = ({
     if (!isTransition && responseData) {
       // Check if response data is an array
       if (Array.isArray(responseData)) {
+        if (shouldRenderArrayAsTableRows) {
+          setAllRecords([]);
+          setHasMultipleRecords(false);
+          setData(responseData);
+          setSelectedRecordIndex(0);
+          setUserHasSelectedRecord(false);
+        } else {
         const isNewDataSet = allRecords.length !== responseData.length;
         
         setAllRecords(responseData);
@@ -98,6 +112,7 @@ export const BaseCalloutCardVisualisation = ({
         } else {
           setData(null);
         }
+        }
       } else {
         // Single record
         setAllRecords([responseData]);
@@ -117,6 +132,7 @@ export const BaseCalloutCardVisualisation = ({
     allRecords.length,
     selectedRecordIndex,
     hasHydrated,
+    shouldRenderArrayAsTableRows,
   ]);
 
   /**
