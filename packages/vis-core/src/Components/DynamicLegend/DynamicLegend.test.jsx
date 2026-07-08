@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { render, screen, act, waitFor, fireEvent } from "@testing-library/react";
 import {
   DynamicLegend,
   interpretWidthExpression,
@@ -42,6 +42,7 @@ beforeEach(() => {
   mockMap.on.mockClear();
   mockMap.off.mockClear();
   mockMap.getStyle.mockClear();
+  localStorage.clear();
 });
 
 describe("interpretWidthExpression", () => {
@@ -159,6 +160,67 @@ describe("DynamicLegend", () => {
     // Check that the legend container exists
     const legendContainer = screen.getByText("water-layer").closest("div");
     expect(legendContainer).toBeInTheDocument();
+  });
+
+  it("defaults eligible numeric legends to a continuous bar", () => {
+    const mockMapWithGetStyle = {
+      ...mockMap,
+      getStyle: jest.fn(() => ({
+        layers: [
+          {
+            id: "continuous-layer",
+            type: "fill",
+            metadata: {
+              isStylable: true,
+            },
+            paint: {
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["feature-state", "value"],
+                0,
+                "#aabbcc",
+                5000,
+                "#ddeeff",
+              ],
+            },
+          },
+        ],
+      })),
+    };
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {},
+      currentZoom: 10,
+    };
+
+    render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={mockMapWithGetStyle} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = mockMapWithGetStyle.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    expect(screen.getByLabelText("continuous-layer continuous legend scale")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTitle("Legend options"));
+
+    expect(screen.getByLabelText("Continuous bar")).toBeChecked();
+    expect(screen.getByLabelText("Discrete swatches")).not.toBeChecked();
+    expect(screen.getByLabelText("Evenly spaced colours")).toBeChecked();
   });
 
   it("does not render layers with shouldShowInLegend = false", () => {

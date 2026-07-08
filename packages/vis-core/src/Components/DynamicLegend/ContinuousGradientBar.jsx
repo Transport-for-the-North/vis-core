@@ -235,6 +235,8 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
       <GradientContainer>
         <GradientBar
           ref={barRef}
+          role="img"
+          aria-label={`${item.title || item.layerId} continuous legend scale`}
           $gradient={gradientString}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
