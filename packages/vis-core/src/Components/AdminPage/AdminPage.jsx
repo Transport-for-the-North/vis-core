@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState, useCallback } from "react";
 import { AppContext } from "contexts";
-import { WarningBox } from "Components";
+import { InfoBox } from "Components";
 import { api, createAdminApi } from "services";
 import { getAppName } from "../../runtime";
 import { resolveAdminEndpoints, defaultLayout, normaliseColumn, isAppAdmin } from "utils";
@@ -24,6 +24,7 @@ export const AdminPage = () => {
   const auditTables = adminPage.auditTables ?? [];
   const editTables = adminPage.editTables ?? [];
   const viewTables = adminPage.viewTables ?? [];
+  const sendScenarios = adminPage.sendScenarios ?? null;
   const layout = adminPage.layout ?? defaultLayout();
   const app = appContext?.appName ?? getAppName();
 
@@ -73,7 +74,7 @@ export const AdminPage = () => {
       <AdminRefreshContext.Provider value={refreshBus}>
       <AdminCanEditContext.Provider value={canEdit}>
         <Page>
-          {warningMessage && <WarningBox text={warningMessage} isSticky />}
+          {warningMessage && <InfoBox text={warningMessage} isSticky />}
           <LayoutContainer>
             {layout.map(normaliseColumn).map((column, colIdx) => (
               <Column key={colIdx} $flex={column.width}>
@@ -84,6 +85,7 @@ export const AdminPage = () => {
                       auditTables={auditTables}
                       editTables={editTables}
                       viewTables={viewTables}
+                      sendScenarios={sendScenarios}
                     />
                   </CellStack>
                 ))}
