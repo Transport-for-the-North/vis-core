@@ -14,7 +14,7 @@ export const HEADER_HEIGHT_PX = 38;
  * Default API endpoints used by the AdminPage. Every endpoint can be overridden per app
  * via the `endpoints` key of the admin page config, so the component hardcodes no paths.
  *
- * @type {{tableAudit: string, rows: string, columns: string, lookup: string, add: string, remove: string}}
+ * @type {{tableAudit: string, rows: string, columns: string, lookup: string, add: string, remove: string, sendScenarios: string}}
  */
 export const DEFAULT_ADMIN_ENDPOINTS = {
   tableAudit: "/api/admin/maintenance/table-audit",
@@ -23,6 +23,7 @@ export const DEFAULT_ADMIN_ENDPOINTS = {
   lookup: "/api/admin/edit-table/lookup",
   add: "/api/admin/edit-table/add",
   remove: "/api/admin/edit-table/delete",
+  sendScenarios: "/api/admin/edit-table/send-scenarios",
 };
 
 /**

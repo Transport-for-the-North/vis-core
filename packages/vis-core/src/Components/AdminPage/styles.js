@@ -236,6 +236,17 @@ export const ErrorMessage = styled(StatusMessage)`
   color: #dc2626;
 `;
 
+// Amber advisory message, e.g. highlighting scenarios skipped because they were already
+// registered — a non-error outcome that still warrants the user's attention.
+export const WarnMessage = styled(StatusMessage)`
+  color: #b45309;
+`;
+
+// Green confirmation message for a successful action.
+export const SuccessMessage = styled(StatusMessage)`
+  color: #059669;
+`;
+
 // Caps the table at $maxRows rows; taller content scrolls vertically with the header
 // kept in view via sticky <Th>. $maxHeight is the measured cap (header + maxRows rows);
 // it falls back to the px approximation until measured.

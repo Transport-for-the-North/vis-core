@@ -28,6 +28,7 @@ configuration; the component contains no table-, column-, or app-specific logic.
    - [auditTables](#audittables)
    - [editTables](#edittables)
    - [viewTables](#viewtables)
+   - [sendScenarios](#sendscenarios)
    - [layout](#layout)
    - [endpoints](#endpoints)
 4. [Lookups (dropdowns and friendly labels)](#lookups-dropdowns-and-friendly-labels)
@@ -84,7 +85,7 @@ const layout      = adminPage.layout ?? defaultLayout();
 ## Page configuration
 
 The page `config` keys are all optional: `auditTables`, `editTables`, `viewTables`,
-`layout`, `endpoints` and `warning`.
+`sendScenarios`, `layout`, `endpoints` and `warning`.
 
 ### auditTables
 
@@ -100,8 +101,15 @@ Read-only summary cards for a table. Each card shows, all scoped by the optional
 - A **stale** amber highlight (and "Stale" badge) when the data hasn't been modified within
   `staleAfterDays` days.
 
-The counts and breakdown are all derived from the mapped `auditColumns`, so no per-table
-code is needed. Metrics whose required column isn't mapped are simply omitted.
+The counts and breakdown are **pre-computed** in the `rail_data.audit_table_overview`
+materialised view (see
+`Database-Tools/data_uploads/norms/audit_view/create_norms_audit_view.sql`) and read from
+there per request, rather than by scanning each (often large, partitioned) table live. The
+figures therefore reflect the last time that view was refreshed
+(`REFRESH MATERIALIZED VIEW CONCURRENTLY rail_data.audit_table_overview;` after each data
+load), not the instantaneous table state. Tables without `created_/modified_` audit columns
+show a **Records** count only. The set of audited tables must stay in step with the tables
+that view is built over (both are server-side whitelisted).
 
 ```js
 {
@@ -121,14 +129,16 @@ code is needed. Metrics whose required column isn't mapped are simply omitted.
 
 | Field            | Required | Description                                                       |
 | ---------------- | -------- | ----------------------------------------------------------------- |
-| `tableName`      | yes      | Table to audit; must be whitelisted server-side.                  |
+| `tableName`      | yes      | Table to audit; must be whitelisted server-side and present in the overview view. |
 | `schema`         | no       | Schema name (defaults to `public`).                               |
 | `displayName`    | yes      | Card heading.                                                     |
-| `auditColumns`   | yes      | Maps the four audit fields to the real column names.              |
-| `filter`         | no       | `{ column, value }` to scope the audit (and all counts) to matching rows. |
+| `auditColumns`   | no       | Legacy hint of the audit column names. No longer used server-side (the summary is read from the pre-computed view); omit for tables without audit columns. |
 | `staleAfterDays` | no       | Age (days) past which the card is highlighted amber as stale.     |
 
-A table whose `auditColumns` is omitted is skipped server-side.
+> **Note:** because the summary is read from the pre-computed overview, a per-table `filter`
+> no longer scopes the audit counts (the overview is aggregated over the whole table). A table
+> requested but not yet present in the view (e.g. added to config before the view is rebuilt)
+> renders an empty card rather than erroring.
 
 ### editTables
 
@@ -183,6 +193,52 @@ plus the same `maxRows` and `hiddenColumns`.
 }
 ```
 
+### sendScenarios
+
+A tool (rendered by a `{ type: "send" }` layout cell) for registering **several** scenarios to
+a **chosen destination app** in one action. Unlike `editTables` — whose registrations editor is
+fixed to the current app — the destination is picked here, so an admin can push scenarios to
+another app. Each registration created also appends a `REGISTERED` entry to the pipeline audit
+log server-side; scenarios already registered to the target app are skipped. The tool is shown
+only to users who can edit (app admins), and posts to the `sendScenarios` endpoint.
+
+> **Authorisation:** the request is authorised as an admin of the app being administered, but
+> the scenarios may be sent to *any* destination app — an app admin can register scenarios into
+> another app's registrations.
+
+```js
+sendScenarios: {
+    title: "Send Scenarios to App",
+    // Scenarios offered in the multi-select (a lookup source, as in Lookups below).
+    scenarioSource: {
+        table: "input_norms_scenario",
+        schema: "rail_data",
+        valueColumn: "id",
+        labelColumn: "scenario_code",
+        filter: { column: "is_deleted", value: false },
+        descriptionColumns: ["vis_description", "network_desc"],
+        placeholder: "Select scenarios to send",
+    },
+    // Destination apps offered in the single-select.
+    appSource: {
+        table: "pipeline_apps",
+        schema: "rail_data",
+        valueColumn: "app_id",
+        labelColumn: "app_name",
+        placeholder: "Select destination app",
+    },
+    // Sections to reload after a successful send.
+    refreshTables: ["pipeline_audit_log", "scenario_app_registrations"],
+}
+```
+
+| Field            | Required | Description                                                                 |
+| ---------------- | -------- | --------------------------------------------------------------------------- |
+| `title`          | no       | Section heading (defaults to "Send Scenarios to App").                      |
+| `scenarioSource` | yes      | Lookup source for the scenario multi-select (see [Lookups](#lookups-dropdowns-and-friendly-labels)). |
+| `appSource`      | yes      | Lookup source for the destination-app single-select.                        |
+| `refreshTables`  | no       | Names of other sections' tables to reload after a successful send.          |
+
 ### layout
 
 Optional grid describing how the sections are arranged. Each top-level entry is a **column**
@@ -213,8 +269,8 @@ layout: [
 
 | Field   | Required | Description                                                                          |
 | ------- | -------- | ------------------------------------------------------------------------------------ |
-| `type`  | yes      | `"audit"`, `"edit"` or `"view"`.                                                      |
-| `table` | no       | Limit the cell to one configured table by `tableName`; omit to render every table in that section. |
+| `type`  | yes      | `"audit"`, `"edit"`, `"view"` or `"send"` (the [Send scenarios](#sendscenarios) tool). |
+| `table` | no       | Limit the cell to one configured table by `tableName`; omit to render every table in that section. (Ignored for `"send"`.) |
 
 **Column width** is optional. Use `{ width: <number>, cells: [...] }` instead of a bare array
 to set the column's share of the row. Widths are **relative ratios**, so `{ width: 40 }` next
@@ -250,16 +306,16 @@ endpoints: {
 | `lookup`     | lookup option lists (`useLookups`)         | `/api/admin/edit-table/lookup`           |
 | `add`        | edit-table add                             | `/api/admin/edit-table/add`              |
 | `remove`     | edit-table delete                          | `/api/admin/edit-table/delete`           |
+| `sendScenarios` | send scenarios to a destination app     | `/api/admin/edit-table/send-scenarios`   |
 
 The defaults live in `DEFAULT_ADMIN_ENDPOINTS` (`src/utils/adminPage.js`); the resolved map
 is used to build the admin API service (`createAdminApi`) that the hooks and sections call.
 
 ### warning
 
-An optional string rendered as a yellow warning banner pinned to the top of the page (the
-shared `WarningBox` — the same style as the map's "no data" message). The token `{app}` is
-replaced with the current app name. Use it to remind admins that app-scoped tables only show
-the current app's data:
+An optional string rendered as an informational banner pinned to the top of the page (the
+shared `InfoBox`). The token `{app}` is replaced with the current app name. Use it to remind
+admins that app-scoped tables only show the current app's data:
 
 ```js
 warning:

@@ -105,5 +105,16 @@ export function createAdminApi({ baseService, endpoints, app }) {
     deleteRow({ tableName, schema, keyValues, alsoInsert }) {
       return post(endpoints.remove, { tableName, schema, keyValues, alsoInsert });
     },
+
+    /**
+     * Registers multiple scenarios to a destination app in one action. The request is
+     * authorised against the current app, but the scenarios are registered to `targetAppId`,
+     * which may be any app.
+     * @param {Object} input - ({ targetAppId, scenarioIds }).
+     * @returns {Promise<{registered: number, skipped: number}>}
+     */
+    sendScenarios({ targetAppId, scenarioIds }) {
+      return post(endpoints.sendScenarios, { targetAppId, scenarioIds });
+    },
   };
 }
