@@ -1,6 +1,7 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
+import { AccordionSection } from "Components/Sidebar/Accordion";
 import { PageContext } from "contexts";
 import { useMapContext, useFilterContext, useLayerZoomMessage, useDebounced } from "hooks";
 import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
@@ -66,6 +67,14 @@ export const MapLayout = () => {
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+
+  // Domain-agnostic extension point: pages can supply extra sidebar sections via
+  // config.additionalMapLayoutAccordionSections so apps can inject bespoke controls without
+  // vis-core knowing anything about them. Each descriptor is rendered inside its own
+  // AccordionSection by default; set `accordion: false` to render the content bare (no
+  // collapsible header). Shape: { component, props?, title?, defaultValue?, accordion? }.
+  const additionalAccordionSections =
+    pageContext.config?.additionalMapLayoutAccordionSections ?? [];
 
   // Debounced copy of filterState used to gate map-action dispatches (UPDATE_PARAMETERISED_LAYER,
   // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
@@ -309,6 +318,26 @@ export const MapLayout = () => {
           handleClassificationChange={handleClassificationChange}
           handleCustomBandsChange={handleCustomBandsChange}
         />
+        {additionalAccordionSections.map((section, index) => {
+          const SectionComponent = section.component;
+          const content = SectionComponent
+            ? <SectionComponent {...(section.props ?? {})} />
+            : section.content;
+          const key = section.title ?? index;
+          // Opt out of the collapsible wrapper to render the content on its own.
+          if (section.accordion === false) {
+            return <Fragment key={key}>{content}</Fragment>;
+          }
+          return (
+            <AccordionSection
+              key={key}
+              title={section.title}
+              defaultValue={section.defaultValue}
+            >
+              {content}
+            </AccordionSection>
+          );
+        })}
       </Sidebar>
 
       {pageContext.type === "MapLayout" && (

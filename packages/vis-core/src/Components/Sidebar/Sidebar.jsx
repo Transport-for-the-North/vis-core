@@ -4,7 +4,7 @@ import { darken } from "polished";
 import { AccordionSection, TextSection, AccordionIcon } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
-import { Hovertip, InfoBox, RegisterScenariosButton } from 'Components';
+import { Hovertip, InfoBox } from 'Components';
 import { DownloadSection } from "./Selectors/DownloadSelection";
 import { FilterProvider } from "contexts";
 import { getScrollbarWidth } from "utils";
@@ -279,7 +279,6 @@ export const Sidebar = ({
           />
         )}
         {children} {/* Render additional AccordionSections passed as children */}
-        <RegisterScenariosButton />
         {additionalFeatures?.download && (
           <FilterProvider>
             <DownloadSection
