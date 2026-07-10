@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { MapContext } from "contexts";
 import userEvent from "@testing-library/user-event";
@@ -123,6 +123,122 @@ describe("Tests when useFetchVisualisationData return valid values", () => {
     // customFormattingFunctions function to have been called
     expect(props.onUpdate).toHaveBeenCalled();
   });
+
+  it("reports visibility when renderable data is available", async () => {
+    const onVisibilityChange = jest.fn();
+
+    render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} onVisibilityChange={onVisibilityChange} />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(onVisibilityChange).toHaveBeenCalledWith(true);
+    });
+  });
+
+  it("shows an update badge for changed data and acknowledges it when opened", async () => {
+    const onCardUpdated = jest.fn();
+    const onCardUpdateAcknowledged = jest.fn();
+    const user = userEvent.setup();
+
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation
+            {...props}
+            onCardUpdated={onCardUpdated}
+            onCardUpdateAcknowledged={onCardUpdateAcknowledged}
+          />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /hide cardName/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("ChevronLeft")).toBeInTheDocument();
+    });
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation
+            {...props}
+            data={{ ...props.data, label: "updated label" }}
+            onCardUpdated={onCardUpdated}
+            onCardUpdateAcknowledged={onCardUpdateAcknowledged}
+          />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(onCardUpdated).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole("status")).toHaveTextContent("Updated");
+    });
+
+    await user.click(screen.getByRole("button", { name: /show cardName/i }));
+
+    expect(onCardUpdateAcknowledged).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the same expiry timestamp for the update callback and local badge", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+    const onCardUpdated = jest.fn();
+
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} onCardUpdated={onCardUpdated} />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("ChevronRight")).toBeInTheDocument();
+    });
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation
+            {...props}
+            data={{ ...props.data, label: "updated label" }}
+            onCardUpdated={onCardUpdated}
+          />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(onCardUpdated).toHaveBeenCalledWith({
+        autoClearAt: Date.now() + 2800,
+        timeoutMs: 2800,
+      });
+      expect(screen.getByRole("status")).toHaveTextContent("Updated");
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(2799);
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("Updated");
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+  });
 });
 
 describe("Tests when useFetchVisualisationData return isLoading", () => {
@@ -147,6 +263,18 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
     expect(h2Element).toBeInTheDocument();
     expect(h3Element).toBeInTheDocument();
   });
+  it("hides the desktop toggle while loading in mobile stack mode", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...propsWithLoading} hideHandleOnMobile />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getAllByText("Loading...")).toHaveLength(2);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
   it("Click on the toggle button", async () => {
     render(
       <ThemeProvider theme={theme}>
@@ -167,6 +295,26 @@ describe("Tests when useFetchVisualisationData return isLoading", () => {
   });
 });
 
+describe("Tests for mobile stacked cards", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("renders loaded card content without the desktop toggle", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={mockMapContext}>
+          <CalloutCardVisualisation {...props} hideHandleOnMobile />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText("cardName")).toBeInTheDocument();
+    expect(screen.getByText("1-label-location_id-text_with_placeholders")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+});
+
 describe("Tests when isLoading is false and without data", () => {
   const propsEmpty = {
     ...props,
@@ -178,13 +326,15 @@ describe("Tests when isLoading is false and without data", () => {
     jest.clearAllMocks();
   });
   it("Check the empty returned", () => {
+    const onVisibilityChange = jest.fn();
     const { container } = render(
       <ThemeProvider theme={theme}>
         <MapContext.Provider value={mockMapContext}>
-          <CalloutCardVisualisation {...propsEmpty} />
+          <CalloutCardVisualisation {...propsEmpty} onVisibilityChange={onVisibilityChange} />
         </MapContext.Provider>
       </ThemeProvider>
     );
     expect(container).toBeEmptyDOMElement();
+    expect(onVisibilityChange).toHaveBeenCalledWith(false);
   });
 });

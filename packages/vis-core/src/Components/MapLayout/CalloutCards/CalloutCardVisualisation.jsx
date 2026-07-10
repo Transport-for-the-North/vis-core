@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState, useContext, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
 import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
@@ -8,8 +15,10 @@ import { replacePlaceholders, formatNumber } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
 import { CARD_CONSTANTS } from "defaults";
+
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
+const UPDATE_MARKER_TIMEOUT_MS = 2800;
 
 /**
  * Styled component for the parent container.
@@ -24,6 +33,7 @@ const ParentContainer = styled.div`
       ? `${CARD_WIDTH + PADDING * 2}px`
       : `${TOGGLE_BUTTON_WIDTH + PADDING}px`};
   transition: width 0.3s ease-in-out;
+
   @media ${(props) => props.theme.mq.mobile} {
     width: 100%;
   }
@@ -38,21 +48,34 @@ const CardContainer = styled.div`
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
   padding: ${PADDING}px;
   z-index: 1000;
+
   transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
-  transform: translateX(${({ $isVisible }) => ($isVisible ? "0" : `100%`)});
-  overflow: hidden; /* Prevent content overflow */
+  transform: translateX(${({ $isVisible }) => ($isVisible ? "0" : "100%")});
+
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   flex-grow: 0;
+
   height: ${({ $isVisible }) => ($isVisible ? "auto" : `${PADDING * 2}px`)};
+
   @media ${(props) => props.theme.mq.mobile} {
     width: 100%;
     box-shadow: none;
     flex-shrink: 1;
   }
+`;
+
+const CardHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px;
+  align-items: start;
+  gap: 8px;
+  min-height: 30px;
 `;
 
 /**
@@ -65,11 +88,46 @@ const CardTitle = styled.h2`
   margin-top: 5px;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
+  min-width: 0;
+
   @media ${(props) => props.theme.mq.mobile} {
     font-size: 1.2em;
     text-align: left;
     margin: 0;
   }
+`;
+
+const StatusSlot = styled.div`
+  min-width: 82px;
+  min-height: 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 4px;
+`;
+
+const StatusBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 82px;
+  padding: 2px 7px;
+
+  border-radius: 999px;
+  background: ${({ $kind }) =>
+    $kind === "updated"
+      ? "rgba(0, 222, 198, 0.18)"
+      : "rgba(240, 240, 247, 0.95)"};
+  color: ${({ $kind }) =>
+    $kind === "updated" ? "rgb(13, 15, 61)" : "#4b3e91"};
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 `;
 
 /**
@@ -82,6 +140,7 @@ const CardContent = styled.div`
     font-size: 1.5em;
     color: #4b3e91;
     margin-bottom: 0.5em;
+
     @media ${(props) => props.theme.mq.mobile} {
       font-size: 1.2em;
     }
@@ -116,6 +175,7 @@ const CardContent = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: left;
   }
+
   .card.small {
     width: auto;
     padding: 0.5em;
@@ -123,21 +183,13 @@ const CardContent = styled.div`
     flex: 0 0 auto;
   }
 
-  .row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
-    padding: 0 0px;
-    justify-content: center;
-  }
-
+  .row,
   .row.small {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    padding: 0 0px;
+    padding: 0;
     justify-content: center;
   }
 
@@ -153,6 +205,7 @@ const CardContent = styled.div`
     color: #4b3e91;
     font-weight: bold;
   }
+
   .card .value.small {
     font-size: 1em;
   }
@@ -161,9 +214,11 @@ const CardContent = styled.div`
     .card {
       flex: 1 0 45%;
     }
+
     .card .value {
       font-size: 1.5em;
     }
+
     .card .label {
       font-size: 0.8em;
     }
@@ -193,9 +248,6 @@ const CardContent = styled.div`
   }
 `;
 
-/**
- * Styled component for the toggle button.
- */
 const ToggleButton = styled.button`
   position: absolute;
   top: ${PADDING}px;
@@ -209,11 +261,52 @@ const ToggleButton = styled.button`
   border-radius: 5px;
   padding: 0;
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   transition: right 0.3s ease-in-out;
 `;
+
+const TogglePing = styled.span`
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+
+  border-radius: 999px;
+  background: ${({ $kind }) => ($kind === "updated" ? "#00dec6" : "#f0f0f7")};
+  color: rgb(13, 15, 61);
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 17px;
+  text-align: center;
+
+  box-shadow:
+    0 0 0 2px #fff,
+    0 2px 6px rgba(0, 0, 0, 0.25);
+
+  pointer-events: none;
+`;
+
+/**
+ * Serialises a value for comparison without throwing on unusual inputs.
+ *
+ * @param {any} value - Value to serialise.
+ * @returns {string} JSON output when possible, otherwise `String(value)`.
+ */
+const safeStringify = (value) => {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+};
 
 /**
  * CalloutCardVisualisation component to display a card-like element within the map.
@@ -221,16 +314,31 @@ const ToggleButton = styled.button`
  * @param {Object} props - The component props.
  * @param {string} props.visualisationName - The name of the visualisation.
  * @param {string} [props.cardName] - Optional name for the card.
- * @param {Function} [props.onUpdate] - Optional function to call when the card updates.
+ * @param {Function} [props.onUpdate] - Backwards-compatible function to call when the card first becomes visible.
+ * @param {Function} [props.onFirstVisible] - Function to call when the card first becomes visible.
+ * @param {Function} [props.onCardUpdated] - Callback fired with update expiry details when hydrated card data changes.
+ * @param {Function} [props.onCardUpdateAcknowledged] - Callback fired when the user opens an updated card.
+ * @param {Object} props.data - Data used by the card.
+ * @param {boolean} props.isLoading- Whether this is the initial loading state.
+ * @param {boolean} props.isUpdating - Whether data is refreshing after first hydration.
+ * @param {boolean} [props.hideHandleOnMobile]
+ * @param {Function} [props.onVisibilityChange] - Callback fired when real card data becomes renderable or hidden.
+ * @param {React.ReactNode} [props.recordSelector]
+ * @param {Function} [props.toggleVisibility]
+ * @param {Function} [props.getAllColors]
  * @returns {JSX.Element|null} The rendered CalloutCardVisualisation component.
  */
-export const CalloutCardVisualisation = ({ 
-  visualisationName, 
-  cardName, 
-  onUpdate, 
-  data, 
-  isLoading, 
-  hideHandleOnMobile = false, 
+export const CalloutCardVisualisation = ({
+  visualisationName,
+  cardName,
+  onUpdate,
+  onFirstVisible,
+  onCardUpdated,
+  onCardUpdateAcknowledged,
+  data,
+  isLoading,
+  isUpdating = false,
+  hideHandleOnMobile = false,
   onVisibilityChange,
   recordSelector = null,
   toggleVisibility: externalToggleVisibility = null,
@@ -238,83 +346,218 @@ export const CalloutCardVisualisation = ({
 }) => {
   const { state } = useContext(MapContext);
   const visualisation = state.visualisations[visualisationName];
+
   const buttonRef = useRef(null);
+  const contentRef = useRef(null);
+  const hasFiredFirstVisibleRef = useRef(false);
+  const previousDataSignatureRef = useRef(null);
+  const updatePingTimerRef = useRef(null);
+  const isVisibleRef = useRef(false);
+
+  const [isVisible, setIsVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [recentlyUpdated, setRecentlyUpdated] = useState(false);
+
+  const showHandle = !hideHandleOnMobile;
 
   const colorsList = useMemo(() => {
     if (typeof getAllColors === "function") return getAllColors();
-    return ["#A0CA2A", "#E97132", "#7317DE", "#6D6875", "#3A86FF"]; // fallback
+
+    return ["#A0CA2A", "#E97132", "#7317DE", "#6D6875", "#3A86FF"];
   }, [getAllColors]);
 
   // Do not render the card if no data is available,
   // or if the data is an empty object,
   // or if every value in the data dictionary is nullish.
-  let hasDataShouldRender = true;
-  if (
-    !data ||
-    Object.keys(data).length === 0 ||
-    Object.values(data).every(
+  const hasDataShouldRender = useMemo(() => {
+    if (!data) return false;
+    if (typeof data !== "object") return true;
+
+    const values = Object.values(data);
+
+    if (values.length === 0) return false;
+
+    return !values.every(
       (value) => value === null || value === undefined || value === 0
-    )
-  ) {
-    hasDataShouldRender = false;
-  }
+    );
+  }, [data]);
 
   const actuallyVisible = !isLoading && hasDataShouldRender;
 
+  const dataUpdateSignature = useMemo(() => {
+    if (!data) return "";
+    return safeStringify(data);
+  }, [data]);
+
+  /**
+   * Mirrors React state into a ref so delayed update-ping timers can tell
+   * whether the card is open without closing over stale state.
+   */
   useEffect(() => {
-    if (onVisibilityChange) onVisibilityChange(actuallyVisible);
-    return () => {
-      if (onVisibilityChange) onVisibilityChange(false);
-    };
+    isVisibleRef.current = isVisible;
+  }, [isVisible]);
+
+  /**
+   * Reports whether this card currently has renderable data.
+   */
+  useEffect(() => {
+    onVisibilityChange?.(actuallyVisible);
   }, [actuallyVisible, onVisibilityChange]);
 
-  // Slide-in: start hidden and slide to visible once the card truly has content.
-  const [isVisible, setIsVisible] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const showHandle = !hideHandleOnMobile;
-  const contentRef = useRef(null);
+  /**
+   * Detects post-hydration data changes, raises the per-card update marker, and
+   * only auto-clears it when the card is open and visible.
+   */
+  useEffect(() => {
+    if (!actuallyVisible) return;
+    if (!dataUpdateSignature) return;
 
-  // Trigger initial slide-in when the card first becomes actually visible
+    if (previousDataSignatureRef.current === null) {
+      previousDataSignatureRef.current = dataUpdateSignature;
+      return;
+    }
+
+    if (previousDataSignatureRef.current === dataUpdateSignature) {
+      return;
+    }
+
+    previousDataSignatureRef.current = dataUpdateSignature;
+
+    const autoClearAt = Date.now() + UPDATE_MARKER_TIMEOUT_MS;
+
+    setRecentlyUpdated(true);
+    onCardUpdated?.({ autoClearAt, timeoutMs: UPDATE_MARKER_TIMEOUT_MS });
+
+    if (updatePingTimerRef.current) {
+      clearTimeout(updatePingTimerRef.current);
+    }
+
+    updatePingTimerRef.current = setTimeout(() => {
+      /**
+       * Only auto-clear the updated ping if the card is open.
+       * If the card is closed/collapsed, keep the handle ping visible until
+       * the user opens the card.
+       */
+      if (isVisibleRef.current) {
+        setRecentlyUpdated(false);
+      }
+    }, Math.max(0, autoClearAt - Date.now()));
+  }, [actuallyVisible, dataUpdateSignature, onCardUpdated]);
+
+  /**
+   * Fires the first-visible callbacks once, after the card has real data.
+   */
+  useEffect(() => {
+    if (!actuallyVisible) return;
+    if (hasFiredFirstVisibleRef.current) return;
+
+    hasFiredFirstVisibleRef.current = true;
+
+    if (typeof onFirstVisible === "function") {
+      onFirstVisible();
+    }
+
+    // Backwards compatibility: older parents may still pass onUpdate.
+    // Fire it once on first visible render rather than on every data update.
+    if (typeof onUpdate === "function") {
+      onUpdate();
+    }
+  }, [actuallyVisible, onFirstVisible, onUpdate]);
+
+  /**
+   * Opens the card on the next animation frame once data is available so the
+   * slide-in transition can run instead of jumping directly to the open state.
+   */
   useEffect(() => {
     if (actuallyVisible) {
       // next frame ensures CSS transition fires
       const id = requestAnimationFrame(() => setIsVisible(true));
       return () => cancelAnimationFrame(id);
     }
+
+    return undefined;
   }, [actuallyVisible]);
 
-  // Respect hideHandleOnMobile: when true, ensure the card is visible (still slides in on first actual visibility)
+  /**
+   * Keeps mobile-rendered cards open when their handle is intentionally hidden.
+   */
   useEffect(() => {
     if (hideHandleOnMobile) setIsVisible(true);
   }, [hideHandleOnMobile]);
 
   /**
-   * Toggles the visibility of the card.
+   * Toggles the visibility of the card and acknowledges pending update markers
+   * when the user opens a collapsed card.
    */
   const toggleVisibility = () => {
     if (externalToggleVisibility) {
       externalToggleVisibility();
     } else {
-      setIsVisible((v) => !v);
+      setIsVisible((current) => {
+        const next = !current;
+
+        /**
+         * Opening the card acknowledges the update immediately.
+         * Closing it does not.
+         */
+        if (next) {
+          setRecentlyUpdated(false);
+
+          if (updatePingTimerRef.current) {
+            clearTimeout(updatePingTimerRef.current);
+            updatePingTimerRef.current = null;
+          }
+
+          onCardUpdateAcknowledged?.();
+        }
+
+        return next;
+      });
     }
+
     setIsHovered(false);
   };
 
+  /**
+   * Clears any pending update-ping timer when the card unmounts.
+   */
+  useEffect(() => {
+    return () => {
+      if (updatePingTimerRef.current) {
+        clearTimeout(updatePingTimerRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * Formats numeric placeholder values and appends an optional unit.
+   *
+   * @param {number|string|null|undefined} value - Value to format.
+   * @param {string} [unit=""] - Unit suffix to append.
+   * @returns {string} Formatted value or "N/A" for invalid input.
+   */
   const formatNumberWithUnit = useCallback((value, unit = "") => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
     return formatNumber(Number(value)) + unit;
   }, []);
 
-  let customFormattingFunctions = {
-    ...(visualisation.customFormattingFunctions || {}),
-    formatNumberWithUnit,
-  };
+  const customFormattingFunctions = useMemo(
+    () => ({
+      ...(visualisation?.customFormattingFunctions || {}),
+      formatNumberWithUnit,
+    }),
+    [visualisation?.customFormattingFunctions, formatNumberWithUnit]
+  );
 
-  // Batch compute the sanitized HTML and dynamic title together to avoid multi-step updates
+  /**
+   * Builds the sanitised HTML fragment and dynamic title in one memoised step to
+   * avoid intermediate renders with mismatched content.
+   */
   const { sanitizedHtml, safeDynamicTitle } = useMemo(() => {
-    if (!data) {
+    if (!data || !visualisation) {
       return { sanitizedHtml: "", safeDynamicTitle: "" };
     }
+
     const htmlFromFragment = visualisation.htmlFragment
       ? DOMPurify.sanitize(
           replacePlaceholders(visualisation.htmlFragment, data, {
@@ -334,71 +577,130 @@ export const CalloutCardVisualisation = ({
       ALLOWED_ATTR: [],
     });
 
-    return { sanitizedHtml: htmlFromFragment, safeDynamicTitle: safeTitle };
+    return {
+      sanitizedHtml: htmlFromFragment,
+      safeDynamicTitle: safeTitle,
+    };
   }, [
     data,
-    visualisation.htmlFragment,
-    visualisation.cardTitle,
+    visualisation,
+    visualisation?.htmlFragment,
+    visualisation?.cardTitle,
     customFormattingFunctions,
   ]);
 
-  // Keep a stable reference to onUpdate so it doesn't churn the effect deps
-  const onUpdateRef = useRef(onUpdate);
-  useEffect(() => {
-    onUpdateRef.current = onUpdate;
-  }, [onUpdate]);
+  const statusKind = isUpdating
+    ? "updating"
+    : recentlyUpdated
+    ? "updated"
+    : null;
 
-  // Call onUpdate to trigger the reordering of cards on a new request
-  useEffect(() => {
-    if (isLoading) return;
-    if (!hasDataShouldRender) return;
-    if (typeof onUpdateRef.current !== "function") return;
+  const statusLabel =
+    statusKind === "updating"
+      ? "Updating…"
+      : statusKind === "updated"
+      ? "Updated"
+      : "";
 
-    onUpdateRef.current();
-  }, [data, visualisation?.htmlFragment, visualisation?.cardTitle, isLoading, hasDataShouldRender]);
-  
+  /**
+   * Renders the transient loading/update status badge in the reserved header slot.
+   *
+   * @returns {JSX.Element|null} Status badge when active.
+   */
+  const renderStatusBadge = () => {
+    if (!statusKind) return null;
 
-  // Loading shell (kept mounted for initial slide-in once data arrives)
+    return (
+      <StatusBadge $kind={statusKind} role="status">
+        {statusLabel}
+      </StatusBadge>
+    );
+  };
+
+  /**
+   * Renders a stable two-column header so status changes do not shift the title.
+   *
+   * @param {string} title - Card title text.
+   * @param {Object} [options] - Header render options.
+   * @param {boolean} [options.showStatus=true] - Whether to show update status.
+   * @returns {JSX.Element} Card header.
+   */
+  const renderCardHeader = (title, { showStatus = true } = {}) => (
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+      <StatusSlot aria-live="polite">
+        {showStatus ? renderStatusBadge() : null}
+      </StatusSlot>
+    </CardHeader>
+  );
+
+  /**
+   * Renders the collapse/expand handle and update ping for desktop cards.
+   *
+   * @returns {JSX.Element|null} Toggle handle when enabled.
+   */
+  const renderHandle = () =>
+    showHandle ? (
+      <>
+        <ToggleButton
+          ref={buttonRef}
+          $isVisible={isVisible}
+          data-callout-card-toggle
+          data-callout-card-toggle-for={visualisationName}
+          onClick={toggleVisibility}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          aria-label={
+            isVisible
+              ? `Hide ${cardName || "Card"}`
+              : `Show ${cardName || "Card"}`
+          }
+        >
+          {isVisible ? (
+            <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
+          ) : (
+            <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
+          )}
+
+          {statusKind && (
+            <TogglePing $kind={statusKind} aria-hidden="true">
+              {statusKind === "updated" ? "!" : "•"}
+            </TogglePing>
+          )}
+        </ToggleButton>
+
+        <Hovertip
+          isVisible={isHovered}
+          displayText={
+            isVisible
+              ? `Hide ${cardName || "Card"}`
+              : `Show ${cardName || "Card"}`
+          }
+          side="left"
+          refElement={buttonRef}
+          offset={5}
+        />
+      </>
+    ) : null;
+
+  if (!visualisation) return null;
+
   if (isLoading) {
     return (
-      <>
-        <ParentContainer $isVisible={isVisible}>
-          <CardContainer $isVisible={isVisible}>
-            <CardTitle>Loading...</CardTitle>
-            <CardContent>
-              <h3>Loading...</h3>
-            </CardContent>
-          </CardContainer>
-          {showHandle && (
-            <>
-              <ToggleButton
-                ref={buttonRef}
-                $isVisible={isVisible}
-                onClick={toggleVisibility}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              >
-                {isVisible ? (
-                  <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
-                ) : (
-                  <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
-                )}
-              </ToggleButton>
-              <Hovertip
-                isVisible={isHovered}
-                displayText={
-                  isVisible
-                    ? `Hide ${cardName || "Card"}`
-                    : `Show ${cardName || "Card"}`
-                }
-                side="left"
-                refElement={buttonRef}
-                offset={5}
-              />
-            </>
-          )}
-        </ParentContainer>
-      </>
+      <ParentContainer
+        $isVisible={isVisible}
+        data-callout-card-name={visualisationName}
+        data-callout-card-open={isVisible ? "true" : "false"}
+      >
+        <CardContainer $isVisible={isVisible}>
+          {renderCardHeader("Loading...", { showStatus: false })}
+          <CardContent>
+            <h3>Loading...</h3>
+          </CardContent>
+        </CardContainer>
+
+        {renderHandle()}
+      </ParentContainer>
     );
   }
 
@@ -408,9 +710,16 @@ export const CalloutCardVisualisation = ({
 
   if (visualisation.layout && visualisation.layout.length > 0) {
     return (
-      <ParentContainer $isVisible={isVisible}>
+      <ParentContainer
+        $isVisible={isVisible}
+        data-callout-card-name={visualisationName}
+        data-callout-card-open={isVisible ? "true" : "false"}
+      >
         <CardContainer $isVisible={isVisible}>
-          <CardTitle>{cardName}</CardTitle>
+          {renderCardHeader(cardName)}
+
+          {recordSelector}
+
           {!hasDataShouldRender ? (
             <CardContent>
               <WarningBox text="No data available for selection" />
@@ -423,11 +732,11 @@ export const CalloutCardVisualisation = ({
                     ...(data.mainValues || {}),
                     ...data,
                   };
-                  const html = replacePlaceholders(
-                    item.fragment,
-                    mergedData,
-                    { customFunctions: customFormattingFunctions }
-                  );
+
+                  const html = replacePlaceholders(item.fragment, mergedData, {
+                    customFunctions: customFormattingFunctions,
+                  });
+
                   return (
                     <CardContent
                       key={idx}
@@ -436,31 +745,35 @@ export const CalloutCardVisualisation = ({
                       }}
                     />
                   );
-                } else {
-                  const allGraphs = Object.entries(data)
-                    .filter(([key, obj]) => obj && obj.type !== undefined)
-                    .map(([key, obj]) => ({ key, ...obj }));
-                  // Association of networks has a colour
-                  const networkColorMap = {};
-                  let colorIdx = 0;
-                  allGraphs.forEach((chart) => {
-                    if (
-                      chart.type === "multiple_bar" &&
-                      Array.isArray(chart.values)
-                    ) {
-                      chart.values.forEach((obj) => {
-                        const network = obj.network;
-                        if (network && !(network in networkColorMap)) {
-                          networkColorMap[network] =
-                            colorsList[colorIdx % colorsList.length];
-                          colorIdx++;
-                        }
-                      });
-                    }
-                  });
-                  return allGraphs.map((chart, idx) => {
-                    let configs;
-                    let chartData;
+                }
+
+                const allGraphs = Object.entries(data)
+                  .filter(([, obj]) => obj && obj.type !== undefined)
+                  .map(([key, obj]) => ({ key, ...obj }));
+                // Association of networks has a colour
+                const networkColorMap = {};
+                let colorIdx = 0;
+
+                allGraphs.forEach((chart) => {
+                  if (
+                    chart.type === "multiple_bar" &&
+                    Array.isArray(chart.values)
+                  ) {
+                    chart.values.forEach((obj) => {
+                      const network = obj.network;
+
+                      if (network && !(network in networkColorMap)) {
+                        networkColorMap[network] =
+                          colorsList[colorIdx % colorsList.length];
+                        colorIdx += 1;
+                      }
+                    });
+                  }
+                });
+
+                return allGraphs.map((chart, chartIdx) => {
+                  let configs;
+                  let chartData;
 
                     configs = {
                       type: chart.type,
@@ -474,38 +787,41 @@ export const CalloutCardVisualisation = ({
                       colors: networkColorMap
                     };
 
-                    // Dynamic title for ranking charts
-                    if (
-                      (chart.type === "ranking" &&
-                        visualisation.queryParams?.dataTypeName?.value !==
-                          undefined) ||
-                      null
-                    ) {
-                      configs.title =
-                        "Top 5 by " +
-                        visualisation.queryParams.dataTypeName.value;
-                    }
+                  // Dynamic title for ranking charts
 
-                    if (chart.type === "multiple_bar") {
-                      // Categories = all 'name'
-                      const categories = [
-                        ...new Set(chart.values.map((obj) => obj.name)),
-                      ];
-                      // Series = all networks
-                      const series = [
-                        ...new Set(chart.values.map((obj) => obj.network)),
-                      ];
+                  if (
+                    (chart.type === "ranking" &&
+                      visualisation.queryParams?.dataTypeName?.value !==
+                        undefined) ||
+                    null
+                  ) {
+                    configs.title =
+                      "Top 5 by " +
+                      visualisation.queryParams.dataTypeName.value;
+                  }
 
-                      // Data formatted for grouped bars
-                      chartData = categories.map((cat) => {
-                        const entry = { label: cat };
-                        chart.values.forEach((obj) => {
-                          if (obj.name === cat) {
-                            entry[obj.network] = obj.columnValue;
-                          }
-                        });
-                        return entry;
+                  if (chart.type === "multiple_bar") {
+                    // Categories = all 'name'
+                    const categories = [
+                      ...new Set(chart.values.map((obj) => obj.name)),
+                    ];
+                    // Series = all networks
+                    const series = [
+                      ...new Set(chart.values.map((obj) => obj.network)),
+                    ];
+
+                    // Data formatted for grouped bars
+                    chartData = categories.map((cat) => {
+                      const entry = { label: cat };
+
+                      chart.values.forEach((obj) => {
+                        if (obj.name === cat) {
+                          entry[obj.network] = obj.columnValue;
+                        }
                       });
+
+                      return entry;
+                    });
 
                       configs.columns = series.map((network) => ({
                         key: network,
@@ -521,138 +837,90 @@ export const CalloutCardVisualisation = ({
                         label: obj.name,
                       }));
 
-                      chartData = chart.values.reduce((acc, obj) => {
-                        acc[obj.name] = obj.columnValue;
+                    chartData = chart.values.reduce((acc, obj) => {
+                      acc[obj.name] = obj.columnValue;
+                      return acc;
+                    }, {});
+                    // ranks if necessary
+                    const hasRank = chart.values.some(
+                      (obj) => obj.rank !== undefined
+                    );
+
+                    if (hasRank) {
+                      configs.ranks = chart.values.reduce((acc, obj) => {
+                        if (obj.rank !== undefined) {
+                          acc[obj.name] = obj.rank;
+                        }
+
                         return acc;
                       }, {});
-
-                      // ranks if necessary
-                      const hasRank = chart.values.some(
-                        (obj) => obj.rank !== undefined
-                      );
-                      if (hasRank) {
-                        configs.ranks = chart.values.reduce((acc, obj) => {
-                          if (obj.rank !== undefined) {
-                            acc[obj.name] = obj.rank;
-                          }
-                          return acc;
-                        }, {});
-                      }
                     }
+                  }
 
-                    return (
-                      <CardContent key={idx}>
-                        <ChartRenderer
-                          charts={[configs]}
-                          data={chartData}
-                          formatters={customFormattingFunctions}
-                          barHeight={225}
-                        />
-                      </CardContent>
-                    );
-                  });
-                }
+                  return (
+                    <CardContent key={`${idx}-${chartIdx}`}>
+                      <ChartRenderer
+                        charts={[configs]}
+                        data={chartData}
+                        formatters={customFormattingFunctions}
+                        barHeight={225}
+                      />
+                    </CardContent>
+                  );
+                });
               })}
             </>
           )}
         </CardContainer>
-        {showHandle && (
-          <>
-            <ToggleButton
-              ref={buttonRef}
-              $isVisible={isVisible}
-              onClick={toggleVisibility}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {isVisible ? (
-                <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
-              ) : (
-                <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
-              )}
-            </ToggleButton>
-            <Hovertip
-              isVisible={isHovered}
-              displayText={
-                isVisible
-                  ? `Hide ${cardName || "Card"}`
-                  : `Show ${cardName || "Card"}`
-              }
-              side="left"
-              refElement={buttonRef}
-              offset={5}
-            />
-          </>
-        )}
+
+        {renderHandle()}
       </ParentContainer>
     );
   }
 
   // Render the card with dynamic content
   return (
-    <>
-      <ParentContainer $isVisible={isVisible}>
-        <CardContainer $isVisible={isVisible}>
-          <CardTitle>{cardName}</CardTitle>
-          {recordSelector}
-          {!hasDataShouldRender ? (
-            <CardContent>
-              <WarningBox text="No data available for selection" />
-            </CardContent>
-          ) : (
-            <>
-              {/* Render charts if provided */}
-              {Array.isArray(visualisation.charts) &&
-                visualisation.charts.length > 0 && (
-                  <CardContent>
-                    {safeDynamicTitle ? <h2>{safeDynamicTitle}</h2> : null}
-                    <ChartRenderer
-                      charts={visualisation.charts}
-                      data={data}
-                      formatters={customFormattingFunctions}
-                      barHeight={225}
-                    />
-                  </CardContent>
-                )}
-              {/* Render HTML fragment if provided (after charts to match nssec config concatenation) */}
-              {sanitizedHtml && (
-                <CardContent
-                  ref={contentRef}
-                  dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-                />
-              )}
-            </>
-          )}
-        </CardContainer>
-        {showHandle && (
+    <ParentContainer
+        $isVisible={isVisible}
+        data-callout-card-name={visualisationName}
+        data-callout-card-open={isVisible ? "true" : "false"}
+      >
+      <CardContainer $isVisible={isVisible}>
+        {renderCardHeader(cardName)}
+
+        {recordSelector}
+
+        {!hasDataShouldRender ? (
+          <CardContent>
+            <WarningBox text="No data available for selection" />
+          </CardContent>
+        ) : (
           <>
-            <ToggleButton
-              ref={buttonRef}
-              $isVisible={isVisible}
-              onClick={toggleVisibility}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              {isVisible ? (
-                <ChevronRightIcon style={{ width: "20px", height: "20px" }} />
-              ) : (
-                <ChevronLeftIcon style={{ width: "20px", height: "20px" }} />
+            {/* Render charts if provided */}
+            {Array.isArray(visualisation.charts) &&
+              visualisation.charts.length > 0 && (
+                <CardContent>
+                  {safeDynamicTitle ? <h2>{safeDynamicTitle}</h2> : null}
+                  <ChartRenderer
+                    charts={visualisation.charts}
+                    data={data}
+                    formatters={customFormattingFunctions}
+                    barHeight={225}
+                  />
+                </CardContent>
               )}
-            </ToggleButton>
-            <Hovertip
-              isVisible={isHovered}
-              displayText={
-                isVisible
-                  ? `Hide ${cardName || "Card"}`
-                  : `Show ${cardName || "Card"}`
-              }
-              side="left"
-              refElement={buttonRef}
-              offset={5}
-            />
+
+            {sanitizedHtml && (
+              <CardContent
+                ref={contentRef}
+                dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+              />
+            )}
           </>
         )}
-      </ParentContainer>
-    </>
+      </CardContainer>
+
+      {renderHandle()}
+    </ParentContainer>
   );
 };
