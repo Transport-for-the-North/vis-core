@@ -388,4 +388,61 @@ describe("tests when !filter.visualisations[0].includes(`Side`)", () => {
       },
     });
   });
+
+  it("dispatches multiselect values without treating them as scalar options", () => {
+    const multiFilterContext = {
+      ...mockFilterContext,
+      state: {
+        ...mockFilterContext.state,
+        multi: ["bus", "rail"],
+      },
+      dispatch: jest.fn(),
+    };
+
+    const multiMapContext = {
+      ...mockMapContext,
+      dispatch: jest.fn(),
+      state: {
+        ...mockMapContext.state,
+        filters: [
+          {
+            actions: [{ action: "UPDATE_COLOR_SCHEME" }],
+            filterName: "Mode",
+            visualisations: ["Other"],
+            multiSelect: true,
+            values: {
+              values: [
+                { paramValue: "bus", colourValue: "red" },
+                { paramValue: "rail", colourValue: "blue" },
+              ],
+            },
+            id: "multi",
+          },
+        ],
+      },
+    };
+
+    render(
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={multiFilterContext}>
+              <MapContext.Provider value={multiMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(multiMapContext.dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_COLOR_SCHEME",
+      payload: {
+        filter: multiMapContext.state.filters[0],
+        value: ["bus", "rail"],
+        color_scheme: "red",
+      },
+    });
+  });
 });

@@ -1413,13 +1413,13 @@ const Map = (props) => {
   return (
     <StyledMapContainer ref={mapContainerRef}>
       {Object.values(state.layers).map((layer) => (
-      <>
+      <React.Fragment key={layer.name}>
         <Layer key={layer.name} layer={layer} />
         { /* Create a sibling 'spider' layer for all point layers, to deal with overlaps */}
         {layer.type === 'tile' && layer.geometryType === 'point' && Boolean(layer.spiderfyOverlappingPoints) && (
           <SpiderLayer key={`${layer.name}_spider`} baseLayerId={layer.name} />
         )}
-      </>
+      </React.Fragment>
       ))}
       {state.visualisations && <VisualisationManager
         visualisationConfigs={state.visualisations}
