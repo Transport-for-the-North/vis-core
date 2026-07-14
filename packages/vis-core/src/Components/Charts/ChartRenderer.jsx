@@ -27,15 +27,28 @@ import { formatNumber } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
-// Shared styles
 const Section = styled.section`
-  margin: 8px 0 12px;
+  margin: 0;
+`;
+
+const ChartContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
 `;
 
 const Title = styled.h3`
-  margin: 6px 0 8px;
-  font-size: 1.1em;
+  margin: 4px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
   color: #4b3e91;
+`;
+
+const AxisLabel = styled.span`
+  font-size: 11px;
+  color: #555;
+  line-height: 1.2;
 `;
 
 // Ranking display element for the ranking table
@@ -120,8 +133,8 @@ const DEFAULTS = {
     pieSize: 220,
     xAngle: -45,
     tickFontSize: 11,
-    yAxisWidth: 44,
-    xAxisMinHeight: 40,
+    yAxisWidth: 50,
+    xAxisMinHeight: 30,
     avgCharWidth: 6,
   },
   MARGIN: { top: 4, right: 10, bottom: 2, left: 10 },
@@ -171,7 +184,7 @@ const estimateRotatedLabelBand = (
   fontSize = 11,
   avgCharWidth = 7
 ) => {
-  if (!labels.length) return 40; // default axis height used elsewhere
+  if (!labels.length) return 30; // default axis height used elsewhere
   const rad = (Math.abs(angleDeg) * Math.PI) / 180;
   const s = Math.sin(rad);
   const c = Math.cos(rad);
@@ -180,7 +193,7 @@ const estimateRotatedLabelBand = (
     ...labels.map((l) => String(l ?? "").length * avgCharWidth)
   );
   const projected = s * maxWidth + c * fontSize + 2; // minimal padding to avoid extra whitespace
-  return Math.max(40, Math.ceil(projected));
+  return Math.max(30, Math.ceil(projected));
 };
 
 /**
@@ -204,19 +217,57 @@ const computeXAxisHeight = (config, labels) => {
 };
 
 /**
- * Shared wrapper component for chart sections with consistent layout
- * @param {string} ariaLabel - Accessibility label for the chart section
- * @param {string} title - Optional title to display above the chart
- * @param {number} height - Height of the chart container
+ * Shared wrapper component for chart sections with consistent layout.
+ * Axis titles are rendered as HTML elements outside the SVG so they sit
+ * naturally beside their axis without eating into chart margins.
+ *
+ * @param {string}  ariaLabel   - Accessibility label for the chart section
+ * @param {string}  title       - Optional title to display above the chart
+ * @param {number}  height      - Height of the chart container
+ * @param {string}  xAxisTitle  - Optional label rendered below the X axis
+ * @param {string}  yAxisTitle  - Optional label rendered beside the Y axis
  * @param {React.ReactNode} children - Chart components to render inside
- * @returns {JSX.Element} - Wrapped chart section with responsive container
+ * @returns {JSX.Element}
  */
-const ChartSection = ({ ariaLabel, title, height, children }) => (
+const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, children }) => (
   <Section aria-label={ariaLabel}>
     {title && <Title>{title}</Title>}
-    <div style={{ width: "100%", height }}>
-      <ResponsiveContainer>{children}</ResponsiveContainer>
+    <div style={{ display: "flex", alignItems: "stretch" }}>
+      {yAxisTitle && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            width: 18,
+          }}
+        >
+          <AxisLabel
+            style={{
+              transform: "rotate(-90deg)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {yAxisTitle}
+          </AxisLabel>
+        </div>
+      )}
+      <div style={{ flex: 1, minWidth: 0, height }}>
+        <ResponsiveContainer>{children}</ResponsiveContainer>
+      </div>
     </div>
+    {xAxisTitle && (
+      <AxisLabel
+        style={{
+          display: "block",
+          textAlign: "center",
+          marginTop: 2,
+        }}
+      >
+        {xAxisTitle}
+      </AxisLabel>
+    )}
   </Section>
 );
 
@@ -227,7 +278,7 @@ const ChartSection = ({ ariaLabel, title, height, children }) => (
 const defaultFormatters = {
   commify: (v) => {
     const n = Number(v ?? 0);
-    return Number.isFinite(n) ? formatNumber(n) : String(v ?? "");
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : String(v ?? "");
   },
   percent: (value, data, keys) => {
     const total = (keys || Object.keys(data || {})).reduce(
@@ -237,6 +288,66 @@ const defaultFormatters = {
     const num = Number(value ?? 0);
     return total > 0 ? `${((num / total) * 100).toFixed(1)}%` : "0.0%";
   },
+};
+
+// Function to wrap long labels into multiple lines after a certain length and a space
+const wrapLabel = (label, maxLen = 15) => {
+  const words = String(label || "").split(" ");
+  let lines = [];
+  let currentLine = "";
+  words.forEach((word) => {
+    if ((currentLine + " " + word).trim().length > maxLen) {
+      lines.push(currentLine.trim());
+      currentLine = word;
+    } else {
+      currentLine += " " + word;
+    }
+  });
+  if (currentLine) lines.push(currentLine.trim());
+  return lines.join("\n");
+};
+
+/**
+ * Shared tick component for category axes.
+ * Handles both wrapped multi-line Y-axis labels and rotated X-axis labels consistently.
+ */
+const CategoryTick = ({ x, y, payload, angle = 0 }) => {
+  if (angle !== 0) {
+    // For rotated X-axis labels, don't overly truncate since they have diagonal space
+    const label = String(payload.value || "");
+    const displayLabel = label.length > 25 ? label.slice(0, 25) + "…" : label;
+    return (
+      <text
+        x={x}
+        y={y}
+        dy={16}
+        textAnchor="end"
+        fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+        transform={`rotate(${angle}, ${x}, ${y})`}
+      >
+        {displayLabel}
+      </text>
+    );
+  }
+
+  // For vertical Y-axis labels, wrap text into multiple lines
+  const lines = wrapLabel(payload.value, 15).split("\n");
+  const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2;
+
+  return (
+    <text
+      x={x}
+      y={startY}
+      textAnchor="end"
+      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+    >
+      {lines.map((line, i) => (
+        <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize + 2} key={i}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
 };
 
 /**
@@ -281,19 +392,16 @@ const toTimeSeries = (data) =>
 const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const hasXLabel = !!config.x_axis_title;
-  const hasYLabel = !!config.y_axis_title;
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const tooltipFormatter = (val) => {
     if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
 
-  const barFill = config.barColor || DEFAULTS.BRAND_COLOR;
   const xAxisHeight = React.useMemo(
     () =>
       computeXAxisHeight(
@@ -303,59 +411,30 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     [config, items]
   );
 
-  // Function to wrap long labels into multiple lines after a certain length and a space
-  const wrapLabel = (label, maxLen = 15) => {
-    const words = label.split(" ");
-    let lines = [];
-    let currentLine = "";
-    words.forEach((word) => {
-      if ((currentLine + " " + word).trim().length > maxLen) {
-        lines.push(currentLine.trim());
-        currentLine = word;
-      } else {
-        currentLine += " " + word;
-      }
-    });
-    if (currentLine) lines.push(currentLine.trim());
-    return lines.join("\n");
-  };
+  const hasNegative = items.some((i) => Number(i.value) < 0);
+  const hasPositive = items.some((i) => Number(i.value) > 0);
+  const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
 
-  const CustomTick = (props) => {
-    const { x, y, payload } = props;
-    const lines = wrapLabel(payload.value, 20).split("\n"); // Cut the label after a space and 20 characters and create an array
-    const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2; // adjust to center
-
-    return (
-      <text
-        x={x}
-        y={startY}
-        textAnchor="end"
-        fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
-      >
-        {lines.map((line, i) => (
-          <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize} key={i}>
-            {line}
-          </tspan>
-        ))}
-      </text>
-    );
-  };
-
-  const chartMargin = { ...DEFAULTS.MARGIN };
-  if (hasXLabel || hasYLabel) {
-    chartMargin.bottom = 20;
-    chartMargin.left = 40;
-  }
+  const yCategoryWidth = React.useMemo(() => {
+    if (type !== "vertical") return 0;
+    const maxLineLength = Math.max(0, ...items.map(i => {
+      const lines = wrapLabel(i.label || "", 15).split("\n");
+      return Math.max(0, ...lines.map(l => l.length));
+    }));
+    return Math.max(60, maxLineLength * 6.5 + 5);
+  }, [items, type]);
 
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={config.height ?? items.length * 45} // Allow explicit height override; otherwise keep dynamic height
+      height={config.height ?? items.length * 50}
+      xAxisTitle={type === "vertical" ? config.x_axis_title : undefined}
+      yAxisTitle={type === "vertical" ? config.y_axis_title : undefined}
     >
       <RBarChart
         data={items}
-        margin={chartMargin}
+        margin={DEFAULTS.MARGIN}
         barCategoryGap="18%"
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
@@ -365,38 +444,19 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
           <>
             <RXAxis
               type="number"
-              domain={[0, "dataMax"]}
+              domain={dataDomain}
               allowDecimals={false}
+              tickCount={6}
               tickFormatter={formatter}
               tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-              label={
-                hasXLabel
-                  ? {
-                      value: config.x_axis_title,
-                      position: "insideBottom",
-                      offset: -5,
-                      fontSize: 14,
-                    }
-                  : undefined
-              }
             />
             <RYAxis
               type="category"
               dataKey="label"
-              width={100}
-              tick={<CustomTick />}
+              width={yCategoryWidth}
+              tick={<CategoryTick />}
               tickLine={false}
-              label={
-                hasYLabel
-                  ? {
-                      value: config.y_axis_title,
-                      position: "left",
-                      offset: 20,
-                      fontSize: 14,
-                      angle: -90,
-                    }
-                  : undefined
-              }
+              interval={0}
             />
           </>
         ) : (
@@ -410,8 +470,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
               tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
             />
             <RYAxis
-              domain={[0, "dataMax"]}
-              allowDataOverflow
+              domain={dataDomain}
               allowDecimals={false}
               tickFormatter={formatter}
               tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
@@ -450,49 +509,45 @@ const BarChartMultiple = ({
 }) => {
   const items = React.useMemo(() => data, [data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const hasXLabel = !!config.x_axis_title;
-  const hasYLabel = !!config.y_axis_title;
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const tooltipFormatter = (val) => {
     if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
-  const truncateLabel = (label, maxLen = 7) =>
-    label.length > maxLen ? label.slice(0, maxLen) + "…" : label;
-  const CustomTick = ({ x, y, payload, angle = 0 }) => (
-    <text
-      x={x}
-      y={y}
-      dy={angle ? 16 : 4}
-      textAnchor="end"
-      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
-      transform={angle ? `rotate(${angle}, ${x}, ${y})` : undefined}
-    >
-      {truncateLabel(payload.value)}
-    </text>
-  );
+
   const yTickFormatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
-  const chartMargin = { ...DEFAULTS.MARGIN };
-  if (hasXLabel || hasYLabel) {
-    chartMargin.bottom = 20;
-    chartMargin.left = 20;
-  }
+
+  const hasNegative = items.some((i) => config.columns.some((c) => Number(i[c.key]) < 0));
+  const hasPositive = items.some((i) => config.columns.some((c) => Number(i[c.key]) > 0));
+  const dataDomain = hasNegative && hasPositive ? ['auto', 'auto'] : hasNegative ? ['auto', 0] : [0, 'auto'];
+
+  const yCategoryWidth = React.useMemo(() => {
+    if (type !== "vertical") return 0;
+    const maxLineLength = Math.max(0, ...items.map(i => {
+      const lines = wrapLabel(i[config.xKey || "label"] || "", 15).split("\n");
+      return Math.max(0, ...lines.map(l => l.length));
+    }));
+    return Math.max(60, maxLineLength * 6.5 + 5);
+  }, [items, type, config]);
+
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
       height={height}
+      xAxisTitle={type === "vertical" ? config.x_axis_title : undefined}
+      yAxisTitle={type === "vertical" ? config.y_axis_title : undefined}
     >
       <RBarChart
         data={items}
-        margin={chartMargin}
+        margin={DEFAULTS.MARGIN}
         barCategoryGap="18%"
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
@@ -502,64 +557,32 @@ const BarChartMultiple = ({
           <>
             <RXAxis
               type="number"
-              domain={[0, "dataMax"]}
+              domain={dataDomain}
               allowDecimals={false}
               tickFormatter={formatter}
-              tick={<CustomTick />}
-              label={
-                hasXLabel
-                  ? {
-                      value: config.x_axis_title,
-                      position: "insideBottom",
-                      offset: -5,
-                      fontSize: 14,
-                    }
-                  : undefined
-              }
+              tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
             />
             <RYAxis
               type="category"
               dataKey={config.xKey || "label"}
-              width={100}
-              tick={<CustomTick />}
+              width={yCategoryWidth}
+              tick={<CategoryTick />}
               tickLine={false}
-              label={
-                hasYLabel
-                  ? {
-                      value: config.y_axis_title,
-                      position: "left",
-                      offset: 0,
-                      fontSize: 10,
-                      angle: -90,
-                    }
-                  : undefined
-              }
+              interval={0}
             />
           </>
         ) : (
           <>
             <RXAxis
               dataKey={config.xKey || "label"}
-              tick={<CustomTick angle={-45} />}
+              tick={<CategoryTick angle={-45} />}
               interval={0}
             />
             <RYAxis
-              domain={[0, "dataMax"]}
-              allowDataOverflow
+              domain={dataDomain}
               allowDecimals={false}
               tickFormatter={yTickFormatter}
               width={DEFAULTS.DIMENSIONS.yAxisWidth}
-              label={
-                hasYLabel
-                  ? {
-                      value: config.y_axis_title,
-                      position: "left",
-                      offset: 10,
-                      fontSize: 10,
-                      angle: -90,
-                    }
-                  : undefined
-              }
             />
           </>
         )}
@@ -606,8 +629,6 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   );
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
-  const hasXLabel = !!config.x_axis_title;
-  const hasYLabel = !!config.y_axis_title;
 
   const comparatorKey = config.comparatorKey || "dmValue";
   const comparatorLabel = config.comparatorLabel || "Comparator";
@@ -616,7 +637,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
 
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const xAxisHeight = React.useMemo(
     () =>
@@ -632,54 +653,29 @@ const LineSeriesChart = ({ config, data, formatters }) => {
     (i) => i[comparatorKey] !== null && i[comparatorKey] !== undefined
   );
 
-  const chartMargin = { ...DEFAULTS.MARGIN };
-  if (hasXLabel || hasYLabel) {
-    chartMargin.bottom = 20;
-    chartMargin.left = 40;
-  }
-
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Line chart"}
       title={config.title}
       height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={config.y_axis_title}
     >
-      <RLineChart data={items} margin={chartMargin}>
+      <RLineChart data={items} margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
         <RXAxis
           dataKey="label"
           angle={DEFAULTS.DIMENSIONS.xAngle}
           textAnchor="end"
           height={xAxisHeight}
-          interval={Array.isArray(data) ? "preserveStartEnd" : 0}
+          interval={Array.isArray(data) ? Math.max(0, Math.ceil(items.length / 8) - 1) : 0}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-          label={
-            hasXLabel
-              ? {
-                  value: config.x_axis_title,
-                  position: "insideBottom",
-                  offset: -5,
-                  fontSize: 14,
-                }
-              : undefined
-          }
         />
         <RYAxis
           allowDecimals={false}
           tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
-          label={
-            hasYLabel
-              ? {
-                  value: config.y_axis_title,
-                  position: "left",
-                  offset: 20,
-                  fontSize: 14,
-                  angle: -90,
-                }
-              : undefined
-          }
         />
         <RTooltip
           formatter={formatter}
@@ -687,7 +683,9 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         />
         {hasComparator && (
           <RLegend
-            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+            verticalAlign="top"
+            align="center"
+            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10 }}
           />
         )}
         <RLine
@@ -698,6 +696,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
+          legendType="plainline"
         />
         {hasComparator && (
           <RLine
@@ -709,6 +708,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
             strokeDasharray="4 4"
             dot={false}
             activeDot={{ r: 4 }}
+            legendType="plainline"
           />
         )}
       </RLineChart>
@@ -732,7 +732,7 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
   const fill = config.areaFillColor || "rgba(75,62,145,0.25)";
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const xAxisHeight = React.useMemo(
     () =>
@@ -795,7 +795,7 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
   const fill = config.scatterColor || DEFAULTS.BRAND_COLOR;
   const formatter = (val) => {
     const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n) : "";
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
   const xAxisHeight = React.useMemo(
     () =>
@@ -869,7 +869,7 @@ const DonutPieChart = ({ config, data, formatters }) => {
         <RTooltip
           formatter={(value, name, props) => {
             const n = Number(value);
-            const formatted = Number.isFinite(n) ? formatNumber(n) : "";
+            const formatted = Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
             return [formatted + ` (${pctFmt(value)})`, props?.payload?.label || name];
           }}
         />
@@ -1116,14 +1116,14 @@ export const ChartRenderer = ({
       data.some((row) =>
         Object.entries(row)
           .filter(([k]) => k !== (charts[0]?.xKey || "label"))
-          .some(([, v]) => Number(v) > 0)
+          .some(([, v]) => Number(v) !== 0)
       )
-    : data && Object.values(data).some((v) => (Number(v) || 0) > 0);
+    : data && Object.values(data).some((v) => Number(v) !== 0);
 
   if (!hasAny) return null;
 
   return (
-    <div>
+    <ChartContainer>
       {charts.map((cfg, idx) => {
         const type = (cfg.type || "").toLowerCase();
         const resolvedBarChartHeight = cfg?.height ?? cfg?.barHeight ?? barHeight;
@@ -1232,7 +1232,7 @@ export const ChartRenderer = ({
             );
         }
       })}
-    </div>
+    </ChartContainer>
   );
 };
 
