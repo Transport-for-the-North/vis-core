@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext } from "contexts";
@@ -66,6 +66,62 @@ export const MapLayout = () => {
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+  const [loadingIntentMessages, setLoadingIntentMessages] = useState([]);
+
+  const deriveFilterIntentMessages = useCallback((filter) => {
+    const filterName = filter?.filterName || "filter";
+    const actions = Array.isArray(filter?.actions)
+      ? filter.actions.map((action) => action?.action).filter(Boolean)
+      : [];
+
+    const messages = [`Applying ${filterName} changes`];
+
+    if (actions.includes("UPDATE_PARAMETERISED_LAYER")) {
+      messages.push("Fetching updated map data for your selection");
+    }
+    if (actions.includes(actionTypes.UPDATE_COLOR_SCHEME)) {
+      messages.push("Updating colour scale and legend");
+    }
+    if (actions.includes("UPDATE_CLASSIFICATION_METHOD")) {
+      messages.push("Reclassifying map bands");
+    }
+    if (actions.includes("UPDATE_CUSTOM_BANDS")) {
+      messages.push("Rebuilding custom band ranges");
+    }
+
+    return messages;
+  }, []);
+
+  const loaderMessages = useMemo(() => {
+    const messages = [];
+
+    if (loadingIntentMessages.length > 0) {
+      messages.push(...loadingIntentMessages);
+    }
+
+    if (!state.pageIsReady) {
+      messages.push("Preparing your map workspace");
+    }
+
+    if (state.visualisationLoadingCount > 1) {
+      messages.push(`Refreshing ${state.visualisationLoadingCount} map visuals`);
+    } else if (state.visualisationLoadingCount === 1) {
+      messages.push("Refreshing map data and boundaries");
+    }
+
+    if (state.isDynamicStylingLoading) {
+      messages.push("Updating colours and legend labels");
+    }
+
+    messages.push("Please wait, this should only take a moment");
+    return [...new Set(messages)];
+  }, [loadingIntentMessages, state.pageIsReady, state.visualisationLoadingCount, state.isDynamicStylingLoading]);
+
+  useEffect(() => {
+    if (!isLoading && loadingIntentMessages.length > 0) {
+      setLoadingIntentMessages([]);
+    }
+  }, [isLoading, loadingIntentMessages.length]);
 
   // Debounced copy of filterState used to gate map-action dispatches (UPDATE_PARAMETERISED_LAYER,
   // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
@@ -102,11 +158,12 @@ export const MapLayout = () => {
   }, [pageContext, filterDispatch]);
 
   const handleFilterChange = useCallback((filter, value) => {
+    setLoadingIntentMessages(deriveFilterIntentMessages(filter));
     filterDispatch({
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value, filter },
     });
-  }, [filterDispatch]);
+  }, [filterDispatch, deriveFilterIntentMessages]);
 
   /**
    * Retrieves the full option objects corresponding to a filter's selected value(s).
@@ -295,6 +352,10 @@ export const MapLayout = () => {
   }, [debouncedFilterState, state.metadataTables, state.filters, dispatch, buildFilterActionPayload]);
 
   const handleColorChange = (color, layerName) => {
+    setLoadingIntentMessages([
+      "Applying your colour changes",
+      "Updating map colours and legend",
+    ]);
     dispatch({
       type: actionTypes.UPDATE_COLOR_SCHEME,
       payload: { layerName: layerName, color_scheme: color },
@@ -302,6 +363,10 @@ export const MapLayout = () => {
   };  
 
   const handleClassificationChange = (classType, layerName) => {
+    setLoadingIntentMessages([
+      "Applying your classification update",
+      "Reclassifying map ranges",
+    ]);
     dispatch({
       type: "UPDATE_CLASSIFICATION_METHOD",
       payload: { class_method: classType, layerName },
@@ -309,6 +374,10 @@ export const MapLayout = () => {
   };
 
   const handleCustomBandsChange = (customBands, layerName) => {
+    setLoadingIntentMessages([
+      "Applying your custom bands",
+      "Refreshing map values with new breakpoints",
+    ]);
     dispatch({
       type: "UPDATE_CUSTOM_BANDS",
       payload: { customBands, layerName },
@@ -317,7 +386,12 @@ export const MapLayout = () => {
 
   return (
     <LayoutContainer>
-      <Dimmer dimmed={isLoading} showLoader={true} />
+      <Dimmer
+        dimmed={isLoading}
+        showLoader={true}
+        statusMessages={loaderMessages}
+        statusHeading={loaderMessages[0]}
+      />
       <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
         pageName={pageContext.pageName}
