@@ -30,7 +30,7 @@ export const DynamicLegend = ({ map }) => {
   const isMobile = useIsMobile();
   const [legendItems, setLegendItems] = useState([]);
   const { state } = useMapContext();
-  const { defaultBands } = useAppContext();
+  const { defaultBands, defaultLegendDisplayMode = 'continuous' } = useAppContext();
   // Initialise from localStorage so the user's display/scale preferences survive
   // page refreshes and navigation. Falls back to an empty object if storage is
   // unavailable (private browsing, quota exceeded, etc.).
@@ -76,9 +76,9 @@ export const DynamicLegend = ({ map }) => {
     setOpenPopoverId(prev => prev === layerId ? null : layerId);
   };
 
-  const updateLayerPref = (layerId, key, value) => {
+  const updateLayerPref = (layerId, key, value, defaultDisplayMode = 'continuous') => {
     setLayerPrefs(prev => {
-      const currentPref = prev[layerId] || { displayMode: 'continuous', scaleMode: 'value' };
+      const currentPref = prev[layerId] || { displayMode: defaultDisplayMode, scaleMode: 'value' };
       const next = { ...prev, [layerId]: { ...currentPref, [key]: value } };
       // Persist to localStorage so preferences survive page refreshes.
       try {
@@ -368,6 +368,7 @@ export const DynamicLegend = ({ map }) => {
           }
 
           const legendNumericEntries = filteredEntries.map(e => e.numericValue);
+          const layerDefaultDisplayMode = layer.metadata?.defaultLegendDisplayMode || defaultLegendDisplayMode;
           
           return {
             layerId: layer.id,
@@ -375,6 +376,7 @@ export const DynamicLegend = ({ map }) => {
             subtitle: legendSubtitleText,
             legendEntries: filteredEntries,
             legendEntriesNumeric: legendNumericEntries,
+            defaultDisplayMode: layerDefaultDisplayMode,
             // legendAnnotations: { start, end } — positional (left/right) annotation
             // strings for the continuous gradient bar. Present only when the layer
             // config declares them; undefined otherwise.
