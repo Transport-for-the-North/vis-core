@@ -352,7 +352,10 @@ export const MapProvider = ({ children }) => {
 
   return (
     <MapContext.Provider value={contextValue}>
-      {state.pageIsReady ? children : <div>Loading...</div>}
+      {/* We no longer conditionally hide children based on pageIsReady. 
+          This prevents MapLibre from unmounting/remounting, 
+          letting MapLayout's internal Dimmer handle the loading state instead. */}
+      {children}
     </MapContext.Provider>
   );
 };

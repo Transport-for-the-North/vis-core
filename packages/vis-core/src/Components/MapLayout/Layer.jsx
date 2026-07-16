@@ -109,9 +109,13 @@ export const Layer = ({ layer }) => {
         layerConfig.paint = layer.customPaint || layerConfig.paint;
 
         // Apply defaultOpacity to the layer's paint properties if specified
-        if (layer.defaultOpacity) {
-          const opacityProp = getOpacityProperty(layerConfig.type);
-          if (layerConfig.paint && opacityProp) {
+        const opacityProp = getOpacityProperty(layerConfig.type);
+        if (layerConfig.paint && opacityProp) {
+          if (layer.isStylable) {
+            // For stylable layers, start them with opacity 0 to prevent flashing
+            // before MapVisualisation applies the actual data-driven style
+            layerConfig.paint[opacityProp] = 0;
+          } else if (layer.defaultOpacity) {
             layerConfig.paint[opacityProp] = layer.defaultOpacity;
           }
         }
@@ -185,9 +189,11 @@ export const Layer = ({ layer }) => {
           lastTilesUrlByMapRef.current.set(mapInstance, url);
           
           // Apply defaultOpacity to tile layer paint properties if specified
-          if (layer.defaultOpacity) {
-            const opacityProp = getOpacityProperty(layerConfig.type);
-            if (layerConfig.paint && opacityProp) {
+          const opacityProp = getOpacityProperty(layerConfig.type);
+          if (layerConfig.paint && opacityProp) {
+            if (layer.isStylable) {
+              layerConfig.paint[opacityProp] = 0;
+            } else if (layer.defaultOpacity) {
               layerConfig.paint[opacityProp] = layer.defaultOpacity;
             }
           }
@@ -382,9 +388,11 @@ export const Layer = ({ layer }) => {
       };
 
       // Apply defaultOpacity if specified.
-      if (layer.defaultOpacity) {
-        const opacityProp = getOpacityProperty(baseLayerConfig.type);
-        if (baseLayerConfig.paint && opacityProp) {
+      const opacityProp = getOpacityProperty(baseLayerConfig.type);
+      if (baseLayerConfig.paint && opacityProp) {
+        if (layer.isStylable) {
+          baseLayerConfig.paint[opacityProp] = 0;
+        } else if (layer.defaultOpacity) {
           baseLayerConfig.paint[opacityProp] = layer.defaultOpacity;
         }
       }
@@ -432,7 +440,7 @@ export const Layer = ({ layer }) => {
       }
       if (Object.keys(filters).length > 0) {
         requestUrl = url.replace(/\{(\w+)\}/g, (_, key) => {
-          const uuid = paramNameToUuidMap[key];
+          const uuid = paramNameToUuidMap?.[key];
           return uuid && filters[uuid] !== undefined ? filters[uuid] : `{${key}}`;
         });
         dispatch({

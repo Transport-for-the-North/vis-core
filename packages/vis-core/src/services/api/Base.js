@@ -211,7 +211,9 @@ class BaseService {
       ...addOptions,
     };
     const result = await fetch(url, options).catch((error) => {
-      console.log(error);
+      if (error.name !== 'AbortError') {
+        console.log(error);
+      }
       throw error;
     });
     if (!result.ok) {
@@ -280,7 +282,9 @@ class BaseService {
       ...addOptions,
     };
     const result = await fetch(url, options).catch((error) => {
-      console.log(error);
+      if (error.name !== 'AbortError') {
+        console.log(error);
+      }
       throw error;
     });
     if (!result.ok) {
