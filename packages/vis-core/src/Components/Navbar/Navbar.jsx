@@ -5,57 +5,77 @@ import { AppContext } from "contexts";
 import { useAuth } from "contexts/AuthProvider";
 import { useWindowWidth } from "hooks";
 import { buildNavbarLinks, validateAppConfigAgainstOpenApi } from "utils";
-import { Button } from "./Button";
+import { defaultBgColour } from "defaults";
 import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
 import { ResponsiveNavbarLinks } from "./ResponsiveNavbarLinks";
 
 const StyledNavbar = styled.nav`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0px;
-  background-color: ${({ theme }) => theme.navbarBg};
-  width: 100%;
-  box-sizing: border-box;
-  height: 75px;
-  z-index: 10005;
-  border-bottom: 1px solid #e0e0e0;
   position: fixed;
   top: 0;
-  font-family: ${({ theme }) => theme.standardFontFamily};
+  left: 0;
+  right: 0;
+  z-index: 10005;
+  width: 100%;
+  background-color: ${({ theme }) => theme.navbarBg};
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 `;
 
-const NavbarContent = styled.div`
+const HeaderOuter = styled.div`
+  width: 100%;
+  border-bottom: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
+`;
+
+const HeaderInner = styled.div`
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 2rem 10vw;
+`;
+
+const HeaderGrid = styled.div`
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  column-gap: 32px;
+`;
+
+const HeaderNavSearch = styled.div`
   display: flex;
   align-items: center;
-  height: 100%;
-  flex-grow: 1;
-  justify-content: space-between;
+  justify-content: flex-start;
 `;
 
-const NavbarMobileButton = styled(Button)`
+const MobileMenuButton = styled.button`
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
   cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
   @media only screen and (max-width: 767px) {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
   }
 `;
 
 const LogoutSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
+  justify-content: flex-end;
+  width: 100%;
 `;
 
 const StyledLogout = styled.img`
   cursor: pointer;
-  width: 50%;
+  width: 20px;
   height: auto;
 `;
 
@@ -73,7 +93,7 @@ export function Navbar() {
   const { logOut } = useAuth();
   const didValidateOpenApiRef = useRef(false);
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
-  const [$bgColor, setBgColor] = useState("#7317de");
+  const [$bgColor, setBgColor] = useState(defaultBgColour);
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
@@ -144,47 +164,53 @@ export function Navbar() {
   return (
     <>
       <StyledNavbar>
-        <NavbarContent>
-          {isMobile && <NavbarMobileButton
-              src={appContext.logoutButtonImage}
-              alt="Burger Button Navbar"
-              onClick={updateSideNav}
-          />}
-          {(!isMobile && logoPosition === "left") && (
-            <Logo
-              logoImage={logoImage}
-              onClick={() => onClick(null, logoImage)}
-              position="left"
-            />
-          )}
-          {!isMobile && (
-            <ResponsiveNavbarLinks
-              links={links}
-              activeLink={activeLink}
-              onClick={onClick}
-              $bgColor={$bgColor}
-            />
-          )}
-          {(!isMobile && logoPosition === "right") && (
-            <Logo
-              logoImage={logoImage}
-              onClick={() => onClick(null, logoImage)}
-              position="right"
-            />
-          )}
-          {isMobile && (
-            <Logo
-              logoImage={logoImage}
-              onClick={() => onClick(null, logoImage)}
-              position="left"
-            />
-          )}
-        </NavbarContent>
-        {appContext.authenticationRequired && (
-          <LogoutSection>
-            <StyledLogout src="/img/logout.png" onClick={handleLogout} />
-          </LogoutSection>
-        )}
+        <HeaderOuter>
+          <HeaderInner>
+            <HeaderGrid>
+              {(logoPosition === "left" || isMobile) && (
+                <Logo
+                  logoImage={logoImage}
+                  onClick={() => onClick(null, logoImage)}
+                  position="left"
+                />
+              )}
+
+              <HeaderNavSearch>
+                {!isMobile && (
+                  <ResponsiveNavbarLinks
+                    links={links}
+                    activeLink={activeLink}
+                    onClick={onClick}
+                    $bgColor={$bgColor}
+                  />
+                )}
+              </HeaderNavSearch>
+
+              <LogoutSection>
+                {!isMobile && logoPosition === "right" && (
+                  <Logo
+                    logoImage={logoImage}
+                    onClick={() => onClick(null, logoImage)}
+                    position="right"
+                  />
+                )}
+                {isMobile && (
+                  <MobileMenuButton
+                    aria-label="Open main menu"
+                    aria-expanded={isSideNavOpen}
+                    onClick={updateSideNav}
+                    data-testid="mobile-menu-toggle"
+                  >
+                    <span aria-hidden="true">☰</span>
+                  </MobileMenuButton>
+                )}
+                {appContext.authenticationRequired && (
+                  <StyledLogout src="/img/logout.png" onClick={handleLogout} />
+                )}
+              </LogoutSection>
+            </HeaderGrid>
+          </HeaderInner>
+        </HeaderOuter>
       </StyledNavbar>
       {isMobile && (
         <LateralNavbar
@@ -193,7 +219,7 @@ export function Navbar() {
           $bgColor={$bgColor}
         />
       )}
-      <div style={{ height: "75px" }}></div>
+      <div style={{ height: "114px" }}></div>
     </>
   );
 }

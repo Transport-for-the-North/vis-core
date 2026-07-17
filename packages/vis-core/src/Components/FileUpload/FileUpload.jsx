@@ -175,7 +175,7 @@ const UploadButton = styled.button`
   border: none;
   border-radius: ${CONTROL_BORDER_RADIUS}px;
   font-size: 1rem;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
   display: flex;
   align-items: center;
@@ -235,7 +235,7 @@ const SuccessResetButton = styled.button`
   border: 1px solid #2e7d32;
   border-radius: ${CONTROL_BORDER_RADIUS}px;
   font-size: 0.9rem;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   cursor: pointer;
   transition: all 0.2s ease;
 

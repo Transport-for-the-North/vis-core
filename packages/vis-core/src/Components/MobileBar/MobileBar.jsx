@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { AccordionHeader, AccordionIcon } from '../Sidebar/Accordion/AccordionSection';
+import { defaultBgColour } from 'defaults';
 
 /**
  * A unified mobile bar styled like the accordion header.
@@ -17,7 +18,7 @@ export const MobileBar = styled(AccordionHeader).attrs({ as: 'button' })`
     height: 45px;
     width: 100vw;
     z-index: 1002;
-    background: ${({ $bgColor }) => $bgColor || '#7317DE'};
+    background: ${({ $bgColor }) => $bgColor || defaultBgColour};
     color: #fff;
     border: 0;
     align-items: center;

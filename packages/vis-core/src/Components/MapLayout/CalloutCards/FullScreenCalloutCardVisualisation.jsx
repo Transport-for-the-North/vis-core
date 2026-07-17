@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { api } from "services";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { CARD_CONSTANTS } from "defaults";
+import { CARD_CONSTANTS, defaultBgColour } from "defaults";
 import { Hovertip } from "Components/Hovertip";
 import { replacePlaceholders } from "utils";
 
@@ -85,7 +85,7 @@ const BackButton = styled.button`
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
-  background-color: #7317de;
+  background-color: ${defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -107,7 +107,7 @@ const OpenButton = styled.button`
   z-index: 2000;
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
-  background-color: #7317de;
+  background-color: ${defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -231,7 +231,7 @@ const NavigationButton = styled.button`
   width: 40px;
   height: 40px;
   padding: 0;
-  background-color: #7317de;
+  background-color: ${defaultBgColour};
   color: white;
   border: none;
   border-radius: 50%;
@@ -255,7 +255,7 @@ const NavigationButton = styled.button`
  */
 const CardTitle = styled.h2`
   font-size: 1.2em;
-  color: #4b3e91;
+  color: ${defaultBgColour};
   font-weight: bold;
   margin-top: 5px;
   user-select: none;
@@ -272,7 +272,7 @@ const CardContent = styled.div`
 
   h2 {
     font-size: 1.5em;
-    color: #4b3e91;
+    color: ${defaultBgColour};
     margin-bottom: 0.5em;
   }
 
@@ -315,7 +315,7 @@ const CardContent = styled.div`
 
   .card .value {
     font-size: 2em;
-    color: #4b3e91;
+    color: ${defaultBgColour};
     font-weight: bold;
   }
 

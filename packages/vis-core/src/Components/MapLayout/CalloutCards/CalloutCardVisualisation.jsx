@@ -14,7 +14,7 @@ import { MapContext } from "contexts";
 import { replacePlaceholders, formatNumber } from "utils";
 import { Hovertip, WarningBox, ChartRenderer } from "Components";
 
-import { CARD_CONSTANTS } from "defaults";
+import { CARD_CONSTANTS, defaultBgColour } from "defaults";
 
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
@@ -83,7 +83,7 @@ const CardHeader = styled.div`
  */
 const CardTitle = styled.h2`
   font-size: 1.2em;
-  color: #4b3e91;
+  color: ${defaultBgColour};
   font-weight: bold;
   margin-top: 5px;
   user-select: none;
@@ -120,7 +120,7 @@ const StatusBadge = styled.span`
       ? "rgba(0, 222, 198, 0.18)"
       : "rgba(240, 240, 247, 0.95)"};
   color: ${({ $kind }) =>
-    $kind === "updated" ? "rgb(13, 15, 61)" : "#4b3e91"};
+    $kind === "updated" ? "rgb(13, 15, 61)" : defaultBgColour};
 
   font-size: 0.72rem;
   font-weight: 700;
@@ -138,7 +138,7 @@ const CardContent = styled.div`
 
   h2 {
     font-size: 1.5em;
-    color: #4b3e91;
+    color: ${defaultBgColour};
     margin-bottom: 0.5em;
 
     @media ${(props) => props.theme.mq.mobile} {
@@ -202,7 +202,7 @@ const CardContent = styled.div`
 
   .card .value {
     font-size: 2em;
-    color: #4b3e91;
+    color: ${defaultBgColour};
     font-weight: bold;
   }
 
@@ -255,7 +255,7 @@ const ToggleButton = styled.button`
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
-  background-color: #7317de;
+  background-color: ${defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -363,7 +363,7 @@ export const CalloutCardVisualisation = ({
   const colorsList = useMemo(() => {
     if (typeof getAllColors === "function") return getAllColors();
 
-    return ["#A0CA2A", "#E97132", "#7317DE", "#6D6875", "#3A86FF"];
+    return ["#A0CA2A", "#E97132", defaultBgColour, "#6D6875", "#3A86FF"];
   }, [getAllColors]);
 
   // Do not render the card if no data is available,

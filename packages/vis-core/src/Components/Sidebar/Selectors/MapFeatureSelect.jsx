@@ -34,7 +34,7 @@ const ModeButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   width: 50%;
   opacity: ${(props) => (props.disabled ? 0.5 : 1)};
   pointer-events: ${(props) => (props.disabled ? 'none' : 'auto')};
@@ -65,7 +65,7 @@ const EnableSelectButton = styled.button`
   border: 1px solid ${(props) => (props.enabled ? 'black' : '#ccc')};
   border-radius: 4px;
   margin-right: 10px;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
 
   &:hover {
     background-color: ${(props) => (props.enabled ? darken(0.1, props.$bgColor) : 'white')};

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
+import { ThemeProvider, createGlobalStyle } from "styled-components";
 import {
   PageSwitch,
   HomePage,
@@ -14,12 +14,127 @@ import { Dashboard } from "../../layouts";
 import { AppContext, AuthProvider, ErrorProvider } from "../../contexts";
 import { api } from "../../services";
 import { loadBands } from "../../utils";
+import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
 import {
   withWarning,
   withRoleValidation,
   composeHOCs,
   withTermsOfUse
 } from "../../hocs";
+
+const BrandGlobalStyles = createGlobalStyle`
+  @font-face {
+    font-family: "Korto";
+    src: url("/fonts/Korto-Medium.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Korto";
+    src: url("/fonts/Korto-Bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --palette-navy: ${brandTokens.palette.navy};
+    --palette-teal: ${brandTokens.palette.teal};
+    --palette-pale-teal: ${brandTokens.palette.paleTeal};
+    --palette-white: ${brandTokens.palette.white};
+    --palette-grey: ${brandTokens.palette.grey};
+    --palette-mid-grey: ${brandTokens.palette.midGrey};
+    --palette-pale-grey: ${brandTokens.palette.paleGrey};
+    --palette-bottom-grey: ${brandTokens.palette.bottomGrey};
+    --text-icon: ${brandTokens.palette.textIcon};
+
+    --radius-xxs: ${brandTokens.radii.xxs};
+    --radius-xs: ${brandTokens.radii.xs};
+    --radius-sm: ${brandTokens.radii.sm};
+    --radius-lg: ${brandTokens.radii.lg};
+    --radius-pill-lg: ${brandTokens.radii.pillLg};
+    --radius-pill-sm: ${brandTokens.radii.pillSm};
+
+    --font-family-base: ${brandTokens.fonts.base};
+    --font-sans: "Open Sans", "Segoe UI", Arial, sans-serif;
+  }
+
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: var(--font-family-base);
+    color: var(--palette-navy);
+    background: var(--palette-white);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Korto", "Open Sans", "Segoe UI", Arial, sans-serif;
+    color: var(--palette-navy);
+  }
+
+  p,
+  a,
+  ul > li,
+  ol > li,
+  li,
+  .copy {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 26px;
+    color: var(--palette-navy);
+  }
+
+  .copy-sm {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .copy-semibold {
+    font-weight: 600;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: 1000;
+    background: var(--palette-teal);
+    color: var(--palette-navy);
+    padding: 8px 16px;
+    border-radius: var(--radius-pill-lg);
+  }
+
+  .skip-link:focus {
+    left: 16px;
+    top: 16px;
+    width: auto;
+    height: auto;
+    outline: 2px solid var(--palette-navy);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+`;
 
 /**
  * Base application component that can be used across all TfN apps.
@@ -49,6 +164,7 @@ export function BaseApp({
   afterDashboard = null
 }) {
   const [appConfig, setAppConfig] = useState(null);
+  const effectiveTheme = useMemo(() => mergeThemeWithBrandDefaults(theme), [theme]);
 
   useEffect(() => {
     /**
@@ -142,7 +258,8 @@ export function BaseApp({
     <div className={appCssClass}>
       <AuthProvider>
         <ErrorProvider>
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={effectiveTheme}>
+            <BrandGlobalStyles />
             <AppContext.Provider value={appConfig}>
               {beforeDashboard}
               <Navbar />

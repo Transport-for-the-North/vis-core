@@ -56,7 +56,11 @@ export function makeSelectStyles(theme, opts = {}) {
       alignItems: "center",
       padding: "10px",
       fontSize,
-      backgroundColor: isSelected ? theme.activeBg : isFocused ? "#ede7f6" : "#fff",
+      backgroundColor: isSelected
+        ? theme.activeBg
+        : isFocused
+        ? (theme.colors?.muted || "#efeff7")
+        : (theme.colors?.surface || "#fff"),
       color: isSelected ? "#fff" : "#0d0f3d",
       cursor: "pointer",
       ":active": {

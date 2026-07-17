@@ -45,7 +45,7 @@ const StyledButton = styled.button`
     props.index !== 0 ? "none none none solid" : "none"};
   border-width: 0.25px;
   width: ${(props) => 100 / props.size + "%"};
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +75,7 @@ const ToggleAllButton = styled.button`
   border: 0.25px solid;
   margin-left: 10px;
   width: 80px; /* Fixed width */
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center;
   justify-content: center;

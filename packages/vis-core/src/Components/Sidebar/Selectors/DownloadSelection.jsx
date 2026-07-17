@@ -29,7 +29,7 @@ const DownloadButton = styled.button`
   border: 0.25px solid;
   margin-right: 10px; /* Changed to margin-right to position it on the left */
   width: 50%;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center; /* Center align items vertically */
   justify-content: center;

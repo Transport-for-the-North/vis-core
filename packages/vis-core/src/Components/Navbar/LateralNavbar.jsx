@@ -4,6 +4,7 @@ import styled, { css } from "styled-components";
 import { buildDropdownTree, createNavItemClickHandler } from "utils/nav";
 import { LateralRecursiveDropdown } from "./LateralRecursiveDropdown";
 import { AppContext } from "contexts";
+import { defaultBgColour } from "defaults";
 import { FixedExternalIcon } from "./FixedExternalIcon";
 
 /**
@@ -37,6 +38,7 @@ const baseSideNavLinkStyles = css`
   overflow-wrap: break-word;
   text-align: left;
   font-size: 16px;
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 
   &:hover {
     background-color: ${({ $bgColor, theme }) =>
@@ -109,7 +111,7 @@ export function LateralNavbar(props) {
         <StyledSideNavLink
           to="/"
           $isActive={activeLink === "/"}
-          $bgColor="#7317de"
+          $bgColor={defaultBgColour}
           onClick={createNavItemClickHandler({ url: "/" }, props.onClick, props.$bgColor)}
         >
           Home

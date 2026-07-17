@@ -16,7 +16,7 @@ jest.mock("react-router-dom", () => ({
 // Mock of the styled-components theme
 const mockTheme = {
   colors: {
-    primary: "#7317de",
+    primary: "#0d0f3d",
     textPrimary: "#111",
     textSecondary: "#666",
     border: "#ddd",

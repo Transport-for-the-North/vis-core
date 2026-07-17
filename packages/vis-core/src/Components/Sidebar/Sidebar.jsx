@@ -13,7 +13,6 @@ import { MobileBar, SideIcon } from "../MobileBar/MobileBar";
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
   font-size: 1.2em;
-  color: #4b3e91;
   font-weight: bold;
   text-align: left;
   padding-left: 5px;

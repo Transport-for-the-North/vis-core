@@ -27,7 +27,7 @@ const DownloadButton = styled.button`
   border-radius: 8px;
   border: 0.25px solid;
   width: 50%;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center; /* Center align items vertically */
   justify-content: center;

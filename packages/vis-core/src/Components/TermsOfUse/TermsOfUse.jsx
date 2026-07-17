@@ -18,8 +18,8 @@ const StyledBox = styled.div`
   top: 27%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #f0f0f0; /* Light grey color */
-  color: rgb(13, 15, 61);
+  background-color: ${({ theme }) => theme?.colors?.surface || '#ffffff'};
+  color: ${({ theme }) => theme?.colors?.text || 'rgb(13, 15, 61)'};
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -50,7 +50,7 @@ const StyledBox = styled.div`
   }
 
   .accept-button {
-    background-color: #7317de; /* Button background color */
+    background-color: ${({ theme }) => theme?.primary || '#0d0f3d'};
     border: none;
     color: white; /* Button text color */
     padding: 10px 20px; /* Button padding */
@@ -60,7 +60,7 @@ const StyledBox = styled.div`
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #5a0fb0; /* Darker shade on hover */
+      background-color: ${({ theme }) => theme?.activeBg || '#0d0f3d'};
     }
   }
 `;

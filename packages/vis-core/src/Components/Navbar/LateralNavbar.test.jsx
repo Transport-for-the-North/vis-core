@@ -7,7 +7,7 @@ import { ThemeProvider } from "styled-components";
 
 const fakeOnClick = jest.fn();
 const props = {
-  $bgColor: "#7317de",
+  $bgColor: "#0d0f3d",
   className: "sideNavbar-shown",
   onClick: fakeOnClick,
 };

@@ -12,6 +12,7 @@ import {
   resolveSvgUrl,
 } from 'utils';
 import { makeSelectStyles } from 'utils/selectStyles';
+import { defaultBgColour } from 'defaults';
 import { AppButton } from '../AppButton';
 
 // Styled Components
@@ -32,7 +33,7 @@ const ContentArea = styled.div`
 
 const HeroBand = styled.section`
   background: #ffffff;
-  border-bottom: 3px solid ${(p) => p.theme.activeBg || '#7317de'};
+  border-bottom: 3px solid ${(p) => p.theme.activeBg || defaultBgColour};
   box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
   padding: 1.5rem 3vw 1.5rem;
 `;
@@ -732,7 +733,7 @@ export function SVGGalleryManager({ config = {} }) {
 
           <ActionsRow>
             <AppButton
-              $bgColor={theme?.navText ?? theme?.activeBg ?? "#7317de"}
+              $bgColor={theme?.navText ?? theme?.activeBg ?? defaultBgColour}
               $height="36px"
               onClick={handleInlineCancel}
             >
