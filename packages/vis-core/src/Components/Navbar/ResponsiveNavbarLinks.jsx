@@ -10,14 +10,10 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
  */
 const NavLinksContainer = styled.div`
   display: flex;
-  align-items: stretch;
-  flex-grow: 1;
-  height: 100%;
-  /* Each direct child takes equal space */
-  & > * {
-    flex: 1 1 auto;
-    text-align: center;
-  }
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  width: auto;
 `;
 
 /**
@@ -25,23 +21,30 @@ const NavLinksContainer = styled.div`
  */
 const baseNavLinkStyles = css`
   text-decoration: none;
-  display: flex;
-  max-width: 200px;
+  display: inline-flex;
+  max-width: 280px;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
-  height: 100%;
-  background-color: ${({ $active, $bgColor, theme }) =>
-    $active ? ($bgColor || theme.activeNavColour) : "transparent"};
-  color: ${({ $active, theme }) => ($active ? "#f9f9f9" : theme.navText)};
-  border-bottom-right-radius: 20px;
-  transition: background-color 0.2s;
-  font-size: clamp(12px, 1.2vw, 18px);
+  padding: 8px 0;
+  height: auto;
+  background-color: transparent;
+  color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  border-radius: 8px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  white-space: nowrap;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 0.08em;
+  cursor: pointer;
 
   &:hover {
-    background-color: ${({ $bgColor, theme }) =>
-      $bgColor || theme.activeNavColour};
-    color: #f9f9f9;
+    color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    text-decoration-color: ${({ theme }) => theme?.colors?.accent || "#00dec6"};
   }
 `;
 
@@ -50,8 +53,6 @@ const baseNavLinkStyles = css`
  */
 export const StyledNavLink = styled(Link)`
   ${baseNavLinkStyles}
-  white-space: normal;
-  overflow-wrap: break-word;
 `;
 
 /**
@@ -60,13 +61,11 @@ export const StyledNavLink = styled(Link)`
  */
 export const StyledExternalNavLink = styled.a`
   ${baseNavLinkStyles}
-  white-space: normal;
-  overflow-wrap: break-word;
+  gap: 6px;
   
   /* The span holding the external label takes full available width */
   span.external-label {
-    flex: 1;
-    white-space: inherit;
+    white-space: nowrap;
   }
 `;
 

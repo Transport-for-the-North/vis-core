@@ -5,14 +5,15 @@ import styled from "styled-components";
  * Styled container for the logo.
  */
 const LogoContainer = styled.div`
-  width: 192px;
-  height: 75px;
+  width: 220px;
+  min-width: 180px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: ${({ $position }) =>
     $position === "left" ? "flex-start" : "flex-end"};
   @media only screen and (min-width: 768px) {
-    padding: 0 1rem;
+    padding: 0;
     cursor: ${({ $hasImage }) => ($hasImage ? "pointer" : "default")};
     margin-left: ${({ $position }) => ($position === "left" ? "0" : "auto")};
   }
@@ -28,9 +29,10 @@ const LogoContainer = styled.div`
  * Styled image element for the logo.
  */
 const LogoImage = styled.img`
-  min-width: 192px;
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  max-width: 220px;
+  max-height: 50px;
+  object-fit: contain;
 `;
 
 /**

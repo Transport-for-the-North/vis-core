@@ -39,6 +39,7 @@ const LateralDropdownHeader = styled.div`
   white-space: normal;
   overflow-wrap: break-word;
   transition: background-color 0.2s;
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
   &:hover {
     background-color: ${({ theme }) => theme.activeBg};
     color: #f9f9f9;
@@ -80,6 +81,7 @@ const baseLateralMenuItemStyles = css`
   text-align: left;
   transition: background-color 0.2s;
   font-size: smaller;
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 
   &:hover {
     background-color: ${({ $bgColor, theme }) =>
