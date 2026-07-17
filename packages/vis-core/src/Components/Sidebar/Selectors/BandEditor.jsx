@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { SelectorLabel } from "./SelectorLabel";
 import { AppButton } from "Components/AppButton";
+import { defaultBgColour } from "defaults";
 
 const BandEditorContainer = styled.div`
   margin-top: 12px;
@@ -40,11 +41,11 @@ const BandActionRight = styled.div`
 
 const ResetButton = styled(AppButton)`
   background-color: transparent;
-  color: ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? "#7317de"};
-  border: 1px solid ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? "#7317de"};
+  color: ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? defaultBgColour};
+  border: 1px solid ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? defaultBgColour};
 
   &:hover:not(:disabled) {
-    background-color: ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? "#7317de"};
+    background-color: ${(props) => props.theme?.primary ?? props.theme?.activeBg ?? defaultBgColour};
     color: white;
   }
 
@@ -100,7 +101,7 @@ const BandInput = styled.input`
   
   &:focus {
     outline: none;
-    border-color: ${props => props.$hasError ? '#d32f2f' : '#4b3e91'};
+    border-color: ${props => props.$hasError ? '#d32f2f' : defaultBgColour};
   }
 `;
 

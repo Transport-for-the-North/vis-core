@@ -6,6 +6,7 @@ const StyledLabel = styled.div`
   align-items: center;
   justify-content: space-between;
   font-size: 0.9rem;
+  margin-bottom: 8px;
 `;
 
 const InfoButton = styled.button`

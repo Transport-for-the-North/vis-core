@@ -22,10 +22,24 @@ import styled from "styled-components";
 import { WarningBox } from "Components/MessageBox";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { CARD_CONSTANTS } from "defaults";
+import { CARD_CONSTANTS, defaultBgColour, brandTokens } from "defaults";
 import { formatNumber } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
+
+const CHART_UI_COLORS = {
+  axisLabel: brandTokens.palette.textIcon,
+  rankBadge: brandTokens.palette.teal,
+  scoreText: brandTokens.palette.navy,
+  grid: brandTokens.palette.bottomGrey,
+  hoverCursor: "rgba(13, 15, 61, 0.06)",
+  comparator: brandTokens.palette.grey,
+  guideStroke: brandTokens.palette.grey,
+  tableBorder: brandTokens.palette.grey,
+  tableDivider: brandTokens.palette.bottomGrey,
+  subtleText: brandTokens.palette.textIcon,
+  areaFill: "rgba(13, 15, 61, 0.25)",
+};
 
 const Section = styled.section`
   margin: 0;
@@ -36,19 +50,22 @@ const ChartContainer = styled.div`
   flex-direction: column;
   gap: 16px;
   margin-top: 16px;
+  font-family: var(--font-sans);
 `;
 
 const Title = styled.h3`
   margin: 4px 0 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #4b3e91;
+  color: ${defaultBgColour};
+  font-family: "Korto", var(--font-sans);
 `;
 
 const AxisLabel = styled.span`
   font-size: 11px;
-  color: #555;
+  color: ${CHART_UI_COLORS.axisLabel};
   line-height: 1.2;
+  font-family: var(--font-sans);
 `;
 
 // Ranking display element for the ranking table
@@ -58,7 +75,7 @@ const RankBadge = styled.span`
   justify-content: center;
   width: 22px;
   height: 22px;
-  background: #a99ad6;
+  background: ${CHART_UI_COLORS.rankBadge};
   color: white;
   border-radius: 50%;
   font-size: 13px;
@@ -67,13 +84,13 @@ const RankBadge = styled.span`
 `;
 
 const NameCell = styled.td`
-  color: #7c5cd6;
+  color: ${({ theme }) => theme?.colors?.accent || brandTokens.palette.teal};
   font-weight: 500;
 `;
 
 const ScoreCell = styled.td`
   font-weight: bold;
-  color: #333;
+  color: ${CHART_UI_COLORS.scoreText};
   text-align: right;
 `;
 
@@ -105,7 +122,7 @@ const ToggleButton = styled.button`
   z-index: 1001;
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
-  background-color: #7317de;
+  background-color: ${defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -127,7 +144,7 @@ const RotatingIcon = styled(FaChevronDown)`
  * @constant {Object}
  */
 const DEFAULTS = {
-  BRAND_COLOR: "#4b3e91",
+  BRAND_COLOR: defaultBgColour,
   DIMENSIONS: {
     baseHeight: 220,
     pieSize: 220,
@@ -138,7 +155,7 @@ const DEFAULTS = {
     avgCharWidth: 6,
   },
   MARGIN: { top: 4, right: 10, bottom: 2, left: 10 },
-  GRID: { stroke: "#eee", vertical: false },
+  GRID: { stroke: CHART_UI_COLORS.grid, vertical: false },
 };
 
 /**
@@ -155,7 +172,7 @@ const DEFAULT_COLORS = [
   "#b07aa1",
   "#e15759",
   "#ff9da7",
-  "#4b3e91",
+  brandTokens.palette.teal,
 ];
 
 /**
@@ -478,7 +495,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RTooltip formatter={tooltipFormatter} cursor={{ fill: CHART_UI_COLORS.hoverCursor }} />
         <RBar dataKey="value" name="Value">
           {items.map((entry, idx) => (
             <RCell
@@ -586,7 +603,7 @@ const BarChartMultiple = ({
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RTooltip formatter={tooltipFormatter} cursor={{ fill: CHART_UI_COLORS.hoverCursor }} />
         <RLegend
           verticalAlign="top"
           align="center"
@@ -616,7 +633,7 @@ const BarChartMultiple = ({
  * @param {string} [props.config.primaryLabel] - Label for the primary line (default: "Value")
  * @param {string} [props.config.comparatorKey] - Data key for the comparator line (default: "dmValue")
  * @param {string} [props.config.comparatorLabel] - Label for the comparator line (default: "Comparator")
- * @param {string} [props.config.comparatorColor] - Stroke colour for the comparator line (default: "#999999")
+ * @param {string} [props.config.comparatorColor] - Stroke colour for the comparator line (default: brand grey)
  * @param {string} [props.config.lineColor] - Stroke colour for the primary line
  * @param {Object} props.data - Data object containing values to chart
  * @param {Object} props.formatters - Custom formatting functions for values
@@ -633,7 +650,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   const comparatorKey = config.comparatorKey || "dmValue";
   const comparatorLabel = config.comparatorLabel || "Comparator";
   const primaryLabel = config.primaryLabel || "Value";
-  const comparatorStroke = config.comparatorColor || "#999999";
+  const comparatorStroke = config.comparatorColor || CHART_UI_COLORS.comparator;
 
   const formatter = (val) => {
     const n = Number(val);
@@ -679,7 +696,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         />
         <RTooltip
           formatter={formatter}
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          cursor={{ stroke: CHART_UI_COLORS.guideStroke, strokeDasharray: "3 3" }}
         />
         {hasComparator && (
           <RLegend
@@ -729,7 +746,7 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke =
     config.areaStrokeColor || config.lineColor || DEFAULTS.BRAND_COLOR;
-  const fill = config.areaFillColor || "rgba(75,62,145,0.25)";
+  const fill = config.areaFillColor || CHART_UI_COLORS.areaFill;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
@@ -767,7 +784,7 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
         />
         <RTooltip
           formatter={formatter}
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          cursor={{ stroke: CHART_UI_COLORS.guideStroke, strokeDasharray: "3 3" }}
         />
         <RArea
           type="monotone"
@@ -832,7 +849,7 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          cursor={{ stroke: CHART_UI_COLORS.guideStroke, strokeDasharray: "3 3" }}
           formatter={formatter}
         />
         <RScatter data={items} fill={fill} />
@@ -934,7 +951,7 @@ const TableChart = ({ config, data, formatters }) => {
             borderCollapse: "collapse",
             fontSize: 12,
             background: "white",
-            border: "1px solid #ddd",
+            border: `1px solid ${CHART_UI_COLORS.tableBorder}`,
             borderRadius: 6,
             overflow: "hidden",
           }}
@@ -960,17 +977,17 @@ const TableChart = ({ config, data, formatters }) => {
                   key={r.key}
                   style={{
                     borderBottom:
-                      idx === rows.length - 1 ? "none" : "1px solid #eee",
+                      idx === rows.length - 1 ? "none" : `1px solid ${CHART_UI_COLORS.tableDivider}`,
                   }}
                 >
-                  <td style={{ padding: 8, borderRight: "1px solid #eee" }}>
+                  <td style={{ padding: 8, borderRight: `1px solid ${CHART_UI_COLORS.tableDivider}` }}>
                     {r.label}
                   </td>
                   <td
                     style={{
                       padding: 8,
                       textAlign: "right",
-                      borderRight: "1px solid #eee",
+                      borderRight: `1px solid ${CHART_UI_COLORS.tableDivider}`,
                     }}
                   >
                     {fmt.commify(val)}
@@ -1073,7 +1090,7 @@ const RankingChart = ({ config, data, formatters }) => {
         {/* Display "..." only if the list is collapsed */}
         {!isOpen && rows.length > 5 && (
           <RowTr>
-            <td colSpan={3} style={{ color: "#888", paddingLeft: 32 }}>
+            <td colSpan={3} style={{ color: CHART_UI_COLORS.subtleText, paddingLeft: 32 }}>
               ...
             </td>
           </RowTr>

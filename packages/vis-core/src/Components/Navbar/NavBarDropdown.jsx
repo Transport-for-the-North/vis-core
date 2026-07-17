@@ -1,9 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Link } from "react-router-dom";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+const fadeSlideDown = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 import { createNavItemClickHandler } from "utils/nav";
 import { FixedExternalIcon } from "./FixedExternalIcon";
+import { defaultBgColour } from "defaults";
 
 /* ----------------------------------
    Styled Components Definitions
@@ -14,9 +26,10 @@ import { FixedExternalIcon } from "./FixedExternalIcon";
  */
 const DropdownMenuWrapper = styled.div`
   position: absolute;
-  width: 100%;
+  width: max-content;
+  min-width: 220px;
   left: 0;
-  top: 74px; // Accounting for nav border to prevent inactivation
+  top: calc(100% + 8px);
   z-index: 1001;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -32,12 +45,13 @@ const DropdownMenuScroll = styled.div`
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   min-width: 140px;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
+  border-radius: 12px;
   position: relative;
+  animation: ${fadeSlideDown} 220ms ease;
 
   &::-webkit-scrollbar {
     width: 4px;
@@ -64,28 +78,32 @@ const DropdownMenuScroll = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-flex;
-  max-width: 200px;
+  max-width: 280px;
   align-items: center;
-  font-family: ${({ theme }) => theme.standardFontFamily};
-  font-size: clamp(12px, 1.2vw, 18px);
-  background-color: ${({ $isActive, $hovered, $bgColor }) =>
-    $isActive || $hovered ? $bgColor : "#f9f9f9"};
-  color: ${({ $isActive, $hovered }) =>
-    $isActive || $hovered ? "#ffffff" : "#4b3e91"};
-  padding: 0 10px;
-  height: 100%;
-  cursor: default;
+  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  background-color: transparent;
+  color: ${({ $isActive, $hovered, theme }) =>
+    theme?.colors?.text || defaultBgColour};
+  padding: 8px 0;
+  height: auto;
+  cursor: pointer;
   justify-content: space-between;
   text-decoration: none;
-  border-bottom-right-radius: 20px;
-  transition: background-color 0.05s;
-  white-space: normal;
-  overflow-wrap: break-word;
+  border-radius: 8px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  white-space: nowrap;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 0.08em;
   z-index: 1000;
 
   &:hover {
-    background-color: ${({ $bgColor }) => $bgColor};
-    color: #ffffff;
+    color: ${({ theme }) => theme?.colors?.text || defaultBgColour};
+    text-decoration-color: ${({ theme }) => theme?.colors?.accent || "#00dec6"};
   }
 
   @media only screen and (max-width: 767px) {
@@ -106,10 +124,12 @@ const DropdownTitle = styled.span`
 /**
  * Indicator (arrow) rendered in the dropdown header.
  */
-const DropdownIndicator = styled.span`
+const DropdownIndicator = styled.img`
   margin-left: 5px;
-  white-space: normal;
-  overflow-wrap: break-word;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
 `;
 
 /**
@@ -131,20 +151,22 @@ const dropdownItemStyles = css`
   display: flex;
   align-items: center; /* Ensure vertical centering */
   justify-content: space-between;
-  padding: 12px 10px;
+  padding: 10px 12px;
   text-decoration: none;
-  font-size: smaller;
+  font-size: 0.92rem;
   text-align: left;
   box-sizing: border-box;
-  background-color: ${({ $active, $hovered, $bgColor }) =>
-    $active || $hovered ? $bgColor : "#f9f9f9"};
-  color: ${({ $active, $hovered }) =>
-    $active || $hovered ? "#f9f9f9" : "#4b3e91"};
-  transition: background-color 0.05s ease, color 0.05s ease;
+  background-color: ${({ $active, $hovered, theme }) =>
+    $active || $hovered ? (theme?.colors?.paleTeal || "#e4f6f6") : "#ffffff"};
+  color: ${({ $active, $hovered, theme }) =>
+    theme?.colors?.text || defaultBgColour};
+  transition: background-color 0.22s ease, color 0.22s ease;
   white-space: normal;
+  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  cursor: pointer;
   &:hover {
-    background-color: ${({ $bgColor }) => $bgColor};
-    color: #ffffff;
+    background-color: ${({ theme }) => theme?.colors?.paleTeal || "#e4f6f6"};
+    color: ${({ theme }) => theme?.colors?.text || defaultBgColour};
   }
 `;
 
@@ -181,8 +203,9 @@ const NestedDropdownMenu = styled.div`
   left: ${({ left }) => left}px;
   top: ${({ top }) => top}px;
   min-width: 160px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
+  box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -191,6 +214,7 @@ const NestedDropdownMenu = styled.div`
   white-space: normal;
   overflow-wrap: break-word;
   font-size: clamp(12px, 1.2vw, 18px);
+  animation: ${fadeSlideDown} 220ms ease;
 `;
 
 /* ----------------------------------
@@ -453,7 +477,11 @@ export function NavBarDropdown({
       $hovered={navChildHovered}
     >
       <DropdownTitle>{dropdownName}</DropdownTitle>
-      <DropdownIndicator>▾</DropdownIndicator>
+      <DropdownIndicator
+        src="/arrows/arrow_down.svg"
+        alt=""
+        aria-hidden="true"
+      />
       {open && (
         <DropdownMenuWrapper>
           <DropdownMenuScroll

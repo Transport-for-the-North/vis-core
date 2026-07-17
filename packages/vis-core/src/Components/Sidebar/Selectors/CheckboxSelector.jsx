@@ -26,7 +26,7 @@ const SelectAllButton = styled.button`
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-radius: 4px;
   border: 0.25px solid;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center;
   justify-content: center;
