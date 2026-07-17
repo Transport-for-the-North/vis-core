@@ -847,6 +847,10 @@ export const reclassifyData = (
       return bins;
     }
 
+    if (bins.length === 1) {
+      return [0, bins[0]];
+    }
+
     return [0, ...bins.slice(1)];
   };
 
