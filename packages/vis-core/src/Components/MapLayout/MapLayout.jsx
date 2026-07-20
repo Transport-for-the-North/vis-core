@@ -59,7 +59,6 @@ const MobileLegendSlot = styled.section`
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
-  const isLoading = state.isLoading || state.visualisationLoadingCount > 0;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
@@ -71,6 +70,26 @@ export const MapLayout = () => {
   // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
   // immediately on each selector interaction. Selector UI still updates from the live filterState.
   const debouncedFilterState = useDebounced(filterState, 400);
+
+  const isFiltersDebouncing = debouncedFilterState !== filterState;
+  
+  // We keep the dimmer on if filters are debouncing.
+  // We also use a small 50ms buffer state for transitioning out of loading, 
+  // to prevent a 1-frame micro-gap flash between the debounce resolving and 
+  // the visualisations registering their loading state.
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const isCurrentlyLoading = state.isLoading || state.visualisationLoadingCount > 0 || isFiltersDebouncing;
+  
+  useEffect(() => {
+    if (isCurrentlyLoading) {
+      setIsTransitioning(true);
+    } else {
+      const timer = setTimeout(() => setIsTransitioning(false), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isCurrentlyLoading]);
+
+  const isLoading = isCurrentlyLoading || isTransitioning;
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
