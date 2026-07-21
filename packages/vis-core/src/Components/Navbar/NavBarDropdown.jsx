@@ -17,6 +17,8 @@ import { createNavItemClickHandler } from "utils/nav";
 import { FixedExternalIcon } from "./FixedExternalIcon";
 import { defaultBgColour } from "defaults";
 
+const NAV_ITEM_WIDTH = "250px";
+
 /* ----------------------------------
    Styled Components Definitions
 -------------------------------------*/
@@ -26,10 +28,11 @@ import { defaultBgColour } from "defaults";
  */
 const DropdownMenuWrapper = styled.div`
   position: absolute;
-  width: max-content;
-  min-width: 220px;
+  width: 100%;
+  min-width: 100%;
   left: 0;
-  top: calc(100% + 8px);
+  top: 100%;
+  padding-top: 8px;
   z-index: 1001;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -46,7 +49,8 @@ const DropdownMenuScroll = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   background-color: #ffffff;
-  min-width: 140px;
+  width: 100%;
+  min-width: 100%;
   box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
   border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
   border-radius: 12px;
@@ -78,32 +82,36 @@ const DropdownMenuScroll = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-flex;
-  max-width: 280px;
+  width: 100%;
   align-items: center;
   font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
   font-size: 18px;
   font-weight: 700;
   line-height: 24px;
-  background-color: transparent;
-  color: ${({ $isActive, $hovered, theme }) =>
-    theme?.colors?.text || defaultBgColour};
-  padding: 8px 0;
+  background-color: ${({ $isActive, $hovered, theme }) =>
+    $isActive || $hovered ? (theme?.colors?.text || defaultBgColour) : "transparent"};
+  color: ${({ $isActive, $hovered }) =>
+    $isActive || $hovered ? "#ffffff" : defaultBgColour};
+  padding: 12px 14px;
   height: auto;
   cursor: pointer;
-  justify-content: space-between;
+  justify-content: center;
   text-decoration: none;
-  border-radius: 8px;
-  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  border-radius: 10px;
+  transition:
+    color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
-  text-decoration-line: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.16em;
-  text-decoration-thickness: 0.08em;
   z-index: 1000;
+  box-sizing: border-box;
 
   &:hover {
-    color: ${({ theme }) => theme?.colors?.text || defaultBgColour};
-    text-decoration-color: ${({ theme }) => theme?.colors?.accent || "#00dec6"};
+    color: #ffffff;
+    background-color: ${({ theme }) => theme?.colors?.text || defaultBgColour};
+    box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
+    transform: translateY(-1px);
   }
 
   @media only screen and (max-width: 767px) {
@@ -125,11 +133,21 @@ const DropdownTitle = styled.span`
  * Indicator (arrow) rendered in the dropdown header.
  */
 const DropdownIndicator = styled.img`
-  margin-left: 5px;
+  margin-left: 8px;
   width: 16px;
   height: 16px;
   object-fit: contain;
   flex-shrink: 0;
+  filter: ${({ $isActive, $hovered }) =>
+    $isActive || $hovered
+      ? "brightness(0) saturate(100%) invert(100%)"
+      : "brightness(0) saturate(100%) invert(16%) sepia(21%) saturate(1975%) hue-rotate(197deg) brightness(94%) contrast(97%)"};
+  transition: filter 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  ${DropdownContainer}:hover & {
+    filter: brightness(0) saturate(100%) invert(100%);
+    transform: translateY(1px);
+  }
 `;
 
 /**
@@ -202,7 +220,8 @@ const NestedDropdownMenu = styled.div`
   position: absolute;
   left: ${({ left }) => left}px;
   top: ${({ top }) => top}px;
-  min-width: 160px;
+  width: ${NAV_ITEM_WIDTH};
+  min-width: ${NAV_ITEM_WIDTH};
   background-color: #ffffff;
   box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
   border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
@@ -474,16 +493,21 @@ export function NavBarDropdown({
       onMouseLeave={() => handleHoverChange(false)}
       $bgColor={$bgColor}
       $isActive={isActive}
-      $hovered={navChildHovered}
+      $hovered={navChildHovered || containerHovered || open}
     >
       <DropdownTitle>{dropdownName}</DropdownTitle>
       <DropdownIndicator
         src="/arrows/arrow_down.svg"
         alt=""
         aria-hidden="true"
+        $isActive={isActive}
+        $hovered={navChildHovered || containerHovered}
       />
       {open && (
-        <DropdownMenuWrapper>
+        <DropdownMenuWrapper
+          onMouseEnter={() => handleHoverChange(true)}
+          onMouseLeave={() => handleHoverChange(false)}
+        >
           <DropdownMenuScroll
             onMouseEnter={() => handleHoverChange(true)}
             onMouseLeave={() => handleHoverChange(false)}

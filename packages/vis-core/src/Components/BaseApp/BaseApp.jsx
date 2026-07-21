@@ -68,6 +68,7 @@ const BrandGlobalStyles = createGlobalStyle`
   }
 
   body {
+    margin: 0;
     font-family: var(--font-family-base);
     color: var(--palette-navy);
     background: var(--palette-white);

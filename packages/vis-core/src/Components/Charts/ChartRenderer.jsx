@@ -29,7 +29,7 @@ const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
 
 const CHART_UI_COLORS = {
   axisLabel: brandTokens.palette.textIcon,
-  rankBadge: brandTokens.palette.teal,
+  rankBadge: brandTokens.palette.navy,
   scoreText: brandTokens.palette.navy,
   grid: brandTokens.palette.bottomGrey,
   hoverCursor: "rgba(13, 15, 61, 0.06)",
@@ -84,7 +84,7 @@ const RankBadge = styled.span`
 `;
 
 const NameCell = styled.td`
-  color: ${({ theme }) => theme?.colors?.accent || brandTokens.palette.teal};
+  color: ${({ theme }) => theme?.colors?.text || brandTokens.palette.navy};
   font-weight: 500;
 `;
 

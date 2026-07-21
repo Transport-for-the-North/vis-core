@@ -116,8 +116,7 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    // The Button (burger) is rendered with an image with the alt text ‘Burger Button Navbar’.
-    expect(screen.getByAltText(/Burger Button Navbar/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Open main menu/i })).toBeInTheDocument();
     // The mocked logo has the alt text ‘Logo’.
     expect(screen.getByAltText(/Logo/i)).toBeInTheDocument();
   });
@@ -142,7 +141,7 @@ describe("Navbar", () => {
     // the component returns null -> no navbar in the DOM
     // we check that there is no fixed element (height spacer present if Navbar rendered)
     // here we search for the burger button and the logo: they must not be found
-    expect(screen.queryByAltText(/Burger Button Navbar/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Open main menu/i })).not.toBeInTheDocument();
     expect(screen.queryByAltText(/Logo/i)).not.toBeInTheDocument();
   });
 
@@ -162,11 +161,10 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    // The logout button is rendered with an image with the src ‘/img/logout.png’.
-    const logoutImg = container.querySelector('img[src="/img/logout.png"]');
-    expect(logoutImg).toBeInTheDocument();
+    const logoutBtn = screen.getByRole("button", { name: /logout/i });
+    expect(logoutBtn).toBeInTheDocument();
 
-    fireEvent.click(logoutImg);
+    fireEvent.click(logoutBtn);
     expect(mockLogOut).toHaveBeenCalled();
   });
 
@@ -191,6 +189,34 @@ describe("Navbar", () => {
 
     // We mocked ResponsiveNavbarLinks to expose data-testid.
     expect(screen.getByTestId("responsive-links")).toBeInTheDocument();
-    expect(screen.queryByAltText(/Burger Button Navbar/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Open main menu/i })).not.toBeInTheDocument();
+  });
+
+  it("shows Login button when authentication is required and there is no token", () => {
+    useAuth.mockReturnValue({
+      logOut: mockLogOut,
+      user: null,
+      token: "",
+      loginAction: jest.fn(),
+    });
+    useWindowWidth.mockReturnValue(1200);
+
+    const appContext = {
+      logoImage: "img/tfn-logo-fullsize.png",
+      appPages: [],
+      logoPosition: "left",
+      authenticationRequired: true,
+    };
+
+    render(
+      <MemoryRouter>
+        <AppContext.Provider value={appContext}>
+          <Navbar />
+        </AppContext.Provider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
+    expect(screen.queryByAltText(/logout/i)).not.toBeInTheDocument();
   });
 });
