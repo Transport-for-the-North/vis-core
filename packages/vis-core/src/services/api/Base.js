@@ -210,9 +210,12 @@ class BaseService {
       },
       ...addOptions,
     };
-    const result = await fetch(url, options).catch((error) =>
-      console.log(error)
-    );
+    const result = await fetch(url, options).catch((error) => {
+      if (error.name !== 'AbortError') {
+        console.log(error);
+      }
+      throw error;
+    });
     if (!result.ok) {
       throw new Error(`HTTP error! status: ${result.status}`);
     }
@@ -249,7 +252,11 @@ class BaseService {
       arrayFormat: options?.queryOptions?.arrayFormat,
     });
     const path = params ? `${withPathParams}?${params}` : withPathParams;
-    return await this._get(path, {}, options.skipAuth);
+    return await this._get(
+      path,
+      options.signal ? { signal: options.signal } : {},
+      options.skipAuth
+    );
   }
 
   /**
@@ -274,9 +281,12 @@ class BaseService {
       body: JSON.stringify(data),
       ...addOptions,
     };
-    const result = await fetch(url, options).catch((error) =>
-      console.log(error)
-    );
+    const result = await fetch(url, options).catch((error) => {
+      if (error.name !== 'AbortError') {
+        console.log(error);
+      }
+      throw error;
+    });
     if (!result.ok) {
       throw new Error(`HTTP error! status: ${result.status}`);
     }

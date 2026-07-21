@@ -249,20 +249,33 @@ export const Dropdown = ({ filter, onChange }) => {
     }
   }, [selectedOptions, filterState, filter, onChange, options]);
 
+  const selectedValue = filterState[filter.id];
+
   // Ensure multi-select selections stay in sync with filtered options, and fallback when emptied.
   useEffect(() => {
     if (!filter.multiSelect) return;
+    if (!Array.isArray(selectedValue)) return;
 
     const current = filterState[filter.id];
     if (!Array.isArray(current)) return;
 
-    console.log(`[Dropdown ${filter.filterName}] Current selection:`, current, 'persistState:', filter.persistState);
+    console.log(
+      `[Dropdown ${filter.filterName}] Current selection:`,
+      current,
+      "persistState:",
+      filter.persistState,
+    );
 
     const visibleOptions = options.slice(1); // exclude 'All'
     const visibleValuesSet = new Set(visibleOptions.map((o) => o.value));
     const next = current.filter((v) => visibleValuesSet.has(v));
 
-    console.log(`[Dropdown ${filter.filterName}] After filtering to visible:`, next, 'visible count:', visibleOptions.length);
+    console.log(
+      `[Dropdown ${filter.filterName}] After filtering to visible:`,
+      next,
+      "visible count:",
+      visibleOptions.length,
+    );
 
     // If some selected values were filtered out, prune them.
     if (next.length !== current.length && next.length > 0) {
@@ -274,24 +287,41 @@ export const Dropdown = ({ filter, onChange }) => {
     // Only fallback to "all visible" if forceRequired is true or not explicitly set to false
     // This allows filters with forceRequired: false to have empty selections
     const shouldFallbackToAll = filter.forceRequired !== false;
-    
+
     // Don't override persisted state with "select all" behavior
     // If the filter has persistState enabled and the current selection is intentionally limited,
     // we should respect that rather than auto-selecting all
     const hasPersistState = filter.persistState === true;
-    
+
     // If all selected values are now filtered out, fallback to "all visible" to keep selection valid
     // but only if the filter is required and doesn't have persisted state that should be respected
-    if (current.length > 0 && next.length === 0 && shouldFallbackToAll && !hasPersistState) {
-      console.log(`[Dropdown ${filter.filterName}] All selections invalid, falling back to all`);
+    if (
+      current.length > 0 &&
+      next.length === 0 &&
+      shouldFallbackToAll &&
+      !hasPersistState
+    ) {
+      console.log(
+        `[Dropdown ${filter.filterName}] All selections invalid, falling back to all`,
+      );
       const allVisible = visibleOptions.map((o) => o.value);
       // Mark that 'All' semantic is active so existing logic keeps it updated when options change.
       setIsAllSelected(true);
       onChange(filter, allVisible);
     } else if (current.length > 0 && next.length === 0 && hasPersistState) {
-      console.log(`[Dropdown ${filter.filterName}] All selections invalid but has persistState, not auto-selecting all`);
+      console.log(
+        `[Dropdown ${filter.filterName}] All selections invalid but has persistState, not auto-selecting all`,
+      );
     }
-  }, [optionsSignature, options, filterState, filter, onChange]);
+  }, [
+    selectedValue,
+    optionsSignature,
+    filter.id,
+    filter.multiSelect,
+    filter.persistState,
+    filter.forceRequired,
+    onChange,
+  ]);
 
   /**
    * Sets loading only when the visible options or their validity change,

@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { AccordionSection } from "Components/Sidebar/Accordion";
@@ -60,7 +60,6 @@ const MobileLegendSlot = styled.section`
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
-  const isLoading = state.isLoading || state.visualisationLoadingCount > 0;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
@@ -80,6 +79,26 @@ export const MapLayout = () => {
   // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
   // immediately on each selector interaction. Selector UI still updates from the live filterState.
   const debouncedFilterState = useDebounced(filterState, 400);
+
+  const isFiltersDebouncing = debouncedFilterState !== filterState;
+  
+  // We keep the dimmer on if filters are debouncing.
+  // We also use a small 50ms buffer state for transitioning out of loading, 
+  // to prevent a 1-frame micro-gap flash between the debounce resolving and 
+  // the visualisations registering their loading state.
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const isCurrentlyLoading = state.isLoading || state.visualisationLoadingCount > 0 || isFiltersDebouncing;
+  
+  useEffect(() => {
+    if (isCurrentlyLoading) {
+      setIsTransitioning(true);
+    } else {
+      const timer = setTimeout(() => setIsTransitioning(false), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isCurrentlyLoading]);
+
+  const isLoading = isCurrentlyLoading || isTransitioning;
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -110,12 +129,55 @@ export const MapLayout = () => {
     }
   }, [pageContext, filterDispatch]);
 
-  const handleFilterChange = (filter, value) => {
+  const handleFilterChange = useCallback((filter, value) => {
     filterDispatch({
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value, filter },
     });
-  };
+  }, [filterDispatch]);
+
+  /**
+   * Retrieves the full option objects corresponding to a filter's selected value(s).
+   *
+   * @param {Object} filter - The filter configuration object, containing a `values` property with an array of options.
+   * @param {any|any[]} value - The currently selected value (scalar for single-select) or array of values (for multi-select).
+   * @returns {Object[]} An array of matching option objects from the filter's configuration. Returns an empty array if no matches are found or if the filter lacks options.
+   */
+  const getSelectedFilterOptions = useCallback((filter, value) => {
+    const values = filter.values?.values;
+    if (!Array.isArray(values)) return [];
+
+    if (Array.isArray(value)) {
+      const selected = new Set(value);
+      return values.filter((item) => selected.has(item.paramValue));
+    }
+
+    const selected = values.find((item) => item.paramValue === value);
+    return selected ? [selected] : [];
+  }, []);
+
+  /**
+   * Constructs the payload for dispatching map reducer actions triggered by filter changes.
+   *
+   * @param {Object} filter - The filter configuration object triggering the action.
+   * @param {Object} action - The action definition, including its base `payload` and action type (e.g., `UPDATE_COLOR_SCHEME`).
+   * @param {any|any[]} value - The currently selected value(s) for the filter.
+   * @param {string[]} [sides] - Optional list of panel sides the action applies to, used in dual-map layouts.
+   * @returns {Object} The enriched payload containing the filter, selected value(s), original action payload parameters, and potentially resolved colour schemes.
+   */
+  const buildFilterActionPayload = useCallback((filter, action, value, sides) => {
+    const selectedOptions = getSelectedFilterOptions(filter, value);
+    const payload = { filter, value, ...action.payload };
+
+    if (sides) payload.sides = sides;
+
+    if (action.action === "UPDATE_COLOR_SCHEME") {
+      const colourValue = selectedOptions.find((option) => option.colourValue)?.colourValue;
+      if (colourValue) payload.color_scheme = colourValue;
+    }
+
+    return payload;
+  }, [getSelectedFilterOptions]);
 
   /**
    * Effect A (immediate): keep derived filters in sync with their source selection and metadata.
@@ -235,44 +297,30 @@ export const MapLayout = () => {
     }
 
     state.filters.forEach((filter) => {
-      let selectedValue
-      if (filter.values?.values && Array.isArray(filter.values.values)) {
-        selectedValue = filter.values?.values.find(
-          (value) => value.paramValue === debouncedFilterState[filter.id]
-        );
-      }
+      const filterValue = debouncedFilterState[filter.id];
+
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
-          // Add the colour scheme to the payload
-          let additionalPayload
-          if (action.action === "UPDATE_COLOR_SCHEME") {
-            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
-          }
           dispatch({
             type: action.action,
-            payload: { filter, value: debouncedFilterState[filter.id], ...action.payload, ...additionalPayload },
+            payload: buildFilterActionPayload(filter, action, filterValue),
           });
         });
       } else {
         filter.actions.forEach((action) => {
           let sides = "";
 
-          // Add the colour scheme to the payload
-          let additionalPayload
-          if (action.action === "UPDATE_COLOR_SCHEME") {
-            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
-          }
           if (filter.filterName.includes("Left")) sides = "left";
           else if (filter.filterName.includes("Right")) sides = "right";
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: debouncedFilterState[filter.id], sides, ...action.payload, ...additionalPayload },
+            payload: buildFilterActionPayload(filter, action, filterValue, sides),
           });
         });
       }
     });
-  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch]);
+  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch, buildFilterActionPayload]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({

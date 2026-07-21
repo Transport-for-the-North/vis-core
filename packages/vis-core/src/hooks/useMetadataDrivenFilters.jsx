@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { PageContext, FilterContext } from "contexts";
 import { api } from "services";
-import { updateFilterValidity } from "utils";
+import { updateFilterValidity, correctInitialCrossFilterValues, correctRuntimeCrossFilterValues } from "utils";
 import { applyWhereConditions, sortValues, buildDeterministicFilterId } from "utils";
 
 /**
@@ -24,43 +24,124 @@ async function callMetadataEndpoint(endpoint) {
   return api.baseService.get(endpoint.path, opts);
 }
 
+const METADATA_CACHE_KEY_PREFIX = "metadata_cache_";
+const metadataPromiseCache = new Map();
+
+/**
+ * Executes a GET or POST request for a metadata table and caches the resulting Promise.
+ * This prevents duplicate concurrent network requests for the same metadata table and 
+ * caches the result across page transitions that share the same metadata requirements.
+ * Data is also persisted to sessionStorage to survive hard page reloads during a session.
+ *
+ * @param {Object} endpoint - The endpoint configuration object.
+ * @param {string} endpoint.path - The API path for the metadata table.
+ * @param {'GET'|'POST'} [endpoint.requestMethod='GET'] - The HTTP method to use.
+ * @param {Object} [endpoint.requestOptions] - Additional fetch options.
+ * @param {Object} [endpoint.body] - The request body for POST requests.
+ * @returns {Promise<any>} A Promise that resolves to the parsed response payload.
+ * @throws {Error} Propagates API errors and automatically invalidates the failed cache entry.
+ */
+async function callMetadataEndpointWithCache(endpoint) {
+  const cacheKey = JSON.stringify({
+    path: endpoint.path,
+    method: (endpoint.requestMethod || "GET").toUpperCase(),
+    body: endpoint.body || {}
+  });
+
+  // 1. Check in-memory promise cache (prevents duplicate simultaneous requests)
+  if (metadataPromiseCache.has(cacheKey)) {
+    return metadataPromiseCache.get(cacheKey);
+  }
+
+  // 2. Check sessionStorage for persisted data from previous visits
+  const storageKey = METADATA_CACHE_KEY_PREFIX + cacheKey;
+  const storedData = sessionStorage.getItem(storageKey);
+  if (storedData) {
+    try {
+      return JSON.parse(storedData);
+    } catch (e) {
+      console.warn("Failed to parse cached metadata from sessionStorage", e);
+    }
+  }
+
+  // 3. Fetch from network and cache
+  const promise = callMetadataEndpoint(endpoint)
+    .then((data) => {
+      try {
+        sessionStorage.setItem(storageKey, JSON.stringify(data));
+      } catch (e) {
+        console.warn("Failed to persist metadata to sessionStorage. Quota exceeded?", e);
+      }
+      return data;
+    })
+    .catch((err) => {
+      metadataPromiseCache.delete(cacheKey);
+      throw err;
+    });
+
+  metadataPromiseCache.set(cacheKey, promise);
+  return promise;
+}
+
 /**
  * useMetadataDrivenFilters
- * Builds data-driven filters (options sourced from metadata tables) and applies dependency validation.
- * Mirrors MapContext’s pipeline (deterministic IDs, default values, updateFilterValidity) for non-map pages.
+ * Canonical filter initialisation pipeline. Handles metadata table fetching, filter option
+ * building, FilterContext initialisation, cross-filter correction, and runtime option hiding.
+ *
+ * Params:
+ * - getInitialValue: optional function (filter) => value. Enables injected functions to override 
+ *   the default config-driven value resolution. This is particularly useful for using 
+ *  `filterPersistence` in map pages. Non-map pages omit this and use the default, though this
+ *  can be overridden.
  *
  * Returns:
- * - { filters, filterState, onFilterChange, isReady }
+ * - { filters, filterState, onFilterChange, isReady } — consumed by all page types.
+ * - { metadataTables, filtersWithIds, paramNameToUuidMap, emptyTables, emptyMetadataFilters }
+ *   — additional data consumed by MapProvider to sync the canonical filter state to mapReducer.
  *
  * Errors:
  * - The hook catches and logs fetch errors and continues with empty tables/filters (resilient UI).
  */
-export function useMetadataDrivenFilters() {
+export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
   const pageContext = useContext(PageContext);
   const { state: filterState, dispatch: filterDispatch } = useContext(FilterContext);
 
   const [metadataTables, setMetadataTables] = useState({});
   const [filtersWithIds, setFiltersWithIds] = useState([]);
+  const [paramNameToUuidMap, setParamNameToUuidMap] = useState({});
+  const [emptyTables, setEmptyTables] = useState([]);
+  const [emptyMetadataFilters, setEmptyMetadataFilters] = useState([]);
   const [isReady, setIsReady] = useState(false);
 
   // 1) Fetch metadata tables via API (GET/POST supported).
+  //    Reset isReady so MapProvider's sync effect does not fire with stale data during page
+  //    navigation; it will only re-fire once this effect completes and effect 3 sets ready again.
   useEffect(() => {
+    setIsReady(false);
     let cancelled = false;
     const loadTables = async () => {
       try {
         const tables = {};
+        const empty = [];
         for (const table of pageContext.config.metadataTables || []) {
-          const response = await callMetadataEndpoint(table);
+          const response = await callMetadataEndpointWithCache(table);
           let rows = response;
           if (Array.isArray(table.where) && table.where.length > 0) {
             rows = applyWhereConditions(rows, table.where);
           }
           tables[table.name] = rows;
+          if (!Array.isArray(rows) || rows.length === 0) empty.push(table.name);
         }
-        if (!cancelled) setMetadataTables(tables);
+        if (!cancelled) {
+          setMetadataTables(tables);
+          setEmptyTables(empty);
+        }
       } catch (err) {
         console.error("useMetadataDrivenFilters: failed to fetch metadata tables:", err);
-        if (!cancelled) setMetadataTables({});
+        if (!cancelled) {
+          setMetadataTables({});
+          setEmptyTables([]);
+        }
       }
     };
     loadTables();
@@ -68,11 +149,27 @@ export function useMetadataDrivenFilters() {
   }, [pageContext]);
 
   // 2) Build filters with deterministic IDs and options from metadata tables.
+  //    Only `metadataTable` sources have their options built here. All other sources
+  //    (`local`, `api`, `map`, `slider`, `mapFeatureSelect`, etc.) are treated as
+  //    passthroughs — their values are already in the config or resolved externally.
+  //
+  //    Guard: if there are configured metadata tables but effect 1 hasn't completed yet
+  //    (metadataTables is still the initial {}), bail out. Without this, effect 2 would run
+  //    with empty tables, produce filters with values.values = [], then effect 3 would fire
+  //    setIsReady(true), causing the page to render before real options are available and
+  //    crashing Toggle/Checkbox on filter.values.values[0].paramValue.
   useEffect(() => {
+    const configuredTableCount = (pageContext.config.metadataTables || []).length;
+    if (configuredTableCount > 0 && Object.keys(metadataTables).length === 0) return;
+
     const used = new Set();
+    const uuidMap = {};
+    const emptyFilters = [];
+
     const built = (pageContext.config.filters || []).map((f) => {
       const id = buildDeterministicFilterId(f, used);
       const filter = { ...f, id };
+      uuidMap[f.paramName] = id;
 
       if (filter.values?.source === "metadataTable") {
         const table = metadataTables[filter.values.metadataTableName] || [];
@@ -98,39 +195,51 @@ export function useMetadataDrivenFilters() {
         if (filter.values.exclude) options = options.filter((o) => !filter.values.exclude.includes(o.paramValue));
 
         filter.values = { ...filter.values, values: options };
+
+        if (options.length === 0) {
+          emptyFilters.push({
+            filterName: filter.filterName,
+            paramName: filter.paramName,
+            metadataTableName: filter.values.metadataTableName,
+          });
+        }
       }
 
       return filter;
     });
 
     setFiltersWithIds(built);
+    setParamNameToUuidMap(uuidMap);
+    setEmptyMetadataFilters(emptyFilters);
   }, [pageContext, metadataTables]);
 
   // 3) Initialise defaults into FilterContext (single/multi).
+  //    `getInitialValue` (if provided) replaces the default computation — map pages pass
+  //    `getInitialFilterValue` to pick up URL-param / persisted-state aware values.
   useEffect(() => {
     if (!filtersWithIds.length) return;
 
-    const initial = {};
-    filtersWithIds.forEach((f) => {
-      if (f.shouldBeBlankOnInit) {
-        initial[f.id] = null;
-        return;
-      }
+    const computeDefault = getInitialValue || ((f) => {
+      if (f.shouldBeBlankOnInit) return null;
       if (f.multiSelect && f.shouldInitialSelectAllInMultiSelect) {
-        initial[f.id] = f.defaultValue ?? f.min ?? (f.values?.values || []).map((v) => v.paramValue);
-      } else {
-        initial[f.id] = f.defaultValue ?? f.min ?? f.values?.values?.[0]?.paramValue ?? null;
+        return f.defaultValue ?? f.min ?? (f.values?.values || []).map((v) => v.paramValue);
       }
+      return f.defaultValue ?? f.min ?? f.values?.values?.[0]?.paramValue ?? null;
     });
 
-    filtersWithIds.forEach((f) => {
-      if (typeof initial[f.id] !== "undefined") {
-        filterDispatch({ type: "SET_FILTER_VALUE", payload: { filterId: f.id, value: initial[f.id] } });
-      }
-    });
+    const initial = {};
+    filtersWithIds.forEach((f) => { initial[f.id] = computeDefault(f); });
+
+    // Enforce cross-filter constraints on the initial values before dispatching.
+    // Each filter's default is computed independently, so a shouldBeFiltered filter's
+    // default may be invalid given the shouldFilterOthers filter's default selection.
+    // Correcting here prevents the first fetch from using an invalid combination.
+    const correctedInitial = correctInitialCrossFilterValues(filtersWithIds, metadataTables, initial);
+
+    filterDispatch({ type: "INITIALIZE_FILTERS", payload: correctedInitial });
 
     setIsReady(true);
-  }, [filtersWithIds, filterDispatch]);
+  }, [filtersWithIds, metadataTables, filterDispatch, getInitialValue]);
 
   // 4) Apply dependency validation/hiding (same routine used in MapLayout).
   const validatedFilters = useMemo(() => {
@@ -138,6 +247,13 @@ export function useMetadataDrivenFilters() {
     const stateLike = { filters: filtersWithIds, metadataTables };
     return updateFilterValidity(stateLike, filterState);
   }, [filtersWithIds, metadataTables, filterState, isReady]);
+
+  // 5) Auto-correct shouldBeFiltered filter values at runtime when a
+  //    shouldFilterOthers filter changes and invalidates another filter's selection.
+  useEffect(() => {
+    if (!isReady) return;
+    correctRuntimeCrossFilterValues(validatedFilters, filterState, filterDispatch);
+  }, [validatedFilters, filterState, filterDispatch, isReady]);
 
   /**
    * onFilterChange
@@ -154,5 +270,17 @@ export function useMetadataDrivenFilters() {
     filterDispatch({ type: "SET_FILTER_VALUE", payload: { filterId: filter.id, value } });
   };
 
-  return { filters: validatedFilters, filterState, onFilterChange, isReady };
+  return {
+    // Consumed by all page types:
+    filters: validatedFilters,
+    filterState,
+    onFilterChange,
+    isReady,
+    // Consumed by MapProvider to sync the canonical filter state to mapReducer:
+    metadataTables,
+    filtersWithIds,
+    paramNameToUuidMap,
+    emptyTables,
+    emptyMetadataFilters,
+  };
 }
