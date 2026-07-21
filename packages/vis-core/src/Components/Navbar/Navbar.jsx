@@ -10,6 +10,8 @@ import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
 import { ResponsiveNavbarLinks } from "./ResponsiveNavbarLinks";
 
+const TFN_WEBSITE_URL = "https://www.transportforthenorth.com/";
+
 const StyledNavbar = styled.nav`
   display: flex;
   align-items: center;
@@ -95,6 +97,10 @@ export function Navbar() {
       setBgColor(navLinkBgColour);
   };
 
+  const handleLogoClick = () => {
+    window.open(TFN_WEBSITE_URL, "_blank", "noopener,noreferrer");
+  }
+
   const updateSideNav = () => {
     setSideNavOpen((prev) => !prev);
   };
@@ -153,7 +159,7 @@ export function Navbar() {
           {(!isMobile && logoPosition === "left") && (
             <Logo
               logoImage={logoImage}
-              onClick={() => onClick(null, logoImage)}
+              onClick={handleLogoClick}
               position="left"
             />
           )}
@@ -168,14 +174,14 @@ export function Navbar() {
           {(!isMobile && logoPosition === "right") && (
             <Logo
               logoImage={logoImage}
-              onClick={() => onClick(null, logoImage)}
+              onClick={handleLogoClick}
               position="right"
             />
           )}
           {isMobile && (
             <Logo
               logoImage={logoImage}
-              onClick={() => onClick(null, logoImage)}
+              onClick={handleLogoClick}
               position="left"
             />
           )}
