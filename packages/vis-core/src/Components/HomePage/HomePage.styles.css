@@ -198,6 +198,7 @@
 
 .container-section.collapsed {
   overflow: hidden;
+  line-clamp: 3;
   display: -webkit-box;
   -webkit-line-clamp: 3;       /* 3 lines */
   -webkit-box-orient: vertical;

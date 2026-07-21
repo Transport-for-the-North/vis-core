@@ -32,20 +32,21 @@ const HeaderInner = styled.div`
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 2rem 10vw;
+  padding: 14px 20px;
 `;
 
 const HeaderGrid = styled.div`
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  column-gap: 32px;
+  column-gap: 20px;
 `;
 
 const HeaderNavSearch = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: stretch;
+  width: 100%;
 `;
 
 const MobileMenuButton = styled.button`
@@ -72,13 +73,55 @@ const LogoutSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 100%;
+  gap: 10px;
+  width: auto;
+  min-width: max-content;
+  padding-right: 22px;
 `;
 
-const StyledLogout = styled.img`
+const StyledLogoutButton = styled.button`
+  border: 1px solid ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  background: transparent;
+  color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
   cursor: pointer;
-  width: 20px;
-  height: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 220ms ease, color 220ms ease;
+
+  &:hover {
+    background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    color: #ffffff;
+  }
+`;
+
+const LogoutIcon = styled.img`
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+`;
+
+const AuthActionButton = styled.button`
+  border: 1px solid ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  background: transparent;
+  color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  cursor: pointer;
+  transition: background-color 220ms ease, color 220ms ease;
+
+  &:hover {
+    background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    color: #ffffff;
+  }
 `;
 
 /**
@@ -91,9 +134,11 @@ export function Navbar() {
   const location = useLocation();
   const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
+  const [navbarSpacerHeight, setNavbarSpacerHeight] = useState(0);
   const appContext = useContext(AppContext);
-  const { logOut } = useAuth();
+  const { logOut, token, user } = useAuth();
   const didValidateOpenApiRef = useRef(false);
+  const navbarRef = useRef(null);
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
   const [$bgColor, setBgColor] = useState(defaultBgColour);
   const navigate = useNavigate();
@@ -104,7 +149,7 @@ export function Navbar() {
 
   // Determine mobile view based on links length and window width.
   const MOBILE_BREAKPOINT = 768;
-  const MIN_NAV_ITEM_WIDTH = 120;
+  const MIN_NAV_ITEM_WIDTH = 250;
   const isMobile =
     windowWidth < MOBILE_BREAKPOINT ||
     links.length * MIN_NAV_ITEM_WIDTH > windowWidth;
@@ -130,10 +175,38 @@ export function Navbar() {
     logOut();
   };
 
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
   useEffect(() => {
     setActiveLink(location.pathname);
     setSideNavOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const updateSpacerHeight = () => {
+      const currentHeight = Math.ceil(navbarRef.current?.getBoundingClientRect()?.height || 0);
+      setNavbarSpacerHeight(currentHeight);
+    };
+
+    updateSpacerHeight();
+
+    let resizeObserver;
+    if ("ResizeObserver" in window && navbarRef.current) {
+      resizeObserver = new ResizeObserver(updateSpacerHeight);
+      resizeObserver.observe(navbarRef.current);
+    }
+
+    window.addEventListener("resize", updateSpacerHeight);
+    window.addEventListener("orientationchange", updateSpacerHeight);
+
+    return () => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener("resize", updateSpacerHeight);
+      window.removeEventListener("orientationchange", updateSpacerHeight);
+    };
+  }, [isMobile]);
 
   // Validate config vs OpenAPI exactly once per app load.
   // This is always-on for this vis-core version, but only logs when issues exist.
@@ -167,10 +240,13 @@ export function Navbar() {
   // Simplified logo logic: on mobile the logo is always left, on non-mobile
   // display the logo on the side indicated by appContext.logoPosition.
   const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
+  const isAuthenticated = Boolean(token || user);
+  const logoutImage = appContext.logoutImage || "img/logout.png";
+  const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;
 
   return (
     <>
-      <StyledNavbar>
+      <StyledNavbar ref={navbarRef}>
         <HeaderOuter>
           <HeaderInner>
             <HeaderGrid>
@@ -212,7 +288,14 @@ export function Navbar() {
                   </MobileMenuButton>
                 )}
                 {appContext.authenticationRequired && (
-                  <StyledLogout src="/img/logout.png" onClick={handleLogout} />
+                  isAuthenticated ? (
+                    <StyledLogoutButton onClick={handleLogout} aria-label="Logout">
+                      <span>Logout</span>
+                      <LogoutIcon src={logoutImageSrc} alt="Logout" />
+                    </StyledLogoutButton>
+                  ) : (
+                    <AuthActionButton onClick={handleLogin}>Login</AuthActionButton>
+                  )
                 )}
               </LogoutSection>
             </HeaderGrid>
@@ -226,7 +309,7 @@ export function Navbar() {
           $bgColor={$bgColor}
         />
       )}
-      <div style={{ height: "114px" }}></div>
+      <div style={{ height: `${navbarSpacerHeight}px` }}></div>
     </>
   );
 }
