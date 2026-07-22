@@ -20,7 +20,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import parse from "html-react-parser";
 import { Footer } from "./Footer";
-import { AppScenarios } from "./AppScenarios";
 import { 
   createBlockSections,
   interweaveContentWithImages,
@@ -45,7 +44,7 @@ import { useWindowWidth } from "hooks/useWindowWidth";
   */
 export const HomePage = () => {
   const appContext = useContext(AppContext);
-  const { footer, homePageFragments } = appContext;
+  const { footer, homePageFragments, homePageComponents } = appContext;
   const useLegacyHomePage = appContext?.useLegacyHomePage === undefined ? true : appContext.useLegacyHomePage === true || appContext.useLegacyHomePage === "true";
   // Changed fragmentsContent to be an array that corresponds to homePageFragments order.
   const [fragmentsContent, setFragmentsContent] = useState([]);
@@ -366,8 +365,11 @@ export const HomePage = () => {
           </>
         )}
 
-        {/* Scenarios registered to this app (opt-in via appContext.appScenarios) */}
-        <AppScenarios />
+        {/* App-supplied sections. `homePageComponents` is a list of React components
+            provided by the app config, letting an app add domain-specific homepage content
+            (which vis-core knows nothing about) without modifying this component. */}
+        {Array.isArray(homePageComponents) &&
+          homePageComponents.map((Component, idx) => <Component key={idx} />)}
 
         {/* Contact Section */}
         {appContext.contactText && appContext.contactEmail && (

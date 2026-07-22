@@ -125,15 +125,5 @@ export function createAdminApi({ baseService, endpoints, app }) {
     getSendTargets() {
       return post(endpoints.sendTargets, {});
     },
-
-    /**
-     * Fetches the scenarios registered to the current app that are missing data in one or
-     * more of the given output tables (registered but not fully loaded).
-     * @param {Object} input - ({ tables }) — output table names (in rail_data) to check.
-     * @returns {Promise<Array<{scenarioId: number, scenarioCode: string, missingTables: string[]}>>}
-     */
-    getScenarioCoverage({ tables }) {
-      return post(endpoints.scenarioCoverage, { tables });
-    },
   };
 }
