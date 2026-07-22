@@ -3,6 +3,7 @@ import { AuditSection } from "./AuditSection";
 import { EditTable } from "./EditTable";
 import { ViewTable } from "./ViewTable";
 import { SendScenarios } from "./SendScenarios";
+import { ScenarioCoverage } from "./ScenarioCoverage";
 
 /**
  * Renders one layout cell. `type` selects the section; `table` (optional) narrows it
@@ -14,9 +15,10 @@ import { SendScenarios } from "./SendScenarios";
  * @param {Array<Object>} props.editTables - All configured edit tables.
  * @param {Array<Object>} props.viewTables - All configured view tables.
  * @param {Object} [props.sendScenarios] - The `sendScenarios` config (for the "send" cell).
+ * @param {Object} [props.scenarioCoverage] - The `scenarioCoverage` config (for the "coverage" cell).
  * @returns {JSX.Element|Array<JSX.Element>|null} The rendered section(s) for the cell.
  */
-export function LayoutCell({ cell, auditTables, editTables, viewTables, sendScenarios }) {
+export function LayoutCell({ cell, auditTables, editTables, viewTables, sendScenarios, scenarioCoverage }) {
   /**
    * Narrows a section's table list to the cell's configured table, if any.
    * @param {Array<Object>} list - The section's full table list.
@@ -34,6 +36,8 @@ export function LayoutCell({ cell, auditTables, editTables, viewTables, sendScen
       return pick(viewTables).map((t) => <ViewTable key={t.tableName} table={t} />);
     case "send":
       return sendScenarios ? <SendScenarios config={sendScenarios} /> : null;
+    case "coverage":
+      return scenarioCoverage ? <ScenarioCoverage config={scenarioCoverage} /> : null;
     default:
       return null;
   }

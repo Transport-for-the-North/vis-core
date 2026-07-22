@@ -65,6 +65,9 @@ export function SendScenarios({ config }) {
 
   const [scenarioOptions, setScenarioOptions] = useState([]);
   const [appOptions, setAppOptions] = useState([]);
+  // True once destinations have loaded and the current app is permitted to send to none
+  // (it feeds no other app per the approved data pathways).
+  const [noTargets, setNoTargets] = useState(false);
   const [selectedScenarios, setSelectedScenarios] = useState([]);
   const [targetApp, setTargetApp] = useState("");
   const [sending, setSending] = useState(false);
@@ -77,9 +80,23 @@ export function SendScenarios({ config }) {
     adminApi.getLookup(scenarioSource).then((opts) => setScenarioOptions(opts ?? [])).catch(() => {});
   }, [adminApi, scenarioSource]);
 
+  // Destinations are the approved data pathways for the current app (enforced server-side),
+  // not every app. If the pathway endpoint is unavailable, fall back to the raw app lookup so
+  // the tool still works against an older backend.
   useEffect(() => {
-    if (!appSource) return;
-    adminApi.getLookup(appSource).then((opts) => setAppOptions(opts ?? [])).catch(() => {});
+    adminApi
+      .getSendTargets()
+      .then((targets) => {
+        const opts = (targets ?? []).map((t) => ({ value: t.appId, label: t.appName }));
+        setAppOptions(opts);
+        setNoTargets(opts.length === 0);
+      })
+      .catch(() => {
+        setNoTargets(false);
+        if (appSource) {
+          adminApi.getLookup(appSource).then((opts) => setAppOptions(opts ?? [])).catch(() => {});
+        }
+      });
   }, [adminApi, appSource]);
 
   // View-only users, or a page without the sources configured, render nothing.
@@ -150,6 +167,11 @@ export function SendScenarios({ config }) {
   return (
     <div>
       <SectionTitle>{config.title ?? "Send Scenarios to App"}</SectionTitle>
+      {noTargets && (
+        <WarnMessage style={{ marginBottom: 8 }}>
+          This app has no approved data pathways, so it cannot send scenarios to another app.
+        </WarnMessage>
+      )}
       {error && <ErrorMessage style={{ marginBottom: 8 }}>{error}</ErrorMessage>}
       {success && <SuccessMessage style={{ marginBottom: 8 }}>{success}</SuccessMessage>}
       {skippedNotice && <WarnMessage style={{ marginBottom: 8 }}>{skippedNotice}</WarnMessage>}
@@ -162,7 +184,7 @@ export function SendScenarios({ config }) {
             onChange={(opts) => setSelectedScenarios(opts ?? [])}
             formatOptionLabel={formatOptionLabel}
             isMulti
-            isDisabled={sending}
+            isDisabled={sending || noTargets}
             placeholder={scenarioSource.placeholder ?? "Select scenarios"}
             closeMenuOnSelect={false}
             menuPortalTarget={typeof document !== "undefined" ? document.body : null}
@@ -173,7 +195,7 @@ export function SendScenarios({ config }) {
           value={targetApp}
           onChange={setTargetApp}
           placeholder={appSource.placeholder ?? "Select destination app"}
-          disabled={sending}
+          disabled={sending || noTargets}
         />
         <AppButton disabled={!canSend} onClick={handleSend}>
           {sending ? "Sending…" : "Send"}

@@ -25,6 +25,7 @@ export const AdminPage = () => {
   const editTables = adminPage.editTables ?? [];
   const viewTables = adminPage.viewTables ?? [];
   const sendScenarios = adminPage.sendScenarios ?? null;
+  const scenarioCoverage = adminPage.scenarioCoverage ?? null;
   const layout = adminPage.layout ?? defaultLayout();
   const app = appContext?.appName ?? getAppName();
 
@@ -86,6 +87,7 @@ export const AdminPage = () => {
                       editTables={editTables}
                       viewTables={viewTables}
                       sendScenarios={sendScenarios}
+                      scenarioCoverage={scenarioCoverage}
                     />
                   </CellStack>
                 ))}
