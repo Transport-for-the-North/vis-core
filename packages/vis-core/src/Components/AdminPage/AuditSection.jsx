@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { formatDate, relativeTimeFromNow, isStale, numberWithCommas } from "utils";
-import { useAdminApi } from "hooks";
+import { useAdminApi, useAdminRefresh } from "hooks";
 import {
   Card, CardTitle, Row, Label, Value, NoData, Muted, StaleBadge, ExpandToggle,
   CardEmpty, MetricRow, Metric, MetricLabel, MetricValue,
@@ -52,12 +52,16 @@ function ActivityRow({ label, date, by }) {
 function AuditCard({ entry, staleAfterDays }) {
   const [expanded, setExpanded] = useState(false);
   const [uploadsOpen, setUploadsOpen] = useState(false);
+  const [missingOpen, setMissingOpen] = useState(false);
   const hasData = !!(entry.modifiedDate || entry.createdDate);
   // An empty table (no rows) shows a single placeholder instead of empty fields.
   const isEmpty = entry.rowCount === 0 || (entry.rowCount == null && !hasData);
   const stale = !isEmpty && isStale(entry.modifiedDate, staleAfterDays);
   const contributors = entry.contributors ?? [];
   const uploads = entry.uploads ?? [];
+  // Scenarios registered to this app with no rows in this table (null for tables not
+  // keyed by scenario, so the section is omitted rather than shown as "none missing").
+  const missingScenarios = entry.missingScenarios ?? null;
 
   const metrics = [
     { label: "Records", value: entry.rowCount },
@@ -130,15 +134,45 @@ function AuditCard({ entry, staleAfterDays }) {
                   const formatted = formatDate(u.date);
                   const ago = relativeTimeFromNow(u.date);
                   return (
-                    <Row key={u.date ?? i}>
+                    <Row key={`${u.date ?? i}-${u.user ?? ""}`}>
                       <Label>
                         {formatted ?? <NoData>—</NoData>}
                         {ago && <Muted> · {ago}</Muted>}
+                        {u.user && <Muted> · {u.user}</Muted>}
                       </Label>
                       <Value>{numberWithCommas(u.count)}</Value>
                     </Row>
                   );
                 })}
+            </>
+          )}
+
+          {missingScenarios && (
+            <>
+              <ExpandToggle
+                type="button"
+                $open={missingOpen}
+                onClick={() => setMissingOpen((o) => !o)}
+                aria-expanded={missingOpen}
+              >
+                <span>Scenarios missing ({missingScenarios.length})</span>
+                <ChevronDownIcon className="chevron" />
+              </ExpandToggle>
+              {missingOpen &&
+                (missingScenarios.length === 0 ? (
+                  <Row>
+                    <Muted>All registered scenarios have data in this table.</Muted>
+                  </Row>
+                ) : (
+                  missingScenarios.map((code) => (
+                    <Row key={code}>
+                      <Label>{code}</Label>
+                      <Value>
+                        <NoData>No data</NoData>
+                      </Value>
+                    </Row>
+                  ))
+                ))}
             </>
           )}
         </>
@@ -157,6 +191,10 @@ function AuditCard({ entry, staleAfterDays }) {
  */
 export function AuditSection({ tables, title = "Table Audit" }) {
   const adminApi = useAdminApi();
+  const { signals } = useAdminRefresh();
+  // The per-card "scenarios missing" list is scoped to this app's registrations, so reload
+  // the cards when a registration is added/removed/sent elsewhere on the page.
+  const refreshSignal = signals?.["scenario_app_registrations"] ?? 0;
   const [auditData, setAuditData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -179,7 +217,7 @@ export function AuditSection({ tables, title = "Table Audit" }) {
       .then((data) => setAuditData(data ?? []))
       .catch(() => setError("Failed to load table audit data."))
       .finally(() => setLoading(false));
-  }, [tables, adminApi]);
+  }, [tables, adminApi, refreshSignal]);
 
   return (
     <div>
