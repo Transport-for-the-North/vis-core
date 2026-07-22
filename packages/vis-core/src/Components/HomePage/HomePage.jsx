@@ -20,6 +20,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import parse from "html-react-parser";
 import { Footer } from "./Footer";
+import { AppScenarios } from "./AppScenarios";
 import { 
   createBlockSections,
   interweaveContentWithImages,
@@ -364,6 +365,9 @@ export const HomePage = () => {
             )}
           </>
         )}
+
+        {/* Scenarios registered to this app (opt-in via appContext.appScenarios) */}
+        <AppScenarios />
 
         {/* Contact Section */}
         {appContext.contactText && appContext.contactEmail && (

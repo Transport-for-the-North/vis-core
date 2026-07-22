@@ -109,12 +109,31 @@ export function createAdminApi({ baseService, endpoints, app }) {
     /**
      * Registers multiple scenarios to a destination app in one action. The request is
      * authorised against the current app, but the scenarios are registered to `targetAppId`,
-     * which may be any app.
+     * which may be any app the current app has an approved data pathway to (enforced server-side).
      * @param {Object} input - ({ targetAppId, scenarioIds }).
      * @returns {Promise<{registered: number, skipped: number}>}
      */
     sendScenarios({ targetAppId, scenarioIds }) {
       return post(endpoints.sendScenarios, { targetAppId, scenarioIds });
+    },
+
+    /**
+     * Fetches the destination apps the current app is permitted to send scenarios to
+     * (approved data pathways). Used to populate the Send Scenarios destination list.
+     * @returns {Promise<Array<{appId: number, appName: string, appDescription: string}>>}
+     */
+    getSendTargets() {
+      return post(endpoints.sendTargets, {});
+    },
+
+    /**
+     * Fetches the scenarios registered to the current app that are missing data in one or
+     * more of the given output tables (registered but not fully loaded).
+     * @param {Object} input - ({ tables }) — output table names (in rail_data) to check.
+     * @returns {Promise<Array<{scenarioId: number, scenarioCode: string, missingTables: string[]}>>}
+     */
+    getScenarioCoverage({ tables }) {
+      return post(endpoints.scenarioCoverage, { tables });
     },
   };
 }

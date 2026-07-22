@@ -51,11 +51,13 @@ function ActivityRow({ label, date, by }) {
  */
 function AuditCard({ entry, staleAfterDays }) {
   const [expanded, setExpanded] = useState(false);
+  const [uploadsOpen, setUploadsOpen] = useState(false);
   const hasData = !!(entry.modifiedDate || entry.createdDate);
   // An empty table (no rows) shows a single placeholder instead of empty fields.
   const isEmpty = entry.rowCount === 0 || (entry.rowCount == null && !hasData);
   const stale = !isEmpty && isStale(entry.modifiedDate, staleAfterDays);
   const contributors = entry.contributors ?? [];
+  const uploads = entry.uploads ?? [];
 
   const metrics = [
     { label: "Records", value: entry.rowCount },
@@ -109,6 +111,34 @@ function AuditCard({ entry, staleAfterDays }) {
                     <Value>{numberWithCommas(c.count)}</Value>
                   </Row>
                 ))}
+            </>
+          )}
+
+          {uploads.length > 0 && (
+            <>
+              <ExpandToggle
+                type="button"
+                $open={uploadsOpen}
+                onClick={() => setUploadsOpen((o) => !o)}
+                aria-expanded={uploadsOpen}
+              >
+                <span>Uploads ({uploads.length})</span>
+                <ChevronDownIcon className="chevron" />
+              </ExpandToggle>
+              {uploadsOpen &&
+                uploads.map((u, i) => {
+                  const formatted = formatDate(u.date);
+                  const ago = relativeTimeFromNow(u.date);
+                  return (
+                    <Row key={u.date ?? i}>
+                      <Label>
+                        {formatted ?? <NoData>—</NoData>}
+                        {ago && <Muted> · {ago}</Muted>}
+                      </Label>
+                      <Value>{numberWithCommas(u.count)}</Value>
+                    </Row>
+                  );
+                })}
             </>
           )}
         </>
