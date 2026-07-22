@@ -109,12 +109,24 @@ function AuditCard({ entry, staleAfterDays }) {
                 <ChevronDownIcon className="chevron" />
               </ExpandToggle>
               {expanded &&
-                contributors.map((c) => (
-                  <Row key={c.user}>
-                    <Label>{c.user}</Label>
-                    <Value>{numberWithCommas(c.count)}</Value>
-                  </Row>
-                ))}
+                contributors.map((c) => {
+                  const lastAgo = relativeTimeFromNow(c.last);
+                  return (
+                    <Row key={c.user}>
+                      <Label>
+                        {c.user}
+                        {c.last && (
+                          <Muted>
+                            {" "}
+                            · {formatDate(c.last)}
+                            {lastAgo && ` · ${lastAgo}`}
+                          </Muted>
+                        )}
+                      </Label>
+                      <Value>{numberWithCommas(c.count)}</Value>
+                    </Row>
+                  );
+                })}
             </>
           )}
 
