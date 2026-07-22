@@ -89,27 +89,41 @@ The page `config` keys are all optional: `auditTables`, `editTables`, `viewTable
 
 ### auditTables
 
-Read-only summary cards for a table. Each card shows, all scoped by the optional `filter`:
+Read-only summary cards for a table. Each card shows:
 
 - **Last modified / Created** — the latest-modified row's dates and users, each with a
   relative "· 3 days ago" suffix.
 - **Records** — total row count.
 - **Uploads** — number of distinct load events (`COUNT(DISTINCT created_date)`).
 - **Modifications** — records changed since upload (`modified_date IS DISTINCT FROM
-  created_date`), plus an expandable **"Changes by user"** breakdown (click to reveal every
-  user's modification count).
+  created_date`).
+- Three expandable breakdowns (click to reveal):
+  - **Changes by user** — every user's modification count, with the date of their most
+    recent change ("· 12 Mar 2026, 09:14 · 3 days ago").
+  - **Uploads (n)** — one row per distinct load event: when it ran, who loaded it
+    (`created_by`) and how many rows it loaded.
+  - **Scenarios missing (n)** — the scenarios registered to *this app* that have no rows in
+    this table, i.e. registered but whose data has not been loaded. Shown only for tables
+    keyed by `norms_scenario_id`; reads "All registered scenarios have data in this table."
+    when there are none. See [Scenarios missing](#scenarios-missing).
 - A **stale** amber highlight (and "Stale" badge) when the data hasn't been modified within
   `staleAfterDays` days.
 
-The counts and breakdown are **pre-computed** in the `rail_data.audit_table_overview`
+The counts and breakdowns are **pre-computed** in the `rail_data.audit_table_overview`
 materialised view (see
 `Database-Tools/data_uploads/norms/audit_view/create_norms_audit_view.sql`) and read from
 there per request, rather than by scanning each (often large, partitioned) table live. The
 figures therefore reflect the last time that view was refreshed
 (`REFRESH MATERIALIZED VIEW CONCURRENTLY rail_data.audit_table_overview;` after each data
-load), not the instantaneous table state. Tables without `created_/modified_` audit columns
-show a **Records** count only. The set of audited tables must stay in step with the tables
-that view is built over (both are server-side whitelisted).
+load), not the instantaneous table state.
+
+**The view defines what is auditable.** There is no separate server-side table whitelist: the
+API reads the whole (tiny) view and matches requested tables to its rows in memory, so a table
+is auditable precisely when the view is built over it. Add or remove tables by editing the
+`audited_tables` array in the view SQL and rebuilding. Only tables carrying the standard
+`created_`/`modified_` audit columns are included — the pipeline bookkeeping tables
+(`pipeline_apps`, `pipeline_audit_log`, `scenario_app_registrations`),
+`input_norms_landuse_scenario` and `output_norms_landuse` are deliberately excluded.
 
 ```js
 {
@@ -129,7 +143,7 @@ that view is built over (both are server-side whitelisted).
 
 | Field            | Required | Description                                                       |
 | ---------------- | -------- | ----------------------------------------------------------------- |
-| `tableName`      | yes      | Table to audit; must be whitelisted server-side and present in the overview view. |
+| `tableName`      | yes      | Table to audit; must be present in the overview view.             |
 | `schema`         | no       | Schema name (defaults to `public`).                               |
 | `displayName`    | yes      | Card heading.                                                     |
 | `auditColumns`   | no       | Legacy hint of the audit column names. No longer used server-side (the summary is read from the pre-computed view); omit for tables without audit columns. |
@@ -139,6 +153,30 @@ that view is built over (both are server-side whitelisted).
 > no longer scopes the audit counts (the overview is aggregated over the whole table). A table
 > requested but not yet present in the view (e.g. added to config before the view is rebuilt)
 > renders an empty card rather than erroring.
+
+#### Scenarios missing
+
+Unlike the rest of the card — which comes from the pre-computed view — this list is queried
+**live** on each load, because it is scoped to the scenarios registered to the current app:
+
+```sql
+SELECT s.scenario_code
+FROM rail_data.scenario_app_registrations r
+JOIN rail_data.input_norms_scenario s ON s.id = r.scenario_id
+WHERE r.app_id = <this app>
+  AND NOT EXISTS (SELECT 1 FROM rail_data.<table> o
+                  WHERE o.norms_scenario_id = r.scenario_id)
+```
+
+Which tables this applies to is **not** configured or hardcoded: the view carries an
+`is_scenario_scoped` flag, derived when it is built by checking `information_schema` for a
+`norms_scenario_id` column, and the API only runs the query for tables the view flags. The
+table names used in that query are taken from the view's own rows rather than from the
+request, so nothing client-supplied is ever interpolated into SQL.
+
+The app id is resolved server-side from `pipeline_apps.app_name`, so the list always reflects
+the app being administered. The cards reload when a registration is added, removed or sent
+elsewhere on the page.
 
 ### editTables
 
@@ -202,9 +240,19 @@ another app. Each registration created also appends a `REGISTERED` entry to the 
 log server-side; scenarios already registered to the target app are skipped. The tool is shown
 only to users who can edit (app admins), and posts to the `sendScenarios` endpoint.
 
-> **Authorisation:** the request is authorised as an admin of the app being administered, but
-> the scenarios may be sent to *any* destination app — an app admin can register scenarios into
-> another app's registrations.
+> **Destinations are restricted to approved data pathways.** The destination dropdown is not
+> "every app" — it is populated from the `sendTargets` endpoint, which returns the current app's
+> approved targets from `rail_data.app_data_pathways`. The server re-checks the pathway when the
+> send is submitted, so a disallowed destination is rejected (400) even if requested directly.
+> An app that feeds no other app shows a notice and the tool is disabled. See
+> `docs/ScenarioRegistration.md` in the consuming app repo (NoRMS-Visualisation-Framework).
+
+> **Authorisation:** the request is authorised as an **admin of the app being administered**.
+> The scenarios are registered into the destination app's registrations, so an app admin can
+> affect another app's data — but only along an approved pathway.
+
+> **Note:** `appSource` below is now only a fallback, used if the `sendTargets` endpoint is
+> unavailable (e.g. an older backend). Normally the destination list comes from the pathways.
 
 ```js
 sendScenarios: {
@@ -289,12 +337,14 @@ their defaults.
 
 ```js
 endpoints: {
-    tableAudit: "/api/admin/maintenance/table-audit", // audit cards
-    rows:       "/api/admin/edit-table/rows",         // table rows
-    columns:    "/api/admin/edit-table/columns",      // column metadata
-    lookup:     "/api/admin/edit-table/lookup",       // lookup option lists
-    add:        "/api/admin/edit-table/add",          // insert (with optional alsoInsert)
-    remove:     "/api/admin/edit-table/delete",       // delete (with optional alsoInsert)
+    tableAudit:  "/api/admin/maintenance/table-audit", // audit cards
+    rows:        "/api/admin/edit-table/rows",         // table rows
+    columns:     "/api/admin/edit-table/columns",      // column metadata
+    lookup:      "/api/admin/edit-table/lookup",       // lookup option lists
+    add:         "/api/admin/edit-table/add",          // insert (with optional alsoInsert)
+    remove:      "/api/admin/edit-table/delete",       // delete (with optional alsoInsert)
+    sendScenarios: "/api/admin/edit-table/send-scenarios", // bulk register to another app
+    sendTargets:   "/api/admin/edit-table/send-targets",   // approved destinations
 }
 ```
 
@@ -307,6 +357,7 @@ endpoints: {
 | `add`        | edit-table add                             | `/api/admin/edit-table/add`              |
 | `remove`     | edit-table delete                          | `/api/admin/edit-table/delete`           |
 | `sendScenarios` | send scenarios to a destination app     | `/api/admin/edit-table/send-scenarios`   |
+| `sendTargets`   | approved destinations for the Send tool | `/api/admin/edit-table/send-targets`     |
 
 The defaults live in `DEFAULT_ADMIN_ENDPOINTS` (`src/utils/adminPage.js`); the resolved map
 is used to build the admin API service (`createAdminApi`) that the hooks and sections call.
@@ -454,18 +505,24 @@ superuser of the app; the writes (`add`/`delete`) require an **admin**. The fron
 
 | Method & path                              | Purpose                                                                 |
 | ------------------------------------------ | ----------------------------------------------------------------------- |
-| `POST /api/admin/maintenance/table-audit`  | Returns per table: last modified/created (date + user), row/upload/modification counts, and modifications-per-user. |
+| `POST /api/admin/maintenance/table-audit`  | Returns per table: last modified/created (date + user), row/upload/modification counts, modifications-per-user (with each user's last change), per-upload events (date + user + rows), and the app's scenarios missing from that table. |
 | `POST /api/admin/edit-table/rows`          | Returns the rows of a table, optionally filtered.                       |
 | `POST /api/admin/edit-table/columns`       | Returns column metadata (type, nullability, generated, primary key).    |
 | `POST /api/admin/edit-table/lookup`        | Returns value/label options from a metadata table, with optional exclusion. |
 | `POST /api/admin/edit-table/add`           | Inserts a row, with an optional secondary insert in the same transaction. |
 | `POST /api/admin/edit-table/delete`        | Deletes a row by key(s), with an optional secondary insert in the same transaction. |
+| `POST /api/admin/edit-table/send-targets`  | Returns the apps this app may register scenarios into (approved pathways). |
+| `POST /api/admin/edit-table/send-scenarios`| Registers several scenarios into a destination app (pathway-checked).   |
 
 The `add` and `delete` requests accept an optional `alsoInsert` object
 (`{ table, schema, values }`) which the front end builds from the `auditWrite` config.
 
 Column and table names in these requests are interpolated into SQL, so every table is checked
 against a server-side whitelist. Values are always parameterised.
+
+`send-scenarios` and `send-targets` are thin wrappers over `NORMS_ScenarioRegistrationFacade`,
+which is shared with the non-admin sidebar registration endpoint — see
+`docs/ScenarioRegistration.md` in the consuming app repo (NoRMS-Visualisation-Framework).
 
 ---
 
@@ -485,36 +542,50 @@ another app's data, even by calling the API directly.
 
 On top of the per-app check, the `EditTableFacade` maintains four table whitelists (an
 anti-injection safety net, since table/column names are interpolated into SQL), and every
-request is validated against the relevant one before any SQL runs:
+request is validated against the relevant one before any SQL runs. Entries are
+**schema-qualified** (`<schema>.<table>`), so a table is only reachable in the schema it was
+approved in, and another application's tables are added simply by listing them under their own
+schema:
 
 | Whitelist                      | Used by                                   | Example members                   |
 | ------------------------------ | ----------------------------------------- | --------------------------------- |
-| `AllowedEditTables`            | reads **and** writes (rows/columns/add/delete) | `scenario_app_registrations`  |
-| `AllowedViewTables`            | reads only (rows/columns)                 | `pipeline_audit_log`, `pipeline_apps` |
-| `AllowedLookupTables`          | lookup option sources                     | `input_norms_scenario`, `pipeline_apps` |
-| `AllowedSecondaryInsertTables` | `alsoInsert` targets                      | `pipeline_audit_log`              |
+| `AllowedEditTables`            | reads **and** writes (rows/columns/add/delete) | `rail_data.scenario_app_registrations` |
+| `AllowedViewTables`            | reads only (rows/columns)                 | `rail_data.pipeline_audit_log`, `rail_data.pipeline_apps` |
+| `AllowedLookupTables`          | lookup option sources                     | `rail_data.input_norms_scenario`, `rail_data.pipeline_apps` |
+| `AllowedSecondaryInsertTables` | `alsoInsert` targets                      | `rail_data.pipeline_audit_log`    |
 
-Schemas are also whitelisted (`public`, `rail_data`). A view table can never be written to,
-because the add/delete paths validate against `AllowedEditTables` only.
+There is no separate schema whitelist — the schema is part of each entry above, which is
+stricter than the previous table-list × schema-list combination. A view table can never be
+written to, because the add/delete paths validate against `AllowedEditTables` only.
 
-> **Note:** the table whitelist is currently global (not scoped per app). The per-app
-> **authorisation** check is the security boundary; the whitelist is an additional
-> anti-injection guard. If multiple apps ever share this controller with disjoint table
-> sets, make the whitelist per-app too (or move to a capabilities endpoint that returns the
-> allowed tables/actions for the user+app).
+**Audit cards have no whitelist**: the `table-audit` path never interpolates a client-supplied
+name (the overview view is read whole and matched in memory), and the per-table
+"scenarios missing" query uses names taken from the view's own rows. The view therefore defines
+both what is auditable and what is safe to name in SQL.
+
+> **Note:** the table whitelist is global (not scoped per app). The per-app **authorisation**
+> check is the security boundary; the whitelist is an additional anti-injection guard. If
+> multiple apps ever share this controller with disjoint table sets, make the whitelist per-app
+> too (or move to a capabilities endpoint that returns the allowed tables/actions for the
+> user+app).
 
 ---
 
 ## Adding a new table — checklist
 
-1. **Server whitelist** — add the table name to the appropriate set in `EditTableFacade`
-   (`AllowedEditTables` for editing, `AllowedViewTables` for read-only, `AllowedLookupTables`
-   for lookup sources, `AllowedSecondaryInsertTables` for audit-write targets). For audit cards,
-   add it to `_allowedTableNames` in `TableAuditFacade`. Confirm its schema is in
-   `AllowedSchemas`.
-2. **Page config** — add an entry to `auditTables`, `editTables` or `viewTables`, and place it
+1. **Server whitelist** (edit/view/lookup tables only) — add the **schema-qualified** name
+   (e.g. `rail_data.my_table`) to the appropriate set in `EditTableFacade`:
+   `AllowedEditTables` for editing, `AllowedViewTables` for read-only, `AllowedLookupTables`
+   for lookup sources, `AllowedSecondaryInsertTables` for audit-write targets.
+2. **Audit cards** — there is no whitelist to update. Instead add the table to the
+   `audited_tables` array in
+   `Database-Tools/data_uploads/norms/audit_view/create_norms_audit_view.sql`, then rebuild the
+   view and `REFRESH MATERIALIZED VIEW rail_data.audit_table_overview;`. The table must carry
+   the standard `created_`/`modified_` audit columns. If it has a `norms_scenario_id` column it
+   is flagged scenario-scoped automatically and gains the "Scenarios missing" breakdown.
+3. **Page config** — add an entry to `auditTables`, `editTables` or `viewTables`, and place it
    in the `layout`.
-3. **Optional extras** — add `lookups` (dropdowns/labels), `fixedValues` (locked add values),
+4. **Optional extras** — add `lookups` (dropdowns/labels), `fixedValues` (locked add values),
    `auditWrite` (secondary insert) and/or `maxRows` as needed.
-4. **Restart** — rebuild/restart the API (whitelist change) and restart the Vite dev server
-   (config change).
+5. **Restart** — rebuild/restart the API (whitelist change), rebuild + refresh the view (audit
+   change), and restart the Vite dev server (config change).
