@@ -4,7 +4,7 @@ import { formatDate, relativeTimeFromNow, isStale, numberWithCommas } from "util
 import { useAdminApi, useAdminRefresh } from "hooks";
 import {
   Card, CardTitle, Row, Label, Value, NoData, Muted, StaleBadge, ExpandToggle,
-  CardEmpty, MetricRow, Metric, MetricLabel, MetricValue,
+  CardEmpty, CardSubheading, MetricRow, Metric, MetricLabel, MetricValue,
   SectionTitle, Grid, StatusMessage, ErrorMessage,
 } from "./styles";
 
@@ -159,23 +159,22 @@ function AuditCard({ entry, staleAfterDays }) {
             </>
           )}
 
-          {missingScenarios && (
-            <>
-              <ExpandToggle
-                type="button"
-                $open={missingOpen}
-                onClick={() => setMissingOpen((o) => !o)}
-                aria-expanded={missingOpen}
-              >
-                <span>Scenarios missing ({missingScenarios.length})</span>
-                <ChevronDownIcon className="chevron" />
-              </ExpandToggle>
-              {missingOpen &&
-                (missingScenarios.length === 0 ? (
-                  <Row>
-                    <Muted>All registered scenarios have data in this table.</Muted>
-                  </Row>
-                ) : (
+          {missingScenarios &&
+            (missingScenarios.length === 0 ? (
+              // Nothing to drill into, so state it plainly instead of an empty dropdown.
+              <CardSubheading>No scenarios missing</CardSubheading>
+            ) : (
+              <>
+                <ExpandToggle
+                  type="button"
+                  $open={missingOpen}
+                  onClick={() => setMissingOpen((o) => !o)}
+                  aria-expanded={missingOpen}
+                >
+                  <span>Scenarios missing ({missingScenarios.length})</span>
+                  <ChevronDownIcon className="chevron" />
+                </ExpandToggle>
+                {missingOpen &&
                   missingScenarios.map((code) => (
                     <Row key={code}>
                       <Label>{code}</Label>
@@ -183,10 +182,9 @@ function AuditCard({ entry, staleAfterDays }) {
                         <NoData>No data</NoData>
                       </Value>
                     </Row>
-                  ))
-                ))}
-            </>
-          )}
+                  ))}
+              </>
+            ))}
         </>
       )}
     </Card>
