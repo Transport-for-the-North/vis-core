@@ -4,7 +4,6 @@ import styled, { css } from "styled-components";
 import { buildDropdownTree, createNavItemClickHandler } from "utils/nav";
 import { LateralRecursiveDropdown } from "./LateralRecursiveDropdown";
 import { AppContext } from "contexts";
-import { defaultBgColour } from "defaults";
 import { FixedExternalIcon } from "./FixedExternalIcon";
 
 /**
@@ -111,7 +110,7 @@ export function LateralNavbar(props) {
         <StyledSideNavLink
           to="/"
           $isActive={activeLink === "/"}
-          $bgColor={defaultBgColour}
+          $bgColor={props.$bgColor}
           onClick={createNavItemClickHandler({ url: "/" }, props.onClick, props.$bgColor)}
         >
           Home

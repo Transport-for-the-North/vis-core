@@ -18,7 +18,7 @@ import {
   ScatterChart as RScatterChart,
   Scatter as RScatter,
 } from "recharts";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 import { WarningBox } from "Components";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -27,18 +27,21 @@ import { formatNumber } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
-const CHART_UI_COLORS = {
-  axisLabel: brandTokens.palette.textIcon,
-  rankBadge: brandTokens.palette.navy,
-  scoreText: brandTokens.palette.navy,
-  grid: brandTokens.palette.bottomGrey,
-  hoverCursor: "rgba(13, 15, 61, 0.06)",
-  comparator: brandTokens.palette.grey,
-  guideStroke: brandTokens.palette.grey,
-  tableBorder: brandTokens.palette.grey,
-  tableDivider: brandTokens.palette.bottomGrey,
-  subtleText: brandTokens.palette.textIcon,
-  areaFill: "rgba(13, 15, 61, 0.25)",
+const getChartUiColors = (theme) => {
+  const primary = theme?.primary || defaultBgColour;
+  return {
+    axisLabel: "var(--text-icon)",
+    rankBadge: primary,
+    scoreText: "var(--text-icon)",
+    grid: primary,
+    hoverCursor: `${primary}14`,
+    comparator: primary,
+    guideStroke: primary,
+    tableBorder: primary,
+    tableDivider: primary,
+    subtleText: "var(--text-icon)",
+    areaFill: `${primary}40`,
+  };
 };
 
 const Section = styled.section`
@@ -57,13 +60,13 @@ const Title = styled.h3`
   margin: 4px 0 6px;
   font-size: 13px;
   font-weight: 600;
-  color: ${defaultBgColour};
+  color: var(--text-icon);
   font-family: "Korto", var(--font-sans);
 `;
 
 const AxisLabel = styled.span`
   font-size: 11px;
-  color: ${CHART_UI_COLORS.axisLabel};
+  color: var(--text-icon);
   line-height: 1.2;
   font-family: var(--font-sans);
 `;
@@ -75,23 +78,26 @@ const RankBadge = styled.span`
   justify-content: center;
   width: 22px;
   height: 22px;
-  background: ${CHART_UI_COLORS.rankBadge};
+  background: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border-radius: 50%;
   font-size: 13px;
   font-weight: bold;
   margin-right: 8px;
+  font-family: var(--font-family-base);
 `;
 
 const NameCell = styled.td`
-  color: ${({ theme }) => theme?.colors?.text || brandTokens.palette.navy};
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   font-weight: 500;
+  font-family: var(--font-family-base);
 `;
 
 const ScoreCell = styled.td`
   font-weight: bold;
-  color: ${CHART_UI_COLORS.scoreText};
+  color: var(--text-icon);
   text-align: right;
+  font-family: var(--font-family-base);
 `;
 
 const RowTr = styled.tr`
@@ -144,7 +150,6 @@ const RotatingIcon = styled(FaChevronDown)`
  * @constant {Object}
  */
 const DEFAULTS = {
-  BRAND_COLOR: defaultBgColour,
   DIMENSIONS: {
     baseHeight: 220,
     pieSize: 220,
@@ -155,7 +160,6 @@ const DEFAULTS = {
     avgCharWidth: 6,
   },
   MARGIN: { top: 4, right: 10, bottom: 2, left: 10 },
-  GRID: { stroke: CHART_UI_COLORS.grid, vertical: false },
 };
 
 /**
@@ -406,7 +410,14 @@ const toTimeSeries = (data) =>
  * @param {Object} props.type - Value that defines whether the graph will be horizontal or vertical
  * @returns {JSX.Element} - Bar chart component with X/Y axes, grid, and tooltip
  */
-const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
+const BarChart = ({
+  config,
+  data,
+  formatters,
+  type = "horizontal",
+  chartUiColors,
+  brandColor,
+}) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
@@ -456,7 +467,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
       >
-        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RCartesianGrid stroke={chartUiColors.grid} vertical={false} />
         {type === "vertical" ? (
           <>
             <RXAxis
@@ -495,12 +506,12 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: CHART_UI_COLORS.hoverCursor }} />
+        <RTooltip formatter={tooltipFormatter} cursor={{ fill: chartUiColors.hoverCursor }} />
         <RBar dataKey="value" name="Value">
           {items.map((entry, idx) => (
             <RCell
               key={`cell-${idx}`}
-              fill={(config.colors && config.colors[entry.label]) || DEFAULTS.BRAND_COLOR}
+              fill={(config.colors && config.colors[entry.label]) || brandColor}
             />
           ))}
         </RBar>
@@ -523,6 +534,7 @@ const BarChartMultiple = ({
   data,
   formatters,
   type = "horizontal",
+  chartUiColors,
 }) => {
   const items = React.useMemo(() => data, [data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
@@ -569,7 +581,7 @@ const BarChartMultiple = ({
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
       >
-        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RCartesianGrid stroke={chartUiColors.grid} vertical={false} />
         {type === "vertical" ? (
           <>
             <RXAxis
@@ -603,7 +615,7 @@ const BarChartMultiple = ({
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: CHART_UI_COLORS.hoverCursor }} />
+        <RTooltip formatter={tooltipFormatter} cursor={{ fill: chartUiColors.hoverCursor }} />
         <RLegend
           verticalAlign="top"
           align="center"
@@ -639,18 +651,18 @@ const BarChartMultiple = ({
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Line chart component with X/Y axes, grid, and tooltip
  */
-const LineSeriesChart = ({ config, data, formatters }) => {
+const LineSeriesChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const items = React.useMemo(
     () => (Array.isArray(data) ? toTimeSeries(data) : toSeries(config, data)),
     [config, data]
   );
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
+  const stroke = config.lineColor || brandColor;
 
   const comparatorKey = config.comparatorKey || "dmValue";
   const comparatorLabel = config.comparatorLabel || "Comparator";
   const primaryLabel = config.primaryLabel || "Value";
-  const comparatorStroke = config.comparatorColor || CHART_UI_COLORS.comparator;
+  const comparatorStroke = config.comparatorColor || chartUiColors.comparator;
 
   const formatter = (val) => {
     const n = Number(val);
@@ -679,7 +691,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
       yAxisTitle={config.y_axis_title}
     >
       <RLineChart data={items} margin={DEFAULTS.MARGIN}>
-        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RCartesianGrid stroke={chartUiColors.grid} vertical={false} />
         <RXAxis
           dataKey="label"
           angle={DEFAULTS.DIMENSIONS.xAngle}
@@ -696,7 +708,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         />
         <RTooltip
           formatter={formatter}
-          cursor={{ stroke: CHART_UI_COLORS.guideStroke, strokeDasharray: "3 3" }}
+          cursor={{ stroke: chartUiColors.guideStroke, strokeDasharray: "3 3" }}
         />
         {hasComparator && (
           <RLegend
@@ -741,12 +753,12 @@ const LineSeriesChart = ({ config, data, formatters }) => {
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Area chart component with X/Y axes, grid, and tooltip
  */
-const AreaSeriesChart = ({ config, data, formatters }) => {
+const AreaSeriesChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke =
-    config.areaStrokeColor || config.lineColor || DEFAULTS.BRAND_COLOR;
-  const fill = config.areaFillColor || CHART_UI_COLORS.areaFill;
+    config.areaStrokeColor || config.lineColor || brandColor;
+  const fill = config.areaFillColor || chartUiColors.areaFill;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
@@ -767,7 +779,7 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
       height={height}
     >
       <RAreaChart data={items} margin={DEFAULTS.MARGIN}>
-        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RCartesianGrid stroke={chartUiColors.grid} vertical={false} />
         <RXAxis
           dataKey="label"
           angle={DEFAULTS.DIMENSIONS.xAngle}
@@ -784,7 +796,7 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
         />
         <RTooltip
           formatter={formatter}
-          cursor={{ stroke: CHART_UI_COLORS.guideStroke, strokeDasharray: "3 3" }}
+          cursor={{ stroke: chartUiColors.guideStroke, strokeDasharray: "3 3" }}
         />
         <RArea
           type="monotone"
@@ -806,10 +818,10 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Scatter chart component with X/Y axes, grid, and tooltip
  */
-const ScatterSeriesChart = ({ config, data, formatters }) => {
+const ScatterSeriesChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const fill = config.scatterColor || DEFAULTS.BRAND_COLOR;
+  const fill = config.scatterColor || brandColor;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
@@ -830,7 +842,7 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
       height={height}
     >
       <RScatterChart margin={DEFAULTS.MARGIN}>
-        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RCartesianGrid stroke={chartUiColors.grid} vertical={false} />
         <RXAxis
           dataKey="label"
           type="category"
@@ -849,7 +861,7 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          cursor={{ stroke: CHART_UI_COLORS.guideStroke, strokeDasharray: "3 3" }}
+          cursor={{ stroke: chartUiColors.guideStroke, strokeDasharray: "3 3" }}
           formatter={formatter}
         />
         <RScatter data={items} fill={fill} />
@@ -924,7 +936,7 @@ const DonutPieChart = ({ config, data, formatters }) => {
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Styled table component with headers and data rows
  */
-const TableChart = ({ config, data, formatters }) => {
+const TableChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const cols = config.columns || [];
   const keys = React.useMemo(() => cols.map((c) => c.key), [cols]);
   const rows = React.useMemo(
@@ -951,13 +963,13 @@ const TableChart = ({ config, data, formatters }) => {
             borderCollapse: "collapse",
             fontSize: 12,
             background: "white",
-            border: `1px solid ${CHART_UI_COLORS.tableBorder}`,
+            border: `1px solid ${chartUiColors.tableBorder}`,
             borderRadius: 6,
             overflow: "hidden",
           }}
         >
           <thead>
-            <tr style={{ background: DEFAULTS.BRAND_COLOR, color: "white" }}>
+            <tr style={{ background: brandColor, color: "white" }}>
               <th style={{ padding: 8, textAlign: "left", fontWeight: 600 }}>
                 {firstColHeader}
               </th>
@@ -977,17 +989,17 @@ const TableChart = ({ config, data, formatters }) => {
                   key={r.key}
                   style={{
                     borderBottom:
-                      idx === rows.length - 1 ? "none" : `1px solid ${CHART_UI_COLORS.tableDivider}`,
+                      idx === rows.length - 1 ? "none" : `1px solid ${chartUiColors.tableDivider}`,
                   }}
                 >
-                  <td style={{ padding: 8, borderRight: `1px solid ${CHART_UI_COLORS.tableDivider}` }}>
+                  <td style={{ padding: 8, borderRight: `1px solid ${chartUiColors.tableDivider}` }}>
                     {r.label}
                   </td>
                   <td
                     style={{
                       padding: 8,
                       textAlign: "right",
-                      borderRight: `1px solid ${CHART_UI_COLORS.tableDivider}`,
+                      borderRight: `1px solid ${chartUiColors.tableDivider}`,
                     }}
                   >
                     {fmt.commify(val)}
@@ -1005,7 +1017,7 @@ const TableChart = ({ config, data, formatters }) => {
   );
 };
 
-const RankingChart = ({ config, data, formatters }) => {
+const RankingChart = ({ config, data, formatters, chartUiColors }) => {
   const [isOpen, setIsOpen] = useState(false);
   const cols = config.columns || [];
   const rows = React.useMemo(
@@ -1090,7 +1102,7 @@ const RankingChart = ({ config, data, formatters }) => {
         {/* Display "..." only if the list is collapsed */}
         {!isOpen && rows.length > 5 && (
           <RowTr>
-            <td colSpan={3} style={{ color: CHART_UI_COLORS.subtleText, paddingLeft: 32 }}>
+            <td colSpan={3} style={{ color: chartUiColors.subtleText, paddingLeft: 32 }}>
               ...
             </td>
           </RowTr>
@@ -1124,6 +1136,10 @@ export const ChartRenderer = ({
   formatters = {},
   barHeight,
 }) => {
+  const theme = useTheme();
+  const brandColor = theme?.primary || defaultBgColour;
+  const chartUiColors = React.useMemo(() => getChartUiColors(theme), [theme]);
+
   if (!charts.length) return null;
   const f = { ...defaultFormatters, ...formatters };
 
@@ -1156,6 +1172,8 @@ export const ChartRenderer = ({
                 config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "bar_vertical":
@@ -1166,6 +1184,8 @@ export const ChartRenderer = ({
                 data={data}
                 formatters={f}
                 type="vertical"
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "multiple_bar":
@@ -1175,6 +1195,7 @@ export const ChartRenderer = ({
                 config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
               />
             );
           case "multiple_bar_vertical":
@@ -1185,6 +1206,7 @@ export const ChartRenderer = ({
                 data={data}
                 formatters={f}
                 type="vertical"
+                chartUiColors={chartUiColors}
               />
             );
           case "line":
@@ -1194,6 +1216,8 @@ export const ChartRenderer = ({
                 config={cfg}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "area":
@@ -1203,6 +1227,8 @@ export const ChartRenderer = ({
                 config={cfg}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "scatter":
@@ -1212,6 +1238,8 @@ export const ChartRenderer = ({
                 config={cfg}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "pie":
@@ -1226,11 +1254,24 @@ export const ChartRenderer = ({
             );
           case "table":
             return (
-              <TableChart key={idx} config={cfg} data={data} formatters={f} />
+              <TableChart
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
+              />
             );
           case "ranking":
             return (
-              <RankingChart key={idx} config={cfg} data={data} formatters={f} />
+              <RankingChart
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+                chartUiColors={chartUiColors}
+              />
             );
           case "histogram":
             return (

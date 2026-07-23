@@ -85,7 +85,7 @@ const StyledLogoutButton = styled.button`
   padding: 6px 10px;
   font-size: 14px;
   font-weight: 700;
-  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -112,7 +112,7 @@ const AuthActionButton = styled.button`
   padding: 6px 12px;
   font-size: 14px;
   font-weight: 700;
-  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   cursor: pointer;
   transition: background-color 220ms ease, color 220ms ease;
 

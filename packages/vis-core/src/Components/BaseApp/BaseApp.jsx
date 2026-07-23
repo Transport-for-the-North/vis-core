@@ -70,7 +70,7 @@ const BrandGlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     font-family: var(--font-family-base);
-    color: var(--palette-navy);
+    color: var(--text-icon);
     background: var(--palette-white);
   }
 
@@ -81,7 +81,7 @@ const BrandGlobalStyles = createGlobalStyle`
   h5,
   h6 {
     font-family: "Korto", "Open Sans", "Segoe UI", Arial, sans-serif;
-    color: var(--palette-navy);
+    color: var(--text-icon);
   }
 
   p,
@@ -92,9 +92,13 @@ const BrandGlobalStyles = createGlobalStyle`
   .copy {
     font-family: var(--font-sans);
     font-weight: 400;
-    font-size: 18px;
-    line-height: 26px;
-    color: var(--palette-navy);
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--text-icon);
+  }
+
+  a:hover {
+    color: var(--palette-teal);
   }
 
   .copy-sm {

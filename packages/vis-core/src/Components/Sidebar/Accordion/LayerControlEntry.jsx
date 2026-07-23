@@ -67,7 +67,8 @@ const ExpandCollapseToggle = styled.span`
 const LayerName = styled.span`
   font-weight: 600;
   font-size: 1rem;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-family: var(--font-sans);
 `;
 
 /**
@@ -92,7 +93,7 @@ const VisibilityToggle = styled.button`
   svg {
     width: 24px;
     height: 24px;
-    color: #555;
+    color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   }
 `;
 
@@ -124,7 +125,8 @@ const Slider = styled.input`
 const ControlLabel = styled.label`
   margin-right: 0.5rem;
   font-size: 0.9rem;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-family: var(--font-sans);
 `;
 
 /**
@@ -134,6 +136,8 @@ const SliderValue = styled.span`
   font-size: 0.9rem;
   width: 36px;
   text-align: right;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-family: var(--font-sans);
 `;
 
 /**

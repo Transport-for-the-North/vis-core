@@ -10,7 +10,7 @@ import { createPortal } from "react-dom";
 import { AccordionIcon } from "../Sidebar/Accordion/AccordionSection";
 import { MobileBar } from "../MobileBar/MobileBar";
 
-import { CARD_CONSTANTS } from "defaults";
+import { CARD_CONSTANTS, defaultBgColour } from "defaults";
 
 const { PADDING } = CARD_CONSTANTS;
 
@@ -102,7 +102,7 @@ const OverflowHint = styled.button`
 
   border: 0;
   border-radius: 999px;
-  background: rgba(24, 20, 69, 0.96);
+  background: ${({ theme }) => theme?.primary || defaultBgColour};
   color: #fff;
 
   font-family: inherit;
@@ -125,7 +125,7 @@ const OverflowHint = styled.button`
 
   &:hover {
     transform: translateY(-1px);
-    background: rgba(36, 29, 91, 0.98);
+    background: ${({ theme }) => theme?.primary || defaultBgColour};
     box-shadow:
       0 8px 18px rgba(13, 15, 61, 0.34),
       0 2px 5px rgba(13, 15, 61, 0.24);

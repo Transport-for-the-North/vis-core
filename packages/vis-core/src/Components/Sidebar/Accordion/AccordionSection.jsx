@@ -28,6 +28,7 @@ const AccordionContent = styled.div`
   overflow: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
   transition: max-height 0.3s ease, padding 0.3s ease;
   padding: ${({ $isOpen }) => ($isOpen ? '15px' : '0')} 20px;
+  font-family: var(--font-sans);
   background-color: #fff;
   border: ${({ $isOpen }) => ($isOpen ? '1px' : '0')} solid #ddd;
   border-radius: 0 0 5px 5px;

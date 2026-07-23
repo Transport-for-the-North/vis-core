@@ -1,5 +1,3 @@
-import { defaultBgColour } from "../defaults";
-
 /**
  * Builds a nested tree structure from an array of page objects by grouping pages with a subCategory.
  *
@@ -95,7 +93,7 @@ export function buildNavbarLinks(appContext) {
   const links = [];
 
   // Add Home link.
-  links.push({ label: "Home", url: "/", navbarLinkBgColour: defaultBgColour });
+  links.push({ label: "Home", url: "/" });
 
   // Internal pages without a category.
   appContext.appPages

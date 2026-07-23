@@ -65,7 +65,7 @@
 }
 
 .introduction h2 {
-  color: #0d0f3d;
+  color: var(--text-icon);
   text-align: start;
   margin-bottom: 1rem;
 }
@@ -73,7 +73,7 @@
 .container-legalText,
 .container-methodology,
 .container-intro {
-  color: #0d0f3d;
+  color: var(--text-icon);
   text-indent: 0em;
 }
 
@@ -115,7 +115,7 @@
 .additional-section .container-section ul,
 .additional-section .container-section ol,
 .additional-section .container-section li {
-  color: var(--palette-navy);
+  color: var(--text-icon);
 }
 
 .additional-section .container-section p,
@@ -131,7 +131,7 @@
 
 .odd-section {
   background-color: #f5f5f5;
-  color: #0d0f3d;
+  color: var(--text-icon);
 }
 
 .even-section .go-to-map {
@@ -145,13 +145,13 @@
 }
 
 .odd-section .go-to-map {
-  color: #0d0f3d;
+  color: var(--text-icon);
   text-decoration: none;
   font-size: 17px;
 }
 
 .odd-section .go-to-map:hover {
-  color: var(--palette-navy);
+  color: var(--text-icon);
 }
 
 /* --- Homepage Grid --- */
@@ -193,7 +193,7 @@
 
 .homepage-grid .even-section {
   background-color: #f5f5f5;
-  color: #0d0f3d;
+  color: var(--text-icon);
 }
 
 .container-section.collapsed {
@@ -218,13 +218,13 @@
 }
 
 .homepage-grid .go-to-map {
-  color: #0d0f3d;
+  color: var(--text-icon);
   text-decoration: none;
   font-size: 16px;
 }
 
 .homepage-grid .go-to-map:hover {
-  color: var(--palette-navy);
+  color: var(--text-icon);
 }
 
 .expanded-fragment-block {

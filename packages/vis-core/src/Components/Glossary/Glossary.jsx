@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import { makeSelectStyles } from 'utils/selectStyles';
 
 const bgColour = '#e6e6e6';
-const fontColour = '#333';
+const fontColour = 'var(--text-icon)';
 
 const GlossaryContainer = styled.div`
   padding: 0px;

@@ -72,6 +72,7 @@ function resolveBaseLayerIdFromSpiderLayerId(layerId) {
   return layerId;
 }
 
+
 /**
  * Map component that renders a map using MapLibre GL and handles layers,
  * including hover and click interactions.
