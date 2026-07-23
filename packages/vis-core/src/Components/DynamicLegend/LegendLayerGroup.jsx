@@ -114,7 +114,7 @@ const LegendLayerGroup = ({
   const numericVals = item.legendEntriesNumeric?.filter(Number.isFinite) || [];
   const isDescending = numericVals.length >= 2 && numericVals[0] > numericVals[numericVals.length - 1];
 
-  const pref = layerPrefs[item.layerId] || { displayMode: 'continuous', scaleMode: 'value' };
+  const pref = layerPrefs[item.layerId] || { displayMode: item.defaultDisplayMode || 'continuous', scaleMode: 'value' };
   const useDiscreteSwatches = !canBeContinuous || pref.displayMode === 'discrete';
 
   const isPopoverOpen = openPopoverId === item.layerId;
@@ -165,7 +165,7 @@ const LegendLayerGroup = ({
                         <input
                           type="radio"
                           checked={pref.displayMode === 'continuous'}
-                          onChange={() => updateLayerPref(item.layerId, 'displayMode', 'continuous')}
+                          onChange={() => updateLayerPref(item.layerId, 'displayMode', 'continuous', item.defaultDisplayMode)}
                         />
                         Continuous bar
                       </label>
@@ -173,7 +173,7 @@ const LegendLayerGroup = ({
                         <input
                           type="radio"
                           checked={pref.displayMode === 'discrete'}
-                          onChange={() => updateLayerPref(item.layerId, 'displayMode', 'discrete')}
+                          onChange={() => updateLayerPref(item.layerId, 'displayMode', 'discrete', item.defaultDisplayMode)}
                         />
                         Discrete swatches
                       </label>
@@ -186,7 +186,7 @@ const LegendLayerGroup = ({
                             <input
                               type="radio"
                               checked={pref.scaleMode === 'value'}
-                              onChange={() => updateLayerPref(item.layerId, 'scaleMode', 'value')}
+                              onChange={() => updateLayerPref(item.layerId, 'scaleMode', 'value', item.defaultDisplayMode)}
                             />
                             Proportional to values
                           </label>
@@ -194,7 +194,7 @@ const LegendLayerGroup = ({
                             <input
                               type="radio"
                               checked={pref.scaleMode === 'color'}
-                              onChange={() => updateLayerPref(item.layerId, 'scaleMode', 'color')}
+                              onChange={() => updateLayerPref(item.layerId, 'scaleMode', 'color', item.defaultDisplayMode)}
                             />
                             Evenly spaced colours
                           </label>
