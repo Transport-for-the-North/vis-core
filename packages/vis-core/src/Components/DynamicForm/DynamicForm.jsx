@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid';
@@ -427,7 +427,17 @@ const validateField = (value, field) => {
  * @param {string} [props.bgColor='#007bff'] - Primary color for buttons.
  * @param {Function} [props.onSubmitSuccess] - Callback after successful submission.
  * @param {Function} [props.onSubmitError] - Callback after submission error.
+ * @param {Object} [props.initialValues] - Values used to pre-populate the form, keyed by field id (or field name).
+ *   Overrides each field's `defaultValue`. When a new object identity is supplied (e.g. a different
+ *   record is selected), the form re-seeds itself and clears any success/error state. This makes the
+ *   component suitable for "edit a selected record" flows in addition to blank submissions.
+ * @param {string} [props.config.submitButtonText='Submit'] - Label for the submit button.
+ * @param {string} [props.config.resetButtonText='Submit Another Entry'] - Label for the post-success reset button.
+ * @param {string} [props.config.successTitle='Submission Successful'] - Heading shown on the success panel.
  * @returns {JSX.Element} The rendered DynamicForm component.
+ *
+ * @note A field with `type: 'hidden'` is not rendered but its value (from `initialValues`/`defaultValue`)
+ *   is still included in the submission payload — useful for carrying a record identifier.
  *
  * @example
  * const formConfig = {
@@ -460,25 +470,50 @@ export const DynamicForm = ({
   onCoordinateChange,
   externalCoordinates,
   onFieldChange,
+  initialValues,
 }) => {
-  const { title, submitEndpoint, submitMethod = 'POST', fields = [] } = config;
+  const {
+    title,
+    submitEndpoint,
+    submitMethod = 'POST',
+    fields = [],
+    submitButtonText = 'Submit',
+    resetButtonText = 'Submit Another Entry',
+    successTitle = 'Submission Successful',
+  } = config;
 
-  // Initialize form values
-  const initialValues = useMemo(() => {
+  /**
+   * Resolves a supplied initial value for a field, honouring either its id or name as the key.
+   * @param {Object} field - Field configuration.
+   * @returns {*} The override value, or undefined when none is supplied.
+   */
+  const getInitialOverride = useCallback(
+    (field) => {
+      if (!initialValues) return undefined;
+      const byId = initialValues[field.id];
+      if (byId !== undefined) return byId;
+      return initialValues[field.name];
+    },
+    [initialValues]
+  );
+
+  // Initialize form values (field.defaultValue, optionally overridden by initialValues)
+  const computedInitialValues = useMemo(() => {
     const values = {};
     fields.forEach((field) => {
+      const override = getInitialOverride(field);
       if (field.type === 'coordinates') {
-        values[field.id] = field.defaultValue || { lat: '', lng: '' };
+        values[field.id] = override ?? field.defaultValue ?? { lat: '', lng: '' };
       } else if (field.type === 'checkbox') {
-        values[field.id] = field.defaultValue || false;
+        values[field.id] = override ?? field.defaultValue ?? false;
       } else {
-        values[field.id] = field.defaultValue ?? '';
+        values[field.id] = override ?? field.defaultValue ?? '';
       }
     });
     return values;
-  }, [fields]);
+  }, [fields, getInitialOverride]);
 
-  const [formValues, setFormValues] = useState(initialValues);
+  const [formValues, setFormValues] = useState(computedInitialValues);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [dropdownOptions, setDropdownOptions] = useState({});
@@ -489,6 +524,30 @@ export const DynamicForm = ({
 
   // Service instance for API calls
   const apiService = useMemo(() => new BaseService(), []);
+
+  // Re-seed the form whenever the caller supplies a new set of initial values
+  // (e.g. the user selects a different record to edit). Serialising gives a stable
+  // trigger without requiring the caller to memoise the object identity.
+  const initialValuesKey = useMemo(
+    () => (initialValues === undefined ? undefined : JSON.stringify(initialValues)),
+    [initialValues]
+  );
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    if (!didMountRef.current) {
+      // First render already seeded state via useState — skip the reset.
+      didMountRef.current = true;
+      return;
+    }
+    setFormValues(computedInitialValues);
+    setErrors({});
+    setTouched({});
+    setSubmittedData(null);
+    setSubmitError(null);
+    // computedInitialValues is derived from initialValuesKey; depending on the key
+    // keeps this effect from firing on unrelated re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValuesKey]);
 
   // Find the coordinate field ID
   const coordinateFieldId = useMemo(() => {
@@ -719,7 +778,7 @@ export const DynamicForm = ({
 
   // Reset form to initial state
   const handleReset = () => {
-    setFormValues(initialValues);
+    setFormValues(computedInitialValues);
     setErrors({});
     setTouched({});
     setSubmittedData(null);
@@ -734,7 +793,7 @@ export const DynamicForm = ({
         <SuccessMessage>
           <SuccessHeader>
             <CheckCircleIcon style={{ width: 24, height: 24 }} />
-            Submission Successful
+            {successTitle}
           </SuccessHeader>
           <SubmittedDataList>
             {submittedData.map((item, index) => (
@@ -745,7 +804,7 @@ export const DynamicForm = ({
             ))}
           </SubmittedDataList>
           <ResetButton type="button" onClick={handleReset}>
-            Submit Another Entry
+            {resetButtonText}
           </ResetButton>
         </SuccessMessage>
       </FormContainer>
@@ -927,6 +986,7 @@ export const DynamicForm = ({
       )}
 
       {visibleFields.map((field) => (
+        field.type === 'hidden' ? null : (
         <FieldGroup key={field.id}>
           {/* Checkboxes have their own label - don't render separate label */}
           {field.type !== 'checkbox' && (
@@ -943,6 +1003,7 @@ export const DynamicForm = ({
             <HelpText>{field.helpText}</HelpText>
           )}
         </FieldGroup>
+        )
       ))}
 
       <SubmitButton type="submit" $bgColor={bgColor} disabled={isSubmitting}>
@@ -951,7 +1012,7 @@ export const DynamicForm = ({
             Submitting <Spinner />
           </>
         ) : (
-          'Submit'
+          submitButtonText
         )}
       </SubmitButton>
     </FormContainer>
