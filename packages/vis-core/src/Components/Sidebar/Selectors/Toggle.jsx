@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useFilterContext } from "hooks/useFilterContext";
 import { darken } from "polished";
+import { defaultBgColour } from 'defaults';
 
 const Container = styled.div`
   display: flex;
@@ -24,7 +25,7 @@ const StyledButton = styled.button`
     props.$isHidden
       ? '#f2f2f2'
       : props.$isSelected
-      ? props.$bgColor
+      ? props.theme?.primary || defaultBgColour
       : 'white'};
   color: ${(props) =>
     props.$isHidden
@@ -45,7 +46,7 @@ const StyledButton = styled.button`
     props.index !== 0 ? "none none none solid" : "none"};
   border-width: 0.25px;
   width: ${(props) => 100 / props.size + "%"};
-  font-family: var(--font-family-base);
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +56,10 @@ const StyledButton = styled.button`
       props.$isHidden
         ? '#f2f2f2'
         : props.$isSelected
-        ? darken(0.1, props.$bgColor)
+        ? darken(
+            0.1,
+            props.theme?.primary || defaultBgColour
+          )
         : 'white'};
     color: ${(props) =>
       props.$isHidden
@@ -69,19 +73,28 @@ const StyledButton = styled.button`
 const ToggleAllButton = styled.button`
   cursor: pointer;
   padding: 5px 2px;
-  background-color: ${(props) => (props.$isSelected ? props.$bgColor : "white")};
+  background-color: ${(props) =>
+    props.$isSelected
+      ? props.$bgColor || props.theme?.primary || defaultBgColour
+      : "white"};
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-radius: 4px;
   border: 0.25px solid;
   margin-left: 10px;
   width: 80px; /* Fixed width */
-  font-family: var(--font-family-base);
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    background-color: ${(props) => (props.$isSelected ?  darken(0.1, props.$bgColor) : "white")};
+    background-color: ${(props) =>
+      props.$isSelected
+        ? darken(
+            0.1,
+            props.$bgColor || props.theme?.primary || defaultBgColour
+          )
+        : "white"};
     color: ${(props) => (props.$isSelected ? "white" : "black")};
   }
 `;

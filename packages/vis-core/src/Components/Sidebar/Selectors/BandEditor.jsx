@@ -58,6 +58,7 @@ const ResetButton = styled(AppButton)`
 `;
 
 const BandCountSelect = styled.select`
+  font-family: var(--font-sans);
   font-size: 0.9em;
   padding: 4px 8px;
   border-radius: 4px;
@@ -83,9 +84,9 @@ const BandInputWrapper = styled.div`
 `;
 
 const BandInputLabel = styled.label`
-  font-size: 0.75rem;
-  color: #666;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
 `;
 
 const BandInput = styled.input`
@@ -95,6 +96,7 @@ const BandInput = styled.input`
   border: ${props => props.$hasError ? '2px solid #d32f2f' : '1px solid #d1d1e0'};
   background: #fff;
   text-align: right;
+  font-family: var(--font-sans);
   font-size: 0.9rem;
   box-sizing: border-box;
   min-width: 0;
@@ -108,11 +110,19 @@ const BandInput = styled.input`
 const ErrorMessage = styled.div`
   color: #d32f2f;
   font-size: 0.8rem;
+  font-family: var(--font-sans);
   margin-bottom: 8px;
   padding: 6px 8px;
   background-color: #ffebee;
   border-radius: 4px;
   border-left: 3px solid #d32f2f;
+`;
+
+const BandCountLabel = styled.span`
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-weight: 500;
 `;
 
 /**
@@ -267,7 +277,7 @@ export const BandEditor = ({
       {showLabel && <SelectorLabel text="Edit banding" />}
       <BandMetaContainer>
         <BandHeader>
-          <span style={{ fontSize: "0.9rem", color: "#555", fontWeight: 500 }}>Number of bands:</span>
+          <BandCountLabel>Number of bands:</BandCountLabel>
           <BandCountSelect
             value={localBands.length}
             onChange={handleBandCountChange}
