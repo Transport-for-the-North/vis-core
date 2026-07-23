@@ -47,7 +47,7 @@ const ParentContainer = styled.div`
  */
 const CardContainer = styled.div`
   width: ${CARD_WIDTH}px;
-  background-color: white;
+  background-color: var(--palette-white);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
@@ -84,9 +84,10 @@ const CardHeader = styled.div`
  * Styled component for the card title.
  */
 const CardTitle = styled.h2`
-  font-size: 1.2em;
-  color: ${defaultBgColour};
-  font-weight: bold;
+  font-family: var(--font-sans);
+  font-size: 2em;
+  color: var(--text-icon);
+  font-weight: 400;
   margin-top: 5px;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
@@ -121,8 +122,7 @@ const StatusBadge = styled.span`
     $kind === "updated"
       ? "rgba(0, 222, 198, 0.18)"
       : "rgba(240, 240, 247, 0.95)"};
-  color: ${({ $kind }) =>
-    $kind === "updated" ? "rgb(13, 15, 61)" : defaultBgColour};
+  color: var(--text-icon);
 
   font-size: 0.72rem;
   font-weight: 700;
@@ -136,11 +136,12 @@ const StatusBadge = styled.span`
  * Styled component for the card content.
  */
 const CardContent = styled.div`
+  font-family: var(--font-sans);
   text-align: left;
 
   h2 {
     font-size: 1.5em;
-    color: ${defaultBgColour};
+    color: var(--text-icon);
     margin-bottom: 0.5em;
 
     @media ${(props) => props.theme.mq.mobile} {
@@ -150,7 +151,7 @@ const CardContent = styled.div`
 
   p {
     font-size: 1.2em;
-    color: #333;
+    color: var(--text-icon);
     line-height: 1.6;
     margin: 0.5em 0;
   }
@@ -168,7 +169,7 @@ const CardContent = styled.div`
   }
 
   .card {
-    background-color: #f9f9f9;
+    background-color: var(--palette-pale-teal);
     border-radius: 8px;
     padding: 1em;
     margin: 0.5em;
@@ -196,16 +197,17 @@ const CardContent = styled.div`
   }
 
   .card .label {
-    font-size: 1em;
-    color: #666;
+    font-size: 1.3em;
+    color: var(--text-icon);
     margin-bottom: 0.5em;
-    font-weight: bold;
+    font-family: var(--font-sans);
   }
 
   .card .value {
     font-size: 2em;
-    color: ${defaultBgColour};
+    color: var(--text-icon);
     font-weight: bold;
+    font-family: var(--font-family-base);
   }
 
   .card .value.small {
@@ -228,10 +230,10 @@ const CardContent = styled.div`
 
   details {
     margin-top: 1em;
-    border: 1px solid #ddd;
+    border: 1px solid var(--palette-bottom-grey);
     border-radius: 5px;
     padding: 0.5em;
-    background-color: #f4f4f4;
+    background-color: var(--palette-pale-teal);
 
     summary {
       font-size: 1.2em;
@@ -239,7 +241,7 @@ const CardContent = styled.div`
       cursor: pointer;
       position: relative;
       outline: none;
-      color: #333333;
+      color: var(--text-icon);
     }
 
     .card-container {
@@ -257,7 +259,7 @@ const ToggleButton = styled.button`
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
-  background-color: ${defaultBgColour};
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -281,8 +283,8 @@ const TogglePing = styled.span`
   padding: 0 4px;
 
   border-radius: 999px;
-  background: ${({ $kind }) => ($kind === "updated" ? "#00dec6" : "#f0f0f7")};
-  color: rgb(13, 15, 61);
+  background: ${({ $kind }) => ($kind === "updated" ? "var(--palette-teal)" : "var(--palette-mid-grey)")};
+  color: ${({ theme }) => theme?.primary || defaultBgColour};
 
   font-size: 10px;
   font-weight: 800;

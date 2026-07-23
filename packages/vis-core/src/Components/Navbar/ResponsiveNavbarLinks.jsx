@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { NavBarDropdown } from "./NavBarDropdown";
 import { createNavItemClickHandler } from "utils/nav";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { defaultBgColour } from "defaults";
 
 const NAV_ITEM_WIDTH = "250px";
 
@@ -37,8 +38,13 @@ const baseNavLinkStyles = css`
   padding: 12px 14px;
   height: auto;
   background-color: ${({ $active, theme }) =>
-    $active ? (theme?.colors?.text || "#0d0f3d") : "transparent"};
-  color: ${({ $active, theme }) => ($active ? "#ffffff" : (theme?.colors?.text || "#0d0f3d"))};
+    $active
+      ? theme?.primary || defaultBgColour
+      : "transparent"};
+  color: ${({ $active, theme }) =>
+    $active
+      ? (theme?.activeNavText || "#ffffff")
+      : (theme?.colors?.text || "var(--text-icon)")};
   border-radius: 10px;
   transition:
     color 260ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -46,16 +52,16 @@ const baseNavLinkStyles = css`
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 24px;
-  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   white-space: nowrap;
   cursor: pointer;
   box-sizing: border-box;
 
   &:hover {
-    color: #ffffff;
-    background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
+    background-color: ${({ theme }) => theme?.primary || defaultBgColour};
     box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
     transform: translateY(-1px);
   }

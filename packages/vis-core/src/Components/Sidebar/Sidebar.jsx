@@ -17,7 +17,7 @@ const SidebarHeader = styled.h2`
   font-weight: bold;
   text-align: left;
   padding-left: 5px;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
   max-width: 270px;
@@ -107,7 +107,7 @@ const ToggleButton = styled.button`
   left: 392px;
   top: 25px;
   z-index: 1001;
-  background-color: ${(props) => props.$bgColor};
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;

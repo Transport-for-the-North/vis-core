@@ -79,7 +79,7 @@ export const brandThemeDefaults = {
   colors: {
     primary: brandTokens.palette.navy,
     accent: brandTokens.palette.teal,
-    text: brandTokens.palette.navy,
+    text: brandTokens.palette.textIcon,
     textMuted: brandTokens.palette.grey,
     surface: brandTokens.palette.white,
     muted: brandTokens.palette.midGrey,

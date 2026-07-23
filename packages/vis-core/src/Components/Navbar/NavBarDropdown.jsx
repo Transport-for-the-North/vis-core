@@ -84,14 +84,18 @@ const DropdownContainer = styled.div`
   display: inline-flex;
   width: 100%;
   align-items: center;
-  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 24px;
   background-color: ${({ $isActive, $hovered, theme }) =>
-    $isActive || $hovered ? (theme?.colors?.text || defaultBgColour) : "transparent"};
-  color: ${({ $isActive, $hovered }) =>
-    $isActive || $hovered ? "#ffffff" : defaultBgColour};
+    $isActive || $hovered
+      ? theme?.primary || defaultBgColour
+      : "transparent"};
+  color: ${({ $isActive, $hovered, theme }) =>
+    $isActive || $hovered
+      ? theme?.activeNavText || "#ffffff"
+      : theme?.colors?.text || "var(--text-icon)"};
   padding: 12px 14px;
   height: auto;
   cursor: pointer;
@@ -108,8 +112,8 @@ const DropdownContainer = styled.div`
   box-sizing: border-box;
 
   &:hover {
-    color: #ffffff;
-    background-color: ${({ theme }) => theme?.colors?.text || defaultBgColour};
+    color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
+    background-color: ${({ theme }) => theme?.primary || defaultBgColour};
     box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
     transform: translateY(-1px);
   }
@@ -174,17 +178,25 @@ const dropdownItemStyles = css`
   font-size: 0.92rem;
   text-align: left;
   box-sizing: border-box;
-  background-color: ${({ $active, $hovered, theme }) =>
-    $active || $hovered ? (theme?.colors?.paleTeal || "#e4f6f6") : "#ffffff"};
+  background-color: ${({ $active, $hovered, $bgColor, theme }) =>
+    $active || $hovered
+      ? $bgColor ||
+        theme?.activeBg ||
+        theme?.colors?.primary ||
+        defaultBgColour
+      : "#ffffff"};
   color: ${({ $active, $hovered, theme }) =>
-    theme?.colors?.text || defaultBgColour};
+    $active || $hovered
+      ? theme?.activeNavText || "#ffffff"
+      : theme?.colors?.text || "var(--text-icon)"};
   transition: background-color 0.22s ease, color 0.22s ease;
   white-space: normal;
-  font-family: "Korto", ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   cursor: pointer;
   &:hover {
-    background-color: ${({ theme }) => theme?.colors?.paleTeal || "#e4f6f6"};
-    color: ${({ theme }) => theme?.colors?.text || defaultBgColour};
+    background-color: ${({ $bgColor, theme }) =>
+      $bgColor || theme?.activeBg || theme?.colors?.primary || defaultBgColour};
+    color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
   }
 `;
 

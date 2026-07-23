@@ -45,11 +45,15 @@ export function makeSelectStyles(theme, opts = {}) {
     borderColor = "#ddd",
     zIndex = 9999,
   } = opts;
+  const fontFamily = '"Open Sans", "Segoe UI", Arial, sans-serif';
+  const textColor = theme?.colors?.text || "var(--text-icon)";
 
   return {
     menuPortal: (base) => ({ ...base, zIndex }),
     control: (base, state) => ({
       ...base,
+      fontFamily,
+      color: textColor,
       minHeight,
       borderRadius: theme.borderRadius,
       borderColor: state.isFocused ? theme.activeBg : borderColor,
@@ -59,6 +63,8 @@ export function makeSelectStyles(theme, opts = {}) {
     }),
     valueContainer: (base) => ({
       ...base,
+      fontFamily,
+      color: textColor,
       padding: "2px 6px",
       fontSize,
       textAlign: "left",
@@ -69,12 +75,35 @@ export function makeSelectStyles(theme, opts = {}) {
     }),
     input: (base) => ({
       ...base,
+      fontFamily,
+      color: textColor,
       fontSize,
       margin: 0,
       padding: 0,
     }),
+    singleValue: (base) => ({
+      ...base,
+      fontFamily,
+      color: textColor,
+      fontSize,
+    }),
+    placeholder: (base) => ({
+      ...base,
+      fontFamily,
+      color: textColor,
+      fontSize,
+    }),
+    menu: (base) => ({
+      ...base,
+      fontFamily,
+    }),
+    menuList: (base) => ({
+      ...base,
+      fontFamily,
+    }),
     option: (styles, { isFocused, isSelected }) => ({
       ...styles,
+      fontFamily,
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
@@ -85,7 +114,7 @@ export function makeSelectStyles(theme, opts = {}) {
         : isFocused
         ? (theme.colors?.muted || "#efeff7")
         : (theme.colors?.surface || "#fff"),
-      color: isSelected ? "#fff" : "#0d0f3d",
+      color: isSelected ? "#fff" : textColor,
       cursor: "pointer",
       ":active": {
         ...styles[":active"],
