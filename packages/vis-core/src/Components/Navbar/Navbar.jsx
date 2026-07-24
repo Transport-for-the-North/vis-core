@@ -10,7 +10,7 @@ import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
 import { ResponsiveNavbarLinks } from "./ResponsiveNavbarLinks";
 
-const TFN_WEBSITE_URL = "https://www.transportforthenorth.com/";
+const DEFAULT_TFN_WEBSITE_URL = "https://www.transportforthenorth.com/";
 
 const StyledNavbar = styled.nav`
   display: flex;
@@ -98,7 +98,8 @@ export function Navbar() {
   };
 
   const handleLogoClick = () => {
-    window.open(TFN_WEBSITE_URL, "_blank", "noopener,noreferrer");
+    const logoClickUrl = appContext.logoClickUrl || DEFAULT_TFN_WEBSITE_URL;
+    window.open(logoClickUrl, "_blank", "noopener,noreferrer");
   }
 
   const updateSideNav = () => {
