@@ -1,9 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { getByPath } from "utils/getByPath";
 
 import {
+  BreakdownList,
   ContentWrapper,
   EmptyState,
+  FocusSummaryBlock,
+  FocusSummaryLabel,
   MetricLabel,
   MetricLabelStrong,
   MetricRow,
@@ -14,6 +17,9 @@ import {
   RemoveBtn,
   Section,
   SectionTitle,
+  SplitDimension,
+  SplitDimensionTitle,
+  ToggleBtn,
 } from "./Scorecard.styles";
 
 /**
@@ -21,6 +27,7 @@ import {
  * @property {string} label
  * @property {string} path - Dot-path into the `details` object.
  * @property {string} [format] - Key into the formatter registry.
+ * @property {"metric"|"focusSummary"} [type] - Defaults to "metric" when omitted.
  */
 
 /**
@@ -66,6 +73,108 @@ function formatValue(raw, spec) {
   });
 
   return fmt.format(num);
+}
+
+/**
+ * Renders a focus/north/rogb summary object with independently collapsible
+ * area (`focusItems`) and dimension (`splitBy`) breakdowns.
+ *
+ * Expects `value` shaped as:
+ * { focusTotal, focusItems: {[area]: number}, northTotal, rogbTotal,
+ *   splitBy: {[dimension]: {[label]: {focusTotal, ...}}} | null }
+ *
+ * @param {{ field: ScorecardField, value: any, formatterRegistry: Record<string, Intl.NumberFormatOptions> }} props
+ */
+function FocusSummaryField({ field, value, formatterRegistry }) {
+  const [showItems, setShowItems] = useState(false);
+  const [showSplit, setShowSplit] = useState(false);
+
+  const spec = formatterRegistry?.[field.format];
+  const fmt = (raw) => (spec ? formatValue(raw, spec) : raw ?? "-");
+
+  if (value == null) {
+    return (
+      <FocusSummaryBlock>
+        <MetricRow>
+          <MetricLabelStrong>{field.label}</MetricLabelStrong>
+          <MetricValue>-</MetricValue>
+        </MetricRow>
+      </FocusSummaryBlock>
+    );
+  }
+
+  const { focusTotal, focusItems, northTotal, rogbTotal, splitBy } = value;
+
+  const itemEntries = focusItems ? Object.entries(focusItems) : [];
+  const splitEntries = splitBy ? Object.entries(splitBy) : [];
+
+  return (
+    <FocusSummaryBlock>
+      <FocusSummaryLabel>{field.label}</FocusSummaryLabel>
+
+      <MetricRow>
+        <MetricLabelStrong>Focus Area</MetricLabelStrong>
+        <MetricValueStrong>{fmt(focusTotal)}</MetricValueStrong>
+      </MetricRow>
+      <MetricRow>
+        <MetricLabel>Rest of North</MetricLabel>
+        <MetricValue>{fmt(northTotal)}</MetricValue>
+      </MetricRow>
+      <MetricRow>
+        <MetricLabel>Rest of GB</MetricLabel>
+        <MetricValue>{fmt(rogbTotal)}</MetricValue>
+      </MetricRow>
+
+      {itemEntries.length > 0 && (
+        <>
+          <ToggleBtn
+            type="button"
+            aria-expanded={showItems}
+            onClick={() => setShowItems((v) => !v)}
+          >
+            {showItems ? "Hide" : "Show"} area breakdown ({itemEntries.length})
+          </ToggleBtn>
+          {showItems && (
+            <BreakdownList>
+              {itemEntries.map(([areaName, areaValue]) => (
+                <MetricRow key={areaName}>
+                  <MetricLabel>{areaName}</MetricLabel>
+                  <MetricValue>{fmt(areaValue)}</MetricValue>
+                </MetricRow>
+              ))}
+            </BreakdownList>
+          )}
+        </>
+      )}
+
+      {splitEntries.length > 0 && (
+        <>
+          <ToggleBtn
+            type="button"
+            aria-expanded={showSplit}
+            onClick={() => setShowSplit((v) => !v)}
+          >
+            {showSplit ? "Hide" : "Show"} split by ({splitEntries.length})
+          </ToggleBtn>
+          {showSplit && (
+            <BreakdownList>
+              {splitEntries.map(([dimensionName, labels]) => (
+                <SplitDimension key={dimensionName}>
+                  <SplitDimensionTitle>{dimensionName}</SplitDimensionTitle>
+                  {Object.entries(labels).map(([labelName, labelValue]) => (
+                    <MetricRow key={labelName}>
+                      <MetricLabel>{labelName}</MetricLabel>
+                      <MetricValue>{fmt(labelValue?.focusTotal)}</MetricValue>
+                    </MetricRow>
+                  ))}
+                </SplitDimension>
+              ))}
+            </BreakdownList>
+          )}
+        </>
+      )}
+    </FocusSummaryBlock>
+  );
 }
 
 /**
@@ -121,6 +230,18 @@ export function Scorecard({
               {(panel.fields || []).map((f, fIdx) => {
                 const spec = formatterRegistry?.[f.format];
                 const valueRaw = getByPath(details, f.path);
+
+                if (f.type === "focusSummary") {
+                  return (
+                    <FocusSummaryField
+                      key={fIdx}
+                      field={f}
+                      value={valueRaw}
+                      formatterRegistry={formatterRegistry}
+                    />
+                  );
+                }
+
                 const value = spec ? formatValue(valueRaw, spec) : valueRaw ?? "-";
 
                 return (

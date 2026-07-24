@@ -113,3 +113,72 @@ export const EmptyState = styled.p`
   border: 1px solid #94a3b8;
   border-radius: 999px;
 `;
+
+/**
+ * Wrapper for a focusSummary field block (totals + collapsible breakdowns).
+ */
+export const FocusSummaryBlock = styled.div`
+  margin: 6px 0;
+  padding-left: 6px;
+  border-left: 2px solid #cbd5e1;
+`;
+
+/**
+ * Sub-heading for a focusSummary field, sits above its total rows.
+ */
+export const FocusSummaryLabel = styled.h5`
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+`;
+
+/**
+ * Expand/collapse trigger for a breakdown (area items or splitBy).
+ */
+export const ToggleBtn = styled.button`
+  border: none;
+  background: none;
+  color: #4c1d95;
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: ${(p) => p.theme.standardFontFamily};
+  text-align: left;
+  text-decoration: underline;
+  &:hover {
+    color: #37136e;
+  }
+  &:focus-visible {
+    outline: 2px solid rgba(76, 29, 149, 0.9);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+`;
+
+/**
+ * Indented container for an expanded breakdown's rows.
+ */
+export const BreakdownList = styled.div`
+  padding-left: 10px;
+  margin-bottom: 4px;
+`;
+
+/**
+ * Groups a single splitBy dimension (e.g. "Household Type") and its labels.
+ */
+export const SplitDimension = styled.div`
+  margin-bottom: 6px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+/**
+ * Sub-heading naming a splitBy dimension within an expanded splitBy breakdown.
+ */
+export const SplitDimensionTitle = styled.p`
+  margin: 4px 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+`;

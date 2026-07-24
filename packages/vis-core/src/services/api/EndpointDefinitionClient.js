@@ -373,52 +373,80 @@ export class EndpointDefinitionClient {
    * fetchDetails()
    *
    * High-level helper for "details" endpoints:
-   * - For GET endpoints: identifier fields are sent as query parameters
-   * - For POST endpoints: identifier fields are merged into the POST body
+   * - For GET endpoints: identifier fields (and any serverFilter query params) are sent as query parameters
+   * - For POST endpoints: identifier fields (and any serverFilter body params) are merged into the POST body
+   * - Supports a single id (idValue) or a bulk id list (idValues) under idParamName
    *
    * @param {import("./EndpointDefinitionClient").EndpointDefinition} endpoint
    * @param {{
    *   idParamName?: string,
    *   idValue?: string|number,
+   *   idValues?: Array<string|number>,
    *   extraQuery?: Record<string, any>
    * }} idConfig
+   * @param {Array<any>} [filters] - metadata-driven filters; expected to include { id, paramName }
+   * @param {Record<string, any>} [filterState] - keyed by filter.id
    * @returns {Promise<any|null>} Raw response or null on error
    *
    * @example
    * // GET details: /api/runs/details?run_id=123
    * const details = await endpointClient.fetchDetails(
    *   { path: "/api/runs/details", requestMethod: "GET" },
-   *   { idParamName: "run_id", idValue: 123 }
+   *   { idParamName: "run_id", idValue: 123 },
+   *   filters,
+   *   filterState
    * );
    *
    * @example
    * // POST details: body merged
    * const details = await endpointClient.fetchDetails(
    *   { path: "/api/runs/details", requestMethod: "POST", body: { verbose: true } },
-   *   { idParamName: "run_id", idValue: 123 }
+   *   { idParamName: "run_id", idValue: 123 },
+   *   filters,
+   *   filterState
    * );
+   * 
+   * @example
+   * // Bulk POST details with serverFilter params merged into the body
+   * const details = await endpointClient.fetchDetails(
+   *   { path: "/api/bronte/scorecard", requestMethod: "POST", serverFilter: { enabled: true, mode: "body", paramMap: { year: "year" } } },
+   *   { idParamName: "runCodes", idValues: ["HN", "HM"] },
+   *   filters,
+   *   filterState
+   * );
+   * // POST body: { runCodes: ["HN", "HM"], year: 2042 }
    */
-  async fetchDetails(endpoint, idConfig) {
+  async fetchDetails(endpoint, idConfig, filters, filterState) {
     const method = (endpoint?.requestMethod || "GET").toUpperCase();
 
+    const isBulk = Array.isArray(idConfig?.idValues);
+
     const idParams = {
-      ...(idConfig?.idParamName && idConfig?.idValue != null
+      ...(isBulk && idConfig?.idParamName && idConfig?.idValues != null
+        ? { [idConfig.idParamName]: idConfig.idValues }
+        : idConfig?.idParamName && idConfig?.idValue != null
         ? { [idConfig.idParamName]: idConfig.idValue }
         : {}),
       ...(idConfig?.extraQuery || {}),
     };
 
+    const { queryParams: sfQuery, body: sfBody } = buildServerRequestFromFilters(
+      endpoint?.serverFilter,
+      filters,
+      filterState
+    );
+
     try {
       if (method === "POST") {
         const res = await this.execute(endpoint, {
-          body: idParams,
-          queryParams: {},
+          body: { ...idParams, ...(sfBody || {}) },
+          queryParams: { ...(sfQuery || {}) },
         });
         return this.baseService.unwrapObjectResponse(res);
       }
 
       const res = await this.execute(endpoint, {
-        queryParams: idParams,
+        queryParams: { ...idParams, ...(sfQuery || {}) },
       });
       return this.baseService.unwrapObjectResponse(res);
     } catch (err) {

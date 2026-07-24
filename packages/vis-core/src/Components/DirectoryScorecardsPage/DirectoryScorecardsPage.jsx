@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { PageContext } from "contexts";
 import { useMetadataDrivenFilters } from "hooks/useMetadataDrivenFilters";
 import { DataTable } from "Components/DataTable";
@@ -66,9 +66,10 @@ export function DirectoryScorecardsPage() {
     return applyWhereConditions(records, where);
   }, [records, config.recordsEndpoint]);
 
-  const scopedRows = useMemo(
-    () => applyTopFilterScoping(clientScopedRecords, filters, filterState, isReady),
-    [clientScopedRecords, filters, filterState, isReady]
+  const scopedRows = useMemo(() => {
+    if (config.recordsEndpoint?.disableTopFilterScoping) return clientScopedRecords;
+    return applyTopFilterScoping(clientScopedRecords, filters, filterState, isReady);
+  }, [clientScopedRecords, filters, filterState, isReady, config.recordsEndpoint]
   );
 
   const idAccessor = config.selection?.rowIdAccessor || "id";
@@ -96,37 +97,78 @@ export function DirectoryScorecardsPage() {
 
   const [detailsCache, setDetailsCache] = useState({});
 
+  /**
+   * Signature of only the filter values that recordDetailsEndpoint.serverFilter
+   * actually maps into the request.
+   */
+  const detailsFilterSignature = useMemo(() => {
+    const serverFilter = config.recordDetailsEndpoint?.serverFilter;
+    const map = serverFilter?.paramMap;
+    if (!serverFilter?.enabled || !map) return null;
+
+    const relevantIds = filters.filter((f) => map[f.paramName]).map((f) => f.id);
+    return JSON.stringify(relevantIds.map((id) => filterState?.[id]));
+  }, [filters, filterState, config.recordDetailsEndpoint]);
+
+  const lastFetchSignatureRef = useRef(null);
+
   useEffect(() => {
     let cancelled = false;
 
     const ids = Array.from(selectedIds);
-    const missing = ids.filter((id) => !detailsCache[id]);
-    if (missing.length === 0) return;
+    const signatureChanged = lastFetchSignatureRef.current !== detailsFilterSignature;
+    const missing = signatureChanged ? ids : ids.filter((id) => !detailsCache[id]);
+
+    if (missing.length === 0) {
+      lastFetchSignatureRef.current = detailsFilterSignature;
+      return;
+    }
 
     (async () => {
       try {
-        const results = await Promise.all(
-          missing.map(async (id) => {
-            const payload = await api.endpointDefinitionClient.fetchDetails(
-              config.recordDetailsEndpoint,
-              {
-                idParamName: config.selection?.rowIdQueryParam || "run_id",
-                idValue: id,
-              }
-            );
-            return { id, payload };
-          })
-        );
+        const resultsById = {};
+        const detailsFetchMode = config.recordDetailsEndpoint?.detailsFetchMode;
+
+        if (detailsFetchMode === "bulk") {
+          const idsParamName = config.recordDetailsEndpoint?.idsRequestKey || "ids";
+          const payload = await api.endpointDefinitionClient.fetchDetails(
+            config.recordDetailsEndpoint,
+            { idParamName: idsParamName, idValues: missing },
+            filters,
+            filterState
+          );
+          Object.assign(resultsById, payload || {});
+        } else {
+          const results = await Promise.all(
+            missing.map(async (id) => {
+              const payload = await api.endpointDefinitionClient.fetchDetails(
+                config.recordDetailsEndpoint,
+                {
+                  idParamName: config.selection?.rowIdQueryParam || "run_id",
+                  idValue: id,
+                },
+                filters,
+                filterState
+              );
+              return { id, payload };
+            })
+          );
+          results.forEach(({ id, payload }) => {
+            resultsById[id] = payload;
+          });
+        }
 
         if (cancelled) return;
 
         setDetailsCache((prev) => {
-          const next = { ...prev };
-          results.forEach(({ id, payload }) => {
-            next[id] = payload;
+          const next = signatureChanged ? {} : { ...prev };
+          missing.forEach((id) => {
+            if (resultsById[id] !== undefined) next[id] = resultsById[id];
           });
           return next;
         });
+
+        lastFetchSignatureRef.current = detailsFilterSignature;
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error("DirectoryScorecardsPage: failed to load record details:", e);
@@ -137,7 +179,12 @@ export function DirectoryScorecardsPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedIds, config.recordDetailsEndpoint, config.selection?.rowIdQueryParam]);
+  }, [
+    selectedIds,
+    detailsFilterSignature,
+    config.recordDetailsEndpoint,
+    config.selection?.rowIdQueryParam,
+  ]);
 
   const formatterRegistry = useMemo(() => config.formatters || {}, [config.formatters]);
   const panelsTemplate = useMemo(() => config.panels || [], [config.panels]);
