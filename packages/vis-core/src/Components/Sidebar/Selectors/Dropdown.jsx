@@ -5,7 +5,7 @@ import styled, { useTheme } from 'styled-components';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { useFilterContext } from 'hooks';
 import { SelectorLabel } from '.';
-import { makeSelectStyles } from 'utils/selectStyles';
+import { makeSelectStyles, selectComponents } from 'utils/selectStyles';
 
 const CONTROL_COLOUR = 'rgb(220, 220, 220)';
 
@@ -177,12 +177,18 @@ export const Dropdown = ({ filter, onChange }) => {
   const selectStyles = useMemo(() => makeSelectStyles(theme), [theme]);
 
   const { state: filterState } = useFilterContext();
-  const animatedComponents = makeAnimated();
   const [loading, setLoading] = useState(false);
   const [isInfoCollapsed, setInfoCollapsed] = useState(false);
   const prevOptionsRef = useRef([]);
   const prevSelectedOptionsRef = useRef(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
+  const animatedComponents = useMemo(
+    () => ({
+      ...makeAnimated(),
+      ...selectComponents,
+    }),
+    []
+  );
 
   const baseOptions = useMemo(() => {
     return filter.values.values
