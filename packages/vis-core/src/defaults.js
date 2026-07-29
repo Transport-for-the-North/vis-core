@@ -1,6 +1,7 @@
 import { getMapApiToken } from './runtime'; 
 export const mapStyles = {
   geoapifyPositron: () => `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${getMapApiToken()}`,
+  geoapifyDarkMatter: () => `https://maps.geoapify.com/v1/styles/dark-matter/style.json?apiKey=${getMapApiToken()}`,
 
   osMapsApiRaster: () => ({
     version: 8,

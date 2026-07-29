@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { syncMaps } from "utils";
 import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "defaults";
@@ -11,7 +11,8 @@ import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "defaults";
  * @param {string} mapStyle - A custom map style to be used for both maps.
  * @param {Array<number>} mapCentre - The initial map center coordinates [longitude, latitude].
  * @param {number} mapZoom - The initial map zoom level.
- * @returns {Object} An object containing the left and right map instances, map style loaded state, map loaded state, and map ready state.
+ * @param {string} extraCopyrightText - Extra copyright text for attribution.
+ * @returns {Object} An object containing the left and right map instances, map loaded states, and base source refs.
  */
 export const useDualMaps = (
   leftMapContainerRef,
@@ -27,12 +28,96 @@ export const useDualMaps = (
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const isMapReady = isMapLoaded && isMapStyleLoaded;
 
+  const leftKnownBaseSourceIds = useRef(null);
+  const rightKnownBaseSourceIds = useRef(null);
+  const knownBaseSourceIds = useRef({
+    left: null,
+    right: null,
+  });
+
   useEffect(() => {
+    let leftMapInstance = null;
+    let rightMapInstance = null;
+    let isCleanedUp = false;
+
+    let leftLoaded = false;
+    let rightLoaded = false;
+    let leftStyleLoaded = false;
+    let rightStyleLoaded = false;
+
+    let leftContainerResizeObserver = null;
+    let rightContainerResizeObserver = null;
+
+    /**
+     * Safely resize/repaint a map.
+     */
+    const safeResizeAndRepaint = (mapInstance) => {
+      if (isCleanedUp || !mapInstance) return;
+
+      try {
+        mapInstance.resize();
+        mapInstance.triggerRepaint?.();
+      } catch {
+        // Ignore resize/repaint calls after map removal.
+      }
+    };
+
+    /**
+     * Capture the initial base source IDs for one side.
+     * 
+     * These are used later during runtime style switching so the application can
+     * preserve custom sources/layers while replacing only the basemap style.
+     */
+    const captureInitialBaseSourceIds = (side, mapInstance) => {
+      if (!mapInstance) return;
+
+      if (side === "left" && leftKnownBaseSourceIds.current) return;
+      if (side === "right" && rightKnownBaseSourceIds.current) return;
+
+      const style = mapInstance.getStyle();
+      const sourceIds = Object.keys(style?.sources ?? {});
+      const sourceIdSet = new Set(sourceIds);
+
+      if (side === "left") {
+        leftKnownBaseSourceIds.current = sourceIdSet;
+      } else {
+        rightKnownBaseSourceIds.current = sourceIdSet;
+      }
+
+      knownBaseSourceIds.current[side] = sourceIdSet;
+    };
+
+    /**
+     * Expose the map instances only when both maps have loaded.
+     */
+    const maybeExposeMaps = () => {
+      if (isCleanedUp) return;
+
+      if (leftStyleLoaded && rightStyleLoaded) {
+        setIsMapStyleLoaded(true);
+      }
+
+      if (leftLoaded && rightLoaded) {
+        setIsMapLoaded(true);
+        setLeftMap(leftMapInstance);
+        setRightMap(rightMapInstance);
+      }
+    };
+
     /**
      * Initializes the two MapLibre map instances.
      */
-    const initializeDualMap = () => {      
-      const styleValue = typeof mapStyle === "function" ? mapStyle() : (mapStyle || defaultMapStyle);
+    const initializeDualMap = () => {
+      const leftContainer = leftMapContainerRef.current;
+      const rightContainer = rightMapContainerRef.current;
+
+      if (!leftContainer || !rightContainer) return;
+
+      const styleValue = typeof mapStyle === "function" ? mapStyle() : mapStyle ||
+            (typeof defaultMapStyle === "function"
+              ? defaultMapStyle()
+              : defaultMapStyle);
+
       const commonOptions = {
         style: styleValue,
         center: mapCentre || defaultMapCentre,
@@ -55,35 +140,48 @@ export const useDualMaps = (
               url: new Request(url).url
             };
           }
+          return { url };
         },
       };
 
-      const leftMapInstance = new maplibregl.Map({
-        container: leftMapContainerRef.current,
+      leftMapInstance = new maplibregl.Map({
+        container: leftContainer,
+        ...commonOptions,
+      });
+
+      rightMapInstance = new maplibregl.Map({
+        container: rightContainer,
         ...commonOptions,
       });
       
       // Add event listeners after map creation
-      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
-      leftMapInstance.on("load", () => {
-        setIsMapLoaded(true);
+      leftMapInstance.on("style.load", () => {
+        leftStyleLoaded = true;
+        captureInitialBaseSourceIds("left", leftMapInstance);
+        maybeExposeMaps();
       });
+
+      leftMapInstance.on("load", () => {
+        leftLoaded = true;
+        maybeExposeMaps();
+      });
+
       leftMapInstance.addControl(
         new maplibregl.NavigationControl(),
         "bottom-left"
       );
-      leftMapInstance.resize();
 
-      const rightMapInstance = new maplibregl.Map({
-        container: rightMapContainerRef.current,
-        ...commonOptions,
+      rightMapInstance.on("style.load", () => {
+        rightStyleLoaded = true;
+        captureInitialBaseSourceIds("right", rightMapInstance);
+        maybeExposeMaps();
       });
-      
-      // Add event listeners after map creation
-      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+
       rightMapInstance.on("load", () => {
-        setIsMapLoaded(true);
+        rightLoaded = true;
+        maybeExposeMaps();
       });
+
       rightMapInstance.addControl(
         new maplibregl.NavigationControl(),
         "bottom-left"
@@ -95,9 +193,41 @@ export const useDualMaps = (
         }),
         "bottom-right"
       );
-      rightMapInstance.resize();
 
-      const isMobile = window.matchMedia('(max-width: 900px)').matches;
+      /**
+       * Resize observers.
+       *
+       * DualMaps.jsx also has resize handling, but doing it here too makes the
+       * hook more resilient during first load and layout changes.
+       */
+      if ("ResizeObserver" in window) {
+        leftContainerResizeObserver = new ResizeObserver(() => {
+          requestAnimationFrame(() => {
+            safeResizeAndRepaint(leftMapInstance);
+          });
+        });
+
+        rightContainerResizeObserver = new ResizeObserver(() => {
+          requestAnimationFrame(() => {
+            safeResizeAndRepaint(rightMapInstance);
+          });
+        });
+
+        leftContainerResizeObserver.observe(leftContainer);
+        rightContainerResizeObserver.observe(rightContainer);
+      }
+
+      /**
+       * Initial resize.
+       */
+      safeResizeAndRepaint(leftMapInstance);
+      safeResizeAndRepaint(rightMapInstance);
+
+      /**
+       * Mobile interaction adjustment.
+       */
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+
       if (isMobile) {
         [leftMapInstance, rightMapInstance].forEach(map => {
           map.scrollZoom.disable();      // prevent single-finger zoom
@@ -114,26 +244,42 @@ export const useDualMaps = (
 
       // Synchronize the two maps
       syncMaps(leftMapInstance, rightMapInstance);
-
-      setLeftMap(leftMapInstance);
-      setRightMap(rightMapInstance);
     };
 
-    if (!leftMap && !rightMap) {
-      initializeDualMap();
-    }
+    initializeDualMap();
 
     return () => {
-      if (leftMap) {
-        leftMap.remove();
-        setLeftMap(null);
+      isCleanedUp = true;
+
+      if (leftContainerResizeObserver) {
+        leftContainerResizeObserver.disconnect();
       }
-      if (rightMap) {
-        rightMap.remove();
-        setRightMap(null);
+
+      if (rightContainerResizeObserver) {
+        rightContainerResizeObserver.disconnect();
       }
+
+      if (leftMapInstance) {
+        leftMapInstance.remove();
+        leftMapInstance = null;
+      }
+
+      if (rightMapInstance) {
+        rightMapInstance.remove();
+        rightMapInstance = null;
+      }
+
+      setLeftMap(null);
+      setRightMap(null);
       setIsMapLoaded(false);
       setIsMapStyleLoaded(false);
+
+      leftKnownBaseSourceIds.current = null;
+      rightKnownBaseSourceIds.current = null;
+      knownBaseSourceIds.current = {
+        left: null,
+        right: null,
+      };
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -160,6 +306,6 @@ export const useDualMaps = (
   }, [leftMap, rightMap, mapZoom]);
 
 
-
-  return { leftMap, rightMap, isMapStyleLoaded, isMapLoaded, isMapReady };
+  
+  return { leftMap, rightMap, isMapStyleLoaded, isMapLoaded, isMapReady, leftKnownBaseSourceIds, rightKnownBaseSourceIds, knownBaseSourceIds, };
 };

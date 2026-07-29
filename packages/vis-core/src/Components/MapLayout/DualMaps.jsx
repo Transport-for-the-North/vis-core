@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import { DynamicLegend } from "Components";
 import { useDualMaps, useMapContext, useFilterContext } from "hooks";
+import { actionTypes } from "reducers";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 
@@ -21,12 +22,14 @@ import {
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from './Layer'
+import MapStyleToggle from "./MapStyleToggle";
 import "./MapLayout.css";
 
 const Wrap = styled.div`
   display: flex;
   height: 100%;
   width: 100%;
+  position: relative;
   @media ${props => props.theme.mq.mobile} {
     flex-direction: column;
     height: auto; /* let content dictate height */
@@ -61,6 +64,13 @@ const StyledMapContainer = styled.div`
 `;
 
 /**
+ * Safely get a source id from a MapLibre style layer.
+ */
+function getLayerSourceId(layer) {
+  return typeof layer?.source === "string" ? layer.source : null;
+}
+
+/**
  * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
  *
@@ -69,9 +79,27 @@ const StyledMapContainer = styled.div`
 const DualMaps = (props) => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
+  const appliedMapStyleRef = useRef({ left: null, right: null });
+
+  /**
+   * Local fallback refs for known base source ids.
+   *
+   * Ideally useDualMaps should eventually return one knownBaseSourceIds ref per map,
+   * like useMap does for the single map. Until then, DualMaps keeps its own refs here.
+   */
+  const localKnownBaseSourceIdsRef = useRef({
+    left: null,
+    right: null,
+  });
+
+  const hasDispatchedInitialBaseSourceIdsRef = useRef({
+    left: false,
+    right: false,
+  });
+
   const { state, dispatch } = useMapContext();
   const { mapStyle, mapCentre, mapZoom } = state;
-  const { leftMap, rightMap, isMapReady } = useDualMaps(
+  const dualMapResult = useDualMaps(
     leftMapContainerRef,
     rightMapContainerRef,
     mapStyle,
@@ -79,6 +107,21 @@ const DualMaps = (props) => {
     mapZoom,
     props.extraCopyrightText
   );
+
+  const {
+    leftMap,
+    rightMap,
+    isMapReady,
+
+    /**
+     * These are optional. This lets this component work now even if useDualMaps
+     * does not return them yet.
+     */
+    leftKnownBaseSourceIds,
+    rightKnownBaseSourceIds,
+    knownBaseSourceIds,
+  } = dualMapResult;
+
   const { dispatch: filterDispatch } = useFilterContext();
 
   const maps = { left: leftMap, right: rightMap };
@@ -90,6 +133,247 @@ const DualMaps = (props) => {
   const hoverEventIdRef = useRef(0);
   const hoverInfoRef = useRef({ left: {}, right: {} });
   const prevHoveredFeaturesRef = useRef({ left: [], right: [] });
+
+  /**
+   * Resolve the known base-source-id Set for one side.
+   *
+   * Priority:
+   * 1. useDualMaps side-specific ref if available
+   * 2. useDualMaps shared object/ref if available
+   * 3. local DualMaps fallback ref
+   * 4. last-resort capture from current map style
+   */
+  const getKnownBaseSourceIdsForSide = useCallback(
+    (side) => {
+      const map = side === "left" ? leftMap : rightMap;
+
+      const sideSpecificHookRef =
+        side === "left" ? leftKnownBaseSourceIds : rightKnownBaseSourceIds;
+
+      if (sideSpecificHookRef?.current) {
+        return sideSpecificHookRef.current;
+      }
+
+      if (knownBaseSourceIds?.[side]?.current) {
+        return knownBaseSourceIds[side].current;
+      }
+
+      if (knownBaseSourceIds?.current?.[side]) {
+        return knownBaseSourceIds.current[side];
+      }
+
+      if (localKnownBaseSourceIdsRef.current[side]) {
+        return localKnownBaseSourceIdsRef.current[side];
+      }
+
+      if (map) {
+        const style = map.getStyle();
+        const ids = new Set(Object.keys(style?.sources ?? {}));
+        localKnownBaseSourceIdsRef.current[side] = ids;
+        return ids;
+      }
+
+      return new Set(state.baseSourceIds ?? []);
+    },
+    [
+      leftMap,
+      rightMap,
+      leftKnownBaseSourceIds,
+      rightKnownBaseSourceIds,
+      knownBaseSourceIds,
+      state.baseSourceIds,
+    ]
+  );
+
+  /**
+   * Store the known base-source-id Set for one side.
+   */
+  const setKnownBaseSourceIdsForSide = useCallback(
+    (side, idsSet) => {
+      const sideSpecificHookRef =
+        side === "left" ? leftKnownBaseSourceIds : rightKnownBaseSourceIds;
+
+      if (sideSpecificHookRef) {
+        sideSpecificHookRef.current = idsSet;
+      }
+
+      if (knownBaseSourceIds?.[side]) {
+        knownBaseSourceIds[side].current = idsSet;
+      }
+
+      if (knownBaseSourceIds?.current && typeof knownBaseSourceIds.current === "object") {
+        knownBaseSourceIds.current[side] = idsSet;
+      }
+
+      localKnownBaseSourceIdsRef.current[side] = idsSet;
+    },
+    [leftKnownBaseSourceIds, rightKnownBaseSourceIds, knownBaseSourceIds]
+  );
+
+  /**
+   * Capture and dispatch initial base source ids for each side.
+   *
+   * This mirrors the single-map Map.jsx behaviour, but keeps each side separate.
+   */
+  useEffect(() => {
+    ["left", "right"].forEach((side) => {
+      const map = maps[side];
+      if (!map) return;
+      if (hasDispatchedInitialBaseSourceIdsRef.current[side]) return;
+
+      const idsSet = getKnownBaseSourceIdsForSide(side);
+      if (!idsSet || idsSet.size === 0) return;
+
+      const ids = Array.from(idsSet);
+
+      dispatch({
+        type: actionTypes.SET_BASE_SOURCE_IDS,
+        payload: ids,
+      });
+
+      hasDispatchedInitialBaseSourceIdsRef.current[side] = true;
+
+      console.log(`[DualMaps] Dispatched initial base source IDs for ${side}:`, ids);
+    });
+  }, [
+    leftMap,
+    rightMap,
+    getKnownBaseSourceIdsForSide,
+    dispatch,
+  ]);
+
+  /**
+   * Creates a transformStyle callback for one side of the dual map.
+   *
+   * This preserves custom/app sources and layers when switching the basemap.
+   */
+  const createTransformStyleForSide = useCallback(
+    (side) => {
+      return (previousStyle, nextStyle) => {
+        const previousBaseSourceIds = getKnownBaseSourceIdsForSide(side);
+
+        /**
+         * Custom sources are anything in the current/previous style that was
+         * NOT part of the previous basemap.
+         */
+        const customSourceEntries = Object.entries(
+          previousStyle.sources ?? {}
+        ).filter(([sourceId]) => !previousBaseSourceIds.has(sourceId));
+
+        const customSources = Object.fromEntries(customSourceEntries);
+
+        const customSourceIds = new Set(
+          customSourceEntries.map(([sourceId]) => sourceId)
+        );
+
+        /**
+         * Custom layers are layers attached to custom sources.
+         */
+        const customLayers = (previousStyle.layers ?? []).filter((layer) => {
+          const sourceId = getLayerSourceId(layer);
+          if (!sourceId) return false;
+
+          return (
+            customSourceIds.has(sourceId) ||
+            !previousBaseSourceIds.has(sourceId)
+          );
+        });
+
+        /**
+         * The incoming style is now the new basemap. Store its source ids as
+         * the latest known base source ids for this side.
+         */
+        const nextBaseSourceIds = new Set(
+          Object.keys(nextStyle.sources ?? {})
+        );
+
+        setKnownBaseSourceIdsForSide(side, nextBaseSourceIds);
+
+        dispatch({
+          type: actionTypes.SET_BASE_SOURCE_IDS,
+          payload: Array.from(nextBaseSourceIds),
+        });
+
+        /**
+         * Avoid duplicate layer IDs if the incoming basemap has any layer with
+         * the same ID as one of our custom layers.
+         */
+        const nextLayerIds = new Set(
+          (nextStyle.layers ?? []).map((layer) => layer.id)
+        );
+
+        const safeCustomLayers = customLayers.filter(
+          (layer) => !nextLayerIds.has(layer.id)
+        );
+
+        const mergedStyle = {
+          ...nextStyle,
+          sources: {
+            ...(nextStyle.sources ?? {}),
+            ...customSources,
+          },
+          layers: [
+            ...(nextStyle.layers ?? []),
+            ...safeCustomLayers,
+          ],
+        };
+
+        return mergedStyle;
+      };
+    },
+    [
+      getKnownBaseSourceIdsForSide,
+      setKnownBaseSourceIdsForSide,
+      dispatch,
+    ]
+  );
+
+  /**
+   * Runtime style switching for both maps.
+   *
+   * Uses MapLibre transformStyle so custom app sources/layers stay visible
+   * when toggling between light and dark basemaps.
+   */
+  useEffect(() => {
+    if (!maps.left || !maps.right || !state.mapStyle) return;
+
+    const nextMapStyle =
+      typeof state.mapStyle === "function" ? state.mapStyle() : state.mapStyle;
+
+    if (
+      appliedMapStyleRef.current.left === null &&
+      appliedMapStyleRef.current.right === null
+    ) {
+      appliedMapStyleRef.current = {
+        left: nextMapStyle,
+        right: nextMapStyle,
+      };
+      return;
+    }
+
+    if (appliedMapStyleRef.current.left !== nextMapStyle) {
+      appliedMapStyleRef.current.left = nextMapStyle;
+
+      maps.left.setStyle(nextMapStyle, {
+        diff: true,
+        transformStyle: createTransformStyleForSide("left"),
+      });
+    }
+
+    if (appliedMapStyleRef.current.right !== nextMapStyle) {
+      appliedMapStyleRef.current.right = nextMapStyle;
+
+      maps.right.setStyle(nextMapStyle, {
+        diff: true,
+        transformStyle: createTransformStyleForSide("right"),
+      });
+    }
+  }, [
+    leftMap,
+    rightMap,
+    state.mapStyle,
+    createTransformStyleForSide,
+  ]);
 
   /**
    * Generates HTML for metadata section of tooltips
@@ -487,6 +771,15 @@ const DualMaps = (props) => {
               ({ feature, layerId, featureName, joinToDefault }) => {
                 const layerConfig = state.layers[layerId];
                 const customTooltip = layerConfig?.customTooltip;
+
+                if (!customTooltip) {
+                  return Promise.resolve(
+                    joinToDefault
+                      ? "<p>Data unavailable.</p>"
+                      : buildErrorTooltip(featureName)
+                  );
+                }
+
                 const { htmlTemplate, customFormattingFunctions } = customTooltip;
                 const featureId = feature.id;
                 const requestUrlResolved = resolveTooltipRequestUrl(customTooltip, featureId);
@@ -571,7 +864,7 @@ const DualMaps = (props) => {
         }
       });
     },
-    [maps, state.layers, state.visualisations]
+    [leftMap, rightMap, state.layers, state.visualisations, generateMetadataHtml]
   );
 
 
@@ -584,6 +877,7 @@ const DualMaps = (props) => {
   const handleLayerClick = (e, layerId, bufferSize) => {
     ["left", "right"].forEach((side) => {
       const map = maps[side];
+      if (!map) return;
 
       if (popups[side]?.[layerId]?.length) {
         popups[side][layerId].forEach((popup) => popup.remove());
@@ -645,7 +939,7 @@ const DualMaps = (props) => {
         }
       });
     },
-    [maps]
+    [leftMap, rightMap]
   );
 
    /**
@@ -661,10 +955,11 @@ const DualMaps = (props) => {
     (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       ["left", "right"].forEach((side) => {
         const map = maps[side];
+        if (!map) return;
         const mapZoomLevel = map.getZoom();
 
         dispatch({
-          type: "STORE_CURRENT_ZOOM",
+          type: actionTypes.STORE_CURRENT_ZOOM,
           payload: mapZoomLevel,
         });
 
@@ -680,7 +975,7 @@ const DualMaps = (props) => {
             });
             
             if (features.length > 0) {
-              const geometryType = features[0].geometry.type
+              const geometryType = features[0].geometry.type;
               
               // Determine symbol placement based on geometry type
               let symbolPlacement = 'point'; // Default to point
@@ -717,7 +1012,7 @@ const DualMaps = (props) => {
         }
       });
     },
-    [maps]
+    [leftMap, rightMap, dispatch]
   );
 
   useEffect(() => {
@@ -726,6 +1021,7 @@ const DualMaps = (props) => {
     Object.keys(state.layers).forEach((layerId) => {
       ["left", "right"].forEach((side) => {
         const map = maps[side];
+
         if (state.layers[layerId].shouldHaveLabel) {
           const layerData = state.layers[layerId];
           const zoomLevel = layerData.labelZoomLevel || 12;
@@ -776,21 +1072,23 @@ const DualMaps = (props) => {
       Object.keys(state.layers).forEach((layerId) => {
         ["left", "right"].forEach((side) => {
           const map = maps[side];
+          if (!map) return;
+
           if (state.layers[layerId].shouldHaveTooltipOnClick) {
             const { clickCallback, hoverCallback, zoomHandler } =
-              listenerCallbackRef.current[layerId];
-            map.off("click", clickCallback);
-            map.off("mousemove", hoverCallback);
-            map.off('zoomend', zoomHandler);
+              listenerCallbackRef.current[layerId] || {};
+            if (clickCallback) map.off("click", clickCallback);
+            if (hoverCallback) map.off("mousemove", hoverCallback);
+            if (zoomHandler) map.off('zoomend', zoomHandler);
           }
           if (state.layers[layerId].shouldHaveLabel) {
             const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-            map.off('zoomend', zoomHandler);
+            if (zoomHandler) map.off('zoomend', zoomHandler);
           }
         });
       });
     };
-  }, [maps, handleLayerLeave, state.layers, state.visualisations]);
+  }, [leftMap, rightMap, handleLayerLeave, handleMapHover, handleZoom, state.layers, state.visualisations]);
 
   /**
    * Handles map click events and dispatches actions based on the clicked feature.
@@ -812,6 +1110,8 @@ const DualMaps = (props) => {
       mapFilters.forEach((filter) => {
         ["left", "right"].forEach((side) => {
           const map = maps[side];
+          if (!map) return;
+
           const features = map.queryRenderedFeatures(point, {
             layers: [filter.layer],
           });
@@ -874,25 +1174,25 @@ const DualMaps = (props) => {
         });
       });
     },
-    [isMapReady, maps, state.filters, dispatch]
+    [isMapReady, leftMap, rightMap, state.filters, dispatch, filterDispatch]
   );
 
   // Run once to set the state of the map
   useEffect(() => {
     if (isMapReady) {
       dispatch({
-        type: "SET_MAP",
+        type: actionTypes.SET_MAP,
         payload: { map: maps.left },
       });
       dispatch({
-        type: "SET_DUAL_MAPS",
+        type: actionTypes.SET_DUAL_MAPS,
         payload: { maps: [maps.left, maps.right] },
       });
     }
-  }, [isMapReady]);
+  }, [isMapReady, leftMap, rightMap, dispatch]);
 
   useEffect(() => {
-    if (isMapReady & (state.filters.length > 0)) {
+    if (isMapReady && (state.filters.length > 0)) {
       const hasMapFilter = state.filters.some(
         (filter) => filter.type === "map"
       );
@@ -910,7 +1210,7 @@ const DualMaps = (props) => {
         });
       }
     };
-  }, [isMapReady, maps, handleMapClick]);
+  }, [isMapReady, leftMap, rightMap, handleMapClick, state.filters]);
 
   useEffect(() => {
   if (!leftMap || !rightMap) return;
@@ -929,8 +1229,15 @@ const DualMaps = (props) => {
     });
    }
 
-  const roLeft = new ResizeObserver(() => leftMap.resize());
-  const roRight = new ResizeObserver(() => rightMap.resize());
+  const resizeMap = (map) => {
+    requestAnimationFrame(() => {
+      map.resize();
+      map.triggerRepaint?.();
+    });
+  };
+
+  const roLeft = new ResizeObserver(() => resizeMap(leftMap));
+  const roRight = new ResizeObserver(() => resizeMap(rightMap));
 
   if (leftMapContainerRef.current) roLeft.observe(leftMapContainerRef.current);
   if (rightMapContainerRef.current) roRight.observe(rightMapContainerRef.current);
@@ -938,20 +1245,32 @@ const DualMaps = (props) => {
   // Also force a resize when the media query flips
   const mq = window.matchMedia('(max-width: 900px)');
   const onChange = () => {
-    leftMap.resize();
-    rightMap.resize();
+    resizeMap(leftMap);
+    resizeMap(rightMap);
   };
-  mq.addEventListener('change', onChange);
+
+  if (mq.addEventListener) {
+    mq.addEventListener('change', onChange);
+  } else {
+    mq.addListener(onChange);
+  }
 
   return () => {
     roLeft.disconnect();
     roRight.disconnect();
-    mq.removeEventListener('change', onChange);
+
+    if (mq.removeEventListener) {
+      mq.removeEventListener('change', onChange);
+    } else {
+      mq.removeListener(onChange);
+    }
   };
 }, [leftMap, rightMap]);
 
   return (
     <Wrap>
+      <MapStyleToggle />
+
       <StyledMapContainer ref={leftMapContainerRef}>
         {Object.values(state.layers).map((layer) => (
           <Layer key={layer.name} layer={layer} />
@@ -972,6 +1291,10 @@ const DualMaps = (props) => {
           left={false}
         />}
         {isMapReady &&
+          state.leftVisualisations &&
+          state.rightVisualisations &&
+          Object.keys(state.leftVisualisations).length > 0 &&
+          Object.keys(state.rightVisualisations).length > 0 &&
           (state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
             .data.length === 0 &&
           state.rightVisualisations[Object.keys(state.rightVisualisations)[0]]

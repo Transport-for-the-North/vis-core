@@ -81,6 +81,7 @@ export const MapProvider = ({ children }) => {
     mapZoom: pageContext.customMapZoom
       ? parseFloat(pageContext.customMapZoom)
       : defaultMapZoom,
+    baseSourceIds: [],
     layers: {},
     visualisations: {},
     leftVisualisations: {},
@@ -105,8 +106,7 @@ export const MapProvider = ({ children }) => {
       ? parseFloat(pageContext.customMapZoom)
       : defaultMapZoom,
   };
-
-
+  
   const [state, dispatch] = useReducer(mapReducer, initialState);
 
   const contextValue = React.useMemo(() => {

@@ -22,10 +22,27 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const isMapReady = isMapLoaded && isMapStyleLoaded;
   const belowBarRef = useRef(null);
+  const knownBaseSourceIds = useRef(null);
 
   useEffect(() => {
     // Will be assigned after Map construction; transformRequest can still close over it.
     let mapInstance = null;
+
+    /**
+     * Captures the initial basemap source IDs once.
+     * 
+     * These are used later during runtime style switching so the application can
+     * preserve custom sources/layers while replacing only the basemap style.
+     */
+    const captureInitialBaseSourceIds = () => {
+      if (!mapInstance || knownBaseSourceIds.current) return;
+
+      const style = mapInstance.getStyle();
+      const sourceIds = Object.keys(style?.sources ?? {});
+
+      knownBaseSourceIds.current = new Set(sourceIds);
+    };
+
     /**
      * Initializes the MapLibre map instance.
      */
@@ -107,9 +124,18 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       });
 
       // Add event listeners after map creation
-      mapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      mapInstance.on("style.load", () => {
+        setIsMapStyleLoaded(true);
+
+        // Capture initial basemap sources once, before app layers are added.
+        captureInitialBaseSourceIds();
+      });
+
       mapInstance.on("load", () => {
         setIsMapLoaded(true);
+
+        // Expose map after initial load.
+        setMap(mapInstance);
       });
 
       const nav = new maplibregl.NavigationControl({ showZoom: true, showCompass: true });
@@ -178,10 +204,28 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       window.addEventListener('resize', updateNavOffset);
       window.addEventListener('orientationchange', updateNavOffset);
 
+      let containerResizeObserver;
+
+      if ("ResizeObserver" in window && container) {
+        containerResizeObserver = new ResizeObserver(() => {
+          if (!mapInstance) return;
+
+          requestAnimationFrame(() => {
+            mapInstance.resize();
+            mapInstance.triggerRepaint?.();
+          });
+        });
+
+        containerResizeObserver.observe(container);
+      }
+
       // keep refs for cleanup
       mapInstance.__nav = nav;
       mapInstance.__navMql = mql;
       mapInstance.__navOnChange = onMqChange;
+      mapInstance.__navResizeObserver = ro;
+      mapInstance.__navUpdateOffset = updateNavOffset;
+      mapInstance.__containerResizeObserver = containerResizeObserver;
 
       mapInstance.resize();
 
@@ -197,14 +241,6 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         mapInstance.touchZoomRotate.enable();
         mapInstance.touchZoomRotate.disableRotation(); // optional
       }
-
-      if (mql?.removeEventListener) mql.removeEventListener('change', onMqChange);
-
-      if (ro) ro.disconnect();
-      window.removeEventListener('resize', updateNavOffset);
-      window.removeEventListener('orientationchange', updateNavOffset);
-
-      setMap(mapInstance);
     };
 
     initializeMap();
@@ -212,10 +248,34 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
     return () => {
       if (mapInstance) {
         console.log("Cleaning up map instance");
+
+        const mql = mapInstance.__navMql;
+        const onMqChange = mapInstance.__navOnChange;
+        const updateNavOffset = mapInstance.__navUpdateOffset;
+        const ro = mapInstance.__navResizeObserver;
+        const containerResizeObserver = mapInstance.__containerResizeObserver;
+
+        if (mql && onMqChange) {
+          if (mql.removeEventListener) {
+            mql.removeEventListener("change", onMqChange);
+          } else if (mql.removeListener) {
+            mql.removeListener(onMqChange);
+          }
+        }
+
+        if (ro) ro.disconnect();
+        if (containerResizeObserver) containerResizeObserver.disconnect();
+
+        if (updateNavOffset) {
+          window.removeEventListener('resize', updateNavOffset);
+          window.removeEventListener('orientationchange', updateNavOffset);
+        }
+
         mapInstance.remove();
         setMap(null);
         setIsMapLoaded(false);
         setIsMapStyleLoaded(false);
+        knownBaseSourceIds.current = null;
       }
     };
   }, []);
@@ -234,5 +294,11 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
     }
   }, [map, mapZoom]);
 
-  return { map, isMapStyleLoaded, isMapLoaded, isMapReady };
+  return {
+    map,
+    isMapStyleLoaded,
+    isMapLoaded,
+    isMapReady,
+    knownBaseSourceIds,
+  };
 };

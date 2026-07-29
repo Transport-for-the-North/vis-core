@@ -139,6 +139,7 @@ export const actionTypes = {
   UPDATE_MAP_CENTRE: "UPDATE_MAP_CENTRE",
   UPDATE_MAP_ZOOM: "UPDATE_MAP_ZOOM",
   UPDATE_MAP_STYLE: "UPDATE_MAP_STYLE",
+  SET_BASE_SOURCE_IDS: "SET_BASE_SOURCE_IDS",
   INITIALISE_SIDEBAR: "INITIALISE_SIDEBAR",
   SET_PAGE_INFO: "SET_PAGE_INFO",
   SET_MAP: "SET_MAP",
@@ -218,6 +219,15 @@ const mergeCategoricalLegendEntries = (currentCache = {}, nextEntries = {}) => {
  */
 export const mapReducer = (state, action) => {
   switch (action.type) {
+    case actionTypes.SET_BASE_SOURCE_IDS: {
+      return {
+        ...state,
+        baseSourceIds: Array.isArray(action.payload)
+          ? action.payload
+          : Array.from(action.payload ?? []),
+      };
+    }
+
     case actionTypes.STORE_CURRENT_ZOOM: {
       return { ...state, currentZoom: action.payload }
     }
@@ -260,6 +270,7 @@ export const mapReducer = (state, action) => {
     case actionTypes.RESET_CONTEXT:
       return {
         ...state,
+        baseSourceIds: [],
         layers: {},
         colorSchemesByLayer: {},
         visualisations: {},
