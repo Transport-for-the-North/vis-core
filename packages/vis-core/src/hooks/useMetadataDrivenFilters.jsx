@@ -3,6 +3,7 @@ import { PageContext, FilterContext } from "contexts";
 import { api } from "services";
 import { updateFilterValidity, correctInitialCrossFilterValues, correctRuntimeCrossFilterValues } from "utils";
 import { applyWhereConditions, sortValues, buildDeterministicFilterId } from "utils";
+import { fetchWithCache } from "utils/metadataCache";
 
 /**
  * callMetadataEndpoint
@@ -24,107 +25,15 @@ async function callMetadataEndpoint(endpoint) {
   return api.baseService.get(endpoint.path, opts);
 }
 
-const METADATA_CACHE_KEY_PREFIX = "metadata_cache_";
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-const metadataPromiseCache = new Map();
-
-// Clear all sessionStorage metadata entries on module initialisation.
-// This runs on every full page reload,
-// ensuring users always get fresh data after a refresh without needing to
-// open the console. The in-memory Map is naturally empty at this point since
-// the module is being freshly evaluated.
-try {
-  const keysToRemove = [];
-  for (let i = 0; i < sessionStorage.length; i++) {
-    const key = sessionStorage.key(i);
-    if (key && key.startsWith(METADATA_CACHE_KEY_PREFIX)) {
-      keysToRemove.push(key);
-    }
-  }
-  keysToRemove.forEach((key) => sessionStorage.removeItem(key));
-} catch (e) {
-  // sessionStorage may be unavailable in some environments (e.g. SSR, sandboxed iframes)
-}
-
 /**
- * Executes a GET or POST request for a metadata table and caches the resulting Promise.
- * This prevents duplicate concurrent network requests for the same metadata table and
- * caches the result across SPA page transitions that share the same metadata requirements.
- * Data is also persisted to sessionStorage with a TTL so that cache entries expire
- * automatically and don't serve stale data indefinitely.
+ * Fetch a metadata table through the shared TTL cache.
+ * Delegates to callMetadataEndpoint for the actual network request.
  *
- * Cache invalidation strategy:
- * - **In-memory Map**: Entries are stored with a timestamp and checked against CACHE_TTL_MS.
- *   Expired entries are evicted on the next access.
- * - **sessionStorage**: Entries store { data, timestamp } and are TTL-checked on read.
- *   All entries are also cleared on module initialisation (i.e. any full page reload).
- * - **On error**: Both in-memory and sessionStorage entries are removed so the next
- *   call always retries the network.
- *
- * @param {Object} endpoint - The endpoint configuration object.
- * @param {string} endpoint.path - The API path for the metadata table.
- * @param {'GET'|'POST'} [endpoint.requestMethod='GET'] - The HTTP method to use.
- * @param {Object} [endpoint.requestOptions] - Additional fetch options.
- * @param {Object} [endpoint.body] - The request body for POST requests.
- * @returns {Promise<any>} A Promise that resolves to the parsed response payload.
- * @throws {Error} Propagates API errors and automatically invalidates the failed cache entry.
+ * @param {Object} endpoint - Endpoint configuration object.
+ * @returns {Promise<any>} Parsed response payload (possibly cached).
  */
 async function callMetadataEndpointWithCache(endpoint) {
-  const cacheKey = JSON.stringify({
-    path: endpoint.path,
-    method: (endpoint.requestMethod || "GET").toUpperCase(),
-    body: endpoint.body || {}
-  });
-
-  // 1. Check in-memory promise cache with TTL (prevents duplicate simultaneous requests)
-  const cached = metadataPromiseCache.get(cacheKey);
-  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
-    return cached.promise;
-  }
-  // Expired: remove stale entry so it doesn't block a fresh fetch
-  if (cached) {
-    metadataPromiseCache.delete(cacheKey);
-  }
-
-  // 2. Check sessionStorage with TTL
-  const storageKey = METADATA_CACHE_KEY_PREFIX + cacheKey;
-  const storedRaw = sessionStorage.getItem(storageKey);
-  if (storedRaw) {
-    try {
-      const stored = JSON.parse(storedRaw);
-      if (stored.timestamp && (Date.now() - stored.timestamp < CACHE_TTL_MS)) {
-        // Populate in-memory cache to avoid repeated JSON.parse on subsequent calls
-        const resolvedPromise = Promise.resolve(stored.data);
-        metadataPromiseCache.set(cacheKey, { promise: resolvedPromise, timestamp: stored.timestamp });
-        return resolvedPromise;
-      }
-      // Expired: remove stale entry
-      sessionStorage.removeItem(storageKey);
-    } catch (e) {
-      console.warn("Failed to parse cached metadata from sessionStorage, removing entry", e);
-      sessionStorage.removeItem(storageKey);
-    }
-  }
-
-  // 3. Fetch from network and cache with timestamp
-  const now = Date.now();
-  const promise = callMetadataEndpoint(endpoint)
-    .then((data) => {
-      try {
-        sessionStorage.setItem(storageKey, JSON.stringify({ data, timestamp: now }));
-      } catch (e) {
-        console.warn("Failed to persist metadata to sessionStorage. Quota exceeded?", e);
-      }
-      return data;
-    })
-    .catch((err) => {
-      metadataPromiseCache.delete(cacheKey);
-      sessionStorage.removeItem(storageKey);
-      throw err;
-    });
-
-  metadataPromiseCache.set(cacheKey, { promise, timestamp: now });
-  return promise;
+  return fetchWithCache(endpoint, callMetadataEndpoint);
 }
 
 /**
