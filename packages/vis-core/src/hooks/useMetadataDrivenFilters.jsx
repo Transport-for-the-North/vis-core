@@ -3,6 +3,7 @@ import { PageContext, FilterContext } from "contexts";
 import { api } from "services";
 import { updateFilterValidity, correctInitialCrossFilterValues, correctRuntimeCrossFilterValues } from "utils";
 import { applyWhereConditions, sortValues, buildDeterministicFilterId } from "utils";
+import { fetchWithCache } from "utils/metadataCache";
 
 /**
  * callMetadataEndpoint
@@ -24,63 +25,15 @@ async function callMetadataEndpoint(endpoint) {
   return api.baseService.get(endpoint.path, opts);
 }
 
-const METADATA_CACHE_KEY_PREFIX = "metadata_cache_";
-const metadataPromiseCache = new Map();
-
 /**
- * Executes a GET or POST request for a metadata table and caches the resulting Promise.
- * This prevents duplicate concurrent network requests for the same metadata table and 
- * caches the result across page transitions that share the same metadata requirements.
- * Data is also persisted to sessionStorage to survive hard page reloads during a session.
+ * Fetch a metadata table through the shared TTL cache.
+ * Delegates to callMetadataEndpoint for the actual network request.
  *
- * @param {Object} endpoint - The endpoint configuration object.
- * @param {string} endpoint.path - The API path for the metadata table.
- * @param {'GET'|'POST'} [endpoint.requestMethod='GET'] - The HTTP method to use.
- * @param {Object} [endpoint.requestOptions] - Additional fetch options.
- * @param {Object} [endpoint.body] - The request body for POST requests.
- * @returns {Promise<any>} A Promise that resolves to the parsed response payload.
- * @throws {Error} Propagates API errors and automatically invalidates the failed cache entry.
+ * @param {Object} endpoint - Endpoint configuration object.
+ * @returns {Promise<any>} Parsed response payload (possibly cached).
  */
 async function callMetadataEndpointWithCache(endpoint) {
-  const cacheKey = JSON.stringify({
-    path: endpoint.path,
-    method: (endpoint.requestMethod || "GET").toUpperCase(),
-    body: endpoint.body || {}
-  });
-
-  // 1. Check in-memory promise cache (prevents duplicate simultaneous requests)
-  if (metadataPromiseCache.has(cacheKey)) {
-    return metadataPromiseCache.get(cacheKey);
-  }
-
-  // 2. Check sessionStorage for persisted data from previous visits
-  const storageKey = METADATA_CACHE_KEY_PREFIX + cacheKey;
-  const storedData = sessionStorage.getItem(storageKey);
-  if (storedData) {
-    try {
-      return JSON.parse(storedData);
-    } catch (e) {
-      console.warn("Failed to parse cached metadata from sessionStorage", e);
-    }
-  }
-
-  // 3. Fetch from network and cache
-  const promise = callMetadataEndpoint(endpoint)
-    .then((data) => {
-      try {
-        sessionStorage.setItem(storageKey, JSON.stringify(data));
-      } catch (e) {
-        console.warn("Failed to persist metadata to sessionStorage. Quota exceeded?", e);
-      }
-      return data;
-    })
-    .catch((err) => {
-      metadataPromiseCache.delete(cacheKey);
-      throw err;
-    });
-
-  metadataPromiseCache.set(cacheKey, promise);
-  return promise;
+  return fetchWithCache(endpoint, callMetadataEndpoint);
 }
 
 /**
