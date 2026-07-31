@@ -137,6 +137,7 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
             legendSubtitleText: row[filter.values?.legendSubtitleTextColumn] || null,
             infoOnHover: row[filter.values?.infoOnHoverColumn] ?? null,
             infoBelowOnChange: row[filter.values?.infoBelowOnChangeColumn] ?? null,
+            sortValue: filter.values.sortColumn ? row[filter.values.sortColumn] : undefined,
           };
           // Deduplicate on (displayValue, paramValue)
           if (!options.some((o) => o.paramValue === value.paramValue && o.displayValue === value.displayValue)) {
