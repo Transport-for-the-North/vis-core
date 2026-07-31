@@ -453,9 +453,14 @@ export const getOutOfBandFlags = (data, numericEntries) => {
   const bandMax = bandEdges.reduce(maxReducer, -Infinity);
   const values = extractDataValues(data);
   if (values.length === 0) return { belowMin: false, aboveMax: false };
+  
+  // Apply a small tolerance to account for 2-decimal rounding in the 
+  // classification pipeline and floating point fuzziness.
+  const TOLERANCE = 0.005001;
+  
   return {
-    belowMin: values.reduce(minReducer, Infinity) < bandMin,
-    aboveMax: values.reduce(maxReducer, -Infinity) > bandMax,
+    belowMin: values.reduce(minReducer, Infinity) < bandMin - TOLERANCE,
+    aboveMax: values.reduce(maxReducer, -Infinity) > bandMax + TOLERANCE,
   };
 };
 
