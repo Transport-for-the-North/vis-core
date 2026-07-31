@@ -16,7 +16,7 @@ import {
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData, useFeatureStateUpdater, useVisualisationLoadingCounter } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 
@@ -165,6 +165,7 @@ export const MapVisualisation = ({
   // State for tracking resolved dynamic styles
   const [resolvedStyle, setResolvedStyle] = useState(null);
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
+  const [isApplyingStyle, setIsApplyingStyle] = useState(false);
 
   const { addFeaturesToMap } = useFeatureStateUpdater();
 
@@ -214,12 +215,12 @@ export const MapVisualisation = ({
     dataWasReturnedButFiltered,
     fetchState,
     resetFetchState,
-  } = useFetchVisualisationData(
-    visualisation,
+  } = useFetchVisualisationData(visualisation, {
     map,
-    layerKey,
+    mapLayerId: layerKey,
     shouldFilterDataToViewport,
-  );
+    debounceMs: 0, // visualisation comes from state.visualisations — already gated by MapLayout's debouncedFilterState
+  });
 
   // Initialise classification method from visualisation config if not already set in state
   useEffect(() => {
@@ -299,13 +300,14 @@ export const MapVisualisation = ({
     };
   }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, isLoading, dispatch]);
 
-  // Handle loading state
+  // Register this visualisation's fetch state with the shared loading counter so
+  // the layout Dimmer stays on until every visualisation on the page has finished.
+  const isFullyLoading = isLoading || isResolvingStyle || isApplyingStyle;
+  useVisualisationLoadingCounter(isFullyLoading, dispatch);
+
   useEffect(() => {
     if (isLoading) {
-      dispatch({ type: actionTypes.SET_IS_LOADING });
       dispatch({ type: actionTypes.SET_DATA_REQUESTED, payload: true });
-    } else {
-      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
   }, [isLoading, dispatch]);
 
@@ -685,6 +687,13 @@ export const MapVisualisation = ({
       return;
     }
 
+    // If the layer has missing parameters, it will not be added to the map by Layer.jsx.
+    // Abort the styling process immediately to prevent infinite waiting.
+    if (layerConfig.missingParams && layerConfig.missingParams.length > 0) {
+      setIsApplyingStyle(false);
+      return;
+    }
+
     // Determine if reclassification is needed
     const dataHasChanged =
       combinedData !== prevCombinedDataRef.current &&
@@ -801,11 +810,14 @@ export const MapVisualisation = ({
       let retryCount = 0;
       let isCleanedUp = false;
 
+      setIsApplyingStyle(true);
+
       const checkLayerAndPerform = () => {
         if (isCleanedUp) return;
 
         if (map.isStyleLoaded() && map.getLayer(layerKey)) {
           performReclassification();
+          setIsApplyingStyle(false);
         } else if (retryCount < maxRetries) {
           retryCount++;
           const timeoutId = setTimeout(checkLayerAndPerform, retryDelay);
@@ -815,6 +827,7 @@ export const MapVisualisation = ({
             if (isCleanedUp || !map.isStyleLoaded() || !map.getLayer(layerKey)) return;
             cleanup();
             performReclassification();
+            setIsApplyingStyle(false);
           };
 
           const cleanup = () => {
@@ -828,7 +841,10 @@ export const MapVisualisation = ({
         }
       };
 
-      cleanupFns.push(() => { isCleanedUp = true; });
+      cleanupFns.push(() => { 
+        isCleanedUp = true; 
+        setIsApplyingStyle(false);
+      });
       checkLayerAndPerform();
     } else {
       performReclassification();
@@ -857,6 +873,7 @@ export const MapVisualisation = ({
     reclassifyAndStyleMap,
     reclassifyAndStyleGeoJSONMap,
   ]);
+
 
   // Trigger update when style resolution completes if there was a pending update
   useEffect(() => {

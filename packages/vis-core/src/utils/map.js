@@ -847,6 +847,10 @@ export const reclassifyData = (
       return bins;
     }
 
+    if (bins.length === 1) {
+      return [0, bins[0]];
+    }
+
     return [0, ...bins.slice(1)];
   };
 
@@ -1036,7 +1040,7 @@ export const reclassifyData = (
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
     roundedBins = [...new Set(roundedBins)]; 
-    roundedBins = roundedBins.slice(0, 4);  
+    roundedBins = roundedBins.slice(-4);  
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map((val) => -val);
     return [...negativeBins, 0, ...roundedBins];

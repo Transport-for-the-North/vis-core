@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import { useMapContext, useFilterContext } from "hooks";
-import { InfoBox, WarningBox } from "Components";
+import { InfoBox, Hovertip } from "Components";
 import { AccordionSection } from "../Accordion";
 import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
-import { AppContext } from "contexts";
-import { useState, useContext, useEffect } from "react";
+import { AppContext, useToast } from "contexts";
+import { useState, useContext, useEffect, useCallback, useRef } from "react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from "./MapFeatureSelect";
 import { CheckboxSelector, MapFeatureSelectAndPan } from ".";
 import { api } from "services";
@@ -65,6 +66,36 @@ const SelectorContainer = styled.div`
 const NoDataParagraph = styled.p``;
 
 /**
+ * Inline warning icon that shows a tooltip message on hover.
+ * @component WarningStatus
+ * @param {Object} props - The component props.
+ * @param {string} props.message - The warning message to display on hover.
+ * @returns {JSX.Element} The rendered WarningStatus component.
+ */
+const WarningStatus = ({ message }) => {
+  const iconRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <div 
+      ref={iconRef}
+      onMouseEnter={() => setIsHovered(true)} 
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ display: 'flex', alignItems: 'center', color: '#d97706' }}
+      onClick={(e) => e.stopPropagation()} // Prevent accordion toggle
+    >
+      <ExclamationTriangleIcon style={{ width: '20px', height: '20px' }} />
+      <Hovertip 
+        isVisible={isHovered} 
+        displayText={message} 
+        refElement={iconRef} 
+        side="top" 
+      />
+    </div>
+  );
+};
+
+/**
  * Renders a section containing filter selectors for filtering and data selection.
  * @property {Object[]} filters - An array of filter objects containing information about the filters to be rendered.
  * @property {Function} onFilterChange - The function called when a filter value changes.
@@ -73,7 +104,8 @@ const NoDataParagraph = styled.p``;
 export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, downloadShapefilePath, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
   const { state: mapState } = useMapContext();
-  const { state: filterState } = useFilterContext();
+  const { state: filterState, dispatch: filterDispatch } = useFilterContext();
+  const { addToast, removeToast } = useToast();
   const [isDownloading, setIsDownloading] = useState(false);
   const [isShapefileDownloading, setIsShapefileDownloading] = useState(false);
   const [requestError, setRequestError] = useState(null);
@@ -86,9 +118,9 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
   const apiRouteShapefile = downloadShapefilePath;
   const requiresAuthShapefile = checkSecurityRequirements(apiSchema, apiRouteShapefile);
 
-  const handleFilterChange = (filter, value) => {
+  const handleFilterChange = useCallback((filter, value) => {
     onFilterChange(filter, value);
-  };
+  }, [filterDispatch]);
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -145,10 +177,28 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     }
   };
 
-  const noDataAvailable = mapState.noDataReturned;
-  const dataRequested = mapState.dataRequested;
-  const noDataMessage =
-    "No data available for the selected filters, please try different filters.";
+  const dataRequested = true; 
+  const emptyTablesList = mapState.emptyTables || [];
+  const emptyFiltersList = mapState.emptyMetadataFilters || [];
+  const noDataAvailable = emptyTablesList.length > 0 || emptyFiltersList.length > 0 || mapState.noDataReturned;
+  
+  // Format warning message
+  const noDataMessage = emptyFiltersList.length > 0
+    ? `No data for selected ${emptyFiltersList.map(f => f.filterName).join(', ')}`
+    : `No data available for the selected filters, please try different filters.`;
+
+  useEffect(() => {
+    if (dataRequested && noDataAvailable) {
+      addToast({
+        id: 'no-data-warning',
+        type: 'warning',
+        message: noDataMessage,
+        duration: 3000
+      });
+    } else {
+      removeToast('no-data-warning');
+    }
+  }, [dataRequested, noDataAvailable, noDataMessage, addToast, removeToast]);
 
   const appName = import.meta.env.VITE_APP_NAME;
   const currentPage = appContext.appPages.find(
@@ -232,13 +282,16 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
   }, [filters, filterState, onFilterChange]);
 
 
+  const statusNode = (dataRequested && noDataAvailable) 
+    ? <WarningStatus message={noDataMessage} /> 
+    : null;
+
   return (
-    <AccordionSection title="Filtering and data selection" defaultValue={true}>
-      {/* Display a warning message if no data is available - sticky at top */}
-      {dataRequested && noDataAvailable && (
-        <WarningBox text={noDataMessage} isSticky={true} />
-      )}
-      
+    <AccordionSection 
+      title="Filtering and data selection" 
+      defaultValue={true}
+      statusNode={statusNode}
+    >
       {isDiffPage && <InfoBox text={diffPageMessage} />}
       {isTrsePage && <InfoBox text={trsePageMessage} />}
 
@@ -264,7 +317,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                     />
                   )}
                   {filter.type === "slider" && (
@@ -272,7 +325,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id] || filter.min || filter.values[0]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                     />
                   )}
                   {filter.type === "toggle" && (
@@ -283,7 +336,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                         filterState[filter.id] ||
                         filter.values.values[0].paramValue
                       }
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -295,7 +348,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                         filterState[filter.id] ||
                         filter.values.values[0].paramValue
                       }
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -304,7 +357,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -313,7 +366,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}
@@ -322,7 +375,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       key={filter.id}
                       filter={filter}
                       value={filterState[filter.id]}
-                      onChange={(filter, value) => handleFilterChange(filter, value)}
+                      onChange={handleFilterChange}
                       bgColor={bgColor}
                     />
                   )}

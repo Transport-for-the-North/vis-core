@@ -56,6 +56,7 @@ export function updateFilterValidity(state, filterState) {
       ) {
         const sourceName = filter.values.metadataTableName;
         const metadataTable = state.metadataTables[sourceName];
+        if (!metadataTable) return;
 
         const validRows = Array.isArray(selectedValues)
           ? metadataTable.filter((row) => selectedValues.includes(row[filter.values.paramColumn]))
@@ -113,6 +114,119 @@ export function updateFilterValidity(state, filterState) {
   });
 
   return updatedFilters;
+}
+
+/**
+ * Corrects cross-filter constraint violations in an initial filter values map.
+ *
+ * `getInitialFilterValue` computes each filter's default independently, so a
+ * `shouldBeFiltered` filter's default may be invalid given the `shouldFilterOthers`
+ * filter's default selection. This function applies `updateFilterValidity` to the
+ * initial state and corrects any hidden values before the first dispatch, preventing
+ * the first API call from using an invalid parameter combination.
+ *
+ * @param {Array}  filters        - Filter config objects with populated metadata values.
+ * @param {Object} metadataTables - Metadata tables keyed by table name.
+ * @param {Object} initialValues  - Map of { [filterId]: value } to derive corrected values from.
+ * @returns {Object} A new values map with any cross-filter violations corrected.
+ */
+export function correctInitialCrossFilterValues(filters, metadataTables, initialValues) {
+  const pseudoState = { filters, metadataTables };
+  const validated = updateFilterValidity(pseudoState, initialValues);
+
+  const corrected = { ...initialValues };
+
+  validated.forEach((filter) => {
+    if (!filter.shouldBeFiltered || !filter.values?.values) return;
+
+    const currentValue = corrected[filter.id];
+
+    if (filter.multiSelect) {
+      if (!Array.isArray(currentValue) || currentValue.length === 0) return;
+
+      const visibleValues = currentValue.filter((val) =>
+        filter.values.values.some((v) => v.paramValue === val && !v.isHidden),
+      );
+
+      if (visibleValues.length !== currentValue.length) {
+        corrected[filter.id] =
+          visibleValues.length > 0
+            ? visibleValues
+            : filter.values.values.filter((v) => !v.isHidden).map((v) => v.paramValue);
+      }
+    } else {
+      if (currentValue === null || currentValue === undefined) return;
+
+      const currentOption = filter.values.values.find((v) => v.paramValue === currentValue);
+      if (currentOption?.isHidden) {
+        const firstVisible = filter.values.values.find((v) => !v.isHidden);
+        corrected[filter.id] = firstVisible?.paramValue ?? null;
+      }
+    }
+  });
+
+  return corrected;
+}
+
+/**
+ * Corrects cross-filter constraint violations in the current FilterContext state at runtime.
+ *
+ * Called after `validatedFilters` changes (e.g. the user changed a `shouldFilterOthers`
+ * filter). At that point the filter options have been re-narrowed by `updateFilterValidity`,
+ * but the selected values in FilterContext may still reference options that are now hidden.
+ * This function dispatches `SET_FILTER_VALUE` for each such filter to realign the selection
+ * with the new visible set.
+ *
+ * @param {Array}    validatedFilters - Filter configs with `isHidden` already applied.
+ * @param {Object}   filterState      - Current FilterContext state (selected values by filter id).
+ * @param {Function} filterDispatch   - FilterContext dispatch function.
+ * @returns {boolean} True if at least one correction was dispatched.
+ */
+export function correctRuntimeCrossFilterValues(validatedFilters, filterState, filterDispatch) {
+  let corrected = false;
+
+  validatedFilters.forEach((filter) => {
+    if (!filter.shouldBeFiltered || !filter.values?.values) return;
+
+    const currentValue = filterState[filter.id];
+
+    if (filter.multiSelect) {
+      if (!Array.isArray(currentValue) || currentValue.length === 0) return;
+
+      const visibleValues = currentValue.filter((val) =>
+        filter.values.values.some((v) => v.paramValue === val && !v.isHidden),
+      );
+
+      if (visibleValues.length !== currentValue.length) {
+        filterDispatch({
+          type: "SET_FILTER_VALUE",
+          payload: {
+            filterId: filter.id,
+            value:
+              visibleValues.length > 0
+                ? visibleValues
+                : filter.values.values.filter((v) => !v.isHidden).map((v) => v.paramValue),
+            filter,
+          },
+        });
+        corrected = true;
+      }
+    } else {
+      if (currentValue === null || currentValue === undefined) return;
+
+      const currentOption = filter.values.values.find((v) => v.paramValue === currentValue);
+      if (currentOption?.isHidden) {
+        const firstVisible = filter.values.values.find((v) => !v.isHidden);
+        filterDispatch({
+          type: "SET_FILTER_VALUE",
+          payload: { filterId: filter.id, value: firstVisible?.paramValue ?? null, filter },
+        });
+        corrected = true;
+      }
+    }
+  });
+
+  return corrected;
 }
 
 /**
