@@ -1,5 +1,29 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useTheme } from "styled-components";
+import { components } from "react-select";
+
+/**
+ * Shared react-select component overrides.
+ * Adds native browser tooltip support for truncated multi-value chips.
+ */
+export const selectComponents = {
+  MultiValueLabel: (props) => {
+    const label =
+      typeof props.data?.label === "string"
+        ? props.data.label
+        : typeof props.children === "string"
+          ? props.children
+          : "";
+
+    return React.createElement(components.MultiValueLabel, {
+      ...props,
+      innerProps: {
+        ...props.innerProps,
+        title: label,
+      },
+    });
+  },
+};
 
 /**
  * makeSelectStyles

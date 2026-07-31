@@ -1,7 +1,8 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
 import { PageContext, ToastProvider } from "contexts";
+import { AccordionSection } from "Components/Sidebar/Accordion";
 import { useMapContext, useFilterContext, useLayerZoomMessage, useDebounced } from "hooks";
 import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
 import { defaultBgColour } from "defaults";
@@ -59,7 +60,6 @@ const MobileLegendSlot = styled.section`
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
-  const isLoading = state.isLoading || state.visualisationLoadingCount > 0;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
@@ -67,10 +67,38 @@ export const MapLayout = () => {
   const layerZoomMessage = useLayerZoomMessage();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
 
+  // Domain-agnostic extension point: pages can supply extra sidebar sections via
+  // config.additionalMapLayoutAccordionSections so apps can inject bespoke controls without
+  // vis-core knowing anything about them. Each descriptor is rendered inside its own
+  // AccordionSection by default; set `accordion: false` to render the content bare (no
+  // collapsible header). Shape: { component, props?, title?, defaultValue?, accordion? }.
+  const additionalAccordionSections =
+    pageContext.config?.additionalMapLayoutAccordionSections ?? [];
+
   // Debounced copy of filterState used to gate map-action dispatches (UPDATE_PARAMETERISED_LAYER,
   // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
   // immediately on each selector interaction. Selector UI still updates from the live filterState.
   const debouncedFilterState = useDebounced(filterState, 400);
+
+  const isFiltersDebouncing = debouncedFilterState !== filterState;
+  
+  // We keep the dimmer on if filters are debouncing.
+  // We also use a small 50ms buffer state for transitioning out of loading, 
+  // to prevent a 1-frame micro-gap flash between the debounce resolving and 
+  // the visualisations registering their loading state.
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const isCurrentlyLoading = state.isLoading || state.visualisationLoadingCount > 0 || isFiltersDebouncing;
+  
+  useEffect(() => {
+    if (isCurrentlyLoading) {
+      setIsTransitioning(true);
+    } else {
+      const timer = setTimeout(() => setIsTransitioning(false), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isCurrentlyLoading]);
+
+  const isLoading = isCurrentlyLoading || isTransitioning;
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -339,6 +367,26 @@ export const MapLayout = () => {
           handleClassificationChange={handleClassificationChange}
           handleCustomBandsChange={handleCustomBandsChange}
         />
+        {additionalAccordionSections.map((section, index) => {
+          const SectionComponent = section.component;
+          const content = SectionComponent
+            ? <SectionComponent {...(section.props ?? {})} />
+            : section.content;
+          const key = section.title ?? index;
+          // Opt out of the collapsible wrapper to render the content on its own.
+          if (section.accordion === false) {
+            return <Fragment key={key}>{content}</Fragment>;
+          }
+          return (
+            <AccordionSection
+              key={key}
+              title={section.title}
+              defaultValue={section.defaultValue}
+            >
+              {content}
+            </AccordionSection>
+          );
+        })}
       </Sidebar>
 
       {pageContext.type === "MapLayout" && (

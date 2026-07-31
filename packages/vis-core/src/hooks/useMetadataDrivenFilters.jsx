@@ -3,6 +3,7 @@ import { PageContext, FilterContext } from "contexts";
 import { api } from "services";
 import { updateFilterValidity, correctInitialCrossFilterValues, correctRuntimeCrossFilterValues } from "utils";
 import { applyWhereConditions, sortValues, buildDeterministicFilterId } from "utils";
+import { fetchWithCache } from "utils/metadataCache";
 
 /**
  * callMetadataEndpoint
@@ -22,6 +23,17 @@ async function callMetadataEndpoint(endpoint) {
   const opts = endpoint?.requestOptions || undefined;
   if (method === "POST") return api.baseService.post(endpoint.path, endpoint.body ?? {}, opts);
   return api.baseService.get(endpoint.path, opts);
+}
+
+/**
+ * Fetch a metadata table through the shared TTL cache.
+ * Delegates to callMetadataEndpoint for the actual network request.
+ *
+ * @param {Object} endpoint - Endpoint configuration object.
+ * @returns {Promise<any>} Parsed response payload (possibly cached).
+ */
+async function callMetadataEndpointWithCache(endpoint) {
+  return fetchWithCache(endpoint, callMetadataEndpoint);
 }
 
 /**
@@ -65,7 +77,7 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
         const tables = {};
         const empty = [];
         for (const table of pageContext.config.metadataTables || []) {
-          const response = await callMetadataEndpoint(table);
+          const response = await callMetadataEndpointWithCache(table);
           let rows = response;
           if (Array.isArray(table.where) && table.where.length > 0) {
             rows = applyWhereConditions(rows, table.where);
