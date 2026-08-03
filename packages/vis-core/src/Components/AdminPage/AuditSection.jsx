@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { formatDate, relativeTimeFromNow, isStale, numberWithCommas } from "utils";
 import { useAdminApi, useAdminRefresh } from "hooks";
 import {
   Card, CardTitle, Row, Label, Value, NoData, Muted, StaleBadge, ExpandToggle,
   CardEmpty, CardSubheading, MetricRow, Metric, MetricLabel, MetricValue,
-  SectionTitle, Grid, StatusMessage, ErrorMessage,
+  SectionTitle, SectionHeader, InlineStatus, Grid, StatusMessage, ErrorMessage,
 } from "./styles";
 
 /**
@@ -207,7 +207,11 @@ export function AuditSection({ tables, title = "Table Audit" }) {
   const refreshSignal = signals?.["scenario_app_registrations"] ?? 0;
   const [auditData, setAuditData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  // Whether cards are already on screen. Reloading behind them keeps the column's height —
+  // and every card's expanded/collapsed state — rather than blanking the whole section.
+  const hasLoaded = useRef(false);
 
   // Staleness threshold is presentational config (not returned by the API), so map it per
   // table name to apply to the matching result.
@@ -221,21 +225,35 @@ export function AuditSection({ tables, title = "Table Audit" }) {
       setLoading(false);
       return;
     }
-    setLoading(true);
+    if (hasLoaded.current) setRefreshing(true);
+    else setLoading(true);
+    setError(null);
     adminApi
       .getTableAudit(tables)
-      .then((data) => setAuditData(data ?? []))
+      .then((data) => {
+        setAuditData(data ?? []);
+        hasLoaded.current = true;
+      })
       .catch(() => setError("Failed to load table audit data."))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   }, [tables, adminApi, refreshSignal]);
 
   return (
     <div>
-      <SectionTitle>{title}</SectionTitle>
+      <SectionHeader>
+        <SectionTitle>{title}</SectionTitle>
+        {/* On the heading line, so a reload doesn't reflow the cards below it. */}
+        {refreshing && <InlineStatus $tone="muted">Updating…</InlineStatus>}
+      </SectionHeader>
       {loading && <StatusMessage>Loading…</StatusMessage>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
-      {!loading && !error && (
-        <Grid>
+      {/* Keyed off the data rather than the error, so a failed background refresh leaves the
+          cards it already has on screen instead of emptying the column. */}
+      {!loading && auditData.length > 0 && (
+        <Grid aria-busy={refreshing}>
           {auditData.map((entry) => (
             <AuditCard
               key={entry.tableName}

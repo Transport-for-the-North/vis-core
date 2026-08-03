@@ -63,6 +63,31 @@ export const SectionTitle = styled.h2`
   text-align: left;
 `;
 
+// Heading row carrying the section title plus a right-aligned inline status. Transient
+// feedback ("Added 2 rows.", "Updating…") lives here rather than in a block above the table
+// so that showing or hiding it never changes the section's height — the page keeps its
+// scroll position and nothing below appears to move.
+export const SectionHeader = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
+const STATUS_TONE_COLOURS = {
+  success: "#059669",
+  error: "#dc2626",
+  muted: "#9ca3af",
+};
+
+export const InlineStatus = styled.span`
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+  color: ${({ $tone }) => STATUS_TONE_COLOURS[$tone] ?? STATUS_TONE_COLOURS.muted};
+`;
+
 // Audit cards stack one per row.
 export const Grid = styled.div`
   display: grid;

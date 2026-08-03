@@ -51,9 +51,17 @@ export const useAdminRefresh = () => useContext(AdminRefreshContext);
  * Shared data hook for view/edit tables. Fetches the table's rows and column metadata
  * together and exposes a refetch for use after mutations.
  *
+ * Reloads of a table that is already on screen are **background** refreshes: `loading` stays
+ * false and the previous rows remain rendered until the new ones arrive, with `refreshing`
+ * flagged instead. Showing the "Loading…" placeholder again would unmount the table on every
+ * add/delete, collapsing the section and shifting the rest of the page (and losing the scroll
+ * position inside the table). `loading` is therefore only true when there is nothing to show
+ * yet — the first load, or after switching to a different table.
+ *
  * @param {Object} table - Table config (tableName, schema, filter).
  * @returns {{rows: Array<Object>, columns: Array<Object>, loading: boolean,
- *   error: (string|null), setError: Function, refetch: Function}} Table data and helpers.
+ *   refreshing: boolean, error: (string|null), setError: Function, refetch: Function}}
+ *   Table data and helpers.
  */
 export function useTableData(table) {
   const adminApi = useAdminApi();
@@ -61,7 +69,13 @@ export function useTableData(table) {
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  // The table the rows currently on screen belong to. Matching it means this fetch is a
+  // refresh of what is already displayed; a mismatch (or a first/failed load) means there is
+  // nothing to keep, so the placeholder is shown instead.
+  const loadedTable = useRef(null);
 
   // Refetch when another section requests a refresh of this table (e.g. an audit log
   // reloaded after a registration is added/removed elsewhere on the page).
@@ -72,15 +86,20 @@ export function useTableData(table) {
    * @returns {void}
    */
   const fetchData = () => {
-    setLoading(true);
+    if (loadedTable.current === table.tableName) setRefreshing(true);
+    else setLoading(true);
     setError(null);
     Promise.all([adminApi.getRows(table), adminApi.getColumns(table)])
       .then(([rowData, colData]) => {
         setRows(rowData ?? []);
         setColumns(colData ?? []);
+        loadedTable.current = table.tableName;
       })
       .catch(() => setError("Failed to load table."))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   };
 
   useEffect(() => {
@@ -88,7 +107,7 @@ export function useTableData(table) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table.tableName, refreshSignal]);
 
-  return { rows, columns, loading, error, setError, refetch: fetchData };
+  return { rows, columns, loading, refreshing, error, setError, refetch: fetchData };
 }
 
 /**

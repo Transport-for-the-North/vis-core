@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTheme } from "styled-components";
 import Select from "react-select";
 import { makeSelectStyles } from "utils/selectStyles";
+// Direct module path: the cache is deliberately not re-exported from the utils barrel.
+import { clearMetadataCache } from "utils/metadataCache";
 import { AppButton } from "Components/AppButton";
 import { useAdminApi, useAdminCanEdit, useAdminRefresh } from "hooks";
 import { LookupSelect } from "./LookupSelect";
@@ -156,6 +158,10 @@ export function SendScenarios({ config }) {
 
       setSelectedScenarios([]);
       setTargetApp("");
+      // Registrations change what the scenario metadata endpoint returns for the destination
+      // app; drop the cached responses so the sidebar dropdowns pick the new ones up rather
+      // than serving the stale list from sessionStorage for the rest of the session.
+      if (registered > 0) clearMetadataCache();
       requestRefresh(refreshTables);
     } catch {
       setError("Failed to send scenarios.");
