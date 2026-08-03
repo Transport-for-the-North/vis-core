@@ -219,6 +219,26 @@ export function buildDisplayFields(columns, lookups, lookupLabels, hiddenColumns
 }
 
 /**
+ * Builds a stable React key for a table row from its primary key values. Keying by identity
+ * rather than by position means a refresh updates the affected rows in place instead of
+ * remounting the list, so the table's scroll position and the rest of the page hold still.
+ * Falls back to the row index for tables without a primary key.
+ *
+ * @param {Array<Object>} columns - Column metadata (provides `isPrimaryKey`).
+ * @returns {(row: Object, index: number) => string} The key function.
+ */
+export function makeRowKey(columns) {
+  const keyColumns = columns.filter((c) => c.isPrimaryKey).map((c) => c.name);
+  if (keyColumns.length === 0) return (_row, index) => String(index);
+  return (row, index) => {
+    const key = keyColumns.map((name) => row[name]).join("|");
+    // A row missing its key values (shouldn't happen) would collide with others, so fall
+    // back to the index for that row rather than duplicating a key.
+    return key === "" ? String(index) : key;
+  };
+}
+
+/**
  * Coerces each add-form value to match its column's data type, since text/number inputs
  * always yield strings (so e.g. an integer column is sent as a number, not "145"). Empty
  * values are dropped so the DB applies its own defaults.

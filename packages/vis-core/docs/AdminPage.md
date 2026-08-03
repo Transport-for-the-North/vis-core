@@ -33,10 +33,11 @@ configuration; the component contains no table-, column-, or app-specific logic.
    - [endpoints](#endpoints)
 4. [Lookups (dropdowns and friendly labels)](#lookups-dropdowns-and-friendly-labels)
 5. [Audit writes on add/delete](#audit-writes-on-adddelete)
-6. [Row limits and scrolling](#row-limits-and-scrolling)
-7. [The API](#the-api)
-8. [Security model](#security-model)
-9. [Adding a new table — checklist](#adding-a-new-table--checklist)
+6. [How sections refresh](#how-sections-refresh)
+7. [Row limits and scrolling](#row-limits-and-scrolling)
+8. [The API](#the-api)
+9. [Security model](#security-model)
+10. [Adding a new table — checklist](#adding-a-new-table--checklist)
 
 ---
 
@@ -214,6 +215,21 @@ automatically.
 **Add-form value typing.** Inputs always yield strings, so before submitting, each value is
 coerced to its column's type (numbers become numbers, booleans become booleans). The server
 additionally casts values into user-defined types (e.g. Postgres enums) on insert.
+
+#### Adding several rows at once
+
+A lookup marked `multiSelect: true` turns its add-form dropdown into a multi-select, and
+**Add** then inserts **one row per selected value** — every other field in the form is shared
+across those rows. The button names the count (`Add 4`) once more than one value is picked, and
+the outcome is reported above the table ("Added 4 rows.").
+
+- **One multi-select column per table.** If more than one lookup on the same table sets the
+  flag, the first one configured is used; the rest stay single-select. Two would otherwise imply
+  a cross-product of rows rather than a list.
+- **Inserts run one at a time**, each with its own `auditWrite` entry in its own transaction, so
+  a row that fails (e.g. a duplicate) leaves the others inserted. A partial failure is reported
+  as "Failed to add 1 of 4 rows."
+- `excludeRegistered` still applies, so values already in the table are not offered.
 
 ### viewTables
 
@@ -394,6 +410,7 @@ lookups: {
         filter: { column: "is_deleted", value: false }, // optional source filter
         excludeRegistered: true,      // hide values already present in this table
         addToTable: true,             // show the friendly label in the table (replacing the raw id)
+        multiSelect: true,            // pick several values at once; Add inserts one row per value
         // headerLabel: "Scenario",   // optional: override the label column's header
         // showValueColumn: true,     // optional: also show the raw id column
         // placeholder: "Please select scenario code…", // optional: add-form dropdown prompt
@@ -410,6 +427,7 @@ lookups: {
 | `labelColumn`       | yes      | Column shown to the user (in the dropdown and, with `addToTable`, in the table).                  |
 | `filter`            | no       | `{ column, value }` restricting which options are offered.                                        |
 | `excludeRegistered` | no       | When `true`, omit options whose value is already present in this table (edit tables only).        |
+| `multiSelect`       | no       | When `true`, the add-form dropdown accepts several values and **Add** inserts one row per selected value (edit tables only). See [Adding several rows at once](#adding-several-rows-at-once). |
 | `addToTable`        | no       | When `true`, show the `labelColumn` in the table **in place of** the raw id/value column.          |
 | `headerLabel`       | no       | Overrides the label column's header. Defaults to the humanised source column name with a trailing `_id` removed (e.g. `scenario_id` → "Scenario"). |
 | `showValueColumn`   | no       | When `true`, keep the raw id/value column alongside the friendly label instead of replacing it.    |
@@ -483,6 +501,30 @@ reload.
 
 Literal values destined for a Postgres enum column work because the server casts each value to
 the target column's user-defined type on insert.
+
+---
+
+## How sections refresh
+
+A mutation reloads the sections it affects (its own rows, plus anything named in
+`refreshTables`), but a reload is deliberately **invisible apart from the data**:
+
+- **Nothing is unmounted.** The first load shows a "Loading…" placeholder; every reload after
+  that keeps the current rows/cards rendered until the new ones arrive (`useTableData` reports
+  these separately as `loading` vs `refreshing`). Blanking a section would collapse it, which
+  shifts everything below it and throws away the page's scroll position — and, on audit cards,
+  the expanded/collapsed state of each breakdown.
+- **Rows are keyed by primary key**, not by position (`makeRowKey`), so a refresh patches the
+  rows that changed instead of rebuilding the list. The table's own scroll position is kept.
+- **Feedback never moves the layout.** "Added 3 rows.", "Updating…" and mutation failures are
+  rendered inline on the section's heading line (`SectionHeader` + `InlineStatus`), which has a
+  fixed height, rather than as a block that would push the table down as it appears and clears.
+  Load failures ("Failed to load table.") remain block messages, since there is no table to
+  push down in that case.
+- A background reload sets `aria-busy` on the table/grid for assistive technology.
+
+The net effect of an add or delete is that the row appears or disappears and the counts move —
+nothing else on the page shifts.
 
 ---
 
