@@ -15,7 +15,7 @@ const Overlay = styled.div`
 
 const StyledBox = styled.div`
   position: fixed;
-  top: 27%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #f0f0f0; /* Light grey color */
