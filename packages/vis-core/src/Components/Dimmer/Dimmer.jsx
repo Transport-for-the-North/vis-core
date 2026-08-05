@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 
 const Dimmed = styled.div.attrs({ 'data-testid': 'dimmed-overlay' })`
@@ -13,41 +14,148 @@ const Dimmed = styled.div.attrs({ 'data-testid': 'dimmed-overlay' })`
   background-color: #000;
 `;
 
-const CenteredSpinner = styled.div`
+const CenteredLoader = styled.div`
   position: fixed; /* Fixed to ensure it stays centered */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 999999;
-  .spinner {
-    border: 8px solid rgba(0, 0, 0, 0.1);
-    border-top: 8px solid #fff;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-  }
+  width: min(440px, calc(100vw - 32px));
+`;
+
+const LoaderCard = styled.div`
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  padding: 16px;
+`;
+
+const LoaderHeading = styled.h3`
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0d0f3d;
+`;
+
+const LoaderMessage = styled.p`
+  margin: 0 0 10px;
+  font-size: 0.94rem;
+  color: #364153;
+`;
+
+const ProgressTrack = styled.div`
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #efeff7;
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div`
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00dec6 0%, #0d0f3d 100%);
+  width: ${({ $progressWidth }) => $progressWidth};
+  transition: width 700ms cubic-bezier(0.22, 1, 0.36, 1);
 `;
 
 /**
- * Dimmer is a React component that renders a dimming overlay and an optional loader spinner.
+ * Dimmer is a React component that renders a dimming overlay and an optional loader card.
  * It is typically used to indicate loading or processing states in an application.
  * 
  * @component
  * @property {boolean} dimmed - Flag indicating whether the dimming overlay should be displayed.
  * @property {boolean} showLoader - Flag indicating whether the loader spinner should be displayed.
+ * @property {string} [statusHeading] - Optional heading above the progress bar.
+ * @property {string[]} [statusMessages] - Optional rotating status messages.
  * @returns {JSX.Element|null} The rendered Dimmer component or null if not dimmed.
  */
-export const Dimmer = ({ dimmed, showLoader }) => {
+export const Dimmer = ({
+  dimmed,
+  showLoader,
+  completeOnExit = false,
+  statusHeading = "Loading map data",
+  statusMessages = [
+    "Preparing your map view...",
+    "Almost there, thanks for waiting.",
+    "Finalising layers and styles...",
+  ],
+}) => {
+  const PROGRESS_STEPS = [18, 30, 42, 54, 66, 76, 84, 90, 94, 97, 100];
+
+  const safeMessages = useMemo(
+    () =>
+      Array.isArray(statusMessages) && statusMessages.length > 0
+        ? statusMessages
+        : ["Almost there, thanks for waiting."],
+    [statusMessages]
+  );
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [progressStepIndex, setProgressStepIndex] = useState(0);
+
+  useEffect(() => {
+    if (!dimmed || !showLoader || safeMessages.length < 2) return undefined;
+
+    const intervalId = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % safeMessages.length);
+    }, 1800);
+
+    return () => clearInterval(intervalId);
+  }, [dimmed, showLoader, safeMessages]);
+
+  useEffect(() => {
+    if (!dimmed) {
+      setMessageIndex(0);
+    }
+  }, [dimmed]);
+
+  useEffect(() => {
+    if (!dimmed || !showLoader) {
+      setProgressStepIndex(0);
+      return undefined;
+    }
+
+    const progressInterval = setInterval(() => {
+      setProgressStepIndex((prev) =>
+        Math.min(prev + 1, PROGRESS_STEPS.length - 1)
+      );
+    }, 900);
+
+    return () => clearInterval(progressInterval);
+  }, [dimmed, showLoader]);
+
+  useEffect(() => {
+    if (completeOnExit && dimmed && showLoader) {
+      setProgressStepIndex(PROGRESS_STEPS.length - 1);
+    }
+  }, [completeOnExit, dimmed, showLoader]);
+
   if (!dimmed) {
     return null;
   }
+
+  const currentMessage = safeMessages[Math.min(messageIndex, safeMessages.length - 1)];
+  const progressPercent = PROGRESS_STEPS[Math.min(progressStepIndex, PROGRESS_STEPS.length - 1)];
+
   return (
     <>
       {showLoader ? (
-        <CenteredSpinner>
-          <div className="spinner" role="progressbar"></div>
-        </CenteredSpinner>
+        <CenteredLoader>
+          <LoaderCard>
+            <LoaderHeading>{statusHeading}</LoaderHeading>
+            <LoaderMessage>{currentMessage}</LoaderMessage>
+            <ProgressTrack>
+              <ProgressFill
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={progressPercent}
+                aria-valuetext={currentMessage}
+                $progressWidth={`${progressPercent}%`}
+              />
+            </ProgressTrack>
+          </LoaderCard>
+        </CenteredLoader>
       ) : null}
       <Dimmed />
     </>

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { MapLayout } from ".";
 import { AppContext, FilterContext, MapContext } from "contexts";
 import { PageContext } from "contexts";
@@ -151,12 +151,13 @@ const mockAppContexte = {
 };
 
 jest.mock("Components/Dimmer", () => ({
-    Dimmer: ({ dimmed, showLoader }) => {
+    Dimmer: ({ dimmed, showLoader, completeOnExit }) => {
       return (
         <>
           <div>dimmed: {dimmed ? "true" : "false"}</div>
           <div>showLoader: {showLoader ? "true" : "false"}</div>
-        </>
+          <div>completeOnExit: {completeOnExit ? "true" : "false"}</div>
+      </>
       );
     }
   }));
@@ -329,6 +330,65 @@ describe("MapLayout component test", () => {
     expect(mockFilterContext.dispatch).toHaveBeenCalledWith({
       type: "RESET_FILTERS",
     });
+  });
+
+  it("passes completeOnExit to Dimmer during loading transition grace", () => {
+    jest.useFakeTimers();
+
+    const loadingMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        isLoading: true,
+      },
+      dispatch: jest.fn(),
+    };
+
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={loadingMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText(/completeOnExit: false/)).toBeInTheDocument();
+
+    const idleMapContext = {
+      ...loadingMapContext,
+      state: {
+        ...loadingMapContext.state,
+        isLoading: false,
+      },
+    };
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={mockFilterContext}>
+              <MapContext.Provider value={idleMapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText(/completeOnExit: true/)).toBeInTheDocument();
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    jest.useRealTimers();
   });
 });
 
