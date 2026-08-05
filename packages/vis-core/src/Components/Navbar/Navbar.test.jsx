@@ -117,8 +117,8 @@ describe("Navbar", () => {
     );
 
     expect(screen.getByRole("button", { name: /Open main menu/i })).toBeInTheDocument();
-    // The mocked logo has the alt text ‘Logo’.
-    expect(screen.getByAltText(/Logo/i)).toBeInTheDocument();
+    // The mocked logo has exact alt text "Logo".
+    expect(screen.getByAltText("Logo")).toBeInTheDocument();
   });
 
   it("does not return anything on the /login route", () => {

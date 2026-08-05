@@ -4,6 +4,7 @@ import styled from 'styled-components';
 export const AccordionHeader = styled.div`
   cursor: pointer;
   padding: 10px;
+  font-family: var(--font-sans);
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   border-radius: 5px 5px ${({ $isOpen }) => ($isOpen ? '0 0' : '5px 5px')};

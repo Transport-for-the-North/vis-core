@@ -1,6 +1,13 @@
 /* --- Base Styles --- */
 .landing {
-  background-color: white;
+  --homepage-surface-muted: #f5f5f5;
+  --homepage-overlay: rgba(13, 15, 61, 0.6);
+  --homepage-tile-radius: 12px;
+  --homepage-contact-radius: 25px;
+  --homepage-border-soft: #ddd;
+  --homepage-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --homepage-shadow-soft: 0 3px 10px rgba(0, 0, 0, 0.04);
+  background-color: var(--palette-white);
 }
 
 .header-landing {
@@ -23,13 +30,13 @@
   content: "";
   display: block;
   position: absolute;
-  background-image: linear-gradient(to top, rgba(13, 15, 61, 0.6), transparent);
+  background-image: linear-gradient(to top, var(--homepage-overlay), transparent);
   width: 100%;
   height: 50vh;
 }
 
 .header-title {
-  color: white;
+  color: var(--palette-white);
   font-weight: 1000;
 }
 
@@ -60,7 +67,7 @@
 .introduction {
   padding: 2rem 10vw;
   font-size: 17px;
-  background-color: #f5f5f5;
+  background-color: var(--homepage-surface-muted);
   text-align: start;
 }
 
@@ -97,7 +104,7 @@
 
 .background {
   background-color: var(--palette-navy);
-  color: white;
+  color: var(--palette-white);
 }
 
 .background h2,
@@ -121,27 +128,27 @@
 .additional-section .container-section p,
 .additional-section .container-section ul,
 .additional-section .container-section ol {
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
 }
 
 .even-section {
   background-color: var(--palette-pale-teal);
-  color: white;
+  color: var(--palette-white);
 }
 
 .odd-section {
-  background-color: #f5f5f5;
+  background-color: var(--homepage-surface-muted);
   color: var(--text-icon);
 }
 
 .even-section .go-to-map {
-  color: white;
+  color: var(--palette-white);
   text-decoration: none;
   font-size: 17px;
 }
 
 .even-section .go-to-map:hover {
-  color: white;
+  color: var(--palette-white);
 }
 
 .odd-section .go-to-map {
@@ -166,7 +173,7 @@
   width: 100%;
   height: auto;           
   object-fit: cover;       
-  border-radius: 12px 12px 0 0;
+  border-radius: var(--homepage-tile-radius) var(--homepage-tile-radius) 0 0;
   display: block;
 }
 
@@ -174,10 +181,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-radius: 12px;
+  border-radius: var(--homepage-tile-radius);
   padding: 0;
   box-sizing: border-box;
-  border: 1px solid #ddd;
+  border: 1px solid var(--homepage-border-soft);
 }
 
 .tile-section {
@@ -192,7 +199,7 @@
 }
 
 .homepage-grid .even-section {
-  background-color: #f5f5f5;
+  background-color: var(--homepage-surface-muted);
   color: var(--text-icon);
 }
 
@@ -229,16 +236,17 @@
 
 .expanded-fragment-block {
   padding: 0 10vw;
-  background: #fff;
+  background: var(--palette-white);
 }
 
 .expanded-fragment-content {
   padding: 0 10px;
-  border-radius: 12px;
+  border-radius: var(--homepage-tile-radius);
   text-align: left;
-  border: 1px solid #ddd;box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08),
-    0 3px 10px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--homepage-border-soft);
+  box-shadow:
+    var(--homepage-shadow-strong),
+    var(--homepage-shadow-soft);
 }
 
 .tile {
@@ -251,7 +259,7 @@
   bottom: -30px;   
   left: 50%;
   transform: translateX(-50%);
-  background: white;
+  background: var(--palette-white);
   border: none;
   padding: 14px;
   border-radius: 50%;
@@ -265,8 +273,8 @@
   display: block;
   width: 14px;
   height: 14px;
-  border-right: 2px solid #444;
-  border-bottom: 2px solid #444;
+  border-right: 2px solid var(--text-icon);
+  border-bottom: 2px solid var(--text-icon);
   transform: rotate(45deg);
   transition: transform 0.25s ease, border-color 0.25s ease;
 }
@@ -274,7 +282,7 @@
 /* Hover animation: small bounce/slide */
 .read-more-toggle:hover .arrow-icon {
   transform: translateY(3px) rotate(45deg);
-  border-color: #000;
+  border-color: var(--palette-navy);
 }
 
 /* When expanded: rotate arrow upward */
@@ -319,7 +327,7 @@
 .contacts {
   text-align: center;
   font-size: larger;
-  color: #0d0f3d;
+  color: var(--palette-navy);
 }
 
 .contacts p {
@@ -328,10 +336,10 @@
 
 .contact {
   font-size: large;
-  color: #0d0f3d;
+  color: var(--palette-navy);
   text-decoration: none;
   border: 1px solid;
-  border-radius: 25px;
+  border-radius: var(--homepage-contact-radius);
   padding: 0.5rem 1rem;
   display: inline-block;
   max-width: 100%;
@@ -342,7 +350,8 @@
 }
 
 .contact:hover {
-  color: #0d0f3d;
+  background-color: var(--palette-pale-teal);
+  color: var(--palette-navy);
 }
 
 /* --- Contacts List --- */

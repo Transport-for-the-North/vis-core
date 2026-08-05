@@ -175,7 +175,7 @@ const dropdownItemStyles = css`
   justify-content: space-between;
   padding: 10px 12px;
   text-decoration: none;
-  font-size: 0.92rem;
+  font-size: 1rem;
   text-align: left;
   box-sizing: border-box;
   background-color: ${({ $active, $hovered, $bgColor, theme }) =>
