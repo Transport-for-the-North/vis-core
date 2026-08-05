@@ -46,6 +46,8 @@ const MobileLegendSlot = styled.section`
   }
 `;
 
+const LOADING_TRANSITION_GRACE_MS = 300;
+
 /**
  * MapLayout component is the main layout component that composes the Map,
  * Sidebar, and MapLayerSection components. It serves as the container for
@@ -83,9 +85,9 @@ export const MapLayout = () => {
   const isFiltersDebouncing = debouncedFilterState !== filterState;
   
   // We keep the dimmer on if filters are debouncing.
-  // We also use a small 50ms buffer state for transitioning out of loading, 
-  // to prevent a 1-frame micro-gap flash between the debounce resolving and 
-  // the visualisations registering their loading state.
+  // We also use a small grace window when transitioning out of loading,
+  // to prevent micro-gap flicker between debounce resolving and
+  // visualisations registering their loading state.
   const [isTransitioning, setIsTransitioning] = useState(false);
   const isCurrentlyLoading = state.isLoading || state.visualisationLoadingCount > 0 || isFiltersDebouncing;
   
@@ -93,7 +95,7 @@ export const MapLayout = () => {
     if (isCurrentlyLoading) {
       setIsTransitioning(true);
     } else {
-      const timer = setTimeout(() => setIsTransitioning(false), 50);
+      const timer = setTimeout(() => setIsTransitioning(false), LOADING_TRANSITION_GRACE_MS);
       return () => clearTimeout(timer);
     }
   }, [isCurrentlyLoading]);
@@ -343,10 +345,25 @@ export const MapLayout = () => {
     });
   };
 
+  const loadingHeading = state.visualisationLoadingCount > 0
+    ? "Loading map layers"
+    : "Preparing your map";
+  const loadingMessages = [
+    "Fetching the latest visualisation data...",
+    "Almost there, thanks for waiting.",
+    "Applying colours and map styling...",
+  ];
+
   return (
     <ToastProvider>
       <LayoutContainer>
-      <Dimmer dimmed={isLoading} showLoader={true} />
+      <Dimmer
+        dimmed={isLoading}
+        showLoader={true}
+        completeOnExit={!isCurrentlyLoading && isTransitioning}
+        statusHeading={loadingHeading}
+        statusMessages={loadingMessages}
+      />
       <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
         pageName={pageContext.pageName}

@@ -1,4 +1,5 @@
 import { Dimmer } from "Components/Dimmer";
+import { act } from "react";
 import { render, screen } from "@testing-library/react";
 
 describe("Dimmer loader tester", () => {
@@ -48,5 +49,38 @@ describe("Dimmer loader tester", () => {
       top: '0',
       left: '0'
     });
+  });
+
+  it("sets progress to 100 when completeOnExit is true", () => {
+    render(<Dimmer dimmed={true} showLoader={true} completeOnExit={true} />);
+
+    const progressbar = screen.getByRole("progressbar");
+    expect(progressbar).toHaveAttribute("aria-valuenow", "100");
+  });
+
+  it("keeps progress non-decreasing over timer ticks", () => {
+    jest.useFakeTimers();
+
+    render(<Dimmer dimmed={true} showLoader={true} />);
+
+    const readProgress = () => {
+      const progressbar = screen.getByRole("progressbar");
+      return Number(progressbar.getAttribute("aria-valuenow"));
+    };
+
+    const values = [readProgress()];
+
+    for (let i = 0; i < 6; i += 1) {
+      act(() => {
+        jest.advanceTimersByTime(900);
+      });
+      values.push(readProgress());
+    }
+
+    for (let i = 1; i < values.length; i += 1) {
+      expect(values[i]).toBeGreaterThanOrEqual(values[i - 1]);
+    }
+
+    jest.useRealTimers();
   });
 });
