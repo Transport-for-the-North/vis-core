@@ -10,8 +10,10 @@ import {
 } from "./CompactSelectParts";
 
 import {
+  AssistiveText,
   CellInner,
   ClearBtn,
+  FilteredCountText,
   FilterInputWrap,
   FilterRowCell,
   HeaderLabel,
@@ -549,25 +551,12 @@ export function DataTable({
     <TablePane>
       <TableTopBar>
         <TableTopBarLeft>
-          <span style={{ fontSize: "0.8rem" }}>Filtered: {filtered.length}</span>
+          <FilteredCountText>Filtered: {filtered.length}</FilteredCountText>
           {/* Screen reader instructions shared by all column resizers. */}
-          <span
-            id={resizeHelpId}
-            style={{
-              position: "absolute",
-              width: 1,
-              height: 1,
-              padding: 0,
-              margin: -1,
-              overflow: "hidden",
-              clip: "rect(0, 0, 0, 0)",
-              whiteSpace: "nowrap",
-              border: 0,
-            }}
-          >
+          <AssistiveText id={resizeHelpId}>
             To resize a column: use Left and Right arrow keys. Hold Shift for larger steps.
             Press Home for minimum width and End for maximum width. Press Enter to auto-fit.
-          </span>
+          </AssistiveText>
         </TableTopBarLeft>
 
         <TableTopBarCenter>
@@ -597,20 +586,8 @@ export function DataTable({
       <ScrollX>
         <StyledTable ref={tableRef} id={tableId}>
           {caption ? (
-            <caption
-              style={{
-                position: "absolute",
-                width: 1,
-                height: 1,
-                padding: 0,
-                margin: -1,
-                overflow: "hidden",
-                clip: "rect(0, 0, 0, 0)",
-                whiteSpace: "nowrap",
-                border: 0,
-              }}
-            >
-              {caption}
+            <caption>
+              <AssistiveText as="span">{caption}</AssistiveText>
             </caption>
           ) : null}
 

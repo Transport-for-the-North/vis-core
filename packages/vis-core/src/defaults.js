@@ -50,7 +50,7 @@ export const brandTokens = {
     midGrey: '#efeff7',
     paleGrey: '#f7f7fb',
     bottomGrey: '#e5e7eb',
-    textIcon: '#364153',
+    textIcon: '#0d0f3d',
   },
   radii: {
     xxs: '6px',

@@ -47,8 +47,15 @@ const HeaderNavSearch = styled.div`
   width: 100%;
 `;
 
+const MobileLogoSlot = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
 const MobileMenuButton = styled.button`
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 44px;
@@ -62,9 +69,17 @@ const MobileMenuButton = styled.button`
     background: #f3f4f6;
   }
 
-  @media only screen and (max-width: 767px) {
-    display: flex;
+  span {
+    font-size: 24px;
+    line-height: 1;
+    color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
   }
+`;
+
+const MobileMenuIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 `;
 
 const LogoutSection = styled.div`
@@ -139,6 +154,7 @@ export function Navbar() {
   const navbarRef = useRef(null);
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
   const [$bgColor, setBgColor] = useState(defaultBgColour);
+  const [showMobileMenuIcon, setShowMobileMenuIcon] = useState(true);
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
@@ -236,6 +252,8 @@ export function Navbar() {
   const isAuthenticated = Boolean(token || user);
   const logoutImage = appContext.logoutImage || "img/logout.png";
   const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;
+  const mobileMenuIconPath = appContext.mobileMenuIcon || appContext.logoutButtonImage || "img/burgerIcon.png";
+  const mobileMenuIconSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${mobileMenuIconPath}`;
 
   return (
     <>
@@ -243,16 +261,44 @@ export function Navbar() {
         <HeaderOuter>
           <HeaderInner>
             <HeaderGrid>
-              {(logoPosition === "left" || isMobile) && (
-                <Logo
-                  logoImage={logoImage}
-                  onClick={() => onClick(null, logoImage)}
-                  position="left"
-                />
+              {isMobile ? (
+                <MobileMenuButton
+                  aria-label="Open main menu"
+                  aria-expanded={isSideNavOpen}
+                  onClick={updateSideNav}
+                  data-testid="mobile-menu-toggle"
+                >
+                  {showMobileMenuIcon ? (
+                    <MobileMenuIcon
+                      src={mobileMenuIconSrc}
+                      alt=""
+                      aria-hidden="true"
+                      onError={() => setShowMobileMenuIcon(false)}
+                    />
+                  ) : (
+                    <span aria-hidden="true">☰</span>
+                  )}
+                </MobileMenuButton>
+              ) : (
+                logoPosition === "left" && (
+                  <Logo
+                    logoImage={logoImage}
+                    onClick={() => onClick(null, logoImage)}
+                    position="left"
+                  />
+                )
               )}
 
               <HeaderNavSearch>
-                {!isMobile && (
+                {isMobile ? (
+                  <MobileLogoSlot>
+                    <Logo
+                      logoImage={logoImage}
+                      onClick={() => onClick(null, logoImage)}
+                      position="left"
+                    />
+                  </MobileLogoSlot>
+                ) : (
                   <ResponsiveNavbarLinks
                     links={links}
                     activeLink={activeLink}
@@ -269,16 +315,6 @@ export function Navbar() {
                     onClick={() => onClick(null, logoImage)}
                     position="right"
                   />
-                )}
-                {isMobile && (
-                  <MobileMenuButton
-                    aria-label="Open main menu"
-                    aria-expanded={isSideNavOpen}
-                    onClick={updateSideNav}
-                    data-testid="mobile-menu-toggle"
-                  >
-                    <span aria-hidden="true">☰</span>
-                  </MobileMenuButton>
                 )}
                 {appContext.authenticationRequired && (
                   isAuthenticated ? (

@@ -273,6 +273,7 @@ const CardContent = styled.div`
   transition: opacity 0.3s;
   text-align: left;
   font-size: 1.5em;
+  line-height: 28px;
 
   h2 {
     font-size: 1.5em;

@@ -32,6 +32,9 @@ export const TableTopBarLeft = styled.div`
   gap: 8px;
   flex-wrap: wrap;
   min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
 
   @media (max-width: 720px) {
     width: 100%;
@@ -61,6 +64,24 @@ export const TableTopBarRight = styled.div`
   }
 `;
 
+export const FilteredCountText = styled.span`
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+`;
+
+export const AssistiveText = styled.span`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+`;
+
 export const ScrollX = styled.div`
   width: 100%;
   max-width: 100%;
@@ -72,6 +93,7 @@ export const ScrollX = styled.div`
 export const StyledTable = styled.table`
   border-collapse: collapse;
   font-size: 0.9rem;
+  font-family: var(--font-sans);
   table-layout: fixed;
   width: 100%;
   min-width: max-content;
@@ -81,6 +103,7 @@ export const Th = styled.th`
   position: sticky;
   top: 0;
   z-index: 1;
+  font-family: var(--font-sans);
   text-align: left;
   vertical-align: top;
   padding: 10px 8px;
@@ -105,6 +128,9 @@ export const ThInner = styled.div`
   justify-content: flex-start;
   gap: 6px;
   min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
 `;
 
 export const SelectHeaderInner = styled(ThInner)`
@@ -115,6 +141,9 @@ export const SelectHeaderLabel = styled.span`
   flex: 0 0 auto;
   white-space: nowrap;
   line-height: 1.2;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
 `;
 
 export const SelectHeaderCheckbox = styled.input`
@@ -132,6 +161,9 @@ export const RowSelectCheckbox = styled.input`
 `;
 
 export const HeaderLabel = styled.span`
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
   min-width: 0;
   max-width: 100%;
 
@@ -182,6 +214,7 @@ export const ResizerButton = styled.button`
 export const FilterRowCell = styled.td`
   padding: 6px 8px;
   border-bottom: 1px solid #e5e7eb;
+  font-family: var(--font-sans);
   text-align: ${(p) => (p.$numeric ? "right" : "left")};
   overflow: hidden;
   vertical-align: middle;
@@ -197,6 +230,7 @@ export const Td = styled.td`
   padding: 6px 8px;
   border-bottom: 1px solid #e5e7eb;
   color: #0f172a;
+  font-family: var(--font-sans);
   text-align: ${(p) => (p.$numeric ? "right" : "left")};
   font-variant-numeric: tabular-nums;
   min-width: 0;
