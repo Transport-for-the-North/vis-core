@@ -27,9 +27,9 @@ export const AppButton = styled.button`
   width: ${(props) => props.$width ?? "auto"};
   height: ${(props) => props.$height ?? "32px"};
 
-  /* Important: inherit the app's font instead of using browser default */
-  font: inherit;
-  font-size: 0.9em;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
 
   display: inline-flex;
   align-items: center;
