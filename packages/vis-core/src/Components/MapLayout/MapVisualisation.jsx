@@ -40,6 +40,33 @@ const areNumericArraysEqual = (a, b) => {
 };
 
 /**
+ * Normalises a visualisation's data into an array of records safe to classify.
+ *
+ * `useFetchVisualisationData` already unwraps the `{ data, metadata }` envelope, so anything
+ * else arriving here is an unrecognised response shape. Rather than letting it reach
+ * `reclassifyData` (which calls `.map` on it), fall back to an empty array so the layer
+ * renders unstyled and log the shape for diagnosis.
+ *
+ * @param {Array|Object|null} data - The visualisation data as returned by the fetch hook.
+ * @param {string} visualisationName - Name of the visualisation, used for the warning.
+ * @returns {Array} The records to classify, or an empty array if the shape is unusable.
+ */
+const toClassifiableArray = (data, visualisationName) => {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (data === null || data === undefined) {
+    return [];
+  }
+
+  console.warn(
+    `Visualisation "${visualisationName}" returned a non-array payload; skipping classification.`,
+    data
+  );
+  return [];
+};
+
+/**
  * Calculates the colour palette based on the provided color scheme and number of bins.
  */
 const calculateColours = (colourScheme, bins, invert = false) => {
@@ -349,14 +376,23 @@ export const MapVisualisation = ({
     }
   }, [visualisationData, dispatch, visualisationName, isLoading, left]);
 
-  // Compute combined data from both left and right visualisations using useMemo (if DualMaps)
+  // Compute combined data from both left and right visualisations using useMemo (if DualMaps).
+  // Always resolves to an array: this feeds reclassifyData, which iterates the records to
+  // build bins. An unrecognised (non-array) response shape must degrade to "no data" rather
+  // than throwing, so the map falls back to its default style instead of crashing the page.
   const combinedData = useMemo(() => {
     if (left === null) {
-      return visualisationData || [];
+      return toClassifiableArray(visualisationData, visualisationName);
     }
-    
-    const leftData = state.leftVisualisations[visualisationName]?.data || [];
-    const rightData = state.rightVisualisations[visualisationName]?.data || [];
+
+    const leftData = toClassifiableArray(
+      state.leftVisualisations[visualisationName]?.data,
+      visualisationName
+    );
+    const rightData = toClassifiableArray(
+      state.rightVisualisations[visualisationName]?.data,
+      visualisationName
+    );
     return [...leftData, ...rightData];
   }, [
     left,
@@ -781,8 +817,11 @@ export const MapVisualisation = ({
       
       switch (visualisation.type) {
         case "joinDataToMap": {
+          // A join needs an array of records; treat anything else (including an
+          // unrecognised response envelope) as "no data" rather than attempting to
+          // classify it. `geojson` below deliberately accepts an object payload.
           if (
-            Array.isArray(dataToVisualise) &&
+            !Array.isArray(dataToVisualise) ||
             dataToVisualise.length === 0
           ) {
             resetMapStyle(resolvedStyle);
