@@ -1,8 +1,9 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Dimmer, MapLayerSection, Sidebar, DynamicStylingStatus } from "Components";
-import { PageContext } from "contexts";
-import { useMapContext, useFilterContext, useLayerZoomMessage } from "hooks";
+import { PageContext, ToastProvider } from "contexts";
+import { AccordionSection } from "Components/Sidebar/Accordion";
+import { useMapContext, useFilterContext, useLayerZoomMessage, useDebounced } from "hooks";
 import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
 import { defaultBgColour } from "defaults";
 import DualMaps from "./DualMaps";
@@ -59,13 +60,45 @@ const MobileLegendSlot = styled.section`
 export const MapLayout = () => {
   const { state, dispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
-  const isLoading = state.isLoading;
   const isDynamicStylingLoading = state.isDynamicStylingLoading;
   const pageContext = useContext(PageContext);
   const initializedRef = useRef(false);
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+
+  // Domain-agnostic extension point: pages can supply extra sidebar sections via
+  // config.additionalMapLayoutAccordionSections so apps can inject bespoke controls without
+  // vis-core knowing anything about them. Each descriptor is rendered inside its own
+  // AccordionSection by default; set `accordion: false` to render the content bare (no
+  // collapsible header). Shape: { component, props?, title?, defaultValue?, accordion? }.
+  const additionalAccordionSections =
+    pageContext.config?.additionalMapLayoutAccordionSections ?? [];
+
+  // Debounced copy of filterState used to gate map-action dispatches (UPDATE_PARAMETERISED_LAYER,
+  // UPDATE_COLOR_SCHEME, etc.) so repaints and data fetches fire together rather than
+  // immediately on each selector interaction. Selector UI still updates from the live filterState.
+  const debouncedFilterState = useDebounced(filterState, 400);
+
+  const isFiltersDebouncing = debouncedFilterState !== filterState;
+  
+  // We keep the dimmer on if filters are debouncing.
+  // We also use a small 50ms buffer state for transitioning out of loading, 
+  // to prevent a 1-frame micro-gap flash between the debounce resolving and 
+  // the visualisations registering their loading state.
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const isCurrentlyLoading = state.isLoading || state.visualisationLoadingCount > 0 || isFiltersDebouncing;
+  
+  useEffect(() => {
+    if (isCurrentlyLoading) {
+      setIsTransitioning(true);
+    } else {
+      const timer = setTimeout(() => setIsTransitioning(false), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isCurrentlyLoading]);
+
+  const isLoading = isCurrentlyLoading || isTransitioning;
 
   useEffect(() => {
     if (!initializedRef.current && state.pageIsReady) {
@@ -96,15 +129,59 @@ export const MapLayout = () => {
     }
   }, [pageContext, filterDispatch]);
 
-  const handleFilterChange = (filter, value) => {
+  const handleFilterChange = useCallback((filter, value) => {
     filterDispatch({
       type: 'SET_FILTER_VALUE',
       payload: { filterId: filter.id, value, filter },
     });
-  };
+  }, [filterDispatch]);
 
   /**
-   * Keep derived filters in sync with their source selection and metadata.
+   * Retrieves the full option objects corresponding to a filter's selected value(s).
+   *
+   * @param {Object} filter - The filter configuration object, containing a `values` property with an array of options.
+   * @param {any|any[]} value - The currently selected value (scalar for single-select) or array of values (for multi-select).
+   * @returns {Object[]} An array of matching option objects from the filter's configuration. Returns an empty array if no matches are found or if the filter lacks options.
+   */
+  const getSelectedFilterOptions = useCallback((filter, value) => {
+    const values = filter.values?.values;
+    if (!Array.isArray(values)) return [];
+
+    if (Array.isArray(value)) {
+      const selected = new Set(value);
+      return values.filter((item) => selected.has(item.paramValue));
+    }
+
+    const selected = values.find((item) => item.paramValue === value);
+    return selected ? [selected] : [];
+  }, []);
+
+  /**
+   * Constructs the payload for dispatching map reducer actions triggered by filter changes.
+   *
+   * @param {Object} filter - The filter configuration object triggering the action.
+   * @param {Object} action - The action definition, including its base `payload` and action type (e.g., `UPDATE_COLOR_SCHEME`).
+   * @param {any|any[]} value - The currently selected value(s) for the filter.
+   * @param {string[]} [sides] - Optional list of panel sides the action applies to, used in dual-map layouts.
+   * @returns {Object} The enriched payload containing the filter, selected value(s), original action payload parameters, and potentially resolved colour schemes.
+   */
+  const buildFilterActionPayload = useCallback((filter, action, value, sides) => {
+    const selectedOptions = getSelectedFilterOptions(filter, value);
+    const payload = { filter, value, ...action.payload };
+
+    if (sides) payload.sides = sides;
+
+    if (action.action === "UPDATE_COLOR_SCHEME") {
+      const colourValue = selectedOptions.find((option) => option.colourValue)?.colourValue;
+      if (colourValue) payload.color_scheme = colourValue;
+    }
+
+    return payload;
+  }, [getSelectedFilterOptions]);
+
+  /**
+   * Effect A (immediate): keep derived filters in sync with their source selection and metadata.
+   * Fires on every filterState change so the UI responds without waiting for the debounce.
    * For every filter that declares `deriveFromFilter`, we:
    * - read the current value of its source filter (`sourceParamName`)
    * - optionally apply override rules driven by other controller filters
@@ -200,8 +277,17 @@ export const MapLayout = () => {
         return;
       }
     }
+  }, [filterState, state.metadataTables, state.filters, filterDispatch]);
 
-    const validatedFilters = updateFilterValidity(state, filterState);
+  /**
+   * Effect B (debounced): validate filter options and dispatch all map actions
+   * (UPDATE_PARAMETERISED_LAYER, UPDATE_COLOR_SCHEME, etc.) after the debounce
+   * window settles. Because useFetchVisualisationData fires immediately when
+   * visualisation params change, this single debounce point ensures repaints and
+   * new data fetches are triggered together rather than immediately on each keystroke.
+   */
+  useEffect(() => {
+    const validatedFilters = updateFilterValidity(state, debouncedFilterState);
 
     if (JSON.stringify(validatedFilters) !== JSON.stringify(state.filters)) {
       dispatch({
@@ -211,44 +297,30 @@ export const MapLayout = () => {
     }
 
     state.filters.forEach((filter) => {
-      let selectedValue
-      if (filter.values?.values && Array.isArray(filter.values.values)) {
-        selectedValue = filter.values?.values.find(
-          (value) => value.paramValue === filterState[filter.id]
-        );
-      }
+      const filterValue = debouncedFilterState[filter.id];
+
       if (!filter.visualisations[0].includes("Side")) {
         filter.actions.forEach((action) => {
-          // Add the colour scheme to the payload
-          let additionalPayload
-          if (action.action === "UPDATE_COLOR_SCHEME") {
-            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
-          }
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], ...action.payload, ...additionalPayload },
+            payload: buildFilterActionPayload(filter, action, filterValue),
           });
         });
       } else {
         filter.actions.forEach((action) => {
           let sides = "";
-          
-          // Add the colour scheme to the payload
-          let additionalPayload
-          if (action.action === "UPDATE_COLOR_SCHEME") {
-            additionalPayload = { ...additionalPayload, color_scheme: selectedValue.colourValue }
-          }
+
           if (filter.filterName.includes("Left")) sides = "left";
           else if (filter.filterName.includes("Right")) sides = "right";
           else sides = "both";
           dispatch({
             type: action.action,
-            payload: { filter, value: filterState[filter.id], sides, ...action.payload, ...additionalPayload },
+            payload: buildFilterActionPayload(filter, action, filterValue, sides),
           });
         });
       }
     });
-  }, [filterState, state.metadataTables, state.filters, dispatch, filterDispatch]);
+  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch, buildFilterActionPayload]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
@@ -272,7 +344,8 @@ export const MapLayout = () => {
   };
 
   return (
-    <LayoutContainer>
+    <ToastProvider>
+      <LayoutContainer>
       <Dimmer dimmed={isLoading} showLoader={true} />
       <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
@@ -294,6 +367,26 @@ export const MapLayout = () => {
           handleClassificationChange={handleClassificationChange}
           handleCustomBandsChange={handleCustomBandsChange}
         />
+        {additionalAccordionSections.map((section, index) => {
+          const SectionComponent = section.component;
+          const content = SectionComponent
+            ? <SectionComponent {...(section.props ?? {})} />
+            : section.content;
+          const key = section.title ?? index;
+          // Opt out of the collapsible wrapper to render the content on its own.
+          if (section.accordion === false) {
+            return <Fragment key={key}>{content}</Fragment>;
+          }
+          return (
+            <AccordionSection
+              key={key}
+              title={section.title}
+              defaultValue={section.defaultValue}
+            >
+              {content}
+            </AccordionSection>
+          );
+        })}
       </Sidebar>
 
       {pageContext.type === "MapLayout" && (
@@ -310,7 +403,8 @@ export const MapLayout = () => {
       {/* Mobile-only: where summary cards will be portaled into */}
       <MobileCardsSlot id="mobile-cards-slot" className="mobile-cards-slot"/>
       
-      <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
-    </LayoutContainer>
+        <MobileLegendSlot id="mobile-legend-slot" aria-label="Legend" />
+      </LayoutContainer>
+    </ToastProvider>
   );
 };

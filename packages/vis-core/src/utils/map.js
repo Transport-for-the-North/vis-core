@@ -837,6 +837,14 @@ export const reclassifyData = (
   queryParams,
   options = {}
 ) => {
+  // Every branch below iterates `data` to derive its breaks. Callers pass the raw
+  // visualisation payload, so guard the shape here rather than throwing a bare
+  // "data.map is not a function" from deep inside a classification branch.
+  if (!Array.isArray(data)) {
+    console.warn("reclassifyData received non-array data; returning no bins.", data);
+    return [];
+  }
+
   /**
    * Normalises continuous-classification bins so the scale starts at zero.
    * @param {Array<number>} bins - Computed continuous break values.
@@ -845,6 +853,10 @@ export const reclassifyData = (
   const normaliseContinuousBins = (bins) => {
     if (!Array.isArray(bins) || bins.length === 0) {
       return bins;
+    }
+
+    if (bins.length === 1) {
+      return [0, bins[0]];
     }
 
     return [0, ...bins.slice(1)];
@@ -1036,7 +1048,7 @@ export const reclassifyData = (
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
     roundedBins = [...new Set(roundedBins)]; 
-    roundedBins = roundedBins.slice(0, 4);  
+    roundedBins = roundedBins.slice(-4);  
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map((val) => -val);
     return [...negativeBins, 0, ...roundedBins];

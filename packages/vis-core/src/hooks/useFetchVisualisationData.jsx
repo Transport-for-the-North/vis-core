@@ -86,6 +86,25 @@ const toSimpleParamsMap = (paramsMap = {}) => {
 };
 
 /**
+ * Unwraps a `{ data, metadata }` API response envelope if present.
+ * Returns the inner `data` array directly. Plain array responses are passed through as-is.
+ *
+ * @param {Array|Object} response - The raw API response.
+ * @returns {Array} - The unwrapped data array, or the original response if not a recognised envelope.
+ */
+export const unwrapApiResponse = (response) => {
+  if (
+    response !== null &&
+    typeof response === 'object' &&
+    !Array.isArray(response) &&
+    Array.isArray(response.data)
+  ) {
+    return response.data;
+  }
+  return response;
+};
+
+/**
  * Helper: Checks whether all required params in a map have a non-null/undefined value.
  *
  * @param {Object<string, {value:any, required?:boolean}>} paramsMap - Map of param definitions.
@@ -153,9 +172,14 @@ const determineFetchState = ({
  * @param {Object} [visualisation.pathParams] - The path parameters to include in the API request (shape: {key: {value, required}}).
  * @param {boolean} visualisation.requiresAuth - Indicates if the request requires authentication.
  * @param {string} visualisation.name - The name of the visualisation.
- * @param {Object} [map] - (Optional) The map instance used for filtering by viewport.
- * @param {string} [mapLayerId] - (Optional) The map layer ID that contains the rendered features.
- * @param {boolean} [shouldFilterDataToViewport=false] - Whether to filter the returned data against the visible map viewport.
+ * @param {Object} [options] - Optional configuration.
+ * @param {Object} [options.map] - The map instance used for filtering by viewport.
+ * @param {string} [options.mapLayerId] - The map layer ID that contains the rendered features.
+ * @param {boolean} [options.shouldFilterDataToViewport=false] - Whether to filter returned data to the visible map viewport.
+ * @param {number} [options.debounceMs=400] - Milliseconds to debounce the fetch. Pass `0` when the caller is already
+ *   behind an upstream debounce (e.g. MapLayout's `debouncedFilterState`) — the params will only arrive after that
+ *   gate has settled, so no additional delay is needed. Pass a positive value for consumers that construct their own
+ *   visualisation object directly from filter state with no upstream rate-limiting (e.g. `SvgGalleryManager`).
  *
  * @returns {{
  *   isLoading: boolean,
@@ -168,9 +192,12 @@ const determineFetchState = ({
  */
 export const useFetchVisualisationData = (
   visualisation,
-  map,
-  mapLayerId,
-  shouldFilterDataToViewport = false
+  {
+    map = null,
+    mapLayerId = null,
+    shouldFilterDataToViewport = false,
+    debounceMs = 400,
+  } = {}
 ) => {
   const [isLoading, setLoading] = useState(false);
   const [rawData, setRawData] = useState(null);
@@ -207,6 +234,18 @@ export const useFetchVisualisationData = (
 
   // Track abort controller for request cancellation
   const abortControllerRef = useRef(null);
+  const cacheTimeoutRef = useRef(null);
+
+  const mapRef = useRef(map);
+  const mapLayerIdRef = useRef(mapLayerId);
+  const shouldFilterRef = useRef(shouldFilterDataToViewport);
+
+  // Keep refs aligned
+  useEffect(() => {
+    mapRef.current = map;
+    mapLayerIdRef.current = mapLayerId;
+    shouldFilterRef.current = shouldFilterDataToViewport;
+  }, [map, mapLayerId, shouldFilterDataToViewport]);
 
   /**
    * Resets the fetch state - useful when visualisation changes (e.g., page navigation).
@@ -215,6 +254,9 @@ export const useFetchVisualisationData = (
     // Cancel any pending request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+    }
+    if (cacheTimeoutRef.current) {
+      clearTimeout(cacheTimeoutRef.current);
     }
     
     // Clear cache for this visualisation
@@ -240,7 +282,7 @@ export const useFetchVisualisationData = (
   useEffect(() => {
     const currentName = visualisation?.name;
     
-    if (prevVisualisationNameRef.current !== undefined && 
+    if (prevVisualisationNameRef.current !== undefined &&
         prevVisualisationNameRef.current !== currentName) {
       resetFetchState();
     }
@@ -257,14 +299,17 @@ export const useFetchVisualisationData = (
       debounce(async (vis) => {
         if (!vis) return;
 
+        // Use the current values from refs
+        const currentMap = mapRef.current;
+        const currentMapLayerId = mapLayerIdRef.current;
+        const currentShouldFilter = shouldFilterRef.current;
+
         /**
          * Commit the params signature only when the fetch actually starts.
          * This prevents "scheduled then cancelled" from blocking future fetches.
          */
-        if (pendingParamsSignatureRef.current) {
-          prevParamsRef.current = pendingParamsSignatureRef.current;
-          pendingParamsSignatureRef.current = null;
-        }
+        const paramsSignatureForThisRequest = pendingParamsSignatureRef.current;
+        pendingParamsSignatureRef.current = null;
 
         const {
           dataPath: path,
@@ -283,10 +328,10 @@ export const useFetchVisualisationData = (
         let isBackgroundFetch = false;
 
         // If configured to filter server-side by viewport, add the current bbox to the query params
-        if (shouldFilterDataToViewport && map && typeof map.getBounds === 'function') {
+        if (currentShouldFilter && currentMap && typeof currentMap.getBounds === 'function') {
           try {
-            const bounds = map.getBounds();
-            currentZoom = Math.round(map.getZoom());
+            const bounds = currentMap.getBounds();
+            currentZoom = Math.round(currentMap.getZoom());
             
             const currentExactBbox = {
               west: bounds.getWest(),
@@ -319,7 +364,7 @@ export const useFetchVisualisationData = (
                 return; 
               }
 
-              // If we made it here, we need new data, but since filters haven't changed 
+              // If we made it here, we need new data, but since filters haven't changed
               // and we already have some data, we can do this silently in the background.
               if (accumulatedDataRef.current.size > 0) {
                 isBackgroundFetch = true;
@@ -341,7 +386,8 @@ export const useFetchVisualisationData = (
           }
         }
 
-        // Only trigger the blocking loading state if this is NOT a background fetch
+        // Only trigger the blocking loading state for actual network requests
+        // (not cache hits, and not background fetches when we already have data).
         if (!isBackgroundFetch) {
           setLoading(true);
         }
@@ -352,30 +398,46 @@ export const useFetchVisualisationData = (
         // Create a cache key based on the request (including bbox when present)
         const cacheKey = JSON.stringify({ path, queryParamsForApi, pathParamsForApi });
 
-        // Check cache first
+        // Check cache first — BEFORE setting loading state.
+        // Setting loading(true) before this check and then clearing it after 50ms (via
+        // setTimeout) would cause the global isLoading flag to flicker true→false
+        // while other visualisations are still mid-fetch, prematurely hiding the Dimmer.
+        // Cache hits are near-instant, so they don't warrant a loading indicator.
         if (responseCache.current.has(cacheKey)) {
           const cachedData = responseCache.current.get(cacheKey);
           
-          // If we hit the cache, we still need to merge it into our accumulated data
-          if (shouldFilterDataToViewport && Array.isArray(cachedData)) {
-            lastFetchedBboxRef.current = fetchBbox;
-            lastFetchedZoomRef.current = currentZoom;
-            
-            cachedData.forEach(item => {
-              if (item.id !== undefined && item.id !== null) {
-                accumulatedDataRef.current.set(item.id, item);
+          // Use a small async gap so React can paint the current frame before we
+          // swap data in. This avoids a visible tile-swap flash on cache hits without
+          // affecting the shared loading state.
+          cacheTimeoutRef.current = setTimeout(() => {
+            if (currentShouldFilter && Array.isArray(cachedData)) {
+              lastFetchedBboxRef.current = fetchBbox;
+              lastFetchedZoomRef.current = currentZoom;
+              
+              cachedData.forEach(item => {
+                if (item.id !== undefined && item.id !== null) {
+                  accumulatedDataRef.current.set(item.id, item);
+                }
+              });
+              
+              const mergedData = Array.from(accumulatedDataRef.current.values());
+              setRawData(mergedData);
+              if (!currentMap || !currentMapLayerId) setFilteredData(mergedData);
+            } else {
+              setRawData(cachedData);
+              if (!currentMap || !currentMapLayerId || !currentShouldFilter) {
+                setFilteredData(cachedData);
               }
-            });
+            }
+
+            if (paramsSignatureForThisRequest) {
+              prevParamsRef.current = paramsSignatureForThisRequest;
+            }
             
-            const mergedData = Array.from(accumulatedDataRef.current.values());
-            setRawData(mergedData);
-            if (!map || !mapLayerId) setFilteredData(mergedData);
-          } else {
-            setRawData(cachedData);
-            if (!map || !mapLayerId || !shouldFilterDataToViewport) setFilteredData(cachedData);
-          }
+            // Ensure loading is cleared in case a previous real fetch left it true.
+            setLoading(false);
+          }, 50);
           
-          setLoading(false);
           return;
         }
 
@@ -383,21 +445,26 @@ export const useFetchVisualisationData = (
         if (abortControllerRef.current) {
           abortControllerRef.current.abort();
         }
+        if (cacheTimeoutRef.current) {
+          clearTimeout(cacheTimeoutRef.current);
+        }
 
         // Create new abort controller for this request
         abortControllerRef.current = new AbortController();
+        const currentSignal = abortControllerRef.current.signal;
 
         try {
-          const responseData = await api.baseService.get(path, {
+          const rawResponse = await api.baseService.get(path, {
             pathParams: pathParamsForApi,
             queryParams: queryParamsForApi,
             skipAuth: !requiresAuth,
-            signal: abortControllerRef.current.signal,
+            signal: currentSignal,
           });
 
+          const responseData = unwrapApiResponse(rawResponse);
+
           // Only set data if request wasn't aborted
-          if (abortControllerRef.current.signal.aborted) {
-            console.log('[Data Fetch] Request was aborted, ignoring response');
+          if (currentSignal.aborted) {
             return;
           }
 
@@ -413,28 +480,25 @@ export const useFetchVisualisationData = (
           // --- DATA ACCUMULATION LOGIC ---
           let finalDataToSet = responseData;
 
-          if (shouldFilterDataToViewport && Array.isArray(responseData)) {
+          if (currentShouldFilter && Array.isArray(responseData)) {
             // Save our successful fetch parameters
             lastFetchedBboxRef.current = fetchBbox;
             lastFetchedZoomRef.current = currentZoom;
-
-            // Merge new data into our accumulated map using the record ID
+            
+            // For viewport-filtered layers, merge the new results into our accumulated cache
             responseData.forEach(item => {
               if (item.id !== undefined && item.id !== null) {
                 accumulatedDataRef.current.set(item.id, item);
               }
             });
-
-            // If items have IDs, use the accumulated data. Otherwise fallback to raw response.
-            if (accumulatedDataRef.current.size > 0) {
-              finalDataToSet = Array.from(accumulatedDataRef.current.values());
-            }
+            
+            finalDataToSet = Array.from(accumulatedDataRef.current.values());
           }
 
           setRawData(finalDataToSet);
 
           // If no viewport filtering is requested or not possible, mirror to filteredData.
-          if (!map || !mapLayerId || !shouldFilterDataToViewport) {
+          if (!currentMap || !currentMapLayerId || !currentShouldFilter) {
             setFilteredData(finalDataToSet);
           }
 
@@ -444,15 +508,23 @@ export const useFetchVisualisationData = (
         } catch (e) {
           // Don't log abort errors
           if (e.name !== 'AbortError') {
-            console.error('Error fetching data for visualisation:', e);
+            console.error('Error fetching data for visualisation:', visualisationName, e);
             setError(e);
           }
         } finally {
-          // Always ensure loading is turned off when the request finishes
-          setLoading(false);
+          // Ensure we update prevParamsRef so we don't infinitely retry failing requests
+          if (paramsSignatureForThisRequest && !currentSignal.aborted) {
+            prevParamsRef.current = paramsSignatureForThisRequest;
+          }
+
+          // Only turn off loading if THIS specific request wasn't aborted.
+          // If it was aborted, a new request has likely already set loading to true.
+          if (!currentSignal.aborted) {
+            setLoading(false);
+          }
         }
-      }, 400),
-    [map, mapLayerId, shouldFilterDataToViewport]
+      }, debounceMs),
+    [debounceMs]
   );
 
   // Cancel any pending debounced call on unmount to avoid setting state after unmount.
@@ -461,6 +533,9 @@ export const useFetchVisualisationData = (
       fetchDataForVisualisation.cancel();
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
+      }
+      if (cacheTimeoutRef.current) {
+        clearTimeout(cacheTimeoutRef.current);
       }
     };
   }, [fetchDataForVisualisation]);
@@ -480,7 +555,8 @@ export const useFetchVisualisationData = (
     }
 
     // Track a combined signature of both param maps to detect changes.
-    const currentParamsStr = JSON.stringify({ queryParams, pathParams });
+    const isMapReady = shouldFilterDataToViewport ? !!map : true;
+    const currentParamsStr = JSON.stringify({ queryParams, pathParams, isMapReady });
 
     const paramsChanged = prevParamsRef.current !== currentParamsStr;
 
@@ -494,9 +570,15 @@ export const useFetchVisualisationData = (
 
       fetchDataForVisualisation(visualisation);
 
-      // CONDITIONAL FLUSH: Only bypass the debounce if it's the very first load
-      if (isFirstFetchRef.current) {
+      // When debounceMs === 0 the debounce is purely a same-tick batch guard, so
+      // flush immediately to ensure the call isn't lost in React StrictMode
+      // double-mount cycles. When debounceMs > 0 the caller relies on the delay
+      // for rate-limiting — flushing here would defeat that purpose.
+      if (debounceMs === 0) {
         fetchDataForVisualisation.flush?.();
+      }
+
+      if (isFirstFetchRef.current) {
         isFirstFetchRef.current = false;
       }
     }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { FullScreenCalloutCardVisualisation } from "./FullScreenCalloutCardVisualisation";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { RecordSelector } from "./RecordSelector";
@@ -18,13 +18,25 @@ import { api } from "services";
  * mirror Map's behavior. This ensures any configured actions tied to the location filter
  * are executed rather than hard-coded path-param updates.
  *
+ * Behaviour:
+ * - Keeps previous data visible during refreshes after first hydration.
+ * - Sends onFirstVisible through to the small callout card so the manager can move it
+ *   to the top once, without reordering on every later data update.
+ * - Sends onCardUpdated through so updated cards can show a per-card ping and stack hint.
+ *
  * @component
- * @param {Object} props - The component props
+ * @param {Object} props
  * @param {'small' | 'fullscreen'} [props.type='small'] - Display type of the card
  * @param {string} props.visualisationName - Name of the visualization from context
  * @param {string} props.cardName - Unique name identifier for the card
- * @param {Function} [props.onUpdate] - Callback function when card data updates
- * @param {string} [props.locationFilterId] - Optional explicit filter id to drive navigation (overrides heuristic resolution)
+ * @param {Function} [props.onUpdate] - Backwards-compatible callback when card data updates
+ * @param {Function} [props.onFirstVisible] - Callback fired once when the card first renders with data
+ * @param {Function} [props.onVisibilityChange] - Callback fired when the card becomes visible/hidden
+ * @param {Function} [props.onCardUpdated] - Callback fired when hydrated card data changes.
+ * @param {Function} [props.onCardUpdateAcknowledged] - Callback fired when the user opens an updated card.
+ * @param {boolean} [props.hideHandleOnMobile] - Hide the desktop card toggle in mobile stacked layout.
+ * @param {string} [props.locationFilterId] - Optional explicit filter id to drive navigation
+ * @param {Function} [props.getAllColors]
  *
  * @returns {JSX.Element|null} The rendered card component or null if loading/hidden
  */
@@ -33,6 +45,11 @@ export const BaseCalloutCardVisualisation = ({
   visualisationName,
   cardName,
   onUpdate,
+  onFirstVisible,
+  onVisibilityChange,
+  onCardUpdated,
+  onCardUpdateAcknowledged,
+  hideHandleOnMobile,
   locationFilterId,
   getAllColors,
   ...props
@@ -44,13 +61,14 @@ export const BaseCalloutCardVisualisation = ({
   const visualisation = state.visualisations[visualisationName];
 
   const [data, setData] = useState(null);
+  const previousDataRef = useRef(null);
   const [hasHydrated, setHasHydrated] = useState(false);
-  
+
   // State for handling multiple records
   const [allRecords, setAllRecords] = useState([]);
   const [selectedRecordIndex, setSelectedRecordIndex] = useState(0);
   const [hasMultipleRecords, setHasMultipleRecords] = useState(false);
-  
+
   // Flag to prevent data reset when user has made a selection
   const [userHasSelectedRecord, setUserHasSelectedRecord] = useState(false);
 
@@ -60,12 +78,23 @@ export const BaseCalloutCardVisualisation = ({
   const [isTransition, setIsTransition] = useState(false);
 
   // ========== Data Fetching ==========
-  const response = useFetchVisualisationData(visualisation);
+  // visualisation comes from state.visualisations — already gated by MapLayout's debouncedFilterState
+  const response = useFetchVisualisationData(visualisation, { debounceMs: 0 });
   const responseData = response.data;
   const remoteIsLoading = response.isLoading;
 
   /**
-   * Synchronizes the displayed data with the fetched data,
+   * Keeps the latest rendered data available so refreshes can show the previous
+   * card content while the next response is loading.
+   */
+  useEffect(() => {
+    if (data !== null && data !== undefined) {
+      previousDataRef.current = data;
+    }
+  }, [data]);
+
+  /**
+   * Synchronises the displayed data with the fetched data,
    * except when we are in a transition (showing prefetched data).
    * Handles both single records and arrays of multiple records.
    */
@@ -74,10 +103,10 @@ export const BaseCalloutCardVisualisation = ({
       // Check if response data is an array
       if (Array.isArray(responseData)) {
         const isNewDataSet = allRecords.length !== responseData.length;
-        
+
         setAllRecords(responseData);
         setHasMultipleRecords(responseData.length > 1);
-        
+
         if (responseData.length > 0) {
           // Only reset selection if this is new data or user hasn't made a selection
           if (isNewDataSet || !userHasSelectedRecord) {
@@ -88,8 +117,13 @@ export const BaseCalloutCardVisualisation = ({
             setUserHasSelectedRecord(false);
           } else {
             // Preserve current selection if possible
-            const validIndex = selectedRecordIndex < responseData.length ? selectedRecordIndex : responseData.length - 1;
+            const validIndex =
+              selectedRecordIndex < responseData.length
+                ? selectedRecordIndex
+                : responseData.length - 1;
+
             setData(responseData[validIndex]);
+
             if (validIndex !== selectedRecordIndex) {
               setSelectedRecordIndex(validIndex);
             }
@@ -105,7 +139,7 @@ export const BaseCalloutCardVisualisation = ({
         setSelectedRecordIndex(0);
         setUserHasSelectedRecord(false);
       }
-      
+
       // Once we have any data, consider initial hydration complete and stop showing loading flashes
       if (!hasHydrated) setHasHydrated(true);
     }
@@ -138,7 +172,6 @@ export const BaseCalloutCardVisualisation = ({
    * @param {number} index - Index of the selected record
    */
   const handleRecordSelection = (index) => {
-    
     if (index >= 0 && index < allRecords.length) {
       setSelectedRecordIndex(index);
       setUserHasSelectedRecord(true);
@@ -154,8 +187,12 @@ export const BaseCalloutCardVisualisation = ({
    * @returns {string} Display label
    */
   const getRecordLabel = (record) => {
-    // Try to get a meaningful label from the record
-    return record.title || record.name || record.reference_id || `Record ${allRecords.indexOf(record) + 1}`;
+    return (
+      record.title ||
+      record.name ||
+      record.reference_id ||
+      `Record ${allRecords.indexOf(record) + 1}`
+    );
   };
 
   /**
@@ -170,8 +207,9 @@ export const BaseCalloutCardVisualisation = ({
       !locationId ||
       (mode === "next" && nextData) ||
       (mode === "previous" && prevData)
-    )
+    ) {
       return;
+    }
 
     const nextVisu = {
       ...visualisation,
@@ -182,7 +220,9 @@ export const BaseCalloutCardVisualisation = ({
         },
       },
     };
+
     const dataUpdated = await prefetch(nextVisu);
+
     if (dataUpdated && mode === "next") setNextData(dataUpdated);
     if (dataUpdated && mode === "previous") setPrevData(dataUpdated);
   };
@@ -208,12 +248,13 @@ export const BaseCalloutCardVisualisation = ({
    * @param {Object} nextVisu - Visualisation config for the location to fetch
    * @returns {Promise<Object>} - The fetched data
    */
-  async function prefetch(nextVisu, mode) {
+  async function prefetch(nextVisu) {
     const response = await api.baseService.get(nextVisu.dataPath, {
       pathParams: toSimpleParamsMap(nextVisu.pathParams),
       queryParams: toSimpleParamsMap(nextVisu.queryParams),
       skipAuth: !nextVisu.requiresAuth,
     });
+
     return response;
   }
 
@@ -230,6 +271,7 @@ export const BaseCalloutCardVisualisation = ({
    */
   const resolveLocationFilter = (filters) => {
     if (!Array.isArray(filters) || filters.length === 0) return null;
+
     if (locationFilterId) {
       return filters.find((f) => f.id === locationFilterId) || null;
     }
@@ -247,14 +289,18 @@ export const BaseCalloutCardVisualisation = ({
               : true)
         )
     );
+
     if (byPathParam) return byPathParam;
 
     const byField = filters.find((f) =>
       ["id", "location_id", "loc_id"].includes(f.field)
     );
+
     if (byField) return byField;
 
-    return filters.find((f) => Array.isArray(f.actions) && f.actions.length) || null;
+    return (
+      filters.find((f) => Array.isArray(f.actions) && f.actions.length) || null
+    );
   };
 
   /**
@@ -296,6 +342,7 @@ export const BaseCalloutCardVisualisation = ({
    */
   const change = (mode) => {
     let targetData = null;
+
     switch (mode) {
       case "next":
         targetData = nextData;
@@ -321,7 +368,7 @@ export const BaseCalloutCardVisualisation = ({
     const locationFilter = resolveLocationFilter(state.filters);
     const ranFilterActions = runFilterActions(locationFilter, targetLocationId);
 
-    // Fallback preserves previous implementation 
+    // Fallback preserves previous implementation
     if (!ranFilterActions) {
       dispatch({
         type: actionTypes.UPDATE_PATH_PARAMS,
@@ -334,15 +381,24 @@ export const BaseCalloutCardVisualisation = ({
         },
       });
     }
+
     setNextData(null);
     setPrevData(null);
   };
 
+  const displayData =
+    remoteIsLoading && hasHydrated
+      ? data ?? previousDataRef.current
+      : data;
+
+  const showInitialLoading = remoteIsLoading && !hasHydrated && !displayData;
+  const showUpdating = remoteIsLoading && hasHydrated;
 
   return type === "fullscreen" ? (
     <FullScreenCalloutCardVisualisation
-      data={data}
-      isLoading={remoteIsLoading}
+      data={displayData}
+      isLoading={showInitialLoading}
+      isUpdating={showUpdating}
       handleUpdatedData={(locationId, mode) => {
         onUpdateData(locationId, mode);
       }}
@@ -354,17 +410,25 @@ export const BaseCalloutCardVisualisation = ({
       visualisationName={visualisationName}
       cardName={cardName}
       onUpdate={onUpdate}
-      data={data}
-      isLoading={remoteIsLoading}
+      onFirstVisible={onFirstVisible}
+      onVisibilityChange={onVisibilityChange}
+      onCardUpdated={onCardUpdated}
+      onCardUpdateAcknowledged={onCardUpdateAcknowledged}
+      data={displayData}
+      isLoading={showInitialLoading}
+      isUpdating={showUpdating}
+      hideHandleOnMobile={hideHandleOnMobile}
       getAllColors={getAllColors ?? injectedGetAllColors}
-      recordSelector={hasMultipleRecords ? (
-        <RecordSelector
-          records={allRecords}
-          selectedIndex={selectedRecordIndex}
-          onSelect={handleRecordSelection}
-          getRecordLabel={getRecordLabel}
-        />
-      ) : null}
+      recordSelector={
+        hasMultipleRecords ? (
+          <RecordSelector
+            records={allRecords}
+            selectedIndex={selectedRecordIndex}
+            onSelect={handleRecordSelection}
+            getRecordLabel={getRecordLabel}
+          />
+        ) : null
+      }
     />
   );
 };

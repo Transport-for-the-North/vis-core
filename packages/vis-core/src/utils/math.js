@@ -106,6 +106,16 @@ export const roundValue = (value) => {
   }
 };
 
+const normaliseSortValue = (value) => {
+  if (typeof value !== 'string') return value;
+
+  const trimmed = value.trim();
+  if (trimmed === '') return value;
+
+  const numericValue = Number(trimmed);
+  return Number.isFinite(numericValue) ? numericValue : value;
+};
+
 /**
  * Helper function to sort values based on the specified order.
  * @function sortValues
@@ -115,10 +125,13 @@ export const roundValue = (value) => {
  */
 export const sortValues = (values, order) => {
   return values.sort((a, b) => {
+    const valA = normaliseSortValue(a.sortValue !== undefined ? a.sortValue : a.displayValue);
+    const valB = normaliseSortValue(b.sortValue !== undefined ? b.sortValue : b.displayValue);
+
     if (order === 'ascending') {
-      return a.displayValue > b.displayValue ? 1 : -1;
+      return valA > valB ? 1 : (valA < valB ? -1 : 0);
     } else if (order === 'descending') {
-      return a.displayValue < b.displayValue ? 1 : -1;
+      return valA < valB ? 1 : (valA > valB ? -1 : 0);
     }
     return 0;
   });

@@ -16,7 +16,7 @@ import {
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData, useFeatureStateUpdater } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData, useFeatureStateUpdater, useVisualisationLoadingCounter } from "hooks"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 
@@ -37,6 +37,33 @@ const areNumericArraysEqual = (a, b) => {
     if (Number(a[i]) !== Number(b[i])) return false;
   }
   return true;
+};
+
+/**
+ * Normalises a visualisation's data into an array of records safe to classify.
+ *
+ * `useFetchVisualisationData` already unwraps the `{ data, metadata }` envelope, so anything
+ * else arriving here is an unrecognised response shape. Rather than letting it reach
+ * `reclassifyData` (which calls `.map` on it), fall back to an empty array so the layer
+ * renders unstyled and log the shape for diagnosis.
+ *
+ * @param {Array|Object|null} data - The visualisation data as returned by the fetch hook.
+ * @param {string} visualisationName - Name of the visualisation, used for the warning.
+ * @returns {Array} The records to classify, or an empty array if the shape is unusable.
+ */
+const toClassifiableArray = (data, visualisationName) => {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (data === null || data === undefined) {
+    return [];
+  }
+
+  console.warn(
+    `Visualisation "${visualisationName}" returned a non-array payload; skipping classification.`,
+    data
+  );
+  return [];
 };
 
 /**
@@ -166,6 +193,7 @@ export const MapVisualisation = ({
   // State for tracking resolved dynamic styles
   const [resolvedStyle, setResolvedStyle] = useState(null);
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
+  const [isApplyingStyle, setIsApplyingStyle] = useState(false);
 
   const { addFeaturesToMap } = useFeatureStateUpdater();
 
@@ -215,12 +243,12 @@ export const MapVisualisation = ({
     dataWasReturnedButFiltered,
     fetchState,
     resetFetchState,
-  } = useFetchVisualisationData(
-    visualisation,
+  } = useFetchVisualisationData(visualisation, {
     map,
-    layerKey,
+    mapLayerId: layerKey,
     shouldFilterDataToViewport,
-  );
+    debounceMs: 0, // visualisation comes from state.visualisations — already gated by MapLayout's debouncedFilterState
+  });
 
   // Initialise classification method from visualisation config if not already set in state
   useEffect(() => {
@@ -301,13 +329,14 @@ export const MapVisualisation = ({
     };
   }, [visualisation?.style, visualisation?.dynamicStyling, visualisationData, isLoading, dispatch]);
 
-  // Handle loading state
+  // Register this visualisation's fetch state with the shared loading counter so
+  // the layout Dimmer stays on until every visualisation on the page has finished.
+  const isFullyLoading = isLoading || isResolvingStyle || isApplyingStyle;
+  useVisualisationLoadingCounter(isFullyLoading, dispatch);
+
   useEffect(() => {
     if (isLoading) {
-      dispatch({ type: actionTypes.SET_IS_LOADING });
       dispatch({ type: actionTypes.SET_DATA_REQUESTED, payload: true });
-    } else {
-      dispatch({ type: actionTypes.SET_LOADING_FINISHED });
     }
   }, [isLoading, dispatch]);
 
@@ -347,14 +376,23 @@ export const MapVisualisation = ({
     }
   }, [visualisationData, dispatch, visualisationName, isLoading, left]);
 
-  // Compute combined data from both left and right visualisations using useMemo (if DualMaps)
+  // Compute combined data from both left and right visualisations using useMemo (if DualMaps).
+  // Always resolves to an array: this feeds reclassifyData, which iterates the records to
+  // build bins. An unrecognised (non-array) response shape must degrade to "no data" rather
+  // than throwing, so the map falls back to its default style instead of crashing the page.
   const combinedData = useMemo(() => {
     if (left === null) {
-      return visualisationData || [];
+      return toClassifiableArray(visualisationData, visualisationName);
     }
-    
-    const leftData = state.leftVisualisations[visualisationName]?.data || [];
-    const rightData = state.rightVisualisations[visualisationName]?.data || [];
+
+    const leftData = toClassifiableArray(
+      state.leftVisualisations[visualisationName]?.data,
+      visualisationName
+    );
+    const rightData = toClassifiableArray(
+      state.rightVisualisations[visualisationName]?.data,
+      visualisationName
+    );
     return [...leftData, ...rightData];
   }, [
     left,
@@ -687,6 +725,13 @@ export const MapVisualisation = ({
       return;
     }
 
+    // If the layer has missing parameters, it will not be added to the map by Layer.jsx.
+    // Abort the styling process immediately to prevent infinite waiting.
+    if (layerConfig.missingParams && layerConfig.missingParams.length > 0) {
+      setIsApplyingStyle(false);
+      return;
+    }
+
     // Determine if reclassification is needed
     const dataHasChanged =
       combinedData !== prevCombinedDataRef.current &&
@@ -772,8 +817,11 @@ export const MapVisualisation = ({
       
       switch (visualisation.type) {
         case "joinDataToMap": {
+          // A join needs an array of records; treat anything else (including an
+          // unrecognised response envelope) as "no data" rather than attempting to
+          // classify it. `geojson` below deliberately accepts an object payload.
           if (
-            Array.isArray(dataToVisualise) &&
+            !Array.isArray(dataToVisualise) ||
             dataToVisualise.length === 0
           ) {
             resetMapStyle(resolvedStyle);
@@ -809,11 +857,14 @@ export const MapVisualisation = ({
       let retryCount = 0;
       let isCleanedUp = false;
 
+      setIsApplyingStyle(true);
+
       const checkLayerAndPerform = () => {
         if (isCleanedUp) return;
 
         if (map.isStyleLoaded() && map.getLayer(layerKey)) {
           performReclassification();
+          setIsApplyingStyle(false);
         } else if (retryCount < maxRetries) {
           retryCount++;
           const timeoutId = setTimeout(checkLayerAndPerform, retryDelay);
@@ -823,6 +874,7 @@ export const MapVisualisation = ({
             if (isCleanedUp || !map.isStyleLoaded() || !map.getLayer(layerKey)) return;
             cleanup();
             performReclassification();
+            setIsApplyingStyle(false);
           };
 
           const cleanup = () => {
@@ -836,7 +888,10 @@ export const MapVisualisation = ({
         }
       };
 
-      cleanupFns.push(() => { isCleanedUp = true; });
+      cleanupFns.push(() => { 
+        isCleanedUp = true; 
+        setIsApplyingStyle(false);
+      });
       checkLayerAndPerform();
     } else {
       performReclassification();
@@ -865,6 +920,7 @@ export const MapVisualisation = ({
     reclassifyAndStyleMap,
     reclassifyAndStyleGeoJSONMap,
   ]);
+
 
   // Trigger update when style resolution completes if there was a pending update
   useEffect(() => {

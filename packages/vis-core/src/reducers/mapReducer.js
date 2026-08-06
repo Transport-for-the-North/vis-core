@@ -159,6 +159,8 @@ export const actionTypes = {
   JOIN_DATA: "JOIN_DATA",
   SET_IS_LOADING: "SET_IS_LOADING",
   SET_LOADING_FINISHED: "SET_LOADING_FINISHED",
+  INCREMENT_VISUALISATION_LOADING: "INCREMENT_VISUALISATION_LOADING",
+  DECREMENT_VISUALISATION_LOADING: "DECREMENT_VISUALISATION_LOADING",
   SET_DYNAMIC_STYLING_LOADING: "SET_DYNAMIC_STYLING_LOADING",
   SET_DYNAMIC_STYLING_FINISHED: "SET_DYNAMIC_STYLING_FINISHED",
   UPDATE_LEGEND_TEXT: "UPDATE_LEGEND_TEXT",
@@ -266,6 +268,7 @@ export const mapReducer = (state, action) => {
         leftVisualisations: {},
         rightVisualisations: {},
         isLoading: true,
+        visualisationLoadingCount: 0,
         pageIsReady: false,
         selectionMode: null,
         selectionLayer: null,
@@ -669,6 +672,12 @@ export const mapReducer = (state, action) => {
     }
     case actionTypes.SET_LOADING_FINISHED: {
       return { ...state, isLoading: false };
+    }
+    case actionTypes.INCREMENT_VISUALISATION_LOADING: {
+      return { ...state, visualisationLoadingCount: (state.visualisationLoadingCount ?? 0) + 1 };
+    }
+    case actionTypes.DECREMENT_VISUALISATION_LOADING: {
+      return { ...state, visualisationLoadingCount: Math.max(0, (state.visualisationLoadingCount ?? 0) - 1) };
     }
     case actionTypes.SET_DYNAMIC_STYLING_LOADING: {
       return { ...state, isDynamicStylingLoading: true };

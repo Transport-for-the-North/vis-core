@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Select, { components } from 'react-select';
 import styled, { useTheme } from 'styled-components';
 import { useLayerFeatureMetadata } from 'hooks/useLayerFeatureMetadata';
-import { makeSelectStyles } from 'utils/selectStyles';
+import { makeSelectStyles, selectComponents } from 'utils/selectStyles';
 
 // Styled components
 const Container = styled.div`
@@ -93,7 +93,7 @@ export const FeatureSelect = ({ layerPath, value, onChange, isMulti = false, pla
         isLoading={isLoading}
         noOptionsMessage={() => noOptionsMessage}
         onMenuOpen={handleMenuOpen}
-        components={{ ValueContainer: CustomValueContainer }}
+        components={{ ...selectComponents, ValueContainer: CustomValueContainer }}
         styles={selectStyles}
         menuPortalTarget={document.body}
         menuPosition="fixed"

@@ -58,7 +58,13 @@ export const useLayerFeatureMetadata = (layerPath) => {
           .map((feature) => ({
             value: feature.id,
             label: feature.name || feature.id,
-          }));
+          }))
+          .sort((a, b) =>
+            String(a.label).localeCompare(String(b.label), undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            })
+          );
 
         // Update the cache with the new result
         cache.current[cacheKey] = filteredOptions;
