@@ -38,6 +38,11 @@ jobs:
         env:
           CI: true
 
+      - name: Check for Circular Dependencies
+        run: |
+          cd packages/vis-core
+          npm run lint:circular
+
   publish:
     needs: test_job
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
