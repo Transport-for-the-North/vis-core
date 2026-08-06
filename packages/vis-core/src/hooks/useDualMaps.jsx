@@ -97,8 +97,14 @@ export const useDualMaps = (
       );
       rightMapInstance.resize();
 
-      const isMobile = window.matchMedia('(max-width: 900px)').matches;
-      if (isMobile) {
+      const isNarrowViewport = window.matchMedia('(max-width: 900px)').matches;
+      const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches ||
+        window.matchMedia('(any-pointer: coarse)').matches;
+      const hasFinePointer = window.matchMedia('(pointer: fine)').matches ||
+        window.matchMedia('(any-pointer: fine)').matches;
+      const shouldDisableDesktopInteractions = isNarrowViewport && hasCoarsePointer && !hasFinePointer;
+
+      if (shouldDisableDesktopInteractions) {
         [leftMapInstance, rightMapInstance].forEach(map => {
           map.scrollZoom.disable();      // prevent single-finger zoom
           map.dragPan.disable();         // prevent single-finger pan
