@@ -27,7 +27,7 @@ import {
 } from "./helpers";
 import { MAX_IMAGE_HEIGHT, WIDTH_BREAKPOINT, MAX_IMAGES_ALLOWED } from "./constants";
 import "./HomePage.styles.css";
-import { AppContext } from "contexts";
+import { AppContext } from "contexts/AppContext";
 import { useWindowWidth } from "hooks/useWindowWidth";
 
 

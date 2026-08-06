@@ -1,18 +1,22 @@
 import styled from "styled-components";
-import { AccordionSection } from "../Accordion";
+import { AccordionSection } from "Components/Sidebar/Accordion";
 import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
 import { useEffect, useContext, useState } from "react";
-import { useFilterContext } from "hooks";
-import { InfoBox } from "Components";
+import { useFilterContext } from "hooks/useFilterContext";
+import { InfoBox } from "Components/MessageBox/MessageBox";
 import { api } from "services";
 import { checkSecurityRequirements, sortValues, isValidCondition, applyCondition } from "utils";
-import { AppContext, PageContext } from "contexts";
+import { AppContext } from "contexts/AppContext";
+import { PageContext } from "contexts/PageContext";
 import { darken } from "polished";
-import { MapFeatureSelectWithControls, MapFeatureSelectAndPan, MapFeatureSelect, CheckboxSelector } from ".";
-import { ErrorBox } from "Components";
+import { MapFeatureSelectWithControls } from './MapFeatureSelect';
+import { MapFeatureSelectAndPan } from './MapFeatureSelectAndPan';
+import { MapFeatureSelect } from './MapFeatureSelect';
+import { CheckboxSelector } from './CheckboxSelector';
+import { ErrorBox } from "Components/MessageBox/MessageBox";
 
 const SelectorContainer = styled.div`
   margin-bottom: 10px;

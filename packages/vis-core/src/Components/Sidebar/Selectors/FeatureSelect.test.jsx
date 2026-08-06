@@ -1,6 +1,6 @@
 jest.mock("../../../hooks/useLayerFeatureMetadata");
 
-import { useLayerFeatureMetadata } from "../../../hooks/useLayerFeatureMetadata";
+import { useLayerFeatureMetadata } from "hooks/useLayerFeatureMetadata";
 import userEvent from "@testing-library/user-event";
 import { FeatureSelect, CustomValueContainer } from "./FeatureSelect";
 import { render, screen, waitFor } from "@testing-library/react";

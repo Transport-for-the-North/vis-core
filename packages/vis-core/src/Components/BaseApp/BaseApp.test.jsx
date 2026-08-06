@@ -6,6 +6,10 @@ jest.mock("js-cookie", () => ({
   default: { get: jest.fn(), set: jest.fn(), remove: jest.fn() },
 }));
 
+jest.mock("utils", () => ({
+  loadBands: jest.fn(),
+}));
+
 jest.mock("jwt-decode", () => ({
   jwtDecode: jest.fn(),
 }));
@@ -17,7 +21,7 @@ jest.mock("maplibre-gl", () => ({
   })),
 }));
 
-jest.mock("../../services", () => ({
+jest.mock("services", () => ({
   api: {
     metadataService: {
       getSwaggerFile: jest.fn(() => Promise.resolve({ swagger: "mockSchema" })),
@@ -25,31 +29,29 @@ jest.mock("../../services", () => ({
   },
 }));
 
-jest.mock("../index", () => ({
-  PageSwitch: () => <div>PageSwitch</div>,
-  HomePage: () => <div>HomePage</div>,
-  Navbar: () => <div>Navbar</div>,
-  Login: () => <div>Login</div>,
-  Unauthorized: () => <div>Unauthorized</div>,
-  TermsOfUse: () => <div>TermsOfUse</div>,
-  NotFound: () => <div>NotFound</div>,
-}));
+jest.mock("Components/PageSwitch", () => ({ PageSwitch: () => <div>PageSwitch</div> }));
+jest.mock("Components/HomePage", () => ({ HomePage: () => <div>HomePage</div> }));
+jest.mock("Components/Navbar", () => ({ Navbar: () => <div>Navbar</div> }));
+jest.mock("Components/Login", () => ({ Login: () => <div>Login</div> }));
+jest.mock("Components/Login/Unauthorised", () => ({ Unauthorized: () => <div>Unauthorized</div> }));
+jest.mock("Components/TermsOfUse", () => ({ TermsOfUse: () => <div>TermsOfUse</div> }));
+jest.mock("Components/NotFoundPage/NotFoundPage", () => ({ NotFound: () => <div>NotFound</div> }));
 
-jest.mock("../../layouts", () => ({
+jest.mock("layouts", () => ({
   Dashboard: ({ children }) => <div>{children}</div>,
 }));
 
-jest.mock("../../contexts", () => ({
+jest.mock("contexts", () => ({
   AppContext: { Provider: ({ children }) => children },
   AuthProvider: ({ children }) => children,
   ErrorProvider: ({ children }) => children,
 }));
 
-jest.mock("../../hocs", () => ({
+jest.mock("hocs", () => ({
   withRoleValidation: jest.fn((Component) => Component),
   withWarning: jest.fn((Component) => Component),
+  composeHOCs: jest.fn((...hocs) => (Component) => Component),
   withTermsOfUse: jest.fn((Component) => Component),
-  composeHOCs: jest.fn(() => (Component) => Component),
 }));
 
 const mockConfigLoader = () => ({

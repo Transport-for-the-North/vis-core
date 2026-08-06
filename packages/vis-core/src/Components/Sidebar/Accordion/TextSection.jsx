@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccordionSection } from 'Components';
+import { AccordionSection } from "./AccordionSection";
 import parse from 'html-react-parser';
 import './TextSection.styles.css'
 

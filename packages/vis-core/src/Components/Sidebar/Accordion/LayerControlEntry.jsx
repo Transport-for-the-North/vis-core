@@ -8,8 +8,10 @@ import {
 } from "@heroicons/react/20/solid";
 import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
-import { ColourSchemeDropdown, BandEditor, SelectorLabel } from "../Selectors";
-import { ClassificationDropdown } from "../Selectors/ClassificationDropdown";
+import { ColourSchemeDropdown } from "Components/Sidebar/Selectors/ColourSchemeDropdown";
+import { BandEditor } from "Components/Sidebar/Selectors/BandEditor";
+import { SelectorLabel } from "Components/Sidebar/Selectors/SelectorLabel";
+import { ClassificationDropdown } from "Components/Sidebar/Selectors/ClassificationDropdown";
 import { AppContext, MapContext, PageContext } from "contexts";
 import { actionTypes } from "reducers";
 import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map";

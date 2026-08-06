@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { AccordionHeader, AccordionIcon } from '../Sidebar/Accordion/AccordionSection';
+import { AccordionHeader, AccordionIcon } from 'Components/Sidebar/Accordion/AccordionSection';
 
 /**
  * A unified mobile bar styled like the accordion header.

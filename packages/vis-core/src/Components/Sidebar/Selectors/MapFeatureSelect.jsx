@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { FaMousePointer, FaDrawPolygon } from 'react-icons/fa';
-import { useMapContext, useFeatureSelect } from 'hooks';
+import { useMapContext } from "hooks/useMapContext";
+import { useFeatureSelect } from "hooks/useFeatureSelect";
 import { FeatureSelect } from './FeatureSelect'; 
 import { darken } from "polished";
 import { isEqual } from 'lodash';

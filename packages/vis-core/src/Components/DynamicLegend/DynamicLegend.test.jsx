@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, act, waitFor } from "@testing-library/react";
+import { DynamicLegend } from "./DynamicLegend";
 import {
-  DynamicLegend,
   interpretWidthExpression,
   interpretColorExpression
 } from ".";
-import { MapContext } from "../../contexts/MapContext";
+import { MapContext } from "contexts/MapContext";
 import { AppContext, PageContext } from "contexts";
 
 // Mock the map object and its methods

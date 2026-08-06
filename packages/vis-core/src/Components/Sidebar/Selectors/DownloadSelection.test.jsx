@@ -33,39 +33,43 @@ jest.mock("services", () => ({
     },
   },
 }));
-jest.mock("Components", () => ({
-  InfoBox: ({ text }) => <div data-testid="info-box">{text}</div>,
-  ErrorBox: ({ text }) => <div data-testid="error-box">{text}</div>,
-}));
-jest.mock("Components/Sidebar/Selectors", () => ({
-  MapFeatureSelect: ({ filter, value, onChange }) => (
-    <div data-testid={`map-feature-${filter.id}`}>
-      MapFeatureSelect: {filter.filterName}
-      <button onClick={() => onChange(filter, { value: "selected" })}>
-        Select Feature
-      </button>
-    </div>
-  ),
-  MapFeatureSelectWithControls: ({ filter }) => (
-    <div data-testid={`map-feature-controls-${filter.id}`}>
-      MapFeatureSelectWithControls: {filter.filterName}
-    </div>
-  ),
-  MapFeatureSelectAndPan: ({ filter }) => (
-    <div data-testid={`map-feature-pan-${filter.id}`}>
-      MapFeatureSelectAndPan: {filter.filterName}
-    </div>
-  ),
-  CheckboxSelector: ({ filter, value, onChange }) => (
-    <div data-testid={`checkbox-${filter.id}`}>
-      CheckboxSelector: {filter.filterName}
-      <input
-        type="checkbox"
-        onChange={(e) => onChange(filter, e.target.checked)}
-      />
-    </div>
-  ),
-}));
+jest.mock("Components/MessageBox/MessageBox", () => ({
+    InfoBox: ({ text }) => <div data-testid="info-box">{text}</div>,
+    ErrorBox: ({ text }) => <div data-testid="error-box">{text}</div>,
+  }));
+jest.mock("./MapFeatureSelect", () => ({
+    MapFeatureSelect: ({ filter, value, onChange }) => (
+      <div data-testid={`map-feature-${filter.id}`}>
+        MapFeatureSelect: {filter.filterName}
+        <button onClick={() => onChange(filter, { value: "selected" })}>
+          Select Feature
+        </button>
+      </div>
+    ),
+    MapFeatureSelectWithControls: ({ filter }) => (
+      <div data-testid={`map-feature-controls-${filter.id}`}>
+        MapFeatureSelectWithControls: {filter.filterName}
+      </div>
+    )
+  }));
+  jest.mock("./MapFeatureSelectAndPan", () => ({
+    MapFeatureSelectAndPan: ({ filter }) => (
+      <div data-testid={`map-feature-pan-${filter.id}`}>
+        MapFeatureSelectAndPan: {filter.filterName}
+      </div>
+    )
+  }));
+  jest.mock("./CheckboxSelector", () => ({
+    CheckboxSelector: ({ filter, value, onChange }) => (
+      <div data-testid={`checkbox-${filter.id}`}>
+        CheckboxSelector: {filter.filterName}
+        <input
+          type="checkbox"
+          onChange={(e) => onChange(filter, e.target.checked)}
+        />
+      </div>
+    )
+  }));
 jest.mock("Components/Sidebar/Selectors/Dropdown", () => ({
   Dropdown: ({ filter, value, onChange }) => (
     <div data-testid={`dropdown-${filter.id}`}>

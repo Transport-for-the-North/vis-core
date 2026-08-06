@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Select from 'react-select';
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid';
 import { darken } from 'polished';
-import BaseService from '../../services/api/Base';
+import BaseService from "services/api/Base";
 
 const CONTROL_COLOUR = 'rgb(220, 220, 220)';
 const CONTROL_BORDER_RADIUS = 6;

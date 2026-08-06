@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useFilterContext } from 'hooks';
+import { useFilterContext } from "hooks/useFilterContext";
 
 const StyledSliderContainer = styled.div`
   display: flex;

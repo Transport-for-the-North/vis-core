@@ -7,8 +7,8 @@ import React, {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { AccordionIcon } from "../Sidebar/Accordion/AccordionSection";
-import { MobileBar } from "../MobileBar/MobileBar";
+import { AccordionIcon } from "Components/Sidebar/Accordion/AccordionSection";
+import { MobileBar } from "Components/MobileBar/MobileBar";
 
 import { CARD_CONSTANTS } from "defaults";
 

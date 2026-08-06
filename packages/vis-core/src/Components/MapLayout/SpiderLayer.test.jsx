@@ -14,7 +14,7 @@ import {
 } from "utils/mapSpiders";
 
 // Mock dependencies
-jest.mock("hooks", () => ({
+jest.mock("hooks/useMapContext", () => ({
   useMapContext: jest.fn(),
 }));
 
