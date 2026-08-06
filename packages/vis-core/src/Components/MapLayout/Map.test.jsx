@@ -1,6 +1,7 @@
 import { render, screen, act } from "@testing-library/react";
-import { FilterContext, MapContext } from "contexts";
-import { useMap } from "hooks";
+import { FilterContext } from "contexts/FilterContext";
+import { MapContext } from "contexts/MapContext";
+import { useMap } from "hooks/useMap";
 import { api } from "services";
 
 jest.mock("maplibre-gl", () => {
@@ -85,16 +86,14 @@ const OriginalPopupClass = (() => {
   return Popup;
 })();
 
-jest.mock("hooks", () => ({
-  ...jest.requireActual("hooks"),
+jest.mock("hooks/useMap", () => ({
   useMap: jest.fn(),
 }));
 jest.mock("./VisualisationManager", () => ({
   ...jest.requireActual("./VisualisationManager"),
   VisualisationManager: () => <div>VisualisationManager</div>,
 }));
-jest.mock("Components", () => ({
-  ...jest.requireActual("Components"),
+jest.mock("Components/DynamicLegend/DynamicLegend", () => ({
   DynamicLegend: () => <div>DynamicLegend</div>,
 }));
 jest.mock("services", () => ({

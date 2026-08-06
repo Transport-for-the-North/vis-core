@@ -11,7 +11,9 @@ jest.mock("maplibre-gl", () => ({
     flyTo: jest.fn(),
   })),
 }));
-jest.mock("Components", () => ({
+jest.mock("Components/Sidebar/Accordion/AccordionSection", () => ({
+  AccordionHeader: () => <div />,
+  AccordionIcon: () => <div />,
   AccordionSection: ({ title, children }) => {
     return (
       <div data-testid="ImATestId">

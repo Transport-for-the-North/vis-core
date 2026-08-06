@@ -150,49 +150,52 @@ const mockAppContexte = {
   legalText: "legalText",
 };
 
-jest.mock("Components", () => ({
-  ...jest.requireActual("Components"),
-  Dimmer: ({ dimmed, showLoader }) => {
-    return (
-      <>
-        <div>dimmed: {dimmed ? "true" : "false"}</div>
-        <div>showLoader: {showLoader ? "true" : "false"}</div>
-      </>
-    );
-  },
-  Sidebar: ({
-    pageName,
-    aboutVisualisationText,
-    filters,
-    legalText,
-    onFilterChange,
-    bgColor,
-    additionalFeatures,
-    infoBoxText,
-    children,
-  }) => {
-    return (
-      <>
-        <button onClick={onFilterChange}>Sidebar</button>
-        {children}
-      </>
-    );
-  },
-  MapLayerSection: ({ handleColorChange, handleClassificationChange, handleCustomBandsChange }) => {
-    return (
-      <>
-        <span>MapLayerSection</span>
-        <button onClick={handleColorChange}>handleColorChange</button>
-        <button onClick={handleClassificationChange}>
-          handleClassificationChange
-        </button>
-        <button onClick={handleCustomBandsChange}>
-          handleCustomBandsChange
-        </button>
-      </>
-    );
-  },
-}));
+jest.mock("Components/Dimmer", () => ({
+    Dimmer: ({ dimmed, showLoader }) => {
+      return (
+        <>
+          <div>dimmed: {dimmed ? "true" : "false"}</div>
+          <div>showLoader: {showLoader ? "true" : "false"}</div>
+        </>
+      );
+    }
+  }));
+  jest.mock("Components/Sidebar", () => ({
+    Sidebar: ({
+      pageName,
+      aboutVisualisationText,
+      filters,
+      legalText,
+      onFilterChange,
+      bgColor,
+      additionalFeatures,
+      infoBoxText,
+      children,
+    }) => {
+      return (
+        <>
+          <button onClick={onFilterChange}>Sidebar</button>
+          {children}
+        </>
+      );
+    }
+  }));
+  jest.mock("Components/Sidebar/Accordion", () => ({
+    MapLayerSection: ({ handleColorChange, handleClassificationChange, handleCustomBandsChange }) => {
+      return (
+        <>
+          <span>MapLayerSection</span>
+          <button onClick={handleColorChange}>handleColorChange</button>
+          <button onClick={handleClassificationChange}>
+            handleClassificationChange
+          </button>
+          <button onClick={handleCustomBandsChange}>
+            handleCustomBandsChange
+          </button>
+        </>
+      );
+    }
+  }));
 jest.mock("./Map", () => ({
   Map: ({ extraCopyrightText }) => <div>Map: {extraCopyrightText}</div>,
 }));
