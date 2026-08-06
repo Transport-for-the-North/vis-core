@@ -193,6 +193,11 @@ jest.mock("Components", () => ({
       </>
     );
   },
+  DynamicStylingStatus: () => null,
+}));
+
+jest.mock("Components/Sidebar/Accordion", () => ({
+  AccordionSection: ({ children }) => <>{children}</>,
 }));
 jest.mock("./Map", () => ({
   Map: ({ extraCopyrightText }) => <div>Map: {extraCopyrightText}</div>,
