@@ -327,6 +327,8 @@ export const MapLayout = () => {
    * the user has stopped changing filters.
    */
   useEffect(() => {
+    if (isFiltersDebouncing) return;
+
     state.filters.forEach((filter) => {
       const filterValue = debouncedFilterState[filter.id];
 
@@ -352,7 +354,7 @@ export const MapLayout = () => {
         });
       }
     });
-  }, [debouncedFilterState, state.filters, dispatch, buildFilterActionPayload]);
+  }, [debouncedFilterState, state.filters, dispatch, buildFilterActionPayload, isFiltersDebouncing]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
