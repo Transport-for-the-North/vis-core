@@ -286,14 +286,27 @@ export const MapLayout = () => {
   }, [filterState, state.metadataTables, state.filters, filterDispatch]);
 
   /**
-   * Effect B (debounced): validate filter options and dispatch all map actions
-   * (UPDATE_PARAMETERISED_LAYER, UPDATE_COLOR_SCHEME, etc.) after the debounce
-   * window settles. Because useFetchVisualisationData fires immediately when
-   * visualisation params change, this single debounce point ensures repaints and
-   * new data fetches are triggered together rather than immediately on each keystroke.
+   * Effect B1 - immediate cross-filter validation.
+   *
+   * Keeps metadata-driven filter option visibility in sync with the live FilterContext state.
+   * This must run immediately, not against the debounced filter state, because dependent
+   * filters such as `shouldBeFiltered` dropdowns need their visible options updated as soon
+   * as a controlling `shouldFilterOthers` filter changes.
+   *
+   * Example:
+   * - Main filter has `shouldFilterOthers: true`.
+   * - Sub-filter has `shouldBeFiltered: true`.
+   * - When main filter changes, sub-filter options are narrowed immediately using
+   *   `updateFilterValidity`.
+   *
+   * This effect only updates the MapContext filter definitions/options. It does not dispatch
+   * expensive map or API actions. Those are handled separately by the debounced action effect.
+   *
+   * Keeping this separate prevents feedback loops where stale debounced state re-validates
+   * filters against an old controller value and causes dependent dropdowns to oscillate.
    */
   useEffect(() => {
-    const validatedFilters = updateFilterValidity(state, debouncedFilterState);
+    const validatedFilters = updateFilterValidity(state, filterState);
 
     if (JSON.stringify(validatedFilters) !== JSON.stringify(state.filters)) {
       dispatch({
@@ -301,11 +314,31 @@ export const MapLayout = () => {
         payload: { updatedFilters: validatedFilters },
       });
     }
+  }, [filterState, state.metadataTables, state.filters, dispatch]);
+
+  /**
+   * Effect B2 - debounced map action dispatch.
+   *
+   * Dispatches filter-driven map actions after the filter state has settled for the debounce
+   * window. This gates expensive downstream work such as parameterised layer updates, query
+   * param updates, colour scheme changes, data fetches, and map repaints.
+   *
+   * Important:
+   * - This effect must not perform cross-filter validation.
+   * - Validation uses the live `filterState` in the immediate validation effect.
+   * - This effect uses `debouncedFilterState` only to delay expensive visualisation actions.
+   *
+   * Splitting validation and action dispatch avoids stale-state feedback loops:
+   * the UI updates dependent dropdown options immediately, while map/API work waits until
+   * the user has stopped changing filters.
+   */
+  useEffect(() => {
+    if (isFiltersDebouncing) return;
 
     state.filters.forEach((filter) => {
       const filterValue = debouncedFilterState[filter.id];
 
-      if (!filter.visualisations[0].includes("Side")) {
+      if (!filter.visualisations?.[0]?.includes("Side")) {
         filter.actions.forEach((action) => {
           dispatch({
             type: action.action,
@@ -319,6 +352,7 @@ export const MapLayout = () => {
           if (filter.filterName.includes("Left")) sides = "left";
           else if (filter.filterName.includes("Right")) sides = "right";
           else sides = "both";
+
           dispatch({
             type: action.action,
             payload: buildFilterActionPayload(filter, action, filterValue, sides),
@@ -326,7 +360,7 @@ export const MapLayout = () => {
         });
       }
     });
-  }, [debouncedFilterState, state.metadataTables, state.filters, dispatch, buildFilterActionPayload]);
+  }, [debouncedFilterState, state.filters, dispatch, buildFilterActionPayload, isFiltersDebouncing]);
 
   const handleColorChange = (color, layerName) => {
     dispatch({
