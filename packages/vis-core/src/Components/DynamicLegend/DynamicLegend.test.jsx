@@ -5,7 +5,7 @@ import {
   interpretWidthExpression,
   interpretColorExpression
 } from ".";
-import { MapContext } from "../../contexts/MapContext";
+import { MapContext } from "contexts/MapContext";
 import { AppContext, PageContext } from "contexts";
 
 // Mock the map object and its methods

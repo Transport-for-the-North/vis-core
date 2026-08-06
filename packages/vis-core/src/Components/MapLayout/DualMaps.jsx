@@ -2,8 +2,10 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
 
-import { DynamicLegend } from "Components";
-import { useDualMaps, useMapContext, useFilterContext } from "hooks";
+import { DynamicLegend } from "Components/DynamicLegend/DynamicLegend";
+import { useDualMaps } from "hooks/useDualMaps";
+import { useMapContext } from "hooks/useMapContext";
+import { useFilterContext } from "hooks/useFilterContext";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
 

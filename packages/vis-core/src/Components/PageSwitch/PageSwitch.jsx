@@ -1,8 +1,14 @@
 import React, { useState, useCallback, useEffect } from "react";
 import styled from "styled-components";
-import { MapLayout, IFrameEmbedPage, DynamicForm, CoordinatePreviewMap, TableLayout, SVGGalleryManager, DirectoryScorecardsPage } from "Components";
+import { MapLayout } from "Components/MapLayout/MapLayout";
+import { IFrameEmbedPage } from "Components/IFrameEmbedPage/IFrameEmbedPage";
+import { DynamicForm } from "Components/DynamicForm/DynamicForm";
+import { CoordinatePreviewMap } from "Components/CoordinatePreviewMap/CoordinatePreviewMap";
+import { TableLayout } from "Components/TableLayout/TableLayout";
+import { SVGGalleryManager } from "Components/SvgGalleryManager/SvgGalleryManager";
+import { DirectoryScorecardsPage } from "Components/DirectoryScorecardsPage/DirectoryScorecardsPage";
 import { FilterProvider, MapProvider, PageContext } from "contexts";
-import { bngToWgs84 } from "../../utils/coordinates";
+import { bngToWgs84 } from "utils/coordinates";
 
 const FormPageWrapper = styled.div`
   display: flex;

@@ -1,9 +1,9 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback, useContext } from 'react';
 import Select from 'react-select';
 import styled, { useTheme } from 'styled-components';
-import { useFetchVisualisationData } from 'hooks';
+import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useMetadataDrivenFilters } from 'hooks/useMetadataDrivenFilters';
-import { AppContext } from 'contexts';
+import { AppContext } from "contexts/AppContext";
 import { Footer } from 'Components/HomePage/Footer';
 import {
   normaliseAssetPath,
@@ -12,7 +12,7 @@ import {
   resolveSvgUrl,
 } from 'utils';
 import { makeSelectStyles } from 'utils/selectStyles';
-import { AppButton } from '../AppButton';
+import { AppButton } from 'Components/AppButton';
 
 // Styled Components
 const Container = styled.div`

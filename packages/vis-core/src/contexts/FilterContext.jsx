@@ -1,6 +1,6 @@
 // contexts/FilterContext.js
 import React, { createContext, useReducer } from 'react';
-import { saveFilterState } from '../utils/filterPersistence';
+import { saveFilterState } from "utils/filterPersistence";
 
 /**
  * Create a context for filter values

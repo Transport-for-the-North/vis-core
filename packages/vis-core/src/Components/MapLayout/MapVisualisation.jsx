@@ -1,7 +1,7 @@
 import colorbrewer from "colorbrewer";
 import { useCallback, useEffect, useRef, useContext, useMemo, useState } from "react";
-import { useMapContext } from "hooks";
-import { AppContext } from "contexts";
+import { useMapContext } from "hooks/useMapContext";
+import { AppContext } from "contexts/AppContext";
 import { actionTypes } from "reducers";
 import {
   buildCategoricalLegendKey,
@@ -16,7 +16,9 @@ import {
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
-import { useFetchVisualisationData, useFeatureStateUpdater, useVisualisationLoadingCounter } from "hooks"; // Import the custom hook
+import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
+import { useFeatureStateUpdater } from "hooks/useFeatureStateUpdater";
+import { useVisualisationLoadingCounter } from "hooks/useVisualisationLoadingCounter"; // Import the custom hook
 import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 

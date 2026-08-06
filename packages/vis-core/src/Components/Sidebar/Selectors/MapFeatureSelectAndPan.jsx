@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMapContext } from 'hooks';
+import { useMapContext } from "hooks/useMapContext";
 import { BaseMapFeatureSelect } from './MapFeatureSelect';
 import { api } from 'services';
 import { actionTypes } from 'reducers/mapReducer';

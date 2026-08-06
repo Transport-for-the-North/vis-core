@@ -10,9 +10,11 @@ import styled from "styled-components";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
 
-import { MapContext } from "contexts";
+import { MapContext } from "contexts/MapContext";
 import { replacePlaceholders, formatNumber } from "utils";
-import { Hovertip, WarningBox, ChartRenderer } from "Components";
+import { Hovertip } from "Components/Hovertip/Hovertip";
+import { WarningBox } from "Components/MessageBox/MessageBox";
+import { ChartRenderer } from "Components/Charts/ChartRenderer";
 
 import { CARD_CONSTANTS } from "defaults";
 

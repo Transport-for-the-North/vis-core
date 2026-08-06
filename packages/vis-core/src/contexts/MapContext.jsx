@@ -14,7 +14,8 @@ import {
   getInitialFilterValue,
 } from "utils";
 import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
-import { AppContext, PageContext } from "contexts";
+import { AppContext } from "./AppContext";
+import { PageContext } from "./PageContext";
 import { ErrorContext } from "./ErrorContext";
 import { api } from "services";
 import { useMetadataDrivenFilters } from "hooks/useMetadataDrivenFilters";

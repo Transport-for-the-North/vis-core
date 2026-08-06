@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Select from "react-select";
 import { useCompactSelectStyles } from "utils/selectStyles";
-import { useDebounced, usePersistentState } from "hooks";
+import { useDebounced } from "hooks/useDebounced";
+import { usePersistentState } from "hooks/usePersistentState";
 
 import {
   CompactClearIndicator,

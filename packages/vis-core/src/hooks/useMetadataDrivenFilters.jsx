@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { PageContext, FilterContext } from "contexts";
+import { PageContext } from "contexts/PageContext";
+import { FilterContext } from "contexts/FilterContext";
 import { api } from "services";
 import { updateFilterValidity, correctInitialCrossFilterValues, correctRuntimeCrossFilterValues } from "utils";
 import { applyWhereConditions, sortValues, buildDeterministicFilterId } from "utils";

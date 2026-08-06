@@ -1,25 +1,23 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
-import {
-  PageSwitch,
-  HomePage,
-  Navbar,
-  Login,
-  Unauthorized,
-  TermsOfUse,
-  NotFound
-} from "../index";
-import { Dashboard } from "../../layouts";
-import { AppContext, AuthProvider, ErrorProvider } from "../../contexts";
-import { api } from "../../services";
-import { loadBands } from "../../utils";
+import { PageSwitch } from "Components/PageSwitch";
+import { HomePage } from "Components/HomePage";
+import { Navbar } from "Components/Navbar";
+import { Login } from "Components/Login";
+import { Unauthorized } from "Components/Login/Unauthorised";
+import { TermsOfUse } from "Components/TermsOfUse";
+import { NotFound } from "Components/NotFoundPage/NotFoundPage";
+import { Dashboard } from "layouts";
+import { AppContext, AuthProvider, ErrorProvider } from "contexts";
+import { api } from "services";
+import { loadBands } from "utils";
 import {
   withWarning,
   withRoleValidation,
   composeHOCs,
   withTermsOfUse
-} from "../../hocs";
+} from "hocs";
 
 /**
  * Base application component that can be used across all TfN apps.
