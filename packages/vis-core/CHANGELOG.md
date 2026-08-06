@@ -1,3 +1,61 @@
+# [0.12.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.11.0...v0.12.0) (2026-07-31)
+
+
+### Bug Fixes
+
+* add cross-filter correction functions and tests for initial and runtime values ([11a1a9a](https://github.com/Transport-for-the-North/vis-core/commit/11a1a9a43526723f6b33ffe50005d7be5baa60bd)), closes [#213](https://github.com/Transport-for-the-North/vis-core/issues/213)
+* add per-visualisation loading counter to prevent premature dimmer dismissal ([8815f29](https://github.com/Transport-for-the-North/vis-core/commit/8815f29be1baf4994d6edae8be65f8de47418375))
+* **api:** propagate fetch errors correctly to allow AbortError handling ([74bac91](https://github.com/Transport-for-the-North/vis-core/commit/74bac918dc39179d9a443155e0b391019052385f))
+* **bronte:** add native tooltips for truncated multiselect chips (BRONTE-0022) ([95e8531](https://github.com/Transport-for-the-North/vis-core/commit/95e8531a6a478cb6abbe44f789725ad786b6a1de))
+* **bronte:** apply natural sorting to zoom-to-feature options (BRONTE-0008) ([b325124](https://github.com/Transport-for-the-North/vis-core/commit/b325124bc1ab8aa65355ff477fe9172a14e74294))
+* **CalloutCard:** ensure handle doesn't appear on mobile ([91837b7](https://github.com/Transport-for-the-North/vis-core/commit/91837b7532fdf575a3cc0c65c94a3af91588d97b))
+* **CalloutCard:** ensure updated toggle timers are aligned ([9ccdb1c](https://github.com/Transport-for-the-North/vis-core/commit/9ccdb1cae362bb914b2c37e3bdc97548f1baa30f))
+* **CalloutCard:** prevent layout shift when updating ([a76689d](https://github.com/Transport-for-the-North/vis-core/commit/a76689d416b8945bc9a37c720e7fb4f65016a68e))
+* **CalloutCard:** prevent layout shifts when re-rendering callout cards ([b91f27d](https://github.com/Transport-for-the-North/vis-core/commit/b91f27d4a7f1b0e0b5b7562a4f13bc93cde68967))
+* **CalloutCardVisualisation:** remove duplicate declaration ([8bc4df8](https://github.com/Transport-for-the-North/vis-core/commit/8bc4df8d612b56361c66c712be0a8a8768866d81))
+* **DynamicLegend:** ensure bins slice incorporates max value ([2fd3488](https://github.com/Transport-for-the-North/vis-core/commit/2fd348850e0cb55748c24476c0c7f399672727b1)), closes [#280](https://github.com/Transport-for-the-North/vis-core/issues/280)
+* **DynamicLegend:** ensure out-of-range message reflects rounding ([5ae3cd4](https://github.com/Transport-for-the-North/vis-core/commit/5ae3cd4c91ce307050d34c38f001837f242ecdf0)), closes [#280](https://github.com/Transport-for-the-North/vis-core/issues/280)
+* extend loading counter to include style-application phase ([9116a0a](https://github.com/Transport-for-the-North/vis-core/commit/9116a0a11539fb9ba3c152bad296406f043829a4))
+* force a release after bad commit message in previous commmit ([c2c1a50](https://github.com/Transport-for-the-North/vis-core/commit/c2c1a501790448f1c5fbc65bf93678d93959c69b))
+* **hooks:** resolve infinite fetch loop and race conditions in useFetchVisualisationData ([f3d4757](https://github.com/Transport-for-the-North/vis-core/commit/f3d4757947b11e5a9f0f8e5c0f84ad0e1abd02da))
+* **MapLayout:** refactor map filter action payload construction so scalar and multiselect values are handled consistently; ([59f5194](https://github.com/Transport-for-the-North/vis-core/commit/59f519447c604ae1e0b3fb181cd26b5e4490f4f1))
+* **MapVisualisation:** prevent infinite waiting by aborting styling process for layers with missing parameters ([d4a9ddc](https://github.com/Transport-for-the-North/vis-core/commit/d4a9ddc8e511681410f7fc180b5b0c6e9a400c94))
+* preserve single bin value in normaliseContinuousBins ([ad88969](https://github.com/Transport-for-the-North/vis-core/commit/ad88969cef35d2f4d6555f2d44cdaacc8f790eb5))
+* prevent effect triggers in multiselect dropdown by memoising callbacks in the MapLayout render chain ([73d59ac](https://github.com/Transport-for-the-North/vis-core/commit/73d59ac484889e8f5c7bcc5c9a38f9508d989458))
+* replace Math.min/max spread with reduce in getOutOfBandFlags ([a4189b1](https://github.com/Transport-for-the-North/vis-core/commit/a4189b19adbfb592e68e954d4ae5ff87b054bf40))
+* **Sidebar:** ensure multiselect dropdown correctly renders item chips when in mobile view ([b346ca5](https://github.com/Transport-for-the-North/vis-core/commit/b346ca5aeb72f13cd925f5f8d59379cc33e55eb7))
+* **ui:** eliminate whitespace to the left of Y-axis ([eb1aa54](https://github.com/Transport-for-the-North/vis-core/commit/eb1aa5469424c5b78bf129255394ee2827214d63))
+* **ui:** ensure clean tick intervals ([a45fe8f](https://github.com/Transport-for-the-North/vis-core/commit/a45fe8fa3a451f59c11beb5a8b11f6f068c4ad74))
+* **ui:** ensure consistent margins and adequate buffer around charts ([d084c6d](https://github.com/Transport-for-the-North/vis-core/commit/d084c6dd396a4a60af155fcefbddc61d76a84a7f))
+* **ui:** improve chart rendering styling and layout ([70baeb4](https://github.com/Transport-for-the-North/vis-core/commit/70baeb421f33602714728c68066887e1ef377f93))
+* **ui:** resolve mobile callout card initialisation and mounting race conditions ([759d51d](https://github.com/Transport-for-the-North/vis-core/commit/759d51d2268e74e9369ebb9f861a65fda616b253))
+* **ui:** unify category tick rendering and tighten chart spacing ([e735026](https://github.com/Transport-for-the-North/vis-core/commit/e7350264d22d000d0561d3278ee1b1ecbc814061))
+* unwrap { data, metadata } envelope from API response ([91308ed](https://github.com/Transport-for-the-North/vis-core/commit/91308ed1b1073017827193f1cc457153f49cb305))
+* **useFetchVisualisationData:** prevent double debounce on data fetch ([50e61e3](https://github.com/Transport-for-the-North/vis-core/commit/50e61e3592e27c8224fc3c5cc97b348111ffaf6d))
+* **useMetadataDrivenFilters:** prevent stale cache ([dd80223](https://github.com/Transport-for-the-North/vis-core/commit/dd8022316ded98c213888c45cbf08567f6c5c683))
+
+
+### Features
+
+* add comparator line and axis label support to LineSeriesChart ([0472cb0](https://github.com/Transport-for-the-North/vis-core/commit/0472cb09036b8ebef01da0ee6b52c5d06e9581ec))
+* add DM comparison line to time-series charts ([50d8d5c](https://github.com/Transport-for-the-North/vis-core/commit/50d8d5cd4d057728ab76a96f304fba7548edb536))
+* add dynamic register scenario button that only renders if registerScenarios.render == true, and if the selected scenario has not got a registration for target app id. ([02aa2a0](https://github.com/Transport-for-the-North/vis-core/commit/02aa2a05c992ca11ad6c474aacf77c2b67c6b1a0))
+* add fileUpload capability with csv and excel validation ([b103def](https://github.com/Transport-for-the-North/vis-core/commit/b103defd8c0f5f74c3140105c7018121c3780946))
+* adding configurable web form capability with preview map for coordinate input ([02eed0a](https://github.com/Transport-for-the-North/vis-core/commit/02eed0acd0cf0efcc666367aec9f83b17ea5ce2a))
+* allow apps to override TfN logo click URL via appContext ([424e611](https://github.com/Transport-for-the-North/vis-core/commit/424e6113938182e7a95cc85bd2c55c64a21b0021))
+* allow dropdown options to be sorted by a custom column ([1b3ed2c](https://github.com/Transport-for-the-North/vis-core/commit/1b3ed2cc9b99992d11df29206410fe22577b7bab))
+* cache metadata tables locally across pages ([0a724be](https://github.com/Transport-for-the-North/vis-core/commit/0a724be0cb20dcb08eb5b0d7f60222dc1c181674))
+* **CalloutCard:** add card update signals in UI ([e7e11f6](https://github.com/Transport-for-the-North/vis-core/commit/e7e11f6ac62ab8a8027cdc197beb016306e85c56))
+* improve map page initial render performance and fix related layer crashes ([918d19b](https://github.com/Transport-for-the-North/vis-core/commit/918d19b07a7f78369f177dd881a8fba2aea2bb02))
+* make dynamic legend default display mode configurable ([e8e3357](https://github.com/Transport-for-the-North/vis-core/commit/e8e33570ad25218acb28a13e9d005b7c32fe9c08))
+* **MapLayout:** debounce filter state updates so that all actions (update parameterised layer etc) trigger at the same time. ([9fd65ee](https://github.com/Transport-for-the-North/vis-core/commit/9fd65eec0349cb01ac2d8f69e8916e42b1b1bd7f))
+* move button to sidebar entry.  added element where if user presses button to register it states if successfully done. ([4e9bcf2](https://github.com/Transport-for-the-North/vis-core/commit/4e9bcf2dcf07a323d735466d6261e97fed191661))
+* **notifications:** add global toast notification system ([167c65f](https://github.com/Transport-for-the-North/vis-core/commit/167c65f95139fb9c0c5e030c4aa11a783b66aba3))
+* redirect TfN logo to main TfN website ([3e44482](https://github.com/Transport-for-the-North/vis-core/commit/3e4448293c9adf5e856513bb9e77f5bd0000a298))
+* support prefilled and hidden fields in DynamicForm ([68f60c1](https://github.com/Transport-for-the-North/vis-core/commit/68f60c174d0d01e3ad7c0ca51821f51892ccf878))
+* support time-series array data in line charts ([36e125d](https://github.com/Transport-for-the-North/vis-core/commit/36e125dbb7f7d4511497493b6f48475d6259a7ef))
+* **ui:** add stripTrailingZeroes param to formatNumber ([9026a1d](https://github.com/Transport-for-the-North/vis-core/commit/9026a1d75b8c1589475c1ea7a074dfc236f0ed97))
+
 # [0.11.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.10.0...v0.11.0) (2026-05-22)
 
 
