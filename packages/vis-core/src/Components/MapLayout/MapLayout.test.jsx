@@ -151,12 +151,13 @@ const mockAppContexte = {
 };
 
 jest.mock("Components/Dimmer", () => ({
-    Dimmer: ({ dimmed, showLoader, completeOnExit }) => {
+    Dimmer: ({ dimmed, showLoader, completeOnExit, completeOnExit }) => {
       return (
         <>
           <div>dimmed: {dimmed ? "true" : "false"}</div>
           <div>showLoader: {showLoader ? "true" : "false"}</div>
           <div>completeOnExit: {completeOnExit ? "true" : "false"}</div>
+        <div>completeOnExit: {completeOnExit ? "true" : "false"}</div>
       </>
       );
     }
