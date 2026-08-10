@@ -917,9 +917,14 @@ const DualMaps = (props) => {
   useEffect(() => {
   if (!leftMap || !rightMap) return;
 
-  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isNarrowViewport = window.matchMedia('(max-width: 900px)').matches;
+  const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches ||
+    window.matchMedia('(any-pointer: coarse)').matches;
+  const hasFinePointer = window.matchMedia('(pointer: fine)').matches ||
+    window.matchMedia('(any-pointer: fine)').matches;
+  const isTouchOnlyMobile = isNarrowViewport && hasCoarsePointer && !hasFinePointer;
 
-  if (isTouch) {
+  if (isTouchOnlyMobile) {
     [leftMap, rightMap].forEach(m => {
       m.dragPan.enable();
       m.touchZoomRotate.enable();
