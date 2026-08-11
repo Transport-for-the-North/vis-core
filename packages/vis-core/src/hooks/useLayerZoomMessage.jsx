@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useMapContext } from "hooks";
+import { useMapContext } from "./useMapContext";
 
 /**
  * Custom hook to generate a message for layers that are not visible due to zoom level.

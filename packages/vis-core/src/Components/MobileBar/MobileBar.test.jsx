@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from 'styled-components';
 import { MobileBar } from './MobileBar';
-import { AccordionIcon } from '../Sidebar/Accordion/AccordionSection';
+import { AccordionIcon } from 'Components/Sidebar/Accordion/AccordionSection';
 
 const theme = { mq: { mobile: '(max-width: 900px)' } };
 

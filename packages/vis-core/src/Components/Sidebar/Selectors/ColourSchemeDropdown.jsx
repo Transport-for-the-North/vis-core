@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import chroma from "chroma-js";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
-import { useMapContext } from "hooks";
+import { useMapContext } from "hooks/useMapContext";
 import { useTheme } from "styled-components";
 import { colorSchemes, colourBlindFriendlySchemes } from "utils";
 import { SelectorLabel } from "./SelectorLabel";

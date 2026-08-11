@@ -7,9 +7,9 @@ import {
   getSelectedLayerStyle,
   getOpacityProperty,
 } from "utils";
-import { useMapContext} from "hooks";
-import { FilterContext } from "contexts";
-import { actionTypes } from "reducers";
+import { useMapContext } from "hooks/useMapContext";
+import { FilterContext } from "contexts/FilterContext";
+import { actionTypes } from "reducers/mapReducer";
 import { DEFAULT_LAYER_OPACITY } from "defaults";
 import { loadImagesFromTileFeatures } from "utils/imageLoader";
 

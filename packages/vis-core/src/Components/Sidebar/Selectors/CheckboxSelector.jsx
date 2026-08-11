@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useFilterContext } from 'hooks';
+import { useFilterContext } from "hooks/useFilterContext";
 import { darken } from 'polished';
 
 const Container = styled.div`

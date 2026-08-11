@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
-import { WarningMessage } from "Components";
+import { WarningMessage } from "Components/WarningMessage/WarningMessage";
 import { api } from "services";
 
 /**

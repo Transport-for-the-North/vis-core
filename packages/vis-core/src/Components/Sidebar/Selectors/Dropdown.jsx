@@ -3,8 +3,8 @@ import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import styled, { useTheme } from 'styled-components';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
-import { useFilterContext } from 'hooks';
-import { SelectorLabel } from '.';
+import { useFilterContext } from "hooks/useFilterContext";
+import { SelectorLabel } from './SelectorLabel';
 import { makeSelectStyles, selectComponents } from 'utils/selectStyles';
 
 const CONTROL_COLOUR = 'rgb(220, 220, 220)';

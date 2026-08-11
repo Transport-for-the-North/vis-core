@@ -40,7 +40,7 @@ const mockMap = {
     },
   },
 };
-jest.mock("../../../utils", () => ({
+jest.mock("utils", () => ({
   colorSchemes: {
     default: ["red", "green", "blue"],
     custom: ["yellow", "purple", "orange"],

@@ -48,10 +48,12 @@ jest.mock("../MobileBar/MobileBar", () => ({
   SideIcon: ({ $isOpen }) => <span>SideIcon - {String($isOpen)}</span>,
   MobileBar: () => <span>MobileBar</span>
 }));
-jest.mock("Components", () => ({
-  Hovertip: ({isVisible, displayText, side, refElement, alignVertical}) => <span>Hovertip - {displayText} - side: {side}</span>,
-  InfoBox: ({text}) => <span>InfoBox - {text}</span>,
-}));
+jest.mock("Components/Hovertip/Hovertip", () => ({
+    Hovertip: ({isVisible, displayText, side, refElement, alignVertical}) => <span>Hovertip - {displayText} - side: {side}</span>,
+  }));
+  jest.mock("Components/MessageBox/MessageBox", () => ({
+    InfoBox: ({text}) => <span>InfoBox - {text}</span>,
+  }));
 
 let mockMapContext = {
   state: {

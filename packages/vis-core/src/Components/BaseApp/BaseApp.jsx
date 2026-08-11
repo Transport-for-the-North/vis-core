@@ -14,6 +14,17 @@ import { Dashboard } from "../../layouts";
 import { AppContext, AuthProvider, ErrorProvider, ErrorContext } from "../../contexts";
 import { api } from "../../services";
 import { loadBands } from "../../utils";
+import { PageSwitch } from "Components/PageSwitch";
+import { HomePage } from "Components/HomePage";
+import { Navbar } from "Components/Navbar";
+import { Login } from "Components/Login";
+import { Unauthorized } from "Components/Login/Unauthorised";
+import { TermsOfUse } from "Components/TermsOfUse";
+import { NotFound } from "Components/NotFoundPage/NotFoundPage";
+import { Dashboard } from "layouts";
+import { AppContext, AuthProvider, ErrorProvider } from "contexts";
+import { api } from "services";
+import { loadBands } from "utils";
 import {
   withWarning,
   withRoleValidation,
@@ -21,6 +32,7 @@ import {
   withTermsOfUse
 } from "../../hocs";
 import { errorActionTypes } from "../../reducers";
+} from "hocs";
 
 /**
  * Maps runtime/bootstrap errors into the structure expected by ErrorOverlay.

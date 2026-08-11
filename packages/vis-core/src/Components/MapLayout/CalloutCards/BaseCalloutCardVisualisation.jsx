@@ -2,8 +2,9 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { FullScreenCalloutCardVisualisation } from "./FullScreenCalloutCardVisualisation";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
 import { RecordSelector } from "./RecordSelector";
-import { useFetchVisualisationData, useFilterContext } from "hooks";
-import { MapContext } from "contexts";
+import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
+import { useFilterContext } from "hooks/useFilterContext";
+import { MapContext } from "contexts/MapContext";
 import { actionTypes } from "reducers";
 import { api } from "services";
 
