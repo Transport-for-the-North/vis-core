@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ContinuousGradientBar from "./ContinuousGradientBar";
 import { extractDataValues, getOutOfBandFlags, decorateLegendLabel } from "./DynamicLegend.utils";
-import { InfoBox } from "Components";
+import { InfoBox } from "Components/MessageBox/MessageBox";
 import {
   LegendGroup,
   LegendItemContainer,

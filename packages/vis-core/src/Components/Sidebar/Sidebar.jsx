@@ -4,11 +4,12 @@ import { darken } from "polished";
 import { AccordionSection, TextSection, AccordionIcon } from "./Accordion";
 import { SelectorSection } from "./Selectors";
 import { Glossary } from "Components/Glossary";
-import { Hovertip, InfoBox } from 'Components';
+import { Hovertip } from "Components/Hovertip/Hovertip";
+import { InfoBox } from "Components/MessageBox/MessageBox";
 import { DownloadSection } from "./Selectors/DownloadSelection";
-import { FilterProvider } from "contexts";
+import { FilterProvider } from "contexts/FilterContext";
 import { getScrollbarWidth } from "utils";
-import { MobileBar, SideIcon } from "../MobileBar/MobileBar";
+import { MobileBar, SideIcon } from "Components/MobileBar/MobileBar";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`

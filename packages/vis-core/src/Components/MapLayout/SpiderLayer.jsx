@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useMapContext } from "hooks";
+import { useMapContext } from "hooks/useMapContext";
 import { getSourceLayer } from 'utils';
 import {
   ensureSpiderHoverSelectLayers,

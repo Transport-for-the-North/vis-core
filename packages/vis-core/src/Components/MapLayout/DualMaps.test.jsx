@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import DualMaps from "./DualMaps";
-import { MapContext, FilterContext } from "contexts";
-import { useDualMaps } from "hooks";
+import { MapContext } from "contexts/MapContext";
+import { FilterContext } from "contexts/FilterContext";
+import { useDualMaps } from "hooks/useDualMaps";
 import { ThemeProvider } from "styled-components";
 
 // TO CONTINUE
@@ -27,11 +28,10 @@ jest.mock("./VisualisationManager", () => ({
 jest.mock("./Layer", () => ({
   Layer: ({ layer }) => <span>Layer: {JSON.stringify(layer)}</span>,
 }));
-jest.mock("../DynamicLegend", () => ({
-  DynamicLegend: ({ map }) => <span>Dynamic Legend: {map.type}</span>,
+jest.mock("Components/DynamicLegend/DynamicLegend", () => ({
+  DynamicLegend: ({ map }) => <span>Dynamic Legend: {map?.type || "unknown"}</span>,
 }));
-jest.mock("hooks", () => ({
-  ...jest.requireActual("hooks"),
+jest.mock("hooks/useDualMaps", () => ({
   useDualMaps: jest.fn(),
 }));
 jest.mock("maplibre-gl", () => {

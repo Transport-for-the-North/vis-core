@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { api } from 'services';
-import { SelectorLabel } from '../Selectors/SelectorLabel';
-import { FeatureSelect } from '../Selectors/FeatureSelect';
+import { SelectorLabel } from 'Components/Sidebar/Selectors/SelectorLabel';
+import { FeatureSelect } from 'Components/Sidebar/Selectors/FeatureSelect';
 
 // Styled components
 const SearchContainer = styled.div`

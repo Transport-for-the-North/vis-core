@@ -49,7 +49,7 @@ jest.mock("./MapVisualisation", () => ({
   },
 }));
 
-jest.mock("Components", () => ({
+jest.mock("Components/ScrollableContainer", () => ({
   ScrollableContainer: ({
     children,
     showOnMobile,

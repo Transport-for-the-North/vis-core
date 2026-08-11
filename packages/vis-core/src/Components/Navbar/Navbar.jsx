@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { AppContext } from "contexts";
+import { AppContext } from "contexts/AppContext";
 import { useAuth } from "contexts/AuthProvider";
-import { useWindowWidth } from "hooks";
+import { useWindowWidth } from "hooks/useWindowWidth";
 import { buildNavbarLinks, validateAppConfigAgainstOpenApi } from "utils";
 import { Button } from "./Button";
 import { Logo } from "./Logo";

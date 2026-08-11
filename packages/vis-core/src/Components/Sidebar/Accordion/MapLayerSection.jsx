@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { AccordionSection } from "Components";
-import { useMapContext } from "hooks";
+import { AccordionSection } from "./AccordionSection";
+import { useMapContext } from "hooks/useMapContext";
 import { LayerControlEntry } from "./LayerControlEntry";
 
 /**

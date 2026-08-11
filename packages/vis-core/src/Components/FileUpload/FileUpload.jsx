@@ -2,8 +2,8 @@ import React, { useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import { CloudArrowUpIcon, XMarkIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { api } from '../../services';
-import { validateCSVFile, validateCSVSchema, parseCSV } from '../../utils/csvValidation';
-import { isExcelFile, parseExcelWorkbook, extractSheetData, extractCellValue } from '../../utils/excelValidation';
+import { validateCSVFile, validateCSVSchema, parseCSV } from "utils/csvValidation";
+import { isExcelFile, parseExcelWorkbook, extractSheetData, extractCellValue } from "utils/excelValidation";
 import { ValidationErrors } from './ValidationErrors';
 import { ValidationPreview } from './ValidationPreview';
 

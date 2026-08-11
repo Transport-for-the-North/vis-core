@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { createPortal } from 'react-dom';
 import { buildCategoricalLegendKey, convertStringToNumber } from "utils";
-import { useMapContext, useFetchVisualisationData, useIsMobile } from "hooks";
-import { PageContext, useAppContext } from "contexts";
+import { useMapContext } from "hooks/useMapContext";
+import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
+import { useIsMobile } from "hooks/useIsMobile";
+import { PageContext } from "contexts/PageContext";
+import { useAppContext } from "contexts/AppContext";
 import { LegendContainer } from "./DynamicLegend.styles";
 import {
   interpolateWidths,

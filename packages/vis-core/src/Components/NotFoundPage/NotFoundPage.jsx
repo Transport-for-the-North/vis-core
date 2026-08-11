@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled, { useTheme, createGlobalStyle } from "styled-components";
-import { AppContext } from "contexts";
+import { AppContext } from "contexts/AppContext";
 
 const NAVBAR_HEIGHT = 75;
 

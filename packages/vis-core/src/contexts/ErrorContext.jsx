@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ErrorOverlay } from 'Components';
+import { ErrorOverlay } from 'Components/ErrorOverlay';
 import { errorReducer, errorActionTypes } from 'reducers';
 
 export const ErrorContext = createContext();

@@ -1,0 +1,2 @@
+cd packages/vis-core
+npm run lint:circular

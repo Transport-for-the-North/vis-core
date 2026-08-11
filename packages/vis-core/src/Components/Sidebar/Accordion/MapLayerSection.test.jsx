@@ -112,7 +112,9 @@ jest.mock("Components/Sidebar/Accordion/LayerControlEntry", () => ({
   },
 }));
 
-jest.mock("Components", () => ({
+jest.mock("./AccordionSection", () => ({
+  AccordionHeader: () => <div />,
+  AccordionIcon: () => <div />,
   AccordionSection: ({ title, children }) => (
     <div data-testid="accordion-section">
       <h3>{title}</h3>

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { Hovertip } from 'Components';
+import { Hovertip } from "Components/Hovertip/Hovertip";
 const StyledLabel = styled.div`
   display: flex;
   align-items: center;

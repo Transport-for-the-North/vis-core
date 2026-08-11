@@ -19,7 +19,7 @@ import {
   Scatter as RScatter,
 } from "recharts";
 import styled from "styled-components";
-import { WarningBox } from "Components";
+import { WarningBox } from "Components/MessageBox";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CARD_CONSTANTS } from "defaults";

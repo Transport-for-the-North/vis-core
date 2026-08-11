@@ -1,8 +1,8 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { CalloutCardVisualisation } from "./CalloutCardVisualisation";
-import { MapContext } from "contexts";
+import { MapContext } from "contexts/MapContext";
 import userEvent from "@testing-library/user-event";
-import { useFetchVisualisationData } from "hooks";
+import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { ThemeProvider } from "styled-components";
 
 jest.mock("@heroicons/react/24/solid", () => ({

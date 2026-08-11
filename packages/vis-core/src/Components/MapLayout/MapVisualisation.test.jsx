@@ -1,11 +1,11 @@
-import { MapContext, AppContext } from "contexts";
+import { MapContext } from "contexts/MapContext";
+import { AppContext } from "contexts/AppContext";
 import { MapVisualisation } from "./MapVisualisation";
 import { render, screen, waitFor } from "@testing-library/react";
 import { actionTypes } from "reducers";
 import { DataFetchState } from "enums";
 
-jest.mock("hooks", () => ({
-  ...jest.requireActual("hooks"),
+jest.mock("hooks/useFetchVisualisationData", () => ({
   useFetchVisualisationData: jest.fn(),
 }));
 jest.mock("utils", () => ({
@@ -15,7 +15,7 @@ jest.mock("utils", () => ({
   reclassifyGeoJSONData: jest.fn(),
   reclassifyData: jest.fn(),
 }));
-import { useFetchVisualisationData } from "hooks";
+import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import {
   hasAnyGeometryNotNull,
   createPaintProperty,

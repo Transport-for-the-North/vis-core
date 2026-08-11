@@ -1,10 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { PageSwitch } from ".";
 // Mocks
-jest.mock("Components", () => ({
-  MapLayout: () => <div data-testid="mock-map-layout" />,
-  IFrameEmbedPage: () => <div data-testid="mock-iframe-embed-page" />,
-}));
+jest.mock("Components/MapLayout/MapLayout", () => ({ MapLayout: () => <div data-testid="mock-map-layout" /> }));
+  jest.mock("Components/IFrameEmbedPage/IFrameEmbedPage", () => ({ IFrameEmbedPage: () => <div data-testid="mock-iframe-embed-page" /> }));
 jest.mock("contexts", () => ({
   FilterProvider: ({ children }) => (
     <div data-testid="mock-filter-provider">{children}</div>

@@ -3,7 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { buildDropdownTree, createNavItemClickHandler } from "utils/nav";
 import { LateralRecursiveDropdown } from "./LateralRecursiveDropdown";
-import { AppContext } from "contexts";
+import { AppContext } from "contexts/AppContext";
 import { FixedExternalIcon } from "./FixedExternalIcon";
 
 /**

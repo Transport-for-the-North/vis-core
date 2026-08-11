@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { MapContext } from 'contexts';
+import { MapContext } from "contexts/MapContext";
 
 /**
  * Custom hook to access the MapContext.

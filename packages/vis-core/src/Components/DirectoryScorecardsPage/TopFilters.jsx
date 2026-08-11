@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Dropdown } from "Components";
+import { Dropdown } from "Components/Sidebar/Selectors/Dropdown";
 import { SelectorLabel } from "Components/Sidebar/Selectors/SelectorLabel";
 
 /**
