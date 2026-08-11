@@ -1,3 +1,13 @@
+## [0.12.1](https://github.com/Transport-for-the-North/vis-core/compare/v0.12.0...v0.12.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **filter validation:** fix an issue where filter validation was permanently hanging due to debounced filter state ([2dcc13c](https://github.com/Transport-for-the-North/vis-core/commit/2dcc13ce65130bc5cf146a9994b8a7e6941cdf25))
+* **MapLayout:** prevent map action dispatch with stale filter state ([5c157d0](https://github.com/Transport-for-the-North/vis-core/commit/5c157d0fbecc62eb322147a7d73b7bd6d970411e))
+* remove circular dependencies by reducing/eliminating reliance on barrel file imports ([a7097b7](https://github.com/Transport-for-the-North/vis-core/commit/a7097b7799478f1cd7248b85702f5a461888a08a))
+* restore mouse-wheel zoom on side-by-side maps ([#293](https://github.com/Transport-for-the-North/vis-core/issues/293)) ([1589931](https://github.com/Transport-for-the-North/vis-core/commit/15899317100788cfcd46b989138bf0b477e8cf6e))
+
 # [0.12.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.11.0...v0.12.0) (2026-07-31)
 
 
