@@ -1,27 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
-import { PageSwitch } from "Components/PageSwitch";
-import { HomePage } from "Components/HomePage";
-import { Navbar } from "Components/Navbar";
+
+import { AdminPage } from "Components/AdminPage";
 import { CookieBanner } from "Components/CookieBanner";
+import { HomePage } from "Components/HomePage";
 import { Login } from "Components/Login";
 import { Unauthorized } from "Components/Login/Unauthorised";
-import { TermsOfUse } from "Components/TermsOfUse";
+import { Navbar } from "Components/Navbar";
 import { NotFound } from "Components/NotFoundPage/NotFoundPage";
-import { AdminPage } from "Components/AdminPage";
+import { PageSwitch } from "Components/PageSwitch";
+import { AppContext, AuthProvider, ErrorContext, ErrorProvider, useAuth } from "contexts";
 import { Dashboard } from "layouts";
-import { AppContext, AuthProvider, ErrorProvider, useAuth } from "contexts";
 import { api } from "services";
 import { loadBands } from "utils";
-import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
-import { buildNavbarLinks } from "utils/nav";
 import { isAppAdmin, isAppSuperuser } from "utils/auth";
+import { buildNavbarLinks } from "utils/nav";
+import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
+import { errorActionTypes } from "../../reducers";
 import {
-  withWarning,
-  withRoleValidation,
   composeHOCs,
-  withTermsOfUse
+  withRoleValidation,
+  withTermsOfUse,
+  withWarning,
 } from "hocs";
 
 const BrandGlobalStyles = createGlobalStyle`
@@ -146,33 +147,25 @@ const BrandGlobalStyles = createGlobalStyle`
   }
 `;
 
-/**
- * Provides AppContext with the role-dependent parts of the config (admin-only pages and
- * the Admin nav link) derived from the current user's roles. It sits inside AuthProvider
- * and re-derives whenever the auth token changes, so logging in or out updates the
- * navbar without a page reload — BaseApp itself does not re-render on login/logout.
- *
- * @param {Object} props
- * @param {Object} props.appConfig - The loaded app config
- * @param {string} props.appName - The application name
- * @param {boolean} props.isAuthRequired - Whether the app requires authentication
- * @param {React.ReactNode} props.children - The app content
- * @returns {JSX.Element} The AppContext provider
- */
-function RoleAwareAppContextProvider({ appConfig, appName, isAuthRequired, children }) {
-  // Role checks read the token cookie; `token` is the dependency that signals it changed.
+function RoleAwareAppContextProvider({
+  appConfig,
+  appName,
+  isAuthRequired,
+  children,
+}) {
   const { token } = useAuth();
 
   const contextValue = useMemo(() => {
-    const normalisedAppName = (appName || '').toLowerCase();
-    const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
+    const normalisedAppName = (appName || "").toLowerCase();
+    const isAdmin =
+      !isAuthRequired ||
+      isAppAdmin(normalisedAppName) ||
+      isAppSuperuser(normalisedAppName);
 
-    // Filter visible app pages based on role authorization
     const visibleAppPages = (appConfig.appPages ?? []).filter(
-      page => !page.adminOnly || isAdmin
+      (page) => !page.adminOnly || isAdmin,
     );
 
-    // Pre-compute the complete list of renderable navigation links
     const navbarLinks = buildNavbarLinks({
       ...appConfig,
       appPages: visibleAppPages,
@@ -192,26 +185,72 @@ function RoleAwareAppContextProvider({ appConfig, appName, isAuthRequired, child
     };
   }, [appConfig, appName, isAuthRequired, token]);
 
-  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={contextValue}>
+      {children}
+    </AppContext.Provider>
+  );
 }
 
 /**
- * Base application component that can be used across all TfN apps.
- * Handles dynamic config loading, routing, and authentication.
- * 
- * @param {Object} props
- * @param {Object} props.theme - Styled-components theme object
- * @param {Function} props.configLoader - Function that returns config modules
- * @param {Function} props.bandsLoader - Function that returns bands modules
- * @param {string} props.appName - The application name (from VITE_APP_NAME env variable)
- * @param {string} [props.appCssClass="App"] - Optional CSS class for the app wrapper
- * @param {JSX.Element} [props.customRoutes=null] - Optional additional Route components to inject into the router
- * @param {Function} [props.customProviders=null] - Optional function that wraps the app content with custom context providers
- * @param {JSX.Element} [props.beforeDashboard=null] - Optional content to render before the Dashboard component
- * @param {JSX.Element} [props.afterDashboard=null] - Optional content to render after the Dashboard component
- * @returns {JSX.Element} The rendered application component
+ * Converts startup errors into the payload expected by ErrorContext.
+ * This function is moved into the utils folder by the next rebase commit.
  */
-export function BaseApp({
+function normaliseStartupError(error) {
+  const status = error?.status;
+  const technicalDetails = `${error?.message || String(error)}${
+    error?.url ? `\nURL: ${error.url}` : ""
+  }`;
+
+  switch (true) {
+    case status === 403:
+      return {
+        title: "Access Denied",
+        subtitle: "You do not have permission to access this resource",
+        message:
+          "The application could not load because access to a required resource was denied.",
+        supportMessage:
+          "Please contact support if you believe you should have access.",
+        supportDetails:
+          "Include the page URL and the time of the error when reporting this issue.",
+        technicalDetails,
+        headerColor: "#c62828",
+        showTechnicalDetails: true,
+      };
+
+    case status >= 500:
+      return {
+        title: "Server Error",
+        subtitle: "A server error occurred while loading the application",
+        message:
+          "The application could not load required configuration from the server.",
+        supportMessage:
+          "Please try again later or contact support if the issue persists.",
+        supportDetails:
+          "If reporting this issue, include the time and any relevant request details.",
+        technicalDetails,
+        headerColor: "#c62828",
+        showTechnicalDetails: true,
+      };
+
+    default:
+      return {
+        title: "Application Error",
+        subtitle: "Failed to load application configuration",
+        message:
+          "The application could not start because a required configuration request failed.",
+        supportMessage:
+          "Please refresh the page or contact support if the issue persists.",
+        supportDetails:
+          "Include the page URL and any visible error details when reporting this issue.",
+        technicalDetails: error?.stack || technicalDetails,
+        headerColor: "#d32f2f",
+        showTechnicalDetails: true,
+      };
+  }
+}
+
+function BaseAppContent({
   theme,
   configLoader,
   bandsLoader,
@@ -220,144 +259,229 @@ export function BaseApp({
   customRoutes = null,
   customProviders = null,
   beforeDashboard = null,
-  afterDashboard = null
+  afterDashboard = null,
 }) {
   const [appConfig, setAppConfig] = useState(null);
-  const effectiveTheme = useMemo(() => mergeThemeWithBrandDefaults(theme), [theme]);
+  const effectiveTheme = useMemo(() => mergeThemeWithBrandDefaults(theme), [theme],); 
+
+  const { dispatch } = useContext(ErrorContext);
+  const location = useLocation();
+
+  const isPublicRoute =
+    location.pathname === "/login" ||
+    location.pathname === "/unauthorized";
+
+  const isAuthRequired =
+    appConfig?.authenticationRequired ?? true;
+
+  // Hooks must stay above the conditional returns below.
+  const HomePageWithRoleValidation = useMemo(
+    () =>
+      isAuthRequired
+        ? withRoleValidation(HomePage)
+        : HomePage,
+    [isAuthRequired],
+  );
+
+  const NotFoundWithRoleValidation = useMemo(
+    () =>
+      isAuthRequired
+        ? withRoleValidation(NotFound)
+        : NotFound,
+    [isAuthRequired],
+  );
+
+  const AdminPageWithAuth = useMemo(
+    () =>
+      isAuthRequired
+        ? withRoleValidation(AdminPage, { adminOnly: true })
+        : AdminPage,
+    [isAuthRequired],
+  );
+
+  const pageRoutes = useMemo(() => {
+    if (!appConfig) {
+      return null;
+    }
+
+    return (appConfig.appPages ?? []).map((page) => {
+      const PageComponent = isAuthRequired
+        ? withRoleValidation(PageSwitch, {
+            adminOnly: page.adminOnly ?? false,
+          })
+        : PageSwitch;
+
+      const WrappedPageComponent = composeHOCs(
+        withWarning,
+        withTermsOfUse,
+      )(PageComponent);
+
+      return (
+        <Route
+          key={page.pageName}
+          path={page.url}
+          element={
+            <WrappedPageComponent pageConfig={page} />
+          }
+        />
+      );
+    });
+  }, [appConfig, isAuthRequired]);
 
   useEffect(() => {
-    /**
-     * Dynamically imports the appConfig based on the provided appName.
-     * Uses import.meta.glob to ensure Vite bundles all possible configs in production.
-     * @function loadAppConfig
-     * @async
-     */
+    if (isPublicRoute) {
+      return;
+    }
+
     const loadAppConfig = async () => {
       try {
         if (!appName) {
           throw new Error("appName prop is required");
         }
 
-        // Get config modules from the app-specific loader
         const configModules = configLoader();
         const bandModules = bandsLoader();
 
-        const configPath = `./configs/${appName}/appConfig.js`;
-        const bandsPath = `./configs/${appName}/bands.js`;
+        const configPath =
+          `./configs/${appName}/appConfig.js`;
+        const bandsPath =
+          `./configs/${appName}/bands.js`;
 
         if (!configModules[configPath]) {
-          throw new Error(`Config not found for app: ${appName}`);
+          throw new Error(
+            `Config not found for app: ${appName}`,
+          );
         }
 
-        const configModule = await configModules[configPath]();
+        const configModule =
+          await configModules[configPath]();
         const initialAppConfig = configModule.appConfig;
 
-        // Load bands with fallback logic.
-        // Uses the shared loader, which is tolerant and returns [] if the module
-        // is missing/invalid/throws.
-        const bands = await loadBands({ bandModules, bandsPath, appName });
+        const bands = await loadBands({
+          bandModules,
+          bandsPath,
+          appName,
+        });
 
-        const apiSchema = await api.metadataService.getSwaggerFile();
-        const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
+        const apiSchema =
+          await api.metadataService.getSwaggerFile();
 
-        // Extract AdminPage from appPages so it sits at appConfig.adminPage instead.
-        // This lets apps configure it via the template without polluting appPages.
-        const adminPageEntry = initialAppConfig.appPages?.find(p => p.type === 'AdminPage');
-        const filteredAppPages = initialAppConfig.appPages?.filter(p => p.type !== 'AdminPage') ?? [];
+        const authenticationRequired =
+          initialAppConfig.authenticationRequired ?? true;
+
+        const adminPageEntry =
+          initialAppConfig.appPages?.find(
+            (page) => page.type === "AdminPage",
+          );
+
+        const filteredAppPages =
+          initialAppConfig.appPages?.filter(
+            (page) => page.type !== "AdminPage",
+          ) ?? [];
 
         setAppConfig({
           ...initialAppConfig,
           appPages: filteredAppPages,
-          adminPage: adminPageEntry?.config ?? initialAppConfig.adminPage ?? null,
-          apiSchema: apiSchema,
+          adminPage:
+            adminPageEntry?.config ??
+            initialAppConfig.adminPage ??
+            null,
+          apiSchema,
           defaultBands: bands,
-          authenticationRequired: authenticationRequired
+          authenticationRequired,
         });
       } catch (error) {
-        console.error("Failed to load app configuration:", error);
+        console.error(
+          "Failed to load app configuration:",
+          error,
+        );
+
+        if (error?.status === 401) {
+          window.location.assign("/login");
+          return;
+        }
+
+        dispatch({
+          type: errorActionTypes.SET_ERROR,
+          payload: normaliseStartupError(error),
+        });
       }
     };
 
     loadAppConfig();
-  }, [appName, configLoader, bandsLoader]);
+  }, [appName, bandsLoader, configLoader, dispatch, isPublicRoute,]);
 
-  const isAuthRequired = appConfig?.authenticationRequired ?? true;
-  const HomePageWithRoleValidation = useMemo(
-    () => (isAuthRequired ? withRoleValidation(HomePage) : HomePage),
-    [isAuthRequired]
-  );
-  const NotFoundWithRoleValidation = useMemo(
-    () => (isAuthRequired ? withRoleValidation(NotFound) : NotFound),
-    [isAuthRequired]
-  );
-  const AdminPageWithAuth = useMemo(
-    () => (isAuthRequired ? withRoleValidation(AdminPage, { adminOnly: true }) : AdminPage),
-    [isAuthRequired]
-  );
-
-  const pageRoutes = useMemo(() => {
-    if (!appConfig) return null;
-    return (appConfig.appPages ?? []).map((page) => {
-      const PageComponent = isAuthRequired
-        ? withRoleValidation(PageSwitch, { adminOnly: page.adminOnly ?? false })
-        : PageSwitch;
-      const WrappedPageComponent = composeHOCs(
-        withWarning,
-        withTermsOfUse
-      )(PageComponent);
-      return (
-        <Route
-          key={page.pageName}
-          path={page.url}
-          element={<WrappedPageComponent pageConfig={page} />}
-        />
-      );
-    });
-  }, [appConfig?.appPages, isAuthRequired]);
+  if (isPublicRoute) {
+    return (
+      <div className={appCssClass}>
+        <AuthProvider>
+          <ThemeProvider theme={effectiveTheme}>
+            <BrandGlobalStyles />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/unauthorized"
+                element={<Unauthorized />}
+              />
+            </Routes>
+          </ThemeProvider>
+        </AuthProvider>
+      </div>
+    );
+  }
 
   if (!appConfig) {
     return <div>Loading...</div>;
   }
 
-
-  // Standard routes
   const standardRoutes = (
     <>
       <Route path="/login" element={<Login />} />
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/" element={<HomePageWithRoleValidation />} />
+      <Route
+        path="/unauthorized"
+        element={<Unauthorized />}
+      />
+      <Route
+        path="/"
+        element={<HomePageWithRoleValidation />}
+      />
+
       {appConfig.adminPage && (
-        <Route path="/admin" element={<AdminPageWithAuth />} />
+        <Route
+          path="/admin"
+          element={<AdminPageWithAuth />}
+        />
       )}
+
       {pageRoutes}
       {customRoutes}
-      <Route path="*" element={<NotFoundWithRoleValidation />} />
+
+      <Route
+        path="*"
+        element={<NotFoundWithRoleValidation />}
+      />
     </>
   );
 
   const appContent = (
     <div className={appCssClass}>
       <AuthProvider>
-        <ErrorProvider>
-          <ThemeProvider theme={effectiveTheme}>
-            <BrandGlobalStyles />
-            <RoleAwareAppContextProvider
-              appConfig={appConfig}
-              appName={appName}
-              isAuthRequired={isAuthRequired}
-            >
-              {beforeDashboard}
-              <Navbar />
-              <CookieBanner />
-              <Dashboard>
-                <Routes>
-                  {standardRoutes}
-                </Routes>
-              </Dashboard>
-              {afterDashboard}
-            </RoleAwareAppContextProvider>
-          </ThemeProvider>
-        </ErrorProvider>
+        <ThemeProvider theme={effectiveTheme}>
+          <BrandGlobalStyles />
+          <RoleAwareAppContextProvider
+            appConfig={appConfig}
+            appName={appName}
+            isAuthRequired={isAuthRequired}
+          >
+            {beforeDashboard}
+            <Navbar />
+            <CookieBanner />
+            <Dashboard>
+              <Routes>{standardRoutes}</Routes>
+            </Dashboard>
+            {afterDashboard}
+          </RoleAwareAppContextProvider>
+        </ThemeProvider>
       </AuthProvider>
     </div>
   );
@@ -367,4 +491,12 @@ export function BaseApp({
   }
 
   return appContent;
+}
+
+export function BaseApp(props) {
+  return (
+    <ErrorProvider>
+      <BaseAppContent {...props} />
+    </ErrorProvider>
+  );
 }
