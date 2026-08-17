@@ -146,6 +146,7 @@ const AuthActionButton = styled.button`
  * @returns {JSX.Element|null} The rendered navbar, or null on routes like "/login".
  */
 export function Navbar() {
+  const DEFAULT_LOGO_IMAGE = "img/tfn-logo-fullsize.png";
   const location = useLocation();
   const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
@@ -154,7 +155,9 @@ export function Navbar() {
   const { logOut, token, user } = useAuth();
   const didValidateOpenApiRef = useRef(false);
   const navbarRef = useRef(null);
-  const [logoImage, setLogoImage] = useState(appContext.logoImage);
+  const [logoImage, setLogoImage] = useState(
+    appContext.logoImage || DEFAULT_LOGO_IMAGE
+  );
   const [$bgColor, setBgColor] = useState(defaultBgColour);
   const [showMobileMenuIcon, setShowMobileMenuIcon] = useState(true);
   const navigate = useNavigate();
@@ -163,16 +166,13 @@ export function Navbar() {
   // Build unified links array from shared function.
   const links = buildNavbarLinks(appContext);
 
-  // Determine mobile view based on links length and window width.
-  const MOBILE_BREAKPOINT = 768;
-  const MIN_NAV_ITEM_WIDTH = 250;
-  const isMobile =
-    windowWidth < MOBILE_BREAKPOINT ||
-    links.length * MIN_NAV_ITEM_WIDTH > windowWidth;
+  // Determine mobile view using one shared breakpoint for all apps.
+  const MOBILE_BREAKPOINT = 1560;
+  const isMobile = windowWidth < MOBILE_BREAKPOINT;
 
   // When a link is clicked, update the logo and active bg colour appropriately.
   const onClick = (url, newLogo, navLinkBgColour) => {
-    setLogoImage(newLogo || appContext.logoImage);
+    setLogoImage(newLogo || appContext.logoImage || DEFAULT_LOGO_IMAGE);
     if (url) navigate(url);
     if (navLinkBgColour && navLinkBgColour !== $bgColor)
       setBgColor(navLinkBgColour);
@@ -255,7 +255,12 @@ export function Navbar() {
 
   // Simplified logo logic: on mobile the logo is always left, on non-mobile
   // display the logo on the side indicated by appContext.logoPosition.
-  const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
+  const isUsingFallbackLogo =
+    !appContext.logoImage || logoImage === DEFAULT_LOGO_IMAGE;
+  const logoPosition =
+    isMobile || isUsingFallbackLogo
+      ? "left"
+      : appContext.logoPosition || "left";
   const isAuthenticated = Boolean(token || user);
   const logoutImage = appContext.logoutImage || "img/logout.png";
   const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;

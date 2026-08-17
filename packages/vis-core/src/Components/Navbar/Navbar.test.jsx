@@ -169,7 +169,7 @@ describe("Navbar", () => {
   });
 
   it("displays responsive links on desktop (not mobile)", () => {
-    useWindowWidth.mockReturnValue(1200); // desktop
+    useWindowWidth.mockReturnValue(1800); // desktop
     buildNavbarLinks.mockReturnValue([{ url: "/a", label: "A" }, { url: "/b", label: "B" }]);
 
     const appContext = {
@@ -199,7 +199,7 @@ describe("Navbar", () => {
       token: "",
       loginAction: jest.fn(),
     });
-    useWindowWidth.mockReturnValue(1200);
+    useWindowWidth.mockReturnValue(1800);
 
     const appContext = {
       logoImage: "img/tfn-logo-fullsize.png",
@@ -218,5 +218,52 @@ describe("Navbar", () => {
 
     expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
     expect(screen.queryByAltText(/logout/i)).not.toBeInTheDocument();
+  });
+
+  it("falls back to default TFN logo when logoImage is missing", () => {
+    useWindowWidth.mockReturnValue(1800);
+
+    const appContext = {
+      appPages: [],
+      logoPosition: "right",
+      authenticationRequired: false,
+    };
+
+    render(
+      <MemoryRouter>
+        <AppContext.Provider value={appContext}>
+          <Navbar />
+        </AppContext.Provider>
+      </MemoryRouter>
+    );
+
+    const logo = screen.getByAltText("Logo");
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute("src", "img/tfn-logo-fullsize.png");
+    expect(logo).toHaveAttribute("data-position", "left");
+  });
+
+  it("keeps default TFN logo on the left when app sets right position", () => {
+    useWindowWidth.mockReturnValue(1800);
+
+    const appContext = {
+      appPages: [],
+      logoImage: "img/tfn-logo-fullsize.png",
+      logoPosition: "right",
+      authenticationRequired: false,
+    };
+
+    render(
+      <MemoryRouter>
+        <AppContext.Provider value={appContext}>
+          <Navbar />
+        </AppContext.Provider>
+      </MemoryRouter>
+    );
+
+    const logo = screen.getByAltText("Logo");
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute("src", "img/tfn-logo-fullsize.png");
+    expect(logo).toHaveAttribute("data-position", "left");
   });
 });

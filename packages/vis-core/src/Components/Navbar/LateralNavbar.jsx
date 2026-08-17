@@ -147,7 +147,18 @@ export function LateralNavbar(props) {
         ))}
       {props.className === "sideNavbar-shown" &&
         Object.keys(pagesByCategory).map((category) => {
-          const tree = buildDropdownTree(pagesByCategory[category]);
+          const categoryPages = pagesByCategory[category];
+          const tree = buildDropdownTree(categoryPages);
+
+          const activeCategoryPage = categoryPages.find(
+            (page) => page.url === activeLink
+          );
+
+          const categoryBgColor =
+            activeCategoryPage?.navbarLinkBgColour ||
+            categoryPages.find((page) => page.navbarLinkBgColour)
+              ?.navbarLinkBgColour;
+
           return (
             <LateralRecursiveDropdown
               key={category}
@@ -155,7 +166,7 @@ export function LateralNavbar(props) {
               items={tree}
               activeLink={activeLink}
               onClick={props.onClick}
-              $bgColor={props.$bgColor}
+              $bgColor={categoryBgColor}
             />
           );
         })}

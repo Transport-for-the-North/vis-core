@@ -88,9 +88,9 @@ const DropdownContainer = styled.div`
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
-  background-color: ${({ $isActive, $hovered, theme }) =>
+  background-color: ${({ $isActive, $hovered, $bgColor, theme }) =>
     $isActive || $hovered
-      ? theme?.primary || defaultBgColour
+      ? $bgColor || theme?.primary || defaultBgColour
       : "transparent"};
   color: ${({ $isActive, $hovered, theme }) =>
     $isActive || $hovered
@@ -107,13 +107,14 @@ const DropdownContainer = styled.div`
     background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
-  white-space: nowrap;
+  white-space: normal;
+  min-width: 0;
   z-index: 1000;
   box-sizing: border-box;
 
   &:hover {
     color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
-    background-color: ${({ theme }) => theme?.primary || defaultBgColour};
+    background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
     box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
     transform: translateY(-1px);
   }
@@ -129,7 +130,13 @@ const DropdownContainer = styled.div`
 const DropdownTitle = styled.span`
   flex-grow: 1;
   text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: normal;
+  line-height: 1.25;
   overflow-wrap: break-word;
 `;
 
