@@ -434,6 +434,7 @@ const validateField = (value, field) => {
  * @param {string} [props.config.submitButtonText='Submit'] - Label for the submit button.
  * @param {string} [props.config.resetButtonText='Submit Another Entry'] - Label for the post-success reset button.
  * @param {string} [props.config.successTitle='Submission Successful'] - Heading shown on the success panel.
+ * @param {Object} [props.afterFieldContent] - Optional React nodes to render after a field, keyed by field id.
  * @returns {JSX.Element} The rendered DynamicForm component.
  *
  * @note A field with `type: 'hidden'` is not rendered but its value (from `initialValues`/`defaultValue`)
@@ -471,6 +472,7 @@ export const DynamicForm = ({
   externalCoordinates,
   onFieldChange,
   initialValues,
+  afterFieldContent,
 }) => {
   const {
     title,
@@ -987,22 +989,25 @@ export const DynamicForm = ({
 
       {visibleFields.map((field) => (
         field.type === 'hidden' ? null : (
-        <FieldGroup key={field.id}>
-          {/* Checkboxes have their own label - don't render separate label */}
-          {field.type !== 'checkbox' && (
-            <Label htmlFor={field.id}>
-              {field.label}
-              {field.required && <RequiredAsterisk>*</RequiredAsterisk>}
-            </Label>
-          )}
-          {renderField(field)}
-          {touched[field.id] && errors[field.id] && (
-            <ErrorText>{errors[field.id]}</ErrorText>
-          )}
-          {field.helpText && !errors[field.id] && (
-            <HelpText>{field.helpText}</HelpText>
-          )}
-        </FieldGroup>
+          <React.Fragment key={field.id}>
+            <FieldGroup>
+              {/* Checkboxes have their own label - don't render separate label */}
+              {field.type !== 'checkbox' && (
+                <Label htmlFor={field.id}>
+                  {field.label}
+                  {field.required && <RequiredAsterisk>*</RequiredAsterisk>}
+                </Label>
+              )}
+              {renderField(field)}
+              {touched[field.id] && errors[field.id] && (
+                <ErrorText>{errors[field.id]}</ErrorText>
+              )}
+              {field.helpText && !errors[field.id] && (
+                <HelpText>{field.helpText}</HelpText>
+              )}
+            </FieldGroup>
+            {afterFieldContent?.[field.id]}
+          </React.Fragment>
         )
       ))}
 
