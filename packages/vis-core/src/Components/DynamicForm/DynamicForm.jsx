@@ -310,7 +310,7 @@ const validateField = (value, field) => {
   // Check required fields
   if (field.required) {
     if (value === null || value === undefined || value === '') {
-      return { isValid: false, error: 'This field is a required' };
+      return { isValid: false, error: 'This field is required' };
     }
     // For coordinates, check both lat and lng
     if (field.type === 'coordinates') {
