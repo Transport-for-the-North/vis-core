@@ -14,6 +14,7 @@ import { loremIpsum, updateFilterValidity, getInitialFilterValue } from "utils";
 import { defaultBgColour } from "defaults";
 import DualMaps from "./DualMaps";
 import Map from "./Map";
+import { MapDataSummaryTable } from "./MapDataSummaryTable";
 import { actionTypes } from "reducers";
 
 const LayoutContainer = styled.div`
@@ -29,9 +30,42 @@ const MapContainer = styled.div`
   flex: 1;
   position: relative;
   display: flex;
+  flex-direction: column;
+  min-width: 0;
   @media ${props => props.theme.mq.mobile} {
    flex: 0 0 auto;
    min-height: 60vh; /* ensure minimum height on mobile */}
+`;
+
+const MapViewport = styled.div`
+  flex: 1;
+  min-height: 0;
+  position: relative;
+`;
+
+const TableToggleButton = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  border: 1px solid #c9d5e7;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+
+  &:hover {
+    background: #f3f6fb;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #0b6bc5;
+    outline-offset: 1px;
+  }
 `;
 
 const MobileCardsSlot = styled.div`
@@ -72,6 +106,8 @@ export const MapLayout = () => {
   const pageRef = useRef(pageContext);
   const layerZoomMessage = useLayerZoomMessage();
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+  const [showBelowMapTable, setShowBelowMapTable] = useState(false);
+  const isTablePreviewEnabled = pageContext.config?.tableBelowMapPreview?.enabled !== false;
 
   // Domain-agnostic extension point: pages can supply extra sidebar sections via
   // config.additionalMapLayoutAccordionSections so apps can inject bespoke controls without
@@ -431,7 +467,30 @@ export const MapLayout = () => {
 
       {pageContext.type === "MapLayout" && (
         <MapContainer>
-          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} sidebarIsOpen={sidebarIsOpen}/>
+          <MapViewport>
+            <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} sidebarIsOpen={sidebarIsOpen}/>
+            {isTablePreviewEnabled && (
+              <TableToggleButton
+                type="button"
+                onClick={() => setShowBelowMapTable((prev) => !prev)}
+                aria-pressed={showBelowMapTable}
+              >
+                {showBelowMapTable ? "Hide Table" : "Show Table"}
+              </TableToggleButton>
+            )}
+          </MapViewport>
+          {isTablePreviewEnabled && showBelowMapTable && (
+            <MapDataSummaryTable
+              map={state.map}
+              layers={state.layers}
+              filters={state.filters}
+              filterState={filterState}
+              visualisations={state.visualisations}
+              maxRows={pageContext.config?.tableBelowMapPreview?.maxRows ?? 120}
+              maxColumns={pageContext.config?.tableBelowMapPreview?.maxColumns ?? 8}
+              focusZoom={pageContext.config?.tableBelowMapPreview?.focusZoom ?? 11}
+            />
+          )}
         </MapContainer>
       )}
       {pageContext.type === "DualMapLayout" && (

@@ -33,9 +33,10 @@ import { mapKeys, uniq } from "lodash";
 
 const StyledMapContainer = styled.div`
   width: 100%;
-  height: calc(100vh - 75px);
+  height: 100%;
+  min-height: 0;
   @media ${props => props.theme.mq.mobile} {
-   height: auto;             /* let content dictate height */
+   min-height: 60vh;
   }
 `;
 
