@@ -6,7 +6,8 @@ import { createNavItemClickHandler } from "utils/nav";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { defaultBgColour } from "defaults";
 
-const NAV_ITEM_WIDTH = "250px";
+const NAV_ITEM_MAX_WIDTH = "250px";
+const NAV_ITEM_MIN_WIDTH = "150px";
 
 /**
  * Styled container for the responsive navigation links.
@@ -17,12 +18,12 @@ const NavLinksContainer = styled.div`
   justify-content: flex-start;
   gap: 10px;
   width: 100%;
+  min-width: 0;
 
   > * {
-    flex: 0 0 ${NAV_ITEM_WIDTH};
-    width: ${NAV_ITEM_WIDTH};
-    max-width: ${NAV_ITEM_WIDTH};
-    min-width: 0;
+    flex: 1 1 0;
+    min-width: ${NAV_ITEM_MIN_WIDTH};
+    max-width: ${NAV_ITEM_MAX_WIDTH};
   }
 `;
 
@@ -37,9 +38,9 @@ const baseNavLinkStyles = css`
   justify-content: center;
   padding: 12px 14px;
   height: auto;
-  background-color: ${({ $active, theme }) =>
+  background-color: ${({ $active, $bgColor, theme }) =>
     $active
-      ? theme?.primary || defaultBgColour
+      ? $bgColor || theme?.primary || defaultBgColour
       : "transparent"};
   color: ${({ $active, theme }) =>
     $active
@@ -53,15 +54,26 @@ const baseNavLinkStyles = css`
     box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
   font-size: 18px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 1.25;
   font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
   cursor: pointer;
   box-sizing: border-box;
 
+  .nav-label {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    width: 100%;
+  }
+
   &:hover {
     color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
-    background-color: ${({ theme }) => theme?.primary || defaultBgColour};
+    background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
     box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
     transform: translateY(-1px);
   }
@@ -81,10 +93,11 @@ export const StyledNavLink = styled(Link)`
 export const StyledExternalNavLink = styled.a`
   ${baseNavLinkStyles}
   gap: 6px;
+  align-items: center;
   
   /* The span holding the external label takes full available width */
   span.external-label {
-    white-space: nowrap;
+    flex: 1 1 auto;
   }
 `;
 
@@ -126,7 +139,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={false}
             >
-              <span className="external-label">{link.label}</span>
+              <span className="external-label nav-label">{link.label}</span>
               <ArrowTopRightOnSquareIcon style={{ width: "1rem", marginLeft: "4px" }} />
             </StyledExternalNavLink>
           );
@@ -137,9 +150,9 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               to={link.url}
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={activeLink === link.url}
-              onClick={createNavItemClickHandler(link, onClick, $bgColor)}
+              onClick={createNavItemClickHandler(link, onClick, link.navbarLinkBgColour || $bgColor)}
             >
-              {link.label}
+              <span className="nav-label">{link.label}</span>
             </StyledNavLink>
           );
         }
