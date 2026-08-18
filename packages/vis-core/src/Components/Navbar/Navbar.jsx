@@ -146,7 +146,6 @@ const AuthActionButton = styled.button`
  * @returns {JSX.Element|null} The rendered navbar, or null on routes like "/login".
  */
 export function Navbar() {
-  const DEFAULT_LOGO_IMAGE = "img/tfn-logo-fullsize.png";
   const location = useLocation();
   const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
@@ -155,9 +154,7 @@ export function Navbar() {
   const { logOut, token, user } = useAuth();
   const didValidateOpenApiRef = useRef(false);
   const navbarRef = useRef(null);
-  const [logoImage, setLogoImage] = useState(
-    appContext.logoImage || DEFAULT_LOGO_IMAGE
-  );
+  const [logoImage, setLogoImage] = useState(appContext.logoImage);
   const [$bgColor, setBgColor] = useState(defaultBgColour);
   const [showMobileMenuIcon, setShowMobileMenuIcon] = useState(true);
   const navigate = useNavigate();
@@ -172,7 +169,7 @@ export function Navbar() {
 
   // When a link is clicked, update the logo and active bg colour appropriately.
   const onClick = (url, newLogo, navLinkBgColour) => {
-    setLogoImage(newLogo || appContext.logoImage || DEFAULT_LOGO_IMAGE);
+    setLogoImage(newLogo || appContext.logoImage);
     if (url) navigate(url);
     if (navLinkBgColour && navLinkBgColour !== $bgColor)
       setBgColor(navLinkBgColour);
@@ -255,12 +252,7 @@ export function Navbar() {
 
   // Simplified logo logic: on mobile the logo is always left, on non-mobile
   // display the logo on the side indicated by appContext.logoPosition.
-  const isUsingFallbackLogo =
-    !appContext.logoImage || logoImage === DEFAULT_LOGO_IMAGE;
-  const logoPosition =
-    isMobile || isUsingFallbackLogo
-      ? "left"
-      : appContext.logoPosition || "left";
+  const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
   const isAuthenticated = Boolean(token || user);
   const logoutImage = appContext.logoutImage || "img/logout.png";
   const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;
