@@ -392,15 +392,6 @@ export const MapLayout = () => {
     "Applying colours and map styling...",
   ];
 
-  const loadingHeading = state.visualisationLoadingCount > 0
-    ? "Loading map layers"
-    : "Preparing your map";
-  const loadingMessages = [
-    "Fetching the latest visualisation data...",
-    "Almost there, thanks for waiting.",
-    "Applying colours and map styling...",
-  ];
-
   return (
     <ToastProvider>
       <LayoutContainer>
