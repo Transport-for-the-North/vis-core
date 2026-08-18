@@ -261,79 +261,48 @@ export function Navbar() {
 
   return (
     <>
-      <StyledNavbar ref={navbarRef}>
-        <HeaderOuter>
-          <HeaderInner>
-            <HeaderGrid>
-              {isMobile ? (
-                <MobileMenuButton
-                  aria-label="Open main menu"
-                  aria-expanded={isSideNavOpen}
-                  onClick={updateSideNav}
-                  data-testid="mobile-menu-toggle"
-                >
-                  {showMobileMenuIcon ? (
-                    <MobileMenuIcon
-                      src={mobileMenuIconSrc}
-                      alt=""
-                      aria-hidden="true"
-                      onError={() => setShowMobileMenuIcon(false)}
-                    />
-                  ) : (
-                    <span aria-hidden="true">☰</span>
-                  )}
-                </MobileMenuButton>
-              ) : (
-                logoPosition === "left" && (
-                  <Logo
-                    logoImage={logoImage}
-                    onClick={handleLogoClick}
-                    position="left"
-                  />
-                )
-              )}
-
-              <HeaderNavSearch>
-                {isMobile ? (
-                  <MobileLogoSlot>
-                    <Logo
-                      logoImage={logoImage}
-                      onClick={() => onClick(null, logoImage)}
-                      position="left"
-                    />
-                  </MobileLogoSlot>
-                ) : (
-                  <ResponsiveNavbarLinks
-                    links={links}
-                    activeLink={activeLink}
-                    onClick={onClick}
-                    $bgColor={$bgColor}
-                  />
-                )}
-              </HeaderNavSearch>
-
-              <LogoutSection>
-                {!isMobile && logoPosition === "right" && (
-                  <Logo
-                    logoImage={logoImage}
-                    onClick={handleLogoClick}
-                    position="right"
-                  />
-                )}
-                {appContext.authenticationRequired && (
-                  isAuthenticated ? (
-                    <StyledLogoutButton onClick={handleLogout} aria-label="Logout">
-                      <span>Logout</span>
-                      <LogoutIcon src={logoutImageSrc} alt="Logout" />
-                    </StyledLogoutButton>
-                  ) : (
-                    <AuthActionButton onClick={handleLogin}>Login</AuthActionButton>
-                  )
-                )}
-              </LogoutSection>
-            </HeaderGrid>
-          </HeaderInner>
-        </HeaderOuter>
+      <StyledNavbar>
+        <NavbarContent>
+          {isMobile && <NavbarMobileButton
+              src={appContext.logoutButtonImage}
+              alt="Burger Button Navbar"
+              onClick={updateSideNav}
+          />}
+          {(!isMobile && logoPosition === "left") && (
+            <Logo
+              logoImage={logoImage}
+              onClick={() => onClick(null, logoImage)}
+              position="left"
+            />
+          )}
+          {!isMobile && (
+            <ResponsiveNavbarLinks
+              links={links}
+              activeLink={activeLink}
+              onClick={onClick}
+              $bgColor={$bgColor}
+            />
+          )}
+          {(!isMobile && logoPosition === "right") && (
+            <Logo
+              logoImage={logoImage}
+              onClick={handleLogoClick}
+              position="right"
+            />
+          )}
+          {isMobile && (
+            <Logo
+              logoImage={logoImage}
+              onClick={handleLogoClick}
+              position="left"
+            />
+          )}
+        </NavbarContent>
+        {appContext.authenticationRequired && (
+          <LogoutSection>
+            <StyledLogout src="/img/logout.png" onClick={handleLogout} />
+          </LogoutSection>
+        )}
       </StyledNavbar>
       {isMobile && (
         <LateralNavbar
