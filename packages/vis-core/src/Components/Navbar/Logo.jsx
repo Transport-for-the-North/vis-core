@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 /**
@@ -44,11 +44,20 @@ const LogoImage = styled.img`
  * @returns {JSX.Element} The rendered Logo component.
  */
 export function Logo({ onClick, logoImage, position }) {
+  const [hasImageError, setHasImageError] = useState(false);
+
+  useEffect(() => {
+    setHasImageError(false);
+  }, [logoImage]);
+
   const handleClick = () => onClick && onClick();
+  const shouldRenderLogo = Boolean(logoImage) && !hasImageError;
+
+  if (!shouldRenderLogo) return null;
 
   return (
     <LogoContainer onClick={handleClick} $position={position} $hasImage={!!logoImage}>
-      {logoImage && <LogoImage src={logoImage} alt="Logo" />}
+      <LogoImage src={logoImage} alt="Logo" onError={() => setHasImageError(true)} />
     </LogoContainer>
   );
 }
