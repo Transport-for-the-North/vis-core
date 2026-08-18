@@ -253,6 +253,7 @@ export function Navbar() {
   // Simplified logo logic: on mobile the logo is always left, on non-mobile
   // display the logo on the side indicated by appContext.logoPosition.
   const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
+  const hasLogo = typeof logoImage === "string" ? Boolean(logoImage.trim()) : Boolean(logoImage);
   const isAuthenticated = Boolean(token || user);
   const logoutImage = appContext.logoutImage || "img/logout.png";
   const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;
