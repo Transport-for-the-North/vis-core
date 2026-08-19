@@ -281,11 +281,11 @@ export function Navbar() {
                       onError={() => setShowMobileMenuIcon(false)}
                     />
                   ) : (
-                    <span aria-hidden="true">☰</span>
+                    <span aria-hidden="true">Menu</span>
                   )}
                 </MobileMenuButton>
               ) : (
-                logoPosition === "left" && (
+                hasLogo && logoPosition === "left" && (
                   <Logo
                     logoImage={logoImage}
                     onClick={handleLogoClick}
@@ -296,13 +296,15 @@ export function Navbar() {
 
               <HeaderNavSearch>
                 {isMobile ? (
-                  <MobileLogoSlot>
-                    <Logo
-                      logoImage={logoImage}
-                      onClick={() => onClick(null, logoImage)}
-                      position="left"
-                    />
-                  </MobileLogoSlot>
+                  hasLogo && (
+                    <MobileLogoSlot>
+                      <Logo
+                        logoImage={logoImage}
+                        onClick={handleLogoClick}
+                        position="left"
+                      />
+                    </MobileLogoSlot>
+                  )
                 ) : (
                   <ResponsiveNavbarLinks
                     links={links}
@@ -314,7 +316,7 @@ export function Navbar() {
               </HeaderNavSearch>
 
               <LogoutSection>
-                {!isMobile && logoPosition === "right" && (
+                {!isMobile && hasLogo && logoPosition === "right" && (
                   <Logo
                     logoImage={logoImage}
                     onClick={handleLogoClick}
