@@ -177,7 +177,7 @@ const SubIndicator = styled.span`
  * Renders at specific coordinates and ensures proper border rounding.
  */
 const NestedDropdownMenu = styled.div`
-  position: absolute;
+  position: fixed;
   left: ${({ left }) => left}px;
   top: ${({ top }) => top}px;
   min-width: 160px;
@@ -292,6 +292,25 @@ export function RecursiveDropdownItem({
   useEffect(() => {
     onChildHoverChange(hovered);
   }, [hovered, onChildHoverChange]);
+
+   // Keep nested submenu anchored when viewport or parent scroll positions change.
+  useEffect(() => {
+    if (!subOpen || !itemRef.current) return undefined;
+
+    const syncParentRect = () => {
+      if (!itemRef.current) return;
+      setParentRect(itemRef.current.getBoundingClientRect());
+    };
+
+    syncParentRect();
+    window.addEventListener("resize", syncParentRect);
+    window.addEventListener("scroll", syncParentRect, true);
+
+    return () => {
+      window.removeEventListener("resize", syncParentRect);
+      window.removeEventListener("scroll", syncParentRect, true);
+    };
+  }, [subOpen]);
 
   /**
    * Called when the mouse enters the item region.
