@@ -151,7 +151,7 @@ describe("NestedDropdownPortal component test", () => {
 
     const parent = first.parentElement;
     expect(parent).toHaveStyle({
-      position: "absolute",
+      position: "fixed",
       top: "200px",
       left: "718.578125px",
     });
