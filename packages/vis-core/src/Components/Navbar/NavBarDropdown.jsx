@@ -177,7 +177,7 @@ const SubIndicator = styled.span`
  * Renders at specific coordinates and ensures proper border rounding.
  */
 const NestedDropdownMenu = styled.div`
-  position: absolute;
+  position: fixed;
   left: ${({ left }) => left}px;
   top: ${({ top }) => top}px;
   min-width: 160px;
