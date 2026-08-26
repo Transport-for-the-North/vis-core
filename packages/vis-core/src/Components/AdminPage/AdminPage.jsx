@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState, useCallback } from "react";
 import { AppContext } from "contexts";
-import { InfoBox } from "Components";
+import { InfoBox } from "Components/MessageBox";
 import { api, createAdminApi } from "services";
 import { getAppName } from "../../runtime";
 import { resolveAdminEndpoints, defaultLayout, normaliseColumn, isAppAdmin } from "utils";
