@@ -486,9 +486,19 @@ export const MapLayout = () => {
               filters={state.filters}
               filterState={filterState}
               visualisations={state.visualisations}
-              maxRows={pageContext.config?.tableBelowMapPreview?.maxRows ?? 120}
+              tableDataVisualisation={pageContext.config?.tableBelowMapPreview?.tableDataVisualisation}
+              rowField={pageContext.config?.tableBelowMapPreview?.rowField}
+              columnField={pageContext.config?.tableBelowMapPreview?.columnField}
+              valueField={pageContext.config?.tableBelowMapPreview?.valueField}
+              aggregation={pageContext.config?.tableBelowMapPreview?.aggregation ?? "sum"}
+              maxRows={pageContext.config?.tableBelowMapPreview?.maxRows ?? 0}
               maxColumns={pageContext.config?.tableBelowMapPreview?.maxColumns ?? 8}
               focusZoom={pageContext.config?.tableBelowMapPreview?.focusZoom ?? 11}
+              debug={pageContext.config?.tableBelowMapPreview?.debug === true}
+              joinIdField={pageContext.config?.tableBelowMapPreview?.joinIdField}
+              mapJoinIdFields={pageContext.config?.tableBelowMapPreview?.mapJoinIdFields}
+              canonicalLinkIdField={pageContext.config?.tableBelowMapPreview?.canonicalLinkIdField ?? "id"}
+              strictIdMapping={pageContext.config?.tableBelowMapPreview?.strictIdMapping === true}
             />
           )}
         </MapContainer>
