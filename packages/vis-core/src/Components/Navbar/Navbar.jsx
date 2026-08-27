@@ -325,7 +325,7 @@ export function Navbar() {
                   isAuthenticated ? (
                     <StyledLogoutButton onClick={handleLogout} aria-label="Logout">
                       <span>Logout</span>
-                      <LogoutIcon src={logoutImageSrc} alt="Logout" />
+                      <LogoutIcon src={logoutImageSrc} alt="" aria-hidden="true" />
                     </StyledLogoutButton>
                   ) : (
                     <AuthActionButton onClick={handleLogin}>Login</AuthActionButton>
