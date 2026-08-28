@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Dimmed = styled.div.attrs({ 'data-testid': 'dimmed-overlay' })`
@@ -71,9 +71,11 @@ const ProgressFill = styled.div`
  * @returns {JSX.Element|null} The rendered Dimmer component or null if not dimmed.
  */
 export const Dimmer = ({
-  dimmed,
-  showLoader,
+  dimmed = false,
+  showLoader = false,
   completeOnExit = false,
+  message,
+  progress,
   statusHeading = "Loading map data",
   statusMessages = [
     "Preparing your map view...",
@@ -81,6 +83,7 @@ export const Dimmer = ({
     "Finalising layers and styles...",
   ],
 }) => {
+  const EXIT_COMPLETE_VISIBILITY_MS = 350;
   const PROGRESS_STEPS = [18, 30, 42, 54, 66, 76, 84, 90, 94, 97, 100];
 
   const safeMessages = useMemo(
@@ -92,16 +95,36 @@ export const Dimmer = ({
   );
   const [messageIndex, setMessageIndex] = useState(0);
   const [progressStepIndex, setProgressStepIndex] = useState(0);
+  const [shouldRender, setShouldRender] = useState(dimmed);
+  const exitTimerRef = useRef(null);
+  const prevDimmedRef = useRef(dimmed);
+  const prevShowLoaderRef = useRef(showLoader);
+  const prevCompleteOnExitRef = useRef(completeOnExit);
+
+  const hasProgressOverride = Number.isFinite(progress);
+  const hasMessageOverride = typeof message === "string" && message.trim().length > 0;
+
+  const clearExitTimer = () => {
+    if (exitTimerRef.current) {
+      clearTimeout(exitTimerRef.current);
+      exitTimerRef.current = null;
+    }
+  };
+
+  const clampProgress = (value) => {
+    if (!Number.isFinite(value)) return 0;
+    return Math.max(0, Math.min(100, Math.round(value)));
+  };
 
   useEffect(() => {
-    if (!dimmed || !showLoader || safeMessages.length < 2) return undefined;
+    if (!dimmed || !showLoader || hasMessageOverride || safeMessages.length < 2) return undefined;
 
     const intervalId = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % safeMessages.length);
     }, 1800);
 
     return () => clearInterval(intervalId);
-  }, [dimmed, showLoader, safeMessages]);
+  }, [dimmed, showLoader, hasMessageOverride, safeMessages]);
 
   useEffect(() => {
     if (!dimmed) {
@@ -110,7 +133,7 @@ export const Dimmer = ({
   }, [dimmed]);
 
   useEffect(() => {
-    if (!dimmed || !showLoader) {
+    if (!dimmed || !showLoader || hasProgressOverride) {
       setProgressStepIndex(0);
       return undefined;
     }
@@ -122,20 +145,46 @@ export const Dimmer = ({
     }, 900);
 
     return () => clearInterval(progressInterval);
-  }, [dimmed, showLoader]);
+  }, [dimmed, showLoader, hasProgressOverride]);
 
   useEffect(() => {
-    if (completeOnExit && dimmed && showLoader) {
+    const wasDimmed = prevDimmedRef.current;
+    const hadLoader = prevShowLoaderRef.current;
+    const hadCompleteOnExit = prevCompleteOnExitRef.current;
+
+    if (dimmed) {
+      clearExitTimer();
+      setShouldRender(true);
+    } else if (wasDimmed && (completeOnExit || hadCompleteOnExit) && hadLoader) {
+      clearExitTimer();
+      setShouldRender(true);
       setProgressStepIndex(PROGRESS_STEPS.length - 1);
+      exitTimerRef.current = setTimeout(() => {
+        setShouldRender(false);
+        exitTimerRef.current = null;
+      }, EXIT_COMPLETE_VISIBILITY_MS);
+    } else {
+      clearExitTimer();
+      setShouldRender(false);
     }
+
+    prevDimmedRef.current = dimmed;
+    prevShowLoaderRef.current = showLoader;
+    prevCompleteOnExitRef.current = completeOnExit;
+
+    return clearExitTimer;
   }, [completeOnExit, dimmed, showLoader]);
 
-  if (!dimmed) {
+  if (!shouldRender) {
     return null;
   }
 
-  const currentMessage = safeMessages[Math.min(messageIndex, safeMessages.length - 1)];
-  const progressPercent = PROGRESS_STEPS[Math.min(progressStepIndex, PROGRESS_STEPS.length - 1)];
+  const currentMessage = hasMessageOverride
+    ? message
+    : safeMessages[Math.min(messageIndex, safeMessages.length - 1)];
+  const progressPercent = hasProgressOverride
+    ? clampProgress(progress)
+    : PROGRESS_STEPS[Math.min(progressStepIndex, PROGRESS_STEPS.length - 1)];
 
   return (
     <>
