@@ -205,6 +205,10 @@ export const LayerControlEntry = memo(
       layer.layout?.visibility || "visible"
     );
 
+    const [boundariesVisibility, setBoundariesVisibility] = useState(
+      layer.metadata?.boundariesVisibleByDefault ? "visible" : "none"
+    );
+
     // State for whether the layer details are expanded
     const [isExpanded, setIsExpanded] = useState(() => {
       // Retrieve the expanded state from localStorage during initial render
@@ -494,9 +498,37 @@ export const LayerControlEntry = memo(
         ids.forEach((id) => {
           map.setLayoutProperty(id, "visibility", newVisibility);
         });
+
+        const boundariesId = `${layer.id}-boundaries`;
+        if (map.getLayer(boundariesId)) {
+          if (newVisibility === "none") {
+            map.setLayoutProperty(boundariesId, "visibility", "none");
+          } else {
+            map.setLayoutProperty(boundariesId, "visibility", boundariesVisibility);
+          }
+        }
       });
 
       setVisibility(newVisibility);
+    };
+
+    /**
+     * Toggles the visibility of the boundaries layer and updates the map.
+     */
+    const toggleBoundariesVisibility = (e) => {
+      const isChecked = e.target.checked;
+      const newVisibility = isChecked ? "visible" : "none";
+      setBoundariesVisibility(newVisibility);
+
+      maps.forEach((mapInstance) => {
+        if (!mapInstance || !mapInstance.style) return;
+        const boundariesId = `${layer.id}-boundaries`;
+        if (mapInstance.getLayer(boundariesId)) {
+          if (visibility === "visible" || newVisibility === "none") {
+            mapInstance.setLayoutProperty(boundariesId, "visibility", newVisibility);
+          }
+        }
+      });
     };
 
     /**
@@ -646,6 +678,26 @@ export const LayerControlEntry = memo(
             <SliderValue>{(opacity * 100).toFixed(0)}%</SliderValue>
           </OpacityControl>
         ),
+      });
+    }
+
+    if (layer.metadata?.switchableBoundaries) {
+      collapsibleSections.push({
+        key: "boundaries-toggle",
+        node: (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
+            <ControlLabel htmlFor={`boundaries-toggle-${layer.id}`}>
+              {layer.metadata?.boundariesLabel || "Show zone boundaries"}
+            </ControlLabel>
+            <input 
+              type="checkbox" 
+              id={`boundaries-toggle-${layer.id}`} 
+              checked={boundariesVisibility === "visible"}
+              onChange={toggleBoundariesVisibility}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
+        )
       });
     }
 
