@@ -117,10 +117,17 @@ const IconWrapper = styled.span`
  * @property {Function} onChange - The function called when a new toggle option is selected.
  * @returns {JSX.Element} The rendered Toggle component.
  */
-export const Toggle = ({ filter, onChange, bgColor }) => {
+export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) => {
   const { state: filterState } = useFilterContext();
 
-  const options = filter.values.values;
+  const options = useMemo(() => {
+    let opts = filter.values.values || [];
+    if (excludeValue !== undefined && excludeValue !== null) {
+      opts = opts.filter(o => String(o.paramValue) !== String(excludeValue));
+    }
+    return opts;
+  }, [filter.values.values, excludeValue]);
+
   const visibleOptions = useMemo(
     () => options.filter((o) => !o.isHidden),
     [options]
@@ -159,7 +166,7 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
 
       // Commit the only visible value when nothing has been written yet, and
       // also recover if the current value becomes hidden after validation.
-      if (currentlyHidden || shouldAutoSelectOnlyVisible) {
+      if (currentlyHidden || shouldAutoSelectOnlyVisible || (current != null && !options.find(o => o.paramValue === current))) {
         const fallback = visibleOptions[0]?.paramValue ?? null;
         onChange(filter, fallback);
         setSelectedButtons(fallback);
@@ -169,20 +176,23 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
       const visibleSet = new Set(visibleOptions.map((o) => o.paramValue));
       const pruned = currentArr.filter((v) => visibleSet.has(v));
 
-      if (pruned.length !== currentArr.length) {
-        if (pruned.length === 0) {
+      if (pruned.length !== currentArr.length || currentArr.some(v => !options.find(o => o.paramValue === v))) {
+        const validPruned = pruned.filter(v => options.find(o => o.paramValue === v));
+        if (validPruned.length === 0) {
           const fallbackAll = visibleOptions.map((o) => o.paramValue);
           onChange(filter, fallbackAll);
           setSelectedButtons(fallbackAll);
         } else {
-          onChange(filter, pruned);
-          setSelectedButtons(pruned);
+          onChange(filter, validPruned);
+          setSelectedButtons(validPruned);
         }
       }
     }
   }, [options, visibleOptions, filterState, filter, onChange]);
 
   const handleToggleChange = (newSelectedValue) => {
+    if (disabled) return;
+    
     // Prevent selecting hidden options
     const isHidden = options.find((o) => o.paramValue === newSelectedValue)?.isHidden;
     if (isHidden) return;
@@ -207,6 +217,8 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
    * Toggle-all respects visibility. It toggles only the non-hidden options.
    */
   const handleToggleAll = () => {
+    if (disabled) return;
+    
     const current = Array.isArray(selectedButtons) ? selectedButtons : [];
     const visibleValues = visibleOptions.map((o) => o.paramValue);
 
@@ -233,12 +245,12 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
                   selectedButtons.includes(option.paramValue)
                 : selectedButtons === option.paramValue
             }
-            $isHidden={!!option.isHidden}
+            $isHidden={!!option.isHidden || disabled}
             size={options.length}
             index={index}
             $bgColor={bgColor}
-            aria-disabled={!!option.isHidden}
-            title={option.isHidden ? 'Unavailable due to current selection' : undefined}
+            aria-disabled={!!option.isHidden || disabled}
+            title={disabled ? 'Filter is disabled' : option.isHidden ? 'Unavailable due to current selection' : undefined}
           >
             {option.displayValue}
             {option.isValid !== undefined && (
@@ -260,6 +272,8 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
             )
           }
           $bgColor={bgColor}
+          disabled={disabled}
+          style={{ opacity: disabled ? 0.45 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
         >
           Toggle All
         </ToggleAllButton>

@@ -308,9 +308,31 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         <>
           {filters
             .filter((filter) => !["fixed", "hidetoggle", "mapViewport"].includes(filter.type))
-            .map((filter) => (
+            .map((filter) => {
+              const checkDisabled = (filter) => {
+                if (!filter.disabledWhen) return false;
+                const { paramName, operator, value } = filter.disabledWhen;
+                const targetFilter = filters.find(f => f.paramName === paramName);
+                if (!targetFilter) return false;
+                
+                const currentValue = filterState[targetFilter.id];
+                if (operator === "equals") return currentValue === value;
+                if (operator === "notEquals") return currentValue !== value;
+                return false;
+              };
               
-                <SelectorContainer key={filter.id}>
+              const isDisabled = checkDisabled(filter);
+              
+              let excludeValue = null;
+              if (filter.excludeWhenMatches) {
+                const targetFilter = filters.find(f => f.paramName === filter.excludeWhenMatches);
+                if (targetFilter) {
+                  excludeValue = filterState[targetFilter.id];
+                }
+              }
+
+              return (
+                <SelectorContainer key={filter.id} style={{ opacity: isDisabled ? 0.5 : 1 }}>
                   {filter.type !== "map" && <SelectorLabel
                     htmlFor={filter.paramName}
                     text={filter.filterName}
@@ -322,6 +344,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       filter={filter}
                       value={filterState[filter.id]}
                       onChange={handleFilterChange}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                   {filter.type === "slider" && (
@@ -330,6 +354,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       filter={filter}
                       value={filterState[filter.id] || filter.min || filter.values[0]}
                       onChange={handleFilterChange}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                   {filter.type === "toggle" && (
@@ -342,6 +368,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       }
                       onChange={handleFilterChange}
                       bgColor={bgColor}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                   {filter.type === "checkbox" && (
@@ -354,6 +382,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       }
                       onChange={handleFilterChange}
                       bgColor={bgColor}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                   {filter.type === "mapFeatureSelect" && (
@@ -363,6 +393,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       value={filterState[filter.id]}
                       onChange={handleFilterChange}
                       bgColor={bgColor}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                   {filter.type === "mapFeatureSelectWithControls" && (
@@ -372,6 +404,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       value={filterState[filter.id]}
                       onChange={handleFilterChange}
                       bgColor={bgColor}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                   {filter.type === "mapFeatureSelectAndPan" && (
@@ -381,10 +415,13 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                       value={filterState[filter.id]}
                       onChange={handleFilterChange}
                       bgColor={bgColor}
+                      disabled={isDisabled}
+                      excludeValue={excludeValue}
                     />
                   )}
                 </SelectorContainer>
-          ))}
+              );
+            })}
           <ButtonRow>
             {downloadPath && (
               <DownloadButton 
