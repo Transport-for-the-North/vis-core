@@ -18,7 +18,7 @@ import {
   ScatterChart as RScatterChart,
   Scatter as RScatter,
 } from "recharts";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { WarningBox } from "Components/MessageBox";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -96,6 +96,19 @@ const RowTr = styled.tr`
     transform: translateY(10px);
     transition: opacity 0.3s, transform 0.3s;
   }
+  td {
+    transition: background-color 0.15s ease;
+  }
+  ${props => props.$clickable && css`
+    cursor: pointer;
+    &:hover td, &:focus-visible td {
+      background-color: #f0f4f8;
+    }
+    &:focus-visible {
+      outline: 2px solid #7317de;
+      outline-offset: -2px;
+    }
+  `}
 `;
 
 /**
@@ -988,7 +1001,7 @@ const TableChart = ({ config, data, formatters }) => {
   );
 };
 
-const RankingChart = ({ config, data, formatters }) => {
+const RankingChart = ({ config, data, formatters, onRowClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const cols = config.columns || [];
   const rows = React.useMemo(
@@ -1057,9 +1070,30 @@ const RankingChart = ({ config, data, formatters }) => {
           {visibleRows.map((r, idx) => {
             const val = data[r.key];
             const nodeRef = getNodeRef(r.key);
+            const isClickable = !!onRowClick && config.ids?.[r.key] !== undefined && config.ids?.[r.key] !== 0;
             return (
               <CSSTransition key={r.key} timeout={300} classNames="row" nodeRef={nodeRef}>
-                <RowTr ref={nodeRef}>
+                <RowTr 
+                  ref={nodeRef} 
+                  $clickable={isClickable}
+                  role={isClickable ? "button" : undefined}
+                  tabIndex={isClickable ? 0 : undefined}
+                  aria-label={isClickable ? `Zoom to ${r.label}` : undefined}
+                  title={isClickable ? `Click to zoom to ${r.label}` : undefined}
+                  onClick={() => {
+                    if (isClickable) {
+                      const id = config.ids[r.key];
+                      onRowClick(id, r.key);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (isClickable && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault();
+                      const id = config.ids[r.key];
+                      onRowClick(id, r.key);
+                    }
+                  }}
+                >
                   <td>
                     <RankBadge>{ranks ? ranks[r.key] : idx + 1}</RankBadge>
                   </td>
@@ -1106,6 +1140,7 @@ export const ChartRenderer = ({
   data,
   formatters = {},
   barHeight,
+  onRowClick,
 }) => {
   if (!charts.length) return null;
   const f = { ...defaultFormatters, ...formatters };
@@ -1213,7 +1248,7 @@ export const ChartRenderer = ({
             );
           case "ranking":
             return (
-              <RankingChart key={idx} config={cfg} data={data} formatters={f} />
+              <RankingChart key={idx} config={cfg} data={data} formatters={f} onRowClick={onRowClick} />
             );
           case "histogram":
             return (

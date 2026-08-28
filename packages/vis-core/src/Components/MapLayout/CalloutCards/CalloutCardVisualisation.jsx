@@ -15,6 +15,8 @@ import { replacePlaceholders, formatNumber } from "utils";
 import { Hovertip } from "Components/Hovertip/Hovertip";
 import { WarningBox } from "Components/MessageBox/MessageBox";
 import { ChartRenderer } from "Components/Charts/ChartRenderer";
+import { api } from 'services';
+import { actionTypes } from 'reducers/mapReducer';
 
 import { CARD_CONSTANTS } from "defaults";
 
@@ -346,7 +348,8 @@ export const CalloutCardVisualisation = ({
   toggleVisibility: externalToggleVisibility = null,
   getAllColors,
 }) => {
-  const { state } = useContext(MapContext);
+  const { state, dispatch: mapDispatch } = useContext(MapContext);
+
   const visualisation = state.visualisations[visualisationName];
 
   const buttonRef = useRef(null);
@@ -361,6 +364,46 @@ export const CalloutCardVisualisation = ({
   const [recentlyUpdated, setRecentlyUpdated] = useState(false);
 
   const showHandle = !hideHandleOnMobile;
+
+  const handleRowClick = async (rowId, rowName) => {
+    let layerName = visualisation.joinLayer;
+    if (!layerName) {
+      // Find the first visualisation that has a joinLayer defined (usually the map layer)
+      const mapVis = Object.values(state.visualisations).find(v => v.joinLayer);
+      layerName = mapVis?.joinLayer;
+    }
+    
+    if (!layerName) return;
+
+    const layer = state.layers[layerName];
+    if (!layer) return;
+    const layerPath = layer?.metadata?.path ?? layer?.path;
+    if (!layerPath) return;
+
+    try {
+      const { bounds, centroid } = await api.geodataService.getFeatureGeometry(layerPath, rowId);
+      mapDispatch({
+        type: actionTypes.SET_BOUNDS_AND_CENTROID,
+        payload: { 
+          bounds, 
+          centroid,
+          featureName: rowName,
+          layerMetadata: layer.metadata
+        },
+      });
+      
+      mapDispatch({
+        type: actionTypes.SET_SELECTED_FEATURES,
+        payload: [{
+          type: "Feature",
+          id: rowId,
+          properties: { name: rowName }
+        }]
+      });
+    } catch (err) {
+      console.warn(`Failed to zoom to zone: ${err.message}`);
+    }
+  };
 
   const colorsList = useMemo(() => {
     if (typeof getAllColors === "function") return getAllColors();
@@ -843,20 +886,20 @@ export const CalloutCardVisualisation = ({
                       acc[obj.name] = obj.columnValue;
                       return acc;
                     }, {});
-                    // ranks if necessary
-                    const hasRank = chart.values.some(
-                      (obj) => obj.rank !== undefined
-                    );
+                    // Always create ranks mapping if rank exists
+                    configs.ranks = chart.values.reduce((acc, obj) => {
+                      if (obj.rank !== undefined && obj.rank !== null) {
+                        acc[obj.name] = obj.rank;
+                      }
+                      return acc;
+                    }, {});
 
-                    if (hasRank) {
-                      configs.ranks = chart.values.reduce((acc, obj) => {
-                        if (obj.rank !== undefined) {
-                          acc[obj.name] = obj.rank;
-                        }
-
-                        return acc;
-                      }, {});
-                    }
+                    configs.ids = chart.values.reduce((acc, obj) => {
+                      if (obj.id !== undefined && obj.id !== null) {
+                        acc[obj.name] = obj.id;
+                      }
+                      return acc;
+                    }, {});
                   }
 
                   return (
@@ -865,6 +908,7 @@ export const CalloutCardVisualisation = ({
                         charts={[configs]}
                         data={chartData}
                         formatters={customFormattingFunctions}
+                        onRowClick={handleRowClick}
                         barHeight={225}
                       />
                     </CardContent>
@@ -907,6 +951,7 @@ export const CalloutCardVisualisation = ({
                     charts={visualisation.charts}
                     data={data}
                     formatters={customFormattingFunctions}
+                    onRowClick={handleRowClick}
                     barHeight={225}
                   />
                 </CardContent>
