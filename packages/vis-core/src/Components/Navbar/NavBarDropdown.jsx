@@ -478,6 +478,8 @@ export function RecursiveDropdownItem({
  * @param {string} props.activeLink - Currently active URL.
  * @param {Function} props.onClick - Callback when an item is clicked.
  * @param {string} props.$bgColor - Background color for active/hovered states.
+ * @param {boolean} [props.isActiveSuppressed=false] - Temporarily suppress active styling when another top-level tab is hovered.
+ * @param {Function} [props.onTopLevelHoverChange] - Callback to notify parent of top-level hover changes.
  * @returns {JSX.Element}
  */
 export function NavBarDropdown({
@@ -486,6 +488,8 @@ export function NavBarDropdown({
   activeLink,
   onClick,
   $bgColor,
+  isActiveSuppressed = false,
+  onTopLevelHoverChange = () => {},
 }) {
   // Local state to determine if the main dropdown is open
   // or if any nested submenu item is hovered.
@@ -504,6 +508,15 @@ export function NavBarDropdown({
     }
   }, [containerHovered, navChildHovered]);
 
+  // Route changes can happen while the pointer is still over portal content.
+  // Reset transient hover/open state so previous parent tabs do not stay highlighted.
+  useEffect(() => {
+    setOpen(false);
+    setContainerHovered(false);
+    setNavChildHovered(false);
+    onTopLevelHoverChange(false);
+  }, [activeLink]);
+
   // isActive flag indicates if any item (or one of its children) matches the active URL.
   const isActive = dropdownItems.some(
     (item) =>
@@ -511,6 +524,7 @@ export function NavBarDropdown({
       (item.children &&
         item.children.some((child) => child.url === activeLink))
   );
+  const showActive = isActive && !isActiveSuppressed;
 
   /**
    * Unified hover handler for the main dropdown container/children.
@@ -518,9 +532,13 @@ export function NavBarDropdown({
    */
   const handleHoverChange = (isHovered) => {
     setContainerHovered(isHovered);
+    onTopLevelHoverChange(isHovered);
     if (isHovered) {
       // as soon as you enter either area, force it open
       setOpen(true);
+    } else {
+      // Prevent stale nested state from keeping this tab highlighted.
+      setNavChildHovered(false);
     }
   };
 
@@ -530,15 +548,15 @@ export function NavBarDropdown({
       onMouseEnter={() => handleHoverChange(true)}
       onMouseLeave={() => handleHoverChange(false)}
       $bgColor={$bgColor}
-      $isActive={isActive}
-      $hovered={navChildHovered || containerHovered || open}
+      $isActive={showActive}
+      $hovered={navChildHovered || containerHovered}
     >
       <DropdownTitle>{dropdownName}</DropdownTitle>
       <DropdownIndicator
         src="/arrows/arrow_down.svg"
         alt=""
         aria-hidden="true"
-        $isActive={isActive}
+        $isActive={showActive}
         $hovered={navChildHovered || containerHovered}
       />
       {open && (
@@ -558,6 +576,9 @@ export function NavBarDropdown({
                 onClick={(url, customLogo, navBg) => {
                   onClick(url, customLogo, navBg);
                   setOpen(false);
+                  setContainerHovered(false);
+                  setNavChildHovered(false);
+                  onTopLevelHoverChange(false);
                 }}
                 $bgColor={$bgColor}
                 onChildHoverChange={setNavChildHovered}

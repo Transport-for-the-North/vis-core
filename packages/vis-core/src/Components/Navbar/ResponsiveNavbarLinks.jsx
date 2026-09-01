@@ -115,18 +115,48 @@ export const StyledExternalNavLink = styled.a`
  * @returns {JSX.Element} The rendered responsive navigation links.
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
+  const [hoveredTopLevelKey, setHoveredTopLevelKey] = React.useState(null);
+  const [pendingActiveLink, setPendingActiveLink] = React.useState(null);
+
+  const effectiveActiveLink = pendingActiveLink || activeLink;
+
+  React.useEffect(() => {
+    if (pendingActiveLink && activeLink === pendingActiveLink) {
+      setPendingActiveLink(null);
+    }
+  }, [activeLink, pendingActiveLink]);
+
+  const handleTopLevelHoverChange = (itemKey, isHovered) => {
+    setHoveredTopLevelKey((previousKey) => {
+      if (isHovered) return itemKey;
+      return previousKey === itemKey ? null : previousKey;
+    });
+  };
+
+  const handleInternalNavigate = (url, customLogo, navBg) => {
+    if (typeof url === "string" && url.startsWith("/")) {
+      setPendingActiveLink(url);
+    }
+    onClick(url, customLogo, navBg);
+  };
+
   return (
     <NavLinksContainer>
       {links.map((link, index) => {
+        const itemKey = `${link.label}-${index}`;
+        const suppressActive = Boolean(hoveredTopLevelKey && hoveredTopLevelKey !== itemKey);
+
         if (link.dropdownItems) {
           return (
             <NavBarDropdown
               key={`dropdown-${link.label}-${index}`}
               dropdownName={link.label}
               dropdownItems={link.dropdownItems}
-              activeLink={activeLink}
-              onClick={onClick}
+              activeLink={effectiveActiveLink}
+              onClick={handleInternalNavigate}
               $bgColor={link.navbarLinkBgColour || $bgColor}
+              isActiveSuppressed={suppressActive}
+              onTopLevelHoverChange={(isHovered) => handleTopLevelHoverChange(itemKey, isHovered)}
             />
           );
         } else if (link.external) {
@@ -138,6 +168,8 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               rel="noopener noreferrer"
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={false}
+              onMouseEnter={() => handleTopLevelHoverChange(itemKey, true)}
+              onMouseLeave={() => handleTopLevelHoverChange(itemKey, false)}
             >
               <span className="external-label nav-label">{link.label}</span>
               <ArrowTopRightOnSquareIcon style={{ width: "1rem", marginLeft: "4px" }} />
@@ -149,8 +181,10 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               key={`internal-${link.label}-${index}`}
               to={link.url}
               $bgColor={link.navbarLinkBgColour || $bgColor}
-              $active={activeLink === link.url}
-              onClick={createNavItemClickHandler(link, onClick, link.navbarLinkBgColour || $bgColor)}
+              $active={effectiveActiveLink === link.url && !suppressActive}
+              onClick={createNavItemClickHandler(link, handleInternalNavigate, $bgColor)}
+              onMouseEnter={() => handleTopLevelHoverChange(itemKey, true)}
+              onMouseLeave={() => handleTopLevelHoverChange(itemKey, false)}
             >
               <span className="nav-label">{link.label}</span>
             </StyledNavLink>
