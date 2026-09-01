@@ -818,11 +818,6 @@ const Map = (props) => {
   const handleZoom = useCallback(
     (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       const mapZoomLevel = map.getZoom();
-      
-      dispatch({
-        type: "STORE_CURRENT_ZOOM",
-        payload: mapZoomLevel,
-      });
 
       if (mapZoomLevel <= labelZoomLevel) {
         if (map.getLayer(`${layerId}-label`)) {
@@ -1175,21 +1170,28 @@ const Map = (props) => {
   useEffect(() => {
     if (!map) return;
 
+    // Use a ref to avoid dispatching identical zoom values
+    let lastZoom = map.getZoom();
+
     const updateZoom = () => {
-      dispatch({
-        type: actionTypes.STORE_CURRENT_ZOOM,
-        payload: map.getZoom(),
-      });
+      const currentZoom = map.getZoom();
+      if (currentZoom !== lastZoom) {
+        lastZoom = currentZoom;
+        dispatch({
+          type: actionTypes.STORE_CURRENT_ZOOM,
+          payload: currentZoom,
+        });
+      }
     };
 
-    map.on("zoom", updateZoom);
+    // Only bind to zoomend. Binding to 'zoom' causes 60 state updates per second
+    // during animations (like fitBounds), crashing React with Maximum Update Depth Exceeded
     map.on("zoomend", updateZoom);
 
     // Initial sync
     updateZoom();
 
     return () => {
-      map.off("zoom", updateZoom);
       map.off("zoomend", updateZoom);
     };
   }, [map, dispatch]);
