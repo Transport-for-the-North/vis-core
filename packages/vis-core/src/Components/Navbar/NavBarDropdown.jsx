@@ -374,6 +374,10 @@ export function RecursiveDropdownItem({
     };
   }, [subOpen]);
 
+  useEffect(() => () => {
+    onChildHoverChange(false);
+  }, [onChildHoverChange]);
+
   /**
    * Called when the mouse enters the item region.
    * If the item has children, the submenu is prepared and shown.
