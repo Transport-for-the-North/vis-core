@@ -85,6 +85,22 @@ describe("NavBarDropdown component test", () => {
 
     jest.useRealTimers();
   });
+
+  it("opens dropdown with Enter key when trigger is focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <NavBarDropdown {...props} />
+      </MemoryRouter>
+    );
+
+    const trigger = screen.getByRole("button", { name: "Menu" });
+    trigger.focus();
+    expect(trigger).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("pageName2")).toBeInTheDocument();
+  });
 });
 
 describe("NestedDropdownPortal component test", () => {

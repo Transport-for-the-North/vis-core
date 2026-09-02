@@ -500,17 +500,18 @@ export function NavBarDropdown({
   const [open, setOpen] = useState(false);
   const [navChildHovered, setNavChildHovered] = useState(false);
   const [containerHovered, setContainerHovered] = useState(false);
+  const [focusWithin, setFocusWithin] = useState(false);
   const anchorRef = useRef(null);
 
   // whenever both are false, close after a short delay
   useEffect(() => {
-    if (!containerHovered && !navChildHovered) {
+    if (!containerHovered && !navChildHovered && !focusWithin) {
       const timeout = setTimeout(() => {
         setOpen(false);
       }, 50);
       return () => clearTimeout(timeout);
     }
-  }, [containerHovered, navChildHovered]);
+  }, [containerHovered, navChildHovered, focusWithin]);
 
   // Route changes can happen while the pointer is still over portal content.
   // Reset transient hover/open state so previous parent tabs do not stay highlighted.
@@ -518,6 +519,7 @@ export function NavBarDropdown({
     setOpen(false);
     setContainerHovered(false);
     setNavChildHovered(false);
+    setFocusWithin(false);
     onTopLevelHoverChange(false);
   }, [activeLink]);
 
@@ -546,14 +548,41 @@ export function NavBarDropdown({
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setOpen((previousOpen) => !previousOpen);
+    }
+  };
+
+  const handleFocus = () => {
+    setFocusWithin(true);
+    setOpen(true);
+  };
+
+  const handleBlur = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setFocusWithin(false);
+      setNavChildHovered(false);
+      onTopLevelHoverChange(false);
+    }
+  };
+
   return (
     <DropdownContainer
       ref={anchorRef}
       onMouseEnter={() => handleHoverChange(true)}
       onMouseLeave={() => handleHoverChange(false)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-expanded={open}
+      aria-haspopup="menu"
       $bgColor={$bgColor}
       $isActive={showActive}
-      $hovered={navChildHovered || containerHovered}
+      $hovered={navChildHovered || containerHovered || focusWithin}
     >
       <DropdownTitle>{dropdownName}</DropdownTitle>
       <DropdownIndicator
@@ -569,6 +598,7 @@ export function NavBarDropdown({
           onMouseLeave={() => handleHoverChange(false)}
         >
           <DropdownMenuScroll
+            role="menu"
             onMouseEnter={() => handleHoverChange(true)}
             onMouseLeave={() => handleHoverChange(false)}
           >
