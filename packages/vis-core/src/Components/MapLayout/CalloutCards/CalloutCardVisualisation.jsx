@@ -817,90 +817,95 @@ export const CalloutCardVisualisation = ({
                 });
 
                 return allGraphs.map((chart, chartIdx) => {
-                  let configs;
-                  let chartData;
-
-                    configs = {
-                      type: chart.type,
-                      title: chart.header || "Title",
-                      x_axis_title: chart?.x_axis_title,
-                      y_axis_title: chart?.y_axis_title,
-                      primaryLabel: chart?.primaryLabel,
-                      comparatorLabel: chart?.comparatorLabel,
-                      comparatorKey: chart?.comparatorKey,
-                      comparatorColor: chart?.comparatorColor,
-                      colors: networkColorMap
-                    };
-
+                  let title = chart.header || "Title";
+                  
                   // Dynamic title for ranking charts
-
-                  if (
-                    (chart.type === "ranking" &&
-                      visualisation.queryParams?.dataTypeName?.value !==
-                        undefined) ||
-                    null
-                  ) {
-                    configs.title =
-                      "Top 5 by " +
-                      visualisation.queryParams.dataTypeName.value;
+                  if (chart.type === "ranking" && !chart.header && visualisation.queryParams?.dataTypeName?.value) {
+                    title = "Top 5 by " + visualisation.queryParams.dataTypeName.value;
                   }
 
-                  if (chart.type === "multiple_bar") {
-                    // Categories = all 'name'
-                    const categories = [
-                      ...new Set(chart.values.map((obj) => obj.name)),
-                    ];
-                    // Series = all networks
-                    const series = [
-                      ...new Set(chart.values.map((obj) => obj.network)),
-                    ];
+                  let chartData;
+                  const chartSpecificConfigs = {};
 
-                    // Data formatted for grouped bars
-                    chartData = categories.map((cat) => {
-                      const entry = { label: cat };
+                  switch (chart.type) {
+                    case "multiple_bar": {
+                      // Categories = all 'name'
+                      const categories = [...new Set(chart.values.map((obj) => obj.name))];
+                      // Series = all networks
+                      const series = [...new Set(chart.values.map((obj) => obj.network))];
 
-                      chart.values.forEach((obj) => {
-                        if (obj.name === cat) {
-                          entry[obj.network] = obj.columnValue;
-                        }
+                      // Data formatted for grouped bars
+                      chartData = categories.map((cat) => {
+                        const entry = { label: cat };
+                        chart.values.forEach((obj) => {
+                          if (obj.name === cat) {
+                            entry[obj.network] = obj.columnValue;
+                          }
+                        });
+                        return entry;
                       });
 
-                      return entry;
-                    });
-
-                      configs.columns = series.map((network) => ({
+                      chartSpecificConfigs.columns = series.map((network) => ({
                         key: network,
                         label: network,
                       }));
-                      configs.xKey = "label";
-                    } else if (chart.type === "line") {
+                      chartSpecificConfigs.xKey = "label";
+                      break;
+                    }
+
+                    case "line":
+                    case "multiple_line": {
                       chartData = chart.values;
-                    } else {
+                      if (chart.type === "multiple_line") {
+                        chartSpecificConfigs.columns = chart.columns;
+                        chartSpecificConfigs.xKey = chart.xKey || "label";
+                      }
+                      break;
+                    }
+
+                    default: {
                       // Data formatted for single bar
-                      configs.columns = chart.values.map((obj) => ({
+                      chartSpecificConfigs.columns = chart.values.map((obj) => ({
                         key: obj.name,
                         label: obj.name,
                       }));
 
-                    chartData = chart.values.reduce((acc, obj) => {
-                      acc[obj.name] = obj.columnValue;
-                      return acc;
-                    }, {});
-                    // Always create ranks mapping if rank exists
-                    configs.ranks = chart.values.reduce((acc, obj) => {
-                      if (obj.rank !== undefined && obj.rank !== null) {
-                        acc[obj.name] = obj.rank;
-                      }
-                      return acc;
-                    }, {});
+                      chartData = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
+                        return acc;
+                      }, {});
 
-                    configs.ids = chart.values.reduce((acc, obj) => {
-                      if (obj.id !== undefined && obj.id !== null) {
-                        acc[obj.name] = obj.id;
-                      }
-                      return acc;
-                    }, {});
+                      // Always create ranks mapping if rank exists
+                      chartSpecificConfigs.ranks = chart.values.reduce((acc, obj) => {
+                        if (obj.rank != null) {
+                          acc[obj.name] = obj.rank;
+                        }
+                        return acc;
+                      }, {});
+
+                      chartSpecificConfigs.ids = chart.values.reduce((acc, obj) => {
+                        if (obj.id != null) {
+                          acc[obj.name] = obj.id;
+                        }
+                        return acc;
+                      }, {});
+                      break;
+                    }
                   }
+
+                  const configs = {
+                    type: chart.type,
+                    title,
+                    chartKey: chart.key,
+                    x_axis_title: chart.x_axis_title,
+                    y_axis_title: chart.y_axis_title,
+                    primaryLabel: chart.primaryLabel,
+                    comparatorLabel: chart.comparatorLabel,
+                    comparatorKey: chart.comparatorKey,
+                    comparatorColor: chart.comparatorColor,
+                    colors: networkColorMap,
+                    ...chartSpecificConfigs,
+                  };
 
                   return (
                     <CardContent key={`${idx}-${chartIdx}`}>

@@ -810,6 +810,120 @@ const LineSeriesChart = ({ config, data, formatters }) => {
 };
 
 /**
+ * Renders a responsive multiple line chart using Recharts
+ * @param {Object} props - Component props
+ * @param {Object} props.config - Chart configuration object
+ * @param {Object} props.data - Data object containing values to chart
+ * @param {Object} props.formatters - Custom formatting functions for values
+ * @returns {JSX.Element} - Multiple Line chart component with X/Y axes, grid, and tooltip
+ */
+const MultipleLineChart = ({ config, data, formatters }) => {
+  const items = React.useMemo(() => data, [data]);
+  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  const [hiddenSeries, setHiddenSeries] = React.useState({});
+
+  const toggleSeries = (e) => {
+    if (!e.dataKey) return;
+    setHiddenSeries((prev) => ({
+      ...prev,
+      [e.dataKey]: !prev[e.dataKey],
+    }));
+  };
+
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
+  };
+  const xAxisHeight = React.useMemo(
+    () =>
+      computeXAxisHeight(
+        config,
+        items.map((i) => i[config.xKey || "label"])
+      ),
+    [config, items]
+  );
+
+  const visibleColumns = (config.columns || []).filter((c) => !hiddenSeries[c.key]);
+  const hasNegative = items.some((i) => visibleColumns.some((c) => Number(i[c.key]) < 0));
+  const hasPositive = items.some((i) => visibleColumns.some((c) => Number(i[c.key]) > 0));
+  const hasOnlyZero = !hasNegative && !hasPositive && items.some((i) => visibleColumns.some((c) => Number(i[c.key]) === 0));
+  
+  let dataDomain = ['auto', 'auto'];
+  if (hasOnlyZero) {
+    dataDomain = [-1, 1]; // Fixes Recharts breaking when all values are exactly 0
+  } else if (!hasNegative && hasPositive) {
+    dataDomain = ['auto', 'auto'];
+  } else if (hasNegative && !hasPositive) {
+    dataDomain = ['auto', 0];
+  }
+
+  // DEBUGGING: Log to console so user can check
+  console.log("MultipleLineChart render:", {
+    itemsCount: items.length,
+    columns: config.columns,
+    hasNegative,
+    hasPositive,
+    hasOnlyZero,
+    dataDomain,
+    firstItem: items[0]
+  });
+
+  return (
+    <ChartSection
+      ariaLabel={config.ariaLabel || "Multiple Line chart"}
+      title={config.title}
+      height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={config.y_axis_title}
+    >
+      <RLineChart data={items} margin={DEFAULTS.MARGIN}>
+        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RXAxis
+          dataKey={config.xKey || "label"}
+          angle={DEFAULTS.DIMENSIONS.xAngle}
+          textAnchor="end"
+          height={xAxisHeight}
+          interval={Math.max(0, Math.ceil(items.length / 8) - 1)}
+          tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+        />
+        <RYAxis
+          allowDecimals={true}
+          domain={dataDomain}
+          tickFormatter={formatter}
+          tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+          width={70}
+        />
+        <RTooltip
+          formatter={formatter}
+          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+        />
+        <RLegend
+          verticalAlign="top"
+          align="center"
+          wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10, cursor: "pointer" }}
+          onClick={toggleSeries}
+        />
+        {(config.columns || []).map((col, idx) => (
+          <RLine
+            key={col.key}
+            type="monotone"
+            dataKey={col.key}
+            name={col.label}
+            stroke={(config.colors && config.colors[col.key]) || col.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length]}
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 4 }}
+            connectNulls={true}
+            hide={hiddenSeries[col.key]}
+            strokeOpacity={hiddenSeries[col.key] ? 0.3 : 1}
+          />
+        ))}
+      </RLineChart>
+    </ChartSection>
+  );
+};
+
+/**
  * Renders a responsive area chart using Recharts
  * @param {Object} props - Component props
  * @param {Object} props.config - Chart configuration object
@@ -1300,6 +1414,15 @@ export const ChartRenderer = ({
           case "line":
             return (
               <LineSeriesChart
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+              />
+            );
+          case "multiple_line":
+            return (
+              <MultipleLineChart
                 key={idx}
                 config={cfg}
                 data={data}
