@@ -35,7 +35,7 @@ const ChartContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: 6px;
 `;
 
 const Title = styled.h3`
@@ -56,25 +56,34 @@ const RankBadge = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  background: #a99ad6;
-  color: white;
-  border-radius: 50%;
-  font-size: 13px;
-  font-weight: bold;
+  min-width: 32px;
+  height: 24px;
+  padding: 0 6px;
+  background: ${props => props.$isBottom ? "#fff8e1" : "#e8eaf6"};
+  color: ${props => props.$isBottom ? "#e65100" : "#3f51b5"};
+  border: 1px solid ${props => props.$isBottom ? "#ffe082" : "#c5cae9"};
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
   margin-right: 8px;
+  
+  svg {
+    margin-right: 2px;
+    font-size: 10px;
+  }
 `;
 
 const NameCell = styled.td`
   color: #7c5cd6;
   font-weight: 500;
+  padding: 4px 0;
 `;
 
 const ScoreCell = styled.td`
   font-weight: bold;
   color: #333;
   text-align: right;
+  padding: 4px 0;
 `;
 
 const RowTr = styled.tr`
@@ -1035,7 +1044,7 @@ const RankingChart = ({ config, data, formatters, onRowClick }) => {
     commify: ((v) => formatNumber(Number(v ?? 0))),
   };
   return (
-    <div style={{ overflowX: "auto", margin: "10px 0" }}>
+    <div style={{ overflowX: "auto", margin: "0" }}>
       <div
         style={{
           display: "flex",
@@ -1045,8 +1054,13 @@ const RankingChart = ({ config, data, formatters, onRowClick }) => {
       >
         <Title>{config.title}</Title>
         {rows.length > 5 ? (
-          <ToggleButton onClick={() => setIsOpen(!isOpen)}>
-            <RotatingIcon $isOpen={isOpen} />
+          <ToggleButton 
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Show less" : "Show all"}
+            title={isOpen ? "Show less" : "Show all"}
+            aria-expanded={isOpen}
+          >
+            <RotatingIcon $isOpen={isOpen} aria-hidden="true" />
           </ToggleButton>
         ) : null}
       </div>
@@ -1061,15 +1075,19 @@ const RankingChart = ({ config, data, formatters, onRowClick }) => {
       >
         <thead>
           <tr>
-            <th style={{ width: 32 }}></th>
-            <th style={{ textAlign: "left", fontWeight: 600 }}>Name</th>
-            <th style={{ textAlign: "right", fontWeight: 600 }}>Score</th>
+            <th style={{ width: 28, paddingBottom: 2 }}></th>
+            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, paddingBottom: 2 }}>Name</th>
+            <th style={{ textAlign: "right", fontWeight: 600, fontSize: 13, paddingBottom: 2 }}>
+              Value {config.units ? `(${config.units})` : ""}
+            </th>
           </tr>
         </thead>
         <TransitionGroup component="tbody">
           {visibleRows.map((r, idx) => {
             const val = data[r.key];
             const nodeRef = getNodeRef(r.key);
+            const isBottom = config.chartKey === "bottom5Losers";
+            const actualRank = ranks && ranks[r.key] !== undefined ? ranks[r.key] : idx + 1;
             const isClickable = !!onRowClick && config.ids?.[r.key] !== undefined && config.ids?.[r.key] !== 0;
             return (
               <CSSTransition key={r.key} timeout={300} classNames="row" nodeRef={nodeRef}>
@@ -1095,7 +1113,10 @@ const RankingChart = ({ config, data, formatters, onRowClick }) => {
                   }}
                 >
                   <td>
-                    <RankBadge>{ranks ? ranks[r.key] : idx + 1}</RankBadge>
+                    <RankBadge $isBottom={isBottom} aria-label={`Rank ${actualRank}`}>
+                      {isBottom ? <FaChevronDown aria-hidden="true" /> : <FaChevronUp aria-hidden="true" />}
+                      <span aria-hidden="true">{actualRank}</span>
+                    </RankBadge>
                   </td>
                   <NameCell>{r.label}</NameCell>
                   <ScoreCell>{fmt.commify(val)}</ScoreCell>
