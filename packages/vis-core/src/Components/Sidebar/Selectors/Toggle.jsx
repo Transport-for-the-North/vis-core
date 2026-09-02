@@ -107,6 +107,10 @@ const IconWrapper = styled.span`
 export const Toggle = ({ filter, onChange, bgColor }) => {
   const { state: filterState } = useFilterContext();
 
+  const valuesEqual = (left, right) => String(left) === String(right);
+  const includesValue = (arrayValues, value) =>
+    Array.isArray(arrayValues) && arrayValues.some((item) => valuesEqual(item, value));
+
   const options = filter.values.values;
   const visibleOptions = useMemo(
     () => options.filter((o) => !o.isHidden),
@@ -141,7 +145,7 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
     const current = filterState[filter.id];
 
     if (!filter.multiSelect) {
-      const currentlyHidden = options.find((o) => o.paramValue === current)?.isHidden;
+      const currentlyHidden = options.find((o) => valuesEqual(o.paramValue, current))?.isHidden;
       const shouldAutoSelectOnlyVisible = current == null && visibleOptions.length === 1;
 
       // Commit the only visible value when nothing has been written yet, and
@@ -171,14 +175,14 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
 
   const handleToggleChange = (newSelectedValue) => {
     // Prevent selecting hidden options
-    const isHidden = options.find((o) => o.paramValue === newSelectedValue)?.isHidden;
+    const isHidden = options.find((o) => valuesEqual(o.paramValue, newSelectedValue))?.isHidden;
     if (isHidden) return;
 
     if (filter.multiSelect) {
       const current = Array.isArray(selectedButtons) ? selectedButtons : [];
       let next;
-      if (current.includes(newSelectedValue)) {
-        next = current.filter((v) => v !== newSelectedValue);
+      if (includesValue(current, newSelectedValue)) {
+        next = current.filter((v) => !valuesEqual(v, newSelectedValue));
       } else {
         next = [...current, newSelectedValue];
       }
@@ -216,9 +220,8 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
             onClick={() => handleToggleChange(option.paramValue)}
             $isSelected={
               filter.multiSelect
-                ? Array.isArray(selectedButtons) &&
-                  selectedButtons.includes(option.paramValue)
-                : selectedButtons === option.paramValue
+                ? includesValue(selectedButtons, option.paramValue)
+                : valuesEqual(selectedButtons, option.paramValue)
             }
             $isHidden={!!option.isHidden}
             size={options.length}
