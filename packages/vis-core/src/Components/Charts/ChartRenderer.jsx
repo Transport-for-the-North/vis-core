@@ -248,10 +248,11 @@ const computeXAxisHeight = (config, labels) => {
  * @param {number}  height      - Height of the chart container
  * @param {string}  xAxisTitle  - Optional label rendered below the X axis
  * @param {string}  yAxisTitle  - Optional label rendered beside the Y axis
+ * @param {string}  rightYAxisTitle  - Optional label rendered beside the right Y axis
  * @param {React.ReactNode} children - Chart components to render inside
  * @returns {JSX.Element}
  */
-const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, children }) => (
+const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, rightYAxisTitle, children }) => (
   <Section aria-label={ariaLabel}>
     {title && <Title>{title}</Title>}
     <div style={{ display: "flex", alignItems: "stretch" }}>
@@ -278,6 +279,26 @@ const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, childr
       <div style={{ flex: 1, minWidth: 0, height }}>
         <ResponsiveContainer>{children}</ResponsiveContainer>
       </div>
+      {rightYAxisTitle && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            width: 18,
+          }}
+        >
+          <AxisLabel
+            style={{
+              transform: "rotate(90deg)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {rightYAxisTitle}
+          </AxisLabel>
+        </div>
+      )}
     </div>
     {xAxisTitle && (
       <AxisLabel
@@ -661,6 +682,16 @@ const LineSeriesChart = ({ config, data, formatters }) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
+
+  const primaryFormatter = (val) => {
+    const str = formatter(val);
+    const unit = config.units && config.units !== "none" ? config.units : "";
+    if (str && unit) {
+      return str + unit;
+    }
+    return str;
+  };
+
   const xAxisHeight = React.useMemo(
     () =>
       computeXAxisHeight(
@@ -670,10 +701,13 @@ const LineSeriesChart = ({ config, data, formatters }) => {
     [config, items]
   );
 
-  // Check if any point has a value for the comparator key
   const hasComparator = items.some(
     (i) => i[comparatorKey] !== null && i[comparatorKey] !== undefined
   );
+
+  const finalPrimaryLabel = hasComparator ? primaryLabel : (config.title || "Value");
+  const legendPrimaryLabel = hasComparator ? `${finalPrimaryLabel} (left)` : finalPrimaryLabel;
+  const legendComparatorLabel = `${comparatorLabel} (right)`;
 
   return (
     <ChartSection
@@ -682,6 +716,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
       height={height}
       xAxisTitle={config.x_axis_title}
       yAxisTitle={config.y_axis_title}
+      rightYAxisTitle={hasComparator ? (config.comparatorLabel || "Comparator") : null}
     >
       <RLineChart data={items} margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
@@ -694,13 +729,33 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
         />
         <RYAxis
-          allowDecimals={false}
-          tickFormatter={formatter}
+          yAxisId="left"
+          allowDecimals={true}
+          tickFormatter={primaryFormatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
+        {hasComparator && (
+          <RYAxis
+            yAxisId="right"
+            orientation="right"
+            allowDecimals={true}
+            tickFormatter={formatter}
+            tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+            width={DEFAULTS.DIMENSIONS.yAxisWidth}
+          />
+        )}
         <RTooltip
-          formatter={formatter}
+          formatter={(value, name) => {
+            const isComparator = name === legendComparatorLabel || name === (config.comparatorKey || "dmValue");
+            const str = formatter(value);
+            const unit = config.units && config.units !== "none" ? config.units : "";
+
+            if (!isComparator && str && unit) {
+              return str + unit;
+            }
+            return str;
+          }}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
         />
         {hasComparator && (
@@ -711,9 +766,10 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           />
         )}
         <RLine
+          yAxisId="left"
           type="monotone"
           dataKey="value"
-          name={hasComparator ? primaryLabel : (config.title || "Value")}
+          name={legendPrimaryLabel}
           stroke={stroke}
           strokeWidth={2}
           dot={false}
@@ -722,9 +778,10 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         />
         {hasComparator && (
           <RLine
+            yAxisId="right"
             type="monotone"
             dataKey={comparatorKey}
-            name={comparatorLabel}
+            name={legendComparatorLabel}
             stroke={comparatorStroke}
             strokeWidth={2}
             strokeDasharray="4 4"
