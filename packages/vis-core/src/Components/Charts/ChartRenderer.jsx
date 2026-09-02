@@ -678,6 +678,15 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   const primaryLabel = config.primaryLabel || "Value";
   const comparatorStroke = config.comparatorColor || "#999999";
 
+  const [hiddenSeries, setHiddenSeries] = React.useState({});
+  const toggleSeries = (e) => {
+    if (!e.dataKey) return;
+    setHiddenSeries((prev) => ({
+      ...prev,
+      [e.dataKey]: !prev[e.dataKey],
+    }));
+  };
+
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
@@ -762,7 +771,8 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           <RLegend
             verticalAlign="top"
             align="center"
-            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10 }}
+            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10, cursor: "pointer" }}
+            onClick={toggleSeries}
           />
         )}
         <RLine
@@ -775,6 +785,8 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           dot={false}
           activeDot={{ r: 4 }}
           legendType="plainline"
+          hide={hiddenSeries["value"]}
+          strokeOpacity={hiddenSeries["value"] ? 0.3 : 1}
         />
         {hasComparator && (
           <RLine
@@ -788,6 +800,8 @@ const LineSeriesChart = ({ config, data, formatters }) => {
             dot={false}
             activeDot={{ r: 4 }}
             legendType="plainline"
+            hide={hiddenSeries[comparatorKey]}
+            strokeOpacity={hiddenSeries[comparatorKey] ? 0.3 : 1}
           />
         )}
       </RLineChart>
