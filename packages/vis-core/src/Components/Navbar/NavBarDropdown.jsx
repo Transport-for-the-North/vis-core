@@ -291,6 +291,11 @@ export function RecursiveDropdownItem({
   // Notify parent when the overall hover state of this item (header or child) changes.
   useEffect(() => {
     onChildHoverChange(hovered);
+    return () => {
+      if (hovered) {
+        onChildHoverChange(false);
+      }
+    };
   }, [hovered, onChildHoverChange]);
 
    // Keep nested submenu anchored when viewport or parent scroll positions change.
@@ -475,10 +480,7 @@ export function NavBarDropdown({
       <DropdownIndicator>▾</DropdownIndicator>
       {open && (
         <DropdownMenuWrapper>
-          <DropdownMenuScroll
-            onMouseEnter={() => handleHoverChange(true)}
-            onMouseLeave={() => handleHoverChange(false)}
-          >
+          <DropdownMenuScroll>
             {dropdownItems.map((item) => (
               <RecursiveDropdownItem
                 key={item.pageName || item.label}
