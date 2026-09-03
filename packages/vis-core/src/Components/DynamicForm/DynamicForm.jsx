@@ -42,7 +42,7 @@ const Input = styled.input`
   border: 1px solid ${CONTROL_COLOUR};
   border-radius: ${CONTROL_BORDER_RADIUS}px;
   font-size: 0.95rem;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &:focus {
@@ -77,7 +77,7 @@ const CoordinateLabel = styled.span`
 `;
 
 const DateInput = styled(Input)`
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   
   &::-webkit-calendar-picker-indicator {
     cursor: pointer;
@@ -136,7 +136,7 @@ const SubmitButton = styled.button`
   border: none;
   border-radius: ${CONTROL_BORDER_RADIUS}px;
   font-size: 1rem;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -226,7 +226,7 @@ const ResetButton = styled.button`
   border-radius: ${CONTROL_BORDER_RADIUS}px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-family-base);
   align-self: flex-start;
   margin-top: 8px;
 

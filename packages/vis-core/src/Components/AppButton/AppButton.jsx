@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { darken } from "polished";
+import { defaultBgColour } from "defaults";
 
 /**
  * Generic reusable button with accessibility features.
@@ -19,16 +20,16 @@ import { darken } from "polished";
 export const AppButton = styled.button`
   cursor: pointer;
   padding: 10px 12px;
-  background-color: ${(props) => props.$bgColor ?? props.theme?.primary ?? "#7317de"};
+  background-color: ${(props) => props.$bgColor ?? props.theme?.primary ?? defaultBgColour};
   color: white;
   border-radius: 8px;
   border: 0.25px solid;
   width: ${(props) => props.$width ?? "auto"};
   height: ${(props) => props.$height ?? "32px"};
 
-  /* Important: inherit the app's font instead of using browser default */
-  font: inherit;
-  font-size: 0.9em;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
 
   display: inline-flex;
   align-items: center;
@@ -38,7 +39,7 @@ export const AppButton = styled.button`
   /* Hover state */
   &:hover:not(:disabled) {
     background-color: ${(props) =>
-      darken(0.1, props.$bgColor ?? props.theme?.primary ?? "#7317de")};
+      darken(0.1, props.$bgColor ?? props.theme?.primary ?? defaultBgColour)};
   }
 
   /* Active state - indented effect and slight shrink when clicked */
@@ -47,12 +48,12 @@ export const AppButton = styled.button`
     transform: scale(0.98);
     box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
     background-color: ${(props) =>
-      darken(0.15, props.$bgColor ?? props.theme?.primary ?? "#7317de")};
+      darken(0.15, props.$bgColor ?? props.theme?.primary ?? defaultBgColour)};
   }
 
   /* Focus state - accessibility for keyboard navigation */
   &:focus-visible {
-    outline: 2px solid ${(props) => props.$bgColor ?? props.theme?.primary ?? "#7317de"};
+    outline: 2px solid ${(props) => props.$bgColor ?? props.theme?.primary ?? defaultBgColour};
     outline-offset: 2px;
     /* Remove default browser outline */
     outline-style: solid;
@@ -68,6 +69,6 @@ export const AppButton = styled.button`
     cursor: not-allowed;
     opacity: 0.7;
     background-color: ${(props) =>
-      darken(0.2, props.$bgColor ?? props.theme?.primary ?? "#7317de")};
+      darken(0.2, props.$bgColor ?? props.theme?.primary ?? defaultBgColour)};
   }
 `;

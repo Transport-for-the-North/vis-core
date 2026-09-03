@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { api } from "services";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { CARD_CONSTANTS } from "defaults";
+import { CARD_CONSTANTS, defaultBgColour } from "defaults";
 import { Hovertip } from "Components/Hovertip";
 import { replacePlaceholders } from "utils";
 
@@ -53,7 +53,7 @@ const FullscreenContainer = styled.div`
       : "70px"}; /* Side panel width (450px) + Sidebar border (10px) + distance between elements (10px) */
   right: 10px;
   bottom: 32px;
-  background-color: white;
+  background-color: var(--palette-white);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -85,7 +85,7 @@ const BackButton = styled.button`
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
-  background-color: #7317de;
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -107,7 +107,7 @@ const OpenButton = styled.button`
   z-index: 2000;
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
-  background-color: #7317de;
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -193,6 +193,7 @@ const Image = styled.img`
  * Title
  */
 const Title = styled.p`
+  font-family: var(--font-sans);
   font-size: clamp(2rem, 5vw, 4rem);
   text-align: center;
   white-space: normal;
@@ -208,11 +209,12 @@ const Title = styled.p`
  * Navigation bar
  */
 const NavigationBar = styled.div`
+  font-family: var(--font-sans);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: white;
+  background-color: var(--palette-white);
   margin-top: auto;
   width: calc(100% - 40px);
   margin-left: auto;
@@ -231,7 +233,7 @@ const NavigationButton = styled.button`
   width: 40px;
   height: 40px;
   padding: 0;
-  background-color: #7317de;
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 50%;
@@ -254,9 +256,10 @@ const NavigationButton = styled.button`
  * Styled component for the card title.
  */
 const CardTitle = styled.h2`
-  font-size: 1.2em;
-  color: #4b3e91;
-  font-weight: bold;
+  font-family: var(--font-sans);
+  font-size: 2em;
+  color: var(--text-icon);
+  font-weight: 400;
   margin-top: 5px;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
@@ -266,19 +269,21 @@ const CardTitle = styled.h2`
  * Styled component for the card content.
  */
 const CardContent = styled.div`
+  font-family: var(--font-sans);
   transition: opacity 0.3s;
   text-align: left;
   font-size: 1.5em;
+  line-height: 28px;
 
   h2 {
     font-size: 1.5em;
-    color: #4b3e91;
+    color: var(--text-icon);
     margin-bottom: 0.5em;
   }
 
   p {
     font-size: 1.2em;
-    color: #333;
+    color: var(--text-icon);
     line-height: 1.6;
     margin: 0.5em 0;
   }
@@ -296,7 +301,7 @@ const CardContent = styled.div`
   }
 
   .card {
-    background-color: #f9f9f9;
+    background-color: var(--palette-pale-teal);
     border-radius: 8px;
     padding: 1em;
     margin: 0.5em;
@@ -307,16 +312,17 @@ const CardContent = styled.div`
   }
 
   .card .label {
-    font-size: 1em;
-    color: #666;
+    font-size: 1.3em;
+    color: var(--text-icon);
     margin-bottom: 0.5em;
-    font-weight: bold;
+    font-family: var(--font-sans);
   }
 
   .card .value {
     font-size: 2em;
-    color: #4b3e91;
+    color: var(--text-icon);
     font-weight: bold;
+    font-family: var(--font-family-base);
   }
 
   @media (max-width: 800px) {
@@ -333,10 +339,10 @@ const CardContent = styled.div`
 
   details {
     margin-top: 1em;
-    border: 1px solid #ddd;
+    border: 1px solid var(--palette-bottom-grey);
     border-radius: 5px;
     padding: 0.5em;
-    background-color: #f4f4f4;
+    background-color: var(--palette-pale-teal);
 
     summary {
       font-size: 1.2em;
@@ -344,7 +350,7 @@ const CardContent = styled.div`
       cursor: pointer;
       position: relative;
       outline: none;
-      color: #333333;
+      color: var(--text-icon);
     }
 
     .card-container {

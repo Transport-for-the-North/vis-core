@@ -383,10 +383,24 @@ export const MapLayout = () => {
     });
   };
 
+  const loadingHeading = state.visualisationLoadingCount > 0
+    ? "Loading map layers"
+    : "Preparing your map";
+  const loadingMessages = [
+    "Fetching the latest visualisation data...",
+    "Almost there, thanks for waiting.",
+    "Applying colours and map styling...",
+  ];
+
   return (
     <ToastProvider>
       <LayoutContainer>
-      <Dimmer dimmed={isLoading} showLoader={true} />
+      <Dimmer
+        dimmed={isLoading}
+        showLoader={true}
+        statusHeading={loadingHeading}
+        statusMessages={loadingMessages}
+      />
       <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
         pageName={pageContext.pageName}

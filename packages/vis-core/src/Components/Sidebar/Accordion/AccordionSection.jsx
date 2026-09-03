@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import styled from 'styled-components';
 
-export const AccordionHeader = styled.div`
+export const AccordionHeader = styled.button`
   cursor: pointer;
   padding: 10px;
+  font-family: var(--font-sans);
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   border-radius: 5px 5px ${({ $isOpen }) => ($isOpen ? '0 0' : '5px 5px')};
@@ -12,6 +13,9 @@ export const AccordionHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.3s ease;
+  width: 100%;
+  text-align: left;
+  color: inherit;
 `;
 
 export const AccordionIcon = styled.span`
@@ -28,6 +32,7 @@ const AccordionContent = styled.div`
   overflow: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
   transition: max-height 0.3s ease, padding 0.3s ease;
   padding: ${({ $isOpen }) => ($isOpen ? '15px' : '0')} 20px;
+  font-family: var(--font-sans);
   background-color: #fff;
   border: ${({ $isOpen }) => ($isOpen ? '1px' : '0')} solid #ddd;
   border-radius: 0 0 5px 5px;
@@ -44,6 +49,9 @@ const AccordionContent = styled.div`
  */
 export const AccordionSection = ({ title, children, defaultValue, statusNode }) => {
   const [isOpen, setIsOpen] = useState(defaultValue);
+  const sectionId = useId();
+  const contentId = `accordion-content-${sectionId}`;
+  const titleId = `accordion-title-${sectionId}`;
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
@@ -51,7 +59,14 @@ export const AccordionSection = ({ title, children, defaultValue, statusNode }) 
 
   return (
     <>
-      <AccordionHeader onClick={toggleAccordion} $isOpen={isOpen}>
+      <AccordionHeader
+        type="button"
+        onClick={toggleAccordion}
+        $isOpen={isOpen}
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+        id={titleId}
+      >
         <div>{title}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {statusNode}
@@ -60,7 +75,13 @@ export const AccordionSection = ({ title, children, defaultValue, statusNode }) 
           </div>
         </div>
       </AccordionHeader>
-      <AccordionContent $isOpen={isOpen} className="selectable-text">
+      <AccordionContent
+        $isOpen={isOpen}
+        className="selectable-text"
+        id={contentId}
+        role="region"
+        aria-labelledby={titleId}
+      >
         {isOpen && children}
       </AccordionContent>
     </>

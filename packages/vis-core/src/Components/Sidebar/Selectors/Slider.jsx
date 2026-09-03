@@ -129,7 +129,11 @@ export const Slider = ({ filter, onChange }) => {
 
   return (
     <StyledSliderContainer>
-      <StyledSlider type="range" {...sliderProps} />
+      <StyledSlider
+        type="range"
+        aria-label={filter.filterName || filter.id || 'Slider control'}
+        {...sliderProps}
+      />
       <SliderValue>{getDisplayValue(value)}</SliderValue>
     </StyledSliderContainer>
   );
