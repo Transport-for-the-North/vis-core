@@ -11,7 +11,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
 
 import { MapContext } from "contexts/MapContext";
-import { replacePlaceholders, formatNumber } from "utils";
+import { replacePlaceholders, formatNumber, formatValueWithUnit } from "utils";
 import { Hovertip } from "Components/Hovertip/Hovertip";
 import { WarningBox } from "Components/MessageBox/MessageBox";
 import { ChartRenderer } from "Components/Charts/ChartRenderer";
@@ -581,14 +581,16 @@ export const CalloutCardVisualisation = ({
    * @param {string} [unit=""] - Unit suffix to append.
    * @returns {string} Formatted value or "N/A" for invalid input.
    */
-  const formatNumberWithUnit = useCallback((value, unitOrData = "") => {
+  const formatNumberWithUnit = useCallback((value, dataOrUnit) => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
     // replacePlaceholders calls custom functions with (argValue, fullDataObject)
-    // when func.length >= 2. Handle both: a plain string unit suffix, or the full
-    // data object (in which case we read data.units).
+    // when func.length >= 2. We avoid default parameter values on the 2nd argument
+    // so that func.length remains 2.
     const unit =
-      typeof unitOrData === "string" ? unitOrData : (unitOrData?.units ?? "");
-    return formatNumber(Number(value)) + unit;
+      typeof dataOrUnit === "string"
+        ? dataOrUnit
+        : (dataOrUnit?.units || dataOrUnit?.mainValues?.units || "");
+    return formatValueWithUnit(Number(value), unit);
   }, []);
 
   const customFormattingFunctions = useMemo(
@@ -608,16 +610,22 @@ export const CalloutCardVisualisation = ({
       return { sanitizedHtml: "", safeDynamicTitle: "" };
     }
 
+    const mergedData = {
+      ...(data.mainValues || {}),
+      ...data,
+      units: data.mainValues?.units || data.units || "",
+    };
+
     const htmlFromFragment = visualisation.htmlFragment
       ? DOMPurify.sanitize(
-          replacePlaceholders(visualisation.htmlFragment, data, {
+          replacePlaceholders(visualisation.htmlFragment, mergedData, {
             customFunctions: customFormattingFunctions,
           })
         )
       : "";
 
     const dynamicTitle = visualisation.cardTitle
-      ? replacePlaceholders(String(visualisation.cardTitle), data, {
+      ? replacePlaceholders(String(visualisation.cardTitle), mergedData, {
           customFunctions: customFormattingFunctions,
         })
       : "";
@@ -781,6 +789,7 @@ export const CalloutCardVisualisation = ({
                   const mergedData = {
                     ...(data.mainValues || {}),
                     ...data,
+                    units: data.mainValues?.units || data.units || "",
                   };
 
                   const html = replacePlaceholders(item.fragment, mergedData, {
@@ -903,6 +912,12 @@ export const CalloutCardVisualisation = ({
                     title,
                     chartKey: chart.key,
                     units: chart.units || data.mainValues?.units || data.units || "",
+                    comparatorUnits:
+                      chart.comparatorUnits ||
+                      data.mainValues?.baseUnits ||
+                      (chart.units !== "%" ? chart.units : "") ||
+                      data.units ||
+                      "",
                     x_axis_title: chart.x_axis_title,
                     y_axis_title: chart.y_axis_title,
                     primaryLabel: chart.primaryLabel,

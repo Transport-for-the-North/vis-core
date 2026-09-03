@@ -1,4 +1,4 @@
-import { formatNumber } from "./text";
+import { formatNumber, formatValueWithUnit } from "./text";
 
 describe("formatNumber", () => {
   it("formats integers under 1000 with trailing zeroes by default", () => {
@@ -25,5 +25,34 @@ describe("formatNumber", () => {
     expect(formatNumber(1500)).toBe("1,500");
     expect(formatNumber(15000)).toBe("15.00K");
     expect(formatNumber(1500000)).toBe("1.50M");
+  });
+});
+
+describe("formatValueWithUnit", () => {
+  it("formats currency values with prefix £", () => {
+    expect(formatValueWithUnit(500, "£")).toBe("£500");
+    expect(formatValueWithUnit(-500, "£")).toBe("-£500");
+  });
+
+  it("formats rates like £/week correctly", () => {
+    expect(formatValueWithUnit(540, "£/week")).toBe("£540/week");
+    expect(formatValueWithUnit(-120, "£/week")).toBe("-£120/week");
+  });
+
+  it("formats percentages with % suffix without space", () => {
+    expect(formatValueWithUnit(12.5, "%")).toBe("12.5%");
+    expect(formatValueWithUnit(-3.2, "%")).toBe("-3.2%");
+  });
+
+  it("formats general metric units like sqm and gen mins with space", () => {
+    expect(formatValueWithUnit(1500, "sqm")).toBe("1,500 sqm");
+    expect(formatValueWithUnit(15.2, "gen mins")).toBe("15.2 gen mins");
+  });
+
+  it("suppresses unit for count and none", () => {
+    expect(formatValueWithUnit(1000, "count")).toBe("1,000");
+    expect(formatValueWithUnit(1000, "none")).toBe("1,000");
+    expect(formatValueWithUnit(1000, null)).toBe("1,000");
+    expect(formatValueWithUnit(1000, "")).toBe("1,000");
   });
 });
