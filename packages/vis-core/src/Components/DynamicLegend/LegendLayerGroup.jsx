@@ -22,6 +22,8 @@ import {
   OptionsPopover,
 } from "./LegendLayerGroup.styles";
 
+const LEGEND_BAND_FOCUS_HINT = "Use this to focus on that range of values.";
+
 /**
  * LegendLayerGroup
  *
@@ -71,6 +73,8 @@ const LegendLayerGroup = ({
   visualisationDataByLayer,
   classMethod,
   popoverRef,
+  activeBandIndex,
+  onBandSelect,
 }) => {
   // LegendDivider is omitted on mobile because legend groups are rendered separately already.
   const shouldRenderDivider = !isLast && !isMobile;
@@ -118,6 +122,18 @@ const LegendLayerGroup = ({
   const useDiscreteSwatches = !canBeContinuous || pref.displayMode === 'discrete';
 
   const isPopoverOpen = openPopoverId === item.layerId;
+
+  const handleBandSelect = (bandIndex) => {
+    if (typeof onBandSelect !== "function") return;
+    onBandSelect(item, bandIndex);
+  };
+
+  const handleBandKeyDown = (event, bandIndex) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleBandSelect(bandIndex);
+    }
+  };
 
   return (
     <LegendGroup $isOpen={isPopoverOpen}>
@@ -232,7 +248,17 @@ const LegendLayerGroup = ({
                   });
 
                   return (
-                    <LegendItem key={idx} style={{ marginBottom: 0 }}>
+                    <LegendItem
+                      key={idx}
+                      style={{ marginBottom: 0 }}
+                      role="button"
+                      tabIndex={0}
+                      data-hover-hint={LEGEND_BAND_FOCUS_HINT}
+                      aria-label={LEGEND_BAND_FOCUS_HINT}
+                      $isActive={activeBandIndex === idx}
+                      onClick={() => handleBandSelect(idx)}
+                      onKeyDown={(event) => handleBandKeyDown(event, idx)}
+                    >
                       {entry.type === "circle" ? (
                         <CircleSwatch diameter={entry.width || 10} color={entry.color} />
                       ) : entry.type === "line" ? (
@@ -247,7 +273,14 @@ const LegendLayerGroup = ({
                 })}
               </DiscreteSwatchesContainer>
             ) : (
-              <ContinuousGradientBar item={item} scaleMode={pref.scaleMode} belowMin={belowMin} aboveMax={aboveMax} />
+              <ContinuousGradientBar
+                item={item}
+                scaleMode={pref.scaleMode}
+                belowMin={belowMin}
+                aboveMax={aboveMax}
+                activeBandIndex={activeBandIndex}
+                onBandSelect={handleBandSelect}
+              />
             )}
 
             {(belowMin || aboveMax) && (

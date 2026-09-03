@@ -28,11 +28,29 @@ export const GradientContainer = styled.div`
  * @prop {string} $gradient - A CSS `linear-gradient(...)` string.
  */
 export const GradientBar = styled.div`
+  position: relative;
   height: 22px;
   width: 100%;
   background: ${(props) => props.$gradient};
   border: 1px solid #bbb;
-  cursor: crosshair;
+  cursor: ${(props) => (props.$isInteractive ? "pointer" : "crosshair")};
+
+  &[data-hover-hint]:hover::after,
+  &[data-hover-hint]:focus-visible::after {
+    content: attr(data-hover-hint);
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    background: rgba(0, 0, 0, 0.86);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    line-height: 1.25;
+    white-space: nowrap;
+    z-index: 18;
+    pointer-events: none;
+  }
 `;
 
 /**
@@ -71,7 +89,8 @@ export const LabelsContainer = styled.div`
 export const TickLabel = styled.span`
   position: absolute;
   font-size: 11px;
-  color: #555;
+  color: ${(props) => (props.$isActive ? "#003b8e" : "#555")};
+  font-weight: ${(props) => (props.$isActive ? 700 : 400)};
   top: 0;
   white-space: nowrap;
   text-align: right;
@@ -81,6 +100,7 @@ export const TickLabel = styled.span`
      corner, sweeping the text downward-left away from the gradient bar. */
   transform-origin: top right;
   transform: translateX(-100%) rotate(-45deg);
+  cursor: pointer;
 `;
 
 /**

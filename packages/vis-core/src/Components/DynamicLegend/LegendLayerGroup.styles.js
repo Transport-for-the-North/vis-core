@@ -63,7 +63,38 @@ export const LegendItem = styled.div`
   display: flex;
   align-items: center;
   min-width: 0;
+  position: relative;
   font-size: medium;
+  border-radius: 4px;
+  padding: 2px 4px;
+  cursor: pointer;
+  background-color: ${(props) => (props.$isActive ? "#f0f7ff" : "transparent")};
+
+  &:hover {
+    background-color: ${(props) => (props.$isActive ? "#e8f2ff" : "#f7f7f7")};
+  }
+
+  &:focus {
+    outline: 2px solid #005fcc;
+    outline-offset: 1px;
+  }
+
+  &[data-hover-hint]:hover::after,
+  &[data-hover-hint]:focus-visible::after {
+    content: attr(data-hover-hint);
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 6px);
+    background: rgba(0, 0, 0, 0.86);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    line-height: 1.25;
+    white-space: nowrap;
+    z-index: 15;
+    pointer-events: none;
+  }
 `;
 
 /**

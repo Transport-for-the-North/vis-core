@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { createPortal } from 'react-dom';
-import { buildCategoricalLegendKey, convertStringToNumber } from "utils";
+import { buildCategoricalLegendKey, convertStringToNumber, getOpacityProperty } from "utils";
 import { useMapContext } from "hooks/useMapContext";
 import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useIsMobile } from "hooks/useIsMobile";
@@ -19,6 +19,124 @@ import {
   getEntryDashStatus,
 } from "./DynamicLegend.utils";
 import LegendLayerGroup from "./LegendLayerGroup";
+
+const LEGEND_HIGHLIGHT_FULL_OPACITY = 1;
+const LEGEND_HIGHLIGHT_MIN_DIM_OPACITY = 0.15;
+const LEGEND_HIGHLIGHT_DIM_RATIO = 0.30;
+const LEGEND_HIGHLIGHT_TRANSITION_DURATION_MS = 260;
+
+const resolveOpacityFallback = (layerType) => {
+  if (layerType === "line") return 1;
+  return 0.65;
+};
+
+const resolveNumericOpacityFromPaintValue = (paintValue, fallbackValue) => {
+  if (typeof paintValue === "number" && Number.isFinite(paintValue)) {
+    return paintValue;
+  }
+
+  if (Array.isArray(paintValue)) {
+    for (let i = paintValue.length - 1; i >= 0; i -= 1) {
+      if (typeof paintValue[i] === "number" && Number.isFinite(paintValue[i])) {
+        return paintValue[i];
+      }
+    }
+  }
+
+  return fallbackValue;
+};
+
+const buildLegendBandPredicate = (numericStops, bandIndex, valueExpression) => {
+  const safeStops = (Array.isArray(numericStops) ? numericStops : [])
+    .map((v) => Number(v))
+    .filter(Number.isFinite);
+
+  if (safeStops.length === 0 || bandIndex < 0 || bandIndex >= safeStops.length) {
+    return null;
+  }
+
+  if (safeStops.length === 1) {
+    return ["==", valueExpression, safeStops[0]];
+  }
+
+  const isDescending = safeStops[0] > safeStops[safeStops.length - 1];
+
+  // Normalise to ascending-order logic, then map back to the clicked index.
+  const orderedStops = isDescending ? [...safeStops].reverse() : safeStops;
+  const orderedIndex = isDescending
+    ? orderedStops.length - 1 - bandIndex
+    : bandIndex;
+
+  const current = orderedStops[orderedIndex];
+  const next = orderedStops[orderedIndex + 1];
+
+  if (orderedIndex === 0 && Number.isFinite(next)) {
+    return ["<=", valueExpression, next];
+  }
+
+  if (orderedIndex < orderedStops.length - 1 && Number.isFinite(next)) {
+    return [
+      "all",
+      [">=", valueExpression, current],
+      ["<", valueExpression, next],
+    ];
+  }
+
+  return [">=", valueExpression, current];
+};
+
+const buildLegendBandOpacityExpression = ({
+  selectedPredicate,
+  dimOpacity,
+  fullOpacity,
+}) => [
+  "case",
+  ["in", ["feature-state", "value"], ["literal", [null]]],
+  0,
+  selectedPredicate,
+  fullOpacity,
+  dimOpacity,
+];
+
+const isLayerAvailable = (mapInstance, layerId) => {
+  if (!mapInstance || !layerId) return false;
+  if (typeof mapInstance.getLayer !== "function") return true;
+
+  try {
+    return Boolean(mapInstance.getLayer(layerId));
+  } catch {
+    return false;
+  }
+};
+
+const safeGetPaintProperty = (mapInstance, layerId, propertyName) => {
+  if (!isLayerAvailable(mapInstance, layerId)) return undefined;
+
+  try {
+    return mapInstance.getPaintProperty(layerId, propertyName);
+  } catch {
+    return undefined;
+  }
+};
+
+const safeSetPaintProperty = (mapInstance, layerId, propertyName, value) => {
+  if (!isLayerAvailable(mapInstance, layerId)) return false;
+
+  try {
+    mapInstance.setPaintProperty(layerId, propertyName, value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const applyOpacityTransition = (mapInstance, layerId, opacityProperty) => {
+  const transitionProperty = `${opacityProperty}-transition`;
+  safeSetPaintProperty(mapInstance, layerId, transitionProperty, {
+    duration: LEGEND_HIGHLIGHT_TRANSITION_DURATION_MS,
+    delay: 0,
+  });
+};
 
 /**
  * DynamicLegend is a React component that renders a map legend based on the styles of map layers.
@@ -46,8 +164,10 @@ export const DynamicLegend = ({ map }) => {
     }
   });
   const [openPopoverId, setOpenPopoverId] = useState(null);
+  const [activeBandByLayer, setActiveBandByLayer] = useState({});
   const popoverRef = useRef(null);
   const legendRef = useRef(null);
+  const baseOpacityByLayerRef = useRef(new Map());
   const currentPage = useContext(PageContext);
   const pageCategory = currentPage.category || currentPage.pageName;
 
@@ -93,6 +213,105 @@ export const DynamicLegend = ({ map }) => {
     });
     // Close the options popover as soon as the user selects a preference.
     setOpenPopoverId(null);
+  };
+
+  const clearLegendBandHighlight = (layerId, layerType) => {
+    if (!map) return;
+    const opacityProp = getOpacityProperty(layerType);
+    applyOpacityTransition(map, layerId, opacityProp);
+    const previous = baseOpacityByLayerRef.current.get(layerId);
+
+    if (previous !== undefined) {
+      if (safeSetPaintProperty(map, layerId, opacityProp, previous)) {
+        baseOpacityByLayerRef.current.delete(layerId);
+      }
+      return;
+    }
+
+    safeSetPaintProperty(
+      map,
+      layerId,
+      opacityProp,
+      resolveOpacityFallback(layerType)
+    );
+  };
+
+  const applyLegendBandHighlight = (item, bandIndex) => {
+    if (!map || !item) return;
+
+    const layerId = item.layerId;
+    const layerType = item.type;
+    const opacityProp = getOpacityProperty(layerType);
+    if (!isLayerAvailable(map, layerId)) return;
+
+    const currentOpacity = safeGetPaintProperty(map, layerId, opacityProp);
+    if (!baseOpacityByLayerRef.current.has(layerId)) {
+      baseOpacityByLayerRef.current.set(layerId, currentOpacity);
+    }
+
+    const fallbackOpacity = resolveOpacityFallback(layerType);
+    const baseOpacity = resolveNumericOpacityFromPaintValue(
+      baseOpacityByLayerRef.current.get(layerId),
+      fallbackOpacity
+    );
+    const dimOpacity = Math.min(
+      baseOpacity,
+      Math.max(LEGEND_HIGHLIGHT_MIN_DIM_OPACITY, baseOpacity * LEGEND_HIGHLIGHT_DIM_RATIO)
+    );
+
+    const colorExpression =
+      safeGetPaintProperty(map, layerId, "line-color") ||
+      safeGetPaintProperty(map, layerId, "fill-color") ||
+      safeGetPaintProperty(map, layerId, "circle-color") ||
+      item.colorExpression;
+    const valueExpression =
+      Array.isArray(colorExpression) && colorExpression.length > 2
+        ? colorExpression[2]
+        : ["to-number", ["feature-state", "value"]];
+
+    const selectedPredicate = buildLegendBandPredicate(
+      item.legendEntriesNumeric,
+      bandIndex,
+      valueExpression
+    );
+
+    if (!selectedPredicate) {
+      return;
+    }
+
+    const highlightExpression = buildLegendBandOpacityExpression({
+      selectedPredicate,
+      dimOpacity,
+      fullOpacity: LEGEND_HIGHLIGHT_FULL_OPACITY,
+    });
+
+    applyOpacityTransition(map, layerId, opacityProp);
+    safeSetPaintProperty(map, layerId, opacityProp, highlightExpression);
+  };
+
+  const handleBandSelect = (item, bandIndex) => {
+    if (!item || typeof bandIndex !== "number") {
+      return;
+    }
+
+    const layerId = item.layerId;
+    const previousBand = activeBandByLayer[layerId];
+
+    if (previousBand === bandIndex) {
+      clearLegendBandHighlight(layerId, item.type);
+      setActiveBandByLayer((prev) => {
+        const next = { ...prev };
+        delete next[layerId];
+        return next;
+      });
+      return;
+    }
+
+    applyLegendBandHighlight(item, bandIndex);
+    setActiveBandByLayer((prev) => ({
+      ...prev,
+      [layerId]: bandIndex,
+    }));
   };
 
   useEffect(() => {
@@ -196,6 +415,10 @@ export const DynamicLegend = ({ map }) => {
           // No format logic lives here; add options to formatLegendNumber instead.
           const formatEntryLabel = (value) => formatLegendNumber(value, legendNumberFormat ?? {});
           const paintProps = layer.paint;
+          const colorExpression =
+            paintProps["line-color"] ||
+            paintProps["fill-color"] ||
+            paintProps["circle-color"];
           
           // Determine the opacity based on the layer type
           const layerOpacity = 
@@ -209,9 +432,7 @@ export const DynamicLegend = ({ map }) => {
           }
 
           let colorStops = interpretColorExpression(
-            paintProps["line-color"] ||
-            paintProps["circle-color"] ||
-            paintProps["fill-color"]
+            colorExpression
           );
           let widthStops = interpretWidthExpression(
             paintProps["line-width"] || paintProps["circle-radius"]
@@ -386,6 +607,7 @@ export const DynamicLegend = ({ map }) => {
             legendAnnotations,
             // legendNumberFormat: { decimals } — tick label precision override.
             legendNumberFormat,
+            colorExpression,
             type: layer.type,
             style: layer.metadata.colorStyle,
             noStyle,
@@ -395,6 +617,21 @@ export const DynamicLegend = ({ map }) => {
         // Layers that produced no renderable entries return null from the map above.
         .filter(Boolean);
       setLegendItems(items);
+
+      // Keep active highlights synced when bands are recalculated after filter/classification changes.
+      items.forEach((item) => {
+        const activeBand = activeBandByLayer[item.layerId];
+        if (typeof activeBand !== "number") {
+          return;
+        }
+
+        const maxIndex = (item.legendEntriesNumeric?.length || 0) - 1;
+        if (maxIndex < 0) {
+          return;
+        }
+
+        applyLegendBandHighlight(item, Math.min(activeBand, maxIndex));
+      });
     };
   
     map.on("styledata", updateLegend);
@@ -404,7 +641,7 @@ export const DynamicLegend = ({ map }) => {
     return () => {
       map.off("styledata", updateLegend);
     };
-  }, [state.filters, state.categoricalLegendCache, map, state.visualisations, state.currentZoom, currentPage]);
+  }, [state.filters, state.categoricalLegendCache, map, state.visualisations, state.currentZoom, currentPage, activeBandByLayer]);
   
   // This effect forces the container's width to update after legendItems change,
   // working around Firefox's flex-wrap column bug.
@@ -448,6 +685,8 @@ export const DynamicLegend = ({ map }) => {
           visualisationDataByLayer={visualisationDataByLayer}
           classMethod={state.layers?.[item.layerId]?.class_method}
           popoverRef={popoverRef}
+          activeBandIndex={activeBandByLayer[item.layerId]}
+          onBandSelect={handleBandSelect}
         />
       ))}
     </LegendContainer>

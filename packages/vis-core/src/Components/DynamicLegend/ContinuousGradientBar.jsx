@@ -13,6 +13,8 @@ import {
 } from "./ContinuousGradientBar.styles";
 import { LineWidthTrack, CircleTrack } from "./WidthTrack";
 
+const LEGEND_BAND_FOCUS_HINT = "Click to focus on that range of values.";
+
 /**
  * ContinuousGradientBar
  *
@@ -48,7 +50,14 @@ import { LineWidthTrack, CircleTrack } from "./WidthTrack";
  * @returns {JSX.Element|null} The rendered gradient bar, or `null` when there is
  *   insufficient data to display.
  */
-const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = false }) => {
+const ContinuousGradientBar = ({
+  item,
+  scaleMode,
+  belowMin = false,
+  aboveMax = false,
+  activeBandIndex,
+  onBandSelect,
+}) => {
   const [hoverInfo, setHoverInfo] = useState(null);
   const barRef = useRef(null);
 
@@ -169,6 +178,33 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
 
   const handleMouseLeave = () => setHoverInfo(null);
 
+  const resolveBandIndexFromPercent = (mousePercent) => {
+    if (!Number.isFinite(mousePercent)) return null;
+    if (stopsWithPercentages.length === 0) return null;
+    if (mousePercent <= stopsWithPercentages[0].percent) return 0;
+
+    for (let i = 0; i < stopsWithPercentages.length - 1; i += 1) {
+      const current = stopsWithPercentages[i];
+      const next = stopsWithPercentages[i + 1];
+      if (mousePercent >= current.percent && mousePercent < next.percent) {
+        return i;
+      }
+    }
+
+    return stopsWithPercentages.length - 1;
+  };
+
+  const handleBandClick = (e) => {
+    if (typeof onBandSelect !== "function" || !barRef.current) return;
+
+    const rect = barRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const mousePercent = (x / rect.width) * 100;
+    const bandIndex = resolveBandIndexFromPercent(mousePercent);
+    if (bandIndex === null) return;
+    onBandSelect(bandIndex);
+  };
+
   // --- Smart Collision Detection ---
   // Minimum % distance between adjacent axis labels before the inner one is suppressed.
   // Prevents labels from overlapping when stops are clustered close together.
@@ -236,8 +272,12 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
         <GradientBar
           ref={barRef}
           $gradient={gradientString}
+          $isInteractive={typeof onBandSelect === "function"}
+          data-hover-hint={typeof onBandSelect === "function" ? LEGEND_BAND_FOCUS_HINT : undefined}
+          aria-label={typeof onBandSelect === "function" ? LEGEND_BAND_FOCUS_HINT : undefined}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
+          onClick={handleBandClick}
         >
           {/* Render tick marks at every stop, including the start (0 %) and end (100 %) */}
           {stopsWithPercentages.map((stop, i) => (
@@ -276,6 +316,8 @@ const ContinuousGradientBar = ({ item, scaleMode, belowMin = false, aboveMax = f
             <TickLabel
               key={`label-${stop.index}`}
               style={{ left: `${stop.percent}%` }}
+              $isActive={activeBandIndex === stop.index}
+              onClick={() => typeof onBandSelect === "function" && onBandSelect(stop.index)}
             >
               {tickLabel}
             </TickLabel>

@@ -391,6 +391,276 @@ describe("DynamicLegend", () => {
     expect(screen.getByText("page-two-layer")).toBeInTheDocument();
     expect(window.getComputedStyle(screen.getByText("A").previousSibling).backgroundColor).toBe("rgb(255, 136, 0)");
   });
+
+  it("highlights a clicked legend band using opacity expression without changing layer colours", async () => {
+    const mockSetPaintProperty = jest.fn();
+    const mockGetPaintProperty = jest.fn((layerId, prop) => {
+      if (prop === "fill-opacity") return 0.6;
+      if (prop === "fill-color") {
+        return [
+          "interpolate",
+          ["linear"],
+          ["feature-state", "value"],
+          0,
+          "#c7e9b4",
+          100,
+          "#7fcdbb",
+          200,
+          "#2c7fb8",
+        ];
+      }
+      return undefined;
+    });
+
+    const interactiveMap = {
+      ...mockMap,
+      getStyle: jest.fn(() => ({
+        layers: [
+          {
+            id: "zones",
+            type: "fill",
+            metadata: {
+              isStylable: true,
+              colorStyle: "continuous",
+              defaultLegendDisplayMode: "discrete",
+            },
+            paint: {
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["feature-state", "value"],
+                0,
+                "#c7e9b4",
+                100,
+                "#7fcdbb",
+                200,
+                "#2c7fb8",
+              ],
+              "fill-opacity": 0.6,
+            },
+          },
+        ],
+      })),
+      getPaintProperty: mockGetPaintProperty,
+      setPaintProperty: mockSetPaintProperty,
+    };
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {},
+      currentZoom: 10,
+    };
+
+    render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={interactiveMap} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = interactiveMap.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    const bandLabel = await screen.findByText("100.00");
+    act(() => {
+      bandLabel.click();
+    });
+
+    const opacityCalls = mockSetPaintProperty.mock.calls.filter(
+      ([layerId, prop]) => layerId === "zones" && prop === "fill-opacity"
+    );
+    expect(opacityCalls.length).toBeGreaterThan(0);
+    const lastExpression = opacityCalls[opacityCalls.length - 1][2];
+
+    expect(lastExpression[0]).toBe("case");
+    expect(lastExpression[2]).toBe(0);
+    expect(lastExpression[4]).toBe(1);
+    expect(lastExpression[5]).toBe(0.28);
+  });
+
+  it("highlights clicked continuous bands correctly when legend stops are descending", async () => {
+    const mockSetPaintProperty = jest.fn();
+    const mockGetPaintProperty = jest.fn((layerId, prop) => {
+      if (prop === "fill-opacity") return 0.6;
+      if (prop === "fill-color") {
+        return [
+          "interpolate",
+          ["linear"],
+          ["feature-state", "value"],
+          200,
+          "#2c7fb8",
+          100,
+          "#7fcdbb",
+          0,
+          "#c7e9b4",
+        ];
+      }
+      return undefined;
+    });
+
+    const interactiveMap = {
+      ...mockMap,
+      getStyle: jest.fn(() => ({
+        layers: [
+          {
+            id: "zones-desc",
+            type: "fill",
+            metadata: {
+              isStylable: true,
+              colorStyle: "continuous",
+              defaultLegendDisplayMode: "discrete",
+            },
+            paint: {
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["feature-state", "value"],
+                200,
+                "#2c7fb8",
+                100,
+                "#7fcdbb",
+                0,
+                "#c7e9b4",
+              ],
+              "fill-opacity": 0.6,
+            },
+          },
+        ],
+      })),
+      getPaintProperty: mockGetPaintProperty,
+      setPaintProperty: mockSetPaintProperty,
+    };
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {
+        "zones-desc": {
+          invertedColorScheme: true,
+        },
+      },
+      currentZoom: 10,
+    };
+
+    render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={interactiveMap} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = interactiveMap.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    const highBandLabel = await screen.findByText("200.00");
+    act(() => {
+      highBandLabel.click();
+    });
+
+    const opacityCalls = mockSetPaintProperty.mock.calls.filter(
+      ([layerId, prop]) => layerId === "zones-desc" && prop === "fill-opacity"
+    );
+    expect(opacityCalls.length).toBeGreaterThan(0);
+
+    const lastExpression = opacityCalls[opacityCalls.length - 1][2];
+    expect(lastExpression[0]).toBe("case");
+    expect(lastExpression[2]).toBe(0);
+    expect(lastExpression[4]).toBe(1);
+    expect(lastExpression[5]).toBe(0.28);
+  });
+
+  it("does not throw when getPaintProperty fails during legend click", async () => {
+    const mockSetPaintProperty = jest.fn();
+    const mockGetPaintProperty = jest.fn((layerId, prop) => {
+      if (prop === "fill-opacity") {
+        throw new TypeError("Cannot read properties of undefined (reading 'value')");
+      }
+      return undefined;
+    });
+
+    const interactiveMap = {
+      ...mockMap,
+      getLayer: jest.fn(() => ({ id: "zones-unstable" })),
+      getStyle: jest.fn(() => ({
+        layers: [
+          {
+            id: "zones-unstable",
+            type: "fill",
+            metadata: {
+              isStylable: true,
+              colorStyle: "continuous",
+              defaultLegendDisplayMode: "discrete",
+            },
+            paint: {
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["feature-state", "value"],
+                0,
+                "#c7e9b4",
+                100,
+                "#7fcdbb",
+                200,
+                "#2c7fb8",
+              ],
+              "fill-opacity": 0.6,
+            },
+          },
+        ],
+      })),
+      getPaintProperty: mockGetPaintProperty,
+      setPaintProperty: mockSetPaintProperty,
+    };
+
+    const mockState = {
+      ...mockSetState,
+      visualisations: {},
+      filters: [],
+      layers: {},
+      currentZoom: 10,
+    };
+
+    render(
+      <MapContext.Provider value={{ state: mockState }}>
+        <AppContext.Provider value={{ defaultBands: [] }}>
+          <PageContext.Provider value={{ pageName: "test" }}>
+            <DynamicLegend map={interactiveMap} />
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </MapContext.Provider>
+    );
+
+    act(() => {
+      const styleChangeHandler = interactiveMap.on.mock.calls.find(
+        (call) => call[0] === "styledata"
+      )[1];
+      styleChangeHandler();
+    });
+
+    const bandLabel = await screen.findByText("100.00");
+    expect(() => {
+      act(() => {
+        bandLabel.click();
+      });
+    }).not.toThrow();
+  });
 });
 
 describe("OutOfBandMessage", () => {
