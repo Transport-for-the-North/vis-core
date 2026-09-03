@@ -581,8 +581,13 @@ export const CalloutCardVisualisation = ({
    * @param {string} [unit=""] - Unit suffix to append.
    * @returns {string} Formatted value or "N/A" for invalid input.
    */
-  const formatNumberWithUnit = useCallback((value, unit = "") => {
+  const formatNumberWithUnit = useCallback((value, unitOrData = "") => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
+    // replacePlaceholders calls custom functions with (argValue, fullDataObject)
+    // when func.length >= 2. Handle both: a plain string unit suffix, or the full
+    // data object (in which case we read data.units).
+    const unit =
+      typeof unitOrData === "string" ? unitOrData : (unitOrData?.units ?? "");
     return formatNumber(Number(value)) + unit;
   }, []);
 
@@ -897,6 +902,7 @@ export const CalloutCardVisualisation = ({
                     type: chart.type,
                     title,
                     chartKey: chart.key,
+                    units: chart.units || data.mainValues?.units || data.units || "",
                     x_axis_title: chart.x_axis_title,
                     y_axis_title: chart.y_axis_title,
                     primaryLabel: chart.primaryLabel,
