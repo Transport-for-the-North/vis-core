@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   ResponsiveContainer,
   BarChart as RBarChart,
@@ -23,7 +24,7 @@ import { WarningBox } from "Components/MessageBox";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CARD_CONSTANTS } from "defaults";
-import { formatNumber } from "utils";
+import { formatNumber, formatValueWithUnit } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
@@ -239,6 +240,192 @@ const computeXAxisHeight = (config, labels) => {
 };
 
 /**
+ * Formats an axis title and unit pair for display.
+ * Returns an object with { title, unit } to support line-break rendering on axes.
+ *
+ * @param {string} [title] - Raw axis title
+ * @param {string} [unit] - Unit string
+ * @returns {{ title: string, unit: string }} Formatted title and unit
+ */
+const formatAxisTitleWithUnit = (title, unit) => {
+  if (!title) return { title: "", unit: "" };
+  if (!unit || unit === "none" || unit === "count") return { title, unit: "" };
+  if (title.toLowerCase().includes(unit.toLowerCase())) return { title, unit: "" };
+  const formattedUnit = unit.startsWith("/") ? unit : `/ ${unit}`;
+  return { title, unit: formattedUnit };
+};
+
+/**
+ * Viewport-bounded custom tooltip component for Recharts.
+ * Measures its bounding rectangle via useLayoutEffect and clamps position so
+ * it never renders off screen in any direction.
+ */
+export const ChartTooltip = ({
+  active,
+  payload,
+  label,
+  config = {},
+  formatter,
+  coordinate,
+}) => {
+  const containerRef = useRef(null);
+  const anchorRef = useRef(null);
+
+  React.useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!active || !el) return;
+
+    const tooltipRect = el.getBoundingClientRect();
+    const padding = 12;
+    let targetX = 0;
+    let targetY = 0;
+
+    const chartWrapper =
+      anchorRef.current?.closest(".recharts-wrapper") ||
+      anchorRef.current?.parentElement?.parentElement;
+
+    if (coordinate && chartWrapper) {
+      const chartBox = chartWrapper.getBoundingClientRect();
+      targetX = chartBox.left + coordinate.x + 12;
+      targetY = chartBox.top + coordinate.y + 12;
+
+      // If overflowing right, flip to left of cursor
+      if (targetX + tooltipRect.width > window.innerWidth - padding) {
+        targetX = chartBox.left + coordinate.x - tooltipRect.width - 12;
+      }
+      // If overflowing bottom, flip above cursor
+      if (targetY + tooltipRect.height > window.innerHeight - padding) {
+        targetY = chartBox.top + coordinate.y - tooltipRect.height - 12;
+      }
+    } else if (anchorRef.current) {
+      const anchorRect = anchorRef.current.getBoundingClientRect();
+      targetX = anchorRect.left;
+      targetY = anchorRect.top;
+
+      if (targetX + tooltipRect.width > window.innerWidth - padding) {
+        targetX = window.innerWidth - padding - tooltipRect.width;
+      }
+      if (targetY + tooltipRect.height > window.innerHeight - padding) {
+        targetY = window.innerHeight - padding - tooltipRect.height;
+      }
+    }
+
+    targetX = Math.max(
+      padding,
+      Math.min(window.innerWidth - tooltipRect.width - padding, targetX)
+    );
+    targetY = Math.max(
+      padding,
+      Math.min(window.innerHeight - tooltipRect.height - padding, targetY)
+    );
+
+    el.style.transform = `translate(${targetX}px, ${targetY}px)`;
+  });
+
+  if (!active || !payload || !payload.length) return null;
+
+  const unit = config.units && config.units !== "none" ? config.units : "";
+
+  const tooltipElement = (
+    <div
+      ref={containerRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        pointerEvents: "none",
+        backgroundColor: "rgba(255, 255, 255, 0.96)",
+        border: "1px solid #ddd",
+        borderRadius: 6,
+        padding: "8px 12px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        fontSize: 12,
+        maxWidth: 280,
+        zIndex: 99999,
+      }}
+    >
+      {label && (
+        <div style={{ fontWeight: 600, marginBottom: 4, color: "#333" }}>
+          {label}
+        </div>
+      )}
+      {payload.map((item, i) => {
+        const val = item.value;
+        const isComparator =
+          item.dataKey === (config.comparatorKey || "dmValue") ||
+          (config.comparatorLabel && item.name === config.comparatorLabel) ||
+          (config.comparatorLabel && item.name === `${config.comparatorLabel} (right)`) ||
+          item.name === "DM" ||
+          item.name === "DM (right)" ||
+          item.name === "Comparator" ||
+          item.name === "Comparator (right)" ||
+          item.name?.includes("(right)");
+
+        const comparatorUnit =
+          config.comparatorUnits || (config.units !== "%" ? config.units : "");
+
+        const itemUnit = isComparator ? comparatorUnit : (item.unit || unit);
+
+        const formattedVal = formatter
+          ? formatter(val, item.name, item)
+          : formatValueWithUnit(val, itemUnit);
+
+        return (
+          <div
+            key={`tooltip-item-${i}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              color: "#444",
+              marginTop: i > 0 ? 2 : 0,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  backgroundColor:
+                    item.color || item.fill || item.stroke || DEFAULTS.BRAND_COLOR,
+                  display: "inline-block",
+                }}
+              />
+              <span>{item.name}</span>
+            </div>
+            <span style={{ fontWeight: 600, color: "#111" }}>
+              {formattedVal}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <>
+      <span
+        ref={anchorRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0,
+          pointerEvents: "none",
+          visibility: "hidden",
+        }}
+      />
+      {typeof document !== "undefined"
+        ? createPortal(tooltipElement, document.body)
+        : tooltipElement}
+    </>
+  );
+};
+
+/**
  * Shared wrapper component for chart sections with consistent layout.
  * Axis titles are rendered as HTML elements outside the SVG so they sit
  * naturally beside their axis without eating into chart margins.
@@ -246,73 +433,123 @@ const computeXAxisHeight = (config, labels) => {
  * @param {string}  ariaLabel   - Accessibility label for the chart section
  * @param {string}  title       - Optional title to display above the chart
  * @param {number}  height      - Height of the chart container
- * @param {string}  xAxisTitle  - Optional label rendered below the X axis
- * @param {string}  yAxisTitle  - Optional label rendered beside the Y axis
+ * @param {string|object}  xAxisTitle  - Optional label rendered below the X axis
+ * @param {string|object}  yAxisTitle  - Optional label rendered beside the Y axis
  * @param {string}  rightYAxisTitle  - Optional label rendered beside the right Y axis
  * @param {React.ReactNode} children - Chart components to render inside
  * @returns {JSX.Element}
  */
-const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, rightYAxisTitle, children }) => (
-  <Section aria-label={ariaLabel}>
-    {title && <Title>{title}</Title>}
-    <div style={{ display: "flex", alignItems: "stretch" }}>
-      {yAxisTitle && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            width: 18,
-          }}
-        >
-          <AxisLabel
+const ChartSection = ({
+  ariaLabel,
+  title,
+  height,
+  xAxisTitle,
+  yAxisTitle,
+  rightYAxisTitle,
+  children,
+}) => {
+  const yAxisObj =
+    typeof yAxisTitle === "object" && yAxisTitle !== null
+      ? yAxisTitle
+      : { title: yAxisTitle, unit: "" };
+  const rightYAxisObj =
+    typeof rightYAxisTitle === "object" && rightYAxisTitle !== null
+      ? rightYAxisTitle
+      : { title: rightYAxisTitle, unit: "" };
+  const xAxisObj =
+    typeof xAxisTitle === "object" && xAxisTitle !== null
+      ? xAxisTitle
+      : { title: xAxisTitle, unit: "" };
+
+  return (
+    <Section aria-label={ariaLabel}>
+      {title && <Title>{title}</Title>}
+      <div style={{ display: "flex", alignItems: "stretch" }}>
+        {yAxisObj.title && (
+          <div
             style={{
-              transform: "rotate(-90deg)",
-              whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: yAxisObj.unit ? 26 : 16,
+              marginRight: 6,
             }}
           >
-            {yAxisTitle}
-          </AxisLabel>
+            <AxisLabel
+              style={{
+                transform: "rotate(-90deg)",
+                whiteSpace: "nowrap",
+                textAlign: "center",
+                display: "inline-flex",
+                flexDirection: "column",
+                alignItems: "center",
+                lineHeight: 1.15,
+              }}
+            >
+              <span>{yAxisObj.title}</span>
+              {yAxisObj.unit && (
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>
+                  {yAxisObj.unit}
+                </span>
+              )}
+            </AxisLabel>
+          </div>
+        )}
+        <div style={{ flex: 1, minWidth: 0, height }}>
+          <ResponsiveContainer>{children}</ResponsiveContainer>
         </div>
-      )}
-      <div style={{ flex: 1, minWidth: 0, height }}>
-        <ResponsiveContainer>{children}</ResponsiveContainer>
+        {rightYAxisObj.title && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: rightYAxisObj.unit ? 26 : 16,
+              marginLeft: 6,
+            }}
+          >
+            <AxisLabel
+              style={{
+                transform: "rotate(90deg)",
+                whiteSpace: "nowrap",
+                textAlign: "center",
+                display: "inline-flex",
+                flexDirection: "column",
+                alignItems: "center",
+                lineHeight: 1.15,
+              }}
+            >
+              <span>{rightYAxisObj.title}</span>
+              {rightYAxisObj.unit && (
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>
+                  {rightYAxisObj.unit}
+                </span>
+              )}
+            </AxisLabel>
+          </div>
+        )}
       </div>
-      {rightYAxisTitle && (
-        <div
+      {xAxisObj.title && (
+        <AxisLabel
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            width: 18,
+            display: "block",
+            textAlign: "center",
+            marginTop: 2,
           }}
         >
-          <AxisLabel
-            style={{
-              transform: "rotate(90deg)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {rightYAxisTitle}
-          </AxisLabel>
-        </div>
+          <span>{xAxisObj.title}</span>
+          {xAxisObj.unit && (
+            <span style={{ display: "block", fontSize: "10px", opacity: 0.85 }}>
+              {xAxisObj.unit}
+            </span>
+          )}
+        </AxisLabel>
       )}
-    </div>
-    {xAxisTitle && (
-      <AxisLabel
-        style={{
-          display: "block",
-          textAlign: "center",
-          marginTop: 2,
-        }}
-      >
-        {xAxisTitle}
-      </AxisLabel>
-    )}
-  </Section>
-);
+    </Section>
+  );
+};
 
 /**
  * Default formatting functions for chart values
@@ -334,16 +571,18 @@ const defaultFormatters = {
 };
 
 // Function to wrap long labels into multiple lines after a certain length and a space
-const wrapLabel = (label, maxLen = 15) => {
-  const words = String(label || "").split(" ");
+export const wrapLabel = (label, maxLen = 26) => {
+  const str = String(label || "").trim();
+  if (str.length <= maxLen) return str;
+  const words = str.split(" ");
   let lines = [];
   let currentLine = "";
   words.forEach((word) => {
-    if ((currentLine + " " + word).trim().length > maxLen) {
+    if (currentLine && (currentLine + " " + word).length > maxLen) {
       lines.push(currentLine.trim());
       currentLine = word;
     } else {
-      currentLine += " " + word;
+      currentLine = currentLine ? currentLine + " " + word : word;
     }
   });
   if (currentLine) lines.push(currentLine.trim());
@@ -374,18 +613,21 @@ const CategoryTick = ({ x, y, payload, angle = 0 }) => {
   }
 
   // For vertical Y-axis labels, wrap text into multiple lines
-  const lines = wrapLabel(payload.value, 15).split("\n");
-  const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2;
+  const lines = wrapLabel(payload.value, 26).split("\n");
+  const fontSize = DEFAULTS.DIMENSIONS.tickFontSize;
+  const lineHeight = fontSize + 2;
+  const startY = y - ((lines.length - 1) * lineHeight) / 2;
 
   return (
     <text
       x={x}
       y={startY}
       textAnchor="end"
-      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+      fontSize={fontSize}
+      fill="#444"
     >
       {lines.map((line, i) => (
-        <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize + 2} key={i}>
+        <tspan x={x - 4} dy={i === 0 ? 3 : lineHeight} key={i}>
           {line}
         </tspan>
       ))}
@@ -434,16 +676,32 @@ const toTimeSeries = (data) =>
  */
 const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
-  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
-  const tooltipFormatter = (val) => {
-    if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
-    const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
-  };
+
+  const dynamicHeight = React.useMemo(() => {
+    if (type === "vertical") {
+      const maxLines = Math.max(
+        1,
+        ...items.map((i) => wrapLabel(i.label || "", 26).split("\n").length)
+      );
+      const rowHeight = maxLines > 1 ? 26 : 22;
+      const computed = items.length * rowHeight + 32;
+      return config.height ? Math.max(config.height, computed) : Math.max(80, computed);
+    }
+    return config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  }, [config.height, type, items]);
+
+  const resolvedXAxisTitle = React.useMemo(
+    () => (type === "vertical" ? formatAxisTitleWithUnit(config.x_axis_title, config.units) : config.x_axis_title),
+    [type, config.x_axis_title, config.units]
+  );
+  const resolvedYAxisTitle = React.useMemo(
+    () => (type === "vertical" ? config.y_axis_title : formatAxisTitleWithUnit(config.y_axis_title, config.units)),
+    [type, config.y_axis_title, config.units]
+  );
 
   const xAxisHeight = React.useMemo(
     () =>
@@ -460,25 +718,25 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
 
   const yCategoryWidth = React.useMemo(() => {
     if (type !== "vertical") return 0;
-    const maxLineLength = Math.max(0, ...items.map(i => {
-      const lines = wrapLabel(i.label || "", 15).split("\n");
-      return Math.max(0, ...lines.map(l => l.length));
+    const maxLineLength = Math.max(1, ...items.map(i => {
+      const lines = wrapLabel(i.label || "", 26).split("\n");
+      return Math.max(...lines.map(l => l.length));
     }));
-    return Math.max(60, maxLineLength * 6.5 + 5);
+    return Math.max(45, Math.min(135, Math.ceil(maxLineLength * 5.2) + 6));
   }, [items, type]);
 
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={config.height ?? items.length * 50}
-      xAxisTitle={type === "vertical" ? config.x_axis_title : undefined}
-      yAxisTitle={type === "vertical" ? config.y_axis_title : undefined}
+      height={dynamicHeight}
+      xAxisTitle={resolvedXAxisTitle}
+      yAxisTitle={resolvedYAxisTitle}
     >
       <RBarChart
         data={items}
-        margin={DEFAULTS.MARGIN}
-        barCategoryGap="18%"
+        margin={type === "vertical" ? { top: 4, right: 12, bottom: 2, left: 4 } : DEFAULTS.MARGIN}
+        barCategoryGap={6}
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
       >
@@ -521,8 +779,12 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
-        <RBar dataKey="value" name="Value">
+        <RTooltip
+          content={<ChartTooltip config={config} formatter={formatters?.tooltipFormatter} />}
+          cursor={{ fill: "rgba(0,0,0,0.06)" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+        />
+        <RBar dataKey="value" name="Value" barSize={type === "vertical" ? 14 : undefined}>
           {items.map((entry, idx) => (
             <RCell
               key={`cell-${idx}`}
@@ -551,16 +813,34 @@ const BarChartMultiple = ({
   type = "horizontal",
 }) => {
   const items = React.useMemo(() => data, [data]);
-  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
-  const tooltipFormatter = (val) => {
-    if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
-    const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
-  };
+
+  const dynamicHeight = React.useMemo(() => {
+    if (type === "vertical") {
+      const numCols = config.columns?.length || 1;
+      const perColHeight = numCols * 14;
+      const maxLines = Math.max(
+        1,
+        ...items.map((i) => wrapLabel(i[config.xKey || "label"] || "", 26).split("\n").length)
+      );
+      const rowHeight = Math.max(26, perColHeight + 8, maxLines * 12 + 8);
+      const computed = items.length * rowHeight + 35;
+      return config.height ? Math.max(config.height, computed) : Math.max(80, computed);
+    }
+    return config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  }, [config.height, type, config.columns, items, config.xKey]);
+
+  const resolvedXAxisTitle = React.useMemo(
+    () => (type === "vertical" ? formatAxisTitleWithUnit(config.x_axis_title, config.units) : config.x_axis_title),
+    [type, config.x_axis_title, config.units]
+  );
+  const resolvedYAxisTitle = React.useMemo(
+    () => (type === "vertical" ? config.y_axis_title : formatAxisTitleWithUnit(config.y_axis_title, config.units)),
+    [type, config.y_axis_title, config.units]
+  );
 
   const yTickFormatter = (val) => {
     const n = Number(val);
@@ -573,25 +853,25 @@ const BarChartMultiple = ({
 
   const yCategoryWidth = React.useMemo(() => {
     if (type !== "vertical") return 0;
-    const maxLineLength = Math.max(0, ...items.map(i => {
-      const lines = wrapLabel(i[config.xKey || "label"] || "", 15).split("\n");
-      return Math.max(0, ...lines.map(l => l.length));
+    const maxLineLength = Math.max(1, ...items.map(i => {
+      const lines = wrapLabel(i[config.xKey || "label"] || "", 26).split("\n");
+      return Math.max(...lines.map(l => l.length));
     }));
-    return Math.max(60, maxLineLength * 6.5 + 5);
+    return Math.max(45, Math.min(135, Math.ceil(maxLineLength * 5.2) + 6));
   }, [items, type, config]);
 
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={height}
-      xAxisTitle={type === "vertical" ? config.x_axis_title : undefined}
-      yAxisTitle={type === "vertical" ? config.y_axis_title : undefined}
+      height={dynamicHeight}
+      xAxisTitle={resolvedXAxisTitle}
+      yAxisTitle={resolvedYAxisTitle}
     >
       <RBarChart
         data={items}
-        margin={DEFAULTS.MARGIN}
-        barCategoryGap="18%"
+        margin={type === "vertical" ? { top: 4, right: 12, bottom: 2, left: 4 } : DEFAULTS.MARGIN}
+        barCategoryGap={6}
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
       >
@@ -629,7 +909,11 @@ const BarChartMultiple = ({
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RTooltip
+          content={<ChartTooltip config={config} formatter={formatters?.tooltipFormatter} />}
+          cursor={{ fill: "rgba(0,0,0,0.06)" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+        />
         <RLegend
           verticalAlign="top"
           align="center"
@@ -641,7 +925,7 @@ const BarChartMultiple = ({
             dataKey={col.key}
             name={col.label}
             fill={(config.colors && config.colors[col.key]) || DEFAULT_COLORS[idx % DEFAULT_COLORS.length]}
-            barSize={DEFAULTS.BAR_SIZE || 24}
+            barSize={type === "vertical" ? (config.columns?.length > 1 ? 10 : 14) : (DEFAULTS.BAR_SIZE || 24)}
             isAnimationActive={false}
           />
         ))}
@@ -718,16 +1002,65 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   const legendPrimaryLabel = hasComparator ? `${finalPrimaryLabel} (left)` : finalPrimaryLabel;
   const legendComparatorLabel = `${comparatorLabel} (right)`;
 
+  const resolvedYAxisTitle = React.useMemo(
+    () => formatAxisTitleWithUnit(config.y_axis_title, config.units),
+    [config.y_axis_title, config.units]
+  );
+
+  const comparatorUnit =
+    config.comparatorUnits || (config.units !== "%" ? config.units : "");
+
+  const resolvedRightYAxisTitle = React.useMemo(
+    () =>
+      hasComparator
+        ? formatAxisTitleWithUnit(comparatorLabel, comparatorUnit)
+        : null,
+    [hasComparator, comparatorLabel, comparatorUnit]
+  );
+
+  const maxLeftTickLen = React.useMemo(() => {
+    const vals = items.map((i) => i.value).filter((v) => v !== null && v !== undefined && !isNaN(Number(v)));
+    if (!vals.length) return 3;
+    const maxVal = Math.max(...vals.map((v) => Math.abs(Number(v))));
+    const formatted = formatter(maxVal);
+    return Math.max(3, formatted.length);
+  }, [items]);
+
+  const leftYAxisWidth = Math.max(28, Math.min(56, maxLeftTickLen * 6.8 + 8));
+
+  const maxRightTickLen = React.useMemo(() => {
+    if (!hasComparator) return 0;
+    const vals = items.map((i) => i[comparatorKey]).filter((v) => v !== null && v !== undefined && !isNaN(Number(v)));
+    if (!vals.length) return 3;
+    const maxVal = Math.max(...vals.map((v) => Math.abs(Number(v))));
+    const formatted = formatter(maxVal);
+    return Math.max(3, formatted.length);
+  }, [items, hasComparator, comparatorKey]);
+
+  const rightYAxisWidth = hasComparator
+    ? Math.max(28, Math.min(56, maxRightTickLen * 6.8 + 8))
+    : 0;
+
+  const chartMargin = React.useMemo(
+    () => ({
+      top: 6,
+      right: hasComparator ? 6 : 10,
+      bottom: 2,
+      left: 6,
+    }),
+    [hasComparator]
+  );
+
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Line chart"}
       title={config.title}
       height={height}
       xAxisTitle={config.x_axis_title}
-      yAxisTitle={config.y_axis_title}
-      rightYAxisTitle={hasComparator ? (config.comparatorLabel || "Comparator") : null}
+      yAxisTitle={resolvedYAxisTitle}
+      rightYAxisTitle={resolvedRightYAxisTitle}
     >
-      <RLineChart data={items} margin={DEFAULTS.MARGIN}>
+      <RLineChart data={items} margin={chartMargin}>
         <RCartesianGrid {...DEFAULTS.GRID} />
         <RXAxis
           dataKey="label"
@@ -740,9 +1073,10 @@ const LineSeriesChart = ({ config, data, formatters }) => {
         <RYAxis
           yAxisId="left"
           allowDecimals={true}
-          tickFormatter={primaryFormatter}
+          tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-          width={DEFAULTS.DIMENSIONS.yAxisWidth}
+          width={leftYAxisWidth}
+          tickMargin={4}
         />
         {hasComparator && (
           <RYAxis
@@ -751,21 +1085,14 @@ const LineSeriesChart = ({ config, data, formatters }) => {
             allowDecimals={true}
             tickFormatter={formatter}
             tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-            width={DEFAULTS.DIMENSIONS.yAxisWidth}
+            width={rightYAxisWidth}
+            tickMargin={4}
           />
         )}
         <RTooltip
-          formatter={(value, name) => {
-            const isComparator = name === legendComparatorLabel || name === (config.comparatorKey || "dmValue");
-            const str = formatter(value);
-            const unit = config.units && config.units !== "none" ? config.units : "";
-
-            if (!isComparator && str && unit) {
-              return str + unit;
-            }
-            return str;
-          }}
+          content={<ChartTooltip config={config} />}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         {hasComparator && (
           <RLegend
@@ -868,15 +1195,31 @@ const MultipleLineChart = ({ config, data, formatters }) => {
     firstItem: items[0]
   });
 
+  const maxTickLen = React.useMemo(() => {
+    let max = 3;
+    items.forEach((item) => {
+      (config.columns || []).forEach((col) => {
+        const val = item[col.key];
+        if (val !== null && val !== undefined && !isNaN(Number(val))) {
+          const len = formatter(Math.abs(Number(val))).length;
+          if (len > max) max = len;
+        }
+      });
+    });
+    return max;
+  }, [items, config.columns]);
+
+  const yAxisWidth = Math.max(28, Math.min(56, maxTickLen * 6.8 + 8));
+
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Multiple Line chart"}
       title={config.title}
       height={height}
       xAxisTitle={config.x_axis_title}
-      yAxisTitle={config.y_axis_title}
+      yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
     >
-      <RLineChart data={items} margin={DEFAULTS.MARGIN}>
+      <RLineChart data={items} margin={{ top: 6, right: 10, bottom: 2, left: 6 }}>
         <RCartesianGrid {...DEFAULTS.GRID} />
         <RXAxis
           dataKey={config.xKey || "label"}
@@ -891,11 +1234,13 @@ const MultipleLineChart = ({ config, data, formatters }) => {
           domain={dataDomain}
           tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-          width={70}
+          width={yAxisWidth}
+          tickMargin={4}
         />
         <RTooltip
-          formatter={formatter}
+          content={<ChartTooltip config={config} />}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RLegend
           verticalAlign="top"
@@ -955,6 +1300,8 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
       ariaLabel={config.ariaLabel || "Area chart"}
       title={config.title}
       height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
     >
       <RAreaChart data={items} margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
@@ -973,8 +1320,9 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          formatter={formatter}
+          content={<ChartTooltip config={config} />}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RArea
           type="monotone"
@@ -1018,6 +1366,8 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
       ariaLabel={config.ariaLabel || "Scatter chart"}
       title={config.title}
       height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
     >
       <RScatterChart margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
@@ -1039,8 +1389,9 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
+          content={<ChartTooltip config={config} />}
           cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
-          formatter={formatter}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RScatter data={items} fill={fill} />
       </RScatterChart>
@@ -1074,11 +1425,16 @@ const DonutPieChart = ({ config, data, formatters }) => {
     >
       <RPieChart>
         <RTooltip
-          formatter={(value, name, props) => {
-            const n = Number(value);
-            const formatted = Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
-            return [formatted + ` (${pctFmt(value)})`, props?.payload?.label || name];
-          }}
+          content={
+            <ChartTooltip
+              config={config}
+              formatter={(value, name, item) => {
+                const formatted = formatValueWithUnit(value, config.units);
+                return `${formatted} (${pctFmt(value)})`;
+              }}
+            />
+          }
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RLegend
           verticalAlign="bottom"
