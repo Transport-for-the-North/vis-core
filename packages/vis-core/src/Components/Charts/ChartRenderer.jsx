@@ -472,8 +472,8 @@ const ChartSection = ({
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              width: yAxisObj.unit ? 26 : 16,
-              marginRight: 6,
+              width: yAxisObj.unit ? 30 : 20,
+              marginRight: 14,
             }}
           >
             <AxisLabel
@@ -506,8 +506,8 @@ const ChartSection = ({
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              width: rightYAxisObj.unit ? 26 : 16,
-              marginLeft: 6,
+              width: rightYAxisObj.unit ? 30 : 20,
+              marginLeft: 14,
             }}
           >
             <AxisLabel
@@ -722,7 +722,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
       const lines = wrapLabel(i.label || "", 26).split("\n");
       return Math.max(...lines.map(l => l.length));
     }));
-    return Math.max(45, Math.min(135, Math.ceil(maxLineLength * 5.2) + 6));
+    return Math.max(50, Math.min(145, Math.ceil(maxLineLength * 5.6) + 10));
   }, [items, type]);
 
   return (
@@ -735,7 +735,7 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
     >
       <RBarChart
         data={items}
-        margin={type === "vertical" ? { top: 4, right: 12, bottom: 2, left: 4 } : DEFAULTS.MARGIN}
+        margin={type === "vertical" ? { top: 4, right: 12, bottom: 2, left: 8 } : DEFAULTS.MARGIN}
         barCategoryGap={6}
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
@@ -857,7 +857,7 @@ const BarChartMultiple = ({
       const lines = wrapLabel(i[config.xKey || "label"] || "", 26).split("\n");
       return Math.max(...lines.map(l => l.length));
     }));
-    return Math.max(45, Math.min(135, Math.ceil(maxLineLength * 5.2) + 6));
+    return Math.max(50, Math.min(145, Math.ceil(maxLineLength * 5.6) + 10));
   }, [items, type, config]);
 
   return (
@@ -870,7 +870,7 @@ const BarChartMultiple = ({
     >
       <RBarChart
         data={items}
-        margin={type === "vertical" ? { top: 4, right: 12, bottom: 2, left: 4 } : DEFAULTS.MARGIN}
+        margin={type === "vertical" ? { top: 4, right: 12, bottom: 2, left: 8 } : DEFAULTS.MARGIN}
         barCategoryGap={6}
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
@@ -1026,7 +1026,7 @@ const LineSeriesChart = ({ config, data, formatters }) => {
     return Math.max(3, formatted.length);
   }, [items]);
 
-  const leftYAxisWidth = Math.max(28, Math.min(56, maxLeftTickLen * 6.8 + 8));
+  const leftYAxisWidth = Math.max(34, Math.min(65, maxLeftTickLen * 7.2 + 10));
 
   const maxRightTickLen = React.useMemo(() => {
     if (!hasComparator) return 0;
@@ -1038,15 +1038,15 @@ const LineSeriesChart = ({ config, data, formatters }) => {
   }, [items, hasComparator, comparatorKey]);
 
   const rightYAxisWidth = hasComparator
-    ? Math.max(28, Math.min(56, maxRightTickLen * 6.8 + 8))
+    ? Math.max(34, Math.min(65, maxRightTickLen * 7.2 + 10))
     : 0;
 
   const chartMargin = React.useMemo(
     () => ({
       top: 6,
-      right: hasComparator ? 6 : 10,
+      right: hasComparator ? 8 : 12,
       bottom: 2,
-      left: 6,
+      left: 10,
     }),
     [hasComparator]
   );
@@ -1209,7 +1209,7 @@ const MultipleLineChart = ({ config, data, formatters }) => {
     return max;
   }, [items, config.columns]);
 
-  const yAxisWidth = Math.max(28, Math.min(56, maxTickLen * 6.8 + 8));
+  const yAxisWidth = Math.max(34, Math.min(65, maxTickLen * 7.2 + 10));
 
   return (
     <ChartSection
@@ -1219,7 +1219,7 @@ const MultipleLineChart = ({ config, data, formatters }) => {
       xAxisTitle={config.x_axis_title}
       yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
     >
-      <RLineChart data={items} margin={{ top: 6, right: 10, bottom: 2, left: 6 }}>
+      <RLineChart data={items} margin={{ top: 6, right: 12, bottom: 2, left: 10 }}>
         <RCartesianGrid {...DEFAULTS.GRID} />
         <RXAxis
           dataKey={config.xKey || "label"}
