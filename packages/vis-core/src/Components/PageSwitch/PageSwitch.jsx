@@ -320,6 +320,9 @@ export const PageSwitch = ({ pageConfig, customPageComponent = null }) => {
                 <SVGGalleryManager config={pageConfig.config} />
               </FilterProvider>
             );
+          // Note: "AdminPage" is intentionally not handled here. BaseApp removes it from
+          // appPages and mounts it directly at /admin (via withRoleValidation), so it never
+          // flows through PageSwitch.
           default:
             return <div>Nothing</div>;
         }

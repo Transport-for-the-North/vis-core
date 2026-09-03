@@ -44,7 +44,7 @@ import { useWindowWidth } from "hooks/useWindowWidth";
   */
 export const HomePage = () => {
   const appContext = useContext(AppContext);
-  const { footer, homePageFragments } = appContext;
+  const { footer, homePageFragments, homePageComponents } = appContext;
   const useLegacyHomePage = appContext?.useLegacyHomePage === undefined ? true : appContext.useLegacyHomePage === true || appContext.useLegacyHomePage === "true";
   // Changed fragmentsContent to be an array that corresponds to homePageFragments order.
   const [fragmentsContent, setFragmentsContent] = useState([]);
@@ -364,6 +364,12 @@ export const HomePage = () => {
             )}
           </>
         )}
+
+        {/* App-supplied sections. `homePageComponents` is a list of React components
+            provided by the app config, letting an app add domain-specific homepage content
+            (which vis-core knows nothing about) without modifying this component. */}
+        {Array.isArray(homePageComponents) &&
+          homePageComponents.map((Component, idx) => <Component key={idx} />)}
 
         {/* Contact Section */}
         {appContext.contactText && appContext.contactEmail && (

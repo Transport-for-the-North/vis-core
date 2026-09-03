@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import { AppContext } from "contexts/AppContext";
 import { useAuth } from "contexts/AuthProvider";
 import { useWindowWidth } from "hooks/useWindowWidth";
 import { buildNavbarLinks, validateAppConfigAgainstOpenApi } from "utils";
+import { getAppName } from "../../runtime";
 import { Button } from "./Button";
 import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
@@ -79,8 +82,33 @@ export function Navbar() {
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
+  // Determine if the current user has an admin role to show adminOnly pages.
+  const navToken = Cookies.get('token');
+  let navUserRoles = navToken
+    ? jwtDecode(navToken)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || []
+    : [];
+  if (typeof navUserRoles === 'string') navUserRoles = [navUserRoles];
+  const lowerNavRoles = navUserRoles.map(r => r.toLowerCase());
+  const navAppName = (getAppName() || '').toLowerCase();
+  // Show admin-only nav/pages to admins (`<app>_admin`/`all_admin`) and superusers
+  // (`<app>_superuser`/`all_superuser`) of THIS app. Another app's roles are not accepted.
+  const isAdmin = lowerNavRoles.some(r =>
+    r === `${navAppName}_admin` || r === 'all_admin' ||
+    r === `${navAppName}_superuser` || r === 'all_superuser'
+  );
+
+  const navAppContext = {
+    ...appContext,
+    appPages: appContext.appPages.filter(page => !page.adminOnly || isAdmin),
+  };
+
   // Build unified links array from shared function.
-  const links = buildNavbarLinks(appContext);
+  const links = buildNavbarLinks(navAppContext);
+
+  // Inject Admin link for admin users when the app has an adminPage config.
+  if (appContext.adminPage && isAdmin) {
+    links.splice(1, 0, { label: "Admin", url: "/admin", navbarLinkBgColour: "#7317de" });
+  }
 
   // Determine mobile view based on links length and window width.
   const MOBILE_BREAKPOINT = 768;
