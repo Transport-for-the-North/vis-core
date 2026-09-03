@@ -27,9 +27,26 @@ const UPDATE_MARKER_TIMEOUT_MS = 2800;
  */
 const mobileMQ = (p) => p.theme?.mq?.mobile || MOBILE_Q;
 
-const StyledScrollableContainer = styled.div`
+const StackWrapper = styled.div`
   position: absolute;
   right: 0;
+  display: ${({ $hidden }) => ($hidden ? "none" : "flex")};
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 1000;
+  width: fit-content;
+  pointer-events: none;
+
+  @media ${mobileMQ} {
+    position: static;
+    right: auto;
+    align-items: stretch;
+    width: 100%;
+  }
+`;
+
+const StyledScrollableContainer = styled.div`
+  position: relative;
   display: ${({ $hidden }) => ($hidden ? "none" : "flex")};
   flex-direction: column;
   align-items: flex-end;
@@ -42,6 +59,7 @@ const StyledScrollableContainer = styled.div`
   overflow-x: hidden;
   width: fit-content;
   transition: transform 0.3s ease-in-out;
+  pointer-events: auto;
 
   @media ${mobileMQ} {
     position: static;
@@ -66,25 +84,20 @@ const StyledScrollableContainer = styled.div`
 `;
 
 /**
- * Sticky wrapper keeps the pill above card content while avoiding a full-width
- * button visual. Width is only used for positioning; the pill itself remains compact.
+ * Wrapper for the overflow hint pill rendered outside the scrollable card list,
+ * preventing it from covering card content.
  */
 const OverflowHintWrap = styled.div`
-  position: sticky;
-  bottom: 10px;
-
   display: ${({ $visible }) => ($visible ? "flex" : "none")};
   justify-content: center;
-  align-self: stretch;
-  padding-top: 10px;
-
-  z-index: 4000;
+  align-self: center;
+  width: 100%;
+  padding: 4px 0 8px 0;
+  z-index: 1001;
   pointer-events: none;
 
   @media ${mobileMQ} {
-    bottom: 8px;
-    margin-top: 8px;
-    padding-top: 10px;
+    padding: 6px 0;
   }
 `;
 
@@ -726,8 +739,8 @@ export const ScrollableContainer = ({
             className="selectable-text"
           >
             {renderChildren(true)}
-            {renderOverflowHint()}
           </StyledScrollableContainer>
+          {open && renderOverflowHint()}
         </>,
         mobilePortalSlot
       );
@@ -748,16 +761,18 @@ export const ScrollableContainer = ({
         </MobileBar>
       )}
 
-      <StyledScrollableContainer
-        ref={scrollRef}
-        $open={isMobile ? open : true}
-        $hidden={hidden}
-        data-testid="container"
-        className="selectable-text"
-      >
-        {renderChildren(isMobile)}
+      <StackWrapper $hidden={hidden}>
+        <StyledScrollableContainer
+          ref={scrollRef}
+          $open={isMobile ? open : true}
+          $hidden={hidden}
+          data-testid="container"
+          className="selectable-text"
+        >
+          {renderChildren(isMobile)}
+        </StyledScrollableContainer>
         {renderOverflowHint()}
-      </StyledScrollableContainer>
+      </StackWrapper>
     </div>
   );
 };
