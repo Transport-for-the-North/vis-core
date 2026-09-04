@@ -301,4 +301,80 @@ describe("ChartRenderer", () => {
 
     unmount();
   });
+
+  it("renders a multiple_line chart with sector series and legend", () => {
+    const charts = [
+      {
+        type: "multiple_line",
+        title: "Floorspace Over Time",
+        x_axis_title: "Year",
+        y_axis_title: "Floorspace",
+        units: "sqm",
+        columns: [
+          { key: "Retail", label: "Retail" },
+          { key: "Office", label: "Office" },
+        ],
+      },
+    ];
+
+    const data = [
+      { label: "2023", Retail: 15000, Office: 25000 },
+      { label: "2028", Retail: 16000, Office: 28000 },
+    ];
+
+    render(<ChartRenderer charts={charts} data={data} />);
+
+    expect(screen.getByRole("region", { name: "Multiple Line chart" })).toBeInTheDocument();
+    expect(screen.getByText("Floorspace Over Time")).toBeInTheDocument();
+    expect(screen.getByText("Floorspace")).toBeInTheDocument();
+    expect(screen.getByText("/ sqm")).toBeInTheDocument();
+    expect(screen.getByText("Year")).toBeInTheDocument();
+  });
+
+  it("renders multiple_line chart when all values are zero (e.g. difference mode zero change)", () => {
+    const charts = [
+      {
+        type: "multiple_line",
+        title: "Floorspace Difference Over Time",
+        x_axis_title: "Year",
+        y_axis_title: "Floorspace (Difference)",
+        units: "sqm",
+        columns: [
+          { key: "Retail", label: "Retail" },
+          { key: "Office", label: "Office" },
+        ],
+      },
+    ];
+
+    const data = [
+      { label: "2023", Retail: 0, Office: 0 },
+      { label: "2028", Retail: 0, Office: 0 },
+    ];
+
+    render(<ChartRenderer charts={charts} data={data} />);
+
+    expect(screen.getByRole("region", { name: "Multiple Line chart" })).toBeInTheDocument();
+    expect(screen.getByText("Floorspace Difference Over Time")).toBeInTheDocument();
+    expect(screen.getByText("Floorspace (Difference)")).toBeInTheDocument();
+    expect(screen.getByText("/ sqm")).toBeInTheDocument();
+  });
+
+  it("returns null when multiple_line data only has label keys and no metric series", () => {
+    const charts = [
+      {
+        type: "multiple_line",
+        title: "Floorspace Over Time",
+        columns: [],
+      },
+    ];
+
+    const data = [
+      { label: "2023" },
+      { label: "2028" },
+    ];
+
+    const { container } = render(<ChartRenderer charts={charts} data={data} />);
+    expect(container.firstChild).toBeNull();
+  });
 });
+

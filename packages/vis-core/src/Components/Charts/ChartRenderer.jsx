@@ -1184,16 +1184,6 @@ const MultipleLineChart = ({ config, data, formatters }) => {
     dataDomain = ['auto', 0];
   }
 
-  // DEBUGGING: Log to console so user can check
-  console.log("MultipleLineChart render:", {
-    itemsCount: items.length,
-    columns: config.columns,
-    hasNegative,
-    hasPositive,
-    hasOnlyZero,
-    dataDomain,
-    firstItem: items[0]
-  });
 
   const maxTickLen = React.useMemo(() => {
     let max = 3;
@@ -1708,13 +1698,22 @@ export const ChartRenderer = ({
   const f = { ...defaultFormatters, ...formatters };
 
   // Determine if data has values
+  const isMultipleLine = charts.some(
+    (c) => (c.type || "").toLowerCase() === "multiple_line"
+  );
   const hasAny = Array.isArray(data)
     ? data.length > 0 &&
-      data.some((row) =>
-        Object.entries(row)
-          .filter(([k]) => k !== (charts[0]?.xKey || "label"))
-          .some(([, v]) => Number(v) !== 0)
-      )
+      (isMultipleLine
+        ? data.some((row) =>
+            Object.entries(row)
+              .filter(([k]) => k !== (charts[0]?.xKey || "label"))
+              .some(([, v]) => v !== null && v !== undefined && !isNaN(Number(v)))
+          )
+        : data.some((row) =>
+            Object.entries(row)
+              .filter(([k]) => k !== (charts[0]?.xKey || "label"))
+              .some(([, v]) => Number(v) !== 0)
+          ))
     : data && Object.values(data).some((v) => Number(v) !== 0);
 
   if (!hasAny) return null;
