@@ -231,6 +231,7 @@ export const useFetchVisualisationData = (
   // Cache for API responses based on query string
   const responseCache = useRef(new Map());
   const maxCacheSize = 20; // Limit cache to avoid excessive memory usage
+  const MIN_CACHE_LOADING_MS = 300;
 
   // Track abort controller for request cancellation
   const abortControllerRef = useRef(null);
@@ -398,17 +399,14 @@ export const useFetchVisualisationData = (
         // Create a cache key based on the request (including bbox when present)
         const cacheKey = JSON.stringify({ path, queryParamsForApi, pathParamsForApi });
 
-        // Check cache first — BEFORE setting loading state.
-        // Setting loading(true) before this check and then clearing it after 50ms (via
-        // setTimeout) would cause the global isLoading flag to flicker true→false
-        // while other visualisations are still mid-fetch, prematurely hiding the Dimmer.
-        // Cache hits are near-instant, so they don't warrant a loading indicator.
+        // Check cache first.
+        // For cache hits, keep the existing loading UI visible for a minimum
+        // duration so users still get clear feedback that the action applied.
         if (responseCache.current.has(cacheKey)) {
           const cachedData = responseCache.current.get(cacheKey);
           
-          // Use a small async gap so React can paint the current frame before we
-          // swap data in. This avoids a visible tile-swap flash on cache hits without
-          // affecting the shared loading state.
+          // Keep the existing loading UI visible briefly before applying
+          // the cached data so users can see that their action was registered.
           cacheTimeoutRef.current = setTimeout(() => {
             if (currentShouldFilter && Array.isArray(cachedData)) {
               lastFetchedBboxRef.current = fetchBbox;
@@ -436,7 +434,7 @@ export const useFetchVisualisationData = (
             
             // Ensure loading is cleared in case a previous real fetch left it true.
             setLoading(false);
-          }, 50);
+          }, MIN_CACHE_LOADING_MS);
           
           return;
         }

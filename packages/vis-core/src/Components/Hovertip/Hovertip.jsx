@@ -12,7 +12,15 @@ import { createPortal } from 'react-dom';
  * @param {boolean} props.alignVertical - Whether to align the hovertip vertically with the middle of the refElement.
  * @returns {JSX.Element|null} The rendered Hovertip component.
  */
-export const Hovertip = ({ isVisible, displayText, side, refElement, offset = 5, alignVertical = true }) => {
+export const Hovertip = ({
+  isVisible,
+  displayText,
+  side,
+  refElement,
+  offset = 5,
+  alignVertical = true,
+  tooltipId,
+}) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const hovertipRef = useRef(null);
 
@@ -51,17 +59,21 @@ export const Hovertip = ({ isVisible, displayText, side, refElement, offset = 5,
     position: 'absolute',
     top: `${position.top}px`,
     left: `${position.left}px`,
-    backgroundColor: 'black',
-    color: 'white',
-    padding: '5px',
+    backgroundColor: 'var(--palette-navy, #0d0f3d)',
+    color: 'var(--palette-white, #ffffff)',
+    fontFamily: 'var(--font-sans)',
+    padding: '6px 10px',
     borderRadius: '6px',
-    fontSize: '0.8em',
+    fontSize: '0.8rem',
+    lineHeight: '1.35',
     zIndex: 9999,
-    maxWidth: '15rem'
+    maxWidth: '15rem',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+    pointerEvents: 'none',
   };
 
   return createPortal(
-    <div ref={hovertipRef} style={style}>
+    <div ref={hovertipRef} style={style} role="tooltip" id={tooltipId}>
       {displayText}
     </div>,
     document.body

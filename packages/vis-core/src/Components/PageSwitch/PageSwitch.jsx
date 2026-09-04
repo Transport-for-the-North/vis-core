@@ -12,9 +12,11 @@ import { bngToWgs84 } from "utils/coordinates";
 
 const FormPageWrapper = styled.div`
   display: flex;
-  height: calc(100vh - 75px);
-  overflow: hidden;
+  height: ${props => props.$centered ? 'auto' : 'calc(100vh - 75px)'};
+  min-height: calc(100vh - 75px);
+  overflow: ${props => props.$centered ? 'auto' : 'hidden'};
   justify-content: ${props => props.$centered ? 'center' : 'flex-start'};
+  align-items: ${props => props.$centered ? 'flex-start' : 'stretch'};
   background: ${props => props.$centered ? '#fafafa' : 'transparent'};
   
   @media (max-width: 1024px) {
@@ -29,15 +31,15 @@ const FormPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 32px;
-  width: ${props => props.$centered ? '600px' : '480px'};
+  width: ${props => props.$centered ? '640px' : '480px'};
   min-width: ${props => props.$centered ? '400px' : '400px'};
-  max-width: ${props => props.$centered ? '700px' : '520px'};
+  max-width: ${props => props.$centered ? '720px' : '520px'};
   background: ${props => props.$centered ? '#fff' : '#fafafa'};
   border-right: ${props => props.$centered ? 'none' : '1px solid #e5e5e5'};
   border-radius: ${props => props.$centered ? '12px' : '0'};
   box-shadow: ${props => props.$centered ? '0 4px 20px rgba(0, 0, 0, 0.08)' : 'none'};
   margin: ${props => props.$centered ? '32px 0' : '0'};
-  overflow-y: auto;
+  overflow-y: ${props => props.$centered ? 'visible' : 'auto'};
   flex-shrink: 0;
   
   @media (max-width: 1024px) {
@@ -84,6 +86,13 @@ const MapPreviewWrapper = styled.div`
   min-height: 0;
 `;
 
+const InlineMapPreview = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 8px 0;
+`;
+
 const FormPageTitle = styled.h1`
   font-size: 1.5rem;
   font-weight: 600;
@@ -99,7 +108,27 @@ const FormPageDescription = styled.p`
 `;
 
 /**
- * FormPageContent - Internal component that manages form state and map preview
+ * Last easting/northing or lat/lng field in form order — used to place the inline map.
+ */
+const getMapAnchorFieldId = (fields = [], isBngMode, eastingFieldId, northingFieldId) => {
+  const anchorIds = new Set();
+  if (isBngMode) {
+    if (eastingFieldId) anchorIds.add(eastingFieldId);
+    if (northingFieldId) anchorIds.add(northingFieldId);
+  } else {
+    const coordField = fields.find((f) => f.type === 'coordinates');
+    if (coordField?.id) anchorIds.add(coordField.id);
+  }
+  if (anchorIds.size === 0) return null;
+  return [...fields].reverse().find((f) => anchorIds.has(f.id))?.id ?? null;
+};
+
+/**
+ * FormPageContent - Internal component that manages form state and map preview.
+ *
+ * Map preview layout is controlled by `pageConfig.config.mapPreviewLayout`:
+ * - `'inline'` (default): centred form with the map under the coordinate fields
+ * - `'sidebar'`: form on the left, map filling the rest of the page
  */
 const FormPageContent = ({ pageConfig }) => {
   const [coordinates, setCoordinates] = useState({ lat: '', lng: '' });
@@ -108,12 +137,19 @@ const FormPageContent = ({ pageConfig }) => {
   
   // Check if using BNG coordinate system
   const isBngMode = pageConfig.config?.coordinateSystem === 'BNG';
-  const eastingFieldId = pageConfig.config?.formConfig?.fields?.find(
+  const formFields = pageConfig.config?.formConfig?.fields || [];
+  const eastingFieldId = formFields.find(
     (f) => f.name === 'easting' || f.id === 'easting'
   )?.id;
-  const northingFieldId = pageConfig.config?.formConfig?.fields?.find(
+  const northingFieldId = formFields.find(
     (f) => f.name === 'northing' || f.id === 'northing'
   )?.id;
+  const mapAnchorFieldId = getMapAnchorFieldId(
+    formFields,
+    isBngMode,
+    eastingFieldId,
+    northingFieldId
+  );
   
   const handleCoordinateChange = useCallback((newCoords) => {
     // For regular lat/lng coordinate changes
@@ -166,19 +202,48 @@ const FormPageContent = ({ pageConfig }) => {
   }, [isBngMode, eastingFieldId, northingFieldId, handleBngCoordinateChange]);
   
   const showMapPreview = pageConfig.config?.showMapPreview !== false;
+  const mapPreviewLayout = pageConfig.config?.mapPreviewLayout === 'sidebar'
+    ? 'sidebar'
+    : 'inline';
+  const isInlineMap = showMapPreview && mapPreviewLayout === 'inline';
+  const isSidebarMap = showMapPreview && mapPreviewLayout === 'sidebar';
+  const isCentered = !isSidebarMap;
   const enableClickToSelect = !isBngMode && pageConfig.config?.enableClickToSelect !== false;
+  const inlineMapHeight = pageConfig.config?.mapPreviewHeight || '280px';
   
-  // Determine map title
   const getMapTitle = () => {
     if (isBngMode) {
       return 'Site Location Preview';
     }
     return 'Location Preview';
   };
+
+  const mapPreview = (
+    <CoordinatePreviewMap
+      lat={coordinates.lat}
+      lng={coordinates.lng}
+      height={isInlineMap ? inlineMapHeight : '100%'}
+      zoom={pageConfig.config?.mapPreviewZoom || 13}
+      markerColor={pageConfig.config?.bgColor || '#dc2626'}
+      clickToSelect={enableClickToSelect}
+      onMapClick={handleMapClick}
+    />
+  );
+
+  const inlineMap = (
+    <InlineMapPreview data-testid="form-page-map-inline">
+      <MapPreviewTitle>{getMapTitle()}</MapPreviewTitle>
+      {mapPreview}
+    </InlineMapPreview>
+  );
+
+  const afterFieldContent = isInlineMap && mapAnchorFieldId
+    ? { [mapAnchorFieldId]: inlineMap }
+    : undefined;
   
   return (
-    <FormPageWrapper $centered={!showMapPreview}>
-      <FormPageContainer $centered={!showMapPreview}>
+    <FormPageWrapper $centered={isCentered}>
+      <FormPageContainer $centered={isCentered}>
         {pageConfig.pageTitle && (
           <FormPageTitle>{pageConfig.pageTitle}</FormPageTitle>
         )}
@@ -193,21 +258,15 @@ const FormPageContent = ({ pageConfig }) => {
           onCoordinateChange={handleCoordinateChange}
           externalCoordinates={mapClickedCoords}
           onFieldChange={handleFormFieldChange}
+          afterFieldContent={afterFieldContent}
         />
+        {isInlineMap && !mapAnchorFieldId && inlineMap}
       </FormPageContainer>
-      {showMapPreview && (
-        <MapPreviewContainer>
+      {isSidebarMap && (
+        <MapPreviewContainer data-testid="form-page-map-sidebar">
           <MapPreviewTitle>{getMapTitle()}</MapPreviewTitle>
           <MapPreviewWrapper>
-            <CoordinatePreviewMap
-              lat={coordinates.lat}
-              lng={coordinates.lng}
-              height="100%"
-              zoom={pageConfig.config?.mapPreviewZoom || 13}
-              markerColor={pageConfig.config?.bgColor || '#dc2626'}
-              clickToSelect={enableClickToSelect}
-              onMapClick={handleMapClick}
-            />
+            {mapPreview}
           </MapPreviewWrapper>
         </MapPreviewContainer>
       )}

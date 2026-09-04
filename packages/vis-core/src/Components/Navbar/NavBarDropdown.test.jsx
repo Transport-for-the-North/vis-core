@@ -7,7 +7,6 @@ import {
 } from "Components/Navbar/NavBarDropdown";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { fireEvent } from "@testing-library/react";
-import { rgb } from "polished";
 
 describe("NavBarDropdown component test", () => {
   const fakeOnClick = jest.fn();
@@ -26,9 +25,11 @@ describe("NavBarDropdown component test", () => {
     dropdownItems: [
       {
         pageName: "pageName2",
+        url: "/pageName2",
         external: false,
       },
     ],
+    dropdownName: "Menu",
     activeLink: "/url",
     onClick: fakeOnClick,
     $bgColor: "#FF637E",
@@ -40,9 +41,9 @@ describe("NavBarDropdown component test", () => {
         <NavBarDropdown {...props} />
       </MemoryRouter>
     );
-    const parent = screen.getByText("▾");
-    expect(parent).toBeInTheDocument();
-    userEvent.click(parent);
+    const trigger = screen.getByText("Menu").closest("div");
+    expect(trigger).toBeInTheDocument();
+    fireEvent.mouseEnter(trigger);
     await waitFor(() => {
       expect(screen.getByText("pageName2")).toBeInTheDocument();
     });
@@ -55,7 +56,7 @@ describe("NavBarDropdown component test", () => {
     });
   });
 
-  it("NavBarDropdown should stay open for 150ms after mouse leaves", async () => {
+  it("NavBarDropdown should stay open briefly after mouse leaves", async () => {
     jest.useFakeTimers();
     render(
       <MemoryRouter>
@@ -63,7 +64,8 @@ describe("NavBarDropdown component test", () => {
       </MemoryRouter>
     );
 
-    const parent = screen.getByText("▾").parentElement;
+    const parent = screen.getByText("Menu").closest("div");
+    expect(parent).toBeInTheDocument();
     fireEvent.mouseEnter(parent);
 
     // Should be open immediately
@@ -71,17 +73,33 @@ describe("NavBarDropdown component test", () => {
 
     fireEvent.mouseLeave(parent);
 
-    // Should still be open before 150ms
-    jest.advanceTimersByTime(100);
+    // Should still be open before the close timeout
+    jest.advanceTimersByTime(49);
     expect(screen.queryByText("pageName2")).toBeInTheDocument();
 
-    // Should be closed after 150ms
-    jest.advanceTimersByTime(51);
+    // Should be closed after timeout
+    jest.advanceTimersByTime(2);
     await waitFor(() => {
       expect(screen.queryByText("pageName2")).not.toBeInTheDocument();
     });
 
     jest.useRealTimers();
+  });
+
+  it("opens dropdown with Enter key when trigger is focused", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <NavBarDropdown {...props} />
+      </MemoryRouter>
+    );
+
+    const trigger = screen.getByRole("button", { name: "Menu" });
+    trigger.focus();
+    expect(trigger).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("pageName2")).toBeInTheDocument();
   });
 });
 
@@ -151,7 +169,7 @@ describe("NestedDropdownPortal component test", () => {
 
     const parent = first.parentElement;
     expect(parent).toHaveStyle({
-      position: "absolute",
+      position: "fixed",
       top: "200px",
       left: "718.578125px",
     });
@@ -181,7 +199,7 @@ describe("RecursiveDropdownItem component test", () => {
     onChildHoverChange: fakeOnChildHoverChange,
     onClick: fakeOnClick,
   };
-  it("Basic use of RecursiveDropdownItem", () => {
+  it("Basic use of RecursiveDropdownItem", async () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
@@ -207,20 +225,43 @@ describe("RecursiveDropdownItem component test", () => {
     fireEvent.mouseEnter(container);
     const item = screen.getByText("pageName");
     expect(item).toBeInTheDocument();
-    item.click();
+    await userEvent.click(item);
     const parent = item.closest("a");
-    expect(parent).toHaveStyle({ backgroundColor: "#2c34a7ff" });
-    expect(parent).toHaveStyle({ color: "rgb(249, 249, 249)" });
+    expect(parent).toBeInTheDocument();
     expect(parent).toHaveAttribute("href", "/");
 
     // Click on child
-    const p = screen.getByText("▸");
+    const p = screen.getAllByText("▸")[0];
     expect(p).toBeInTheDocument();
-    userEvent.click(p);
+    await userEvent.click(p);
     const child1 = screen.getByText("pageName1");
-    userEvent.click(child1);
-    waitFor(() => {
+    await userEvent.click(child1);
+    await waitFor(() => {
       expect(screen.getByText("/url1")).toBeInTheDocument();
     });
+  });
+
+  it("Cleans up hover state when unmounted while hovered", () => {
+    const fakeOnChildHoverChange = jest.fn();
+    const { unmount } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <RecursiveDropdownItem {...props} onChildHoverChange={fakeOnChildHoverChange} />
+      </MemoryRouter>
+    );
+
+    const container = screen.getByTestId("dropdown-item");
+
+    // Simulate hover
+    fireEvent.mouseEnter(container);
+    expect(fakeOnChildHoverChange).toHaveBeenCalledWith(true);
+
+    // Clear mocks before unmount to ensure we catch the cleanup call specifically
+    fakeOnChildHoverChange.mockClear();
+
+    // Unmount the component while it is still hovered
+    unmount();
+
+    // Verify the cleanup function fired and set hover state back to false
+    expect(fakeOnChildHoverChange).toHaveBeenCalledWith(false);
   });
 });

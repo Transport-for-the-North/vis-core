@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useFilterContext } from "hooks/useFilterContext";
 import { darken } from "polished";
+import { defaultBgColour } from 'defaults';
 
 const Container = styled.div`
   display: flex;
@@ -24,7 +25,7 @@ const StyledButton = styled.button`
     props.$isHidden
       ? '#f2f2f2'
       : props.$isSelected
-      ? props.$bgColor
+      ? props.theme?.primary || defaultBgColour
       : 'white'};
   color: ${(props) =>
     props.$isHidden
@@ -45,7 +46,7 @@ const StyledButton = styled.button`
     props.index !== 0 ? "none none none solid" : "none"};
   border-width: 0.25px;
   width: ${(props) => 100 / props.size + "%"};
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +56,10 @@ const StyledButton = styled.button`
       props.$isHidden
         ? '#f2f2f2'
         : props.$isSelected
-        ? darken(0.1, props.$bgColor)
+        ? darken(
+            0.1,
+            props.theme?.primary || defaultBgColour
+          )
         : 'white'};
     color: ${(props) =>
       props.$isHidden
@@ -69,19 +73,28 @@ const StyledButton = styled.button`
 const ToggleAllButton = styled.button`
   cursor: pointer;
   padding: 5px 2px;
-  background-color: ${(props) => (props.$isSelected ? props.$bgColor : "white")};
+  background-color: ${(props) =>
+    props.$isSelected
+      ? props.$bgColor || props.theme?.primary || defaultBgColour
+      : "white"};
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-radius: 4px;
   border: 0.25px solid;
   margin-left: 10px;
   width: 80px; /* Fixed width */
-  font-family: 'Hanken Grotesk', sans-serif;
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    background-color: ${(props) => (props.$isSelected ?  darken(0.1, props.$bgColor) : "white")};
+    background-color: ${(props) =>
+      props.$isSelected
+        ? darken(
+            0.1,
+            props.$bgColor || props.theme?.primary || defaultBgColour
+          )
+        : "white"};
     color: ${(props) => (props.$isSelected ? "white" : "black")};
   }
 `;
@@ -104,10 +117,17 @@ const IconWrapper = styled.span`
  * @property {Function} onChange - The function called when a new toggle option is selected.
  * @returns {JSX.Element} The rendered Toggle component.
  */
-export const Toggle = ({ filter, onChange, bgColor }) => {
+export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) => {
   const { state: filterState } = useFilterContext();
 
-  const options = filter.values.values;
+  const options = useMemo(() => {
+    let opts = filter.values.values || [];
+    if (excludeValue !== undefined && excludeValue !== null) {
+      opts = opts.filter(o => String(o.paramValue) !== String(excludeValue));
+    }
+    return opts;
+  }, [filter.values.values, excludeValue]);
+
   const visibleOptions = useMemo(
     () => options.filter((o) => !o.isHidden),
     [options]
@@ -146,7 +166,7 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
 
       // Commit the only visible value when nothing has been written yet, and
       // also recover if the current value becomes hidden after validation.
-      if (currentlyHidden || shouldAutoSelectOnlyVisible) {
+      if (currentlyHidden || shouldAutoSelectOnlyVisible || (current != null && !options.find(o => o.paramValue === current))) {
         const fallback = visibleOptions[0]?.paramValue ?? null;
         onChange(filter, fallback);
         setSelectedButtons(fallback);
@@ -156,20 +176,23 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
       const visibleSet = new Set(visibleOptions.map((o) => o.paramValue));
       const pruned = currentArr.filter((v) => visibleSet.has(v));
 
-      if (pruned.length !== currentArr.length) {
-        if (pruned.length === 0) {
+      if (pruned.length !== currentArr.length || currentArr.some(v => !options.find(o => o.paramValue === v))) {
+        const validPruned = pruned.filter(v => options.find(o => o.paramValue === v));
+        if (validPruned.length === 0) {
           const fallbackAll = visibleOptions.map((o) => o.paramValue);
           onChange(filter, fallbackAll);
           setSelectedButtons(fallbackAll);
         } else {
-          onChange(filter, pruned);
-          setSelectedButtons(pruned);
+          onChange(filter, validPruned);
+          setSelectedButtons(validPruned);
         }
       }
     }
   }, [options, visibleOptions, filterState, filter, onChange]);
 
   const handleToggleChange = (newSelectedValue) => {
+    if (disabled) return;
+    
     // Prevent selecting hidden options
     const isHidden = options.find((o) => o.paramValue === newSelectedValue)?.isHidden;
     if (isHidden) return;
@@ -194,6 +217,8 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
    * Toggle-all respects visibility. It toggles only the non-hidden options.
    */
   const handleToggleAll = () => {
+    if (disabled) return;
+    
     const current = Array.isArray(selectedButtons) ? selectedButtons : [];
     const visibleValues = visibleOptions.map((o) => o.paramValue);
 
@@ -220,12 +245,12 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
                   selectedButtons.includes(option.paramValue)
                 : selectedButtons === option.paramValue
             }
-            $isHidden={!!option.isHidden}
+            $isHidden={!!option.isHidden || disabled}
             size={options.length}
             index={index}
             $bgColor={bgColor}
-            aria-disabled={!!option.isHidden}
-            title={option.isHidden ? 'Unavailable due to current selection' : undefined}
+            aria-disabled={!!option.isHidden || disabled}
+            title={disabled ? 'Filter is disabled' : option.isHidden ? 'Unavailable due to current selection' : undefined}
           >
             {option.displayValue}
             {option.isValid !== undefined && (
@@ -247,6 +272,8 @@ export const Toggle = ({ filter, onChange, bgColor }) => {
             )
           }
           $bgColor={bgColor}
+          disabled={disabled}
+          style={{ opacity: disabled ? 0.45 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
         >
           Toggle All
         </ToggleAllButton>

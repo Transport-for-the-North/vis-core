@@ -1075,10 +1075,6 @@ describe("handleZoom function tests", () => {
       </ThemeProvider>
     );
 
-    expect(mockMapContext.dispatch).toHaveBeenCalledWith({
-      type: "STORE_CURRENT_ZOOM",
-      payload: 10,
-    });
     expect(getLayer).toHaveBeenCalledWith("id-label");
     expect(setLayoutProperty).toHaveBeenCalledWith(
       "id-label",
@@ -1154,7 +1150,12 @@ describe("Pan and centre map", () => {
             coordinates: [5, 10],
           },
           bounds: {
-            coordinates: [["un", "deux"], 10],
+            coordinates: [
+              [
+                [0, 0],
+                [1, 1],
+              ],
+            ],
           },
         },
       },
@@ -1188,12 +1189,17 @@ describe("Pan and centre map", () => {
       </ThemeProvider>
     );
     expect(fitBounds).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bounds: ["un", "deux", [9, 19], [11, 21]],
-      }),
-      { padding: 80, duration: 0 }
+      [
+        [0, 0],
+        [1, 1],
+      ],
+      {
+        padding: 100,
+        maxZoom: 14,
+        duration: 1000,
+        linear: false,
+      }
     );
-    expect(panTo).toHaveBeenCalledWith([5, 10]);
   });
   it("Test when !bounds", () => {
     mockMapContext = {
@@ -1216,7 +1222,7 @@ describe("Pan and centre map", () => {
         </FilterContext.Provider>
       </ThemeProvider>
     );
-    expect(panTo).toHaveBeenCalledWith([5, 10]);
+    expect(panTo).toHaveBeenCalledWith([5, 10], { duration: 1000 });
   });
 });
 

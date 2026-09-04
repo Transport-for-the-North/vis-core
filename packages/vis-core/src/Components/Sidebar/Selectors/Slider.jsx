@@ -35,7 +35,7 @@ const SliderValue = styled.span`
  * @property {Function} onChange - The function called when the slider value changes.
  * @returns {JSX.Element} The rendered Slider component.
  */
-export const Slider = ({ filter, onChange }) => {
+export const Slider = ({ filter, onChange, disabled }) => {
   const { state: filterState } = useFilterContext();
 
   // Determine the initial value for the slider.
@@ -95,6 +95,8 @@ export const Slider = ({ filter, onChange }) => {
   };
 
   const handleSliderChange = (e) => {
+    if (disabled) return;
+    
     if (filter.values) {
       const newIndex = parseInt(e.target.value, 10);
       const newItem = filter.values.values[newIndex];
@@ -128,8 +130,18 @@ export const Slider = ({ filter, onChange }) => {
       };
 
   return (
-    <StyledSliderContainer>
-      <StyledSlider type="range" {...sliderProps} />
+    <StyledSliderContainer
+      style={{
+        opacity: disabled ? 0.45 : 1,
+        pointerEvents: disabled ? "none" : "auto",
+      }}
+    >
+      <StyledSlider
+        type="range"
+        disabled={disabled}
+        aria-label={filter.filterName || filter.id || "Slider control"}
+        {...sliderProps}
+      />
       <SliderValue>{getDisplayValue(value)}</SliderValue>
     </StyledSliderContainer>
   );

@@ -14,50 +14,62 @@ jest.mock("maplibre-gl", () => ({
   })),
 }));
 jest.mock("./Dropdown", () => ({
-  Dropdown: ({ key, filter, value, onChange }) => (
+  Dropdown: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-dropdown">
       <div>key: {key}</div>
       <div>filter: {JSON.stringify(filter)}</div>
       <div>value: {value}</div>
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button onClick={onChange(filter, value)}>onChange</button>
     </div>
   ),
 }));
 jest.mock("./Slider", () => ({
-  Slider: ({ key, filter, value, onChange }) => (
+  Slider: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-slider">
       <div>key: {key}</div>
       <div>filter: {JSON.stringify(filter)}</div>
       <div>value: {value}</div>
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button onClick={onChange(filter, value)}>onChange</button>
     </div>
   ),
 }));
 jest.mock("./Toggle", () => ({
-  Toggle: ({ key, filter, value, onChange }) => (
+  Toggle: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-toggle">
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button data-testid="toggle" onClick={onChange(filter, value)}></button>
     </div>
   ),
 }));
 jest.mock("./CheckboxSelector", () => ({
-  CheckboxSelector: ({ key, filter, value, onChange }) => (
+  CheckboxSelector: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-checkbox">
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button data-testid="checkbox" onClick={onChange(filter, value)}></button>
     </div>
   ),
 }));
 jest.mock("./MapFeatureSelect", () => ({
-  MapFeatureSelect: ({ key, filter, value, onChange }) => (
+  MapFeatureSelect: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-mapFeatureSelect">
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button
         data-testid="mapFeatureSelect"
         onClick={onChange(filter, value)}
       ></button>
     </div>
   ),
-  MapFeatureSelectWithControls: ({ key, filter, value, onChange }) => (
+  MapFeatureSelectWithControls: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-mapFeatureSelectWithControls">
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button
         data-testid="mapFeatureSelectWithControls"
         onClick={onChange(filter, value)}
@@ -66,8 +78,10 @@ jest.mock("./MapFeatureSelect", () => ({
   ),
 }));
 jest.mock("./MapFeatureSelectAndPan", () => ({
-  MapFeatureSelectAndPan: ({ key, filter, value, onChange }) => (
+  MapFeatureSelectAndPan: ({ key, filter, value, onChange, disabled, excludeValue }) => (
     <div data-testid="mock-mapFeatureSelectAndPan">
+      <div data-testid="disabled">{String(disabled)}</div>
+      <div data-testid="excludeValue">{String(excludeValue)}</div>
       <button
         data-testid="mapFeatureSelectAndPan"
         onClick={onChange(filter, value)}
@@ -367,5 +381,75 @@ describe("SelectorSection component test", () => {
       },
       "mapFeatureSelectAndPan"
     );
+  });
+
+  it("Passes disabled and excludeValue props to all filter components", async () => {
+    // Setup a target filter that will trigger the disabledWhen condition
+    const targetFilter = {
+      type: "dropdown",
+      id: "targetFilterId",
+      paramName: "targetFilterParam",
+      values: []
+    };
+    
+    // Setup filters of various types that should inherit the disabled/excludeValue
+    const filterTypes = ["dropdown", "slider", "toggle", "checkbox", "mapFeatureSelect", "mapFeatureSelectWithControls", "mapFeatureSelectAndPan"];
+    const dependentFilters = filterTypes.map(type => ({
+      type,
+      id: `${type}DependentId`,
+      paramName: `${type}DependentParam`,
+      values: { source: "local", values: [{paramValue: "val1"}] },
+      disabledWhen: {
+        paramName: "targetFilterParam",
+        operator: "equals",
+        value: "triggerValue"
+      },
+      excludeWhenMatches: "targetFilterParam"
+    }));
+
+    props = {
+      ...props,
+      filters: [targetFilter, ...dependentFilters],
+    };
+
+    const testMockFilterContext = {
+      ...mockFilterContext,
+      state: {
+        ...mockFilterContext.state,
+        targetFilterId: "triggerValue",
+      }
+    };
+
+    render(
+      <AppContext.Provider value={mockAppContexte}>
+        <MapContext.Provider value={{ state: mockState, dispatch }}>
+          <FilterContext.Provider value={testMockFilterContext}>
+            <SelectorSection {...props} />
+          </FilterContext.Provider>
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+
+    // Verify each dependent mock component received disabled=true and excludeValue="triggerValue"
+    const disabledNodes = screen.getAllByTestId("disabled");
+    const excludeValueNodes = screen.getAllByTestId("excludeValue");
+
+    // The first node is the targetFilter, which should not be disabled
+    expect(disabledNodes[0]).toHaveTextContent("false");
+    expect(excludeValueNodes[0]).toHaveTextContent("null");
+
+    // All other nodes (dependent filters) should show 'true' and 'triggerValue'
+    disabledNodes.slice(1).forEach(node => {
+      expect(node).toHaveTextContent("true");
+    });
+    
+    excludeValueNodes.slice(1).forEach(node => {
+      expect(node).toHaveTextContent("triggerValue");
+    });
+    
+    // Ensure we checked exactly the number of filters total (1 target + 7 dependent = 8)
+    expect(disabledNodes.length).toBe(8);
+    expect(excludeValueNodes.length).toBe(8);
   });
 });

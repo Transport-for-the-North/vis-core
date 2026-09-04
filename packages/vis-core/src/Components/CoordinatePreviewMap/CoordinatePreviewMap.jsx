@@ -70,7 +70,7 @@ const CoordinatesDisplay = styled.div`
   padding: 6px 10px;
   border-radius: 4px;
   font-size: 0.75rem;
-  font-family: 'Hanken Grotesk', monospace;
+  font-family: var(--font-family-base);
   color: #333;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
   z-index: 1;
@@ -225,6 +225,7 @@ export const CoordinatePreviewMap = ({
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
 
     map.on('load', () => {
+      map.resize();
       setIsMapReady(true);
     });
 

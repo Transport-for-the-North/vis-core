@@ -93,7 +93,7 @@ export function buildNavbarLinks(appContext) {
   const links = [];
 
   // Add Home link.
-  links.push({ label: "Home", url: "/", navbarLinkBgColour: "#7317de" });
+  links.push({ label: "Home", url: "/" });
 
   // Internal pages without a category.
   appContext.appPages

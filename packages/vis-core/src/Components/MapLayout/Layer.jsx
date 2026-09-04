@@ -86,6 +86,9 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
         }
+        if (mapInstance.getLayer(`${layer.name}-boundaries`)) {
+          mapInstance.removeLayer(`${layer.name}-boundaries`);
+        }
         if (mapInstance.getSource(layer.name)) {
           mapInstance.removeSource(layer.name);
         }
@@ -139,8 +142,12 @@ export const Layer = ({ layer }) => {
               ? layer.fixedLineWidth
               : null,
           enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
+          hideOutOfBandWarning: layer.hideOutOfBandWarning ?? true,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
+          switchableBoundaries: layer.switchableBoundaries !== false && layer.geometryType === "polygon",
+          boundariesVisibleByDefault: layer.boundariesVisibleByDefault ?? false,
+          boundariesLabel: layer.boundariesLabel ?? "Show Zone Boundaries"
         };
 
         // Handle GeoJSON layer type
@@ -150,6 +157,26 @@ export const Layer = ({ layer }) => {
             sourceConfig.data = geojson;
             mapInstance.addSource(layer.name, sourceConfig);
             mapInstance.addLayer({ ...layerConfig, source: layer.name });
+
+            if (layer.switchableBoundaries !== false && layer.geometryType === "polygon") {
+              const boundariesLayerConfig = {
+                id: `${layer.name}-boundaries`,
+                type: "line",
+                source: layer.name,
+                layout: {
+                  visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
+                },
+                paint: {
+                  "line-color": layer.boundariesColor || "#444444",
+                  "line-width": layer.boundariesWidth || 1,
+                  "line-opacity": layer.boundariesOpacity || 0.8
+                },
+                metadata: {
+                  isStylable: false,
+                }
+              };
+              mapInstance.addLayer(boundariesLayerConfig);
+            }
 
             // Add the hover layer if the layer is hoverable
             if (layer.isHoverable) {
@@ -207,6 +234,9 @@ export const Layer = ({ layer }) => {
               isStylable: layer.isStylable ?? false,
               bufferSize: layer.bufferSize,
               defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
+              switchableBoundaries: layer.switchableBoundaries !== false && layer.geometryType === "polygon",
+              boundariesVisibleByDefault: layer.boundariesVisibleByDefault ?? false,
+              boundariesLabel: layer.boundariesLabel ?? "Show Zone Boundaries"
             },
           });
 
@@ -231,6 +261,27 @@ export const Layer = ({ layer }) => {
             };
             
             mapInstance.on('sourcedata', handleSourceData);
+          }
+
+          if (layer.switchableBoundaries !== false && layer.geometryType === "polygon") {
+            const boundariesLayerConfig = {
+              id: `${layer.name}-boundaries`,
+              type: "line",
+              source: layer.name,
+              "source-layer": layer.sourceLayer,
+              layout: {
+                visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
+              },
+              paint: {
+                "line-color": layer.boundariesColor || "#444444",
+                "line-width": layer.boundariesWidth || 1,
+                "line-opacity": layer.boundariesOpacity || 0.8
+              },
+              metadata: {
+                isStylable: false,
+              }
+            };
+            mapInstance.addLayer(boundariesLayerConfig);
           }
 
           // Add the hover layer if the layer is hoverable
@@ -279,6 +330,9 @@ export const Layer = ({ layer }) => {
         }
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
+        }
+        if (mapInstance.getLayer(`${layer.name}-boundaries`)) {
+          mapInstance.removeLayer(`${layer.name}-boundaries`);
         }
         if (mapInstance.getLayer(`${layer.name}-label`)) {
           mapInstance.removeLayer(`${layer.name}-label`);
@@ -333,6 +387,7 @@ export const Layer = ({ layer }) => {
           `${layer.name}-symbols-hover`,
           `${layer.name}-hover`,
           `${layer.name}-select`,
+          `${layer.name}-boundaries`,
           `${layer.name}-label`,
         ].forEach((layerId) => {
           if (mapInstance.getLayer(layerId)) mapInstance.removeLayer(layerId);
@@ -381,6 +436,7 @@ export const Layer = ({ layer }) => {
               ? layer.fixedLineWidth
               : null,
           enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
+          hideOutOfBandWarning: layer.hideOutOfBandWarning ?? true,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY,
           bufferSize: layer.bufferSize,
@@ -398,6 +454,27 @@ export const Layer = ({ layer }) => {
       }
 
       mapInstance.addLayer(baseLayerConfig);
+
+      if (layer.switchableBoundaries !== false && layer.geometryType === "polygon") {
+        const boundariesLayerConfig = {
+          id: `${layer.name}-boundaries`,
+          type: "line",
+          source: layer.name,
+          "source-layer": layer.sourceLayer,
+          layout: {
+            visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
+          },
+          paint: {
+            "line-color": layer.boundariesColor || "#444444",
+            "line-width": layer.boundariesWidth || 1,
+            "line-opacity": layer.boundariesOpacity || 0.8
+          },
+          metadata: {
+            isStylable: false,
+          }
+        };
+        mapInstance.addLayer(boundariesLayerConfig);
+      }
 
       if (layer.isHoverable) {
         const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
