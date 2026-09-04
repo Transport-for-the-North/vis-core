@@ -24,7 +24,8 @@ const SearchContainer = styled.div`
  * @returns {JSX.Element} The rendered LayerSearch component.
  */
 export const LayerSearch = ({ layer }) => {
-  const { dispatch: mapDispatch } = useMapContext();
+  const mapContext = useMapContext();
+  const mapDispatch = mapContext?.dispatch;
   const [selectedOption, setSelectedOption] = useState(null);
   const zoomToFeaturePlaceholderText = 
     layer.metadata?.zoomToFeaturePlaceholderText || 'Search features in this layer...';
@@ -32,7 +33,7 @@ export const LayerSearch = ({ layer }) => {
   // Reset selected option when layer path changes
   useEffect(() => {
     setSelectedOption(null);
-  }, [layer.metadata.path]);
+  }, [layer.metadata?.path]);
   
   /**
    * Handles the change event when a feature is selected.
@@ -50,15 +51,17 @@ export const LayerSearch = ({ layer }) => {
             selectedOption.value
           );
 
-          mapDispatch({
-            type: actionTypes.SET_BOUNDS_AND_CENTROID,
-            payload: { 
-              bounds, 
-              centroid, 
-              featureName: selectedOption.label, 
-              layerMetadata: layer.metadata 
-            },
-          });
+          if (mapDispatch) {
+            mapDispatch({
+              type: actionTypes.SET_BOUNDS_AND_CENTROID,
+              payload: { 
+                bounds, 
+                centroid, 
+                featureName: selectedOption.label, 
+                layerMetadata: layer.metadata 
+              },
+            });
+          }
 
         } catch (error) {
           console.error('Failed to fetch bounds:', error);
