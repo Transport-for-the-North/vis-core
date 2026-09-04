@@ -117,9 +117,27 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
       }
     );
 
-    // isHoverable = true, test if this part is well throw
+    // switchableBoundaries defaults to true for polygon tile layers
     expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
       2,
+      expect.objectContaining({
+        id: "Accessibility-boundaries",
+        source: "Accessibility",
+        "source-layer": "zones",
+        type: "line",
+        layout: { visibility: "none" },
+        paint: {
+          "line-color": "#444444",
+          "line-opacity": 0.8,
+          "line-width": 1,
+        },
+        metadata: { isStylable: false },
+      })
+    );
+
+    // isHoverable = true, test if this part is well throw
+    expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
+      3,
       expect.objectContaining({
         id: "Accessibility-hover",
         source: "Accessibility",
@@ -133,7 +151,7 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
 
     // last addLayer called when type = "tile"
     expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
-      3,
+      4,
       expect.objectContaining({
         id: "Accessibility-select",
         type: "line",
@@ -144,6 +162,28 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
         source: "Accessibility",
         "source-layer": "zones",
         metadata: { isStylable: false },
+      })
+    );
+  });
+
+  it("Does not add boundaries layer when switchableBoundaries is false", () => {
+    props = {
+      ...props,
+      layer: {
+        ...props.layer,
+        switchableBoundaries: false,
+      },
+    };
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <Layer {...props} />
+      </MapContext.Provider>
+    );
+
+    expect(mockMapContext.state.maps[0].addLayer).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "Accessibility-boundaries",
       })
     );
   });
