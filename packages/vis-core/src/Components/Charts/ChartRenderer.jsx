@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   ResponsiveContainer,
   BarChart as RBarChart,
@@ -18,37 +19,76 @@ import {
   ScatterChart as RScatterChart,
   Scatter as RScatter,
 } from "recharts";
-import styled from "styled-components";
+import styled, { css, useTheme } from "styled-components";
 import { WarningBox } from "Components/MessageBox";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { CARD_CONSTANTS } from "defaults";
-import { formatNumber } from "utils";
+import { CARD_CONSTANTS, defaultBgColour, brandTokens } from "defaults";
+import { formatNumber, formatValueWithUnit } from "utils";
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
 
+const getChartUiColors = (theme) => {
+  const primary = theme?.primary || defaultBgColour;
+  return {
+    axisLabel: "var(--text-icon)",
+    rankBadge: primary,
+    scoreText: "var(--text-icon)",
+    grid: "#eee",
+    hoverCursor: `${primary}14`,
+    comparator: "#767676",
+    guideStroke: primary,
+    tableBorder: primary,
+    tableDivider: primary,
+    subtleText: "var(--text-icon)",
+    areaFill: `${primary}40`,
+  };
+};
+
 const Section = styled.section`
   margin: 0;
+
+  .recharts-default-legend {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .recharts-legend-item,
+  li.recharts-legend-item {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    font-family: var(--font-sans) !important;
+  }
+
+  .recharts-legend-item-text {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    color: var(--text-icon) !important;
+    font-family: var(--font-sans) !important;
+  }
 `;
 
 const ChartContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 4px;
+  font-family: var(--font-sans);
 `;
 
 const Title = styled.h3`
-  margin: 4px 0 6px;
+  margin: 2px 0 4px;
   font-size: 13px;
   font-weight: 600;
-  color: #4b3e91;
+  color: var(--text-icon);
+  font-family: "Korto", var(--font-sans);
 `;
 
 const AxisLabel = styled.span`
   font-size: 11px;
-  color: #555;
+  color: var(--text-icon);
   line-height: 1.2;
+  font-family: var(--font-sans);
 `;
 
 // Ranking display element for the ranking table
@@ -56,25 +96,37 @@ const RankBadge = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  background: #a99ad6;
-  color: white;
-  border-radius: 50%;
-  font-size: 13px;
-  font-weight: bold;
+  min-width: 32px;
+  height: 24px;
+  padding: 0 6px;
+  background: ${props => props.$isBottom ? "#fff8e1" : "#e8eaf6"};
+  color: ${props => props.$isBottom ? "#e65100" : "#3f51b5"};
+  border: 1px solid ${props => props.$isBottom ? "#ffe082" : "#c5cae9"};
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
   margin-right: 8px;
+  font-family: var(--font-family-base);
+  
+  svg {
+    margin-right: 2px;
+    font-size: 10px;
+  }
 `;
 
 const NameCell = styled.td`
-  color: #7c5cd6;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   font-weight: 500;
+  padding: 4px 0;
+  font-family: var(--font-family-base);
 `;
 
 const ScoreCell = styled.td`
   font-weight: bold;
-  color: #333;
+  color: var(--text-icon);
   text-align: right;
+  padding: 4px 0;
+  font-family: var(--font-family-base);
 `;
 
 const RowTr = styled.tr`
@@ -96,6 +148,19 @@ const RowTr = styled.tr`
     transform: translateY(10px);
     transition: opacity 0.3s, transform 0.3s;
   }
+  td {
+    transition: background-color 0.15s ease;
+  }
+  ${props => props.$clickable && css`
+    cursor: pointer;
+    &:hover td, &:focus-visible td {
+      background-color: #f0f4f8;
+    }
+    &:focus-visible {
+      outline: 2px solid #7317de;
+      outline-offset: -2px;
+    }
+  `}
 `;
 
 /**
@@ -105,7 +170,7 @@ const ToggleButton = styled.button`
   z-index: 1001;
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
-  background-color: #7317de;
+  background-color: ${defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -127,18 +192,17 @@ const RotatingIcon = styled(FaChevronDown)`
  * @constant {Object}
  */
 const DEFAULTS = {
-  BRAND_COLOR: "#4b3e91",
   DIMENSIONS: {
     baseHeight: 220,
     pieSize: 220,
     xAngle: -45,
-    tickFontSize: 11,
+    tickFontSize: 10,
     yAxisWidth: 50,
     xAxisMinHeight: 30,
     avgCharWidth: 6,
   },
-  MARGIN: { top: 4, right: 10, bottom: 2, left: 10 },
   GRID: { stroke: "#eee", vertical: false },
+  MARGIN: { top: 4, right: 8, bottom: 2, left: 4 },
 };
 
 /**
@@ -155,7 +219,7 @@ const DEFAULT_COLORS = [
   "#b07aa1",
   "#e15759",
   "#ff9da7",
-  "#4b3e91",
+  brandTokens.palette.teal,
 ];
 
 /**
@@ -217,6 +281,192 @@ const computeXAxisHeight = (config, labels) => {
 };
 
 /**
+ * Formats an axis title and unit pair for display.
+ * Returns an object with { title, unit } to support line-break rendering on axes.
+ *
+ * @param {string} [title] - Raw axis title
+ * @param {string} [unit] - Unit string
+ * @returns {{ title: string, unit: string }} Formatted title and unit
+ */
+const formatAxisTitleWithUnit = (title, unit) => {
+  if (!title) return { title: "", unit: "" };
+  if (!unit || unit === "none" || unit === "count") return { title, unit: "" };
+  if (title.toLowerCase().includes(unit.toLowerCase())) return { title, unit: "" };
+  const formattedUnit = unit.startsWith("/") ? unit : `/ ${unit}`;
+  return { title, unit: formattedUnit };
+};
+
+/**
+ * Viewport-bounded custom tooltip component for Recharts.
+ * Measures its bounding rectangle via useLayoutEffect and clamps position so
+ * it never renders off screen in any direction.
+ */
+export const ChartTooltip = ({
+  active,
+  payload,
+  label,
+  config = {},
+  formatter,
+  coordinate,
+}) => {
+  const containerRef = useRef(null);
+  const anchorRef = useRef(null);
+
+  React.useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!active || !el) return;
+
+    const tooltipRect = el.getBoundingClientRect();
+    const padding = 12;
+    let targetX = 0;
+    let targetY = 0;
+
+    const chartWrapper =
+      anchorRef.current?.closest(".recharts-wrapper") ||
+      anchorRef.current?.parentElement?.parentElement;
+
+    if (coordinate && chartWrapper) {
+      const chartBox = chartWrapper.getBoundingClientRect();
+      targetX = chartBox.left + coordinate.x + 12;
+      targetY = chartBox.top + coordinate.y + 12;
+
+      // If overflowing right, flip to left of cursor
+      if (targetX + tooltipRect.width > window.innerWidth - padding) {
+        targetX = chartBox.left + coordinate.x - tooltipRect.width - 12;
+      }
+      // If overflowing bottom, flip above cursor
+      if (targetY + tooltipRect.height > window.innerHeight - padding) {
+        targetY = chartBox.top + coordinate.y - tooltipRect.height - 12;
+      }
+    } else if (anchorRef.current) {
+      const anchorRect = anchorRef.current.getBoundingClientRect();
+      targetX = anchorRect.left;
+      targetY = anchorRect.top;
+
+      if (targetX + tooltipRect.width > window.innerWidth - padding) {
+        targetX = window.innerWidth - padding - tooltipRect.width;
+      }
+      if (targetY + tooltipRect.height > window.innerHeight - padding) {
+        targetY = window.innerHeight - padding - tooltipRect.height;
+      }
+    }
+
+    targetX = Math.max(
+      padding,
+      Math.min(window.innerWidth - tooltipRect.width - padding, targetX)
+    );
+    targetY = Math.max(
+      padding,
+      Math.min(window.innerHeight - tooltipRect.height - padding, targetY)
+    );
+
+    el.style.transform = `translate(${targetX}px, ${targetY}px)`;
+  });
+
+  if (!active || !payload || !payload.length) return null;
+
+  const unit = config.units && config.units !== "none" ? config.units : "";
+
+  const tooltipElement = (
+    <div
+      ref={containerRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        pointerEvents: "none",
+        backgroundColor: "rgba(255, 255, 255, 0.96)",
+        border: "1px solid #ddd",
+        borderRadius: 6,
+        padding: "8px 12px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        fontSize: 12,
+        maxWidth: 280,
+        zIndex: 99999,
+      }}
+    >
+      {label && (
+        <div style={{ fontWeight: 600, marginBottom: 4, color: "#333" }}>
+          {label}
+        </div>
+      )}
+      {payload.map((item, i) => {
+        const val = item.value;
+        const isComparator =
+          item.dataKey === (config.comparatorKey || "dmValue") ||
+          (config.comparatorLabel && item.name === config.comparatorLabel) ||
+          (config.comparatorLabel && item.name === `${config.comparatorLabel} (right)`) ||
+          item.name === "DM" ||
+          item.name === "DM (right)" ||
+          item.name === "Comparator" ||
+          item.name === "Comparator (right)" ||
+          item.name?.includes("(right)");
+
+        const comparatorUnit =
+          config.comparatorUnits || (config.units !== "%" ? config.units : "");
+
+        const itemUnit = isComparator ? comparatorUnit : (item.unit || unit);
+
+        const formattedVal = formatter
+          ? formatter(val, item.name, item)
+          : formatValueWithUnit(val, itemUnit);
+
+        return (
+          <div
+            key={`tooltip-item-${i}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              color: "#444",
+              marginTop: i > 0 ? 2 : 0,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  backgroundColor:
+                    item.color || item.fill || item.stroke || DEFAULTS.BRAND_COLOR,
+                  display: "inline-block",
+                }}
+              />
+              <span>{item.name}</span>
+            </div>
+            <span style={{ fontWeight: 600, color: "#111" }}>
+              {formattedVal}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <>
+      <span
+        ref={anchorRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0,
+          pointerEvents: "none",
+          visibility: "hidden",
+        }}
+      />
+      {typeof document !== "undefined"
+        ? createPortal(tooltipElement, document.body)
+        : tooltipElement}
+    </>
+  );
+};
+
+/**
  * Shared wrapper component for chart sections with consistent layout.
  * Axis titles are rendered as HTML elements outside the SVG so they sit
  * naturally beside their axis without eating into chart margins.
@@ -224,52 +474,123 @@ const computeXAxisHeight = (config, labels) => {
  * @param {string}  ariaLabel   - Accessibility label for the chart section
  * @param {string}  title       - Optional title to display above the chart
  * @param {number}  height      - Height of the chart container
- * @param {string}  xAxisTitle  - Optional label rendered below the X axis
- * @param {string}  yAxisTitle  - Optional label rendered beside the Y axis
+ * @param {string|object}  xAxisTitle  - Optional label rendered below the X axis
+ * @param {string|object}  yAxisTitle  - Optional label rendered beside the Y axis
+ * @param {string}  rightYAxisTitle  - Optional label rendered beside the right Y axis
  * @param {React.ReactNode} children - Chart components to render inside
  * @returns {JSX.Element}
  */
-const ChartSection = ({ ariaLabel, title, height, xAxisTitle, yAxisTitle, children }) => (
-  <Section aria-label={ariaLabel}>
-    {title && <Title>{title}</Title>}
-    <div style={{ display: "flex", alignItems: "stretch" }}>
-      {yAxisTitle && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            width: 18,
-          }}
-        >
-          <AxisLabel
+const ChartSection = ({
+  ariaLabel,
+  title,
+  height,
+  xAxisTitle,
+  yAxisTitle,
+  rightYAxisTitle,
+  children,
+}) => {
+  const yAxisObj =
+    typeof yAxisTitle === "object" && yAxisTitle !== null
+      ? yAxisTitle
+      : { title: yAxisTitle, unit: "" };
+  const rightYAxisObj =
+    typeof rightYAxisTitle === "object" && rightYAxisTitle !== null
+      ? rightYAxisTitle
+      : { title: rightYAxisTitle, unit: "" };
+  const xAxisObj =
+    typeof xAxisTitle === "object" && xAxisTitle !== null
+      ? xAxisTitle
+      : { title: xAxisTitle, unit: "" };
+
+  return (
+    <Section aria-label={ariaLabel}>
+      {title && <Title>{title}</Title>}
+      <div style={{ display: "flex", alignItems: "stretch" }}>
+        {yAxisObj.title && (
+          <div
             style={{
-              transform: "rotate(-90deg)",
-              whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: yAxisObj.unit ? 24 : 16,
+              marginRight: 6,
             }}
           >
-            {yAxisTitle}
-          </AxisLabel>
+            <AxisLabel
+              style={{
+                transform: "rotate(-90deg)",
+                whiteSpace: "nowrap",
+                textAlign: "center",
+                display: "inline-flex",
+                flexDirection: "column",
+                alignItems: "center",
+                lineHeight: 1.15,
+              }}
+            >
+              <span>{yAxisObj.title}</span>
+              {yAxisObj.unit && (
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>
+                  {yAxisObj.unit}
+                </span>
+              )}
+            </AxisLabel>
+          </div>
+        )}
+        <div style={{ flex: 1, minWidth: 0, height }}>
+          <ResponsiveContainer>{children}</ResponsiveContainer>
         </div>
-      )}
-      <div style={{ flex: 1, minWidth: 0, height }}>
-        <ResponsiveContainer>{children}</ResponsiveContainer>
+        {rightYAxisObj.title && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: rightYAxisObj.unit ? 24 : 16,
+              marginLeft: 6,
+            }}
+          >
+            <AxisLabel
+              style={{
+                transform: "rotate(90deg)",
+                whiteSpace: "nowrap",
+                textAlign: "center",
+                display: "inline-flex",
+                flexDirection: "column",
+                alignItems: "center",
+                lineHeight: 1.15,
+              }}
+            >
+              <span>{rightYAxisObj.title}</span>
+              {rightYAxisObj.unit && (
+                <span style={{ fontSize: "10px", opacity: 0.85 }}>
+                  {rightYAxisObj.unit}
+                </span>
+              )}
+            </AxisLabel>
+          </div>
+        )}
       </div>
-    </div>
-    {xAxisTitle && (
-      <AxisLabel
-        style={{
-          display: "block",
-          textAlign: "center",
-          marginTop: 2,
-        }}
-      >
-        {xAxisTitle}
-      </AxisLabel>
-    )}
-  </Section>
-);
+      {xAxisObj.title && (
+        <AxisLabel
+          style={{
+            display: "block",
+            textAlign: "center",
+            marginTop: 2,
+          }}
+        >
+          <span>{xAxisObj.title}</span>
+          {xAxisObj.unit && (
+            <span style={{ display: "block", fontSize: "10px", opacity: 0.85 }}>
+              {xAxisObj.unit}
+            </span>
+          )}
+        </AxisLabel>
+      )}
+    </Section>
+  );
+};
 
 /**
  * Default formatting functions for chart values
@@ -291,16 +612,18 @@ const defaultFormatters = {
 };
 
 // Function to wrap long labels into multiple lines after a certain length and a space
-const wrapLabel = (label, maxLen = 15) => {
-  const words = String(label || "").split(" ");
+export const wrapLabel = (label, maxLen = 26) => {
+  const str = String(label || "").trim();
+  if (str.length <= maxLen) return str;
+  const words = str.split(" ");
   let lines = [];
   let currentLine = "";
   words.forEach((word) => {
-    if ((currentLine + " " + word).trim().length > maxLen) {
+    if (currentLine && (currentLine + " " + word).length > maxLen) {
       lines.push(currentLine.trim());
       currentLine = word;
     } else {
-      currentLine += " " + word;
+      currentLine = currentLine ? currentLine + " " + word : word;
     }
   });
   if (currentLine) lines.push(currentLine.trim());
@@ -331,18 +654,21 @@ const CategoryTick = ({ x, y, payload, angle = 0 }) => {
   }
 
   // For vertical Y-axis labels, wrap text into multiple lines
-  const lines = wrapLabel(payload.value, 15).split("\n");
-  const startY = y - ((lines.length - 1.5) * DEFAULTS.DIMENSIONS.tickFontSize) / 2;
+  const lines = wrapLabel(payload.value, 26).split("\n");
+  const fontSize = DEFAULTS.DIMENSIONS.tickFontSize;
+  const lineHeight = fontSize + 2;
+  const startY = y - ((lines.length - 1) * lineHeight) / 2;
 
   return (
     <text
       x={x}
       y={startY}
       textAnchor="end"
-      fontSize={DEFAULTS.DIMENSIONS.tickFontSize}
+      fontSize={fontSize}
+      fill="#444"
     >
       {lines.map((line, i) => (
-        <tspan x={x} dy={i === 0 ? 0 : DEFAULTS.DIMENSIONS.tickFontSize + 2} key={i}>
+        <tspan x={x - 4} dy={i === 0 ? 3 : lineHeight} key={i}>
           {line}
         </tspan>
       ))}
@@ -389,18 +715,41 @@ const toTimeSeries = (data) =>
  * @param {Object} props.type - Value that defines whether the graph will be horizontal or vertical
  * @returns {JSX.Element} - Bar chart component with X/Y axes, grid, and tooltip
  */
-const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
+const BarChart = ({
+  config,
+  data,
+  formatters,
+  type = "horizontal",
+  chartUiColors,
+  brandColor,
+}) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
-  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
-  const tooltipFormatter = (val) => {
-    if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
-    const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
-  };
+
+  const dynamicHeight = React.useMemo(() => {
+    if (type === "vertical") {
+      const maxLines = Math.max(
+        1,
+        ...items.map((i) => wrapLabel(i.label || "", 26).split("\n").length)
+      );
+      const rowHeight = maxLines > 1 ? 26 : 22;
+      const computed = items.length * rowHeight + 32;
+      return config.height ? Math.max(config.height, computed) : Math.max(80, computed);
+    }
+    return config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  }, [config.height, type, items]);
+
+  const resolvedXAxisTitle = React.useMemo(
+    () => (type === "vertical" ? formatAxisTitleWithUnit(config.x_axis_title, config.units) : config.x_axis_title),
+    [type, config.x_axis_title, config.units]
+  );
+  const resolvedYAxisTitle = React.useMemo(
+    () => (type === "vertical" ? config.y_axis_title : formatAxisTitleWithUnit(config.y_axis_title, config.units)),
+    [type, config.y_axis_title, config.units]
+  );
 
   const xAxisHeight = React.useMemo(
     () =>
@@ -417,25 +766,25 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
 
   const yCategoryWidth = React.useMemo(() => {
     if (type !== "vertical") return 0;
-    const maxLineLength = Math.max(0, ...items.map(i => {
-      const lines = wrapLabel(i.label || "", 15).split("\n");
-      return Math.max(0, ...lines.map(l => l.length));
+    const maxLineLength = Math.max(1, ...items.map(i => {
+      const lines = wrapLabel(i.label || "", 26).split("\n");
+      return Math.max(...lines.map(l => l.length));
     }));
-    return Math.max(60, maxLineLength * 6.5 + 5);
+    return Math.max(45, Math.min(135, Math.ceil(maxLineLength * 5.2) + 6));
   }, [items, type]);
 
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={config.height ?? items.length * 50}
-      xAxisTitle={type === "vertical" ? config.x_axis_title : undefined}
-      yAxisTitle={type === "vertical" ? config.y_axis_title : undefined}
+      height={dynamicHeight}
+      xAxisTitle={resolvedXAxisTitle}
+      yAxisTitle={resolvedYAxisTitle}
     >
       <RBarChart
         data={items}
-        margin={DEFAULTS.MARGIN}
-        barCategoryGap="18%"
+        margin={type === "vertical" ? { top: 4, right: 8, bottom: 2, left: 4 } : DEFAULTS.MARGIN}
+        barCategoryGap={6}
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
       >
@@ -478,12 +827,16 @@ const BarChart = ({ config, data, formatters, type = "horizontal" }) => {
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
-        <RBar dataKey="value" name="Value">
+        <RTooltip
+          content={<ChartTooltip config={config} formatter={formatters?.tooltipFormatter} />}
+          cursor={{ fill: chartUiColors.hoverCursor }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+        />
+        <RBar dataKey="value" name="Value" barSize={type === "vertical" ? 14 : undefined}>
           {items.map((entry, idx) => (
             <RCell
               key={`cell-${idx}`}
-              fill={(config.colors && config.colors[entry.label]) || DEFAULTS.BRAND_COLOR}
+              fill={(config.colors && config.colors[entry.label]) || brandColor}
             />
           ))}
         </RBar>
@@ -506,18 +859,37 @@ const BarChartMultiple = ({
   data,
   formatters,
   type = "horizontal",
+  chartUiColors,
 }) => {
   const items = React.useMemo(() => data, [data]);
-  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
-  const tooltipFormatter = (val) => {
-    if (formatters.tooltipFormatter) return formatters.tooltipFormatter(val);
-    const n = Number(val);
-    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
-  };
+
+  const dynamicHeight = React.useMemo(() => {
+    if (type === "vertical") {
+      const numCols = config.columns?.length || 1;
+      const perColHeight = numCols * 14;
+      const maxLines = Math.max(
+        1,
+        ...items.map((i) => wrapLabel(i[config.xKey || "label"] || "", 26).split("\n").length)
+      );
+      const rowHeight = Math.max(26, perColHeight + 8, maxLines * 12 + 8);
+      const computed = items.length * rowHeight + 35;
+      return config.height ? Math.max(config.height, computed) : Math.max(80, computed);
+    }
+    return config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  }, [config.height, type, config.columns, items, config.xKey]);
+
+  const resolvedXAxisTitle = React.useMemo(
+    () => (type === "vertical" ? formatAxisTitleWithUnit(config.x_axis_title, config.units) : config.x_axis_title),
+    [type, config.x_axis_title, config.units]
+  );
+  const resolvedYAxisTitle = React.useMemo(
+    () => (type === "vertical" ? config.y_axis_title : formatAxisTitleWithUnit(config.y_axis_title, config.units)),
+    [type, config.y_axis_title, config.units]
+  );
 
   const yTickFormatter = (val) => {
     const n = Number(val);
@@ -530,25 +902,25 @@ const BarChartMultiple = ({
 
   const yCategoryWidth = React.useMemo(() => {
     if (type !== "vertical") return 0;
-    const maxLineLength = Math.max(0, ...items.map(i => {
-      const lines = wrapLabel(i[config.xKey || "label"] || "", 15).split("\n");
-      return Math.max(0, ...lines.map(l => l.length));
+    const maxLineLength = Math.max(1, ...items.map(i => {
+      const lines = wrapLabel(i[config.xKey || "label"] || "", 26).split("\n");
+      return Math.max(...lines.map(l => l.length));
     }));
-    return Math.max(60, maxLineLength * 6.5 + 5);
+    return Math.max(45, Math.min(135, Math.ceil(maxLineLength * 5.2) + 6));
   }, [items, type, config]);
 
   return (
     <ChartSection
       ariaLabel={config.ariaLabel || "Bar chart"}
       title={config.title}
-      height={height}
-      xAxisTitle={type === "vertical" ? config.x_axis_title : undefined}
-      yAxisTitle={type === "vertical" ? config.y_axis_title : undefined}
+      height={dynamicHeight}
+      xAxisTitle={resolvedXAxisTitle}
+      yAxisTitle={resolvedYAxisTitle}
     >
       <RBarChart
         data={items}
-        margin={DEFAULTS.MARGIN}
-        barCategoryGap="18%"
+        margin={type === "vertical" ? { top: 4, right: 8, bottom: 2, left: 4 } : DEFAULTS.MARGIN}
+        barCategoryGap={6}
         barGap={2}
         layout={type === "horizontal" ? "horizontal" : "vertical"}
       >
@@ -586,11 +958,26 @@ const BarChartMultiple = ({
             />
           </>
         )}
-        <RTooltip formatter={tooltipFormatter} cursor={{ fill: "rgba(0,0,0,0.06)" }} />
+        <RTooltip
+          content={<ChartTooltip config={config} formatter={formatters?.tooltipFormatter} />}
+          cursor={{ fill: chartUiColors.hoverCursor }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+        />
         <RLegend
           verticalAlign="top"
           align="center"
-          wrapperStyle={{ paddingBottom: 10 }}
+          wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10 }}
+          formatter={(value) => (
+            <span
+              style={{
+                fontSize: DEFAULTS.DIMENSIONS.tickFontSize,
+                fontFamily: "var(--font-sans)",
+                color: "var(--text-icon)",
+              }}
+            >
+              {value}
+            </span>
+          )}
         />
         {config.columns.map((col, idx) => (
           <RBar
@@ -598,7 +985,7 @@ const BarChartMultiple = ({
             dataKey={col.key}
             name={col.label}
             fill={(config.colors && config.colors[col.key]) || DEFAULT_COLORS[idx % DEFAULT_COLORS.length]}
-            barSize={DEFAULTS.BAR_SIZE || 24}
+            barSize={type === "vertical" ? (config.columns?.length > 1 ? 10 : 14) : (DEFAULTS.BAR_SIZE || 24)}
             isAnimationActive={false}
           />
         ))}
@@ -616,29 +1003,48 @@ const BarChartMultiple = ({
  * @param {string} [props.config.primaryLabel] - Label for the primary line (default: "Value")
  * @param {string} [props.config.comparatorKey] - Data key for the comparator line (default: "dmValue")
  * @param {string} [props.config.comparatorLabel] - Label for the comparator line (default: "Comparator")
- * @param {string} [props.config.comparatorColor] - Stroke colour for the comparator line (default: "#999999")
+ * @param {string} [props.config.comparatorColor] - Stroke colour for the comparator line (default: brand grey)
  * @param {string} [props.config.lineColor] - Stroke colour for the primary line
  * @param {Object} props.data - Data object containing values to chart
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Line chart component with X/Y axes, grid, and tooltip
  */
-const LineSeriesChart = ({ config, data, formatters }) => {
+const LineSeriesChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const items = React.useMemo(
     () => (Array.isArray(data) ? toTimeSeries(data) : toSeries(config, data)),
     [config, data]
   );
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const stroke = config.lineColor || DEFAULTS.BRAND_COLOR;
+  const stroke = config.lineColor || brandColor;
 
   const comparatorKey = config.comparatorKey || "dmValue";
   const comparatorLabel = config.comparatorLabel || "Comparator";
   const primaryLabel = config.primaryLabel || "Value";
-  const comparatorStroke = config.comparatorColor || "#999999";
+  const comparatorStroke = config.comparatorColor || chartUiColors?.comparator || "#767676";
+
+  const [hiddenSeries, setHiddenSeries] = React.useState({});
+  const toggleSeries = (e) => {
+    if (!e.dataKey) return;
+    setHiddenSeries((prev) => ({
+      ...prev,
+      [e.dataKey]: !prev[e.dataKey],
+    }));
+  };
 
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
   };
+
+  const primaryFormatter = (val) => {
+    const str = formatter(val);
+    const unit = config.units && config.units !== "none" ? config.units : "";
+    if (str && unit) {
+      return str + unit;
+    }
+    return str;
+  };
+
   const xAxisHeight = React.useMemo(
     () =>
       computeXAxisHeight(
@@ -648,9 +1054,61 @@ const LineSeriesChart = ({ config, data, formatters }) => {
     [config, items]
   );
 
-  // Check if any point has a value for the comparator key
   const hasComparator = items.some(
     (i) => i[comparatorKey] !== null && i[comparatorKey] !== undefined
+  );
+
+  const finalPrimaryLabel = hasComparator ? primaryLabel : (config.title || "Value");
+  const legendPrimaryLabel = hasComparator ? `${finalPrimaryLabel} (left)` : finalPrimaryLabel;
+  const legendComparatorLabel = `${comparatorLabel} (right)`;
+
+  const resolvedYAxisTitle = React.useMemo(
+    () => formatAxisTitleWithUnit(config.y_axis_title, config.units),
+    [config.y_axis_title, config.units]
+  );
+
+  const comparatorUnit =
+    config.comparatorUnits || (config.units !== "%" ? config.units : "");
+
+  const resolvedRightYAxisTitle = React.useMemo(
+    () =>
+      hasComparator
+        ? formatAxisTitleWithUnit(comparatorLabel, comparatorUnit)
+        : null,
+    [hasComparator, comparatorLabel, comparatorUnit]
+  );
+
+  const maxLeftTickLen = React.useMemo(() => {
+    const vals = items.map((i) => i.value).filter((v) => v !== null && v !== undefined && !isNaN(Number(v)));
+    if (!vals.length) return 3;
+    const maxVal = Math.max(...vals.map((v) => Math.abs(Number(v))));
+    const formatted = formatter(maxVal);
+    return Math.max(3, formatted.length);
+  }, [items]);
+
+  const leftYAxisWidth = Math.max(26, Math.min(52, maxLeftTickLen * 6.2 + 6));
+
+  const maxRightTickLen = React.useMemo(() => {
+    if (!hasComparator) return 0;
+    const vals = items.map((i) => i[comparatorKey]).filter((v) => v !== null && v !== undefined && !isNaN(Number(v)));
+    if (!vals.length) return 3;
+    const maxVal = Math.max(...vals.map((v) => Math.abs(Number(v))));
+    const formatted = formatter(maxVal);
+    return Math.max(3, formatted.length);
+  }, [items, hasComparator, comparatorKey]);
+
+  const rightYAxisWidth = hasComparator
+    ? Math.max(26, Math.min(52, maxRightTickLen * 6.2 + 6))
+    : 0;
+
+  const chartMargin = React.useMemo(
+    () => ({
+      top: 6,
+      right: hasComparator ? 6 : 8,
+      bottom: 2,
+      left: 4,
+    }),
+    [hasComparator]
   );
 
   return (
@@ -659,9 +1117,10 @@ const LineSeriesChart = ({ config, data, formatters }) => {
       title={config.title}
       height={height}
       xAxisTitle={config.x_axis_title}
-      yAxisTitle={config.y_axis_title}
+      yAxisTitle={resolvedYAxisTitle}
+      rightYAxisTitle={resolvedRightYAxisTitle}
     >
-      <RLineChart data={items} margin={DEFAULTS.MARGIN}>
+      <RLineChart data={items} margin={chartMargin}>
         <RCartesianGrid {...DEFAULTS.GRID} />
         <RXAxis
           dataKey="label"
@@ -672,45 +1131,210 @@ const LineSeriesChart = ({ config, data, formatters }) => {
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
         />
         <RYAxis
-          allowDecimals={false}
+          yAxisId="left"
+          allowDecimals={true}
           tickFormatter={formatter}
           tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
-          width={DEFAULTS.DIMENSIONS.yAxisWidth}
+          width={leftYAxisWidth}
+          tickMargin={4}
         />
+        {hasComparator && (
+          <RYAxis
+            yAxisId="right"
+            orientation="right"
+            allowDecimals={true}
+            tickFormatter={formatter}
+            tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+            width={rightYAxisWidth}
+            tickMargin={4}
+          />
+        )}
         <RTooltip
-          formatter={formatter}
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          content={<ChartTooltip config={config} />}
+          cursor={{ stroke: chartUiColors.guideStroke, strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         {hasComparator && (
           <RLegend
             verticalAlign="top"
             align="center"
-            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10 }}
+            wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10, cursor: "pointer" }}
+            formatter={(value) => (
+              <span
+                style={{
+                  fontSize: DEFAULTS.DIMENSIONS.tickFontSize,
+                  fontFamily: "var(--font-sans)",
+                  color: "var(--text-icon)",
+                }}
+              >
+                {value}
+              </span>
+            )}
+            onClick={toggleSeries}
           />
         )}
         <RLine
+          yAxisId="left"
           type="monotone"
           dataKey="value"
-          name={hasComparator ? primaryLabel : (config.title || "Value")}
+          name={legendPrimaryLabel}
           stroke={stroke}
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
-          legendType="plainline"
+          legendType="line"
+          hide={hiddenSeries["value"]}
+          strokeOpacity={hiddenSeries["value"] ? 0.3 : 1}
         />
         {hasComparator && (
           <RLine
+            yAxisId="right"
             type="monotone"
             dataKey={comparatorKey}
-            name={comparatorLabel}
+            name={legendComparatorLabel}
             stroke={comparatorStroke}
             strokeWidth={2}
-            strokeDasharray="4 4"
+            strokeDasharray="5 5"
             dot={false}
             activeDot={{ r: 4 }}
-            legendType="plainline"
+            legendType="line"
+            hide={hiddenSeries[comparatorKey]}
+            strokeOpacity={hiddenSeries[comparatorKey] ? 0.3 : 1}
           />
         )}
+      </RLineChart>
+    </ChartSection>
+  );
+};
+
+/**
+ * Renders a responsive multiple line chart using Recharts
+ * @param {Object} props - Component props
+ * @param {Object} props.config - Chart configuration object
+ * @param {Object} props.data - Data object containing values to chart
+ * @param {Object} props.formatters - Custom formatting functions for values
+ * @returns {JSX.Element} - Multiple Line chart component with X/Y axes, grid, and tooltip
+ */
+const MultipleLineChart = ({ config, data, formatters }) => {
+  const items = React.useMemo(() => data, [data]);
+  const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
+  const [hiddenSeries, setHiddenSeries] = React.useState({});
+
+  const toggleSeries = (e) => {
+    if (!e.dataKey) return;
+    setHiddenSeries((prev) => ({
+      ...prev,
+      [e.dataKey]: !prev[e.dataKey],
+    }));
+  };
+
+  const formatter = (val) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
+  };
+  const xAxisHeight = React.useMemo(
+    () =>
+      computeXAxisHeight(
+        config,
+        items.map((i) => i[config.xKey || "label"])
+      ),
+    [config, items]
+  );
+
+  const visibleColumns = (config.columns || []).filter((c) => !hiddenSeries[c.key]);
+  const hasNegative = items.some((i) => visibleColumns.some((c) => Number(i[c.key]) < 0));
+  const hasPositive = items.some((i) => visibleColumns.some((c) => Number(i[c.key]) > 0));
+  const hasOnlyZero = !hasNegative && !hasPositive && items.some((i) => visibleColumns.some((c) => Number(i[c.key]) === 0));
+  
+  let dataDomain = ['auto', 'auto'];
+  if (hasOnlyZero) {
+    dataDomain = [-1, 1]; // Fixes Recharts breaking when all values are exactly 0
+  } else if (!hasNegative && hasPositive) {
+    dataDomain = ['auto', 'auto'];
+  } else if (hasNegative && !hasPositive) {
+    dataDomain = ['auto', 0];
+  }
+
+
+  const maxTickLen = React.useMemo(() => {
+    let max = 3;
+    items.forEach((item) => {
+      (config.columns || []).forEach((col) => {
+        const val = item[col.key];
+        if (val !== null && val !== undefined && !isNaN(Number(val))) {
+          const len = formatter(Math.abs(Number(val))).length;
+          if (len > max) max = len;
+        }
+      });
+    });
+    return max;
+  }, [items, config.columns]);
+
+  const yAxisWidth = Math.max(26, Math.min(52, maxTickLen * 6.2 + 6));
+
+  return (
+    <ChartSection
+      ariaLabel={config.ariaLabel || "Multiple Line chart"}
+      title={config.title}
+      height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
+    >
+      <RLineChart data={items} margin={{ top: 6, right: 8, bottom: 2, left: 4 }}>
+        <RCartesianGrid {...DEFAULTS.GRID} />
+        <RXAxis
+          dataKey={config.xKey || "label"}
+          angle={DEFAULTS.DIMENSIONS.xAngle}
+          textAnchor="end"
+          height={xAxisHeight}
+          interval={Math.max(0, Math.ceil(items.length / 8) - 1)}
+          tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+        />
+        <RYAxis
+          allowDecimals={true}
+          domain={dataDomain}
+          tickFormatter={formatter}
+          tick={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+          width={yAxisWidth}
+          tickMargin={4}
+        />
+        <RTooltip
+          content={<ChartTooltip config={config} />}
+          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
+        />
+        <RLegend
+          verticalAlign="top"
+          align="center"
+          wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize, paddingBottom: 10, cursor: "pointer" }}
+          formatter={(value) => (
+            <span
+              style={{
+                fontSize: DEFAULTS.DIMENSIONS.tickFontSize,
+                fontFamily: "var(--font-sans)",
+                color: "var(--text-icon)",
+              }}
+            >
+              {value}
+            </span>
+          )}
+          onClick={toggleSeries}
+        />
+        {(config.columns || []).map((col, idx) => (
+          <RLine
+            key={col.key}
+            type="monotone"
+            dataKey={col.key}
+            name={col.label}
+            stroke={(config.colors && config.colors[col.key]) || col.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length]}
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 4 }}
+            connectNulls={true}
+            hide={hiddenSeries[col.key]}
+            strokeOpacity={hiddenSeries[col.key] ? 0.3 : 1}
+          />
+        ))}
       </RLineChart>
     </ChartSection>
   );
@@ -724,12 +1348,12 @@ const LineSeriesChart = ({ config, data, formatters }) => {
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Area chart component with X/Y axes, grid, and tooltip
  */
-const AreaSeriesChart = ({ config, data, formatters }) => {
+const AreaSeriesChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
   const stroke =
-    config.areaStrokeColor || config.lineColor || DEFAULTS.BRAND_COLOR;
-  const fill = config.areaFillColor || "rgba(75,62,145,0.25)";
+    config.areaStrokeColor || config.lineColor || brandColor;
+  const fill = config.areaFillColor || chartUiColors.areaFill;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
@@ -748,6 +1372,8 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
       ariaLabel={config.ariaLabel || "Area chart"}
       title={config.title}
       height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
     >
       <RAreaChart data={items} margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
@@ -766,8 +1392,9 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          formatter={formatter}
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
+          content={<ChartTooltip config={config} />}
+          cursor={{ stroke: chartUiColors.guideStroke, strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RArea
           type="monotone"
@@ -789,10 +1416,10 @@ const AreaSeriesChart = ({ config, data, formatters }) => {
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Scatter chart component with X/Y axes, grid, and tooltip
  */
-const ScatterSeriesChart = ({ config, data, formatters }) => {
+const ScatterSeriesChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const items = React.useMemo(() => toSeries(config, data), [config, data]);
   const height = config.height ?? DEFAULTS.DIMENSIONS.baseHeight;
-  const fill = config.scatterColor || DEFAULTS.BRAND_COLOR;
+  const fill = config.scatterColor || brandColor;
   const formatter = (val) => {
     const n = Number(val);
     return Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
@@ -811,6 +1438,8 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
       ariaLabel={config.ariaLabel || "Scatter chart"}
       title={config.title}
       height={height}
+      xAxisTitle={config.x_axis_title}
+      yAxisTitle={formatAxisTitleWithUnit(config.y_axis_title, config.units)}
     >
       <RScatterChart margin={DEFAULTS.MARGIN}>
         <RCartesianGrid {...DEFAULTS.GRID} />
@@ -832,8 +1461,9 @@ const ScatterSeriesChart = ({ config, data, formatters }) => {
           width={DEFAULTS.DIMENSIONS.yAxisWidth}
         />
         <RTooltip
-          cursor={{ stroke: "#ccc", strokeDasharray: "3 3" }}
-          formatter={formatter}
+          content={<ChartTooltip config={config} />}
+          cursor={{ stroke: chartUiColors.guideStroke, strokeDasharray: "3 3" }}
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RScatter data={items} fill={fill} />
       </RScatterChart>
@@ -867,17 +1497,33 @@ const DonutPieChart = ({ config, data, formatters }) => {
     >
       <RPieChart>
         <RTooltip
-          formatter={(value, name, props) => {
-            const n = Number(value);
-            const formatted = Number.isFinite(n) ? formatNumber(n, { stripTrailingZeroes: true }) : "";
-            return [formatted + ` (${pctFmt(value)})`, props?.payload?.label || name];
-          }}
+          content={
+            <ChartTooltip
+              config={config}
+              formatter={(value, name, item) => {
+                const formatted = formatValueWithUnit(value, config.units);
+                return `${formatted} (${pctFmt(value)})`;
+              }}
+            />
+          }
+          wrapperStyle={{ zIndex: 9999, pointerEvents: "none" }}
         />
         <RLegend
           verticalAlign="bottom"
           align="center"
           layout="horizontal"
-          wrapperStyle={{ fontSize: 12 }}
+          wrapperStyle={{ fontSize: DEFAULTS.DIMENSIONS.tickFontSize }}
+          formatter={(val) => (
+            <span
+              style={{
+                fontSize: DEFAULTS.DIMENSIONS.tickFontSize,
+                fontFamily: "var(--font-sans)",
+                color: "var(--text-icon)",
+              }}
+            >
+              {val}
+            </span>
+          )}
         />
         <RPie
           data={items}
@@ -907,7 +1553,7 @@ const DonutPieChart = ({ config, data, formatters }) => {
  * @param {Object} props.formatters - Custom formatting functions for values
  * @returns {JSX.Element} - Styled table component with headers and data rows
  */
-const TableChart = ({ config, data, formatters }) => {
+const TableChart = ({ config, data, formatters, chartUiColors, brandColor }) => {
   const cols = config.columns || [];
   const keys = React.useMemo(() => cols.map((c) => c.key), [cols]);
   const rows = React.useMemo(
@@ -934,13 +1580,13 @@ const TableChart = ({ config, data, formatters }) => {
             borderCollapse: "collapse",
             fontSize: 12,
             background: "white",
-            border: "1px solid #ddd",
+            border: `1px solid ${chartUiColors.tableBorder}`,
             borderRadius: 6,
             overflow: "hidden",
           }}
         >
           <thead>
-            <tr style={{ background: DEFAULTS.BRAND_COLOR, color: "white" }}>
+            <tr style={{ background: brandColor, color: "white" }}>
               <th style={{ padding: 8, textAlign: "left", fontWeight: 600 }}>
                 {firstColHeader}
               </th>
@@ -960,17 +1606,17 @@ const TableChart = ({ config, data, formatters }) => {
                   key={r.key}
                   style={{
                     borderBottom:
-                      idx === rows.length - 1 ? "none" : "1px solid #eee",
+                      idx === rows.length - 1 ? "none" : `1px solid ${chartUiColors.tableDivider}`,
                   }}
                 >
-                  <td style={{ padding: 8, borderRight: "1px solid #eee" }}>
+                  <td style={{ padding: 8, borderRight: `1px solid ${chartUiColors.tableDivider}` }}>
                     {r.label}
                   </td>
                   <td
                     style={{
                       padding: 8,
                       textAlign: "right",
-                      borderRight: "1px solid #eee",
+                      borderRight: `1px solid ${chartUiColors.tableDivider}`,
                     }}
                   >
                     {fmt.commify(val)}
@@ -988,7 +1634,7 @@ const TableChart = ({ config, data, formatters }) => {
   );
 };
 
-const RankingChart = ({ config, data, formatters }) => {
+const RankingChart = ({ config, data, formatters, chartUiColors, onRowClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const cols = config.columns || [];
   const rows = React.useMemo(
@@ -1022,7 +1668,7 @@ const RankingChart = ({ config, data, formatters }) => {
     commify: ((v) => formatNumber(Number(v ?? 0))),
   };
   return (
-    <div style={{ overflowX: "auto", margin: "10px 0" }}>
+    <div style={{ overflowX: "auto", margin: "0" }}>
       <div
         style={{
           display: "flex",
@@ -1032,8 +1678,13 @@ const RankingChart = ({ config, data, formatters }) => {
       >
         <Title>{config.title}</Title>
         {rows.length > 5 ? (
-          <ToggleButton onClick={() => setIsOpen(!isOpen)}>
-            <RotatingIcon $isOpen={isOpen} />
+          <ToggleButton 
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Show less" : "Show all"}
+            title={isOpen ? "Show less" : "Show all"}
+            aria-expanded={isOpen}
+          >
+            <RotatingIcon $isOpen={isOpen} aria-hidden="true" />
           </ToggleButton>
         ) : null}
       </div>
@@ -1048,20 +1699,48 @@ const RankingChart = ({ config, data, formatters }) => {
       >
         <thead>
           <tr>
-            <th style={{ width: 32 }}></th>
-            <th style={{ textAlign: "left", fontWeight: 600 }}>Name</th>
-            <th style={{ textAlign: "right", fontWeight: 600 }}>Score</th>
+            <th style={{ width: 28, paddingBottom: 2 }}></th>
+            <th style={{ textAlign: "left", fontWeight: 600, fontSize: 13, paddingBottom: 2 }}>Name</th>
+            <th style={{ textAlign: "right", fontWeight: 600, fontSize: 13, paddingBottom: 2 }}>
+              Value {config.units ? `(${config.units})` : ""}
+            </th>
           </tr>
         </thead>
         <TransitionGroup component="tbody">
           {visibleRows.map((r, idx) => {
             const val = data[r.key];
             const nodeRef = getNodeRef(r.key);
+            const isBottom = config.chartKey === "bottom5Losers";
+            const actualRank = ranks && ranks[r.key] !== undefined ? ranks[r.key] : idx + 1;
+            const isClickable = !!onRowClick && config.ids?.[r.key] !== undefined && config.ids?.[r.key] !== 0;
             return (
               <CSSTransition key={r.key} timeout={300} classNames="row" nodeRef={nodeRef}>
-                <RowTr ref={nodeRef}>
+                <RowTr 
+                  ref={nodeRef} 
+                  $clickable={isClickable}
+                  role={isClickable ? "button" : undefined}
+                  tabIndex={isClickable ? 0 : undefined}
+                  aria-label={isClickable ? `Zoom to ${r.label}` : undefined}
+                  title={isClickable ? `Click to zoom to ${r.label}` : undefined}
+                  onClick={() => {
+                    if (isClickable) {
+                      const id = config.ids[r.key];
+                      onRowClick(id, r.key);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (isClickable && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault();
+                      const id = config.ids[r.key];
+                      onRowClick(id, r.key);
+                    }
+                  }}
+                >
                   <td>
-                    <RankBadge>{ranks ? ranks[r.key] : idx + 1}</RankBadge>
+                    <RankBadge $isBottom={isBottom} aria-label={`Rank ${actualRank}`}>
+                      {isBottom ? <FaChevronDown aria-hidden="true" /> : <FaChevronUp aria-hidden="true" />}
+                      <span aria-hidden="true">{actualRank}</span>
+                    </RankBadge>
                   </td>
                   <NameCell>{r.label}</NameCell>
                   <ScoreCell>{fmt.commify(val)}</ScoreCell>
@@ -1073,7 +1752,7 @@ const RankingChart = ({ config, data, formatters }) => {
         {/* Display "..." only if the list is collapsed */}
         {!isOpen && rows.length > 5 && (
           <RowTr>
-            <td colSpan={3} style={{ color: "#888", paddingLeft: 32 }}>
+            <td colSpan={3} style={{ color: chartUiColors.subtleText, paddingLeft: 32 }}>
               ...
             </td>
           </RowTr>
@@ -1106,18 +1785,32 @@ export const ChartRenderer = ({
   data,
   formatters = {},
   barHeight,
+  onRowClick,
 }) => {
+  const theme = useTheme();
+  const brandColor = theme?.primary || defaultBgColour;
+  const chartUiColors = React.useMemo(() => getChartUiColors(theme), [theme]);
+
   if (!charts.length) return null;
   const f = { ...defaultFormatters, ...formatters };
 
   // Determine if data has values
+  const isMultipleLine = charts.some(
+    (c) => (c.type || "").toLowerCase() === "multiple_line"
+  );
   const hasAny = Array.isArray(data)
     ? data.length > 0 &&
-      data.some((row) =>
-        Object.entries(row)
-          .filter(([k]) => k !== (charts[0]?.xKey || "label"))
-          .some(([, v]) => Number(v) !== 0)
-      )
+      (isMultipleLine
+        ? data.some((row) =>
+            Object.entries(row)
+              .filter(([k]) => k !== (charts[0]?.xKey || "label"))
+              .some(([, v]) => v !== null && v !== undefined && !isNaN(Number(v)))
+          )
+        : data.some((row) =>
+            Object.entries(row)
+              .filter(([k]) => k !== (charts[0]?.xKey || "label"))
+              .some(([, v]) => Number(v) !== 0)
+          ))
     : data && Object.values(data).some((v) => Number(v) !== 0);
 
   if (!hasAny) return null;
@@ -1139,6 +1832,8 @@ export const ChartRenderer = ({
                 config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "bar_vertical":
@@ -1149,6 +1844,8 @@ export const ChartRenderer = ({
                 data={data}
                 formatters={f}
                 type="vertical"
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "multiple_bar":
@@ -1158,6 +1855,7 @@ export const ChartRenderer = ({
                 config={cfgWithResolvedHeight}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
               />
             );
           case "multiple_bar_vertical":
@@ -1168,11 +1866,23 @@ export const ChartRenderer = ({
                 data={data}
                 formatters={f}
                 type="vertical"
+                chartUiColors={chartUiColors}
               />
             );
           case "line":
             return (
               <LineSeriesChart
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
+              />
+            );
+          case "multiple_line":
+            return (
+              <MultipleLineChart
                 key={idx}
                 config={cfg}
                 data={data}
@@ -1186,6 +1896,8 @@ export const ChartRenderer = ({
                 config={cfg}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "scatter":
@@ -1195,6 +1907,8 @@ export const ChartRenderer = ({
                 config={cfg}
                 data={data}
                 formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
               />
             );
           case "pie":
@@ -1209,11 +1923,25 @@ export const ChartRenderer = ({
             );
           case "table":
             return (
-              <TableChart key={idx} config={cfg} data={data} formatters={f} />
+              <TableChart
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+                chartUiColors={chartUiColors}
+                brandColor={brandColor}
+              />
             );
           case "ranking":
             return (
-              <RankingChart key={idx} config={cfg} data={data} formatters={f} />
+              <RankingChart
+                key={idx}
+                config={cfg}
+                data={data}
+                formatters={f}
+                chartUiColors={chartUiColors}
+                onRowClick={onRowClick}
+              />
             );
           case "histogram":
             return (

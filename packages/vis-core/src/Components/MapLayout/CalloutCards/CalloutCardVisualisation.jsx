@@ -11,12 +11,14 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
 
 import { MapContext } from "contexts/MapContext";
-import { replacePlaceholders, formatNumber } from "utils";
+import { replacePlaceholders, formatNumber, formatValueWithUnit } from "utils";
 import { Hovertip } from "Components/Hovertip/Hovertip";
 import { WarningBox } from "Components/MessageBox/MessageBox";
 import { ChartRenderer } from "Components/Charts/ChartRenderer";
+import { api } from 'services';
+import { actionTypes } from 'reducers/mapReducer';
 
-import { CARD_CONSTANTS } from "defaults";
+import { CARD_CONSTANTS, defaultBgColour } from "defaults";
 
 const { CARD_WIDTH, PADDING, TOGGLE_BUTTON_WIDTH, TOGGLE_BUTTON_HEIGHT } =
   CARD_CONSTANTS;
@@ -47,7 +49,7 @@ const ParentContainer = styled.div`
  */
 const CardContainer = styled.div`
   width: ${CARD_WIDTH}px;
-  background-color: white;
+  background-color: var(--palette-white);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
@@ -73,39 +75,45 @@ const CardContainer = styled.div`
 `;
 
 const CardHeader = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 82px;
-  align-items: start;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   min-height: 30px;
+  width: 100%;
 `;
 
 /**
  * Styled component for the card title.
  */
 const CardTitle = styled.h2`
-  font-size: 1.2em;
-  color: #4b3e91;
-  font-weight: bold;
-  margin-top: 5px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--text-icon);
+  font-weight: 600;
+  margin: 5px 0 0 0;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
   min-width: 0;
+  text-align: center;
+  width: 100%;
 
   @media ${(props) => props.theme.mq.mobile} {
-    font-size: 1.2em;
-    text-align: left;
+    font-size: 0.95rem;
+    text-align: center;
     margin: 0;
   }
 `;
 
 const StatusSlot = styled.div`
+  position: absolute;
+  right: 0;
+  top: 4px;
   min-width: 82px;
   min-height: 22px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  padding-top: 4px;
 `;
 
 const StatusBadge = styled.span`
@@ -121,8 +129,7 @@ const StatusBadge = styled.span`
     $kind === "updated"
       ? "rgba(0, 222, 198, 0.18)"
       : "rgba(240, 240, 247, 0.95)"};
-  color: ${({ $kind }) =>
-    $kind === "updated" ? "rgb(13, 15, 61)" : "#4b3e91"};
+  color: var(--text-icon);
 
   font-size: 0.72rem;
   font-weight: 700;
@@ -136,22 +143,26 @@ const StatusBadge = styled.span`
  * Styled component for the card content.
  */
 const CardContent = styled.div`
+  font-family: var(--font-sans);
   text-align: left;
 
   h2 {
-    font-size: 1.5em;
-    color: #4b3e91;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-icon);
     margin-bottom: 0.5em;
+    text-align: left;
 
     @media ${(props) => props.theme.mq.mobile} {
-      font-size: 1.2em;
+      font-size: 0.9rem;
+      text-align: left;
     }
   }
 
   p {
-    font-size: 1.2em;
-    color: #333;
-    line-height: 1.6;
+    font-size: 0.85rem;
+    color: var(--text-icon);
+    line-height: 1.5;
     margin: 0.5em 0;
   }
 
@@ -168,14 +179,14 @@ const CardContent = styled.div`
   }
 
   .card {
-    background-color: #f9f9f9;
+    background-color: var(--palette-pale-teal);
     border-radius: 8px;
-    padding: 1em;
+    padding: 0.75em 1em;
     margin: 0.5em;
     flex: 1 0 100px;
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: left;
+    text-align: center;
   }
 
   .card.small {
@@ -196,20 +207,27 @@ const CardContent = styled.div`
   }
 
   .card .label {
-    font-size: 1em;
-    color: #666;
-    margin-bottom: 0.5em;
-    font-weight: bold;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-icon);
+    margin-bottom: 0.35em;
+    font-family: var(--font-sans);
+    text-align: center;
   }
 
   .card .value {
-    font-size: 2em;
-    color: #4b3e91;
+    font-size: 1.35rem;
+    color: var(--text-icon);
     font-weight: bold;
+    font-family: var(--font-family-base);
+    text-align: center;
+    line-height: 1.2;
   }
 
   .card .value.small {
-    font-size: 1em;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 900px) {
@@ -218,28 +236,28 @@ const CardContent = styled.div`
     }
 
     .card .value {
-      font-size: 1.5em;
+      font-size: 1.15rem;
     }
 
     .card .label {
-      font-size: 0.8em;
+      font-size: 0.7rem;
     }
   }
 
   details {
     margin-top: 1em;
-    border: 1px solid #ddd;
+    border: 1px solid var(--palette-bottom-grey);
     border-radius: 5px;
     padding: 0.5em;
-    background-color: #f4f4f4;
+    background-color: var(--palette-pale-teal);
 
     summary {
-      font-size: 1.2em;
+      font-size: 0.9rem;
       font-weight: bold;
       cursor: pointer;
       position: relative;
       outline: none;
-      color: #333333;
+      color: var(--text-icon);
     }
 
     .card-container {
@@ -257,7 +275,7 @@ const ToggleButton = styled.button`
   width: ${TOGGLE_BUTTON_WIDTH}px;
   height: ${TOGGLE_BUTTON_HEIGHT}px;
   z-index: 1001;
-  background-color: #7317de;
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;
@@ -281,8 +299,8 @@ const TogglePing = styled.span`
   padding: 0 4px;
 
   border-radius: 999px;
-  background: ${({ $kind }) => ($kind === "updated" ? "#00dec6" : "#f0f0f7")};
-  color: rgb(13, 15, 61);
+  background: ${({ $kind }) => ($kind === "updated" ? "var(--palette-teal)" : "var(--palette-mid-grey)")};
+  color: ${({ theme }) => theme?.primary || defaultBgColour};
 
   font-size: 10px;
   font-weight: 800;
@@ -346,7 +364,8 @@ export const CalloutCardVisualisation = ({
   toggleVisibility: externalToggleVisibility = null,
   getAllColors,
 }) => {
-  const { state } = useContext(MapContext);
+  const { state, dispatch: mapDispatch } = useContext(MapContext);
+
   const visualisation = state.visualisations[visualisationName];
 
   const buttonRef = useRef(null);
@@ -362,10 +381,50 @@ export const CalloutCardVisualisation = ({
 
   const showHandle = !hideHandleOnMobile;
 
+  const handleRowClick = async (rowId, rowName) => {
+    let layerName = visualisation.joinLayer;
+    if (!layerName) {
+      // Find the first visualisation that has a joinLayer defined (usually the map layer)
+      const mapVis = Object.values(state.visualisations).find(v => v.joinLayer);
+      layerName = mapVis?.joinLayer;
+    }
+    
+    if (!layerName) return;
+
+    const layer = state.layers[layerName];
+    if (!layer) return;
+    const layerPath = layer?.metadata?.path ?? layer?.path;
+    if (!layerPath) return;
+
+    try {
+      const { bounds, centroid } = await api.geodataService.getFeatureGeometry(layerPath, rowId);
+      mapDispatch({
+        type: actionTypes.SET_BOUNDS_AND_CENTROID,
+        payload: { 
+          bounds, 
+          centroid,
+          featureName: rowName,
+          layerMetadata: layer.metadata
+        },
+      });
+      
+      mapDispatch({
+        type: actionTypes.SET_SELECTED_FEATURES,
+        payload: [{
+          type: "Feature",
+          id: rowId,
+          properties: { name: rowName }
+        }]
+      });
+    } catch (err) {
+      console.warn(`Failed to zoom to zone: ${err.message}`);
+    }
+  };
+
   const colorsList = useMemo(() => {
     if (typeof getAllColors === "function") return getAllColors();
 
-    return ["#A0CA2A", "#E97132", "#7317DE", "#6D6875", "#3A86FF"];
+    return ["#A0CA2A", "#E97132", defaultBgColour, "#6D6875", "#3A86FF"];
   }, [getAllColors]);
 
   // Do not render the card if no data is available,
@@ -538,9 +597,16 @@ export const CalloutCardVisualisation = ({
    * @param {string} [unit=""] - Unit suffix to append.
    * @returns {string} Formatted value or "N/A" for invalid input.
    */
-  const formatNumberWithUnit = useCallback((value, unit = "") => {
+  const formatNumberWithUnit = useCallback((value, dataOrUnit) => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
-    return formatNumber(Number(value)) + unit;
+    // replacePlaceholders calls custom functions with (argValue, fullDataObject)
+    // when func.length >= 2. We avoid default parameter values on the 2nd argument
+    // so that func.length remains 2.
+    const unit =
+      typeof dataOrUnit === "string"
+        ? dataOrUnit
+        : (dataOrUnit?.units || dataOrUnit?.mainValues?.units || "");
+    return formatValueWithUnit(Number(value), unit);
   }, []);
 
   const customFormattingFunctions = useMemo(
@@ -560,16 +626,22 @@ export const CalloutCardVisualisation = ({
       return { sanitizedHtml: "", safeDynamicTitle: "" };
     }
 
+    const mergedData = {
+      ...(data.mainValues || {}),
+      ...data,
+      units: data.mainValues?.units || data.units || "",
+    };
+
     const htmlFromFragment = visualisation.htmlFragment
       ? DOMPurify.sanitize(
-          replacePlaceholders(visualisation.htmlFragment, data, {
+          replacePlaceholders(visualisation.htmlFragment, mergedData, {
             customFunctions: customFormattingFunctions,
           })
         )
       : "";
 
     const dynamicTitle = visualisation.cardTitle
-      ? replacePlaceholders(String(visualisation.cardTitle), data, {
+      ? replacePlaceholders(String(visualisation.cardTitle), mergedData, {
           customFunctions: customFormattingFunctions,
         })
       : "";
@@ -733,6 +805,7 @@ export const CalloutCardVisualisation = ({
                   const mergedData = {
                     ...(data.mainValues || {}),
                     ...data,
+                    units: data.mainValues?.units || data.units || "",
                   };
 
                   const html = replacePlaceholders(item.fragment, mergedData, {
@@ -774,90 +847,102 @@ export const CalloutCardVisualisation = ({
                 });
 
                 return allGraphs.map((chart, chartIdx) => {
-                  let configs;
-                  let chartData;
-
-                    configs = {
-                      type: chart.type,
-                      title: chart.header || "Title",
-                      x_axis_title: chart?.x_axis_title,
-                      y_axis_title: chart?.y_axis_title,
-                      primaryLabel: chart?.primaryLabel,
-                      comparatorLabel: chart?.comparatorLabel,
-                      comparatorKey: chart?.comparatorKey,
-                      comparatorColor: chart?.comparatorColor,
-                      colors: networkColorMap
-                    };
-
+                  let title = chart.header || "Title";
+                  
                   // Dynamic title for ranking charts
-
-                  if (
-                    (chart.type === "ranking" &&
-                      visualisation.queryParams?.dataTypeName?.value !==
-                        undefined) ||
-                    null
-                  ) {
-                    configs.title =
-                      "Top 5 by " +
-                      visualisation.queryParams.dataTypeName.value;
+                  if (chart.type === "ranking" && !chart.header && visualisation.queryParams?.dataTypeName?.value) {
+                    title = "Top 5 by " + visualisation.queryParams.dataTypeName.value;
                   }
 
-                  if (chart.type === "multiple_bar") {
-                    // Categories = all 'name'
-                    const categories = [
-                      ...new Set(chart.values.map((obj) => obj.name)),
-                    ];
-                    // Series = all networks
-                    const series = [
-                      ...new Set(chart.values.map((obj) => obj.network)),
-                    ];
+                  let chartData;
+                  const chartSpecificConfigs = {};
 
-                    // Data formatted for grouped bars
-                    chartData = categories.map((cat) => {
-                      const entry = { label: cat };
+                  switch (chart.type) {
+                    case "multiple_bar": {
+                      // Categories = all 'name'
+                      const categories = [...new Set(chart.values.map((obj) => obj.name))];
+                      // Series = all networks
+                      const series = [...new Set(chart.values.map((obj) => obj.network))];
 
-                      chart.values.forEach((obj) => {
-                        if (obj.name === cat) {
-                          entry[obj.network] = obj.columnValue;
-                        }
+                      // Data formatted for grouped bars
+                      chartData = categories.map((cat) => {
+                        const entry = { label: cat };
+                        chart.values.forEach((obj) => {
+                          if (obj.name === cat) {
+                            entry[obj.network] = obj.columnValue;
+                          }
+                        });
+                        return entry;
                       });
 
-                      return entry;
-                    });
-
-                      configs.columns = series.map((network) => ({
+                      chartSpecificConfigs.columns = series.map((network) => ({
                         key: network,
                         label: network,
                       }));
-                      configs.xKey = "label";
-                    } else if (chart.type === "line") {
+                      chartSpecificConfigs.xKey = "label";
+                      break;
+                    }
+
+                    case "line":
+                    case "multiple_line": {
                       chartData = chart.values;
-                    } else {
+                      if (chart.type === "multiple_line") {
+                        chartSpecificConfigs.columns = chart.columns;
+                        chartSpecificConfigs.xKey = chart.xKey || "label";
+                      }
+                      break;
+                    }
+
+                    default: {
                       // Data formatted for single bar
-                      configs.columns = chart.values.map((obj) => ({
+                      chartSpecificConfigs.columns = chart.values.map((obj) => ({
                         key: obj.name,
                         label: obj.name,
                       }));
 
-                    chartData = chart.values.reduce((acc, obj) => {
-                      acc[obj.name] = obj.columnValue;
-                      return acc;
-                    }, {});
-                    // ranks if necessary
-                    const hasRank = chart.values.some(
-                      (obj) => obj.rank !== undefined
-                    );
-
-                    if (hasRank) {
-                      configs.ranks = chart.values.reduce((acc, obj) => {
-                        if (obj.rank !== undefined) {
-                          acc[obj.name] = obj.rank;
-                        }
-
+                      chartData = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
                         return acc;
                       }, {});
+
+                      // Always create ranks mapping if rank exists
+                      chartSpecificConfigs.ranks = chart.values.reduce((acc, obj) => {
+                        if (obj.rank != null) {
+                          acc[obj.name] = obj.rank;
+                        }
+                        return acc;
+                      }, {});
+
+                      chartSpecificConfigs.ids = chart.values.reduce((acc, obj) => {
+                        if (obj.id != null) {
+                          acc[obj.name] = obj.id;
+                        }
+                        return acc;
+                      }, {});
+                      break;
                     }
                   }
+
+                  const configs = {
+                    type: chart.type,
+                    title,
+                    chartKey: chart.key,
+                    units: chart.units || data.mainValues?.units || data.units || "",
+                    comparatorUnits:
+                      chart.comparatorUnits ||
+                      data.mainValues?.baseUnits ||
+                      (chart.units !== "%" ? chart.units : "") ||
+                      data.units ||
+                      "",
+                    x_axis_title: chart.x_axis_title,
+                    y_axis_title: chart.y_axis_title,
+                    primaryLabel: chart.primaryLabel,
+                    comparatorLabel: chart.comparatorLabel,
+                    comparatorKey: chart.comparatorKey,
+                    comparatorColor: chart.comparatorColor,
+                    colors: networkColorMap,
+                    ...chartSpecificConfigs,
+                  };
 
                   return (
                     <CardContent key={`${idx}-${chartIdx}`}>
@@ -865,6 +950,7 @@ export const CalloutCardVisualisation = ({
                         charts={[configs]}
                         data={chartData}
                         formatters={customFormattingFunctions}
+                        onRowClick={handleRowClick}
                         barHeight={225}
                       />
                     </CardContent>
@@ -907,6 +993,7 @@ export const CalloutCardVisualisation = ({
                     charts={visualisation.charts}
                     data={data}
                     formatters={customFormattingFunctions}
+                    onRowClick={handleRowClick}
                     barHeight={225}
                   />
                 </CardContent>

@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { AccordionSection } from "Components/Sidebar";
 
 jest.mock("maplibre-gl", () => ({
@@ -61,5 +62,42 @@ describe("AccordionSection", () => {
 
     fireEvent.click(header); // close
     expect(screen.queryByText("Content toggle")).not.toBeInTheDocument();
+  });
+
+  it("supports keyboard Enter to toggle the section", async () => {
+    const user = userEvent.setup();
+    render(
+      <AccordionSection title="Keyboard" defaultValue={false}>
+        <div>Keyboard content</div>
+      </AccordionSection>
+    );
+
+    const headerButton = screen.getByRole("button", { name: "Keyboard" });
+    headerButton.focus();
+    expect(headerButton).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+    expect(screen.getByText("Keyboard content")).toBeInTheDocument();
+
+    await user.keyboard("{Enter}");
+    expect(screen.queryByText("Keyboard content")).not.toBeInTheDocument();
+  });
+
+  it("is reachable via tab navigation", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button type="button">Before</button>
+        <AccordionSection title="Tab target" defaultValue={false}>
+          <div>Tab content</div>
+        </AccordionSection>
+      </>
+    );
+
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Before" })).toHaveFocus();
+
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Tab target" })).toHaveFocus();
   });
 });

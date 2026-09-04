@@ -62,6 +62,7 @@ const StyledMapContainer = styled.div`
   }
 `;
 
+
 /**
  * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
@@ -664,11 +665,6 @@ const DualMaps = (props) => {
       ["left", "right"].forEach((side) => {
         const map = maps[side];
         const mapZoomLevel = map.getZoom();
-
-        dispatch({
-          type: "STORE_CURRENT_ZOOM",
-          payload: mapZoomLevel,
-        });
 
         if (mapZoomLevel <= labelZoomLevel) {
           if (map.getLayer(`${layerId}-label`)) {

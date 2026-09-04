@@ -26,7 +26,7 @@ const SelectAllButton = styled.button`
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-radius: 4px;
   border: 0.25px solid;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,18 +103,20 @@ export const CheckboxSelector = ({ filter, onChange, bgColor }) => {
 
   return (
     <Container>
-      {options.map((option) => (
+      {options.map((option) => {
+        const checkboxId = `${filter.id || 'checkbox'}-${option.paramValue || option.displayValue}`;
+        return (
         <CheckboxContainer key={option.displayValue}>
-        <label htmlFor={option.displayValue} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+        <label htmlFor={checkboxId} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
           <StyledCheckbox
-            id={option.displayValue}
+            id={checkboxId}
             checked={!!selectedCheckboxes[option.displayValue]} // Ensure boolean value
             onChange={() => handleCheckboxChange(option.displayValue, option.paramValue)}
           />
           {option.displayValue}
         </label>
       </CheckboxContainer>
-      ))}
+      )})}
       {filter.multiSelect && (
         <SelectAllButton
           onClick={handleSelectAll}

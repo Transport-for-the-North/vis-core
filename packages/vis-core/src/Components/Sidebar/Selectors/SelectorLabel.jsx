@@ -1,11 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useId } from 'react';
 import styled from 'styled-components';
 import { Hovertip } from "Components/Hovertip/Hovertip";
 const StyledLabel = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  margin-bottom: 8px;
 `;
 
 const InfoButton = styled.button`
@@ -31,6 +33,7 @@ const InfoButton = styled.button`
 export const SelectorLabel = ({ text, info }) => {
   const [isTooltipVisible, setTooltipVisible] = useState(false);
   const infoButtonRef = useRef(null);
+  const tooltipId = useId();
 
   const handleMouseEnter = () => {
     setTooltipVisible(true);
@@ -48,6 +51,10 @@ export const SelectorLabel = ({ text, info }) => {
           ref={infoButtonRef}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onFocus={handleMouseEnter}
+          onBlur={handleMouseLeave}
+          aria-label={text ? `More information about ${text}` : "More information"}
+          aria-describedby={isTooltipVisible ? tooltipId : undefined}
         >
           ℹ
           <Hovertip
@@ -56,6 +63,7 @@ export const SelectorLabel = ({ text, info }) => {
             side="right"
             refElement={infoButtonRef}
             offset={5}
+            tooltipId={tooltipId}
           />
         </InfoButton>
       )}
