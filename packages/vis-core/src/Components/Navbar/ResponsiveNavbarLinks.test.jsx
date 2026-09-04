@@ -69,6 +69,20 @@ describe("ResponsiveNavbarLinks component test", () => {
     expect(fakeOnCLick).toHaveBeenCalled();
     await waitFor(() => {
       expect(screen.getByText("SecondPage")).toBeInTheDocument();
-    })
+    });
+  });
+
+  it("keeps active nav item highlighted when another nav item is hovered", async () => {
+    render(renderElement);
+    const homeLink = screen.getByText("Home").closest("a");
+    const secondLink = screen.getByText("Second").closest("a");
+
+    expect(homeLink).toHaveStyle({ backgroundColor: "#0d0f3d" });
+
+    // Hover over "Second"
+    await userEvent.hover(secondLink);
+
+    // "Home" must remain highlighted
+    expect(homeLink).toHaveStyle({ backgroundColor: "#0d0f3d" });
   });
 });

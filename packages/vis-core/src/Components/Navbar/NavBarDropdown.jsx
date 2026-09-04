@@ -104,9 +104,7 @@ const DropdownContainer = styled.div`
   border-radius: 10px;
   transition:
     color 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1);
   white-space: normal;
   min-width: 0;
   z-index: 1000;
@@ -115,8 +113,6 @@ const DropdownContainer = styled.div`
   &:hover {
     color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
     background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
-    box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
-    transform: translateY(-1px);
   }
 
   @media only screen and (max-width: 767px) {
@@ -153,11 +149,10 @@ const DropdownIndicator = styled.img`
     $isActive || $hovered
       ? "brightness(0) saturate(100%) invert(100%)"
       : "brightness(0) saturate(100%) invert(16%) sepia(21%) saturate(1975%) hue-rotate(197deg) brightness(94%) contrast(97%)"};
-  transition: filter 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: filter 260ms cubic-bezier(0.22, 1, 0.36, 1);
 
   ${DropdownContainer}:hover & {
     filter: brightness(0) saturate(100%) invert(100%);
-    transform: translateY(1px);
   }
 `;
 
@@ -531,7 +526,7 @@ export function NavBarDropdown({
       (item.children &&
         item.children.some((child) => child.url === activeLink))
   );
-  const showActive = isActive && !isActiveSuppressed;
+  const showActive = isActive;
 
   /**
    * Unified hover handler for the main dropdown container/children.

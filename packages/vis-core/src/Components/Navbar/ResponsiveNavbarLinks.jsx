@@ -50,9 +50,7 @@ const baseNavLinkStyles = css`
   border-radius: 10px;
   transition:
     color 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1);
   font-size: 16px;
   font-weight: 500;
   line-height: 1.25;
@@ -75,8 +73,6 @@ const baseNavLinkStyles = css`
   &:hover {
     color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
     background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
-    box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
-    transform: translateY(-1px);
   }
 `;
 
@@ -116,7 +112,6 @@ export const StyledExternalNavLink = styled.a`
  * @returns {JSX.Element} The rendered responsive navigation links.
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
-  const [hoveredTopLevelKey, setHoveredTopLevelKey] = React.useState(null);
   const [pendingActiveLink, setPendingActiveLink] = React.useState(null);
 
   const effectiveActiveLink = pendingActiveLink || activeLink;
@@ -126,13 +121,6 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
       setPendingActiveLink(null);
     }
   }, [activeLink, pendingActiveLink]);
-
-  const handleTopLevelHoverChange = (itemKey, isHovered) => {
-    setHoveredTopLevelKey((previousKey) => {
-      if (isHovered) return itemKey;
-      return previousKey === itemKey ? null : previousKey;
-    });
-  };
 
   const handleInternalNavigate = (url, customLogo, navBg) => {
     if (typeof url === "string" && url.startsWith("/")) {
@@ -144,9 +132,6 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
   return (
     <NavLinksContainer>
       {links.map((link, index) => {
-        const itemKey = `${link.label}-${index}`;
-        const suppressActive = Boolean(hoveredTopLevelKey && hoveredTopLevelKey !== itemKey);
-
         if (link.dropdownItems) {
           return (
             <NavBarDropdown
@@ -156,8 +141,6 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               activeLink={effectiveActiveLink}
               onClick={handleInternalNavigate}
               $bgColor={link.navbarLinkBgColour || $bgColor}
-              isActiveSuppressed={suppressActive}
-              onTopLevelHoverChange={(isHovered) => handleTopLevelHoverChange(itemKey, isHovered)}
             />
           );
         } else if (link.external) {
@@ -169,8 +152,6 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               rel="noopener noreferrer"
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={false}
-              onMouseEnter={() => handleTopLevelHoverChange(itemKey, true)}
-              onMouseLeave={() => handleTopLevelHoverChange(itemKey, false)}
             >
               <span className="external-label nav-label">{link.label}</span>
               <ArrowTopRightOnSquareIcon style={{ width: "1rem", marginLeft: "4px" }} />
@@ -182,10 +163,8 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               key={`internal-${link.label}-${index}`}
               to={link.url}
               $bgColor={link.navbarLinkBgColour || $bgColor}
-              $active={effectiveActiveLink === link.url && !suppressActive}
+              $active={effectiveActiveLink === link.url}
               onClick={createNavItemClickHandler(link, handleInternalNavigate, $bgColor)}
-              onMouseEnter={() => handleTopLevelHoverChange(itemKey, true)}
-              onMouseLeave={() => handleTopLevelHoverChange(itemKey, false)}
             >
               <span className="nav-label">{link.label}</span>
             </StyledNavLink>
