@@ -11,10 +11,12 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import DOMPurify from "dompurify";
 
 import { MapContext } from "contexts/MapContext";
-import { replacePlaceholders, formatNumber } from "utils";
+import { replacePlaceholders, formatNumber, formatValueWithUnit } from "utils";
 import { Hovertip } from "Components/Hovertip/Hovertip";
 import { WarningBox } from "Components/MessageBox/MessageBox";
 import { ChartRenderer } from "Components/Charts/ChartRenderer";
+import { api } from 'services';
+import { actionTypes } from 'reducers/mapReducer';
 
 import { CARD_CONSTANTS, defaultBgColour } from "defaults";
 
@@ -362,7 +364,8 @@ export const CalloutCardVisualisation = ({
   toggleVisibility: externalToggleVisibility = null,
   getAllColors,
 }) => {
-  const { state } = useContext(MapContext);
+  const { state, dispatch: mapDispatch } = useContext(MapContext);
+
   const visualisation = state.visualisations[visualisationName];
 
   const buttonRef = useRef(null);
@@ -377,6 +380,46 @@ export const CalloutCardVisualisation = ({
   const [recentlyUpdated, setRecentlyUpdated] = useState(false);
 
   const showHandle = !hideHandleOnMobile;
+
+  const handleRowClick = async (rowId, rowName) => {
+    let layerName = visualisation.joinLayer;
+    if (!layerName) {
+      // Find the first visualisation that has a joinLayer defined (usually the map layer)
+      const mapVis = Object.values(state.visualisations).find(v => v.joinLayer);
+      layerName = mapVis?.joinLayer;
+    }
+    
+    if (!layerName) return;
+
+    const layer = state.layers[layerName];
+    if (!layer) return;
+    const layerPath = layer?.metadata?.path ?? layer?.path;
+    if (!layerPath) return;
+
+    try {
+      const { bounds, centroid } = await api.geodataService.getFeatureGeometry(layerPath, rowId);
+      mapDispatch({
+        type: actionTypes.SET_BOUNDS_AND_CENTROID,
+        payload: { 
+          bounds, 
+          centroid,
+          featureName: rowName,
+          layerMetadata: layer.metadata
+        },
+      });
+      
+      mapDispatch({
+        type: actionTypes.SET_SELECTED_FEATURES,
+        payload: [{
+          type: "Feature",
+          id: rowId,
+          properties: { name: rowName }
+        }]
+      });
+    } catch (err) {
+      console.warn(`Failed to zoom to zone: ${err.message}`);
+    }
+  };
 
   const colorsList = useMemo(() => {
     if (typeof getAllColors === "function") return getAllColors();
@@ -554,9 +597,16 @@ export const CalloutCardVisualisation = ({
    * @param {string} [unit=""] - Unit suffix to append.
    * @returns {string} Formatted value or "N/A" for invalid input.
    */
-  const formatNumberWithUnit = useCallback((value, unit = "") => {
+  const formatNumberWithUnit = useCallback((value, dataOrUnit) => {
     if (value === null || value === undefined || isNaN(value)) return "N/A";
-    return formatNumber(Number(value)) + unit;
+    // replacePlaceholders calls custom functions with (argValue, fullDataObject)
+    // when func.length >= 2. We avoid default parameter values on the 2nd argument
+    // so that func.length remains 2.
+    const unit =
+      typeof dataOrUnit === "string"
+        ? dataOrUnit
+        : (dataOrUnit?.units || dataOrUnit?.mainValues?.units || "");
+    return formatValueWithUnit(Number(value), unit);
   }, []);
 
   const customFormattingFunctions = useMemo(
@@ -576,16 +626,22 @@ export const CalloutCardVisualisation = ({
       return { sanitizedHtml: "", safeDynamicTitle: "" };
     }
 
+    const mergedData = {
+      ...(data.mainValues || {}),
+      ...data,
+      units: data.mainValues?.units || data.units || "",
+    };
+
     const htmlFromFragment = visualisation.htmlFragment
       ? DOMPurify.sanitize(
-          replacePlaceholders(visualisation.htmlFragment, data, {
+          replacePlaceholders(visualisation.htmlFragment, mergedData, {
             customFunctions: customFormattingFunctions,
           })
         )
       : "";
 
     const dynamicTitle = visualisation.cardTitle
-      ? replacePlaceholders(String(visualisation.cardTitle), data, {
+      ? replacePlaceholders(String(visualisation.cardTitle), mergedData, {
           customFunctions: customFormattingFunctions,
         })
       : "";
@@ -749,6 +805,7 @@ export const CalloutCardVisualisation = ({
                   const mergedData = {
                     ...(data.mainValues || {}),
                     ...data,
+                    units: data.mainValues?.units || data.units || "",
                   };
 
                   const html = replacePlaceholders(item.fragment, mergedData, {
@@ -790,90 +847,102 @@ export const CalloutCardVisualisation = ({
                 });
 
                 return allGraphs.map((chart, chartIdx) => {
-                  let configs;
-                  let chartData;
-
-                    configs = {
-                      type: chart.type,
-                      title: chart.header || "Title",
-                      x_axis_title: chart?.x_axis_title,
-                      y_axis_title: chart?.y_axis_title,
-                      primaryLabel: chart?.primaryLabel,
-                      comparatorLabel: chart?.comparatorLabel,
-                      comparatorKey: chart?.comparatorKey,
-                      comparatorColor: chart?.comparatorColor,
-                      colors: networkColorMap
-                    };
-
+                  let title = chart.header || "Title";
+                  
                   // Dynamic title for ranking charts
-
-                  if (
-                    (chart.type === "ranking" &&
-                      visualisation.queryParams?.dataTypeName?.value !==
-                        undefined) ||
-                    null
-                  ) {
-                    configs.title =
-                      "Top 5 by " +
-                      visualisation.queryParams.dataTypeName.value;
+                  if (chart.type === "ranking" && !chart.header && visualisation.queryParams?.dataTypeName?.value) {
+                    title = "Top 5 by " + visualisation.queryParams.dataTypeName.value;
                   }
 
-                  if (chart.type === "multiple_bar") {
-                    // Categories = all 'name'
-                    const categories = [
-                      ...new Set(chart.values.map((obj) => obj.name)),
-                    ];
-                    // Series = all networks
-                    const series = [
-                      ...new Set(chart.values.map((obj) => obj.network)),
-                    ];
+                  let chartData;
+                  const chartSpecificConfigs = {};
 
-                    // Data formatted for grouped bars
-                    chartData = categories.map((cat) => {
-                      const entry = { label: cat };
+                  switch (chart.type) {
+                    case "multiple_bar": {
+                      // Categories = all 'name'
+                      const categories = [...new Set(chart.values.map((obj) => obj.name))];
+                      // Series = all networks
+                      const series = [...new Set(chart.values.map((obj) => obj.network))];
 
-                      chart.values.forEach((obj) => {
-                        if (obj.name === cat) {
-                          entry[obj.network] = obj.columnValue;
-                        }
+                      // Data formatted for grouped bars
+                      chartData = categories.map((cat) => {
+                        const entry = { label: cat };
+                        chart.values.forEach((obj) => {
+                          if (obj.name === cat) {
+                            entry[obj.network] = obj.columnValue;
+                          }
+                        });
+                        return entry;
                       });
 
-                      return entry;
-                    });
-
-                      configs.columns = series.map((network) => ({
+                      chartSpecificConfigs.columns = series.map((network) => ({
                         key: network,
                         label: network,
                       }));
-                      configs.xKey = "label";
-                    } else if (chart.type === "line") {
+                      chartSpecificConfigs.xKey = "label";
+                      break;
+                    }
+
+                    case "line":
+                    case "multiple_line": {
                       chartData = chart.values;
-                    } else {
+                      if (chart.type === "multiple_line") {
+                        chartSpecificConfigs.columns = chart.columns;
+                        chartSpecificConfigs.xKey = chart.xKey || "label";
+                      }
+                      break;
+                    }
+
+                    default: {
                       // Data formatted for single bar
-                      configs.columns = chart.values.map((obj) => ({
+                      chartSpecificConfigs.columns = chart.values.map((obj) => ({
                         key: obj.name,
                         label: obj.name,
                       }));
 
-                    chartData = chart.values.reduce((acc, obj) => {
-                      acc[obj.name] = obj.columnValue;
-                      return acc;
-                    }, {});
-                    // ranks if necessary
-                    const hasRank = chart.values.some(
-                      (obj) => obj.rank !== undefined
-                    );
-
-                    if (hasRank) {
-                      configs.ranks = chart.values.reduce((acc, obj) => {
-                        if (obj.rank !== undefined) {
-                          acc[obj.name] = obj.rank;
-                        }
-
+                      chartData = chart.values.reduce((acc, obj) => {
+                        acc[obj.name] = obj.columnValue;
                         return acc;
                       }, {});
+
+                      // Always create ranks mapping if rank exists
+                      chartSpecificConfigs.ranks = chart.values.reduce((acc, obj) => {
+                        if (obj.rank != null) {
+                          acc[obj.name] = obj.rank;
+                        }
+                        return acc;
+                      }, {});
+
+                      chartSpecificConfigs.ids = chart.values.reduce((acc, obj) => {
+                        if (obj.id != null) {
+                          acc[obj.name] = obj.id;
+                        }
+                        return acc;
+                      }, {});
+                      break;
                     }
                   }
+
+                  const configs = {
+                    type: chart.type,
+                    title,
+                    chartKey: chart.key,
+                    units: chart.units || data.mainValues?.units || data.units || "",
+                    comparatorUnits:
+                      chart.comparatorUnits ||
+                      data.mainValues?.baseUnits ||
+                      (chart.units !== "%" ? chart.units : "") ||
+                      data.units ||
+                      "",
+                    x_axis_title: chart.x_axis_title,
+                    y_axis_title: chart.y_axis_title,
+                    primaryLabel: chart.primaryLabel,
+                    comparatorLabel: chart.comparatorLabel,
+                    comparatorKey: chart.comparatorKey,
+                    comparatorColor: chart.comparatorColor,
+                    colors: networkColorMap,
+                    ...chartSpecificConfigs,
+                  };
 
                   return (
                     <CardContent key={`${idx}-${chartIdx}`}>
@@ -881,6 +950,7 @@ export const CalloutCardVisualisation = ({
                         charts={[configs]}
                         data={chartData}
                         formatters={customFormattingFunctions}
+                        onRowClick={handleRowClick}
                         barHeight={225}
                       />
                     </CardContent>
@@ -923,6 +993,7 @@ export const CalloutCardVisualisation = ({
                     charts={visualisation.charts}
                     data={data}
                     formatters={customFormattingFunctions}
+                    onRowClick={handleRowClick}
                     barHeight={225}
                   />
                 </CardContent>

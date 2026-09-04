@@ -130,6 +130,7 @@ const Map = (props) => {
   const lastTouchTimeRef = useRef(0);
 
   const lastViewportSignatureRef = useRef({});
+  const labelTimeoutRef = useRef(null);
 
   // Single feature picker for map clicks
   const pickFeatureAtPoint = useCallback(
@@ -818,11 +819,6 @@ const Map = (props) => {
   const handleZoom = useCallback(
     (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       const mapZoomLevel = map.getZoom();
-      
-      dispatch({
-        type: "STORE_CURRENT_ZOOM",
-        payload: mapZoomLevel,
-      });
 
       if (mapZoomLevel <= labelZoomLevel) {
         if (map.getLayer(`${layerId}-label`)) {
@@ -1175,21 +1171,28 @@ const Map = (props) => {
   useEffect(() => {
     if (!map) return;
 
+    // Use a ref to avoid dispatching identical zoom values
+    let lastZoom = map.getZoom();
+
     const updateZoom = () => {
-      dispatch({
-        type: actionTypes.STORE_CURRENT_ZOOM,
-        payload: map.getZoom(),
-      });
+      const currentZoom = map.getZoom();
+      if (currentZoom !== lastZoom) {
+        lastZoom = currentZoom;
+        dispatch({
+          type: actionTypes.STORE_CURRENT_ZOOM,
+          payload: currentZoom,
+        });
+      }
     };
 
-    map.on("zoom", updateZoom);
+    // Only bind to zoomend. Binding to 'zoom' causes 60 state updates per second
+    // during animations (like fitBounds), crashing React with Maximum Update Depth Exceeded
     map.on("zoomend", updateZoom);
 
     // Initial sync
     updateZoom();
 
     return () => {
-      map.off("zoom", updateZoom);
       map.off("zoomend", updateZoom);
     };
   }, [map, dispatch]);
@@ -1364,50 +1367,102 @@ const Map = (props) => {
   // **Pan and centre map**
   useEffect(() => {
     if (map && state.mapBoundsAndCentroid) {
-      const { centroid, bounds } = state.mapBoundsAndCentroid;
+      const { centroid, bounds, featureName, layerMetadata = {} } = state.mapBoundsAndCentroid;
+
       if (bounds && centroid) {
-        // Initialize a new LngLatBounds object
-        const mapBounds = new maplibregl.LngLatBounds();
-  
-        // Extend bounds with the coordinates from your bounds data
-        bounds.coordinates[0].forEach(coord => mapBounds.extend(coord));
-  
-        // Calculate the northeast and southwest points of the bounds
-        const ne = mapBounds.getNorthEast();
-        const sw = mapBounds.getSouthWest();
-  
-        // Get the centre coordinates
-        const centre = centroid.coordinates; // [lng, lat]
-  
-        // Calculate offsets based on the difference between the centre and the bounds
-        const offset = {
-          ne: [
-            centre[0] - ne.lng,
-            centre[1] - ne.lat,
-          ],
-          sw: [
-            centre[0] - sw.lng,
-            centre[1] - sw.lat,
-          ],
-        };
-  
-        // Adjust the bounds by extending them with the offset points
-        mapBounds.extend([centre[0] + offset.ne[0], centre[1] + offset.ne[1]]);
-        mapBounds.extend([centre[0] + offset.sw[0], centre[1] + offset.sw[1]]);
-  
-        // Define the fitBounds options
-        const options = {
-          padding: 80,
-          duration: 0,
-        };
-  
-        // Fit the map to the adjusted bounds and pan
-        map.fitBounds(mapBounds, options);
-        map.panTo(centre)
+        // Find min max for calculating padding
+        const coords = bounds.coordinates[0];
+        const lngs = coords.map(c => c[0]);
+        const lats = coords.map(c => c[1]);
+        const minLng = Math.min(...lngs);
+        const maxLng = Math.max(...lngs);
+        const minLat = Math.min(...lats);
+        const maxLat = Math.max(...lats);
+        
+        // Calculate padding based on geometry size
+        const lngDiff = maxLng - minLng;
+        const latDiff = maxLat - minLat;
+        const maxDiff = Math.max(lngDiff, latDiff);
+        const basePadding = maxDiff < 0.01 ? 150 : maxDiff < 0.05 ? 120 : 100;
+
+        const zoomToFeatureMaxZoom = layerMetadata.zoomToFeatureMaxZoom ?? 14;
+        const zoomToFeatureDuration = layerMetadata.zoomToFeatureDuration ?? 1000;
+        const zoomToFeatureLinear = layerMetadata.zoomToFeatureLinear ?? false;
+
+        // Fit bounds to show entire geometry
+        map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
+          padding: basePadding,
+          maxZoom: zoomToFeatureMaxZoom,
+          duration: zoomToFeatureDuration,
+          linear: zoomToFeatureLinear,
+        });
+      } else if (centroid) {
+        map.panTo(centroid.coordinates, {
+          duration: layerMetadata.zoomToFeatureDuration ?? 1000
+        });
       }
-      if (centroid && !bounds) {
-        map.panTo(centroid.coordinates);
+
+      // If a featureName is provided, show a temporary label on the map
+      if (featureName && centroid) {
+        const LABEL_DISPLAY_DURATION = 5000;
+        const labelLayerId = 'feature-label';
+        const labelSourceId = 'feature-label-source';
+
+        // Clear any existing timeout so it doesn't remove the new label
+        if (labelTimeoutRef.current) {
+          clearTimeout(labelTimeoutRef.current);
+          labelTimeoutRef.current = null;
+        }
+
+        if (map.getLayer(labelLayerId)) {
+          map.removeLayer(labelLayerId);
+          map.removeSource(labelSourceId);
+        }
+
+        map.addSource(labelSourceId, {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: centroid.coordinates,
+            },
+            properties: {
+              name: featureName,
+            },
+          },
+        });
+
+        map.addLayer({
+          id: labelLayerId,
+          type: 'symbol',
+          source: labelSourceId,
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-font': ['Noto Sans Bold'],
+            'text-size': 14,
+            'text-offset': [0, 1.5],
+            'text-anchor': 'top',
+            'text-allow-overlap': true,
+            'text-ignore-placement': true,
+          },
+          paint: {
+            'text-color': '#000000',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+            'text-opacity': 1,
+          },
+        });
+
+        labelTimeoutRef.current = setTimeout(() => {
+          if (map.getLayer(labelLayerId)) {
+            map.removeLayer(labelLayerId);
+            map.removeSource(labelSourceId);
+          }
+          labelTimeoutRef.current = null;
+        }, LABEL_DISPLAY_DURATION);
       }
+
       // Clear the bounds and centroid after panning
       dispatch({ type: actionTypes.CLEAR_BOUNDS_AND_CENTROID });
     }
