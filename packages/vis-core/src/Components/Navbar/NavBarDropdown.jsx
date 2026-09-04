@@ -171,7 +171,8 @@ const dropdownItemStyles = css`
   justify-content: space-between;
   padding: 10px 12px;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
   text-align: left;
   box-sizing: border-box;
   background-color: ${({ $active, $hovered, $bgColor, theme }) =>
@@ -240,7 +241,6 @@ const NestedDropdownMenu = styled.div`
   z-index: 1000;
   white-space: normal;
   overflow-wrap: break-word;
-  font-size: clamp(12px, 1.2vw, 18px);
   animation: ${fadeSlideDown} 220ms ease;
 `;
 
