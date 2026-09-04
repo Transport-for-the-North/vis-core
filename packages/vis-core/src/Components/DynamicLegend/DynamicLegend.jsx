@@ -390,6 +390,7 @@ export const DynamicLegend = ({ map }) => {
             style: layer.metadata.colorStyle,
             noStyle,
             hasCustomLabels, // True when bands.js-style range labels (e.g. "0-20 (Very low)") are applied.
+            hideOutOfBandWarning: layer.metadata?.hideOutOfBandWarning !== false,
           };
         })
         // Layers that produced no renderable entries return null from the map above.

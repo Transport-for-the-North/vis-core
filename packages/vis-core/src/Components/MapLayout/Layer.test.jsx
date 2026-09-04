@@ -201,6 +201,7 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
             enforceNoColourSchemeSelector: false,
             enforceNoClassificationMethod: false,
             enforceNoCustomBanding: false,
+            hideOutOfBandWarning: true,
             zoomToFeaturePlaceholderText: "",
             shouldFixLineWidth: false,
             fixedLineWidth: null,
@@ -301,6 +302,35 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
           id: "Accessibility",
           metadata: expect.objectContaining({
             enforceNoCustomBanding: true,
+          }),
+        })
+      );
+    });
+  });
+
+  it("passes hideOutOfBandWarning: false into layer metadata", async () => {
+    props = {
+      ...props,
+      layer: {
+        ...props.layer,
+        type: "geojson",
+        hideOutOfBandWarning: false,
+      },
+    };
+    api.geodataService.getLayer.mockResolvedValue("getLayer returned");
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <Layer {...props} />
+      </MapContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "Accessibility",
+          metadata: expect.objectContaining({
+            hideOutOfBandWarning: false,
           }),
         })
       );
