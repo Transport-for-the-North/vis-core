@@ -174,7 +174,7 @@ const formatOptionLabel = (data, meta) => {
  * @property {Function} onChange - The function called when a new option is selected.
  * @returns {JSX.Element} The Dropdown component.
  */
-export const Dropdown = ({ filter, onChange }) => {
+export const Dropdown = ({ filter, onChange, disabled, excludeValue }) => {
   const theme = useTheme();
   const selectStyles = useMemo(() => makeSelectStyles(theme), [theme]);
 
@@ -194,7 +194,7 @@ export const Dropdown = ({ filter, onChange }) => {
 
   const baseOptions = useMemo(() => {
     return filter.values.values
-      .filter((option) => !option.isHidden)
+      .filter((option) => !option.isHidden && (excludeValue === null || excludeValue === undefined || String(option.paramValue) !== String(excludeValue)))
       .map((option) => ({
         value: option.paramValue,
         label: option.displayValue,
@@ -202,7 +202,7 @@ export const Dropdown = ({ filter, onChange }) => {
         infoOnHover: option?.infoOnHover ?? null,
         infoBelowOnChange: option?.infoBelowOnChange ?? null,
       }));
-  }, [filter.values.values]);
+  }, [filter.values.values, excludeValue]);
 
   const options = useMemo(() => {
     if (filter.multiSelect) {
@@ -433,6 +433,7 @@ export const Dropdown = ({ filter, onChange }) => {
         isMulti={filter.multiSelect}
         isLoading={loading}
         placeholder={placeholder}
+        isDisabled={disabled}
       />
       {hasSelection && infoBelowItems.length > 0 && (
         <InfoBelowPanel>

@@ -87,7 +87,7 @@ const EnableSelectButton = styled.button`
  * @param {boolean} props.showControls - Whether to show selection mode controls.
  * @returns {JSX.Element} The rendered BaseMapFeatureSelect component.
  */
-export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControls, ...props }) => {
+export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControls, disabled, excludeValue, ...props }) => {
   const { state: mapState } = useMapContext();
   const { map } = mapState;
   const prevTransformedFeaturesRef = useRef();
@@ -169,7 +169,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
   }, [transformedFeatures, handleSelectionChange]);
 
   return (
-    <Container key={key}>
+    <Container key={key} style={{ opacity: disabled ? 0.45 : 1, pointerEvents: disabled ? 'none' : 'auto' }}>
       <FeatureSelect
         layerPath={layerPath}
         value={selectedOptions}
@@ -177,6 +177,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
         isMulti={props.isMulti !== undefined ? props.isMulti : filter.multiSelect}
         placeholder={props.placeholder || "Search and select map features..."}
         isClearable
+        isDisabled={disabled}
       />
 
       {showControls && (
@@ -185,6 +186,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
             $enabled={isFeatureSelectActive}
             onClick={toggleSelectEnabled}
             $bgColor={props.bgColor}
+            disabled={disabled}
           >
             {isFeatureSelectActive ? 'Disable Selector' : 'Enable Selector'}
           </EnableSelectButton>
@@ -193,7 +195,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
             <ModeButton
               $selected={selectionMode === 'feature'}
               onClick={() => handleSelectionModeChange('feature')}
-              disabled={!isFeatureSelectActive}
+              disabled={!isFeatureSelectActive || disabled}
               $bgColor={props.bgColor}
             >
               <FaMousePointer />
@@ -202,7 +204,7 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
             <ModeButton
               $selected={selectionMode === 'rectangle'}
               onClick={() => handleSelectionModeChange('rectangle')}
-              disabled={!isFeatureSelectActive}
+              disabled={!isFeatureSelectActive || disabled}
               $bgColor={props.bgColor}
             >
               <FaDrawPolygon />
