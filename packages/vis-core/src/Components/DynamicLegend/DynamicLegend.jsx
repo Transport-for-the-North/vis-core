@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { createPortal } from 'react-dom';
-import { buildCategoricalLegendKey, convertStringToNumber } from "utils";
+import { buildCategoricalLegendKey, convertStringToNumber, getMetricDefinition } from "utils";
 import { useMapContext } from "hooks/useMapContext";
 import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useIsMobile } from "hooks/useIsMobile";
@@ -49,7 +49,6 @@ export const DynamicLegend = ({ map }) => {
   const popoverRef = useRef(null);
   const legendRef = useRef(null);
   const currentPage = useContext(PageContext);
-  const pageCategory = currentPage.category || currentPage.pageName;
 
   // Build a lookup of already-fetched data by layerId from state.visualisations
   const visualisationDataByLayer = {};
@@ -153,25 +152,20 @@ export const DynamicLegend = ({ map }) => {
             }
           }
           
-          // Look up custom labels from defaultBands using pageCategory
-          let customLabels = null;
-          if (visualisation && visualisation.queryParams) {
-            const legendFilter = state?.filters?.find(
-              (filter) => filter.containsLegendInfo === true
-            );
-            if (legendFilter) {
-              const filterParamName = legendFilter.paramName;
-              const metricName = visualisation.queryParams[filterParamName]?.value;
-              const defaultBandEntry = defaultBands.find(band => band.name === pageCategory);
-              if (defaultBandEntry) {
-                const metricDefinition = defaultBandEntry.metric.find(
-                  m => m.name === metricName
-                );
-                if (metricDefinition && metricDefinition.labels && metricDefinition.labels.length > 0) {
-                  customLabels = metricDefinition.labels;
-                }
-              }
-            }
+          // Resolve the metric definition from defaultBands the same way the map does, so
+          // any active band variant (e.g. percentage difference bands) drives the legend too.
+          const metricDefinition = visualisation?.queryParams
+            ? getMetricDefinition(defaultBands, currentPage, visualisation.queryParams)
+            : null;
+
+          let customLabels = metricDefinition?.labels?.length
+            ? metricDefinition.labels
+            : null;
+
+          // A band variant can restate the units so the legend does not keep describing
+          // the metric's absolute units while the map is showing, say, percentages.
+          if (metricDefinition?.legendSubtitleText) {
+            legendSubtitleText = metricDefinition.legendSubtitleText;
           }
           
           // --- Interpret paint expressions ---

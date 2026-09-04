@@ -7,6 +7,50 @@ import {
 } from './classificationMethods';
 
 /**
+ * Helper: Resolves the active band variant key for a page.
+ *
+ * A band variant lets one page serve the same metric in more than one unit — for
+ * example an absolute difference and a percentage difference — without duplicating
+ * every metric entry in bands.js. The page nominates the driving filter by setting
+ * `containsBandVariantInfo: true` on it, and the filter's current value is the key.
+ *
+ * @param {Object} currentPage - The current app page.
+ * @param {Object} queryParams - The URL query parameters.
+ * @returns {string|null} The active variant key, or null when the page has no variant filter.
+ */
+const getBandVariantKey = (currentPage, queryParams) => {
+  const variantFilter = currentPage?.config?.filters?.find(
+    (filter) => filter.containsBandVariantInfo === true
+  );
+
+  if (!variantFilter) return null;
+
+  return queryParams?.[variantFilter.paramName]?.value ?? null;
+};
+
+/**
+ * Helper: Overlays a band variant onto a resolved metric definition.
+ *
+ * A variant only needs to restate the keys it changes (typically `differenceValues`,
+ * and optionally `values`, `colours`, `labels` or `legendSubtitleText`). A variant
+ * declared on the metric itself wins over one declared on the page category, so a
+ * category-wide default can be overridden per metric.
+ *
+ * @param {Object|null} metric            - The resolved metric definition.
+ * @param {Object} [selectedPageBands]    - The bands entry for the page category.
+ * @param {string|null} variantKey        - The active variant key.
+ * @returns {Object|null} The metric definition, with any matching variant applied.
+ */
+const applyBandVariant = (metric, selectedPageBands, variantKey) => {
+  if (!metric || !variantKey) return metric;
+
+  const variant =
+    metric.variants?.[variantKey] ?? selectedPageBands?.variants?.[variantKey];
+
+  return variant ? { ...metric, ...variant } : metric;
+};
+
+/**
  * Helper: Extracts the metric definition from the defaultBands.
  * Returns an object that includes values, differenceValues, and colours for the metric,
  * or null if nothing is found.
@@ -31,6 +75,7 @@ export const getMetricDefinition = (
 ) => {
   const pageCategory = currentPage.category || currentPage.pageName;
   const selectedPageBands = defaultBands?.find((band) => band.name === pageCategory);
+  const variantKey = getBandVariantKey(currentPage, queryParams);
 
   // 1. Prefer the explicit bandMetricName override (e.g. TRSE layers that pin
   //    to a fixed metric regardless of the active filter). If it resolves,
@@ -38,7 +83,7 @@ export const getMetricDefinition = (
   //    entry are not silently broken.
   if (options.bandMetricName && selectedPageBands) {
     const found = selectedPageBands.metric.find((m) => m.name === options.bandMetricName);
-    if (found) return found;
+    if (found) return applyBandVariant(found, selectedPageBands, variantKey);
   }
 
   // 2. Filter-based resolution: derive the metric name from the page filter
@@ -50,7 +95,8 @@ export const getMetricDefinition = (
     );
     const metricName = queryParams[selectedMetricFilter?.paramName]?.value;
     if (selectedPageBands && metricName) {
-      return selectedPageBands.metric.find((m) => m.name === metricName) || null;
+      const found = selectedPageBands.metric.find((m) => m.name === metricName) || null;
+      return applyBandVariant(found, selectedPageBands, variantKey);
     }
   }
 
@@ -925,12 +971,14 @@ export const reclassifyData = (
     if (classificationMethod === "d") {
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
-      if (metric) {
+      if (metric?.values?.length) {
         // Return explicit band values as-is; the user configured these intentionally
         // (e.g. values: [5, 20, 40, 60, 80]) and normalising to 0 would discard that.
         return metric.values;
       }
-      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      // Fallback to page-level defaultClassification if specified, otherwise quantile.
+      // A metric that carries no bands for this style (e.g. a band variant that only
+      // defines difference bands) is classified from the data rather than left unbanded.
       classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {
@@ -996,12 +1044,14 @@ export const reclassifyData = (
     if (classificationMethod === "d") {
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
-      if (metric) {
+      if (metric?.differenceValues?.length) {
         return !style.includes("line")
           ? metric.differenceValues
           : metric.differenceValues.slice(metric.differenceValues.length / 2);
       }
-      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      // Fallback to page-level defaultClassification if specified, otherwise quantile.
+      // A metric that carries no difference bands for the active band variant is
+      // classified from the data rather than banded against the wrong units.
       classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {

@@ -217,4 +217,108 @@ describe("getMetricDefinition", () => {
       expect(result).toMatchObject({ name: "trse" });
     });
   });
+
+  describe("band variants", () => {
+    /** defaultBands fixture carrying both category-level and metric-level variants. */
+    const makeVariantBands = () => [
+      {
+        name: "trse",
+        variants: {
+          percentage: {
+            differenceValues: [-50, -20, 0, 20, 50],
+            legendSubtitleText: "% difference",
+          },
+        },
+        metric: [
+          {
+            name: "trse",
+            values: [0, 10, 20, 30],
+            differenceValues: [-30, -10, 0, 10, 30],
+            colours: ["#fff", "#ccc", "#999", "#333"],
+          },
+          {
+            name: "other",
+            values: [1, 2, 3],
+            differenceValues: [-3, 0, 3],
+            variants: {
+              percentage: { differenceValues: [-5, 0, 5] },
+            },
+          },
+        ],
+      },
+    ];
+
+    /** Page whose metric filter drives the lookup and whose toggle drives the variant. */
+    const makeVariantPage = () => ({
+      category: "trse",
+      pageName: "trse-page",
+      config: {
+        filters: [
+          { containsLegendInfo: true, paramName: "metric" },
+          { containsBandVariantInfo: true, paramName: "differenceType" },
+        ],
+      },
+    });
+
+    it("returns the base metric when no variant filter value is set", () => {
+      const result = getMetricDefinition(makeVariantBands(), makeVariantPage(), {
+        metric: { value: "trse" },
+      });
+      expect(result.differenceValues).toEqual([-30, -10, 0, 10, 30]);
+      expect(result.legendSubtitleText).toBeUndefined();
+    });
+
+    it("returns the base metric when the variant key does not match a declared variant", () => {
+      const result = getMetricDefinition(makeVariantBands(), makeVariantPage(), {
+        metric: { value: "trse" },
+        differenceType: { value: "absolute" },
+      });
+      expect(result.differenceValues).toEqual([-30, -10, 0, 10, 30]);
+    });
+
+    it("overlays the category-level variant onto the resolved metric", () => {
+      const result = getMetricDefinition(makeVariantBands(), makeVariantPage(), {
+        metric: { value: "trse" },
+        differenceType: { value: "percentage" },
+      });
+      expect(result.differenceValues).toEqual([-50, -20, 0, 20, 50]);
+      expect(result.legendSubtitleText).toBe("% difference");
+      // Keys the variant does not restate are carried through untouched.
+      expect(result.values).toEqual([0, 10, 20, 30]);
+      expect(result.name).toBe("trse");
+    });
+
+    it("prefers a metric-level variant over the category-level one", () => {
+      const result = getMetricDefinition(makeVariantBands(), makeVariantPage(), {
+        metric: { value: "other" },
+        differenceType: { value: "percentage" },
+      });
+      expect(result.differenceValues).toEqual([-5, 0, 5]);
+      // The category variant's subtitle is not applied when a metric variant wins.
+      expect(result.legendSubtitleText).toBeUndefined();
+    });
+
+    it("applies the variant on the bandMetricName path too", () => {
+      const result = getMetricDefinition(
+        makeVariantBands(),
+        makeVariantPage(),
+        { differenceType: { value: "percentage" } },
+        { bandMetricName: "trse" }
+      );
+      expect(result.differenceValues).toEqual([-50, -20, 0, 20, 50]);
+    });
+
+    it("ignores the variant when the page declares no band-variant filter", () => {
+      const currentPage = {
+        category: "trse",
+        pageName: "trse-page",
+        config: { filters: [{ containsLegendInfo: true, paramName: "metric" }] },
+      };
+      const result = getMetricDefinition(makeVariantBands(), currentPage, {
+        metric: { value: "trse" },
+        differenceType: { value: "percentage" },
+      });
+      expect(result.differenceValues).toEqual([-30, -10, 0, 10, 30]);
+    });
+  });
 });
