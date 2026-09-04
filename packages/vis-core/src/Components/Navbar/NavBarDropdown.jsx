@@ -557,7 +557,6 @@ export function NavBarDropdown({
 
   const handleFocus = () => {
     setFocusWithin(true);
-    setOpen(true);
   };
 
   const handleBlur = (event) => {

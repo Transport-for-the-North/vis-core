@@ -10,10 +10,11 @@ import { DownloadSection } from "./Selectors/DownloadSelection";
 import { FilterProvider } from "contexts/FilterContext";
 import { getScrollbarWidth } from "utils";
 import { MobileBar, SideIcon } from "Components/MobileBar/MobileBar";
+import { defaultBgColour } from "defaults";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
-  font-size: 1.2em;
+  font-size: 1.05rem;
   font-weight: bold;
   text-align: left;
   padding-left: 5px;

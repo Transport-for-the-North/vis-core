@@ -307,13 +307,22 @@ export const BandEditor = ({
       </BandInputsGrid>
       <BandActionRow>
         <BandActionLeft>
-          <AppButton $width="100%" type="button" onClick={handleUpdate} disabled={!hasChanges || !validation.valid}>
+          <AppButton
+            $width="100%"
+            $fontSize="0.8rem"
+            $fontWeight="500"
+            type="button"
+            onClick={handleUpdate}
+            disabled={!hasChanges || !validation.valid}
+          >
             Update
           </AppButton>
         </BandActionLeft>
         <BandActionRight>
           <ResetButton
             $width="100%"
+            $fontSize="0.8rem"
+            $fontWeight="500"
             type="button"
             onClick={handleResetBands}
             disabled={localBands.length < 2 || (!hasChanges && !isCustom)}

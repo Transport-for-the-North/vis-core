@@ -220,7 +220,7 @@ describe("Navbar", () => {
     expect(screen.queryByAltText(/logout/i)).not.toBeInTheDocument();
   });
 
-  it("falls back to default TFN logo when logoImage is missing", () => {
+  it("does not render logo when logoImage is missing", () => {
     useWindowWidth.mockReturnValue(1800);
 
     const appContext = {
@@ -237,13 +237,10 @@ describe("Navbar", () => {
       </MemoryRouter>
     );
 
-    const logo = screen.getByAltText("Logo");
-    expect(logo).toBeInTheDocument();
-    expect(logo).toHaveAttribute("src", "img/tfn-logo-fullsize.png");
-    expect(logo).toHaveAttribute("data-position", "left");
+    expect(screen.queryByAltText("Logo")).not.toBeInTheDocument();
   });
 
-  it("keeps default TFN logo on the left when app sets right position", () => {
+  it("renders logo on the right when app sets right position", () => {
     useWindowWidth.mockReturnValue(1800);
 
     const appContext = {
@@ -264,6 +261,6 @@ describe("Navbar", () => {
     const logo = screen.getByAltText("Logo");
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute("src", "img/tfn-logo-fullsize.png");
-    expect(logo).toHaveAttribute("data-position", "left");
+    expect(logo).toHaveAttribute("data-position", "right");
   });
 });

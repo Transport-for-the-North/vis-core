@@ -15,6 +15,8 @@ import { defaultBgColour } from "defaults";
  * @param {string} [props.$bgColor] - Background color for the button (defaults to theme primary if present).
  * @param {string} [props.$width="auto"] - Optional width override.
  * @param {string} [props.$height="32px"] - Optional height override.
+ * @param {string} [props.$fontSize="16px"] - Optional font size override.
+ * @param {string|number} [props.$fontWeight="600"] - Optional font weight override.
  * @returns {JSX.Element} A styled button component.
  */
 export const AppButton = styled.button`
@@ -28,8 +30,8 @@ export const AppButton = styled.button`
   height: ${(props) => props.$height ?? "32px"};
 
   font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 600;
+  font-size: ${(props) => props.$fontSize ?? "16px"};
+  font-weight: ${(props) => props.$fontWeight ?? "600"};
 
   display: inline-flex;
   align-items: center;

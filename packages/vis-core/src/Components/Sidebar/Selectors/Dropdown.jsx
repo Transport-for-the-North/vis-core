@@ -7,7 +7,7 @@ import { useFilterContext } from "hooks/useFilterContext";
 import { SelectorLabel } from './SelectorLabel';
 import { makeSelectStyles, selectComponents } from 'utils/selectStyles';
 
-const CONTROL_COLOUR = 'rgb(220, 220, 220)';
+const CONTROL_COLOUR = 'var(--palette-mid-grey, #f0f0f7)';
 
 /**
  * Styled container around the dropdown and the optional info panel below.
@@ -17,20 +17,22 @@ const StyledDropdown = styled.div`
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 const InfoBelowPanel = styled.div`
   margin-top: -2px;
   padding: 8px 10px;
-  background: ${CONTROL_COLOUR};
-  border-right: 1px solid ${CONTROL_COLOUR};
-  border-bottom: 1px solid ${CONTROL_COLOUR};
-  border-left: 1px solid ${CONTROL_COLOUR};
+  background: ${({ theme }) => theme?.colors?.muted || CONTROL_COLOUR};
+  border-right: 1px solid ${({ theme }) => theme?.colors?.border || CONTROL_COLOUR};
+  border-bottom: 1px solid ${({ theme }) => theme?.colors?.border || CONTROL_COLOUR};
+  border-left: 1px solid ${({ theme }) => theme?.colors?.border || CONTROL_COLOUR};
   border-top: none;
-  border-radius: 0 0 ${(p) => p.theme.borderRadius} ${(p) => p.theme.borderRadius};
+  border-radius: 0 0 ${(p) => p.theme?.borderRadius || "4px"} ${(p) => p.theme?.borderRadius || "4px"};
   font-size: 0.85rem;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   position: relative;
+  z-index: 0;
 
   &::before {
     content: '';
@@ -39,8 +41,8 @@ const InfoBelowPanel = styled.div`
     bottom: 0;
     left: 0;
     width: 3px;
-    background: #adadadff;
-    border-bottom-left-radius: ${(p) => p.theme.borderRadius};
+    background: ${({ theme }) => theme?.colors?.accent || "var(--palette-teal, #00dec6)"};
+    border-bottom-left-radius: ${(p) => p.theme?.borderRadius || "4px"};
   }
 `;
 
@@ -57,7 +59,7 @@ const CollapseButton = styled.button`
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: ${({ theme }) => theme?.colors?.textMuted || "#666"};
   font-size: 0.9rem;
   padding: 2px;
   line-height: 0;

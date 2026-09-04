@@ -5,7 +5,7 @@ const StyledLabel = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-family: var(--font-sans);
   margin-bottom: 8px;
 `;

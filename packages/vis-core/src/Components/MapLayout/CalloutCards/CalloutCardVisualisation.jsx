@@ -73,11 +73,12 @@ const CardContainer = styled.div`
 `;
 
 const CardHeader = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 82px;
-  align-items: start;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   min-height: 30px;
+  width: 100%;
 `;
 
 /**
@@ -85,28 +86,32 @@ const CardHeader = styled.div`
  */
 const CardTitle = styled.h2`
   font-family: var(--font-sans);
-  font-size: 2em;
+  font-size: 1rem;
   color: var(--text-icon);
-  font-weight: 400;
-  margin-top: 5px;
+  font-weight: 600;
+  margin: 5px 0 0 0;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
   min-width: 0;
+  text-align: center;
+  width: 100%;
 
   @media ${(props) => props.theme.mq.mobile} {
-    font-size: 1.2em;
-    text-align: left;
+    font-size: 0.95rem;
+    text-align: center;
     margin: 0;
   }
 `;
 
 const StatusSlot = styled.div`
+  position: absolute;
+  right: 0;
+  top: 4px;
   min-width: 82px;
   min-height: 22px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  padding-top: 4px;
 `;
 
 const StatusBadge = styled.span`
@@ -140,19 +145,22 @@ const CardContent = styled.div`
   text-align: left;
 
   h2 {
-    font-size: 1.5em;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: var(--text-icon);
     margin-bottom: 0.5em;
+    text-align: left;
 
     @media ${(props) => props.theme.mq.mobile} {
-      font-size: 1.2em;
+      font-size: 0.9rem;
+      text-align: left;
     }
   }
 
   p {
-    font-size: 1.2em;
+    font-size: 0.85rem;
     color: var(--text-icon);
-    line-height: 1.6;
+    line-height: 1.5;
     margin: 0.5em 0;
   }
 
@@ -171,12 +179,12 @@ const CardContent = styled.div`
   .card {
     background-color: var(--palette-pale-teal);
     border-radius: 8px;
-    padding: 1em;
+    padding: 0.75em 1em;
     margin: 0.5em;
     flex: 1 0 100px;
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: left;
+    text-align: center;
   }
 
   .card.small {
@@ -197,21 +205,27 @@ const CardContent = styled.div`
   }
 
   .card .label {
-    font-size: 1.3em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     color: var(--text-icon);
-    margin-bottom: 0.5em;
+    margin-bottom: 0.35em;
     font-family: var(--font-sans);
+    text-align: center;
   }
 
   .card .value {
-    font-size: 2em;
+    font-size: 1.35rem;
     color: var(--text-icon);
     font-weight: bold;
     font-family: var(--font-family-base);
+    text-align: center;
+    line-height: 1.2;
   }
 
   .card .value.small {
-    font-size: 1em;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 900px) {
@@ -220,11 +234,11 @@ const CardContent = styled.div`
     }
 
     .card .value {
-      font-size: 1.5em;
+      font-size: 1.15rem;
     }
 
     .card .label {
-      font-size: 0.8em;
+      font-size: 0.7rem;
     }
   }
 
@@ -236,7 +250,7 @@ const CardContent = styled.div`
     background-color: var(--palette-pale-teal);
 
     summary {
-      font-size: 1.2em;
+      font-size: 0.9rem;
       font-weight: bold;
       cursor: pointer;
       position: relative;

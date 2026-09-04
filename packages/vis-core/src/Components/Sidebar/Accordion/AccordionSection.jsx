@@ -5,6 +5,8 @@ export const AccordionHeader = styled.button`
   cursor: pointer;
   padding: 10px;
   font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   border-radius: 5px 5px ${({ $isOpen }) => ($isOpen ? '0 0' : '5px 5px')};
@@ -33,9 +35,18 @@ const AccordionContent = styled.div`
   transition: max-height 0.3s ease, padding 0.3s ease;
   padding: ${({ $isOpen }) => ($isOpen ? '15px' : '0')} 20px;
   font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.45;
   background-color: #fff;
   border: ${({ $isOpen }) => ($isOpen ? '1px' : '0')} solid #ddd;
   border-radius: 0 0 5px 5px;
+
+  p,
+  li,
+  span,
+  label {
+    font-size: inherit;
+  }
 `;
 
 /**

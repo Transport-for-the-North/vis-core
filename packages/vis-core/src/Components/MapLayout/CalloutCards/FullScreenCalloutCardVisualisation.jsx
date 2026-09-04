@@ -257,12 +257,19 @@ const NavigationButton = styled.button`
  */
 const CardTitle = styled.h2`
   font-family: var(--font-sans);
-  font-size: 2em;
+  font-size: 1.05rem;
   color: var(--text-icon);
-  font-weight: 400;
+  font-weight: 600;
   margin-top: 5px;
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
+  text-align: center;
+
+  @media ${(props) => props.theme.mq.mobile} {
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 0;
+  }
 `;
 
 /**
@@ -272,19 +279,26 @@ const CardContent = styled.div`
   font-family: var(--font-sans);
   transition: opacity 0.3s;
   text-align: left;
-  font-size: 1.5em;
-  line-height: 28px;
+  font-size: 1rem;
+  line-height: 1.5;
 
   h2 {
-    font-size: 1.5em;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: var(--text-icon);
     margin-bottom: 0.5em;
+    text-align: left;
+
+    @media ${(props) => props.theme.mq.mobile} {
+      font-size: 0.9rem;
+      text-align: left;
+    }
   }
 
   p {
-    font-size: 1.2em;
+    font-size: 0.85rem;
     color: var(--text-icon);
-    line-height: 1.6;
+    line-height: 1.5;
     margin: 0.5em 0;
   }
 
@@ -303,31 +317,45 @@ const CardContent = styled.div`
   .card {
     background-color: var(--palette-pale-teal);
     border-radius: 8px;
-    padding: 1em;
+    padding: 0.75em 1em;
     margin: 0.5em;
     flex: 1 0 100px;
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: left;
+    text-align: center;
   }
 
   .card .label {
-    font-size: 1.3em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     color: var(--text-icon);
-    margin-bottom: 0.5em;
+    margin-bottom: 0.35em;
     font-family: var(--font-sans);
+    text-align: center;
   }
 
   .card .value {
-    font-size: 2em;
+    font-size: 1.35rem;
     color: var(--text-icon);
     font-weight: bold;
     font-family: var(--font-family-base);
+    text-align: center;
+    line-height: 1.2;
   }
 
   @media (max-width: 800px) {
     .card {
       flex: 1 0 45%;
+    }
+
+    .card .value {
+      font-size: 1.15rem;
+    }
+
+    .card .label {
+      font-size: 0.7rem;
     }
   }
 
@@ -345,7 +373,7 @@ const CardContent = styled.div`
     background-color: var(--palette-pale-teal);
 
     summary {
-      font-size: 1.2em;
+      font-size: 0.9rem;
       font-weight: bold;
       cursor: pointer;
       position: relative;

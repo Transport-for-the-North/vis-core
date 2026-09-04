@@ -59,13 +59,17 @@ export const Hovertip = ({
     position: 'absolute',
     top: `${position.top}px`,
     left: `${position.left}px`,
-    backgroundColor: 'black',
-    color: 'white',
-    padding: '5px',
+    backgroundColor: 'var(--palette-navy, #0d0f3d)',
+    color: 'var(--palette-white, #ffffff)',
+    fontFamily: 'var(--font-sans)',
+    padding: '6px 10px',
     borderRadius: '6px',
-    fontSize: '0.8em',
+    fontSize: '0.8rem',
+    lineHeight: '1.35',
     zIndex: 9999,
-    maxWidth: '15rem'
+    maxWidth: '15rem',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+    pointerEvents: 'none',
   };
 
   return createPortal(

@@ -42,11 +42,23 @@ export function makeSelectStyles(theme, opts = {}) {
   const {
     minHeight = 28,
     fontSize = "0.85rem",
-    borderColor = "#ddd",
+    borderColor,
     zIndex = 9999,
   } = opts;
-  const fontFamily = '"Open Sans", "Segoe UI", Arial, sans-serif';
+  const isLegacyFont = (font) =>
+    typeof font === "string" && font.includes("Hanken Grotesk");
+
+  const fontFamily =
+    (theme?.standardFontFamily && !isLegacyFont(theme.standardFontFamily)
+      ? theme.standardFontFamily
+      : null) || "var(--font-family-base)";
   const textColor = theme?.colors?.text || "var(--text-icon)";
+  // Prioritize brand theme primary color, avoiding legacy activeBg purple (#7317de)
+  const primaryColor =
+    theme?.colors?.primary ||
+    (theme?.primary && theme.primary !== "#7317de" && theme.primary !== "#7317DE" ? theme.primary : null) ||
+    "var(--palette-navy, #0d0f3d)";
+  const defaultBorder = borderColor || theme?.colors?.border || "var(--palette-grey, #d1d5db)";
 
   return {
     menuPortal: (base) => ({ ...base, zIndex }),
@@ -55,10 +67,15 @@ export function makeSelectStyles(theme, opts = {}) {
       fontFamily,
       color: textColor,
       minHeight,
-      borderRadius: theme.borderRadius,
-      borderColor: state.isFocused ? theme.activeBg : borderColor,
-      boxShadow: state.isFocused ? `0 0 0 1px ${theme.activeBg}` : "none",
-      "&:hover": { borderColor: theme.activeBg },
+      borderRadius: theme?.borderRadius || "4px",
+      borderColor: state.isFocused ? primaryColor : defaultBorder,
+      boxShadow: state.isFocused ? `0 0 0 1px ${primaryColor}` : "none",
+      position: "relative",
+      zIndex: state.isFocused ? 3 : 1,
+      "&:hover": {
+        borderColor: primaryColor,
+        zIndex: 2,
+      },
       textAlign: "left",
     }),
     valueContainer: (base) => ({
@@ -93,6 +110,14 @@ export function makeSelectStyles(theme, opts = {}) {
       color: textColor,
       fontSize,
     }),
+    multiValue: (base) => ({
+      ...base,
+      fontFamily,
+    }),
+    multiValueLabel: (base) => ({
+      ...base,
+      fontFamily,
+    }),
     menu: (base) => ({
       ...base,
       fontFamily,
@@ -110,16 +135,16 @@ export function makeSelectStyles(theme, opts = {}) {
       padding: "10px",
       fontSize,
       backgroundColor: isSelected
-        ? theme.activeBg
+        ? primaryColor
         : isFocused
-        ? (theme.colors?.muted || "#efeff7")
-        : (theme.colors?.surface || "#fff"),
-      color: isSelected ? "#fff" : textColor,
+        ? (theme?.colors?.muted || "var(--palette-mid-grey, #f0f0f7)")
+        : (theme?.colors?.surface || "var(--palette-white, #ffffff)"),
+      color: isSelected ? "var(--palette-white, #ffffff)" : textColor,
       cursor: "pointer",
       ":active": {
         ...styles[":active"],
-        backgroundColor: theme.activeBg,
-        color: "#fff",
+        backgroundColor: primaryColor,
+        color: "var(--palette-white, #ffffff)",
       },
     }),
   };
@@ -144,7 +169,7 @@ export function useCompactSelectStyles(opts = {}) {
     const base = makeSelectStyles(theme, {
       minHeight: opts.minHeight ?? 24,
       fontSize: opts.fontSize ?? "0.8rem",
-      borderColor: opts.borderColor ?? "#ddd",
+      borderColor: opts.borderColor ?? theme?.colors?.border ?? "#d1d5db",
       zIndex: opts.zIndex ?? 9999,
     });
 
