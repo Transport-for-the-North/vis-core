@@ -837,6 +837,14 @@ export const reclassifyData = (
   queryParams,
   options = {}
 ) => {
+  // Every branch below iterates `data` to derive its breaks. Callers pass the raw
+  // visualisation payload, so guard the shape here rather than throwing a bare
+  // "data.map is not a function" from deep inside a classification branch.
+  if (!Array.isArray(data)) {
+    console.warn("reclassifyData received non-array data; returning no bins.", data);
+    return [];
+  }
+
   /**
    * Normalises continuous-classification bins so the scale starts at zero.
    * @param {Array<number>} bins - Computed continuous break values.

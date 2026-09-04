@@ -9,7 +9,10 @@
  * @returns {string} Complete style string (e.g., 'line-categorical', 'point-continuous')
  */
 export const determineDynamicStyle = (dataSample, baseStyle) => {
-  if (!dataSample || dataSample.length === 0) {
+  // Non-array payloads (e.g. an unrecognised response envelope) have no `.map`, and
+  // throwing here is silently swallowed by the caller's fallback — which then resolves
+  // to a continuous style and hides the real problem until classification fails.
+  if (!Array.isArray(dataSample) || dataSample.length === 0) {
     return `${baseStyle}-continuous`; // Default fallback
   }
 

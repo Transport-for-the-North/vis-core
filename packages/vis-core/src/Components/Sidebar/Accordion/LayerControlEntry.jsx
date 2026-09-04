@@ -678,11 +678,33 @@ export const LayerControlEntry = memo(
         stylableSections.push({
           key: "colour-scheme",
           node: (
-            <ColourSchemeDropdown
-              colorStyle={colorStyle}
-              handleColorChange={handleColorChange}
-              layerName={layer.id}
-            />
+            <>
+              <ColourSchemeDropdown
+                colorStyle={colorStyle}
+                handleColorChange={handleColorChange}
+                layerName={layer.id}
+              />
+              <div style={{ display: "flex", alignItems: "center", marginTop: "8px" }}>
+                <input
+                  id={`invert-colour-${layer.id}`}
+                  type="checkbox"
+                  checked={state.layers?.[layer.id]?.invertedColorScheme === true}
+                  onChange={() => {
+                    mapDispatch?.({
+                      type: actionTypes.TOGGLE_INVERTED_COLOR_SCHEME,
+                      payload: { layerName: layer.id },
+                    });
+                  }}
+                  style={{ marginRight: "0.5rem", cursor: "pointer" }}
+                />
+                <ControlLabel
+                  htmlFor={`invert-colour-${layer.id}`}
+                  style={{ marginBottom: 0, cursor: "pointer" }}
+                >
+                  Invert colour scheme
+                </ControlLabel>
+              </div>
+            </>
           ),
         });
       }
