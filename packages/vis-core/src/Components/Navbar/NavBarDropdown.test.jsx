@@ -240,4 +240,28 @@ describe("RecursiveDropdownItem component test", () => {
       expect(screen.getByText("/url1")).toBeInTheDocument();
     });
   });
+
+  it("Cleans up hover state when unmounted while hovered", () => {
+    const fakeOnChildHoverChange = jest.fn();
+    const { unmount } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <RecursiveDropdownItem {...props} onChildHoverChange={fakeOnChildHoverChange} />
+      </MemoryRouter>
+    );
+
+    const container = screen.getByTestId("dropdown-item");
+
+    // Simulate hover
+    fireEvent.mouseEnter(container);
+    expect(fakeOnChildHoverChange).toHaveBeenCalledWith(true);
+
+    // Clear mocks before unmount to ensure we catch the cleanup call specifically
+    fakeOnChildHoverChange.mockClear();
+
+    // Unmount the component while it is still hovered
+    unmount();
+
+    // Verify the cleanup function fired and set hover state back to false
+    expect(fakeOnChildHoverChange).toHaveBeenCalledWith(false);
+  });
 });

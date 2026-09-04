@@ -353,6 +353,11 @@ export function RecursiveDropdownItem({
   // Notify parent when the overall hover state of this item (header or child) changes.
   useEffect(() => {
     onChildHoverChange(hovered);
+    return () => {
+      if (hovered) {
+        onChildHoverChange(false);
+      }
+    };
   }, [hovered, onChildHoverChange]);
 
    // Keep nested submenu anchored when viewport or parent scroll positions change.
@@ -373,10 +378,6 @@ export function RecursiveDropdownItem({
       window.removeEventListener("scroll", syncParentRect, true);
     };
   }, [subOpen]);
-
-  useEffect(() => () => {
-    onChildHoverChange(false);
-  }, [onChildHoverChange]);
 
   /**
    * Called when the mouse enters the item region.
@@ -542,9 +543,6 @@ export function NavBarDropdown({
     if (isHovered) {
       // as soon as you enter either area, force it open
       setOpen(true);
-    } else {
-      // Prevent stale nested state from keeping this tab highlighted.
-      setNavChildHovered(false);
     }
   };
 
@@ -592,15 +590,8 @@ export function NavBarDropdown({
         $hovered={navChildHovered || containerHovered}
       />
       {open && (
-        <DropdownMenuWrapper
-          onMouseEnter={() => handleHoverChange(true)}
-          onMouseLeave={() => handleHoverChange(false)}
-        >
-          <DropdownMenuScroll
-            role="menu"
-            onMouseEnter={() => handleHoverChange(true)}
-            onMouseLeave={() => handleHoverChange(false)}
-          >
+        <DropdownMenuWrapper>
+          <DropdownMenuScroll role="menu">
             {dropdownItems.map((item) => (
               <RecursiveDropdownItem
                 key={item.pageName || item.label}
