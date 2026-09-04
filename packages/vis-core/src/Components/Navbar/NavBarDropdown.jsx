@@ -15,6 +15,7 @@ const fadeSlideDown = keyframes`
 
 import { createNavItemClickHandler } from "utils/nav";
 import { FixedExternalIcon } from "./FixedExternalIcon";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { defaultBgColour } from "defaults";
 
 const NAV_ITEM_WIDTH = "250px";
@@ -139,21 +140,14 @@ const DropdownTitle = styled.span`
 /**
  * Indicator (arrow) rendered in the dropdown header.
  */
-const DropdownIndicator = styled.img`
-  margin-left: 8px;
-  width: 16px;
-  height: 16px;
-  object-fit: contain;
+const DropdownIndicator = styled(ChevronDownIcon)`
+  margin-left: 6px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
-  filter: ${({ $isActive, $hovered }) =>
-    $isActive || $hovered
-      ? "brightness(0) saturate(100%) invert(100%)"
-      : "brightness(0) saturate(100%) invert(16%) sepia(21%) saturate(1975%) hue-rotate(197deg) brightness(94%) contrast(97%)"};
-  transition: filter 260ms cubic-bezier(0.22, 1, 0.36, 1);
-
-  ${DropdownContainer}:hover & {
-    filter: brightness(0) saturate(100%) invert(100%);
-  }
+  color: inherit;
+  transition: transform 200ms ease;
+  transform: ${({ $isOpen }) => ($isOpen ? "rotate(180deg)" : "rotate(0deg)")};
 `;
 
 /**
@@ -578,11 +572,8 @@ export function NavBarDropdown({
     >
       <DropdownTitle>{dropdownName}</DropdownTitle>
       <DropdownIndicator
-        src="/arrows/arrow_down.svg"
-        alt=""
         aria-hidden="true"
-        $isActive={showActive}
-        $hovered={navChildHovered || containerHovered}
+        $isOpen={open}
       />
       {open && (
         <DropdownMenuWrapper>
