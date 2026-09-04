@@ -19,6 +19,7 @@ const NavLinksContainer = styled.div`
   gap: 10px;
   width: 100%;
   min-width: 0;
+  height: 100%;
 
   > * {
     flex: 1 1 0;
@@ -36,7 +37,7 @@ const baseNavLinkStyles = css`
   width: 100%;
   align-items: center;
   justify-content: center;
-  padding: 12px 14px;
+  padding: 8px 12px;
   height: auto;
   background-color: ${({ $active, $bgColor, theme }) =>
     $active
@@ -52,7 +53,7 @@ const baseNavLinkStyles = css`
     background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.25;
   font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};

@@ -19,20 +19,28 @@ const StyledNavbar = styled.nav`
   right: 0;
   z-index: 10005;
   width: 100%;
+  height: 75px;
+  box-sizing: border-box;
   background-color: ${({ theme }) => theme.navbarBg};
   font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 `;
 
 const HeaderOuter = styled.div`
   width: 100%;
+  height: 75px;
+  box-sizing: border-box;
   border-bottom: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
 `;
 
 const HeaderInner = styled.div`
   width: 100%;
+  height: 100%;
   max-width: none;
   margin: 0;
-  padding: 14px 20px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 `;
 
 const HeaderGrid = styled.div`
@@ -40,6 +48,8 @@ const HeaderGrid = styled.div`
   grid-template-columns: auto 1fr auto;
   align-items: center;
   column-gap: 20px;
+  width: 100%;
+  height: 100%;
 `;
 
 const HeaderNavSearch = styled.div`
@@ -47,6 +57,7 @@ const HeaderNavSearch = styled.div`
   align-items: center;
   justify-content: stretch;
   width: 100%;
+  height: 100%;
 `;
 
 const MobileLogoSlot = styled.div`
@@ -149,7 +160,7 @@ export function Navbar() {
   const location = useLocation();
   const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
-  const [navbarSpacerHeight, setNavbarSpacerHeight] = useState(0);
+  const [navbarSpacerHeight, setNavbarSpacerHeight] = useState(75);
   const appContext = useContext(AppContext);
   const { logOut, token, user } = useAuth();
   const didValidateOpenApiRef = useRef(false);
@@ -199,8 +210,8 @@ export function Navbar() {
 
   useEffect(() => {
     const updateSpacerHeight = () => {
-      const currentHeight = Math.ceil(navbarRef.current?.getBoundingClientRect()?.height || 0);
-      setNavbarSpacerHeight(currentHeight);
+      const currentHeight = Math.ceil(navbarRef.current?.getBoundingClientRect()?.height || 75);
+      setNavbarSpacerHeight(currentHeight || 75);
     };
 
     updateSpacerHeight();

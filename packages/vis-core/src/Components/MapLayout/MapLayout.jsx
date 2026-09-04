@@ -19,9 +19,11 @@ import { actionTypes } from "reducers";
 const LayoutContainer = styled.div`
   display: flex;
   height: calc(100vh - 75px);
+  overflow: hidden;
   @media ${props => props.theme.mq.mobile} {
    flex-direction: column;   /* stack Sidebar above Map */
    height: auto;             /* let content dictate height */
+   overflow: visible;
   }
 `;
 
@@ -29,6 +31,7 @@ const MapContainer = styled.div`
   flex: 1;
   position: relative;
   display: flex;
+  overflow: hidden;
   @media ${props => props.theme.mq.mobile} {
    flex: 0 0 auto;
    min-height: 60vh; /* ensure minimum height on mobile */}

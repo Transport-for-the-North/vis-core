@@ -85,9 +85,9 @@ const DropdownContainer = styled.div`
   width: 100%;
   align-items: center;
   font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 1.25;
   background-color: ${({ $isActive, $hovered, $bgColor, theme }) =>
     $isActive || $hovered
       ? $bgColor || theme?.primary || defaultBgColour
@@ -96,7 +96,7 @@ const DropdownContainer = styled.div`
     $isActive || $hovered
       ? theme?.activeNavText || "#ffffff"
       : theme?.colors?.text || "var(--text-icon)"};
-  padding: 12px 14px;
+  padding: 8px 12px;
   height: auto;
   cursor: pointer;
   justify-content: center;

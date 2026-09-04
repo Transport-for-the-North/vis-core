@@ -42,7 +42,7 @@ const SidebarContainer = styled.div`
   /* Desktop: fixed sidebar */
   position: fixed;
   left: ${({ $isVisible }) => ($isVisible ? '10px' : '-470px')};
-  top: 88px;
+  top: 85px;
   z-index: 1000;
 
   /* Mobile/tablet: static sidebar */
