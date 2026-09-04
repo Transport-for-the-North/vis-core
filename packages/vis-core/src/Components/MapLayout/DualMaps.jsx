@@ -62,6 +62,7 @@ const StyledMapContainer = styled.div`
   }
 `;
 
+
 /**
  * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.

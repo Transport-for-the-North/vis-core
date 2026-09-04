@@ -4,19 +4,26 @@ import { Link } from "react-router-dom";
 import { NavBarDropdown } from "./NavBarDropdown";
 import { createNavItemClickHandler } from "utils/nav";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import { defaultBgColour } from "defaults";
+
+const NAV_ITEM_MAX_WIDTH = "250px";
+const NAV_ITEM_MIN_WIDTH = "150px";
 
 /**
  * Styled container for the responsive navigation links.
  */
 const NavLinksContainer = styled.div`
   display: flex;
-  align-items: stretch;
-  flex-grow: 1;
-  height: 100%;
-  /* Each direct child takes equal space */
-  & > * {
-    flex: 1 1 auto;
-    text-align: center;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+
+  > * {
+    flex: 1 1 0;
+    min-width: ${NAV_ITEM_MIN_WIDTH};
+    max-width: ${NAV_ITEM_MAX_WIDTH};
   }
 `;
 
@@ -25,23 +32,50 @@ const NavLinksContainer = styled.div`
  */
 const baseNavLinkStyles = css`
   text-decoration: none;
-  display: flex;
-  max-width: 200px;
+  display: inline-flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
-  height: 100%;
+  padding: 12px 14px;
+  height: auto;
   background-color: ${({ $active, $bgColor, theme }) =>
-    $active ? ($bgColor || theme.activeNavColour) : "transparent"};
-  color: ${({ $active, theme }) => ($active ? "#f9f9f9" : theme.navText)};
-  border-bottom-right-radius: 20px;
-  transition: background-color 0.2s;
-  font-size: clamp(12px, 1.2vw, 18px);
+    $active
+      ? $bgColor || theme?.primary || defaultBgColour
+      : "transparent"};
+  color: ${({ $active, theme }) =>
+    $active
+      ? (theme?.activeNavText || "#ffffff")
+      : (theme?.colors?.text || "var(--text-icon)")};
+  border-radius: 10px;
+  transition:
+    color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
+  white-space: normal;
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  .nav-label {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    width: 100%;
+  }
 
   &:hover {
-    background-color: ${({ $bgColor, theme }) =>
-      $bgColor || theme.activeNavColour};
-    color: #f9f9f9;
+    color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
+    background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
+    box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
+    transform: translateY(-1px);
   }
 `;
 
@@ -50,8 +84,6 @@ const baseNavLinkStyles = css`
  */
 export const StyledNavLink = styled(Link)`
   ${baseNavLinkStyles}
-  white-space: normal;
-  overflow-wrap: break-word;
 `;
 
 /**
@@ -60,13 +92,12 @@ export const StyledNavLink = styled(Link)`
  */
 export const StyledExternalNavLink = styled.a`
   ${baseNavLinkStyles}
-  white-space: normal;
-  overflow-wrap: break-word;
+  gap: 6px;
+  align-items: center;
   
   /* The span holding the external label takes full available width */
   span.external-label {
-    flex: 1;
-    white-space: inherit;
+    flex: 1 1 auto;
   }
 `;
 
@@ -84,18 +115,48 @@ export const StyledExternalNavLink = styled.a`
  * @returns {JSX.Element} The rendered responsive navigation links.
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
+  const [hoveredTopLevelKey, setHoveredTopLevelKey] = React.useState(null);
+  const [pendingActiveLink, setPendingActiveLink] = React.useState(null);
+
+  const effectiveActiveLink = pendingActiveLink || activeLink;
+
+  React.useEffect(() => {
+    if (pendingActiveLink && activeLink === pendingActiveLink) {
+      setPendingActiveLink(null);
+    }
+  }, [activeLink, pendingActiveLink]);
+
+  const handleTopLevelHoverChange = (itemKey, isHovered) => {
+    setHoveredTopLevelKey((previousKey) => {
+      if (isHovered) return itemKey;
+      return previousKey === itemKey ? null : previousKey;
+    });
+  };
+
+  const handleInternalNavigate = (url, customLogo, navBg) => {
+    if (typeof url === "string" && url.startsWith("/")) {
+      setPendingActiveLink(url);
+    }
+    onClick(url, customLogo, navBg);
+  };
+
   return (
     <NavLinksContainer>
       {links.map((link, index) => {
+        const itemKey = `${link.label}-${index}`;
+        const suppressActive = Boolean(hoveredTopLevelKey && hoveredTopLevelKey !== itemKey);
+
         if (link.dropdownItems) {
           return (
             <NavBarDropdown
               key={`dropdown-${link.label}-${index}`}
               dropdownName={link.label}
               dropdownItems={link.dropdownItems}
-              activeLink={activeLink}
-              onClick={onClick}
+              activeLink={effectiveActiveLink}
+              onClick={handleInternalNavigate}
               $bgColor={link.navbarLinkBgColour || $bgColor}
+              isActiveSuppressed={suppressActive}
+              onTopLevelHoverChange={(isHovered) => handleTopLevelHoverChange(itemKey, isHovered)}
             />
           );
         } else if (link.external) {
@@ -107,8 +168,10 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               rel="noopener noreferrer"
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={false}
+              onMouseEnter={() => handleTopLevelHoverChange(itemKey, true)}
+              onMouseLeave={() => handleTopLevelHoverChange(itemKey, false)}
             >
-              <span className="external-label">{link.label}</span>
+              <span className="external-label nav-label">{link.label}</span>
               <ArrowTopRightOnSquareIcon style={{ width: "1rem", marginLeft: "4px" }} />
             </StyledExternalNavLink>
           );
@@ -118,10 +181,12 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               key={`internal-${link.label}-${index}`}
               to={link.url}
               $bgColor={link.navbarLinkBgColour || $bgColor}
-              $active={activeLink === link.url}
-              onClick={createNavItemClickHandler(link, onClick, $bgColor)}
+              $active={effectiveActiveLink === link.url && !suppressActive}
+              onClick={createNavItemClickHandler(link, handleInternalNavigate, $bgColor)}
+              onMouseEnter={() => handleTopLevelHoverChange(itemKey, true)}
+              onMouseLeave={() => handleTopLevelHoverChange(itemKey, false)}
             >
-              {link.label}
+              <span className="nav-label">{link.label}</span>
             </StyledNavLink>
           );
         }

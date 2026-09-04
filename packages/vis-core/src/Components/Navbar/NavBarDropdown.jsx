@@ -1,9 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Link } from "react-router-dom";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+const fadeSlideDown = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 import { createNavItemClickHandler } from "utils/nav";
 import { FixedExternalIcon } from "./FixedExternalIcon";
+import { defaultBgColour } from "defaults";
+
+const NAV_ITEM_WIDTH = "250px";
 
 /* ----------------------------------
    Styled Components Definitions
@@ -15,8 +29,10 @@ import { FixedExternalIcon } from "./FixedExternalIcon";
 const DropdownMenuWrapper = styled.div`
   position: absolute;
   width: 100%;
+  min-width: 100%;
   left: 0;
-  top: 74px; // Accounting for nav border to prevent inactivation
+  top: 100%;
+  padding-top: 8px;
   z-index: 1001;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -32,12 +48,14 @@ const DropdownMenuScroll = styled.div`
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #f9f9f9;
-  min-width: 140px;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  background-color: #ffffff;
+  width: 100%;
+  min-width: 100%;
+  box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
+  border-radius: 12px;
   position: relative;
+  animation: ${fadeSlideDown} 220ms ease;
 
   &::-webkit-scrollbar {
     width: 4px;
@@ -64,28 +82,41 @@ const DropdownMenuScroll = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-flex;
-  max-width: 200px;
+  width: 100%;
   align-items: center;
-  font-family: ${({ theme }) => theme.standardFontFamily};
-  font-size: clamp(12px, 1.2vw, 18px);
-  background-color: ${({ $isActive, $hovered, $bgColor }) =>
-    $isActive || $hovered ? $bgColor : "#f9f9f9"};
-  color: ${({ $isActive, $hovered }) =>
-    $isActive || $hovered ? "#ffffff" : "#4b3e91"};
-  padding: 0 10px;
-  height: 100%;
-  cursor: default;
-  justify-content: space-between;
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  background-color: ${({ $isActive, $hovered, $bgColor, theme }) =>
+    $isActive || $hovered
+      ? $bgColor || theme?.primary || defaultBgColour
+      : "transparent"};
+  color: ${({ $isActive, $hovered, theme }) =>
+    $isActive || $hovered
+      ? theme?.activeNavText || "#ffffff"
+      : theme?.colors?.text || "var(--text-icon)"};
+  padding: 12px 14px;
+  height: auto;
+  cursor: pointer;
+  justify-content: center;
   text-decoration: none;
-  border-bottom-right-radius: 20px;
-  transition: background-color 0.05s;
+  border-radius: 10px;
+  transition:
+    color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
   white-space: normal;
-  overflow-wrap: break-word;
+  min-width: 0;
   z-index: 1000;
+  box-sizing: border-box;
 
   &:hover {
-    background-color: ${({ $bgColor }) => $bgColor};
-    color: #ffffff;
+    color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
+    background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
+    box-shadow: 0 8px 20px rgba(13, 15, 61, 0.24);
+    transform: translateY(-1px);
   }
 
   @media only screen and (max-width: 767px) {
@@ -99,17 +130,35 @@ const DropdownContainer = styled.div`
 const DropdownTitle = styled.span`
   flex-grow: 1;
   text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: normal;
+  line-height: 1.25;
   overflow-wrap: break-word;
 `;
 
 /**
  * Indicator (arrow) rendered in the dropdown header.
  */
-const DropdownIndicator = styled.span`
-  margin-left: 5px;
-  white-space: normal;
-  overflow-wrap: break-word;
+const DropdownIndicator = styled.img`
+  margin-left: 8px;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: ${({ $isActive, $hovered }) =>
+    $isActive || $hovered
+      ? "brightness(0) saturate(100%) invert(100%)"
+      : "brightness(0) saturate(100%) invert(16%) sepia(21%) saturate(1975%) hue-rotate(197deg) brightness(94%) contrast(97%)"};
+  transition: filter 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  ${DropdownContainer}:hover & {
+    filter: brightness(0) saturate(100%) invert(100%);
+    transform: translateY(1px);
+  }
 `;
 
 /**
@@ -131,20 +180,30 @@ const dropdownItemStyles = css`
   display: flex;
   align-items: center; /* Ensure vertical centering */
   justify-content: space-between;
-  padding: 12px 10px;
+  padding: 10px 12px;
   text-decoration: none;
-  font-size: smaller;
+  font-size: 1rem;
   text-align: left;
   box-sizing: border-box;
-  background-color: ${({ $active, $hovered, $bgColor }) =>
-    $active || $hovered ? $bgColor : "#f9f9f9"};
-  color: ${({ $active, $hovered }) =>
-    $active || $hovered ? "#f9f9f9" : "#4b3e91"};
-  transition: background-color 0.05s ease, color 0.05s ease;
+  background-color: ${({ $active, $hovered, $bgColor, theme }) =>
+    $active || $hovered
+      ? $bgColor ||
+        theme?.activeBg ||
+        theme?.colors?.primary ||
+        defaultBgColour
+      : "#ffffff"};
+  color: ${({ $active, $hovered, theme }) =>
+    $active || $hovered
+      ? theme?.activeNavText || "#ffffff"
+      : theme?.colors?.text || "var(--text-icon)"};
+  transition: background-color 0.22s ease, color 0.22s ease;
   white-space: normal;
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
+  cursor: pointer;
   &:hover {
-    background-color: ${({ $bgColor }) => $bgColor};
-    color: #ffffff;
+    background-color: ${({ $bgColor, theme }) =>
+      $bgColor || theme?.activeBg || theme?.colors?.primary || defaultBgColour};
+    color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
   }
 `;
 
@@ -180,9 +239,11 @@ const NestedDropdownMenu = styled.div`
   position: fixed;
   left: ${({ left }) => left}px;
   top: ${({ top }) => top}px;
-  min-width: 160px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  width: ${NAV_ITEM_WIDTH};
+  min-width: ${NAV_ITEM_WIDTH};
+  background-color: #ffffff;
+  box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -191,6 +252,7 @@ const NestedDropdownMenu = styled.div`
   white-space: normal;
   overflow-wrap: break-word;
   font-size: clamp(12px, 1.2vw, 18px);
+  animation: ${fadeSlideDown} 220ms ease;
 `;
 
 /* ----------------------------------
@@ -312,6 +374,10 @@ export function RecursiveDropdownItem({
     };
   }, [subOpen]);
 
+  useEffect(() => () => {
+    onChildHoverChange(false);
+  }, [onChildHoverChange]);
+
   /**
    * Called when the mouse enters the item region.
    * If the item has children, the submenu is prepared and shown.
@@ -416,6 +482,8 @@ export function RecursiveDropdownItem({
  * @param {string} props.activeLink - Currently active URL.
  * @param {Function} props.onClick - Callback when an item is clicked.
  * @param {string} props.$bgColor - Background color for active/hovered states.
+ * @param {boolean} [props.isActiveSuppressed=false] - Temporarily suppress active styling when another top-level tab is hovered.
+ * @param {Function} [props.onTopLevelHoverChange] - Callback to notify parent of top-level hover changes.
  * @returns {JSX.Element}
  */
 export function NavBarDropdown({
@@ -424,23 +492,36 @@ export function NavBarDropdown({
   activeLink,
   onClick,
   $bgColor,
+  isActiveSuppressed = false,
+  onTopLevelHoverChange = () => {},
 }) {
   // Local state to determine if the main dropdown is open
   // or if any nested submenu item is hovered.
   const [open, setOpen] = useState(false);
   const [navChildHovered, setNavChildHovered] = useState(false);
   const [containerHovered, setContainerHovered] = useState(false);
+  const [focusWithin, setFocusWithin] = useState(false);
   const anchorRef = useRef(null);
 
   // whenever both are false, close after a short delay
   useEffect(() => {
-    if (!containerHovered && !navChildHovered) {
+    if (!containerHovered && !navChildHovered && !focusWithin) {
       const timeout = setTimeout(() => {
         setOpen(false);
       }, 50);
       return () => clearTimeout(timeout);
     }
-  }, [containerHovered, navChildHovered]);
+  }, [containerHovered, navChildHovered, focusWithin]);
+
+  // Route changes can happen while the pointer is still over portal content.
+  // Reset transient hover/open state so previous parent tabs do not stay highlighted.
+  useEffect(() => {
+    setOpen(false);
+    setContainerHovered(false);
+    setNavChildHovered(false);
+    setFocusWithin(false);
+    onTopLevelHoverChange(false);
+  }, [activeLink]);
 
   // isActive flag indicates if any item (or one of its children) matches the active URL.
   const isActive = dropdownItems.some(
@@ -449,6 +530,7 @@ export function NavBarDropdown({
       (item.children &&
         item.children.some((child) => child.url === activeLink))
   );
+  const showActive = isActive && !isActiveSuppressed;
 
   /**
    * Unified hover handler for the main dropdown container/children.
@@ -456,9 +538,33 @@ export function NavBarDropdown({
    */
   const handleHoverChange = (isHovered) => {
     setContainerHovered(isHovered);
+    onTopLevelHoverChange(isHovered);
     if (isHovered) {
       // as soon as you enter either area, force it open
       setOpen(true);
+    } else {
+      // Prevent stale nested state from keeping this tab highlighted.
+      setNavChildHovered(false);
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setOpen((previousOpen) => !previousOpen);
+    }
+  };
+
+  const handleFocus = () => {
+    setFocusWithin(true);
+    setOpen(true);
+  };
+
+  const handleBlur = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setFocusWithin(false);
+      setNavChildHovered(false);
+      onTopLevelHoverChange(false);
     }
   };
 
@@ -467,15 +573,32 @@ export function NavBarDropdown({
       ref={anchorRef}
       onMouseEnter={() => handleHoverChange(true)}
       onMouseLeave={() => handleHoverChange(false)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-expanded={open}
+      aria-haspopup="menu"
       $bgColor={$bgColor}
-      $isActive={isActive}
-      $hovered={navChildHovered}
+      $isActive={showActive}
+      $hovered={navChildHovered || containerHovered || focusWithin}
     >
       <DropdownTitle>{dropdownName}</DropdownTitle>
-      <DropdownIndicator>▾</DropdownIndicator>
+      <DropdownIndicator
+        src="/arrows/arrow_down.svg"
+        alt=""
+        aria-hidden="true"
+        $isActive={showActive}
+        $hovered={navChildHovered || containerHovered}
+      />
       {open && (
-        <DropdownMenuWrapper>
+        <DropdownMenuWrapper
+          onMouseEnter={() => handleHoverChange(true)}
+          onMouseLeave={() => handleHoverChange(false)}
+        >
           <DropdownMenuScroll
+            role="menu"
             onMouseEnter={() => handleHoverChange(true)}
             onMouseLeave={() => handleHoverChange(false)}
           >
@@ -487,6 +610,9 @@ export function NavBarDropdown({
                 onClick={(url, customLogo, navBg) => {
                   onClick(url, customLogo, navBg);
                   setOpen(false);
+                  setContainerHovered(false);
+                  setNavChildHovered(false);
+                  onTopLevelHoverChange(false);
                 }}
                 $bgColor={$bgColor}
                 onChildHoverChange={setNavChildHovered}

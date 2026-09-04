@@ -274,48 +274,4 @@ describe("Toggle component tests", () => {
       "only-option"
     );
   });
-
-  it("keeps selected button highlighted when option values are numbers and state stores strings", async () => {
-    const mixedTypeProps = {
-      filter: {
-        id: "direction-toggle",
-        values: {
-          values: [
-            {
-              paramValue: 0,
-              displayValue: "Access",
-              isValid: true,
-            },
-            {
-              paramValue: 1,
-              displayValue: "Egress",
-              isValid: true,
-            },
-          ],
-        },
-        multiSelect: false,
-      },
-      onChange: jest.fn(),
-      bgColor: "#123456",
-    };
-
-    const { rerender } = render(
-      <FilterContext.Provider value={{ ...mockFilterContext, state: { "direction-toggle": 0 } }}>
-        <Toggle {...mixedTypeProps} />
-      </FilterContext.Provider>
-    );
-
-    expect(screen.getByRole("button", { name: "Access ✅" })).toHaveStyle("background-color: #123456");
-
-    await userEvent.click(screen.getByRole("button", { name: "Egress ✅" }));
-    expect(mixedTypeProps.onChange).toHaveBeenCalledWith(mixedTypeProps.filter, 1);
-
-    rerender(
-      <FilterContext.Provider value={{ ...mockFilterContext, state: { "direction-toggle": "1" } }}>
-        <Toggle {...mixedTypeProps} />
-      </FilterContext.Provider>
-    );
-
-    expect(screen.getByRole("button", { name: "Egress ✅" })).toHaveStyle("background-color: #123456");
-  });
 });

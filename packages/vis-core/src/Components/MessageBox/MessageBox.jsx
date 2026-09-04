@@ -89,9 +89,19 @@ const MessageBox = ({ text, type, isSticky, margin, fontSize }) => {
       break;
   }
 
+  const accessibilityProps =
+    type === "error"
+      ? { role: "alert", "aria-live": "assertive", "aria-atomic": "true" }
+      : { role: "status", "aria-live": "polite", "aria-atomic": "true" };
+
   const messageContent = (
-    <MessageBoxContainer type={type} $margin={margin} $fontSize={fontSize}>
-      <IconWrapper>
+    <MessageBoxContainer
+      type={type}
+      $margin={margin}
+      $fontSize={fontSize}
+      {...accessibilityProps}
+    >
+      <IconWrapper aria-hidden="true">
         <Icon style={{ width: '20px', height: '20px', color: 'inherit' }} />
       </IconWrapper>
       <MessageText>{text}</MessageText>

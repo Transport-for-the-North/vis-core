@@ -14,11 +14,10 @@ import { MobileBar, SideIcon } from "Components/MobileBar/MobileBar";
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
   font-size: 1.2em;
-  color: #4b3e91;
   font-weight: bold;
   text-align: left;
   padding-left: 5px;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
   max-width: 270px;
@@ -42,7 +41,7 @@ const SidebarContainer = styled.div`
   /* Desktop: fixed sidebar */
   position: fixed;
   left: ${({ $isVisible }) => ($isVisible ? '10px' : '-470px')};
-  top: 85px;
+  top: 88px;
   z-index: 1000;
 
   /* Mobile/tablet: static sidebar */
@@ -108,7 +107,7 @@ const ToggleButton = styled.button`
   left: 392px;
   top: 25px;
   z-index: 1001;
-  background-color: ${(props) => props.$bgColor};
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;

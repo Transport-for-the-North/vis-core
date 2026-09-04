@@ -5,7 +5,7 @@ import { AppContext } from "contexts/AppContext";
 import { useAuth } from "contexts/AuthProvider";
 import { useWindowWidth } from "hooks/useWindowWidth";
 import { buildNavbarLinks, validateAppConfigAgainstOpenApi } from "utils";
-import { Button } from "./Button";
+import { defaultBgColour } from "defaults";
 import { Logo } from "./Logo";
 import { LateralNavbar } from "./LateralNavbar";
 import { ResponsiveNavbarLinks } from "./ResponsiveNavbarLinks";
@@ -13,52 +13,130 @@ import { ResponsiveNavbarLinks } from "./ResponsiveNavbarLinks";
 const DEFAULT_TFN_WEBSITE_URL = "https://www.transportforthenorth.com/";
 
 const StyledNavbar = styled.nav`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0px;
-  background-color: ${({ theme }) => theme.navbarBg};
-  width: 100%;
-  box-sizing: border-box;
-  height: 75px;
-  z-index: 10005;
-  border-bottom: 1px solid #e0e0e0;
   position: fixed;
   top: 0;
-  font-family: ${({ theme }) => theme.standardFontFamily};
+  left: 0;
+  right: 0;
+  z-index: 10005;
+  width: 100%;
+  background-color: ${({ theme }) => theme.navbarBg};
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 `;
 
-const NavbarContent = styled.div`
+const HeaderOuter = styled.div`
+  width: 100%;
+  border-bottom: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
+`;
+
+const HeaderInner = styled.div`
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 14px 20px;
+`;
+
+const HeaderGrid = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 20px;
+`;
+
+const HeaderNavSearch = styled.div`
   display: flex;
   align-items: center;
-  height: 100%;
-  flex-grow: 1;
-  justify-content: space-between;
+  justify-content: stretch;
+  width: 100%;
 `;
 
-const NavbarMobileButton = styled(Button)`
+const MobileLogoSlot = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
+const MobileMenuButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
   cursor: pointer;
-  margin-left: 10px;
-  margin-right: 10px;
-  @media only screen and (max-width: 767px) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+
+  &:hover {
+    background: #f3f4f6;
   }
+
+  span {
+    font-size: 24px;
+    line-height: 1;
+    color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  }
+`;
+
+const MobileMenuIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 `;
 
 const LogoutSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
+  justify-content: flex-end;
+  gap: 10px;
+  width: auto;
+  min-width: max-content;
+  padding-right: 22px;
 `;
 
-const StyledLogout = styled.img`
+const StyledLogoutButton = styled.button`
+  border: 1px solid ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  background: transparent;
+  color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   cursor: pointer;
-  width: 50%;
-  height: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 220ms ease, color 220ms ease;
+
+  &:hover {
+    background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    color: #ffffff;
+  }
+`;
+
+const LogoutIcon = styled.img`
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+`;
+
+const AuthActionButton = styled.button`
+  border: 1px solid ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  background: transparent;
+  color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
+  cursor: pointer;
+  transition: background-color 220ms ease, color 220ms ease;
+
+  &:hover {
+    background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    color: #ffffff;
+  }
 `;
 
 /**
@@ -71,23 +149,23 @@ export function Navbar() {
   const location = useLocation();
   const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
+  const [navbarSpacerHeight, setNavbarSpacerHeight] = useState(0);
   const appContext = useContext(AppContext);
-  const { logOut } = useAuth();
+  const { logOut, token, user } = useAuth();
   const didValidateOpenApiRef = useRef(false);
+  const navbarRef = useRef(null);
   const [logoImage, setLogoImage] = useState(appContext.logoImage);
-  const [$bgColor, setBgColor] = useState("#7317de");
+  const [$bgColor, setBgColor] = useState(defaultBgColour);
+  const [showMobileMenuIcon, setShowMobileMenuIcon] = useState(true);
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
   // Build unified links array from shared function.
   const links = buildNavbarLinks(appContext);
 
-  // Determine mobile view based on links length and window width.
-  const MOBILE_BREAKPOINT = 768;
-  const MIN_NAV_ITEM_WIDTH = 120;
-  const isMobile =
-    windowWidth < MOBILE_BREAKPOINT ||
-    links.length * MIN_NAV_ITEM_WIDTH > windowWidth;
+  // Determine mobile view using one shared breakpoint for all apps.
+  const MOBILE_BREAKPOINT = 1560;
+  const isMobile = windowWidth < MOBILE_BREAKPOINT;
 
   // When a link is clicked, update the logo and active bg colour appropriately.
   const onClick = (url, newLogo, navLinkBgColour) => {
@@ -110,10 +188,38 @@ export function Navbar() {
     logOut();
   };
 
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
   useEffect(() => {
     setActiveLink(location.pathname);
     setSideNavOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const updateSpacerHeight = () => {
+      const currentHeight = Math.ceil(navbarRef.current?.getBoundingClientRect()?.height || 0);
+      setNavbarSpacerHeight(currentHeight);
+    };
+
+    updateSpacerHeight();
+
+    let resizeObserver;
+    if ("ResizeObserver" in window && navbarRef.current) {
+      resizeObserver = new ResizeObserver(updateSpacerHeight);
+      resizeObserver.observe(navbarRef.current);
+    }
+
+    window.addEventListener("resize", updateSpacerHeight);
+    window.addEventListener("orientationchange", updateSpacerHeight);
+
+    return () => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener("resize", updateSpacerHeight);
+      window.removeEventListener("orientationchange", updateSpacerHeight);
+    };
+  }, [isMobile]);
 
   // Validate config vs OpenAPI exactly once per app load.
   // This is always-on for this vis-core version, but only logs when issues exist.
@@ -147,51 +253,90 @@ export function Navbar() {
   // Simplified logo logic: on mobile the logo is always left, on non-mobile
   // display the logo on the side indicated by appContext.logoPosition.
   const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
+  const hasLogo = typeof logoImage === "string" ? Boolean(logoImage.trim()) : Boolean(logoImage);
+  const isAuthenticated = Boolean(token || user);
+  const logoutImage = appContext.logoutImage || "img/logout.png";
+  const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;
+  const mobileMenuIconPath = appContext.mobileMenuIcon || appContext.logoutButtonImage || "img/burgerIcon.png";
+  const mobileMenuIconSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${mobileMenuIconPath}`;
 
   return (
     <>
-      <StyledNavbar>
-        <NavbarContent>
-          {isMobile && <NavbarMobileButton
-              src={appContext.logoutButtonImage}
-              alt="Burger Button Navbar"
-              onClick={updateSideNav}
-          />}
-          {(!isMobile && logoPosition === "left") && (
-            <Logo
-              logoImage={logoImage}
-              onClick={handleLogoClick}
-              position="left"
-            />
-          )}
-          {!isMobile && (
-            <ResponsiveNavbarLinks
-              links={links}
-              activeLink={activeLink}
-              onClick={onClick}
-              $bgColor={$bgColor}
-            />
-          )}
-          {(!isMobile && logoPosition === "right") && (
-            <Logo
-              logoImage={logoImage}
-              onClick={handleLogoClick}
-              position="right"
-            />
-          )}
-          {isMobile && (
-            <Logo
-              logoImage={logoImage}
-              onClick={handleLogoClick}
-              position="left"
-            />
-          )}
-        </NavbarContent>
-        {appContext.authenticationRequired && (
-          <LogoutSection>
-            <StyledLogout src="/img/logout.png" onClick={handleLogout} />
-          </LogoutSection>
-        )}
+      <StyledNavbar ref={navbarRef}>
+        <HeaderOuter>
+          <HeaderInner>
+            <HeaderGrid>
+              {isMobile ? (
+                <MobileMenuButton
+                  aria-label="Open main menu"
+                  aria-expanded={isSideNavOpen}
+                  onClick={updateSideNav}
+                  data-testid="mobile-menu-toggle"
+                >
+                  {showMobileMenuIcon ? (
+                    <MobileMenuIcon
+                      src={mobileMenuIconSrc}
+                      alt=""
+                      aria-hidden="true"
+                      onError={() => setShowMobileMenuIcon(false)}
+                    />
+                  ) : (
+                    <span aria-hidden="true">Menu</span>
+                  )}
+                </MobileMenuButton>
+              ) : (
+                hasLogo && logoPosition === "left" && (
+                  <Logo
+                    logoImage={logoImage}
+                    onClick={handleLogoClick}
+                    position="left"
+                  />
+                )
+              )}
+
+              <HeaderNavSearch>
+                {isMobile ? (
+                  hasLogo && (
+                    <MobileLogoSlot>
+                      <Logo
+                        logoImage={logoImage}
+                        onClick={handleLogoClick}
+                        position="left"
+                      />
+                    </MobileLogoSlot>
+                  )
+                ) : (
+                  <ResponsiveNavbarLinks
+                    links={links}
+                    activeLink={activeLink}
+                    onClick={onClick}
+                    $bgColor={$bgColor}
+                  />
+                )}
+              </HeaderNavSearch>
+
+              <LogoutSection>
+                {!isMobile && hasLogo && logoPosition === "right" && (
+                  <Logo
+                    logoImage={logoImage}
+                    onClick={handleLogoClick}
+                    position="right"
+                  />
+                )}
+                {appContext.authenticationRequired && (
+                  isAuthenticated ? (
+                    <StyledLogoutButton onClick={handleLogout} aria-label="Logout">
+                      <span>Logout</span>
+                      <LogoutIcon src={logoutImageSrc} alt="" aria-hidden="true" />
+                    </StyledLogoutButton>
+                  ) : (
+                    <AuthActionButton onClick={handleLogin}>Login</AuthActionButton>
+                  )
+                )}
+              </LogoutSection>
+            </HeaderGrid>
+          </HeaderInner>
+        </HeaderOuter>
       </StyledNavbar>
       {isMobile && (
         <LateralNavbar
@@ -200,7 +345,7 @@ export function Navbar() {
           $bgColor={$bgColor}
         />
       )}
-      <div style={{ height: "75px" }}></div>
+      <div style={{ height: `${navbarSpacerHeight}px` }}></div>
     </>
   );
 }
