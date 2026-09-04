@@ -139,6 +139,7 @@ export const Layer = ({ layer }) => {
               ? layer.fixedLineWidth
               : null,
           enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
+          hideOutOfBandWarning: layer.hideOutOfBandWarning ?? true,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY, // configurable default opacity with fallback
         };
@@ -381,6 +382,7 @@ export const Layer = ({ layer }) => {
               ? layer.fixedLineWidth
               : null,
           enforceNoCustomBanding: layer.enforceNoCustomBanding ?? false,
+          hideOutOfBandWarning: layer.hideOutOfBandWarning ?? true,
           zoomToFeaturePlaceholderText: layer.zoomToFeaturePlaceholderText || "",
           defaultOpacity: layer.defaultOpacity ?? DEFAULT_LAYER_OPACITY,
           bufferSize: layer.bufferSize,
