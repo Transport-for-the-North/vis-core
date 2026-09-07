@@ -1,8 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
 import { getAppName } from '../runtime';
+import { getUserRoles } from '../utils/auth';
 
 /**
  * Higher-Order Component to check authentication and roles.
@@ -18,15 +18,8 @@ export const withRoleValidation = (WrappedComponent, { adminOnly = false } = {})
         const token = Cookies.get('token');
         const appName = getAppName();
 
-        let userRoles = token ? jwtDecode(token)["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [] : [];
-
-        // Ensure userRoles is an array
-        if (typeof userRoles === 'string') {
-            userRoles = [userRoles];
-        }
-
         const isAuthenticated = !!token;
-        const lowerCaseUserRoles = userRoles.map(role => role.toLowerCase());
+        const lowerCaseUserRoles = getUserRoles();
 
         // appName is lower-cased to match the (already lower-cased) user roles.
         const lowerAppName = (appName || '').toLowerCase();

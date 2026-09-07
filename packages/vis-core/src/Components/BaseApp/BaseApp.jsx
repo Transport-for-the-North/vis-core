@@ -14,6 +14,8 @@ import { AppContext, AuthProvider, ErrorProvider } from "contexts";
 import { api } from "services";
 import { loadBands } from "utils";
 import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
+import { buildNavbarLinks } from "utils/nav";
+import { isAppAdmin, isAppSuperuser } from "utils/auth";
 import {
   withWarning,
   withRoleValidation,
@@ -274,13 +276,40 @@ export function BaseApp({
     </>
   );
 
+  const normalisedAppName = (appName || '').toLowerCase();
+  const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
+
+  // Filter visible app pages based on role authorization
+  const visibleAppPages = (appConfig.appPages ?? []).filter(
+    page => !page.adminOnly || isAdmin
+  );
+
+  // Pre-compute the complete list of renderable navigation links
+  const navbarLinks = buildNavbarLinks({
+    ...appConfig,
+    appPages: visibleAppPages,
+  });
+
+  if (appConfig.adminPage && isAdmin) {
+    navbarLinks.splice(1, 0, {
+      label: "Admin",
+      url: "/admin",
+    });
+  }
+
+  const contextValue = {
+    ...appConfig,
+    appPages: visibleAppPages,
+    navbarLinks,
+  };
+
   const appContent = (
     <div className={appCssClass}>
       <AuthProvider>
         <ErrorProvider>
           <ThemeProvider theme={effectiveTheme}>
             <BrandGlobalStyles />
-            <AppContext.Provider value={appConfig}>
+            <AppContext.Provider value={contextValue}>
               {beforeDashboard}
               <Navbar />
               <Dashboard>

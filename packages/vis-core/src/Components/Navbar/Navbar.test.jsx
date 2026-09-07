@@ -263,4 +263,62 @@ describe("Navbar", () => {
     expect(logo).toHaveAttribute("src", "img/tfn-logo-fullsize.png");
     expect(logo).toHaveAttribute("data-position", "right");
   });
+
+  it("renders safely when appPages is undefined in appContext", () => {
+    const appContext = {
+      logoImage: "img/tfn-logo-fullsize.png",
+      authenticationRequired: false,
+    };
+
+    expect(() => {
+      render(
+        <MemoryRouter>
+          <AppContext.Provider value={appContext}>
+            <Navbar />
+          </AppContext.Provider>
+        </MemoryRouter>
+      );
+    }).not.toThrow();
+  });
+
+  it("uses pre-computed navbarLinks from AppContext directly", () => {
+    useWindowWidth.mockReturnValue(1800);
+    const appContext = {
+      logoImage: "img/tfn-logo-fullsize.png",
+      authenticationRequired: false,
+      navbarLinks: [
+        { label: "Home", url: "/" },
+        { label: "Admin", url: "/admin" },
+        { label: "Data", url: "/data" },
+      ],
+    };
+
+    render(
+      <MemoryRouter>
+        <AppContext.Provider value={appContext}>
+          <Navbar />
+        </AppContext.Provider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId("responsive-links")).toHaveTextContent("links:3");
+  });
+
+  it("uses links prop directly when passed to Navbar", () => {
+    useWindowWidth.mockReturnValue(1800);
+    const customLinks = [
+      { label: "Custom 1", url: "/c1" },
+      { label: "Custom 2", url: "/c2" },
+    ];
+
+    render(
+      <MemoryRouter>
+        <AppContext.Provider value={{ logoImage: "img/logo.png" }}>
+          <Navbar links={customLinks} />
+        </AppContext.Provider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId("responsive-links")).toHaveTextContent("links:2");
+  });
 });
