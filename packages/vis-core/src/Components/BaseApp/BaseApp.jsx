@@ -228,20 +228,44 @@ export function BaseApp({
     loadAppConfig();
   }, [appName, configLoader, bandsLoader]);
 
+  const isAuthRequired = appConfig?.authenticationRequired ?? true;
+  const HomePageWithRoleValidation = useMemo(
+    () => (isAuthRequired ? withRoleValidation(HomePage) : HomePage),
+    [isAuthRequired]
+  );
+  const NotFoundWithRoleValidation = useMemo(
+    () => (isAuthRequired ? withRoleValidation(NotFound) : NotFound),
+    [isAuthRequired]
+  );
+  const AdminPageWithAuth = useMemo(
+    () => (isAuthRequired ? withRoleValidation(AdminPage, { adminOnly: true }) : AdminPage),
+    [isAuthRequired]
+  );
+
+  const pageRoutes = useMemo(() => {
+    if (!appConfig) return null;
+    return (appConfig.appPages ?? []).map((page) => {
+      const PageComponent = isAuthRequired
+        ? withRoleValidation(PageSwitch, { adminOnly: page.adminOnly ?? false })
+        : PageSwitch;
+      const WrappedPageComponent = composeHOCs(
+        withWarning,
+        withTermsOfUse
+      )(PageComponent);
+      return (
+        <Route
+          key={page.pageName}
+          path={page.url}
+          element={<WrappedPageComponent pageConfig={page} />}
+        />
+      );
+    });
+  }, [appConfig?.appPages, isAuthRequired]);
+
   if (!appConfig) {
     return <div>Loading...</div>;
   }
 
-  const isAuthRequired = appConfig.authenticationRequired ?? true;
-  const HomePageWithRoleValidation = isAuthRequired
-    ? withRoleValidation(HomePage)
-    : HomePage;
-  const NotFoundWithRoleValidation = isAuthRequired
-    ? withRoleValidation(NotFound)
-    : NotFound;
-  const AdminPageWithAuth = isAuthRequired
-    ? withRoleValidation(AdminPage, { adminOnly: true })
-    : AdminPage;
 
   // Standard routes
   const standardRoutes = (
@@ -252,25 +276,7 @@ export function BaseApp({
       {appConfig.adminPage && (
         <Route path="/admin" element={<AdminPageWithAuth />} />
       )}
-      {appConfig.appPages.map((page) => {
-        let PageComponent;
-        if (!isAuthRequired) {
-          PageComponent = PageSwitch;
-        } else {
-          PageComponent = withRoleValidation(PageSwitch, { adminOnly: page.adminOnly ?? false });
-        }
-        const WrappedPageComponent = composeHOCs(
-          withWarning,
-          withTermsOfUse
-        )(PageComponent);
-        return (
-          <Route
-            key={page.pageName}
-            path={page.url}
-            element={<WrappedPageComponent pageConfig={page} />}
-          />
-        );
-      })}
+      {pageRoutes}
       {customRoutes}
       <Route path="*" element={<NotFoundWithRoleValidation />} />
     </>
