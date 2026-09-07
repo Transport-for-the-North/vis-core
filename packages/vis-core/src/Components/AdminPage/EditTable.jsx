@@ -241,7 +241,7 @@ export function EditTable({ table }) {
               <tbody>
                 {rows.length === 0 ? (
                   <tr>
-                    <Td colSpan={displayFields.length + (showActions ? 1 : 0)} style={{ color: "#9ca3af", fontStyle: "italic" }}>
+                    <Td colSpan={displayFields.length + (showActions ? 1 : 0)} style={{ color: "#64748b", fontStyle: "italic" }}>
                       No rows
                     </Td>
                   </tr>
@@ -252,7 +252,10 @@ export function EditTable({ table }) {
                         <ActionTd>
                           <AppButton
                             $bgColor="#dc2626"
-                            $height="28px"
+                            $height="26px"
+                            $fontSize="0.75rem"
+                            $padding="2px 8px"
+                            $fontWeight="500"
                             disabled={mutating}
                             onClick={() => handleDelete(row)}
                           >
@@ -300,7 +303,13 @@ export function EditTable({ table }) {
                   />
                 )
               )}
-              <AppButton disabled={!canAdd || mutating} onClick={handleAdd}>
+              <AppButton
+                $height="36px"
+                $fontSize="0.85rem"
+                $padding="6px 16px"
+                disabled={!canAdd || mutating}
+                onClick={handleAdd}
+              >
                 {/* Name the row count once several can be added in one press. */}
                 {canAdd && pendingRows.length > 1 ? `Add ${pendingRows.length}` : "Add"}
               </AppButton>

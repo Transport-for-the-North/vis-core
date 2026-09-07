@@ -24,7 +24,7 @@ function formatOptionLabel(option, meta) {
     <div>
       <div>{option.label}</div>
       {descriptions.map((d, i) => (
-        <div key={i} style={{ fontSize: "0.72rem", color: "#6b7280", lineHeight: 1.3 }}>
+        <div key={i} style={{ fontSize: "0.72rem", color: "#4b5563", lineHeight: 1.3 }}>
           {d}
         </div>
       ))}
@@ -53,7 +53,7 @@ function formatOptionLabel(option, meta) {
 export function LookupSelect({ options, value, onChange, placeholder, disabled, multi }) {
   const theme = useTheme();
   const selectStyles = useMemo(
-    () => makeSelectStyles(theme, { minHeight: 36, fontSize: "0.85rem", borderColor: "#d1d5db" }),
+    () => makeSelectStyles(theme, { minHeight: 36, fontSize: "0.85rem", borderColor: "#94a3b8" }),
     [theme]
   );
   const optionFor = (v) => options.find((o) => String(o.value) === String(v)) ?? null;

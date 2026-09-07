@@ -4,7 +4,9 @@ import { ROW_HEIGHT_PX, HEADER_HEIGHT_PX } from "utils";
 
 export const Page = styled.div`
   padding: 16px 32px 32px;
-  background: #f5f5f5;
+  background: #edf0f5;
+  font-family: ${({ theme }) => theme?.navFontFamily || 'var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif)'};
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
   min-height: calc(100vh - 75px);
   box-sizing: border-box;
 `;
@@ -16,7 +18,7 @@ export const LayoutContainer = styled.div`
   align-items: stretch;
 
   & > *:not(:last-child) {
-    border-right: 1px solid #d1d5db;
+    border-right: 1px solid #cbd5e1;
     padding-right: 18px;
   }
   & > *:not(:first-child) {
@@ -33,7 +35,7 @@ export const Column = styled.div`
   flex-direction: column;
 
   & > *:not(:last-child) {
-    border-bottom: 1px solid #d1d5db;
+    border-bottom: 1px solid #cbd5e1;
     padding-bottom: 16px;
   }
   & > *:not(:first-child) {
@@ -47,7 +49,7 @@ export const CellStack = styled.div`
   flex-direction: column;
 
   & > *:not(:last-child) {
-    border-bottom: 1px solid #d1d5db;
+    border-bottom: 1px solid #cbd5e1;
     padding-bottom: 16px;
   }
   & > *:not(:first-child) {
@@ -56,9 +58,11 @@ export const CellStack = styled.div`
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
+  font-family: ${({ theme }) =>
+    theme?.standardFontFamily || 'var(--font-family-base, "Korto", "Open Sans", sans-serif)'};
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
   margin: 0 0 12px 0;
   text-align: left;
 `;
@@ -77,12 +81,13 @@ export const SectionHeader = styled.div`
 const STATUS_TONE_COLOURS = {
   success: "#059669",
   error: "#dc2626",
-  muted: "#9ca3af",
+  muted: "#64748b",
 };
 
 export const InlineStatus = styled.span`
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  font-size: 0.8rem;
   line-height: 1;
   white-space: nowrap;
   color: ${({ $tone }) => STATUS_TONE_COLOURS[$tone] ?? STATUS_TONE_COLOURS.muted};
@@ -96,12 +101,18 @@ export const Grid = styled.div`
 `;
 
 export const Card = styled.div`
-  background: ${({ $stale }) => ($stale ? "#fffbeb" : "#fff")};
-  border-radius: 8px;
+  background: ${({ $stale }) => ($stale ? "#fffbeb" : "#ffffff")};
+  border-radius: ${({ theme }) => theme?.borderRadius || "8px"};
+  border: 1px solid ${({ $stale }) => ($stale ? "#fde68a" : "#cbd5e1")};
   padding: 16px 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   border-left: 4px solid
-    ${({ $stale, $hasData }) => ($stale ? "#f59e0b" : $hasData ? "#7317de" : "#d1d5db")};
+    ${({ $stale, $hasData, theme }) =>
+      $stale
+        ? "#d97706"
+        : $hasData
+        ? theme?.colors?.primary || theme?.primary || "var(--palette-navy, #0d0f3d)"
+        : "#94a3b8"};
 `;
 
 // Amber "Stale" pill shown on a card whose data is older than its staleAfterDays.
@@ -110,9 +121,10 @@ export const StaleBadge = styled.span`
   margin-left: 8px;
   padding: 1px 7px;
   border-radius: 999px;
-  background: #f59e0b;
+  background: #d97706;
   color: #fff;
-  font-size: 0.6rem;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   vertical-align: middle;
@@ -120,14 +132,15 @@ export const StaleBadge = styled.span`
 
 // Muted inline text, e.g. the "· 3 days ago" suffix after a date.
 export const Muted = styled.span`
-  color: #9ca3af;
+  color: #4b5563;
   font-weight: 400;
 `;
 
 // Placeholder shown on an audit card for an empty table.
 export const CardEmpty = styled.p`
   margin: 4px 0 0;
-  color: #9ca3af;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  color: #4b5563;
   font-style: italic;
   font-size: 0.85rem;
 `;
@@ -137,7 +150,7 @@ export const MetricRow = styled.div`
   display: flex;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid #cbd5e1;
 `;
 
 export const Metric = styled.div`
@@ -146,32 +159,37 @@ export const Metric = styled.div`
   text-align: center;
 
   & + & {
-    border-left: 1px solid #f3f4f6;
+    border-left: 1px solid #cbd5e1;
   }
 `;
 
 export const MetricLabel = styled.div`
-  font-size: 0.62rem;
-  color: #9ca3af;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #4b5563;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 2px;
 `;
 
 export const MetricValue = styled.div`
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #111;
+  font-family: ${({ theme }) =>
+    theme?.standardFontFamily || 'var(--font-family-base, "Korto", "Open Sans", sans-serif)'};
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
 `;
 
 // Small uppercase heading separating a group of rows within a card.
 export const CardSubheading = styled.div`
   margin: 12px 0 4px;
   padding-top: 10px;
-  border-top: 1px solid #f3f4f6;
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #9ca3af;
+  border-top: 1px solid #cbd5e1;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #334155;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 `;
@@ -186,16 +204,19 @@ export const ExpandToggle = styled.button`
   margin: 12px 0 4px;
   padding: 10px 0 0;
   border: none;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid #cbd5e1;
   background: none;
   cursor: pointer;
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #6b7280;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #334155;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 
-  &:hover { color: #374151; }
+  &:hover {
+    color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
+  }
 
   .chevron {
     width: 14px;
@@ -207,9 +228,11 @@ export const ExpandToggle = styled.button`
 `;
 
 export const CardTitle = styled.h3`
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #374151;
+  font-family: ${({ theme }) =>
+    theme?.standardFontFamily || 'var(--font-family-base, "Korto", "Open Sans", sans-serif)'};
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
   margin: 0 0 10px 0;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -218,8 +241,9 @@ export const CardTitle = styled.h3`
 export const Row = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  color: #555;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
   margin-bottom: 4px;
 
   &:last-child {
@@ -228,32 +252,34 @@ export const Row = styled.div`
 `;
 
 export const Label = styled.span`
-  color: #9ca3af;
+  color: #4b5563;
+  font-weight: 500;
   flex-shrink: 0;
   margin-right: 12px;
 `;
 
 export const Value = styled.span`
-  color: #111;
-  font-weight: 500;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
+  font-weight: 600;
   text-align: right;
   word-break: break-word;
 `;
 
 export const NoData = styled.span`
-  color: #d1d5db;
+  color: #64748b;
   font-style: italic;
 `;
 
 // Placeholder shown in a table cell when its value is empty.
 export const EmptyValue = styled.span`
-  color: #b6bcc4;
+  color: #64748b;
   font-style: italic;
 `;
 
 export const StatusMessage = styled.p`
-  color: #6b7280;
-  font-size: 0.9rem;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
+  color: #334155;
+  font-size: 0.85rem;
   margin: 0;
 `;
 
@@ -293,49 +319,59 @@ export const TableWrap = styled.div`
     height: 10px;
   }
   &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #94a3b8;
     border-radius: 5px;
   }
   &::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: #64748b;
   }
   &::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #e2e8f0;
     border-radius: 5px;
   }
-  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-color: #94a3b8 #e2e8f0;
 `;
 
 export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  background: #ffffff;
+  border-radius: ${({ theme }) => theme?.borderRadius || "8px"};
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
 `;
 
 export const Th = styled.th`
   text-align: left;
-  padding: 10px 14px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b7280;
+  padding: 11px 14px;
+  font-family: ${({ theme }) =>
+    theme?.standardFontFamily || 'var(--font-family-base, "Korto", "Open Sans", sans-serif)'};
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: 0.05em;
+  background: ${({ theme }) => theme?.colors?.primary || theme?.primary || "var(--palette-navy, #0d0f3d)"};
+  border-bottom: 2px solid ${({ theme }) => theme?.colors?.accent || "var(--palette-teal, #00dec6)"};
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
   white-space: nowrap;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+
+  &:last-child {
+    border-right: none;
+  }
 `;
 
 export const Td = styled.td`
   padding: 10px 14px;
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
   font-size: 0.85rem;
-  color: #111;
-  border-bottom: 1px solid #f3f4f6;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
+  border-bottom: 1px solid #e2e8f0;
   white-space: nowrap;
 `;
 
@@ -343,13 +379,16 @@ export const Td = styled.td`
 // scrolls horizontally.
 export const ActionTh = styled(Th)`
   left: 0;
-  z-index: 2;
+  z-index: 3;
+  background: ${({ theme }) => theme?.colors?.primary || theme?.primary || "var(--palette-navy, #0d0f3d)"};
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
 `;
 
 export const ActionTd = styled(Td)`
   position: sticky;
   left: 0;
-  background: #fff;
+  background: #ffffff;
+  border-right: 1px solid #cbd5e1;
   z-index: 1;
 `;
 
@@ -364,13 +403,26 @@ export const AddRow = styled.div`
 export const FieldInput = styled.input`
   flex: 1;
   min-width: 140px;
+  height: 36px;
+  box-sizing: border-box;
   padding: 7px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  border-radius: ${({ theme }) => theme?.borderRadius || "6px"};
+  font-family: var(--font-sans, "Open Sans", "Segoe UI", Arial, sans-serif);
   font-size: 0.85rem;
-  background: #fff;
-  color: #111;
+  background: #ffffff;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon, #0d0f3d)"};
+
+  &::placeholder {
+    color: #64748b;
+  }
+
   &:disabled { opacity: 0.5; }
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme?.colors?.primary || theme?.primary || "var(--palette-navy, #0d0f3d)"};
+    box-shadow: 0 0 0 1px ${({ theme }) => theme?.colors?.primary || theme?.primary || "var(--palette-navy, #0d0f3d)"};
+  }
 `;
 
 export const SelectWrap = styled.div`

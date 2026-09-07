@@ -50,7 +50,7 @@ export function ViewTable({ table }) {
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <Td colSpan={displayFields.length} style={{ color: "#9ca3af", fontStyle: "italic" }}>
+                  <Td colSpan={displayFields.length} style={{ color: "#64748b", fontStyle: "italic" }}>
                     No rows
                   </Td>
                 </tr>

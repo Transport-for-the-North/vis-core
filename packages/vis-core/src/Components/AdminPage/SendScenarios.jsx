@@ -29,7 +29,7 @@ function formatOptionLabel(option, meta) {
     <div>
       <div>{option.label}</div>
       {descriptions.map((d, i) => (
-        <div key={i} style={{ fontSize: "0.72rem", color: "#6b7280", lineHeight: 1.3 }}>
+        <div key={i} style={{ fontSize: "0.72rem", color: "#4b5563", lineHeight: 1.3 }}>
           {d}
         </div>
       ))}
@@ -57,7 +57,7 @@ export function SendScenarios({ config }) {
   const { requestRefresh } = useAdminRefresh();
   const theme = useTheme();
   const selectStyles = useMemo(
-    () => makeSelectStyles(theme, { minHeight: 36, fontSize: "0.85rem", borderColor: "#d1d5db" }),
+    () => makeSelectStyles(theme, { minHeight: 36, fontSize: "0.85rem", borderColor: "#94a3b8" }),
     [theme]
   );
 
@@ -203,7 +203,13 @@ export function SendScenarios({ config }) {
           placeholder={appSource.placeholder ?? "Select destination app"}
           disabled={sending || noTargets}
         />
-        <AppButton disabled={!canSend} onClick={handleSend}>
+        <AppButton
+          $height="36px"
+          $fontSize="0.85rem"
+          $padding="6px 16px"
+          disabled={!canSend}
+          onClick={handleSend}
+        >
           {sending ? "Sending…" : "Send"}
         </AppButton>
       </AddRow>
