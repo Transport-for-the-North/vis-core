@@ -35,8 +35,7 @@ const DropdownMenuWrapper = styled.div`
   top: 100%;
   padding-top: 8px;
   z-index: 1001;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-radius: 12px;
   overflow: visible;
   box-sizing: border-box;
 `;
@@ -234,11 +233,9 @@ const NestedDropdownMenu = styled.div`
   background-color: #ffffff;
   box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
   border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border-radius: 12px;
   overflow: hidden;
-  z-index: 1000;
+  z-index: 10010;
   white-space: normal;
   overflow-wrap: break-word;
   animation: ${fadeSlideDown} 220ms ease;
