@@ -1,10 +1,12 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components/DynamicLegend/DynamicLegend";
 import { useMap } from "hooks/useMap";
 import { useMapContext } from "hooks/useMapContext";
+import { useAppContext } from "contexts/AppContext";
+import { PageContext } from "contexts/PageContext";
 import { useFilterContext } from "hooks/useFilterContext";
 import { actionTypes } from "reducers";
 import { api } from "services";
@@ -24,6 +26,7 @@ import {
   buildLoadingSection,
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
+  getMetricDefinition,
 } from "utils";
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -84,6 +87,8 @@ function resolveBaseLayerIdFromSpiderLayerId(layerId) {
 const Map = (props) => {
   const mapContainerRef = useRef(null);
   const { state, dispatch } = useMapContext();
+  const defaultBands = useAppContext()?.defaultBands;
+  const currentPage = useContext(PageContext);
   const { mapStyle, mapCentre, mapZoom } = state;
   const { map, isMapReady } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom, props.extraCopyrightText);
   const { dispatch: filterDispatch } = useFilterContext();
@@ -551,8 +556,14 @@ const Map = (props) => {
             ? formatNumber(featureValue)
             : "";
         const layerVisualisationName = layerConfig.visualisationName;
+        const tooltipMetricDefinition = getMetricDefinition(
+          defaultBands,
+          currentPage,
+          state.visualisations[layerVisualisationName]?.queryParams ?? {}
+        );
         const unitText =
           layerConfig.defaultTooltipUnitName ??
+          tooltipMetricDefinition?.legendSubtitleText ??
           state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
         const valueText =
            layerConfig.defaultTooltipValueName ??
@@ -756,7 +767,7 @@ const Map = (props) => {
         hoverInfoRef.current.timeoutId = timeoutId;
       }
     },
-    [map, state.layers, state.visualisations, generateMetadataHtml]
+    [map, state.layers, state.visualisations, currentPage, defaultBands, generateMetadataHtml]
   );
 
   /**

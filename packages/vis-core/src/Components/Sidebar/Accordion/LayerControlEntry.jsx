@@ -14,7 +14,12 @@ import { SelectorLabel } from "Components/Sidebar/Selectors/SelectorLabel";
 import { ClassificationDropdown } from "Components/Sidebar/Selectors/ClassificationDropdown";
 import { AppContext, MapContext, PageContext } from "contexts";
 import { actionTypes } from "reducers";
-import { calculateMaxWidthFactor, applyWidthFactor, updateOpacityExpression } from "utils/map";
+import {
+  calculateMaxWidthFactor,
+  applyWidthFactor,
+  updateOpacityExpression,
+  getMetricDefinition,
+} from "utils/map";
 
 /**
  * Styled container for the layer control entry.
@@ -313,11 +318,6 @@ export const LayerControlEntry = memo(
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
-    const selectedPageBands = appConfig.defaultBands.find((band) => {
-      if (!currentPage) return false;
-      const categoryOrName = currentPage.category || currentPage.pageName;
-      return band.name === categoryOrName;
-    });
     const visualisation =
       currentPage.pageName.includes("Side-by-Side") ||
       currentPage.pageName.includes("Side by Side")
@@ -333,11 +333,28 @@ export const LayerControlEntry = memo(
       );
     }, [layer.metadata?.colorStyle, visualisation?.style]);
 
-    const hasDefaultBands = selectedPageBands?.metric.find(
-      (metric) =>
-        metric.name ===
-        visualisation.queryParams[selectedMetricParamName.paramName]?.value
+    const metricDefinition = useMemo(
+      () =>
+        getMetricDefinition(
+          appConfig.defaultBands,
+          currentPage,
+          visualisation?.queryParams ?? {}
+        ),
+      [appConfig.defaultBands, currentPage, visualisation?.queryParams]
     );
+
+    // Diverging layers are banded from differenceValues; every other style uses values.
+    // Reading `values` for a diverging layer showed a scale the map never used.
+    const defaultBandValues = useMemo(() => {
+      if (colorStyle !== "diverging") return metricDefinition?.values;
+
+      const differenceValues = metricDefinition?.differenceValues;
+      if (!differenceValues?.length) return differenceValues;
+
+      return visualisation?.style?.includes("line")
+        ? differenceValues.slice(differenceValues.length / 2)
+        : differenceValues;
+    }, [colorStyle, metricDefinition, visualisation?.style]);
 
     const shouldHaveOpacityControl =
       layer.metadata?.shouldHaveOpacityControl ?? true;
@@ -449,7 +466,7 @@ export const LayerControlEntry = memo(
       }
 
       if (!maps.length || !maps[0].getLayer(layer.id)) {
-        return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+        return defaultBandValues || [0, 1, 2, 3, 4];
       }
 
       const paintProps = layer.paint;
@@ -458,30 +475,34 @@ export const LayerControlEntry = memo(
         paintProps?.["circle-color"] ||
         paintProps?.["fill-color"];
 
-      if (!colorExpression || !Array.isArray(colorExpression)) {
-        return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      // Diverging line layers colour by sign alone -- a "case" expression carrying no
+      // stops -- and hold their bands in the width ramp instead. Read that when the
+      // colour ramp has no stops to offer, otherwise the editor can never reflect the
+      // live classification on those layers and silently shows the configured defaults.
+      const binExpression =
+        Array.isArray(colorExpression) && colorExpression[0] === "interpolate"
+          ? colorExpression
+          : paintProps?.["line-width"];
+
+      if (!Array.isArray(binExpression) || binExpression[0] !== "interpolate") {
+        return defaultBandValues || [0, 1, 2, 3, 4];
       }
 
-      // Extract bins from interpolate expression: ["interpolate", ["linear"], ["feature-state", "value"], bin1, color1, bin2, color2, ...]
-      if (colorExpression[0] === "interpolate") {
-        const stops = colorExpression.slice(3); // Skip ["interpolate", ["linear"], ["feature-state", "value"]]
-        const bins = [];
-        for (let i = 0; i < stops.length; i += 2) {
-          bins.push(stops[i]);
-        }
-        return bins.length > 0
-          ? bins
-          : hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      // ["interpolate", ["linear"], ["feature-state", <field>], bin1, out1, bin2, out2, ...]
+      const stops = binExpression.slice(3);
+      const bins = [];
+      for (let i = 0; i < stops.length; i += 2) {
+        bins.push(stops[i]);
       }
 
-      return hasDefaultBands?.values || [0, 1, 2, 3, 4];
+      return bins.length > 0 ? bins : defaultBandValues || [0, 1, 2, 3, 4];
     }, [
       currentClassMethod,
       customBandsFromState,
       maps,
       layer.id,
       layer.paint,
-      hasDefaultBands,
+      defaultBandValues,
     ]);
 
     /**
@@ -773,7 +794,7 @@ export const LayerControlEntry = memo(
                 isDiverging={colorStyle === "diverging"}
                 isCustom={currentClassMethod === "c"}
                 data={bandEditorData}
-                defaultBandValues={hasDefaultBands?.values || null}
+                defaultBandValues={defaultBandValues || null}
                 onReset={() => {
                   const target = prevNonCustomClassMethodRef.current || "d";
                   handleCustomBandsChange([], layer.id);

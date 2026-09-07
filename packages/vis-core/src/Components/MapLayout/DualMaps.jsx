@@ -1,10 +1,12 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components/DynamicLegend/DynamicLegend";
 import { useDualMaps } from "hooks/useDualMaps";
 import { useMapContext } from "hooks/useMapContext";
+import { useAppContext } from "contexts/AppContext";
+import { PageContext } from "contexts/PageContext";
 import { useFilterContext } from "hooks/useFilterContext";
 import maplibregl from "maplibre-gl";
 import { api } from "services";
@@ -19,6 +21,7 @@ import {
   buildLoadingSection,
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
+  getMetricDefinition,
 } from "utils";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
@@ -73,6 +76,8 @@ const DualMaps = (props) => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
   const { state, dispatch } = useMapContext();
+  const defaultBands = useAppContext()?.defaultBands;
+  const currentPage = useContext(PageContext);
   const { mapStyle, mapCentre, mapZoom } = state;
   const { leftMap, rightMap, isMapReady } = useDualMaps(
     leftMapContainerRef,
@@ -383,8 +388,15 @@ const DualMaps = (props) => {
               ? numberWithCommas(featureValue)
               : "";
           const layerVisualisationName = state.layers[layerId]?.visualisationName;
+          
+          const tooltipMetricDefinition = getMetricDefinition(
+            defaultBands,
+            currentPage,
+            state.visualisations[layerVisualisationName]?.queryParams ?? {}
+          );
           const unitText =
             layerConfig.defaultTooltipUnitName ??
+            tooltipMetricDefinition?.legendSubtitleText ??
             state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
           const valueText =
             layerConfig.defaultTooltipValueName ??
@@ -580,7 +592,7 @@ const DualMaps = (props) => {
         }
       });
     },
-    [maps, state.layers, state.visualisations]
+    [maps, state.layers, state.visualisations, currentPage, defaultBands]
   );
 
 

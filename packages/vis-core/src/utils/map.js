@@ -32,9 +32,43 @@ export function moveTownCityLabelsToTop(map) {
 
 
 /**
+ * Helper: Resolves the active display mode for a page.
+ *
+ * A display mode changes the units a visualisation is drawn in — an absolute difference
+ * versus a percentage difference, say — which means the same metric needs a different set
+ * of bands, legend units and tooltip units depending on the mode. The page nominates the
+ * driving filter by setting `containsDisplayModeInfo: true` on it, and that filter's
+ * current value is the mode.
+ *
+ * This is deliberately a separate flag from `containsLegendInfo`: a page usually needs both
+ * a metric selector and a display-mode selector, so one flag cannot serve both roles.
+ *
+ * @param {Object} currentPage - The current app page.
+ * @param {Object} queryParams - The URL query parameters.
+ * @returns {string|null} The active display mode, or null when the page has no such filter.
+ */
+export const getActiveDisplayMode = (currentPage, queryParams) => {
+  const displayModeFilter = currentPage?.config?.filters?.find(
+    (filter) => filter.containsDisplayModeInfo === true
+  );
+
+  if (!displayModeFilter) return null;
+
+  return queryParams?.[displayModeFilter.paramName]?.value ?? null;
+};
+
+/**
  * Helper: Extracts the metric definition from the defaultBands.
  * Returns an object that includes values, differenceValues, and colours for the metric,
  * or null if nothing is found.
+ *
+ * Resolution order:
+ *   1. A band entry named after the active display mode (e.g. "pct_difference"). Such an
+ *      entry replaces the metric's own definition outright rather than merging into it,
+ *      so it must be self-contained. One entry serves every metric in the category, which
+ *      suits percentage bands because a percentage change is unitless.
+ *   2. An explicit `bandMetricName` override.
+ *   3. The metric named by the page's `containsLegendInfo` filter.
  *
  * @param {Array}  defaultBands              - The bands array from defaults.
  * @param {Object} currentPage              - The current app page (used to resolve the page category).
@@ -54,8 +88,14 @@ export const getMetricDefinition = (
   queryParams,
   options = {}
 ) => {
-  const pageCategory = currentPage.category || currentPage.pageName;
+  const pageCategory = currentPage?.category || currentPage?.pageName;
   const selectedPageBands = defaultBands?.find((band) => band.name === pageCategory);
+
+  const displayMode = getActiveDisplayMode(currentPage, queryParams);
+  if (displayMode && selectedPageBands) {
+    const modeBands = selectedPageBands.metric.find((m) => m.name === displayMode);
+    if (modeBands) return modeBands;
+  }
 
   // 1. Prefer the explicit bandMetricName override (e.g. TRSE layers that pin
   //    to a fixed metric regardless of the active filter). If it resolves,
@@ -69,7 +109,7 @@ export const getMetricDefinition = (
   // 2. Filter-based resolution: derive the metric name from the page filter
   //    whose containsLegendInfo flag is set. This is the original path used
   //    by all layers that do not pin a metric.
-  if (currentPage.config && currentPage.config.filters) {
+  if (currentPage?.config && currentPage.config.filters) {
     const selectedMetricFilter = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
@@ -950,12 +990,14 @@ export const reclassifyData = (
     if (classificationMethod === "d") {
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
-      if (metric) {
+      if (metric?.values?.length) {
         // Return explicit band values as-is; the user configured these intentionally
         // (e.g. values: [5, 20, 40, 60, 80]) and normalising to 0 would discard that.
         return metric.values;
       }
-      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      // Fallback to page-level defaultClassification if specified, otherwise quantile.
+      // A display-mode entry that only defines difference bands lands here for continuous
+      // layers, and is classified from the data rather than left unbanded.
       classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {
@@ -1021,12 +1063,14 @@ export const reclassifyData = (
     if (classificationMethod === "d") {
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
-      if (metric) {
+      if (metric?.differenceValues?.length) {
         return !style.includes("line")
           ? metric.differenceValues
           : metric.differenceValues.slice(metric.differenceValues.length / 2);
       }
-      // Fallback to page-level defaultClassification if specified, otherwise quantile
+      // Fallback to page-level defaultClassification if specified, otherwise quantile.
+      // A display-mode entry with no difference bands is classified from the data rather
+      // than banded against the wrong units.
       classificationMethod = options.defaultClassification ?? "q";
     }
     if (classificationMethod === "l") {

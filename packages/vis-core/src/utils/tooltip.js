@@ -2,6 +2,29 @@
 // NOTE: Keep templates minimal and consistent with existing CSS classes
 
 /**
+ * Join an already-formatted value to its unit.
+ *
+ * Most units are words and read as a separate token ("218.63 Passengers"), but "%" is
+ * conventionally written tight against the number ("218.63%"), so the space is dropped
+ * for it. An empty unit contributes nothing rather than a trailing space.
+ *
+ * Deliberately module-private and distinct from `formatValueWithUnit` in utils/text.js:
+ * that one takes a raw number and formats it, whereas callers here have already formatted
+ * the value (and may have thousands separators, which would not survive Number()).
+ *
+ * @param {string|number} value - The already-formatted value.
+ * @param {string} [unit] - The unit text, if any.
+ * @returns {string} The value and unit joined for display.
+ */
+function joinValueAndUnit(value, unit) {
+  const unitText = unit ?? "";
+
+  if (!unitText) return `${value}`;
+
+  return unitText.startsWith("%") ? `${value}${unitText}` : `${value} ${unitText}`;
+}
+
+/**
  * Build the default tooltip HTML (title/value/metadata-section wrapper) used by maps.
  * Returns empty string if nothing to render.
  */
@@ -34,7 +57,7 @@ export function buildDefaultTooltip({
     ? `
       <div class="metadata-item">
         <span class="metadata-key">${valueText}:</span>
-        <span class="metadata-value">${featureValueDisplay} ${unitText ?? ""}</span>
+        <span class="metadata-value">${joinValueAndUnit(featureValueDisplay, unitText)}</span>
       </div>`
     : "";
 
@@ -42,7 +65,7 @@ export function buildDefaultTooltip({
     ? `
       <hr class="divider">`
     : "";
-  
+
   return `
     <div class="popup-content">
       ${featureNameHtml}
