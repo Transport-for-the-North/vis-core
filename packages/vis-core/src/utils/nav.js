@@ -95,8 +95,10 @@ export function buildNavbarLinks(appContext) {
   // Add Home link.
   links.push({ label: "Home", url: "/" });
 
+  const appPages = appContext?.appPages ?? [];
+
   // Internal pages without a category.
-  appContext.appPages
+  appPages
     .filter((page) => !page.category)
     .forEach((page) => {
       links.push({
@@ -109,7 +111,7 @@ export function buildNavbarLinks(appContext) {
 
   // Group internal pages with categories.
   const pagesByCategory = {};
-  appContext.appPages
+  appPages
     .filter((page) => page.category)
     .forEach((page) => {
       if (!pagesByCategory[page.category]) pagesByCategory[page.category] = [];

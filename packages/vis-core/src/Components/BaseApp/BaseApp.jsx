@@ -8,11 +8,14 @@ import { Login } from "Components/Login";
 import { Unauthorized } from "Components/Login/Unauthorised";
 import { TermsOfUse } from "Components/TermsOfUse";
 import { NotFound } from "Components/NotFoundPage/NotFoundPage";
+import { AdminPage } from "Components/AdminPage";
 import { Dashboard } from "layouts";
 import { AppContext, AuthProvider, ErrorProvider } from "contexts";
 import { api } from "services";
 import { loadBands } from "utils";
 import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
+import { buildNavbarLinks } from "utils/nav";
+import { isAppAdmin, isAppSuperuser } from "utils/auth";
 import {
   withWarning,
   withRoleValidation,
@@ -204,8 +207,15 @@ export function BaseApp({
         const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
 
+        // Extract AdminPage from appPages so it sits at appConfig.adminPage instead.
+        // This lets apps configure it via the template without polluting appPages.
+        const adminPageEntry = initialAppConfig.appPages?.find(p => p.type === 'AdminPage');
+        const filteredAppPages = initialAppConfig.appPages?.filter(p => p.type !== 'AdminPage') ?? [];
+
         setAppConfig({
           ...initialAppConfig,
+          appPages: filteredAppPages,
+          adminPage: adminPageEntry?.config ?? initialAppConfig.adminPage ?? null,
           apiSchema: apiSchema,
           defaultBands: bands,
           authenticationRequired: authenticationRequired
@@ -218,17 +228,44 @@ export function BaseApp({
     loadAppConfig();
   }, [appName, configLoader, bandsLoader]);
 
+  const isAuthRequired = appConfig?.authenticationRequired ?? true;
+  const HomePageWithRoleValidation = useMemo(
+    () => (isAuthRequired ? withRoleValidation(HomePage) : HomePage),
+    [isAuthRequired]
+  );
+  const NotFoundWithRoleValidation = useMemo(
+    () => (isAuthRequired ? withRoleValidation(NotFound) : NotFound),
+    [isAuthRequired]
+  );
+  const AdminPageWithAuth = useMemo(
+    () => (isAuthRequired ? withRoleValidation(AdminPage, { adminOnly: true }) : AdminPage),
+    [isAuthRequired]
+  );
+
+  const pageRoutes = useMemo(() => {
+    if (!appConfig) return null;
+    return (appConfig.appPages ?? []).map((page) => {
+      const PageComponent = isAuthRequired
+        ? withRoleValidation(PageSwitch, { adminOnly: page.adminOnly ?? false })
+        : PageSwitch;
+      const WrappedPageComponent = composeHOCs(
+        withWarning,
+        withTermsOfUse
+      )(PageComponent);
+      return (
+        <Route
+          key={page.pageName}
+          path={page.url}
+          element={<WrappedPageComponent pageConfig={page} />}
+        />
+      );
+    });
+  }, [appConfig?.appPages, isAuthRequired]);
+
   if (!appConfig) {
     return <div>Loading...</div>;
   }
 
-  const isAuthRequired = appConfig.authenticationRequired ?? true;
-  const HomePageWithRoleValidation = isAuthRequired
-    ? withRoleValidation(HomePage)
-    : HomePage;
-  const NotFoundWithRoleValidation = isAuthRequired
-    ? withRoleValidation(NotFound)
-    : NotFound;
 
   // Standard routes
   const standardRoutes = (
@@ -236,26 +273,41 @@ export function BaseApp({
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<HomePageWithRoleValidation />} />
-      {appConfig.appPages.map((page) => {
-        const PageComponent = isAuthRequired
-          ? withRoleValidation(PageSwitch)
-          : PageSwitch;
-        const WrappedPageComponent = composeHOCs(
-          withWarning,
-          withTermsOfUse
-        )(PageComponent);
-        return (
-          <Route
-            key={page.pageName}
-            path={page.url}
-            element={<WrappedPageComponent pageConfig={page} />}
-          />
-        );
-      })}
+      {appConfig.adminPage && (
+        <Route path="/admin" element={<AdminPageWithAuth />} />
+      )}
+      {pageRoutes}
       {customRoutes}
       <Route path="*" element={<NotFoundWithRoleValidation />} />
     </>
   );
+
+  const normalisedAppName = (appName || '').toLowerCase();
+  const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
+
+  // Filter visible app pages based on role authorization
+  const visibleAppPages = (appConfig.appPages ?? []).filter(
+    page => !page.adminOnly || isAdmin
+  );
+
+  // Pre-compute the complete list of renderable navigation links
+  const navbarLinks = buildNavbarLinks({
+    ...appConfig,
+    appPages: visibleAppPages,
+  });
+
+  if (appConfig.adminPage && isAdmin) {
+    navbarLinks.splice(1, 0, {
+      label: "Admin",
+      url: "/admin",
+    });
+  }
+
+  const contextValue = {
+    ...appConfig,
+    appPages: visibleAppPages,
+    navbarLinks,
+  };
 
   const appContent = (
     <div className={appCssClass}>
@@ -263,7 +315,7 @@ export function BaseApp({
         <ErrorProvider>
           <ThemeProvider theme={effectiveTheme}>
             <BrandGlobalStyles />
-            <AppContext.Provider value={appConfig}>
+            <AppContext.Provider value={contextValue}>
               {beforeDashboard}
               <Navbar />
               <Dashboard>

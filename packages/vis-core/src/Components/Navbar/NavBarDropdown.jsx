@@ -19,6 +19,7 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { defaultBgColour } from "defaults";
 
 const NAV_ITEM_WIDTH = "250px";
+const NESTED_NAV_ITEM_WIDTH = "230px";
 
 /* ----------------------------------
    Styled Components Definitions
@@ -35,8 +36,7 @@ const DropdownMenuWrapper = styled.div`
   top: 100%;
   padding-top: 8px;
   z-index: 1001;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-radius: 12px;
   overflow: visible;
   box-sizing: border-box;
 `;
@@ -229,19 +229,24 @@ const NestedDropdownMenu = styled.div`
   position: fixed;
   left: ${({ left }) => left}px;
   top: ${({ top }) => top}px;
-  width: ${NAV_ITEM_WIDTH};
-  min-width: ${NAV_ITEM_WIDTH};
+  width: ${NESTED_NAV_ITEM_WIDTH};
+  min-width: ${NESTED_NAV_ITEM_WIDTH};
   background-color: #ffffff;
-  box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
   border: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border-radius: 12px;
   overflow: hidden;
-  z-index: 1000;
+  z-index: 10010;
   white-space: normal;
   overflow-wrap: break-word;
   animation: ${fadeSlideDown} 220ms ease;
+
+  ${DropdownItemLink},
+  ${DropdownItemAnchor} {
+    font-size: 0.8125rem;
+    padding: 8px 12px;
+    line-height: 1.35;
+  }
 `;
 
 /* ----------------------------------

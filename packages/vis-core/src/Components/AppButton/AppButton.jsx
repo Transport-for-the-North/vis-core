@@ -15,14 +15,15 @@ import { defaultBgColour } from "defaults";
  * @param {string} [props.$bgColor] - Background color for the button (defaults to theme primary if present).
  * @param {string} [props.$width="auto"] - Optional width override.
  * @param {string} [props.$height="32px"] - Optional height override.
+ * @param {string} [props.$padding] - Optional padding override.
  * @param {string} [props.$fontSize="16px"] - Optional font size override.
  * @param {string|number} [props.$fontWeight="600"] - Optional font weight override.
  * @returns {JSX.Element} A styled button component.
  */
 export const AppButton = styled.button`
   cursor: pointer;
-  padding: 10px 12px;
-  background-color: ${(props) => props.$bgColor ?? props.theme?.primary ?? defaultBgColour};
+  padding: ${(props) => props.$padding ?? "10px 12px"};
+  background-color: ${(props) => props.$bgColor ?? props.theme?.colors?.primary ?? props.theme?.primary ?? defaultBgColour};
   color: white;
   border-radius: 8px;
   border: 0.25px solid;

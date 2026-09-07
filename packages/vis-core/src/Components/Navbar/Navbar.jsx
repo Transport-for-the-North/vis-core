@@ -156,7 +156,7 @@ const AuthActionButton = styled.button`
  * @component
  * @returns {JSX.Element|null} The rendered navbar, or null on routes like "/login".
  */
-export function Navbar() {
+export function Navbar({ links: propLinks }) {
   const location = useLocation();
   const [isSideNavOpen, setSideNavOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("");
@@ -165,14 +165,15 @@ export function Navbar() {
   const { logOut, token, user } = useAuth();
   const didValidateOpenApiRef = useRef(false);
   const navbarRef = useRef(null);
-  const [logoImage, setLogoImage] = useState(appContext.logoImage);
+  const [logoImage, setLogoImage] = useState(appContext?.logoImage);
   const [$bgColor, setBgColor] = useState(defaultBgColour);
   const [showMobileMenuIcon, setShowMobileMenuIcon] = useState(true);
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
 
-  // Build unified links array from shared function.
-  const links = buildNavbarLinks(appContext);
+  // Use pre-computed links from AppContext (or propLinks if provided),
+  // falling back to buildNavbarLinks for backwards compatibility.
+  const links = propLinks ?? appContext?.navbarLinks ?? buildNavbarLinks(appContext ?? {});
 
   // Determine mobile view using one shared breakpoint for all apps.
   const MOBILE_BREAKPOINT = 1560;
