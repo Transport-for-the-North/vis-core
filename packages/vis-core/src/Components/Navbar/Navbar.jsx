@@ -41,6 +41,10 @@ const HeaderInner = styled.div`
   box-sizing: border-box;
   display: flex;
   align-items: center;
+
+  @media only screen and (max-width: 767px) {
+    padding: 0 8px;
+  }
 `;
 
 const HeaderGrid = styled.div`
@@ -50,6 +54,11 @@ const HeaderGrid = styled.div`
   column-gap: 20px;
   width: 100%;
   height: 100%;
+
+  @media only screen and (max-width: 767px) {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    column-gap: 8px;
+  }
 `;
 
 const HeaderNavSearch = styled.div`
@@ -58,6 +67,7 @@ const HeaderNavSearch = styled.div`
   justify-content: stretch;
   width: 100%;
   height: 100%;
+  min-width: 0;
 `;
 
 const MobileLogoSlot = styled.div`
@@ -65,6 +75,7 @@ const MobileLogoSlot = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-width: 0;
 `;
 
 const MobileMenuButton = styled.button`
@@ -103,6 +114,12 @@ const LogoutSection = styled.div`
   width: auto;
   min-width: max-content;
   padding-right: 22px;
+
+  @media only screen and (max-width: 767px) {
+    gap: 6px;
+    min-width: 0;
+    padding-right: 0;
+  }
 `;
 
 const StyledLogoutButton = styled.button`
@@ -119,6 +136,14 @@ const StyledLogoutButton = styled.button`
   align-items: center;
   gap: 8px;
   transition: background-color 220ms ease, color 220ms ease;
+
+  @media only screen and (max-width: 767px) {
+    padding: 6px 8px;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+  }
 
   &:hover {
     background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
@@ -143,6 +168,13 @@ const AuthActionButton = styled.button`
   font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   cursor: pointer;
   transition: background-color 220ms ease, color 220ms ease;
+
+  @media only screen and (max-width: 767px) {
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+  }
 
   &:hover {
     background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
