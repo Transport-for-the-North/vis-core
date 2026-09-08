@@ -32,6 +32,7 @@ const mockMapContext = {
         getSource: jest.fn(),
         addSource: jest.fn(),
         addLayer: jest.fn(),
+        moveLayer: jest.fn(),
         isStyleLoaded: jest.fn(() => true),
         style: {},
       },
@@ -164,6 +165,48 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
         metadata: { isStylable: false },
       })
     );
+  });
+
+  it("moves Geoapify town and city labels above the application layer", () => {
+    const map = mockMapContext.state.maps[0];
+
+    map.getLayer.mockImplementation((layerId) => {
+      const geoapifyTownCityLabelIds = [
+        "place_town",
+        "place_city",
+        "place_capital",
+        "place_city_large",
+      ];
+
+      return geoapifyTownCityLabelIds.includes(layerId)
+        ? { id: layerId }
+        : undefined;
+    });
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <Layer {...props} />
+      </MapContext.Provider>
+    );
+
+    expect(map.moveLayer).toHaveBeenNthCalledWith(1, "place_town");
+    expect(map.moveLayer).toHaveBeenNthCalledWith(2, "place_city");
+    expect(map.moveLayer).toHaveBeenNthCalledWith(3, "place_capital");
+    expect(map.moveLayer).toHaveBeenNthCalledWith(4, "place_city_large");
+  });
+
+  it("does not move town or city labels when the active map style does not contain them", () => {
+    const map = mockMapContext.state.maps[0];
+
+    map.getLayer.mockReturnValue(undefined);
+
+    render(
+      <MapContext.Provider value={mockMapContext}>
+        <Layer {...props} />
+      </MapContext.Provider>
+    );
+
+    expect(map.moveLayer).not.toHaveBeenCalled();
   });
 
   it("Does not add boundaries layer when switchableBoundaries is false", () => {
