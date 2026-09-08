@@ -259,8 +259,10 @@ const DualMaps = (props) => {
           return;
         }
 
+        const selectedFeatures = [filteredFeatures[0]];
+
         // Collect current hovered features for this map side (using filtered features)
-        const currentHoveredFeatures = filteredFeatures.map((feature) => ({
+        const currentHoveredFeatures = selectedFeatures.map((feature) => ({
           layerId: feature.layer.id,
           featureId: feature.id,
           source: feature.layer.source,
@@ -361,7 +363,7 @@ const DualMaps = (props) => {
   const requestIndexByDescriptionIndex = {};
 
         // Process each feature for immediate tooltip or API-based tooltip (using filtered features)
-        filteredFeatures.forEach((feature) => {
+        selectedFeatures.forEach((feature) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const customTooltip = layerConfig?.customTooltip;

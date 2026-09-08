@@ -412,8 +412,10 @@ const Map = (props) => {
         return;
       }
 
+      const selectedFeatures = [filteredFeatures[0]];
+
       // Collect current hovered features (using filtered features)
-      const currentHoveredFeatures = filteredFeatures.map((feature) => ({
+      const currentHoveredFeatures = selectedFeatures.map((feature) => ({
         layerId: feature.layer.id,
         featureId: feature.id,
         source: feature.layer.source,
@@ -515,7 +517,7 @@ const Map = (props) => {
   const apiRequests = [];
       const requestIndexByDescriptionIndex = {};
 
-      filteredFeatures.forEach((feature) => {
+      selectedFeatures.forEach((feature) => {
         const rawLayerId = feature.layer.id;
         const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
         const layerConfig = state.layers[layerId];
