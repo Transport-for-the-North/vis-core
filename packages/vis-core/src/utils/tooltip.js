@@ -11,47 +11,45 @@ export function buildDefaultTooltip({
   unitText,
   valueText,
   metadataHtml = "",
+  identifierLabel
 }) {
   const hasValue = featureValueDisplay !== undefined && featureValueDisplay !== null && featureValueDisplay !== "";
   const hasName = !!featureName;
+  const hasidentifierLabel = !!identifierLabel;
 
   if (!hasName && !hasValue && !metadataHtml) return "";
 
-  // Minimal structure; match existing classes exactly
-  if (hasName && hasValue) {
-    return `
-      <div class="popup-content">
-        <p class="feature-name">${featureName}</p>
-        <hr class="divider">
-        <div class="metadata-item">
-          <span class="metadata-key">${valueText}:</span>
-          <span class="metadata-value">${featureValueDisplay} ${unitText ?? ""}</span>
-        </div>
-        ${metadataHtml}
-      </div>`;
-  }
+  const featureNameHtml = hasName
+    ? hasidentifierLabel
+      ? `
+        <div class="feature-identifier">
+          <span class="feature-identifier-label">${identifierLabel}:</span>
+          <span class="feature-identifier-value">${featureName}</span>
+        </div>`
+      : `
+        <p class="feature-name">${featureName}</p>`
+    : "";
 
-  if (hasName) {
-    return `
-      <div class="popup-content">
-        <p class="feature-name">${featureName}</p>
-        ${metadataHtml}
-      </div>`;
-  }
+  const valueHtml = hasValue
+    ? `
+      <div class="metadata-item">
+        <span class="metadata-key">${valueText}:</span>
+        <span class="metadata-value">${featureValueDisplay} ${unitText ?? ""}</span>
+      </div>`
+    : "";
 
-  // Value only case (rare)
-  if (hasValue) {
-    return `
-      <div class="popup-content">
-        <div class="metadata-item">
-          <span class="metadata-key">${valueText}:</span>
-          <span class="metadata-value">${featureValueDisplay} ${unitText ?? ""}</span>
-        </div>
-        ${metadataHtml}
-      </div>`;
-  }
-
-  return "";
+  const dividerHtml = hasName && hasValue
+    ? `
+      <hr class="divider">`
+    : "";
+  
+  return `
+    <div class="popup-content">
+      ${featureNameHtml}
+      ${dividerHtml}
+      ${valueHtml}
+      ${metadataHtml}
+    </div>`;
 }
 
 /**

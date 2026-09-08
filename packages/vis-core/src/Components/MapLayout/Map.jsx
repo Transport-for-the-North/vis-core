@@ -558,6 +558,7 @@ const Map = (props) => {
            layerConfig.defaultTooltipValueName ??
            state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ??
            "Value";
+        const identifierLabel = layerConfig?.defaultTooltipIdentifierLabel || "";
 
         let description = "";
 
@@ -567,7 +568,8 @@ const Map = (props) => {
             featureName,
             featureValueDisplay,
             unitText,
-            valueText
+            valueText,
+            identifierLabel
           });
 
           // Inject additional metadata if available and enabled
@@ -594,7 +596,8 @@ const Map = (props) => {
               featureName,
               featureValueDisplay,
               unitText,
-              valueText: customValueText
+              valueText: customValueText,
+              identifierLabel
             });
 
             // Inject additional metadata if available and enabled

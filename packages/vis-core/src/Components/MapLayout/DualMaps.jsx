@@ -389,6 +389,7 @@ const DualMaps = (props) => {
           const valueText =
             layerConfig.defaultTooltipValueName ??
             state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
+          const identifierLabel = layerConfig?.defaultTooltipIdentifierLabel || "";
 
           let description = "";
 
@@ -398,7 +399,8 @@ const DualMaps = (props) => {
               featureName,
               featureValueDisplay,
               unitText,
-              valueText
+              valueText,
+              identifierLabel
             });
 
             // Inject additional metadata if enabled
@@ -422,11 +424,13 @@ const DualMaps = (props) => {
             if (joinToDefault) {
               // Build default description first
               const customValueText = customTooltip.defaultValueName || valueText;
+
               description = buildDefaultTooltip({
                 featureName,
                 featureValueDisplay,
                 unitText,
-                valueText: customValueText
+                valueText: customValueText,
+                identifierLabel
               });
 
               // Inject additional metadata if enabled
