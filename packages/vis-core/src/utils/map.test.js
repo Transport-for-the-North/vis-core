@@ -2,6 +2,7 @@ import {
   buildCategoricalLegendKey,
   resolveCategoricalColours,
   getMetricDefinition,
+  reclassifyData,
 } from "./map";
 
 describe("buildCategoricalLegendKey", () => {
@@ -216,5 +217,36 @@ describe("getMetricDefinition", () => {
       );
       expect(result).toMatchObject({ name: "trse" });
     });
+  });
+});
+
+describe("reclassifyData", () => {
+  let warnSpy;
+
+  beforeEach(() => {
+    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
+
+  it.each([
+    ["a { data } envelope", { data: [{ id: 1, value: 5 }] }],
+    ["an error payload", { detail: "Not found" }],
+    ["a string", "no data"],
+    ["undefined", undefined],
+  ])("returns no bins and warns when given %s", (_label, data) => {
+    expect(reclassifyData(data, "polygon-continuous", "q", [], {}, {})).toEqual([]);
+    expect(warnSpy).toHaveBeenCalled();
+  });
+
+  it("still classifies a valid array of records", () => {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8].map((value, id) => ({ id, value }));
+    const bins = reclassifyData(data, "polygon-continuous", "q", [], {}, {});
+
+    expect(Array.isArray(bins)).toBe(true);
+    expect(bins.length).toBeGreaterThan(1);
+    expect(warnSpy).not.toHaveBeenCalled();
   });
 });
