@@ -145,6 +145,14 @@ export const HomePage = () => {
             </section>
           ))}
 
+        {/* App-supplied sections. `homePageComponents` is a list of React components
+            provided by the app config, letting an app add domain-specific homepage content
+            (which vis-core knows nothing about) without modifying this component.
+            Rendered above the homepage fragments so app-specific content (e.g. the NoRMS
+            scenarios list) leads, with the fragment tiles/sections following it. */}
+        {Array.isArray(homePageComponents) &&
+          homePageComponents.map((Component, idx) => <Component key={idx} />)}
+
         {useLegacyHomePage ? (
           // ===== Legacy layout (old section-based fragments) =====
           <>
@@ -364,12 +372,6 @@ export const HomePage = () => {
             )}
           </>
         )}
-
-        {/* App-supplied sections. `homePageComponents` is a list of React components
-            provided by the app config, letting an app add domain-specific homepage content
-            (which vis-core knows nothing about) without modifying this component. */}
-        {Array.isArray(homePageComponents) &&
-          homePageComponents.map((Component, idx) => <Component key={idx} />)}
 
         {/* Contact Section */}
         {appContext.contactText && appContext.contactEmail && (
