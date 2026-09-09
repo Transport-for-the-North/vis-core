@@ -13,7 +13,7 @@ import {
   resetPaintProperty,
   hasAnyGeometryNotNull,
   getMetricDefinition,
-  getActiveDisplayMode,
+  getVisualisationDisplayMode,
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
@@ -248,11 +248,8 @@ export const MapVisualisation = ({
     }
   }, [layerKey, visualisation?.defaultClassification, state.layers, dispatch]);
 
-  // The display mode currently driving this visualisation's units, if the page has one.
-  const activeDisplayMode = useMemo(
-    () => getActiveDisplayMode(currentPage, visualisation?.queryParams ?? {}),
-    [currentPage, visualisation?.queryParams]
-  );
+  // The display mode currently driving this visualisation, read from state.
+  const activeDisplayMode = getVisualisationDisplayMode(visualisation);
 
   const previousDisplayModeRef = useRef(activeDisplayMode);
 
@@ -436,7 +433,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { bandMetricName, customBands, defaultClassification } // Pass bandMetricName, customBands and defaultClassification in options
+        { bandMetricName, customBands, defaultClassification, displayMode: activeDisplayMode } // Pass bandMetricName, customBands, defaultClassification and the active display mode in options
       );
 
       // Get the metric definition for the current page/metric
@@ -444,7 +441,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation?.queryParams,
-        { bandMetricName }
+        { bandMetricName, displayMode: activeDisplayMode }
       );
 
       // Determine the current color scheme
@@ -551,6 +548,7 @@ export const MapVisualisation = ({
       appContext,
       currentPage,
       visualisation, 
+      activeDisplayMode,
       layerColorScheme,
       layerKey,
       // calculateColours,

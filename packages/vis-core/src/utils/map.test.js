@@ -2,8 +2,8 @@ import {
   buildCategoricalLegendKey,
   resolveCategoricalColours,
   getMetricDefinition,
-  getActiveDisplayMode,
 } from "./map";
+import { DisplayMode } from "enums";
 
 describe("buildCategoricalLegendKey", () => {
   it("normalises field names and values into a stable key", () => {
@@ -232,48 +232,48 @@ describe("getMetricDefinition", () => {
             colours: ["#fff", "#ccc", "#999", "#333"],
           },
           {
-            name: "pct_difference",
+            name: DisplayMode.PCT_DIFFERENCE,
             differenceValues: [-100, -50, 0, 50, 100],
-            legendSubtitleText: "%",
           },
         ],
       },
     ];
 
-    /** Page carrying both a metric selector and a display-mode selector. */
     const makeDisplayModePage = () => ({
       category: "trse",
       pageName: "trse-page",
       config: {
-        filters: [
-          { containsLegendInfo: true, paramName: "metric" },
-          { containsDisplayModeInfo: true, paramName: "displayMode" },
-        ],
+        filters: [{ containsLegendInfo: true, paramName: "metric" }],
       },
     });
 
     it("returns the metric's own bands when the mode has no matching entry", () => {
-      const result = getMetricDefinition(makeDisplayModeBands(), makeDisplayModePage(), {
-        metric: { value: "trse" },
-        displayMode: { value: "absolute" },
-      });
+      const result = getMetricDefinition(
+        makeDisplayModeBands(),
+        makeDisplayModePage(),
+        { metric: { value: "trse" } },
+        { displayMode: DisplayMode.ABSOLUTE }
+      );
       expect(result.differenceValues).toEqual([-30, -10, 0, 10, 30]);
     });
 
     it("returns the mode entry when one is named after the active display mode", () => {
-      const result = getMetricDefinition(makeDisplayModeBands(), makeDisplayModePage(), {
-        metric: { value: "trse" },
-        displayMode: { value: "pct_difference" },
-      });
+      const result = getMetricDefinition(
+        makeDisplayModeBands(),
+        makeDisplayModePage(),
+        { metric: { value: "trse" } },
+        { displayMode: DisplayMode.PCT_DIFFERENCE }
+      );
       expect(result.differenceValues).toEqual([-100, -50, 0, 50, 100]);
-      expect(result.legendSubtitleText).toBe("%");
     });
 
     it("replaces the metric definition outright rather than merging into it", () => {
-      const result = getMetricDefinition(makeDisplayModeBands(), makeDisplayModePage(), {
-        metric: { value: "trse" },
-        displayMode: { value: "pct_difference" },
-      });
+      const result = getMetricDefinition(
+        makeDisplayModeBands(),
+        makeDisplayModePage(),
+        { metric: { value: "trse" } },
+        { displayMode: DisplayMode.PCT_DIFFERENCE }
+      );
       // The metric's absolute-scale keys must not leak into the percentage view.
       expect(result.values).toBeUndefined();
       expect(result.colours).toBeUndefined();
@@ -283,46 +283,28 @@ describe("getMetricDefinition", () => {
       const result = getMetricDefinition(
         makeDisplayModeBands(),
         makeDisplayModePage(),
-        { displayMode: { value: "pct_difference" } },
-        { bandMetricName: "trse" }
+        {},
+        { bandMetricName: "trse", displayMode: DisplayMode.PCT_DIFFERENCE }
       );
       expect(result.differenceValues).toEqual([-100, -50, 0, 50, 100]);
     });
 
-    it("ignores display mode when the page declares no display-mode filter", () => {
-      const currentPage = {
-        category: "trse",
-        pageName: "trse-page",
-        config: { filters: [{ containsLegendInfo: true, paramName: "metric" }] },
-      };
-      const result = getMetricDefinition(makeDisplayModeBands(), currentPage, {
+    it("ignores display mode when the caller supplies none", () => {
+      const result = getMetricDefinition(makeDisplayModeBands(), makeDisplayModePage(), {
         metric: { value: "trse" },
-        displayMode: { value: "pct_difference" },
       });
       expect(result.differenceValues).toEqual([-30, -10, 0, 10, 30]);
     });
-  });
 
-  describe("getActiveDisplayMode", () => {
-    it("returns null when the page declares no display-mode filter", () => {
-      const currentPage = { config: { filters: [{ paramName: "metric" }] } };
-      expect(getActiveDisplayMode(currentPage, { displayMode: { value: "x" } })).toBeNull();
-    });
-
-    it("returns the value of the flagged filter", () => {
-      const currentPage = {
-        config: { filters: [{ containsDisplayModeInfo: true, paramName: "displayMode" }] },
-      };
-      expect(
-        getActiveDisplayMode(currentPage, { displayMode: { value: "pct_difference" } })
-      ).toBe("pct_difference");
-    });
-
-    it("returns null when the flagged filter has no value yet", () => {
-      const currentPage = {
-        config: { filters: [{ containsDisplayModeInfo: true, paramName: "displayMode" }] },
-      };
-      expect(getActiveDisplayMode(currentPage, {})).toBeNull();
+    it("falls back to the metric's bands when the mode has no configured entry", () => {
+      // A mode needs no bands.js entry to be usable; callers then classify from the data.
+      const result = getMetricDefinition(
+        makeDisplayModeBands(),
+        makeDisplayModePage(),
+        { metric: { value: "trse" } },
+        { displayMode: DisplayMode.DIFFERENCE }
+      );
+      expect(result).toMatchObject({ name: "trse" });
     });
   });
 });

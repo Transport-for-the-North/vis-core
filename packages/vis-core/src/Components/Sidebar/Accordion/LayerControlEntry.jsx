@@ -20,6 +20,7 @@ import {
   updateOpacityExpression,
   getMetricDefinition,
 } from "utils/map";
+import { getVisualisationDisplayMode } from "utils/displayMode";
 
 /**
  * Styled container for the layer control entry.
@@ -333,14 +334,19 @@ export const LayerControlEntry = memo(
       );
     }, [layer.metadata?.colorStyle, visualisation?.style]);
 
+    // Band the editor against the mode the map is actually drawn in, so the defaults it
+    // offers are on the same scale as what the user is looking at.
+    const displayMode = getVisualisationDisplayMode(visualisation);
+
     const metricDefinition = useMemo(
       () =>
         getMetricDefinition(
           appConfig.defaultBands,
           currentPage,
-          visualisation?.queryParams ?? {}
+          visualisation?.queryParams ?? {},
+          { displayMode }
         ),
-      [appConfig.defaultBands, currentPage, visualisation?.queryParams]
+      [appConfig.defaultBands, currentPage, visualisation?.queryParams, displayMode]
     );
 
     // Diverging layers are banded from differenceValues; every other style uses values.

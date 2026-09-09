@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { createPortal } from 'react-dom';
-import { buildCategoricalLegendKey, convertStringToNumber, getMetricDefinition } from "utils";
+import {
+  buildCategoricalLegendKey,
+  convertStringToNumber,
+  getMetricDefinition,
+  getVisualisationDisplayMode,
+  resolveDisplayUnit,
+} from "utils";
 import { useMapContext } from "hooks/useMapContext";
 import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useIsMobile } from "hooks/useIsMobile";
@@ -152,21 +158,25 @@ export const DynamicLegend = ({ map }) => {
             }
           }
           
-          // Resolve bands the same way the map does, so that when a display mode is active
-          // its entry drives the legend's labels and units rather than the metric's own.
+          // Resolve bands the same way the map does, so a mode-specific band entry drives
+          // the legend's labels. The mode comes from visualisation state rather than being
+          // re-derived from filter config, so legend and map band the same numbers.
+          const displayMode = getVisualisationDisplayMode(visualisation);
           const metricDefinition = visualisation?.queryParams
-            ? getMetricDefinition(defaultBands, currentPage, visualisation.queryParams)
+            ? getMetricDefinition(defaultBands, currentPage, visualisation.queryParams, {
+                displayMode,
+              })
             : null;
 
           let customLabels = metricDefinition?.labels?.length
             ? metricDefinition.labels
             : null;
 
-          // A display-mode entry restates the units, so the legend stops describing the
-          // metric's own units (e.g. "Passengers") while percentages are on the map.
-          if (metricDefinition?.legendSubtitleText) {
-            legendSubtitleText = metricDefinition.legendSubtitleText;
-          }
+          // The unit follows the display mode, not the band configuration: in a percentage
+          // view the legend stops describing the metric's own units (e.g. "Passengers").
+          // The hovertip resolves its unit through this same helper, so the two agree
+          // without either needing a bands.js entry to exist.
+          legendSubtitleText = resolveDisplayUnit(displayMode, legendSubtitleText);
           
           // --- Interpret paint expressions ---
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;

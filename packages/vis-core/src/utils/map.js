@@ -32,32 +32,6 @@ export function moveTownCityLabelsToTop(map) {
 
 
 /**
- * Helper: Resolves the active display mode for a page.
- *
- * A display mode changes the units a visualisation is drawn in — an absolute difference
- * versus a percentage difference, say — which means the same metric needs a different set
- * of bands, legend units and tooltip units depending on the mode. The page nominates the
- * driving filter by setting `containsDisplayModeInfo: true` on it, and that filter's
- * current value is the mode.
- *
- * This is deliberately a separate flag from `containsLegendInfo`: a page usually needs both
- * a metric selector and a display-mode selector, so one flag cannot serve both roles.
- *
- * @param {Object} currentPage - The current app page.
- * @param {Object} queryParams - The URL query parameters.
- * @returns {string|null} The active display mode, or null when the page has no such filter.
- */
-export const getActiveDisplayMode = (currentPage, queryParams) => {
-  const displayModeFilter = currentPage?.config?.filters?.find(
-    (filter) => filter.containsDisplayModeInfo === true
-  );
-
-  if (!displayModeFilter) return null;
-
-  return queryParams?.[displayModeFilter.paramName]?.value ?? null;
-};
-
-/**
  * Helper: Extracts the metric definition from the defaultBands.
  * Returns an object that includes values, differenceValues, and colours for the metric,
  * or null if nothing is found.
@@ -70,6 +44,10 @@ export const getActiveDisplayMode = (currentPage, queryParams) => {
  *   2. An explicit `bandMetricName` override.
  *   3. The metric named by the page's `containsLegendInfo` filter.
  *
+ * Mode-specific band entries are optional. Units do not come from here — they are derived
+ * from the display mode itself (see `resolveDisplayUnit`) — so a mode works with no
+ * `bands.js` entry at all, falling back to a data-driven classification.
+ *
  * @param {Array}  defaultBands              - The bands array from defaults.
  * @param {Object} currentPage              - The current app page (used to resolve the page category).
  * @param {Object} queryParams              - The URL query parameters.
@@ -80,6 +58,10 @@ export const getActiveDisplayMode = (currentPage, queryParams) => {
  *                                           does not match any metric the function falls
  *                                           through to the filter-based path so callers
  *                                           without a matching entry are unaffected.
+ * @param {string} [options.displayMode]    - The visualisation's tracked display mode.
+ *                                           Callers read this from state via
+ *                                           `getVisualisationDisplayMode`; omitting it
+ *                                           simply skips the mode-specific band lookup.
  * @returns {Object|null} The metric definition or null.
  */
 export const getMetricDefinition = (
@@ -91,9 +73,11 @@ export const getMetricDefinition = (
   const pageCategory = currentPage?.category || currentPage?.pageName;
   const selectedPageBands = defaultBands?.find((band) => band.name === pageCategory);
 
-  const displayMode = getActiveDisplayMode(currentPage, queryParams);
-  if (displayMode && selectedPageBands) {
-    const modeBands = selectedPageBands.metric.find((m) => m.name === displayMode);
+  // 0. Prefer a band entry named after the active display mode. The mode is passed in
+  //    from visualisation state rather than read back out of page config, so bands agree
+  //    with the legend and hovertip about which mode is live.
+  if (options.displayMode && selectedPageBands) {
+    const modeBands = selectedPageBands.metric.find((m) => m.name === options.displayMode);
     if (modeBands) return modeBands;
   }
 
