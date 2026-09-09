@@ -12,6 +12,13 @@ const LogoContainer = styled.div`
   align-items: center;
   justify-content: ${({ $position }) =>
     $position === "left" ? "flex-start" : "flex-end"};
+
+  @media only screen and (max-width: 1200px) {
+    width: 170px;
+    min-width: 130px;
+    height: 44px;
+  }
+
   @media only screen and (min-width: 768px) {
     padding: 0;
     cursor: ${({ $hasImage }) => ($hasImage ? "pointer" : "default")};
@@ -36,6 +43,11 @@ const LogoImage = styled.img`
   max-width: 220px;
   max-height: 50px;
   object-fit: contain;
+
+  @media only screen and (max-width: 1200px) {
+    max-width: 170px;
+    max-height: 44px;
+  }
 
   @media only screen and (max-width: 767px) {
     max-width: 160px;

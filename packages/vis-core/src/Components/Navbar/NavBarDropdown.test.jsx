@@ -254,9 +254,6 @@ describe("RecursiveDropdownItem component test", () => {
     expect(parent).toHaveAttribute("href", "/");
 
     // Click on child
-    const p = screen.getAllByText("▸")[0];
-    expect(p).toBeInTheDocument();
-    await userEvent.click(p);
     const child1 = screen.getByText("pageName1");
     await userEvent.click(child1);
     await waitFor(() => {

@@ -42,6 +42,10 @@ const HeaderInner = styled.div`
   display: flex;
   align-items: center;
 
+  @media only screen and (max-width: 1200px) {
+    padding: 0 12px;
+  }
+
   @media only screen and (max-width: 767px) {
     padding: 0 8px;
   }
@@ -54,6 +58,10 @@ const HeaderGrid = styled.div`
   column-gap: 20px;
   width: 100%;
   height: 100%;
+
+  @media only screen and (max-width: 1200px) {
+    column-gap: 10px;
+  }
 
   @media only screen and (max-width: 767px) {
     grid-template-columns: 44px minmax(0, 1fr) auto;
@@ -115,6 +123,12 @@ const LogoutSection = styled.div`
   min-width: max-content;
   padding-right: 22px;
 
+  @media only screen and (max-width: 1200px) {
+    gap: 6px;
+    min-width: 0;
+    padding-right: 8px;
+  }
+
   @media only screen and (max-width: 767px) {
     gap: 6px;
     min-width: 0;
@@ -137,6 +151,22 @@ const StyledLogoutButton = styled.button`
   gap: 8px;
   transition: background-color 220ms ease, color 220ms ease;
 
+  @media only screen and (max-width: 1200px) {
+    border: none;
+    border-radius: 0;
+    padding: 4px;
+    gap: 0;
+
+    span {
+      display: none;
+    }
+
+    &:hover {
+      background-color: transparent;
+      color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+    }
+  }
+
   @media only screen and (max-width: 767px) {
     padding: 6px 8px;
     gap: 4px;
@@ -155,6 +185,11 @@ const LogoutIcon = styled.img`
   width: 16px;
   height: 16px;
   object-fit: contain;
+
+  @media only screen and (max-width: 1200px) {
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 const AuthActionButton = styled.button`
@@ -207,7 +242,7 @@ export function Navbar() {
   const links = buildNavbarLinks(appContext);
 
   // Determine mobile view using one shared breakpoint for all apps.
-  const MOBILE_BREAKPOINT = 1560;
+  const MOBILE_BREAKPOINT = 1024;
   const isMobile = windowWidth < MOBILE_BREAKPOINT;
 
   // When a link is clicked, update the logo and active bg colour appropriately.
