@@ -225,8 +225,15 @@ export const useFeatureStateUpdater = () => {
           return;
         }
 
-        // Check if layer is stylable
-        if (!specifiedLayer.isStylable) {
+        // Check if layer is stylable.
+        //
+        // `preserveBaseStyle` layers are let through even though they are not stylable. They keep
+        // their base paint either way - the applyPaintProperties call below is gated on
+        // !preserveBaseStyle - but they still need to reach the setFilter further down, which
+        // restricts the layer to the features the data actually covers. That filter is the only
+        // thing preserveBaseStyle does, so returning here left the flag with no effect at all and
+        // the layer drawing every feature in the tile, data or not.
+        if (!specifiedLayer.isStylable && !specifiedLayer.preserveBaseStyle) {
           return;
         }
 
