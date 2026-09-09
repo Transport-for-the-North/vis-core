@@ -6,6 +6,7 @@ import {
   getLayerStyle,
   getSelectedLayerStyle,
   getOpacityProperty,
+  moveTownCityLabelsToTop,
 } from "utils";
 import { useMapContext } from "hooks/useMapContext";
 import { FilterContext } from "contexts/FilterContext";
@@ -189,6 +190,7 @@ export const Layer = ({ layer }) => {
             const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
             selectLayerConfig.id = `${layer.name}-select`;
             mapInstance.addLayer({ ...selectLayerConfig, source: layer.name });
+            moveTownCityLabelsToTop(mapInstance);
           });
         }
         // Handle tile layer type
@@ -307,6 +309,7 @@ export const Layer = ({ layer }) => {
             isStylable: false,
           };
           mapInstance.addLayer(selectLayerConfig);
+          moveTownCityLabelsToTop(mapInstance);
         }
       }
     });
@@ -497,6 +500,7 @@ export const Layer = ({ layer }) => {
         isStylable: false,
       };
       mapInstance.addLayer(selectLayerConfig);
+      moveTownCityLabelsToTop(mapInstance);
 
       lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
     });

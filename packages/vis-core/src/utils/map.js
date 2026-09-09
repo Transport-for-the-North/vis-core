@@ -6,6 +6,31 @@ import {
   headTailBreaks
 } from './classificationMethods';
 
+const GEOAPIFY_TOWN_CITY_LABEL_LAYER_IDS = [
+  "place_town",
+  "place_city",
+  "place_capital",
+  "place_city_large",
+];
+
+/**
+ * Keeps Geoapify town and city labels above application information layers.
+ *
+ * Safe for other map styles because absent layer IDs are ignored.
+ *
+ * @param {maplibregl.Map} map - MapLibre map instance.
+ */
+export function moveTownCityLabelsToTop(map) {
+  if (!map?.getLayer || !map?.moveLayer) return;
+
+  GEOAPIFY_TOWN_CITY_LABEL_LAYER_IDS.forEach((layerId) => {
+    if (map.getLayer(layerId)) {
+      map.moveLayer(layerId);
+    }
+  });
+}
+
+
 /**
  * Helper: Extracts the metric definition from the defaultBands.
  * Returns an object that includes values, differenceValues, and colours for the metric,
