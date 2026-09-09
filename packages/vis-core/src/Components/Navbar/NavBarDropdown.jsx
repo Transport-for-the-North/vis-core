@@ -116,6 +116,11 @@ const DropdownContainer = styled.div`
     background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
   }
 
+  @media only screen and (max-width: 1200px) {
+    padding: 7px 8px;
+    font-size: 14px;
+  }
+
   @media only screen and (max-width: 767px) {
     display: none;
   }
@@ -148,6 +153,12 @@ const DropdownIndicator = styled(ChevronDownIcon)`
   color: inherit;
   transition: transform 200ms ease;
   transform: ${({ $isOpen }) => ($isOpen ? "rotate(180deg)" : "rotate(0deg)")};
+
+  @media only screen and (max-width: 1200px) {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+  }
 `;
 
 /**
@@ -215,10 +226,13 @@ const DropdownItemAnchor = styled.a`
 /**
  * Indicator for dropdown items that have nested submenus.
  */
-const SubIndicator = styled.span`
+const SubIndicator = styled(ChevronDownIcon)`
   margin-left: auto;
-  white-space: normal;
-  overflow-wrap: break-word;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: inherit;
+  transform: rotate(-90deg);
 `;
 
 /**
@@ -420,7 +434,7 @@ export function RecursiveDropdownItem({
         >
           <span>{item.pageName || item.label}</span>
           <FixedExternalIcon />
-          {hasChildren && <SubIndicator>▸</SubIndicator>}
+          {hasChildren && <SubIndicator aria-hidden="true" />}
         </DropdownItemAnchor>
       ) : (
         <DropdownItemLink
@@ -432,7 +446,7 @@ export function RecursiveDropdownItem({
           $hovered={hovered}
         >
           <span>{item.pageName || item.label}</span>
-          {hasChildren && <SubIndicator>▸</SubIndicator>}
+          {hasChildren && <SubIndicator aria-hidden="true" />}
         </DropdownItemLink>
       )}
 
@@ -541,6 +555,10 @@ export function NavBarDropdown({
   };
 
   const handleKeyDown = (event) => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       setOpen((previousOpen) => !previousOpen);
