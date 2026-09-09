@@ -259,8 +259,10 @@ const DualMaps = (props) => {
           return;
         }
 
+        const selectedFeatures = [filteredFeatures[0]];
+
         // Collect current hovered features for this map side (using filtered features)
-        const currentHoveredFeatures = filteredFeatures.map((feature) => ({
+        const currentHoveredFeatures = selectedFeatures.map((feature) => ({
           layerId: feature.layer.id,
           featureId: feature.id,
           source: feature.layer.source,
@@ -361,7 +363,7 @@ const DualMaps = (props) => {
   const requestIndexByDescriptionIndex = {};
 
         // Process each feature for immediate tooltip or API-based tooltip (using filtered features)
-        filteredFeatures.forEach((feature) => {
+        selectedFeatures.forEach((feature) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const customTooltip = layerConfig?.customTooltip;
@@ -387,6 +389,7 @@ const DualMaps = (props) => {
           const valueText =
             layerConfig.defaultTooltipValueName ??
             state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
+          const identifierLabel = layerConfig?.defaultTooltipIdentifierLabel || "";
 
           let description = "";
 
@@ -396,7 +399,8 @@ const DualMaps = (props) => {
               featureName,
               featureValueDisplay,
               unitText,
-              valueText
+              valueText,
+              identifierLabel
             });
 
             // Inject additional metadata if enabled
@@ -420,11 +424,13 @@ const DualMaps = (props) => {
             if (joinToDefault) {
               // Build default description first
               const customValueText = customTooltip.defaultValueName || valueText;
+
               description = buildDefaultTooltip({
                 featureName,
                 featureValueDisplay,
                 unitText,
-                valueText: customValueText
+                valueText: customValueText,
+                identifierLabel
               });
 
               // Inject additional metadata if enabled

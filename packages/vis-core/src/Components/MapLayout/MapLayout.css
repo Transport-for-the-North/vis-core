@@ -132,6 +132,25 @@
     flex-grow: 1;
   }
 
+  .feature-identifier {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 2px 0;
+  }
+
+  .feature-identifier-label {
+    font-weight: bold;
+    margin-right: 10px;
+    text-align: left;
+  }
+
+  .feature-identifier-value {
+    text-align: right;
+    flex-grow: 1;
+  }
+
   .more-records-indicator {
     font-style: italic;
     color: #666;
