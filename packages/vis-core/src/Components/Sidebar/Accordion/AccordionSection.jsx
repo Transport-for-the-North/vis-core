@@ -35,7 +35,7 @@ const AccordionContent = styled.div`
   transition: max-height 0.3s ease, padding 0.3s ease;
   padding: ${({ $isOpen }) => ($isOpen ? '15px' : '0')} 20px;
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 0.85rem;
   line-height: 1.45;
   background-color: #fff;
   border: ${({ $isOpen }) => ($isOpen ? '1px' : '0')} solid #ddd;
