@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
+import { ThemeProvider, createGlobalStyle } from "styled-components";
 import { PageSwitch } from "Components/PageSwitch";
 import { HomePage } from "Components/HomePage";
 import { Navbar } from "Components/Navbar";
@@ -8,16 +8,139 @@ import { Login } from "Components/Login";
 import { Unauthorized } from "Components/Login/Unauthorised";
 import { TermsOfUse } from "Components/TermsOfUse";
 import { NotFound } from "Components/NotFoundPage/NotFoundPage";
+import { AdminPage } from "Components/AdminPage";
 import { Dashboard } from "layouts";
 import { AppContext, AuthProvider, ErrorProvider } from "contexts";
 import { api } from "services";
 import { loadBands } from "utils";
+import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
+import { buildNavbarLinks } from "utils/nav";
+import { isAppAdmin, isAppSuperuser } from "utils/auth";
 import {
   withWarning,
   withRoleValidation,
   composeHOCs,
   withTermsOfUse
 } from "hocs";
+
+const BrandGlobalStyles = createGlobalStyle`
+  @font-face {
+    font-family: "Korto";
+    src: url("/fonts/Korto-Medium.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Korto";
+    src: url("/fonts/Korto-Bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --palette-navy: ${brandTokens.palette.navy};
+    --palette-teal: ${brandTokens.palette.teal};
+    --palette-pale-teal: ${brandTokens.palette.paleTeal};
+    --palette-white: ${brandTokens.palette.white};
+    --palette-grey: ${brandTokens.palette.grey};
+    --palette-mid-grey: ${brandTokens.palette.midGrey};
+    --palette-pale-grey: ${brandTokens.palette.paleGrey};
+    --palette-bottom-grey: ${brandTokens.palette.bottomGrey};
+    --text-icon: ${brandTokens.palette.textIcon};
+
+    --radius-xxs: ${brandTokens.radii.xxs};
+    --radius-xs: ${brandTokens.radii.xs};
+    --radius-sm: ${brandTokens.radii.sm};
+    --radius-lg: ${brandTokens.radii.lg};
+    --radius-pill-lg: ${brandTokens.radii.pillLg};
+    --radius-pill-sm: ${brandTokens.radii.pillSm};
+
+    --font-family-base: ${brandTokens.fonts.base};
+    --font-sans: "Open Sans", "Segoe UI", Arial, sans-serif;
+  }
+
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-family-base);
+    color: var(--text-icon);
+    background: var(--palette-white);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Korto", "Open Sans", "Segoe UI", Arial, sans-serif;
+    color: var(--text-icon);
+  }
+
+  p,
+  a,
+  ul > li,
+  ol > li,
+  li,
+  .copy {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--text-icon);
+  }
+
+  a:hover {
+    color: var(--palette-teal);
+  }
+
+  .copy-sm {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .copy-semibold {
+    font-weight: 600;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: 1000;
+    background: var(--palette-teal);
+    color: var(--palette-navy);
+    padding: 8px 16px;
+    border-radius: var(--radius-pill-lg);
+  }
+
+  .skip-link:focus {
+    left: 16px;
+    top: 16px;
+    width: auto;
+    height: auto;
+    outline: 2px solid var(--palette-navy);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+`;
 
 /**
  * Base application component that can be used across all TfN apps.
@@ -47,6 +170,7 @@ export function BaseApp({
   afterDashboard = null
 }) {
   const [appConfig, setAppConfig] = useState(null);
+  const effectiveTheme = useMemo(() => mergeThemeWithBrandDefaults(theme), [theme]);
 
   useEffect(() => {
     /**
@@ -83,8 +207,15 @@ export function BaseApp({
         const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
 
+        // Extract AdminPage from appPages so it sits at appConfig.adminPage instead.
+        // This lets apps configure it via the template without polluting appPages.
+        const adminPageEntry = initialAppConfig.appPages?.find(p => p.type === 'AdminPage');
+        const filteredAppPages = initialAppConfig.appPages?.filter(p => p.type !== 'AdminPage') ?? [];
+
         setAppConfig({
           ...initialAppConfig,
+          appPages: filteredAppPages,
+          adminPage: adminPageEntry?.config ?? initialAppConfig.adminPage ?? null,
           apiSchema: apiSchema,
           defaultBands: bands,
           authenticationRequired: authenticationRequired
@@ -97,17 +228,44 @@ export function BaseApp({
     loadAppConfig();
   }, [appName, configLoader, bandsLoader]);
 
+  const isAuthRequired = appConfig?.authenticationRequired ?? true;
+  const HomePageWithRoleValidation = useMemo(
+    () => (isAuthRequired ? withRoleValidation(HomePage) : HomePage),
+    [isAuthRequired]
+  );
+  const NotFoundWithRoleValidation = useMemo(
+    () => (isAuthRequired ? withRoleValidation(NotFound) : NotFound),
+    [isAuthRequired]
+  );
+  const AdminPageWithAuth = useMemo(
+    () => (isAuthRequired ? withRoleValidation(AdminPage, { adminOnly: true }) : AdminPage),
+    [isAuthRequired]
+  );
+
+  const pageRoutes = useMemo(() => {
+    if (!appConfig) return null;
+    return (appConfig.appPages ?? []).map((page) => {
+      const PageComponent = isAuthRequired
+        ? withRoleValidation(PageSwitch, { adminOnly: page.adminOnly ?? false })
+        : PageSwitch;
+      const WrappedPageComponent = composeHOCs(
+        withWarning,
+        withTermsOfUse
+      )(PageComponent);
+      return (
+        <Route
+          key={page.pageName}
+          path={page.url}
+          element={<WrappedPageComponent pageConfig={page} />}
+        />
+      );
+    });
+  }, [appConfig?.appPages, isAuthRequired]);
+
   if (!appConfig) {
     return <div>Loading...</div>;
   }
 
-  const isAuthRequired = appConfig.authenticationRequired ?? true;
-  const HomePageWithRoleValidation = isAuthRequired
-    ? withRoleValidation(HomePage)
-    : HomePage;
-  const NotFoundWithRoleValidation = isAuthRequired
-    ? withRoleValidation(NotFound)
-    : NotFound;
 
   // Standard routes
   const standardRoutes = (
@@ -115,33 +273,49 @@ export function BaseApp({
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<HomePageWithRoleValidation />} />
-      {appConfig.appPages.map((page) => {
-        const PageComponent = isAuthRequired
-          ? withRoleValidation(PageSwitch)
-          : PageSwitch;
-        const WrappedPageComponent = composeHOCs(
-          withWarning,
-          withTermsOfUse
-        )(PageComponent);
-        return (
-          <Route
-            key={page.pageName}
-            path={page.url}
-            element={<WrappedPageComponent pageConfig={page} />}
-          />
-        );
-      })}
+      {appConfig.adminPage && (
+        <Route path="/admin" element={<AdminPageWithAuth />} />
+      )}
+      {pageRoutes}
       {customRoutes}
       <Route path="*" element={<NotFoundWithRoleValidation />} />
     </>
   );
 
+  const normalisedAppName = (appName || '').toLowerCase();
+  const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
+
+  // Filter visible app pages based on role authorization
+  const visibleAppPages = (appConfig.appPages ?? []).filter(
+    page => !page.adminOnly || isAdmin
+  );
+
+  // Pre-compute the complete list of renderable navigation links
+  const navbarLinks = buildNavbarLinks({
+    ...appConfig,
+    appPages: visibleAppPages,
+  });
+
+  if (appConfig.adminPage && isAdmin) {
+    navbarLinks.splice(1, 0, {
+      label: "Admin",
+      url: "/admin",
+    });
+  }
+
+  const contextValue = {
+    ...appConfig,
+    appPages: visibleAppPages,
+    navbarLinks,
+  };
+
   const appContent = (
     <div className={appCssClass}>
       <AuthProvider>
         <ErrorProvider>
-          <ThemeProvider theme={theme}>
-            <AppContext.Provider value={appConfig}>
+          <ThemeProvider theme={effectiveTheme}>
+            <BrandGlobalStyles />
+            <AppContext.Provider value={contextValue}>
               {beforeDashboard}
               <Navbar />
               <Dashboard>

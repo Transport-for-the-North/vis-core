@@ -35,6 +35,8 @@ export const Login = () => {
                         id="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        autoComplete="username"
+                        aria-describedby={error ? "login-error" : undefined}
                         required
                     />
                     <label htmlFor="password">Password*</label>
@@ -43,15 +45,21 @@ export const Login = () => {
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="current-password"
+                        aria-describedby={error ? "login-error" : undefined}
                         required
                     />
 
-                    {error && <p className="error-message">{error}</p>}
+                    {error && (
+                        <p id="login-error" className="error-message" role="alert" aria-live="assertive">
+                            {error}
+                        </p>
+                    )}
                     <button type="submit">Continue</button>
                 </form>
                 <p className="RequestLogin">
                     <button
-                        type="submit"
+                        type="button"
                         onClick={() => {
                             window.open(
                                 'https://forms.office.com/Pages/ResponsePage.aspx?id=HZ6K1cpNlUWp6Hk0oV80GRcTERVASNVEmqyTtKGGoIpUMFBLTVpIMlFTQjBORExHM1Q4MElMREVYRy4u',

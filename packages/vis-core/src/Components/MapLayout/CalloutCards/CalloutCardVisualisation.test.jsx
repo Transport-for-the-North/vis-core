@@ -338,3 +338,48 @@ describe("Tests when isLoading is false and without data", () => {
     expect(onVisibilityChange).toHaveBeenCalledWith(false);
   });
 });
+
+describe("Tests formatNumberWithUnit in callout card", () => {
+  it("renders card value with unit from mainValues.units", () => {
+    const layoutContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        visualisations: {
+          layoutTest: {
+            name: "Summary Card",
+            type: "calloutCard",
+            layout: [
+              {
+                type: "html",
+                fragment: '<div class="value">{formatNumberWithUnit(value)}</div>',
+              },
+            ],
+          },
+        },
+      },
+    };
+
+    const layoutProps = {
+      ...props,
+      visualisationName: "layoutTest",
+      data: {
+        mainValues: {
+          metric: "Total Floorspace",
+          value: "123456",
+          units: "sqm",
+        },
+      },
+    };
+
+    render(
+      <ThemeProvider theme={theme}>
+        <MapContext.Provider value={layoutContext}>
+          <CalloutCardVisualisation {...layoutProps} />
+        </MapContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText("123.46K sqm")).toBeInTheDocument();
+  });
+});

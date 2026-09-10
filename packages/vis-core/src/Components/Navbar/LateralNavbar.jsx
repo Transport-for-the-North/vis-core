@@ -37,6 +37,7 @@ const baseSideNavLinkStyles = css`
   overflow-wrap: break-word;
   text-align: left;
   font-size: 16px;
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 
   &:hover {
     background-color: ${({ $bgColor, theme }) =>
@@ -109,7 +110,7 @@ export function LateralNavbar(props) {
         <StyledSideNavLink
           to="/"
           $isActive={activeLink === "/"}
-          $bgColor="#7317de"
+          $bgColor={props.$bgColor}
           onClick={createNavItemClickHandler({ url: "/" }, props.onClick, props.$bgColor)}
         >
           Home
@@ -146,7 +147,18 @@ export function LateralNavbar(props) {
         ))}
       {props.className === "sideNavbar-shown" &&
         Object.keys(pagesByCategory).map((category) => {
-          const tree = buildDropdownTree(pagesByCategory[category]);
+          const categoryPages = pagesByCategory[category];
+          const tree = buildDropdownTree(categoryPages);
+
+          const activeCategoryPage = categoryPages.find(
+            (page) => page.url === activeLink
+          );
+
+          const categoryBgColor =
+            activeCategoryPage?.navbarLinkBgColour ||
+            categoryPages.find((page) => page.navbarLinkBgColour)
+              ?.navbarLinkBgColour;
+
           return (
             <LateralRecursiveDropdown
               key={category}
@@ -154,7 +166,7 @@ export function LateralNavbar(props) {
               items={tree}
               activeLink={activeLink}
               onClick={props.onClick}
-              $bgColor={props.$bgColor}
+              $bgColor={categoryBgColor}
             />
           );
         })}

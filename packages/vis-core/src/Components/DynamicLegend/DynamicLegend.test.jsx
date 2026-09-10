@@ -409,7 +409,7 @@ describe("OutOfBandMessage", () => {
     ],
   };
 
-  const makeMapWithLayer = (layerId, paint) => ({
+  const makeMapWithLayer = (layerId, paint, metadata = {}) => ({
     on: jest.fn(),
     off: jest.fn(),
     getStyle: jest.fn(() => ({
@@ -417,7 +417,7 @@ describe("OutOfBandMessage", () => {
         {
           id: layerId,
           type: "fill",
-          metadata: { isStylable: true },
+          metadata: { isStylable: true, ...metadata },
           paint,
         },
       ],
@@ -449,7 +449,9 @@ describe("OutOfBandMessage", () => {
   });
 
   it("renders when class_method is 'c', customBands are set, and data has out-of-band values", async () => {
-    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT, {
+      hideOutOfBandWarning: false,
+    });
     const state = {
       filters: [],
       currentZoom: 10,
@@ -493,7 +495,9 @@ describe("OutOfBandMessage", () => {
   });
 
   it("renders when class_method is not 'c' and data has out-of-band values", async () => {
-    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT, {
+      hideOutOfBandWarning: false,
+    });
     const state = {
       filters: [],
       currentZoom: 10,
@@ -516,7 +520,9 @@ describe("OutOfBandMessage", () => {
   });
 
   it("renders when class_method is 'c' but no customBands are set and data is out-of-band", async () => {
-    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT, {
+      hideOutOfBandWarning: false,
+    });
     const state = {
       filters: [],
       currentZoom: 10,
@@ -536,5 +542,29 @@ describe("OutOfBandMessage", () => {
         screen.getByText(/some data is outside the specified bands/i)
       ).toBeInTheDocument()
     );
+  });
+
+  it("does not render by default, even with out-of-band values", async () => {
+    const map = makeMapWithLayer(LAYER_ID, INTERPOLATE_PAINT);
+    const state = {
+      filters: [],
+      currentZoom: 10,
+      visualisations: {
+        testVis: { joinLayer: LAYER_ID, data: [{ value: 7000 }] },
+      },
+      layers: {
+        [LAYER_ID]: { class_method: "c", customBands: [0, 5000] },
+      },
+    };
+
+    renderWithState(map, state);
+    triggerStyledata(map);
+
+    await waitFor(() => {
+      expect(screen.getByText(LAYER_ID)).toBeInTheDocument();
+    });
+    expect(
+      screen.queryByText(/some data is outside the specified bands/i)
+    ).not.toBeInTheDocument();
   });
 });

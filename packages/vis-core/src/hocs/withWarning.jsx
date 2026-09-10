@@ -1,33 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
-import { WarningMessage } from "Components/WarningMessage/WarningMessage";
+import { Warning } from "Components/WarningMessage/Warning";
 import { api } from "services";
-
-/**
- * Component to render a warning message.
- * @param {Object} props - The component props.
- * @param {string} props.message - The warning message to display.
- * @param {Function} props.onClose - Function to call when the warning is closed.
- * @returns {JSX.Element} The warning message component.
- */
-const Warning = ({ message, onClose }) => (
-  <WarningMessage>
-    <button className="close-button" onClick={onClose}>
-      &times;
-    </button>
-    <div className="icon-container">
-      <ExclamationCircleIcon className="warning-icon" />
-    </div>
-    <div className="text-container">
-      <div className="warning-header">
-        <div className="warning-title">Warning</div>
-      </div>
-      <div className="warning-content">
-        {message}
-      </div>
-    </div>
-  </WarningMessage>
-);
 
 /**
  * Higher-Order Component that adds a warning message to the wrapped component.

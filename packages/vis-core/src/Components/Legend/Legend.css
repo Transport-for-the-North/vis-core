@@ -9,7 +9,7 @@
     z-index: 1;
     width: fit-content;
     height: fit-content;
-    font-family: "Hanken Grotesk", sans-serif;
+    font-family: var(--font-family-base);
   }
   
   .legend-section {

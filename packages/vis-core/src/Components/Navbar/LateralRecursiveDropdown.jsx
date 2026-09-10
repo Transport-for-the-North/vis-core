@@ -28,8 +28,10 @@ const SideAccordionIcon = styled.span`
 const LateralDropdownHeader = styled.div`
   padding: 12px 10px;
   padding-left: ${({ depth }) => `calc(10px + ${depth * 10}px)`};
-  background-color: ${({ $isActive, theme, depth }) =>
-    $isActive ? theme.activeBg : darken(depth / 10, theme.navbarBg)};
+  background-color: ${({ $isActive, $bgColor, theme, depth }) =>
+    $isActive
+      ? ($bgColor || theme.activeNavColour)
+      : darken(depth / 10, theme.navbarBg)};
   color: ${({ $isActive, theme }) => ($isActive ? theme.activeNavText : theme.navText)};
   font-weight: normal;
   cursor: pointer;
@@ -39,8 +41,10 @@ const LateralDropdownHeader = styled.div`
   white-space: normal;
   overflow-wrap: break-word;
   transition: background-color 0.2s;
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
   &:hover {
-    background-color: ${({ theme }) => theme.activeBg};
+    background-color: ${({ $bgColor, theme }) =>
+      $bgColor || theme.activeNavColour};
     color: #f9f9f9;
   }
   &:hover ${SideAccordionIcon} {
@@ -80,6 +84,7 @@ const baseLateralMenuItemStyles = css`
   text-align: left;
   transition: background-color 0.2s;
   font-size: smaller;
+  font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
 
   &:hover {
     background-color: ${({ $bgColor, theme }) =>
@@ -146,7 +151,7 @@ export function LateralRecursiveDropdown({
 
   return (
     <div>
-      <LateralDropdownHeader onClick={toggle} depth={depth} $isActive={isActive}>
+      <LateralDropdownHeader onClick={toggle} depth={depth} $isActive={isActive} $bgColor={$bgColor}>
         <TextContainer>{label}</TextContainer>
         <SideAccordionIcon $isOpen={open} $isActive={isActive} />
       </LateralDropdownHeader>

@@ -39,7 +39,77 @@ export const CARD_CONSTANTS = {
   TOGGLE_BUTTON_HEIGHT: 30,
   PADDING: 10,
 }
-export const defaultBgColour = '#7317DE';
+
+export const brandTokens = {
+  palette: {
+    navy: '#0d0f3d',
+    teal: '#00dec6',
+    paleTeal: '#e4f6f6',
+    white: '#ffffff',
+    grey: '#c2c2d0',
+    midGrey: '#efeff7',
+    paleGrey: '#f7f7fb',
+    bottomGrey: '#e5e7eb',
+    textIcon: '#0d0f3d',
+  },
+  radii: {
+    xxs: '6px',
+    xs: '8px',
+    sm: '16px',
+    lg: '20px',
+    pillLg: '50px',
+    pillSm: '25px',
+  },
+  fonts: {
+    base: '"Korto", "Open Sans", "Segoe UI", Arial, sans-serif',
+    nav: '"Open Sans", "Segoe UI", Arial, sans-serif',
+  },
+};
+
+export const brandThemeDefaults = {
+  primary: brandTokens.palette.navy,
+  activeBg: brandTokens.palette.navy,
+  activeNavColour: brandTokens.palette.navy,
+  navText: brandTokens.palette.textIcon,
+  activeNavText: brandTokens.palette.white,
+  navbarBg: brandTokens.palette.white,
+  standardFontFamily: brandTokens.fonts.base,
+  navFontFamily: brandTokens.fonts.nav,
+  borderRadius: brandTokens.radii.xs,
+  colors: {
+    primary: brandTokens.palette.navy,
+    accent: brandTokens.palette.teal,
+    text: brandTokens.palette.textIcon,
+    textMuted: brandTokens.palette.grey,
+    surface: brandTokens.palette.white,
+    muted: brandTokens.palette.midGrey,
+    border: brandTokens.palette.grey,
+    navBorder: brandTokens.palette.bottomGrey,
+  },
+  mq: {
+    mobile: '(max-width: 900px)',
+    desktopUp: '(min-width: 901px)',
+  },
+};
+
+export const mergeThemeWithBrandDefaults = (theme) => {
+  if (!theme) return brandThemeDefaults;
+
+  return {
+    ...brandThemeDefaults,
+    ...theme,
+    colors: {
+      ...brandThemeDefaults.colors,
+      ...(theme.colors || {}),
+    },
+    mq: {
+      ...brandThemeDefaults.mq,
+      ...(theme.mq || {}),
+    },
+  };
+};
+
+export const defaultBgColour = brandTokens.palette.navy;
 
 export const defaultMapColourMapper = {
   'diverging': { value: 'BrBG', label: 'BrBG' },

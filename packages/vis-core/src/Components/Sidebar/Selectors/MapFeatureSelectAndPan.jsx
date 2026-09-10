@@ -59,7 +59,12 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
 
     mapDispatch({
       type: actionTypes.SET_BOUNDS_AND_CENTROID,
-      payload: { bounds, centroid },
+      payload: { 
+        bounds, 
+        centroid,
+        featureName: option.label,
+        layerMetadata: layer.metadata
+      },
     });
 
     onChange?.(filter, id);

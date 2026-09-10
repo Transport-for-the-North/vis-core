@@ -14,6 +14,8 @@ This document provides comprehensive information about testing in the vis-core p
 - [Common Patterns](#common-patterns)
 - [Debugging Tests](#debugging-tests)
 - [Best Practices](#best-practices)
+- [Accessibility Testing](#accessibility-testing)
+- [Accessibility Workflow](#accessibility-workflow)
 
 ## Overview
 
@@ -78,6 +80,81 @@ Pull requests with failing tests will be blocked from merging. You can view test
 
 - **jest-environment-jsdom**: Simulates a browser environment in Node.js
 - **babel-jest**: Transforms JSX and modern JavaScript for Jest
+
+## Accessibility Testing
+
+vis-core is a reusable component library, so accessibility checks are split across two layers:
+
+- Library layer (this repo): component-level automated checks using `jest-axe` inside Jest/jsdom.
+- App layer (consumer repo): end-to-end route and journey checks using Playwright.
+
+### Run Accessibility Checks in vis-core
+
+```bash
+npm run test:a11y
+```
+
+The CI workflow also runs this command in addition to the main Jest suite.
+
+### Why Not Reuse Full App Playwright WCAG Tests Here?
+
+Playwright page-level WCAG tests (for `/`, `/search`, navigation landmarks, full flows, responsive reflow across routes) require a full running app with production routes, content, and API-backed state.
+
+In vis-core, we validate what the library controls directly:
+
+- semantic markup of shared components
+- accessible names/roles for controls
+- common ARIA patterns and regressions in rendered component trees
+
+Then the consuming app validates composed pages, content, and integrations end-to-end.
+
+### App Integration Checklist (Consumer Repos)
+
+Use this checklist in app repositories to make vis-core accessibility checks visible and enforceable:
+
+- Add a skip link near the top of the app shell that targets the primary content region.
+- Ensure the destination content region exists and can receive focus (for example `id="main-content"` with `tabIndex={-1}`).
+- Keep global/repeated navigation outside the main content landmark where possible.
+- Include route-level Playwright + axe checks for critical routes (home, search, filters, forms, auth flows).
+- Run route checks in at least one desktop browser and one mobile profile on pull requests.
+- Run the full browser matrix on merge or scheduled builds.
+- Upload Playwright HTML/blob reports for debugging and trend visibility.
+
+### Suggested Ownership Split
+
+- vis-core: reusable component semantics, roles, states, and keyboard/focus behavior.
+- app repo: page composition, route flows, live data updates, app copy, and content-specific accessibility.
+
+## Accessibility Workflow
+
+This section describes the full user journey of accessibility testing from local development to CI.
+
+### In vis-core (library)
+
+1. Developer updates or adds a shared component.
+2. Developer runs `npm run test:a11y` in vis-core.
+3. Jest runs only `*.accessibility.test.*` files.
+4. Each test renders a component with realistic props/context and runs automated axe checks.
+5. If an accessibility violation is found, the test fails before publish.
+6. On pull request/push, GitHub Actions runs the same accessibility command and blocks publish on failure.
+
+### In app repositories (consumers)
+
+1. App composes vis-core components into full pages/routes.
+2. Playwright + axe scans route-level behavior (landmarks, keyboard flow, live updates, responsive layouts).
+3. Browser matrix and shard strategy validate app-level behavior across desktop/mobile engines.
+4. Playwright artifacts (blob/html) are generated in the app repo for route-level debugging.
+
+### Why Reports Are Separate
+
+- vis-core accessibility tests are Jest results in the vis-core repository CI workflow.
+- app accessibility tests are Playwright artifacts and reports in each app repository workflow.
+- App merge reports do not automatically include vis-core test reports unless you explicitly aggregate cross-repo artifacts in a separate reporting system.
+
+This separation is intentional:
+
+- vis-core verifies reusable component accessibility at source.
+- app repos verify end-to-end user journeys and app-specific content.
 
 ## Test Structure
 

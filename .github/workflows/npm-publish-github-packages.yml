@@ -31,12 +31,30 @@ jobs:
           cd packages/vis-core
           npm ci
 
-      - name: Run tests
+      - name: Run tests and generate report
         run: |
           cd packages/vis-core
-          npm test
+          npm run test:output
         env:
           CI: true
+
+      - name: Run accessibility checks and generate report
+        run: |
+          cd packages/vis-core
+          npm run test:a11y:output
+        env:
+          CI: true
+
+      - name: Upload Jest reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jest-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            packages/vis-core/jest-results.json
+            packages/vis-core/jest-a11y-results.json
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Check for Circular Dependencies
         run: |

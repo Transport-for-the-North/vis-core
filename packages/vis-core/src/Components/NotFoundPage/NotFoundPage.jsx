@@ -60,7 +60,7 @@ const Actions = styled.div`
 const PrimaryLink = styled(Link)`
   padding: 0.625rem 1rem;
   border-radius: 8px;
-  background: ${({ theme }) => theme?.colors?.primary || "#7317de"};
+  background: ${({ theme }) => theme?.colors?.primary || "#0d0f3d"};
   color: #fff;
   text-decoration: none;
   font-weight: 600;

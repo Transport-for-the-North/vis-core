@@ -69,7 +69,8 @@ const ExpandCollapseToggle = styled.span`
 const LayerName = styled.span`
   font-weight: 600;
   font-size: 1rem;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-family: var(--font-sans);
 `;
 
 /**
@@ -94,7 +95,7 @@ const VisibilityToggle = styled.button`
   svg {
     width: 24px;
     height: 24px;
-    color: #555;
+    color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   }
 `;
 
@@ -126,7 +127,8 @@ const Slider = styled.input`
 const ControlLabel = styled.label`
   margin-right: 0.5rem;
   font-size: 0.9rem;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-family: var(--font-sans);
 `;
 
 /**
@@ -136,6 +138,8 @@ const SliderValue = styled.span`
   font-size: 0.9rem;
   width: 36px;
   text-align: right;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
+  font-family: var(--font-sans);
 `;
 
 /**
@@ -199,6 +203,10 @@ export const LayerControlEntry = memo(
   }) => {
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
+    );
+
+    const [boundariesVisibility, setBoundariesVisibility] = useState(
+      layer.metadata?.boundariesVisibleByDefault ? "visible" : "none"
     );
 
     // State for whether the layer details are expanded
@@ -490,9 +498,37 @@ export const LayerControlEntry = memo(
         ids.forEach((id) => {
           map.setLayoutProperty(id, "visibility", newVisibility);
         });
+
+        const boundariesId = `${layer.id}-boundaries`;
+        if (map.getLayer(boundariesId)) {
+          if (newVisibility === "none") {
+            map.setLayoutProperty(boundariesId, "visibility", "none");
+          } else {
+            map.setLayoutProperty(boundariesId, "visibility", boundariesVisibility);
+          }
+        }
       });
 
       setVisibility(newVisibility);
+    };
+
+    /**
+     * Toggles the visibility of the boundaries layer and updates the map.
+     */
+    const toggleBoundariesVisibility = (e) => {
+      const isChecked = e.target.checked;
+      const newVisibility = isChecked ? "visible" : "none";
+      setBoundariesVisibility(newVisibility);
+
+      maps.forEach((mapInstance) => {
+        if (!mapInstance || !mapInstance.style) return;
+        const boundariesId = `${layer.id}-boundaries`;
+        if (mapInstance.getLayer(boundariesId)) {
+          if (visibility === "visible" || newVisibility === "none") {
+            mapInstance.setLayoutProperty(boundariesId, "visibility", newVisibility);
+          }
+        }
+      });
     };
 
     /**
@@ -645,6 +681,26 @@ export const LayerControlEntry = memo(
       });
     }
 
+    if (layer.metadata?.switchableBoundaries) {
+      collapsibleSections.push({
+        key: "boundaries-toggle",
+        node: (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
+            <ControlLabel htmlFor={`boundaries-toggle-${layer.id}`}>
+              {layer.metadata?.boundariesLabel || "Show zone boundaries"}
+            </ControlLabel>
+            <input 
+              type="checkbox" 
+              id={`boundaries-toggle-${layer.id}`} 
+              checked={boundariesVisibility === "visible"}
+              onChange={toggleBoundariesVisibility}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
+        )
+      });
+    }
+
     if (showWidth) {
       collapsibleSections.push({
         key: "width",
@@ -674,11 +730,33 @@ export const LayerControlEntry = memo(
         stylableSections.push({
           key: "colour-scheme",
           node: (
-            <ColourSchemeDropdown
-              colorStyle={colorStyle}
-              handleColorChange={handleColorChange}
-              layerName={layer.id}
-            />
+            <>
+              <ColourSchemeDropdown
+                colorStyle={colorStyle}
+                handleColorChange={handleColorChange}
+                layerName={layer.id}
+              />
+              <div style={{ display: "flex", alignItems: "center", marginTop: "8px" }}>
+                <input
+                  id={`invert-colour-${layer.id}`}
+                  type="checkbox"
+                  checked={state.layers?.[layer.id]?.invertedColorScheme === true}
+                  onChange={() => {
+                    mapDispatch?.({
+                      type: actionTypes.TOGGLE_INVERTED_COLOR_SCHEME,
+                      payload: { layerName: layer.id },
+                    });
+                  }}
+                  style={{ marginRight: "0.5rem", cursor: "pointer" }}
+                />
+                <ControlLabel
+                  htmlFor={`invert-colour-${layer.id}`}
+                  style={{ marginBottom: 0, cursor: "pointer" }}
+                >
+                  Invert colour scheme
+                </ControlLabel>
+              </div>
+            </>
           ),
         });
       }

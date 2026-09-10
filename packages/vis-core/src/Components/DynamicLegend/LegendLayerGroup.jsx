@@ -28,7 +28,8 @@ import {
  * Renders a single layer's legend group, including its title, subtitle, colour
  * swatches (discrete or continuous gradient), optional cog-menu for display
  * preferences, and an out-of-band warning when data values fall outside the
- * manually configured band range.
+ * manually configured band range. The warning is hidden by default; show it with
+ * `hideOutOfBandWarning: false`. Out-of-band label decorations (≤ / ≥) are unaffected.
  *
  * This component is the per-item child rendered by `DynamicLegend` and receives
  * all state callbacks from the parent orchestrator.
@@ -250,7 +251,7 @@ const LegendLayerGroup = ({
               <ContinuousGradientBar item={item} scaleMode={pref.scaleMode} belowMin={belowMin} aboveMax={aboveMax} />
             )}
 
-            {(belowMin || aboveMax) && (
+            {(belowMin || aboveMax) && !item.hideOutOfBandWarning && (
               <OutOfBandWrapper>
                 <InfoBox 
                   text="Some data is outside the specified bands and has been capped to the nearest band."

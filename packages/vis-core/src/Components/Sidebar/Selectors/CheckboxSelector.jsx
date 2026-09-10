@@ -26,7 +26,7 @@ const SelectAllButton = styled.button`
   color: ${(props) => (props.$isSelected ? "white" : "black")};
   border-radius: 4px;
   border: 0.25px solid;
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,8 +45,16 @@ const SelectAllButton = styled.button`
  * @param {Function} props.onChange - Callback function to handle changes in selection.
  * @param {string} props.bgColor - Background color for the select all button when selected.
  */
-export const CheckboxSelector = ({ filter, onChange, bgColor }) => {
+export const CheckboxSelector = ({ filter, onChange, bgColor, disabled, excludeValue }) => {
   const { state: filterState } = useFilterContext();
+
+  const options = React.useMemo(() => {
+    let opts = filter.values.values || [];
+    if (excludeValue !== undefined && excludeValue !== null) {
+      opts = opts.filter(o => String(o.paramValue) !== String(excludeValue));
+    }
+    return opts;
+  }, [filter.values.values, excludeValue]);
 
   const initialSelection = filter.values.values.reduce((acc, option) => {
     acc[option.displayValue] = false;
@@ -62,6 +70,8 @@ export const CheckboxSelector = ({ filter, onChange, bgColor }) => {
   }, [filter.id, filter.values.values]);
 
   const handleCheckboxChange = (displayValue, paramValue) => {
+    if (disabled) return;
+    
     let newSelectedCheckboxes;
 
     if (filter.multiSelect) {
@@ -86,40 +96,47 @@ export const CheckboxSelector = ({ filter, onChange, bgColor }) => {
   };
 
   const handleSelectAll = () => {
-    const allSelected = Object.values(selectedCheckboxes).every(Boolean);
-    const newSelectedCheckboxes = Object.keys(selectedCheckboxes).reduce((acc, key) => {
-      acc[key] = !allSelected;
-      return acc;
-    }, {});
+    if (disabled) return;
+    
+    const allSelected = options.every(option => selectedCheckboxes[option.displayValue]);
+    const newSelectedCheckboxes = { ...selectedCheckboxes };
+    
+    options.forEach(option => {
+      newSelectedCheckboxes[option.displayValue] = !allSelected;
+    });
+
     const selectedValues = Object.keys(newSelectedCheckboxes)
       .filter(key => newSelectedCheckboxes[key])
-      .map(key => filter.values.values.find(option => option.displayValue === key).paramValue)
+      .map(key => filter.values.values.find(option => option.displayValue === key)?.paramValue)
+      .filter(Boolean)
       .join(',');
     onChange(filter, selectedValues);
     setSelectedCheckboxes(newSelectedCheckboxes);
   };
 
-  const options = filter.values.values;
-
   return (
-    <Container>
-      {options.map((option) => (
+    <Container style={{ opacity: disabled ? 0.45 : 1, pointerEvents: disabled ? 'none' : 'auto' }}>
+      {options.map((option) => {
+        const checkboxId = `${filter.id || 'checkbox'}-${option.paramValue || option.displayValue}`;
+        return (
         <CheckboxContainer key={option.displayValue}>
-        <label htmlFor={option.displayValue} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+        <label htmlFor={checkboxId} style={{ display: 'flex', alignItems: 'center', cursor: disabled ? 'not-allowed' : 'pointer' }}>
           <StyledCheckbox
-            id={option.displayValue}
+            id={checkboxId}
             checked={!!selectedCheckboxes[option.displayValue]} // Ensure boolean value
             onChange={() => handleCheckboxChange(option.displayValue, option.paramValue)}
+            disabled={disabled}
           />
           {option.displayValue}
         </label>
       </CheckboxContainer>
-      ))}
+      )})}
       {filter.multiSelect && (
         <SelectAllButton
           onClick={handleSelectAll}
-          $isSelected={Object.values(selectedCheckboxes).every(Boolean)}
+          $isSelected={options.every(option => selectedCheckboxes[option.displayValue])}
           $bgColor={bgColor}
+          disabled={disabled}
         >
           Select All
         </SelectAllButton>

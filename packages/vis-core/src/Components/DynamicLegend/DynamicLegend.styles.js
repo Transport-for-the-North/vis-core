@@ -44,7 +44,7 @@ export const LegendContainer = styled.div`
   max-width: 80vw;
   overflow: visible;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: var(--font-family-base);
   font-size: medium;
   
   /* Custom scrollbar styling for Webkit-based browsers */

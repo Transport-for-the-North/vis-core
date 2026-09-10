@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
+import { defaultBgColour } from 'defaults';
 
 const ScrollLock = createGlobalStyle`
     html, body {
@@ -56,7 +57,7 @@ const Actions = styled.div`
 const PrimaryLink = styled(Link)`
     padding: 0.625rem 1rem;
     border-radius: 8px;
-    background: ${({ theme }) => theme?.colors?.primary || '#7317de'};
+    background: ${({ theme }) => theme?.colors?.primary || defaultBgColour};
     color: #fff;
     text-decoration: none;
     font-weight: 600;

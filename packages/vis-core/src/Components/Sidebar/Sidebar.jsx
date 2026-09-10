@@ -10,15 +10,15 @@ import { DownloadSection } from "./Selectors/DownloadSelection";
 import { FilterProvider } from "contexts/FilterContext";
 import { getScrollbarWidth } from "utils";
 import { MobileBar, SideIcon } from "Components/MobileBar/MobileBar";
+import { defaultBgColour } from "defaults";
 
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
-  font-size: 1.2em;
-  color: #4b3e91;
+  font-size: 1.05rem;
   font-weight: bold;
   text-align: left;
   padding-left: 5px;
-  color: #333;
+  color: ${({ theme }) => theme?.colors?.text || "var(--text-icon)"};
   user-select: none;
   background-color: rgba(255, 255, 255, 0);
   max-width: 270px;
@@ -108,7 +108,7 @@ const ToggleButton = styled.button`
   left: 392px;
   top: 25px;
   z-index: 1001;
-  background-color: ${(props) => props.$bgColor};
+  background-color: ${({ theme }) => theme?.primary || defaultBgColour};
   color: white;
   border: none;
   border-radius: 5px;

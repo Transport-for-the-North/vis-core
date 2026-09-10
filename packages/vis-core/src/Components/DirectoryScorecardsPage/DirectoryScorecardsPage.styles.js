@@ -78,6 +78,9 @@ export const Toolbar = styled.div`
   gap: 6px;
   margin-bottom: 6px;
   flex-wrap: wrap;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
 `;
 
 /**
@@ -88,7 +91,9 @@ export const Tag = styled.span`
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
   border: 1px solid #94a3b8;
   background: #e2e8f0;
   color: #0f172a;

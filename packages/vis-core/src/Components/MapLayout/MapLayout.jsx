@@ -19,9 +19,11 @@ import { actionTypes } from "reducers";
 const LayoutContainer = styled.div`
   display: flex;
   height: calc(100vh - 75px);
+  overflow: hidden;
   @media ${props => props.theme.mq.mobile} {
    flex-direction: column;   /* stack Sidebar above Map */
    height: auto;             /* let content dictate height */
+   overflow: visible;
   }
 `;
 
@@ -29,6 +31,7 @@ const MapContainer = styled.div`
   flex: 1;
   position: relative;
   display: flex;
+  overflow: hidden;
   @media ${props => props.theme.mq.mobile} {
    flex: 0 0 auto;
    min-height: 60vh; /* ensure minimum height on mobile */}
@@ -383,10 +386,24 @@ export const MapLayout = () => {
     });
   };
 
+  const loadingHeading = state.visualisationLoadingCount > 0
+    ? "Loading map layers"
+    : "Preparing your map";
+  const loadingMessages = [
+    "Fetching the latest visualisation data...",
+    "Almost there, thanks for waiting.",
+    "Applying colours and map styling...",
+  ];
+
   return (
     <ToastProvider>
       <LayoutContainer>
-      <Dimmer dimmed={isLoading} showLoader={true} />
+      <Dimmer
+        dimmed={isLoading}
+        showLoader={true}
+        statusHeading={loadingHeading}
+        statusMessages={loadingMessages}
+      />
       <DynamicStylingStatus isResolving={isDynamicStylingLoading} />
       <Sidebar
         pageName={pageContext.pageName}

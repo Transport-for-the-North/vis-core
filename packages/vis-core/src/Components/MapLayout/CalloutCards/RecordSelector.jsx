@@ -25,26 +25,44 @@ const customStyles = {
   }),
   control: (base, state) => ({
     ...base,
-    borderColor: 'rgb(220, 220, 220)',
+    fontFamily: 'var(--font-family-base)',
+    borderColor: state.isFocused ? 'var(--palette-navy, #0d0f3d)' : 'var(--palette-grey, #d1d5db)',
     borderRadius: 6,
     minHeight: '32px',
-    fontSize: '0.9rem',
-    boxShadow: state.isFocused ? '0 0 0 1px rgba(0, 0, 0, 0.06)' : 'none',
+    fontSize: '0.85rem',
+    boxShadow: state.isFocused ? '0 0 0 1px var(--palette-navy, #0d0f3d)' : 'none',
     '&:hover': {
-      borderColor: 'rgb(220, 220, 220)',
+      borderColor: 'var(--palette-navy, #0d0f3d)',
     },
   }),
   option: (styles, { isFocused, isSelected }) => ({
     ...styles,
-    fontSize: '0.9rem',
+    fontFamily: 'var(--font-family-base)',
+    fontSize: '0.85rem',
     padding: '8px 12px',
-    backgroundColor: isSelected ? '#007bff' : isFocused ? '#f5f5f5' : 'white',
-    color: isSelected ? 'white' : 'black',
+    backgroundColor: isSelected
+      ? 'var(--palette-navy, #0d0f3d)'
+      : isFocused
+      ? 'var(--palette-mid-grey, #f0f0f7)'
+      : 'var(--palette-white, #ffffff)',
+    color: isSelected ? 'var(--palette-white, #ffffff)' : 'var(--text-icon)',
     cursor: 'pointer',
   }),
   singleValue: (base) => ({
     ...base,
-    fontSize: '0.9rem',
+    fontFamily: 'var(--font-family-base)',
+    fontSize: '0.85rem',
+    color: 'var(--text-icon)',
+  }),
+  placeholder: (base) => ({
+    ...base,
+    fontFamily: 'var(--font-family-base)',
+    fontSize: '0.85rem',
+  }),
+  input: (base) => ({
+    ...base,
+    fontFamily: 'var(--font-family-base)',
+    fontSize: '0.85rem',
   }),
 };
 

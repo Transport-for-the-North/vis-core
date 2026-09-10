@@ -228,13 +228,12 @@ export const DynamicLegend = ({ map }) => {
             colorStyle === "categorical" ||
             (colorStops && colorStops.some((s) => isNaN(convertStringToNumber(s.value))));
 
-          // Invert color and width stops if necessary
-          if (invertColorScheme && colorStops) {
-            colorStops = colorStops.slice().reverse();
-            if (widthStops) {
-              widthStops = widthStops.slice().reverse();
-            }
-          }
+          // Note: when invertColorScheme is true, the map paint expression was already
+          // built with the colours reversed (via calculateColours in MapVisualisation).
+          // interpretColorExpression reads those stops back in ascending value order with
+          // the already-inverted colours, so no further reversal is needed here. Reversing
+          // again would flip the labels to show highest→lowest instead of lowest→highest.
+
           // For categorical circle styles, keep a uniform diameter (do not scale by bins)
           if (layer.type === "circle" && isCategorical) {
             widthStops = null; // allow default diameter to apply uniformly
@@ -390,6 +389,7 @@ export const DynamicLegend = ({ map }) => {
             style: layer.metadata.colorStyle,
             noStyle,
             hasCustomLabels, // True when bands.js-style range labels (e.g. "0-20 (Very low)") are applied.
+            hideOutOfBandWarning: layer.metadata?.hideOutOfBandWarning !== false,
           };
         })
         // Layers that produced no renderable entries return null from the map above.

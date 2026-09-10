@@ -153,3 +153,26 @@ export const formatOrdinal = (n) => {
   }
   return n;
 };
+
+/**
+ * Formats a numeric value with its associated unit.
+ * Supports currency symbols (e.g. £, £/week), percentages (%), and text units (e.g. sqm, gen mins).
+ *
+ * @param {number|string} val - Numeric value to format
+ * @param {string} [unit] - Unit string
+ * @returns {string} Formatted number with unit
+ */
+export const formatValueWithUnit = (val, unit) => {
+  const n = Number(val);
+  if (!Number.isFinite(n)) return "";
+  const formatted = formatNumber(n, { stripTrailingZeroes: true });
+  if (!unit || unit === "none" || unit === "count") return String(formatted);
+  if (unit === "%") return `${formatted}%`;
+  if (unit.startsWith("£")) {
+    const sign = n < 0 ? "-" : "";
+    const absFormatted = formatNumber(Math.abs(n), { stripTrailingZeroes: true });
+    return `${sign}£${absFormatted}${unit.slice(1)}`;
+  }
+  if (unit.startsWith("/")) return `${formatted} ${unit}`;
+  return `${formatted} ${unit}`;
+};
