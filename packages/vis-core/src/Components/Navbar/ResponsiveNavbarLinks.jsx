@@ -8,6 +8,10 @@ import { defaultBgColour } from "defaults";
 
 const NAV_ITEM_MAX_WIDTH = "250px";
 const NAV_ITEM_MIN_WIDTH = "150px";
+const NAV_ITEM_TABLET_MAX_WIDTH = "220px";
+const NAV_ITEM_TABLET_MIN_WIDTH = "130px";
+const NAV_ITEM_COMPACT_MAX_WIDTH = "190px";
+const NAV_ITEM_COMPACT_MIN_WIDTH = "100px";
 
 /**
  * Styled container for the responsive navigation links.
@@ -25,6 +29,24 @@ const NavLinksContainer = styled.div`
     flex: 1 1 0;
     min-width: ${NAV_ITEM_MIN_WIDTH};
     max-width: ${NAV_ITEM_MAX_WIDTH};
+  }
+
+  @media only screen and (max-width: 1400px) {
+    gap: 8px;
+
+    > * {
+      min-width: ${NAV_ITEM_TABLET_MIN_WIDTH};
+      max-width: ${NAV_ITEM_TABLET_MAX_WIDTH};
+    }
+  }
+
+  @media only screen and (max-width: 1200px) {
+    gap: 6px;
+
+    > * {
+      min-width: ${NAV_ITEM_COMPACT_MIN_WIDTH};
+      max-width: ${NAV_ITEM_COMPACT_MAX_WIDTH};
+    }
   }
 `;
 
@@ -73,6 +95,11 @@ const baseNavLinkStyles = css`
   &:hover {
     color: ${({ theme }) => theme?.activeNavText || "#ffffff"};
     background-color: ${({ $bgColor, theme }) => $bgColor || theme?.primary || defaultBgColour};
+  }
+
+  @media only screen and (max-width: 1200px) {
+    font-size: 14px;
+    padding: 7px 8px;
   }
 `;
 

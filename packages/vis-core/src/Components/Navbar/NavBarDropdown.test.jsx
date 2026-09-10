@@ -101,6 +101,29 @@ describe("NavBarDropdown component test", () => {
     await user.keyboard("{Enter}");
     expect(screen.getByText("pageName2")).toBeInTheDocument();
   });
+
+  it("navigates when Enter is pressed on a focused child link", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <NavBarDropdown {...props} />
+      </MemoryRouter>
+    );
+
+    const trigger = screen.getByRole("button", { name: "Menu" });
+    trigger.focus();
+    await user.keyboard("{Enter}");
+
+    const childLink = screen.getByRole("link", { name: "pageName2" });
+    childLink.focus();
+    expect(childLink).toHaveFocus();
+
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(fakeOnClick).toHaveBeenCalled();
+    });
+  });
 });
 
 describe("NestedDropdownPortal component test", () => {
@@ -231,9 +254,6 @@ describe("RecursiveDropdownItem component test", () => {
     expect(parent).toHaveAttribute("href", "/");
 
     // Click on child
-    const p = screen.getAllByText("▸")[0];
-    expect(p).toBeInTheDocument();
-    await userEvent.click(p);
     const child1 = screen.getByText("pageName1");
     await userEvent.click(child1);
     await waitFor(() => {

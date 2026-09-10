@@ -309,8 +309,16 @@ export const ChartTooltip = ({
   formatter,
   coordinate,
 }) => {
+  const theme = useTheme();
   const containerRef = useRef(null);
   const anchorRef = useRef(null);
+
+  const primaryColor =
+    theme?.colors?.primary ||
+    theme?.primary ||
+    defaultBgColour;
+  const textColor = theme?.colors?.text || "var(--text-icon)";
+  const tooltipFont = '"Open Sans", var(--font-sans), "Segoe UI", Arial, sans-serif';
 
   React.useLayoutEffect(() => {
     const el = containerRef.current;
@@ -376,17 +384,19 @@ export const ChartTooltip = ({
         left: 0,
         pointerEvents: "none",
         backgroundColor: "rgba(255, 255, 255, 0.96)",
-        border: "1px solid #ddd",
+        border: `1px solid ${primaryColor}`,
         borderRadius: 6,
         padding: "8px 12px",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
         fontSize: 12,
+        fontFamily: tooltipFont,
+        color: textColor,
         maxWidth: 280,
         zIndex: 99999,
       }}
     >
       {label && (
-        <div style={{ fontWeight: 600, marginBottom: 4, color: "#333" }}>
+        <div style={{ fontWeight: 700, marginBottom: 4, color: primaryColor }}>
           {label}
         </div>
       )}
@@ -419,7 +429,7 @@ export const ChartTooltip = ({
               alignItems: "center",
               justifyContent: "space-between",
               gap: 12,
-              color: "#444",
+              color: textColor,
               marginTop: i > 0 ? 2 : 0,
             }}
           >
@@ -436,7 +446,7 @@ export const ChartTooltip = ({
               />
               <span>{item.name}</span>
             </div>
-            <span style={{ fontWeight: 600, color: "#111" }}>
+            <span style={{ fontWeight: 600, color: textColor }}>
               {formattedVal}
             </span>
           </div>
