@@ -391,7 +391,7 @@ describe("reclassifyAndStyleMap is called", () => {
         undefined,
         { url: "/" },
         undefined,
-        { bandMetricName: undefined, customBands: undefined, defaultClassification: undefined }
+        { bandMetricName: undefined, customBands: undefined, defaultClassification: undefined, displayMode: "absolute" }
       );
     });
   });

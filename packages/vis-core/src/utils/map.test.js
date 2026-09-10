@@ -309,7 +309,6 @@ describe("getMetricDefinition", () => {
     });
   });
 });
-});
 
 describe("reclassifyData", () => {
   let warnSpy;
