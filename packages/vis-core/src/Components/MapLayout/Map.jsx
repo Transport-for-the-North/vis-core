@@ -24,6 +24,7 @@ import {
   buildLoadingSection,
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
+  resolveVisualisationUnit,
 } from "utils";
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -551,9 +552,11 @@ const Map = (props) => {
             ? formatNumber(featureValue)
             : "";
         const layerVisualisationName = layerConfig.visualisationName;
-        const unitText =
+        const layerVisualisation = state.visualisations[layerVisualisationName];
+        const baseUnitText =
           layerConfig.defaultTooltipUnitName ??
-          state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
+          layerVisualisation?.legendText?.[0]?.legendSubtitleText ?? "";
+        const unitText = resolveVisualisationUnit(layerVisualisation, baseUnitText);
         const valueText =
            layerConfig.defaultTooltipValueName ??
            state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ??

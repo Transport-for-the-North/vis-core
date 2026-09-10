@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import { createPortal } from 'react-dom';
-import { buildCategoricalLegendKey, convertStringToNumber } from "utils";
+import {
+  buildCategoricalLegendKey,
+  convertStringToNumber,
+  getMetricDefinition,
+  getVisualisationDisplayMode,
+  resolveDisplayUnit,
+} from "utils";
 import { useMapContext } from "hooks/useMapContext";
 import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useIsMobile } from "hooks/useIsMobile";
@@ -49,7 +55,6 @@ export const DynamicLegend = ({ map }) => {
   const popoverRef = useRef(null);
   const legendRef = useRef(null);
   const currentPage = useContext(PageContext);
-  const pageCategory = currentPage.category || currentPage.pageName;
 
   // Build a lookup of already-fetched data by layerId from state.visualisations
   const visualisationDataByLayer = {};
@@ -153,26 +158,25 @@ export const DynamicLegend = ({ map }) => {
             }
           }
           
-          // Look up custom labels from defaultBands using pageCategory
-          let customLabels = null;
-          if (visualisation && visualisation.queryParams) {
-            const legendFilter = state?.filters?.find(
-              (filter) => filter.containsLegendInfo === true
-            );
-            if (legendFilter) {
-              const filterParamName = legendFilter.paramName;
-              const metricName = visualisation.queryParams[filterParamName]?.value;
-              const defaultBandEntry = defaultBands.find(band => band.name === pageCategory);
-              if (defaultBandEntry) {
-                const metricDefinition = defaultBandEntry.metric.find(
-                  m => m.name === metricName
-                );
-                if (metricDefinition && metricDefinition.labels && metricDefinition.labels.length > 0) {
-                  customLabels = metricDefinition.labels;
-                }
-              }
-            }
-          }
+          // Resolve bands the same way the map does, so a mode-specific band entry drives
+          // the legend's labels. The mode comes from visualisation state rather than being
+          // re-derived from filter config, so legend and map band the same numbers.
+          const displayMode = getVisualisationDisplayMode(visualisation);
+          const metricDefinition = visualisation?.queryParams
+            ? getMetricDefinition(defaultBands, currentPage, visualisation.queryParams, {
+                displayMode,
+              })
+            : null;
+
+          let customLabels = metricDefinition?.labels?.length
+            ? metricDefinition.labels
+            : null;
+
+          // The unit follows the display mode, not the band configuration: in a percentage
+          // view the legend stops describing the metric's own units (e.g. "Passengers").
+          // The hovertip resolves its unit through this same helper, so the two agree
+          // without either needing a bands.js entry to exist.
+          legendSubtitleText = resolveDisplayUnit(displayMode, legendSubtitleText);
           
           // --- Interpret paint expressions ---
           const invertColorScheme = state.layers[layer.id]?.invertedColorScheme === true;

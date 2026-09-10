@@ -19,6 +19,7 @@ import {
   buildLoadingSection,
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
+  resolveVisualisationUnit,
 } from "utils";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
@@ -383,9 +384,11 @@ const DualMaps = (props) => {
               ? numberWithCommas(featureValue)
               : "";
           const layerVisualisationName = state.layers[layerId]?.visualisationName;
-          const unitText =
+          const layerVisualisation = state.visualisations[layerVisualisationName];
+          const baseUnitText =
             layerConfig.defaultTooltipUnitName ??
-            state.visualisations[layerVisualisationName]?.legendText?.[0]?.legendSubtitleText ?? "";
+            layerVisualisation?.legendText?.[0]?.legendSubtitleText ?? "";
+          const unitText = resolveVisualisationUnit(layerVisualisation, baseUnitText);
           const valueText =
             layerConfig.defaultTooltipValueName ??
             state.visualisations[layerVisualisationName]?.legendText?.[0]?.displayValue ?? "Value";
