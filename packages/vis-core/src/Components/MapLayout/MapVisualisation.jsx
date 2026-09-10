@@ -13,6 +13,7 @@ import {
   resetPaintProperty,
   hasAnyGeometryNotNull,
   getMetricDefinition,
+  getVisualisationDisplayMode,
   determineDynamicStyle
 } from "utils";
 import chroma from "chroma-js";
@@ -175,6 +176,13 @@ export const MapVisualisation = ({
   const { state, dispatch } = useMapContext();
   const appContext = useContext(AppContext);
 
+  // The page this visualisation belongs to. Hoisted to component scope because both the
+  // styling callback and the display-mode effect need it.
+  const currentPage = useMemo(
+    () => appContext?.appPages?.find((page) => page.url === window.location.pathname),
+    [appContext?.appPages]
+  );
+
   // Refs to keep track of previous values
   const prevCombinedDataRef = useRef();
   const prevVisualisationDataRef = useRef();
@@ -267,6 +275,34 @@ export const MapVisualisation = ({
       });
     }
   }, [layerKey, visualisation?.defaultClassification, state.layers, dispatch]);
+
+  // The display mode currently driving this visualisation, read from state.
+  const activeDisplayMode = getVisualisationDisplayMode(visualisation);
+
+  const previousDisplayModeRef = useRef(activeDisplayMode);
+
+  // Drop hand-edited bands when the display mode changes the units under them. Bands typed
+  // in absolute terms are meaningless once the map switches to percentages, and leaving
+  // them applied paints the whole layer a single colour. Only custom mode is reset: the
+  // data-driven methods (quantile, logarithmic, Jenks) recompute from the new values on
+  // their own and are deliberately left as the user set them.
+  useEffect(() => {
+    if (previousDisplayModeRef.current === activeDisplayMode) return;
+    previousDisplayModeRef.current = activeDisplayMode;
+
+    if (classificationMethod !== "c") return;
+
+    // Order matters: UPDATE_CUSTOM_BANDS forces class_method back to "c", so the
+    // classification reset has to follow it.
+    dispatch({
+      type: actionTypes.UPDATE_CUSTOM_BANDS,
+      payload: { customBands: null, layerName: layerKey },
+    });
+    dispatch({
+      type: actionTypes.UPDATE_CLASSIFICATION_METHOD,
+      payload: { class_method: "d", layerName: layerKey },
+    });
+  }, [activeDisplayMode, classificationMethod, layerKey, dispatch]);
 
   // Reset fetch state when visualisation changes (page navigation)
   useEffect(() => {
@@ -421,11 +457,6 @@ export const MapVisualisation = ({
         return;
       }
 
-      // Reclassify data using combinedData
-      const currentPage = appContext.appPages.find(
-        (page) => page.url === window.location.pathname
-      );
-
       // Get bandMetricName and customBands from state.layers
       const bandMetricName = state.layers[layerKey]?.bandMetricName;
       const customBands = state.layers[layerKey]?.customBands;
@@ -440,7 +471,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { bandMetricName, customBands, defaultClassification } // Pass bandMetricName, customBands and defaultClassification in options
+        { bandMetricName, customBands, defaultClassification, displayMode: activeDisplayMode } // Pass bandMetricName, customBands, defaultClassification and the active display mode in options
       );
 
       // Get the metric definition for the current page/metric
@@ -448,7 +479,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation?.queryParams,
-        { bandMetricName }
+        { bandMetricName, displayMode: activeDisplayMode }
       );
 
       // Determine the current color scheme
@@ -553,7 +584,9 @@ export const MapVisualisation = ({
       state.layers,
       resolvedStyle,
       appContext,
+      currentPage,
       visualisation, 
+      activeDisplayMode,
       layerColorScheme,
       layerKey,
       // calculateColours,
