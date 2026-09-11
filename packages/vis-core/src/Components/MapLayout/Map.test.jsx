@@ -3,6 +3,7 @@ import { FilterContext } from "contexts/FilterContext";
 import { MapContext } from "contexts/MapContext";
 import { useMap } from "hooks/useMap";
 import { api } from "services";
+import { registerInitialBaseSources } from "../../map/baseSources";
 
 jest.mock("maplibre-gl", () => {
   class Popup {
@@ -220,6 +221,8 @@ const addLayer = jest.fn();
 const setLayoutProperty = jest.fn();
 const fitBounds = jest.fn();
 const panTo = jest.fn();
+const setStyle = jest.fn();
+const once = jest.fn();
 // const addEventListener = jest.fn();
 
 beforeEach(() => {
@@ -247,6 +250,7 @@ beforeEach(() => {
     map: {
       addControl,
       on,
+      once,
       getCanvas,
       off,
       getLayer,
@@ -259,8 +263,10 @@ beforeEach(() => {
       setLayoutProperty,
       fitBounds,
       panTo,
+      setStyle,
     },
     isMapReady: true,
+    knownBaseSourceIds: { current: new Set(["default"]) },
   });
   Object.defineProperty(window, "ontouchstart", {
     value: true,
@@ -412,6 +418,8 @@ describe("Hooks tests", () => {
       setFilter,
       setFeatureState,
       setLayoutProperty,
+      once,
+      setStyle,
     });
     expect(isMapReady).toBe(true);
     expect(screen.getByText("DynamicLegend")).toBeInTheDocument();
@@ -1351,5 +1359,150 @@ describe("mouseLeaveCallback function test", () => {
       { source: "test-source", id: 123, sourceLayer: "test-source-layer" },
       { hover: true }
     );
+  });
+});
+
+describe("Map style toggle and transformStyle", () => {
+  it("pushes base place labels on top of custom application layers during style change", () => {
+    const currentMapStyle = () => "https://maps.geoapify.com/v1/styles/positron/style.json";
+    const contextWithStyle = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        mapStyle: currentMapStyle,
+      },
+    };
+
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={contextWithStyle}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    // Initial render skips setStyle
+    expect(setStyle).not.toHaveBeenCalled();
+
+    // Toggle style
+    registerInitialBaseSources(useMap.mock.results[0]?.value?.map, new Set(["default"]));
+    const nextStyleUrl = "https://tiles.openfreemap.org/styles/dark";
+    const nextContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        baseMapId: "darkMatter",
+      },
+    };
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={nextContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(setStyle).toHaveBeenCalledWith(nextStyleUrl, expect.objectContaining({
+      transformStyle: expect.any(Function),
+    }));
+    expect(once).toHaveBeenCalledWith("style.load", expect.any(Function));
+    expect(once).not.toHaveBeenCalledWith("idle", expect.any(Function));
+
+    // Test the transformStyle function directly
+    const { transformStyle } = setStyle.mock.calls[0][1];
+    const previousStyle = {
+      sources: {
+        default: { type: "vector" },
+        "app-source": { type: "geojson" },
+      },
+      layers: [
+        { id: "background", type: "background" },
+        { id: "place_town", type: "symbol", source: "default" },
+        { id: "custom-polygon", type: "fill", source: "app-source" },
+        { id: "place_markers", type: "symbol", source: "app-source" },
+      ],
+    };
+    const incomingDarkLayout = {
+      "text-font": ["Provider Sans"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], 5, 10, 12, 16],
+      "text-anchor": "center",
+    };
+    const nextStyle = {
+      sources: {
+        openmaptiles: { type: "vector" },
+      },
+      layers: [
+        { id: "dark-background", type: "background" },
+        { id: "place_town", type: "symbol", source: "openmaptiles", layout: incomingDarkLayout },
+        { id: "place_village", type: "symbol", source: "openmaptiles" },
+      ],
+    };
+
+    const transformed = transformStyle(previousStyle, nextStyle);
+
+    // Custom sources should contain only app-source
+    expect(transformed.sources["app-source"]).toBeDefined();
+    expect(transformed.sources.default).toBeUndefined();
+
+    // Layers order should place base labels AFTER custom layers
+    const layerIds = transformed.layers.map((l) => l.id);
+    expect(layerIds).toEqual([
+      "dark-background",
+      "custom-polygon",
+      "place_markers",
+      "place_town",
+      "place_village",
+    ]);
+
+    // Base place labels in dark mode should have enhanced paint properties
+    const placeTown = transformed.layers.find((l) => l.id === "place_town");
+    expect(placeTown.paint["text-color"]).toBe("#ffffff");
+    expect(placeTown.paint["text-halo-color"]).toBe("rgba(0, 0, 0, 0.85)");
+    expect(placeTown.paint["text-halo-width"]).toBe(1.25);
+    expect(placeTown.layout).toBe(incomingDarkLayout);
+
+    // Toggle style back to normal mode
+    const lightContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        baseMapId: "positron",
+      },
+    };
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={lightContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    const { transformStyle: lightTransformStyle } = setStyle.mock.calls[1][1];
+    const originalLightTown = {
+      id: "place_town",
+      type: "symbol",
+      source: "default",
+      paint: { "text-color": "#333333" },
+      layout: { "text-size": 12, "text-font": ["Noto Sans Regular"] },
+    };
+    const normalTransformed = lightTransformStyle(nextStyle, {
+      sources: { default: { type: "vector" } },
+      layers: [
+        { id: "light-bg", type: "background" },
+        originalLightTown,
+      ],
+    });
+    const normalTown = normalTransformed.layers.find((l) => l.id === "place_town");
+    expect(normalTown).toBe(originalLightTown);
+    expect(normalTown.layout).toBe(originalLightTown.layout);
+    expect(normalTown.paint["text-color"]).toBe("#333333");
   });
 });

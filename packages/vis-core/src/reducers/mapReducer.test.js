@@ -127,6 +127,21 @@ describe("mapReducer categorical legend cache", () => {
 
     expect(nextState.categoricalLegendCache).toEqual({});
   });
+
+  it("updates baseMapId and mapStyle atomically on SET_BASE_MAP", () => {
+    const initialState = {
+      baseMapId: "positron",
+      mapStyle: "https://maps.geoapify.com/v1/styles/positron/style.json",
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.SET_BASE_MAP,
+      payload: "darkMatter",
+    });
+
+    expect(nextState.baseMapId).toBe("darkMatter");
+    expect(nextState.mapStyle).toBe("https://tiles.openfreemap.org/styles/dark");
+  });
 });
 
 describe("mapReducer display mode", () => {

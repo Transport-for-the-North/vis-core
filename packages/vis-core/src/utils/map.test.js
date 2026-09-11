@@ -3,6 +3,10 @@ import {
   resolveCategoricalColours,
   getMetricDefinition,
   reclassifyData,
+  getWidthProperty,
+  isBasePlaceLabelLayer,
+  moveTownCityLabelsToTop,
+  TOWN_CITY_LABEL_LAYER_IDS,
 } from "./map";
 import { DisplayMode } from "enums";
 
@@ -338,5 +342,186 @@ describe("reclassifyData", () => {
     expect(Array.isArray(bins)).toBe(true);
     expect(bins.length).toBeGreaterThan(1);
     expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("getWidthProperty", () => {
+  let warnSpy;
+
+  beforeEach(() => {
+    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
+
+  it("returns line-width for line layers", () => {
+    expect(getWidthProperty("line")).toBe("line-width");
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("returns circle-radius for circle layers", () => {
+    expect(getWidthProperty("circle")).toBe("circle-radius");
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("returns undefined without warning for fill, symbol, raster, and background layers", () => {
+    expect(getWidthProperty("fill")).toBeUndefined();
+    expect(getWidthProperty("symbol")).toBeUndefined();
+    expect(getWidthProperty("raster")).toBeUndefined();
+    expect(getWidthProperty("background")).toBeUndefined();
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("warns and returns undefined for unknown layer types", () => {
+    expect(getWidthProperty("unknown-type")).toBeUndefined();
+    expect(warnSpy).toHaveBeenCalledWith("Unable to get width property name for layerType unknown-type");
+  });
+});
+
+describe("isBasePlaceLabelLayer", () => {
+  it("identifies standard place-label symbol layers", () => {
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place_town",
+        type: "symbol",
+      })
+    ).toBe(true);
+
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place_city",
+        type: "symbol",
+      })
+    ).toBe(true);
+
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place_village",
+        type: "symbol",
+      })
+    ).toBe(true);
+
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place_country_major",
+        type: "symbol",
+      })
+    ).toBe(true);
+  });
+
+  it("identifies additional place-prefix symbol layers", () => {
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place_region",
+        type: "symbol",
+      })
+    ).toBe(true);
+
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place-suburb",
+        type: "symbol",
+      })
+    ).toBe(true);
+  });
+
+  it("rejects non-symbol and non-place layers", () => {
+    expect(
+      isBasePlaceLabelLayer({
+        id: "place_boundaries",
+        type: "line",
+      })
+    ).toBe(false);
+
+    expect(
+      isBasePlaceLabelLayer({
+        id: "custom-polygon-layer",
+        type: "fill",
+      })
+    ).toBe(false);
+
+    expect(
+      isBasePlaceLabelLayer({
+        id: "water",
+        type: "symbol",
+      })
+    ).toBe(false);
+
+    expect(isBasePlaceLabelLayer(null)).toBe(false);
+    expect(isBasePlaceLabelLayer({})).toBe(false);
+  });
+
+  it("does not target application-owned place-prefixed layers when base sources are known", () => {
+    const baseSourceIds = new Set(["openmaptiles"]);
+
+    expect(
+      isBasePlaceLabelLayer(
+        { id: "place_markers", type: "symbol", source: "app-source" },
+        baseSourceIds
+      )
+    ).toBe(false);
+
+    expect(
+      isBasePlaceLabelLayer(
+        { id: "place_town", type: "symbol", source: "openmaptiles" },
+        baseSourceIds
+      )
+    ).toBe(true);
+  });
+});
+
+describe("moveTownCityLabelsToTop", () => {
+  it("moves known label layers to the top of the map layer stack in order", () => {
+    const existingLayers = new Set(["place_town", "place_city", "place_village"]);
+    const moved = [];
+    const mockMap = {
+      getLayer: jest.fn((id) => (existingLayers.has(id) ? { id, type: "symbol" } : undefined)),
+      moveLayer: jest.fn((id) => moved.push(id)),
+      getStyle: jest.fn(() => ({
+        layers: [
+          { id: "background", type: "background" },
+          { id: "place_town", type: "symbol" },
+          { id: "place_village", type: "symbol" },
+          { id: "place_custom", type: "symbol" },
+        ],
+      })),
+    };
+    existingLayers.add("place_custom");
+
+    moveTownCityLabelsToTop(mockMap);
+
+    expect(mockMap.moveLayer).toHaveBeenCalledWith("place_town");
+    expect(mockMap.moveLayer).toHaveBeenCalledWith("place_village");
+    expect(mockMap.moveLayer).toHaveBeenCalledWith("place_custom");
+    expect(mockMap.moveLayer).not.toHaveBeenCalledWith("place_city_large");
+  });
+
+  it("does not move application-owned place labels when base sources are known", () => {
+    const mockMap = {
+      getLayer: jest.fn((id) => ({
+        id,
+        type: "symbol",
+        source: id === "place_custom" ? "app-source" : "openmaptiles",
+      })),
+      moveLayer: jest.fn(),
+      getStyle: jest.fn(() => ({
+        layers: [
+          { id: "place_town", type: "symbol", source: "openmaptiles" },
+          { id: "place_custom", type: "symbol", source: "app-source" },
+        ],
+      })),
+    };
+
+    moveTownCityLabelsToTop(mockMap, new Set(["openmaptiles"]));
+
+    expect(mockMap.moveLayer).toHaveBeenCalledWith("place_town");
+    expect(mockMap.moveLayer).not.toHaveBeenCalledWith("place_custom");
+  });
+
+  it("safely handles maps without getLayer or moveLayer", () => {
+    expect(() => moveTownCityLabelsToTop(null)).not.toThrow();
+    expect(() => moveTownCityLabelsToTop({})).not.toThrow();
   });
 });
