@@ -20,16 +20,14 @@ import chroma from "chroma-js";
 import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useFeatureStateUpdater } from "hooks/useFeatureStateUpdater";
 import { useVisualisationLoadingCounter } from "hooks/useVisualisationLoadingCounter"; // Import the custom hook
+import { registerMapRestorer } from "../../map/runtimeRestorationRegistry";
 import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 
 // Constants
 const DEFAULT_OPACITY = 0.65;
 const DEFAULT_COLOR_STYLE = "continuous";
-const LAYER_RETRY_CONFIG = {
-  maxRetries: 10,
-  retryDelay: 200,
-};
+
 
 const areNumericArraysEqual = (a, b) => {
   if (a === b) return true;
@@ -198,6 +196,7 @@ export const MapVisualisation = ({
   const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   
   // Ref to track if the layer has been styled
+  const LAYER_RETRY_CONFIG = { maxRetries: 10, retryDelay: 200 };
   const hasStyledLayerRef = useRef(false);
 
   // State for tracking resolved dynamic styles
@@ -205,7 +204,7 @@ export const MapVisualisation = ({
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
   const [isApplyingStyle, setIsApplyingStyle] = useState(false);
 
-  const { addFeaturesToMap } = useFeatureStateUpdater();
+  const { addFeaturesToMap, replayLayerState } = useFeatureStateUpdater();
 
   // Determine the visualisation based on side (left, right, or single)
   const visualisation = useMemo(() => {
@@ -967,6 +966,27 @@ export const MapVisualisation = ({
       setForceUpdateCounter((prev) => prev + 1);
     }
   }, [isResolvingStyle, resolvedStyle, colorStyle]);
+
+  // Register a feature-state restorer with the central registry.
+  // The transition coordinator (useBaseMapTransition) runs all registered
+  // restorers after each style reload — without MapVisualisation needing to
+  // listen for style.load directly.
+  useEffect(() => {
+    if (!map || !layerKey) return undefined;
+
+    const restore = () => replayLayerState(map, state.layers, layerKey);
+
+    return registerMapRestorer(
+      map,
+      `feature-state:${layerKey}`,
+      restore
+    );
+  }, [
+    map,
+    layerKey,
+    replayLayerState,
+    state.layers,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {

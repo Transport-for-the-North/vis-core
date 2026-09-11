@@ -54,6 +54,17 @@ const createRetryManager = () => {
 };
 
 /**
+ * Resolves the canonical source ID for a layer.
+ *
+ * @param {Object} layer
+ * @returns {string}
+ */
+const getLayerSourceId = (layer) =>
+  layer?.sourceId ??
+  layer?.mapSourceId ??
+  layer?.name;
+
+/**
  * Updates feature states on the map for the given data.
  * Performs a diff against prevStates to avoid redundant map operations.
  */
@@ -86,7 +97,7 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
     if (!prevStates.has(id) || prevStates.get(id) !== value) {
       map.setFeatureState(
         {
-          source: layer.name,
+          source: getLayerSourceId(layer),
           sourceLayer: layer.sourceLayer,
           id,
         },
@@ -102,7 +113,7 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
   prevStates.forEach((_, id) => {
     if (!newStates.has(id)) {
       map.removeFeatureState({
-        source: layer.name,
+        source: getLayerSourceId(layer),
         sourceLayer: layer.sourceLayer,
         id,
       });
@@ -185,7 +196,17 @@ export const useFeatureStateUpdater = () => {
    * Finds the layer configuration from the layers object.
    */
   const findLayer = useCallback((layers, layerName) => {
-    return Object.values(layers).find((layer) => layer.name === layerName);
+    if (!layers || !layerName) return null;
+
+    return (
+      layers[layerName] ||
+      Object.values(layers).find(
+        (layer) =>
+          layer?.name === layerName ||
+          layer?.id === layerName
+      ) ||
+      null
+    );
   }, []);
 
   /**
@@ -233,7 +254,8 @@ export const useFeatureStateUpdater = () => {
         // restricts the layer to the features the data actually covers. That filter is the only
         // thing preserveBaseStyle does, so returning here left the flag with no effect at all and
         // the layer drawing every feature in the tile, data or not.
-        if (!specifiedLayer.isStylable && !specifiedLayer.preserveBaseStyle) {
+        const isStylable = Boolean(specifiedLayer.isStylable || specifiedLayer.metadata?.isStylable);
+        if (!isStylable && !specifiedLayer.preserveBaseStyle) {
           return;
         }
 
@@ -290,6 +312,87 @@ export const useFeatureStateUpdater = () => {
   );
 
   /**
+   * Replays the feature states already held in memory after MapLibre reloads
+   * its style.
+   *
+   * A base-style change preserves application sources, layers and paint
+   * expressions through transformStyle, but MapLibre can discard feature state.
+   * Replaying the cached values is much cheaper than reclassifying the data and
+   * rebuilding every paint expression.
+   *
+   * @param {Object} map - MapLibre map instance.
+   * @param {Object} layers - Application layer definitions.
+   * @param {string} layerName - Application layer name.
+   * @returns {boolean} Whether the state was replayed.
+   */
+  const replayLayerState = useCallback(
+    (map, layers, layerName) => {
+      if (!map || !layerName) return false;
+
+      const specifiedLayer = findLayer(layers, layerName);
+      if (!specifiedLayer) return false;
+
+      if (
+        !map.isStyleLoaded?.() ||
+        !map.getLayer?.(specifiedLayer.name)
+      ) {
+        return false;
+      }
+
+      const states =
+        layerStatesRef.current.get(specifiedLayer.name);
+
+      if (!states) {
+        return false;
+      }
+
+      try {
+        states.forEach((value, id) => {
+          const isNumeric =
+            typeof value === "number" &&
+            Number.isFinite(value);
+
+          map.setFeatureState(
+            {
+              source: getLayerSourceId(specifiedLayer),
+              sourceLayer: specifiedLayer.sourceLayer,
+              id,
+            },
+            {
+              value,
+              valueAbs: isNumeric ? Math.abs(value) : null,
+            }
+          );
+        });
+
+        if (specifiedLayer.preserveBaseStyle) {
+          const featureIds = Array.from(states.keys());
+
+          map.setFilter(
+            specifiedLayer.name,
+            featureIds.length > 0
+              ? [
+                  "in",
+                  ["get", "id"],
+                  ["literal", featureIds],
+                ]
+              : ["==", ["get", "id"], -1]
+          );
+        }
+
+        return true;
+      } catch (error) {
+        console.error(
+          `Failed to replay feature states for "${layerName}":`,
+          error
+        );
+        return false;
+      }
+    },
+    [findLayer]
+  );
+
+  /**
    * Clears all tracked feature states for a specific layer.
    * Useful when completely resetting a layer's visualization.
    */
@@ -308,6 +411,7 @@ export const useFeatureStateUpdater = () => {
 
   return { 
     addFeaturesToMap, 
+    replayLayerState,
     clearLayerState, 
     getLayerFeatureIds 
   };
