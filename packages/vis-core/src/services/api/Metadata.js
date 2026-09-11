@@ -40,30 +40,25 @@ class MetadataService extends BaseService {
    */
   async getSwaggerFile() {
     const url = this._buildUrl('/swagger/v1/swagger.json');
-    
+    const response = await fetch(url);
+    let responseBody = null;
+
     try {
-      const response = await fetch(url);
-      let responseBody = null;
-
-      try {
-        const contentType = response.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
+      const contentType = (response.headers.get("content-type") || "").toLowerCase();
+      if (contentType.includes("application/json")) {
           responseBody = await response.json();
-        } else {
+      }   else {
           responseBody = await response.text();
-        }
-      } catch {
+      }
+    } catch {
         responseBody = null;
-      }
-
-      if (!response.ok) {
-        throw new HttpError(response.status,`HTTP error! status: ${response.status}`,url,responseBody);
-      }
-      return responseBody;
-    } catch (error) {console.error('Error fetching Swagger file:', error);
-      throw error; // Rethrow the error for further handling if necessary
     }
-  }
-}
 
+    if (!response.ok) {
+      throw new HttpError(response.status,`HTTP error! status: ${response.status}`,url,responseBody,);
+    }
+    return responseBody;
+  }
+
+}
 export { MetadataService };

@@ -13,17 +13,12 @@ import { PageSwitch } from "Components/PageSwitch";
 import { AppContext, AuthProvider, ErrorContext, ErrorProvider, useAuth } from "contexts";
 import { Dashboard } from "layouts";
 import { api } from "services";
-import { loadBands } from "utils";
+import { loadBands, normaliseStartupError } from "utils";
 import { isAppAdmin, isAppSuperuser } from "utils/auth";
 import { buildNavbarLinks } from "utils/nav";
 import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
 import { errorActionTypes } from "../../reducers";
-import {
-  composeHOCs,
-  withRoleValidation,
-  withTermsOfUse,
-  withWarning,
-} from "hocs";
+import { composeHOCs, withRoleValidation, withTermsOfUse, withWarning } from "hocs";
 
 const BrandGlobalStyles = createGlobalStyle`
   @font-face {
@@ -192,64 +187,6 @@ function RoleAwareAppContextProvider({
   );
 }
 
-/**
- * Converts startup errors into the payload expected by ErrorContext.
- * This function is moved into the utils folder by the next rebase commit.
- */
-function normaliseStartupError(error) {
-  const status = error?.status;
-  const technicalDetails = `${error?.message || String(error)}${
-    error?.url ? `\nURL: ${error.url}` : ""
-  }`;
-
-  switch (true) {
-    case status === 403:
-      return {
-        title: "Access Denied",
-        subtitle: "You do not have permission to access this resource",
-        message:
-          "The application could not load because access to a required resource was denied.",
-        supportMessage:
-          "Please contact support if you believe you should have access.",
-        supportDetails:
-          "Include the page URL and the time of the error when reporting this issue.",
-        technicalDetails,
-        headerColor: "#c62828",
-        showTechnicalDetails: true,
-      };
-
-    case status >= 500:
-      return {
-        title: "Server Error",
-        subtitle: "A server error occurred while loading the application",
-        message:
-          "The application could not load required configuration from the server.",
-        supportMessage:
-          "Please try again later or contact support if the issue persists.",
-        supportDetails:
-          "If reporting this issue, include the time and any relevant request details.",
-        technicalDetails,
-        headerColor: "#c62828",
-        showTechnicalDetails: true,
-      };
-
-    default:
-      return {
-        title: "Application Error",
-        subtitle: "Failed to load application configuration",
-        message:
-          "The application could not start because a required configuration request failed.",
-        supportMessage:
-          "Please refresh the page or contact support if the issue persists.",
-        supportDetails:
-          "Include the page URL and any visible error details when reporting this issue.",
-        technicalDetails: error?.stack || technicalDetails,
-        headerColor: "#d32f2f",
-        showTechnicalDetails: true,
-      };
-  }
-}
-
 function BaseAppContent({
   theme,
   configLoader,
@@ -262,8 +199,10 @@ function BaseAppContent({
   afterDashboard = null,
 }) {
   const [appConfig, setAppConfig] = useState(null);
-  const effectiveTheme = useMemo(() => mergeThemeWithBrandDefaults(theme), [theme],); 
-
+  const effectiveTheme = useMemo(
+    () => mergeThemeWithBrandDefaults(theme),
+    [theme],
+  );
   const { dispatch } = useContext(ErrorContext);
   const location = useLocation();
 
@@ -274,7 +213,7 @@ function BaseAppContent({
   const isAuthRequired =
     appConfig?.authenticationRequired ?? true;
 
-  // Hooks must stay above the conditional returns below.
+  // Keep hooks above the conditional returns below.
   const HomePageWithRoleValidation = useMemo(
     () =>
       isAuthRequired
@@ -320,9 +259,7 @@ function BaseAppContent({
         <Route
           key={page.pageName}
           path={page.url}
-          element={
-            <WrappedPageComponent pageConfig={page} />
-          }
+          element={<WrappedPageComponent pageConfig={page} />}
         />
       );
     });
@@ -342,19 +279,14 @@ function BaseAppContent({
         const configModules = configLoader();
         const bandModules = bandsLoader();
 
-        const configPath =
-          `./configs/${appName}/appConfig.js`;
-        const bandsPath =
-          `./configs/${appName}/bands.js`;
+        const configPath = `./configs/${appName}/appConfig.js`;
+        const bandsPath = `./configs/${appName}/bands.js`;
 
         if (!configModules[configPath]) {
-          throw new Error(
-            `Config not found for app: ${appName}`,
-          );
+          throw new Error(`Config not found for app: ${appName}`);
         }
 
-        const configModule =
-          await configModules[configPath]();
+        const configModule = await configModules[configPath]();
         const initialAppConfig = configModule.appConfig;
 
         const bands = await loadBands({
@@ -363,9 +295,7 @@ function BaseAppContent({
           appName,
         });
 
-        const apiSchema =
-          await api.metadataService.getSwaggerFile();
-
+        const apiSchema = await api.metadataService.getSwaggerFile();
         const authenticationRequired =
           initialAppConfig.authenticationRequired ?? true;
 
@@ -409,7 +339,7 @@ function BaseAppContent({
     };
 
     loadAppConfig();
-  }, [appName, bandsLoader, configLoader, dispatch, isPublicRoute,]);
+  }, [appName, bandsLoader, configLoader, dispatch, isPublicRoute]);
 
   if (isPublicRoute) {
     return (
