@@ -13,15 +13,31 @@ import {
   buildCategoricalLegendKey,
   getInitialFilterValue,
 } from "utils";
-import { defaultMapStyle, defaultMapZoom, defaultMapCentre } from "defaults";
+import { defaultMapZoom, defaultMapCentre, defaultMapStyle } from "defaults";
 import { AppContext } from "./AppContext";
 import { PageContext } from "./PageContext";
 import { ErrorContext } from "./ErrorContext";
 import { api } from "services";
 import { useMetadataDrivenFilters } from "hooks/useMetadataDrivenFilters";
+import { BASE_MAPS, DEFAULT_BASE_MAP_ID, getBaseMap } from "../map/baseMaps";
+import { readBaseMapPreference, writeBaseMapPreference } from "../map/baseMapPreference";
 
 // Create a context for the app configuration
 export const MapContext = createContext();
+
+/**
+ * Helper function to check for duplicate values in an array.
+ * @function isDuplicateValue
+ * @param {Array} values - The array of values.
+ * @param {Object} value - The value to check for duplicates.
+ * @returns {boolean} True if the value is a duplicate, false otherwise.
+ */
+const isDuplicateValue = (values, value) => {
+  return values.some(existingValue => 
+    existingValue.paramValue === value.paramValue &&
+    existingValue.displayValue === value.displayValue
+  );
+};
 
 /**
  * Builds initial categorical cache entries from filter values that define explicit colours.
@@ -74,8 +90,18 @@ export const MapProvider = ({ children }) => {
   const errorDispatch = errorContext?.dispatch ?? (() => {}); // no-op if provider missing
 
   // Initialize state within the provider function
+  const initialBaseMapId =
+    readBaseMapPreference(BASE_MAPS) ??
+    appContext.defaultBaseMapId ??
+    (appContext.mapStyle ? null : DEFAULT_BASE_MAP_ID);
+
+  const initialMapStyle = initialBaseMapId
+    ? getBaseMap(initialBaseMapId).resolveStyle()
+    : (appContext.mapStyle ?? defaultMapStyle());
+
   const initialState = {
-    mapStyle: appContext.mapStyle || defaultMapStyle,
+    baseMapId: initialBaseMapId,
+    mapStyle: initialMapStyle,
     mapCentre: pageContext.customMapCentre
       ? parseStringToArray(pageContext.customMapCentre)
       : defaultMapCentre,
@@ -83,6 +109,7 @@ export const MapProvider = ({ children }) => {
       ? parseFloat(pageContext.customMapZoom)
       : defaultMapZoom,
     layers: {},
+    colorSchemesByLayer: {},
     visualisations: {},
     leftVisualisations: {},
     rightVisualisations: {},
@@ -113,6 +140,12 @@ export const MapProvider = ({ children }) => {
   const contextValue = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
+
+  useEffect(() => {
+    if (state.baseMapId) {
+      writeBaseMapPreference(state.baseMapId);
+    }
+  }, [state.baseMapId]);
 
   // Core filter pipeline — useMetadataDrivenFilters owns metadata table fetching, filter option building,
   // FilterContext initialisation, cross-filter correction, and runtime option hiding.
