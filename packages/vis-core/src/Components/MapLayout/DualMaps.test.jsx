@@ -5,7 +5,7 @@ import { FilterContext } from "contexts/FilterContext";
 import { useDualMaps } from "hooks/useDualMaps";
 import { ThemeProvider } from "styled-components";
 
-// TO CONTINUE
+import { registerInitialBaseSources } from "../../map/baseSources";
 
 /**
  * Mocked map controls to prevent undefined errors when the component
@@ -230,6 +230,143 @@ describe("DualMaps component test", () => {
       </ThemeProvider>
     );
     expect(screen.getByText(/Dynamic Legend: left/)).toBeInTheDocument();
+  });
+});
+
+describe("DualMaps style toggle transform", () => {
+  it("applies style changes to both maps without idle listeners and preserves application layers", () => {
+    const leftSetStyle = jest.fn();
+    const rightSetStyle = jest.fn();
+    const leftOnce = jest.fn();
+    const rightOnce = jest.fn();
+    const leftOff = jest.fn();
+    const rightOff = jest.fn();
+    const leftMap = {
+      off: leftOff,
+      on: jest.fn(),
+      once: leftOnce,
+      setStyle: leftSetStyle,
+      getCanvas,
+      getLayer,
+      resize: jest.fn(),
+      triggerRepaint: jest.fn(),
+      type: "left",
+      ...mockMapControls,
+    };
+    const rightMap = {
+      off: rightOff,
+      on: jest.fn(),
+      once: rightOnce,
+      setStyle: rightSetStyle,
+      getLayer,
+      resize: jest.fn(),
+      triggerRepaint: jest.fn(),
+      type: "right",
+      ...mockMapControls,
+    };
+
+    useDualMaps.mockReturnValue({
+      leftMap,
+      rightMap,
+      maps: { left: leftMap, right: rightMap },
+      isMapStyleLoaded: true,
+      isMapLoaded: true,
+      isMapReady: true,
+      knownBaseSourceIds: { current: new Set(["oldBase"]) },
+    });
+
+    const initialContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        baseMapId: "positron",
+      },
+    };
+
+    const { rerender, unmount } = render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={initialContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(leftSetStyle).not.toHaveBeenCalled();
+    expect(rightSetStyle).not.toHaveBeenCalled();
+
+    registerInitialBaseSources(leftMap, new Set(["oldBase"]));
+    registerInitialBaseSources(rightMap, new Set(["oldBase"]));
+
+    const nextContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        baseMapId: "darkMatter",
+      },
+    };
+
+    rerender(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={nextContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    expect(leftSetStyle).toHaveBeenCalledWith(
+      "https://tiles.openfreemap.org/styles/dark",
+      expect.objectContaining({ transformStyle: expect.any(Function) })
+    );
+    expect(rightSetStyle).toHaveBeenCalledWith(
+      "https://tiles.openfreemap.org/styles/dark",
+      expect.objectContaining({ transformStyle: expect.any(Function) })
+    );
+    expect(leftOnce).toHaveBeenCalledWith("style.load", expect.any(Function));
+    expect(rightOnce).toHaveBeenCalledWith("style.load", expect.any(Function));
+    expect(leftOnce).not.toHaveBeenCalledWith("idle", expect.any(Function));
+    expect(rightOnce).not.toHaveBeenCalledWith("idle", expect.any(Function));
+
+    const { transformStyle } = leftSetStyle.mock.calls[0][1];
+    const incomingLayout = { "text-size": ["interpolate", ["linear"], ["zoom"], 5, 10, 10, 14] };
+    const transformed = transformStyle(
+      {
+        sources: {
+          oldBase: { type: "vector" },
+          app: { type: "geojson" },
+        },
+        layers: [
+          { id: "place_town", type: "symbol", source: "oldBase" },
+          { id: "place_markers", type: "symbol", source: "app" },
+        ],
+      },
+      {
+        sources: {
+          newBase: { type: "vector" },
+        },
+        layers: [
+          { id: "background", type: "background" },
+          { id: "place_town", type: "symbol", source: "newBase", layout: incomingLayout },
+        ],
+      }
+    );
+
+    expect(transformed.sources.oldBase).toBeUndefined();
+    expect(transformed.sources.app).toEqual({ type: "geojson" });
+    expect(transformed.layers.map((layer) => layer.id)).toEqual([
+      "background",
+      "place_markers",
+      "place_town",
+    ]);
+    expect(transformed.layers.find((layer) => layer.id === "place_town").layout).toBe(incomingLayout);
+
+    unmount();
+
+    expect(leftOff).toHaveBeenCalledWith("style.load", expect.any(Function));
+    expect(rightOff).toHaveBeenCalledWith("style.load", expect.any(Function));
   });
 });
 
