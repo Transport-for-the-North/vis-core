@@ -543,4 +543,103 @@ describe("LayerControlEntry component test", () => {
     expect(screen.getByText("Classification method")).toBeInTheDocument();
     expect(screen.queryByText("Edit banding")).not.toBeInTheDocument();
   });
+
+  it("updates zone boundaries line-opacity when the opacity slider changes", async () => {
+    const mockSetPaintProperty = jest.fn();
+    const mockGetLayer = jest.fn((id) => id === "id" || id === "id-boundaries");
+    const mockGetPaintProperty = jest.fn((id, prop) => (prop === "fill-opacity" ? 0.5 : undefined));
+    const testMap = {
+      getLayer: mockGetLayer,
+      getPaintProperty: mockGetPaintProperty,
+      setPaintProperty: mockSetPaintProperty,
+    };
+
+    const testProps = {
+      ...props,
+      maps: [testMap],
+      layer: {
+        id: "id",
+        type: "fill",
+        layout: { visibility: true },
+        metadata: { path: "/", shouldHaveOpacityControl: true },
+        switchableBoundaries: true,
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry {...testProps} />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    const slider = screen.getByRole("slider");
+    expect(slider).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: "0.3" } });
+
+    expect(mockSetPaintProperty).toHaveBeenCalledWith(
+      "id",
+      "fill-opacity",
+      0.3
+    );
+    expect(mockSetPaintProperty).toHaveBeenCalledWith(
+      "id-boundaries",
+      "line-opacity",
+      0.3
+    );
+  });
+
+  it("synchronises zone boundaries line-opacity when toggling boundaries visible", () => {
+    const mockSetLayoutProperty = jest.fn();
+    const mockSetPaintProperty = jest.fn();
+    const mockGetLayer = jest.fn((id) => id === "id" || id === "id-boundaries");
+    const mockGetPaintProperty = jest.fn((id, prop) => (prop === "fill-opacity" ? 0.7 : undefined));
+    const testMap = {
+      style: {},
+      getLayer: mockGetLayer,
+      getPaintProperty: mockGetPaintProperty,
+      setLayoutProperty: mockSetLayoutProperty,
+      setPaintProperty: mockSetPaintProperty,
+    };
+
+    const testProps = {
+      ...props,
+      maps: [testMap],
+      layer: {
+        id: "id",
+        type: "fill",
+        layout: { visibility: true },
+        metadata: { path: "/", shouldHaveOpacityControl: true },
+        switchableBoundaries: true,
+        boundariesVisibleByDefault: false,
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry {...testProps} />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: /show zone boundaries/i });
+    expect(checkbox).not.toBeChecked();
+
+    fireEvent.click(checkbox);
+
+    expect(mockSetLayoutProperty).toHaveBeenCalledWith(
+      "id-boundaries",
+      "visibility",
+      "visible"
+    );
+    expect(mockSetPaintProperty).toHaveBeenCalledWith(
+      "id-boundaries",
+      "line-opacity",
+      0.7
+    );
+  });
 });
+

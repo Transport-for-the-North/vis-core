@@ -13,19 +13,23 @@ export const useLayerZoomMessage = () => {
     const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
     if (maps.length > 0) {
       const newLayers = maps[0].getStyle().layers;
+      // Only report on app-configured layers (from state.layers), not base map
+      // provider layers (e.g. Geoapify Positron/Dark Matter landcover, roads, etc.).
+      // App layer IDs either exactly match a state layer name or start with one
+      // followed by a dash (for sub-layers such as ${name}-outline, ${name}-fill).
+      const stateLayerIds = Object.keys(state.layers ?? {});
       return newLayers.filter(
         (layer) =>
-          (layer.type === "fill" ||
-            layer.type === "line" ||
-            layer.type === "circle") &&
-            layer.source !== "default" &&
-            !layer.id.endsWith("-hover") &&
-            layer.id !== "selected-feature-layer" &&
-            !layer.id.startsWith("gl-draw")
+          stateLayerIds.some(
+            (id) => layer.id === id || layer.id.startsWith(`${id}-`)
+          ) &&
+          !layer.id.endsWith("-hover") &&
+          layer.id !== "selected-feature-layer" &&
+          !layer.id.startsWith("gl-draw")
       );
     }
     return [];
-  }, [state.maps, state.map]);
+  }, [state.maps, state.map, state.layers]);
 
   useEffect(() => {
     const updateZoomMessage = () => {
