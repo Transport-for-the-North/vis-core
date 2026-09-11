@@ -1,7 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccordionSection } from "./AccordionSection";
 import { useMapContext } from "hooks/useMapContext";
 import { LayerControlEntry } from "./LayerControlEntry";
+import { isApplicationLayer } from "utils";
+import {
+  isConfiguredApplicationLayer,
+  getApplicationLayerRootId,
+} from "../../../map/applicationLayerIds";
+import { getInitialBaseSources } from "../../../map/baseSources";
 
 /**
  * MapLayerSection component represents a section for controlling map layers.
@@ -20,49 +26,102 @@ export const MapLayerSection = ({
   handleCustomBandsChange,
 }) => {
   const { state } = useMapContext();
-  const maps = Array.isArray(state.maps) ? state.maps.filter(map => map) : [state.map].filter(map => map);
+  const maps = useMemo(() => {
+    if (Array.isArray(state.maps)) {
+      return state.maps.filter(Boolean);
+    }
+    return [state.map].filter(Boolean);
+  }, [state.maps, state.map]);
   const [layers, setLayers] = useState([]);
 
   const updateLayers = useCallback(() => {
     if (maps.length > 0) {
-      const newLayers = maps[0].getStyle().layers;
-      const filteredLayers = newLayers.filter(
-        (layer) =>
-          (layer.type === "fill" ||
-            layer.type === "line" ||
-            layer.type === "circle" ||
-            layer.type === "symbol") &&
-            layer.source !== "default" &&
-            !layer.id.endsWith("-hover") &&
-            !layer.id.endsWith("-select") &&
-            !layer.id.endsWith("-label") &&
-            !layer.id.endsWith("-spider") &&
-            !layer.id.endsWith("-spider-links") &&
-            !layer.id.endsWith("-boundaries") &&
-            layer.id !== "selected-feature-layer" &&
-            !layer.id.startsWith("hide_") &&
-            !layer.id.startsWith("gl-draw")
-      );
-      setLayers(filteredLayers);
+      const style = maps[0].getStyle();
+      if (!style || !style.layers) return;
+
+      const newLayers = style.layers;
+      const appLayerIds = state.layers ? Object.keys(state.layers) : [];
+      const hasAppLayers = appLayerIds.length > 0;
+      const fallbackBaseSourceIds = hasAppLayers
+        ? null
+        : (getInitialBaseSources(maps[0]) ?? new Set());
+
+      const filteredLayers = newLayers.filter((layer) => {
+        if (
+          layer.type !== "fill" &&
+          layer.type !== "line" &&
+          layer.type !== "circle" &&
+          layer.type !== "symbol"
+        ) {
+          return false;
+        }
+
+        if (
+          layer.source === "default" ||
+          layer.id === "selected-feature-layer" ||
+          layer.id.startsWith("hide_") ||
+          layer.id.startsWith("gl-draw")
+        ) {
+          return false;
+        }
+
+        if (layer.id !== getApplicationLayerRootId(layer.id)) {
+          return false;
+        }
+
+        if (hasAppLayers) {
+          return isConfiguredApplicationLayer(layer, state.layers);
+        }
+
+        return isApplicationLayer(layer, fallbackBaseSourceIds);
+      });
+      setLayers((prevLayers) => {
+        if (
+          prevLayers.length === filteredLayers.length &&
+          prevLayers.every((layer, index) => {
+            const next = filteredLayers[index];
+            return (
+              layer.id === next.id &&
+              layer.type === next.type &&
+              layer.metadata?.colorStyle === next.metadata?.colorStyle &&
+              layer.metadata?.isStylable === next.metadata?.isStylable &&
+              layer.layout?.visibility === next.layout?.visibility
+            );
+          })
+        ) {
+          return prevLayers;
+        }
+        return filteredLayers;
+      });
     }
+  }, [maps, state.layers]);
+
+  const updateLayersRef = useRef(updateLayers);
+  updateLayersRef.current = updateLayers;
+
+  useEffect(() => {
+    if (maps.length === 0) return undefined;
+
+    updateLayersRef.current();
+
+    const handleStyleData = () => {
+      updateLayersRef.current();
+    };
+
+    maps.forEach((map) => {
+      map?.on("styledata", handleStyleData);
+    });
+
+    return () => {
+      maps.forEach((map) => {
+        map?.off("styledata", handleStyleData);
+      });
+    };
   }, [maps]);
 
   useEffect(() => {
-    if (maps.length > 0) {
-      maps.forEach((map) => {
-        if (map) {
-          map.on('styledata', updateLayers);
-        }
-      });
-      return () => {
-        maps.forEach((map) => {
-          if (map) {
-            map.off('styledata', updateLayers);
-          }
-        });
-      };
-    }
-  }, [maps, updateLayers]);
+    updateLayers();
+  }, [updateLayers]);
 
   if (maps.length === 0) {
     return <div>Loading map layers...</div>;

@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { MapLayerSection } from "Components/Sidebar";
 import { MapContext } from "contexts";
+import { registerInitialBaseSources } from "../../../map/baseSources";
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -228,5 +229,78 @@ describe("MapLayerSection component test", () => {
     // Check that the event listeners have been deleted
     expect(mockMap1.off).toHaveBeenCalledWith('styledata', expect.any(Function));
     expect(mockMap2.off).toHaveBeenCalledWith('styledata', expect.any(Function));
+  });
+
+  it("Should filter out dark base map layers when application layers are configured", async () => {
+    mockMap1.getStyle.mockReturnValue({
+      layers: [
+        { id: "app-zones", type: "fill", source: "zones-source" },
+        { id: "water", type: "fill", source: "openmaptiles" },
+        { id: "road_motorway", type: "line", source: "openmaptiles" },
+        { id: "building", type: "fill", source: "openmaptiles" },
+      ],
+    });
+
+    const contextWithAppLayers = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          "app-zones": { name: "app-zones" },
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={contextWithAppLayers}>
+        <MapLayerSection {...props} />
+      </MapContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("layer-app-zones")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId("layer-water")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("layer-road_motorway")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("layer-building")).not.toBeInTheDocument();
+  });
+
+  it("Should filter out base map layers using initial base sources fallback", async () => {
+    const fallbackMap = {
+      id: "fallbackMap",
+      on: jest.fn(),
+      off: jest.fn(),
+      getStyle: jest.fn(() => ({
+        layers: [
+          { id: "app-zones", type: "fill", source: "zones-source" },
+          { id: "water", type: "fill", source: "openmaptiles" },
+          { id: "road_motorway", type: "line", source: "openmaptiles" },
+        ],
+      })),
+    };
+    registerInitialBaseSources(fallbackMap, new Set(["openmaptiles"]));
+
+    const contextWithFallback = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        maps: [fallbackMap],
+        layers: {},
+      },
+    };
+
+    render(
+      <MapContext.Provider value={contextWithFallback}>
+        <MapLayerSection {...props} />
+      </MapContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("layer-app-zones")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId("layer-water")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("layer-road_motorway")).not.toBeInTheDocument();
   });
 });
