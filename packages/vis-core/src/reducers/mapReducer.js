@@ -266,6 +266,7 @@ export const mapReducer = (state, action) => {
         ...state,
         layers: {},
         colorSchemesByLayer: {},
+        customColorSchemeSelectedByLayer: {},
         visualisations: {},
         filters: [],
         leftVisualisations: {},
@@ -385,6 +386,10 @@ export const mapReducer = (state, action) => {
         colorSchemesByLayer: {
           ...state.colorSchemesByLayer,
           [layerName]: color_scheme,
+        },
+        customColorSchemeSelectedByLayer: {
+          ...state.customColorSchemeSelectedByLayer,
+          [layerName]: true,
         },
       };
     }

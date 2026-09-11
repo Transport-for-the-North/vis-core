@@ -110,6 +110,7 @@ export const MapProvider = ({ children }) => {
       : defaultMapZoom,
     layers: {},
     colorSchemesByLayer: {},
+    customColorSchemeSelectedByLayer: {},
     visualisations: {},
     leftVisualisations: {},
     rightVisualisations: {},
