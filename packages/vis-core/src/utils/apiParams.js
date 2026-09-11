@@ -49,6 +49,22 @@ export const replaceRouteParameter = (path, paramName, paramValue) => {
     .replace(new RegExp(`/:${paramName}(?=/|$)`, "g"), `/${encoded}`);
 };
 
+const normaliseApiRouteForSchemaLookup = (apiRoute) => {
+  if (typeof apiRoute !== "string") return apiRoute;
+
+  const trimmedRoute = apiRoute.trim();
+  if (!trimmedRoute) return trimmedRoute;
+
+  // OpenAPI path keys are path-only, so drop any query string first.
+  // If a full URL is provided, use its pathname; otherwise treat the input as an app route.
+  const routePath = /^[A-Za-z][A-Za-z\d+.-]*:\/\//.test(trimmedRoute)
+    ? new URL(trimmedRoute).pathname
+    : trimmedRoute.split("?")[0];
+
+  // Schema path keys typically omit trailing slashes, except for the root path.
+  return routePath.replace(/\/+$/, "") || "/";
+};
+
 /**
  * Checks if the specified API route in the given API schema has security requirements.
  *
@@ -79,7 +95,8 @@ export const replaceRouteParameter = (path, paramName, paramValue) => {
  * console.log(hasSecurity); // Output: true
  */
 export const checkSecurityRequirements = (apiSchema, apiRoute) => {
-  const pathDetails = apiSchema.paths[apiRoute]?.get;
+  const normalisedRoute = normaliseApiRouteForSchemaLookup(apiRoute);
+  const pathDetails = apiSchema.paths[normalisedRoute]?.get;
   return pathDetails && pathDetails.security ? pathDetails.security.length > 0 : false;
 };
 

@@ -108,4 +108,30 @@ describe("validateAppConfigAgainstOpenApi", () => {
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0]).toMatchObject({ type: "missing_schema_path" });
   });
+
+  it("matches uppercase route variants via lowercase schema lookup", () => {
+    const apiSchema = makeSchema({
+      "/api/foo": {
+        get: {
+          parameters: [{ in: "query", name: "q", required: true }],
+        },
+      },
+    });
+
+    const appConfig = {
+      appPages: [
+        {
+          pageName: "Test Page",
+          config: {
+            filters: [{ paramName: "q" }],
+            visualisations: [{ name: "V", dataPath: "/API/FOO" }],
+          },
+        },
+      ],
+    };
+
+    const result = validateAppConfigAgainstOpenApi(appConfig, apiSchema);
+    expect(result.errors).toHaveLength(0);
+    expect(result.warnings).toHaveLength(0);
+  });
 });
