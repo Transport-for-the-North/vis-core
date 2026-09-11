@@ -142,6 +142,27 @@ describe("mapReducer categorical legend cache", () => {
     expect(nextState.baseMapId).toBe("darkMatter");
     expect(nextState.mapStyle).toBe("https://tiles.openfreemap.org/styles/dark");
   });
+
+  it("updates colour scheme and marks custom colour scheme as selected", () => {
+    const initialState = {
+      colorSchemesByLayer: {},
+      customColorSchemeSelectedByLayer: {},
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.UPDATE_COLOR_SCHEME,
+      payload: {
+        layerName: "layerA",
+        color_scheme: { value: "Purples", label: "Purples" },
+      },
+    });
+
+    expect(nextState.colorSchemesByLayer.layerA).toEqual({
+      value: "Purples",
+      label: "Purples",
+    });
+    expect(nextState.customColorSchemeSelectedByLayer.layerA).toBe(true);
+  });
 });
 
 describe("mapReducer display mode", () => {

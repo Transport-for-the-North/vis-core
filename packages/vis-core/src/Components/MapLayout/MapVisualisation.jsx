@@ -492,8 +492,12 @@ export const MapVisualisation = ({
       // Calculate the color palette based on the classification
       const invertColorScheme = state.layers[layerKey]?.invertedColorScheme === true;
 
+      const isCustomColorSchemeSelected = Boolean(
+        state.customColorSchemeSelectedByLayer?.[layerKey]
+      );
+
       let colourPalette;
-      if (metric?.colours?.length === reclassifiedData.length) {
+      if (!isCustomColorSchemeSelected && metric?.colours?.length === reclassifiedData.length) {
         colourPalette = metric.colours;
       } else {
         colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
