@@ -5,6 +5,7 @@ import { defaultMapStyle } from "defaults";
 import { defaultMapCentre } from "defaults";
 import { defaultMapZoom } from "defaults";
 import { api } from "services";
+import { registerInitialBaseSources, getInitialBaseSources } from "../map/baseSources";
 
 /**
  * Custom hook to initialize and manage a MapLibre map.
@@ -107,7 +108,16 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       });
 
       // Add event listeners after map creation
-      mapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      mapInstance.on("style.load", () => {
+        const style = mapInstance.getStyle?.();
+        if (style?.sources && !getInitialBaseSources(mapInstance)) {
+          registerInitialBaseSources(
+            mapInstance,
+            new Set(Object.keys(style.sources))
+          );
+        }
+        setIsMapStyleLoaded(true);
+      });
       mapInstance.on("load", () => {
         setIsMapLoaded(true);
       });
@@ -155,7 +165,8 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         } else {
           const pill = attrib?._container;
           const h = pill ? Math.ceil(pill.getBoundingClientRect().height) : 0;
-          navEl.style.marginBottom = `calc(${h + 20}px + env(safe-area-inset-bottom))`;
+          const baseMargin = Math.max(10, h - 10);
+          navEl.style.marginBottom = `calc(${baseMargin}px + env(safe-area-inset-bottom))`;
         }
         navEl.style.marginRight = '6px';
         navEl.style.marginLeft  = '6px';
@@ -211,7 +222,6 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
 
     return () => {
       if (mapInstance) {
-        console.log("Cleaning up map instance");
         mapInstance.remove();
         setMap(null);
         setIsMapLoaded(false);

@@ -6,30 +6,82 @@ import {
   headTailBreaks
 } from './classificationMethods';
 
-const GEOAPIFY_TOWN_CITY_LABEL_LAYER_IDS = [
+export const TOWN_CITY_LABEL_LAYER_IDS = [
   "place_town",
   "place_city",
   "place_capital",
   "place_city_large",
+  "place_village",
+  "place_suburb",
+  "place_other",
+  "place_state",
+  "place_country_other",
+  "place_country_minor",
+  "place_country_major",
 ];
 
+export const GEOAPIFY_TOWN_CITY_LABEL_LAYER_IDS = TOWN_CITY_LABEL_LAYER_IDS;
+
 /**
- * Keeps Geoapify town and city labels above application information layers.
+ * Checks whether a layer is a base map town, city, or place label symbol layer.
+ *
+ * @param {Object} layer - A MapLibre layer object.
+ * @returns {boolean}
+ */
+const hasBaseSource = (layer, baseSourceIds) => {
+  if (!baseSourceIds || !layer?.source) return true;
+  return baseSourceIds.has(layer.source);
+};
+
+export const isBasePlaceLabelLayer = (layer, baseSourceIds = null) => {
+  if (!layer?.id || layer.type !== "symbol") return false;
+  if (!hasBaseSource(layer, baseSourceIds)) return false;
+  if (TOWN_CITY_LABEL_LAYER_IDS.includes(layer.id)) return true;
+  if (layer.id.startsWith("place_") || layer.id.startsWith("place-")) return true;
+  return false;
+};
+
+/**
+ * Keeps Geoapify and OpenFreeMap town and city labels above application information layers.
  *
  * Safe for other map styles because absent layer IDs are ignored.
  *
  * @param {maplibregl.Map} map - MapLibre map instance.
  */
-export function moveTownCityLabelsToTop(map) {
+export function moveTownCityLabelsToTop(map, baseSourceIds = null) {
   if (!map?.getLayer || !map?.moveLayer) return;
 
-  GEOAPIFY_TOWN_CITY_LABEL_LAYER_IDS.forEach((layerId) => {
-    if (map.getLayer(layerId)) {
+  TOWN_CITY_LABEL_LAYER_IDS.forEach((layerId) => {
+    const layer = map.getLayer(layerId);
+    if (
+      layer &&
+      isBasePlaceLabelLayer(
+        {
+          id: layer.id ?? layerId,
+          type: layer.type ?? "symbol",
+          source: layer.source,
+        },
+        baseSourceIds
+      )
+    ) {
       map.moveLayer(layerId);
     }
   });
-}
 
+  const style = map.getStyle?.();
+  if (style?.layers) {
+    style.layers.forEach((layer) => {
+      if (
+        layer.type === "symbol" &&
+        isBasePlaceLabelLayer(layer, baseSourceIds) &&
+        !TOWN_CITY_LABEL_LAYER_IDS.includes(layer.id) &&
+        map.getLayer(layer.id)
+      ) {
+        map.moveLayer(layer.id);
+      }
+    });
+  }
+}
 
 /**
  * Helper: Extracts the metric definition from the defaultBands.
@@ -281,6 +333,13 @@ export function getWidthProperty(layerType) {
     }
     case "circle": {
       widthProp = "circle-radius";
+      break;
+    }
+    case "fill":
+    case "symbol":
+    case "raster":
+    case "background": {
+      // These layer types do not have a stroke or radius width property.
       break;
     }
     default:
@@ -1453,6 +1512,26 @@ export const getSourceLayer = (map, layerId) => {
  */
 export const getFeatureStateValue = (feature) => {
   return feature?.state?.value;
+};
+
+/**
+ * Returns true if a MapLibre layer belongs to the application (i.e. not part
+ * of the basemap style).
+ *
+ * Uses the set of source IDs that were present in the map style at the point
+ * it first loaded — before any application sources were registered — to
+ * distinguish basemap layers from application layers.  This is more robust
+ * than comparing against a hard-coded source name such as "default".
+ *
+ * @param {Object} layer          - A MapLibre layer object from `getStyle().layers`.
+ * @param {Set<string>} baseSourceIds - Set of source IDs belonging to the basemap.
+ * @returns {boolean}
+ */
+export const isApplicationLayer = (layer, baseSourceIds) => {
+  if (!layer || !layer.source) return false;
+  if (layer.source === "default") return false;
+  if (!baseSourceIds || baseSourceIds.size === 0) return true;
+  return !baseSourceIds.has(layer.source);
 };
 
 /**

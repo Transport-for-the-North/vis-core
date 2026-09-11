@@ -7,8 +7,11 @@ import { useDualMaps } from "hooks/useDualMaps";
 import { useMapContext } from "hooks/useMapContext";
 import { useFilterContext } from "hooks/useFilterContext";
 import maplibregl from "maplibre-gl";
+import { actionTypes } from "reducers";
 import { api } from "services";
 
+import { useBaseMapTransition } from "hooks/useBaseMapTransition";
+import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
   numberWithCommas,
@@ -24,7 +27,7 @@ import {
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from './Layer'
-import "./MapLayout.css";
+import MapStyleToggle from "./MapStyleToggle";
 
 const Wrap = styled.div`
   display: flex;
@@ -63,7 +66,6 @@ const StyledMapContainer = styled.div`
   }
 `;
 
-
 /**
  * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
@@ -74,7 +76,8 @@ const DualMaps = (props) => {
   const leftMapContainerRef = useRef(null);
   const rightMapContainerRef = useRef(null);
   const { state, dispatch } = useMapContext();
-  const { mapStyle, mapCentre, mapZoom } = state;
+  const { baseMapId, mapStyle, mapCentre, mapZoom } = state;
+  const currentBaseMap = getBaseMap(baseMapId);
   const { leftMap, rightMap, isMapReady } = useDualMaps(
     leftMapContainerRef,
     rightMapContainerRef,
@@ -83,6 +86,19 @@ const DualMaps = (props) => {
     mapZoom,
     props.extraCopyrightText
   );
+
+  const activeMaps = React.useMemo(
+    () => [leftMap, rightMap].filter(Boolean),
+    [leftMap, rightMap]
+  );
+
+  // Shared transition coordinator: same hook as Map.jsx, just with two maps.
+  useBaseMapTransition({
+    maps: activeMaps,
+    descriptor: currentBaseMap,
+    applicationLayers: state.layers,
+  });
+
   const { dispatch: filterDispatch } = useFilterContext();
 
   const maps = { left: leftMap, right: rightMap };
@@ -586,7 +602,6 @@ const DualMaps = (props) => {
     [maps, state.layers, state.visualisations]
   );
 
-
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
    * @property {Object} e - The event object containing information about the click event.
@@ -965,8 +980,8 @@ const DualMaps = (props) => {
   return (
     <Wrap>
       <StyledMapContainer ref={leftMapContainerRef}>
-        {Object.values(state.layers).map((layer) => (
-          <Layer key={layer.name} layer={layer} />
+        {Object.values(state.layers).map((layer, index) => (
+          <Layer key={layer.name || layer.id || index} layer={layer} />
         ))}
         {state.leftVisualisations && <VisualisationManager
             visualisationConfigs={state.leftVisualisations}
@@ -975,8 +990,9 @@ const DualMaps = (props) => {
           />}
       </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
-        {Object.values(state.layers).map((layer) => (
-          <Layer key={layer.name} layer={layer} />
+        <MapStyleToggle map={rightMap} />
+        {Object.values(state.layers).map((layer, index) => (
+          <Layer key={layer.name || layer.id || index} layer={layer} />
         ))}
         {state.rightVisualisations && <VisualisationManager
           visualisationConfigs={state.rightVisualisations}
