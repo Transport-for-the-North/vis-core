@@ -212,7 +212,9 @@ export const LayerControlEntry = memo(
     );
 
     const [boundariesVisibility, setBoundariesVisibility] = useState(
-      layer.metadata?.boundariesVisibleByDefault ? "visible" : "none"
+      (layer.metadata?.boundariesVisibleByDefault ?? layer.boundariesVisibleByDefault)
+        ? "visible"
+        : "none"
     );
 
     // State for whether the layer details are expanded
@@ -425,7 +427,15 @@ export const LayerControlEntry = memo(
     const showWidth = isFeatureStateWidthExpression && !isFixedLineWidth;
 
     // State for opacity of the layer
-    const [opacity, setOpacity] = useState(initialOpacity || 0.5);
+    const fallbackOpacity =
+      layer.defaultOpacity ??
+      layer.metadata?.defaultOpacity ??
+      0.5;
+    const [opacity, setOpacity] = useState(
+      initialOpacity !== null && initialOpacity !== undefined
+        ? initialOpacity
+        : fallbackOpacity
+    );
     const [widthFactor, setWidth] = useState(initialWidth ?? 1);
 
     const bandEditorData = useMemo(() => {
@@ -549,10 +559,30 @@ export const LayerControlEntry = memo(
 
       maps.forEach((mapInstance) => {
         if (!mapInstance || !mapInstance.style) return;
-        const boundariesId = `${layer.id}-boundaries`;
-        if (mapInstance.getLayer(boundariesId)) {
-          if (visibility === "visible" || newVisibility === "none") {
+        const boundariesId = mapInstance.getLayer?.(`${layer.id}-boundaries`)
+          ? `${layer.id}-boundaries`
+          : (layer.name && mapInstance.getLayer?.(`${layer.name}-boundaries`))
+          ? `${layer.name}-boundaries`
+          : null;
+        if (boundariesId) {
+          if (visibility !== "none" || newVisibility === "none") {
             mapInstance.setLayoutProperty(boundariesId, "visibility", newVisibility);
+          }
+          // Synchronise boundaries line-opacity with current layer opacity when shown (unless fixed)
+          const boundariesMode =
+            layer.metadata?.boundariesOpacityMode ??
+            layer.boundariesOpacityMode ??
+            "inherit";
+          if (
+            newVisibility === "visible" &&
+            typeof opacity === "number" &&
+            boundariesMode !== "fixed"
+          ) {
+            try {
+              mapInstance.setPaintProperty(boundariesId, "line-opacity", opacity);
+            } catch {
+              // Ignore if paint property cannot be set
+            }
           }
         }
       });
@@ -580,6 +610,25 @@ export const LayerControlEntry = memo(
           setPaintAcross(
             map,
             [`${layer.id}-spider-links`],
+            "line-opacity",
+            newOpacity
+          );
+        }
+
+        // Zone boundaries layer tracks opacity of parent layer (unless mode is fixed)
+        const boundariesId = map.getLayer?.(`${layer.id}-boundaries`)
+          ? `${layer.id}-boundaries`
+          : (layer.name && map.getLayer?.(`${layer.name}-boundaries`))
+          ? `${layer.name}-boundaries`
+          : null;
+        const boundariesMode =
+          layer.metadata?.boundariesOpacityMode ??
+          layer.boundariesOpacityMode ??
+          "inherit";
+        if (boundariesId && boundariesMode !== "fixed") {
+          setPaintAcross(
+            map,
+            [boundariesId],
             "line-opacity",
             newOpacity
           );
@@ -708,13 +757,16 @@ export const LayerControlEntry = memo(
       });
     }
 
-    if (layer.metadata?.switchableBoundaries) {
+    const isSwitchableBoundaries = Boolean(
+      layer.metadata?.switchableBoundaries ?? layer.switchableBoundaries
+    );
+    if (isSwitchableBoundaries) {
       collapsibleSections.push({
         key: "boundaries-toggle",
         node: (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
             <ControlLabel htmlFor={`boundaries-toggle-${layer.id}`}>
-              {layer.metadata?.boundariesLabel || "Show zone boundaries"}
+              {layer.metadata?.boundariesLabel || layer.boundariesLabel || "Show zone boundaries"}
             </ControlLabel>
             <input 
               type="checkbox" 
