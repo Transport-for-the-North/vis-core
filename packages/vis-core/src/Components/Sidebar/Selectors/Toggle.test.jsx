@@ -274,4 +274,84 @@ describe("Toggle component tests", () => {
       "only-option"
     );
   });
+
+  it("does not auto-fallback for single-select when value matches by string/number equivalence", () => {
+    const singleSelectProps = {
+      filter: {
+        id: "mixed-type-single-toggle",
+        values: {
+          values: [
+            {
+              paramValue: 1,
+              displayValue: "One",
+              isValid: true,
+            },
+            {
+              paramValue: 2,
+              displayValue: "Two",
+              isValid: true,
+            },
+          ],
+        },
+        multiSelect: false,
+      },
+      onChange: jest.fn(),
+    };
+
+    render(
+      <FilterContext.Provider
+        value={{
+          ...mockFilterContext,
+          state: { "mixed-type-single-toggle": "1" },
+        }}
+      >
+        <Toggle {...singleSelectProps} />
+      </FilterContext.Provider>
+    );
+
+    expect(singleSelectProps.onChange).not.toHaveBeenCalled();
+  });
+
+  it("toggles off selected value in multi-select when context value type differs", async () => {
+    const multiSelectProps = {
+      filter: {
+        id: "mixed-type-multi-toggle",
+        values: {
+          values: [
+            {
+              paramValue: 1,
+              displayValue: "One",
+              isValid: true,
+            },
+            {
+              paramValue: 2,
+              displayValue: "Two",
+              isValid: true,
+            },
+          ],
+        },
+        multiSelect: true,
+      },
+      onChange: jest.fn(),
+    };
+
+    render(
+      <FilterContext.Provider
+        value={{
+          ...mockFilterContext,
+          state: { "mixed-type-multi-toggle": ["1"] },
+        }}
+      >
+        <Toggle {...multiSelectProps} />
+      </FilterContext.Provider>
+    );
+
+    const oneButton = screen.getByRole("button", { name: "One ✅" });
+    await userEvent.click(oneButton);
+
+    expect(multiSelectProps.onChange).toHaveBeenCalledWith(
+      multiSelectProps.filter,
+      []
+    );
+  });
 });
