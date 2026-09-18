@@ -112,6 +112,12 @@ export const HomePage = () => {
     });
   }
 
+  const relatedAppsConfig = appContext?.relatedApps || appContext?.homePageRelatedApps || {};
+  const relatedAppsTitle = relatedAppsConfig?.title || "Explore Other Apps";
+  const relatedAppsLinks = Array.isArray(relatedAppsConfig?.links)
+    ? relatedAppsConfig.links.filter((link) => link?.label && link?.url)
+    : [];
+
   return (
     <>
       <div className="landing selectable-text">
@@ -152,6 +158,36 @@ export const HomePage = () => {
             scenarios list) leads, with the fragment tiles/sections following it. */}
         {Array.isArray(homePageComponents) &&
           homePageComponents.map((Component, idx) => <Component key={idx} />)}
+
+        {relatedAppsLinks.length > 0 && (
+          <section className="related-apps-section container-content" aria-label="Related applications">
+            <h2>{relatedAppsTitle}</h2>
+            <ul className="related-apps-list">
+              {relatedAppsLinks.map((link, idx) => {
+                const openInNewTab = link.openInNewTab !== undefined ? !!link.openInNewTab : true;
+                const target = openInNewTab ? "_blank" : undefined;
+                const rel = openInNewTab ? "noreferrer" : undefined;
+
+                return (
+                  <li key={`${link.url}-${idx}`} className="related-apps-item">
+                    <a
+                      href={link.url}
+                      className="related-app-link"
+                      target={target}
+                      rel={rel}
+                      aria-label={link.description ? `${link.label}: ${link.description}` : link.label}
+                    >
+                      <span className="related-app-link-label">{link.label}</span>
+                      {link.description && (
+                        <span className="related-app-link-description">{link.description}</span>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
 
         {useLegacyHomePage ? (
           // ===== Legacy layout (old section-based fragments) =====
