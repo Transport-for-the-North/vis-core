@@ -306,10 +306,19 @@ const isFieldVisible = (field, formValues) => {
  * @param {Object} field - The field configuration.
  * @returns {{ isValid: boolean, error: string | null }}
  */
+const isEmptyMultiSelectValue = (value) =>
+  !Array.isArray(value) || value.length === 0;
+
+const valuesMatch = (a, b) => a === b || String(a) === String(b);
+
 const validateField = (value, field) => {
   // Check required fields
   if (field.required) {
-    if (value === null || value === undefined || value === '') {
+    if (field.type === 'dropdown' && field.multiSelect) {
+      if (isEmptyMultiSelectValue(value)) {
+        return { isValid: false, error: 'This field is required' };
+      }
+    } else if (value === null || value === undefined || value === '') {
       return { isValid: false, error: 'This field is required' };
     }
     // For coordinates, check both lat and lng
@@ -325,7 +334,11 @@ const validateField = (value, field) => {
   }
 
   // Skip further validation if empty and not required
-  if (value === null || value === undefined || value === '') {
+  if (field.type === 'dropdown' && field.multiSelect) {
+    if (isEmptyMultiSelectValue(value)) {
+      return { isValid: true, error: null };
+    }
+  } else if (value === null || value === undefined || value === '') {
     return { isValid: true, error: null };
   }
 
@@ -419,6 +432,7 @@ const validateField = (value, field) => {
  * @param {string} [props.config.fields[].optionsEndpoint] - API endpoint for dropdown options.
  * @param {string} [props.config.fields[].optionValueKey='value'] - Key for option value in API response.
  * @param {string} [props.config.fields[].optionLabelKey='label'] - Key for option label in API response.
+ * @param {boolean} [props.config.fields[].multiSelect=false] - For dropdowns: allow multiple selections (value is an array).
  * @param {Array} [props.config.fields[].options] - Static options for dropdown (if not using API).
  * @param {Object} [props.config.fields[].visibleWhen] - Conditional visibility configuration.
  * @param {string} props.config.fields[].visibleWhen.field - The field ID this visibility depends on.
@@ -508,6 +522,9 @@ export const DynamicForm = ({
         values[field.id] = override ?? field.defaultValue ?? { lat: '', lng: '' };
       } else if (field.type === 'checkbox') {
         values[field.id] = override ?? field.defaultValue ?? false;
+      } else if (field.type === 'dropdown' && field.multiSelect) {
+        const multiValue = override ?? field.defaultValue ?? [];
+        values[field.id] = Array.isArray(multiValue) ? multiValue : [];
       } else {
         values[field.id] = override ?? field.defaultValue ?? '';
       }
@@ -695,7 +712,11 @@ export const DynamicForm = ({
           }
           break;
         case 'dropdown':
-          data[key] = value !== '' ? value : null;
+          if (field.multiSelect) {
+            data[key] = Array.isArray(value) && value.length > 0 ? value : null;
+          } else {
+            data[key] = value !== '' ? value : null;
+          }
           break;
         case 'checkbox':
           data[key] = value === true;
@@ -726,8 +747,16 @@ export const DynamicForm = ({
           break;
         case 'dropdown': {
           const options = dropdownOptions[field.id] || field.options || [];
-          const selectedOption = options.find((opt) => opt.value === value);
-          displayValue = selectedOption ? selectedOption.label : value || 'Not selected';
+          if (field.multiSelect) {
+            const selectedValues = Array.isArray(value) ? value : [];
+            const labels = options
+              .filter((opt) => selectedValues.some((v) => valuesMatch(opt.value, v)))
+              .map((opt) => opt.label);
+            displayValue = labels.length > 0 ? labels.join(', ') : 'Not selected';
+          } else {
+            const selectedOption = options.find((opt) => valuesMatch(opt.value, value));
+            displayValue = selectedOption ? selectedOption.label : value || 'Not selected';
+          }
           break;
         }
         case 'checkbox':
@@ -904,7 +933,12 @@ export const DynamicForm = ({
 
       case 'dropdown': {
         const options = dropdownOptions[field.id] || field.options || [];
-        const selectedOption = options.find((opt) => opt.value === value) || null;
+        const isMulti = Boolean(field.multiSelect);
+        const selectedOption = isMulti
+          ? options.filter((opt) =>
+              (Array.isArray(value) ? value : []).some((v) => valuesMatch(opt.value, v))
+            )
+          : options.find((opt) => valuesMatch(opt.value, value)) || null;
         const isLoading = loadingOptions[field.id];
 
         return (
@@ -913,15 +947,26 @@ export const DynamicForm = ({
             name={field.name || field.id}
             options={options}
             value={selectedOption}
-            onChange={(opt) => handleChange(field.id, opt ? opt.value : '')}
+            onChange={(opt) => {
+              if (isMulti) {
+                handleChange(
+                  field.id,
+                  Array.isArray(opt) ? opt.map((option) => option.value) : []
+                );
+              } else {
+                handleChange(field.id, opt ? opt.value : '');
+              }
+            }}
             onBlur={() => handleBlur(field.id)}
             placeholder={field.placeholder || 'Select...'}
             styles={selectStyles}
             menuPlacement="auto"
             menuPortalTarget={document.body}
+            isMulti={isMulti}
             isClearable={!field.required}
             isLoading={isLoading}
             isDisabled={isSubmitting}
+            closeMenuOnSelect={!isMulti}
           />
         );
       }

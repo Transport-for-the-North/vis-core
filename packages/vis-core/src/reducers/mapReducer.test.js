@@ -1,4 +1,5 @@
 import { actionTypes, mapReducer } from "./mapReducer";
+import { DisplayMode, DEFAULT_DISPLAY_MODE } from "enums";
 
 describe("mapReducer categorical legend cache", () => {
   it("registers categorical legend entries without replacing the existing cache", () => {
@@ -127,3 +128,116 @@ describe("mapReducer categorical legend cache", () => {
     expect(nextState.categoricalLegendCache).toEqual({});
   });
 });
+
+describe("mapReducer display mode", () => {
+  const makeState = () => ({
+    visualisations: {
+      "Link Totals": { displayMode: DEFAULT_DISPLAY_MODE, queryParams: {} },
+      "Zone Totals": { displayMode: DEFAULT_DISPLAY_MODE, queryParams: {} },
+    },
+  });
+
+  it("gives every added visualisation a display mode", () => {
+    const nextState = mapReducer(
+      { visualisations: {} },
+      {
+        type: actionTypes.ADD_VISUALISATION,
+        payload: { "Link Totals": { queryParams: {} } },
+      }
+    );
+
+    expect(nextState.visualisations["Link Totals"].displayMode).toBe(
+      DEFAULT_DISPLAY_MODE
+    );
+  });
+
+  it("honours a display mode pinned in page configuration", () => {
+    const nextState = mapReducer(
+      { visualisations: {} },
+      {
+        type: actionTypes.ADD_VISUALISATION,
+        payload: {
+          "Link Difference": { displayMode: DisplayMode.DIFFERENCE, queryParams: {} },
+        },
+      }
+    );
+
+    expect(nextState.visualisations["Link Difference"].displayMode).toBe(
+      DisplayMode.DIFFERENCE
+    );
+  });
+
+  it("tracks the selected mode on the named visualisations", () => {
+    const nextState = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_DISPLAY_MODE,
+      payload: {
+        filter: { visualisations: ["Link Totals"] },
+        value: DisplayMode.PCT_DIFFERENCE,
+      },
+    });
+
+    expect(nextState.visualisations["Link Totals"].displayMode).toBe(
+      DisplayMode.PCT_DIFFERENCE
+    );
+    expect(nextState.visualisations["Zone Totals"].displayMode).toBe(
+      DEFAULT_DISPLAY_MODE
+    );
+  });
+
+  it("applies to every visualisation when the filter names none", () => {
+    const nextState = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_DISPLAY_MODE,
+      payload: {
+        filter: { visualisations: null },
+        value: DisplayMode.PCT_DIFFERENCE,
+      },
+    });
+
+    expect(nextState.visualisations["Link Totals"].displayMode).toBe(
+      DisplayMode.PCT_DIFFERENCE
+    );
+    expect(nextState.visualisations["Zone Totals"].displayMode).toBe(
+      DisplayMode.PCT_DIFFERENCE
+    );
+  });
+
+  it("falls back to the default rather than storing an unknown mode", () => {
+    const nextState = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_DISPLAY_MODE,
+      payload: { filter: { visualisations: ["Link Totals"] }, value: "nonsense" },
+    });
+
+    expect(nextState.visualisations["Link Totals"].displayMode).toBe(
+      DEFAULT_DISPLAY_MODE
+    );
+  });
+
+  it("ignores visualisations that are not on the page", () => {
+    const state = makeState();
+    const nextState = mapReducer(state, {
+      type: actionTypes.UPDATE_DISPLAY_MODE,
+      payload: {
+        filter: { visualisations: ["Absent Visualisation"] },
+        value: DisplayMode.PCT_DIFFERENCE,
+      },
+    });
+
+    expect(nextState.visualisations["Absent Visualisation"]).toBeUndefined();
+    expect(nextState.visualisations["Link Totals"].displayMode).toBe(
+      DEFAULT_DISPLAY_MODE
+    );
+  });
+
+  it("leaves the rest of the visualisation untouched", () => {
+    const nextState = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_DISPLAY_MODE,
+      payload: {
+        filter: { visualisations: ["Link Totals"] },
+        value: DisplayMode.PCT_DIFFERENCE,
+      },
+    });
+
+    expect(nextState.visualisations["Link Totals"].queryParams).toEqual({});
+  });
+});
+
