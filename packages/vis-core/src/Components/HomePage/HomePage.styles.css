@@ -230,6 +230,61 @@
   font-size: 16px;
 }
 
+.related-apps-section {
+  background: linear-gradient(180deg, #ffffff 0%, var(--palette-pale-teal) 100%);
+  border: 1px solid var(--homepage-border-soft);
+  border-radius: 14px;
+  margin: 1.5rem 10vw 2rem;
+  box-shadow: var(--homepage-shadow-soft);
+  text-align: left;
+}
+
+.related-apps-section h2 {
+  margin: 0 0 1rem;
+  color: var(--text-icon);
+}
+
+.related-apps-list {
+  list-style: decimal;
+  display: block;
+  gap: 0;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.related-apps-item + .related-apps-item {
+  margin-top: 1.25rem;
+}
+
+.related-app-link {
+  display: inline-block;
+  color: var(--palette-navy);
+  font-weight: 400;
+  text-decoration-line: underline;
+  text-decoration-color: var(--palette-navy);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
+.related-app-link:hover,
+.related-app-link:focus-visible {
+  color: var(--palette-navy);
+  text-decoration-color: var(--palette-pale-teal);
+  outline: none;
+}
+
+.related-apps-list,
+.related-apps-item {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .related-apps-section {
+    margin: 1.25rem 5vw 1.75rem;
+  }
+}
+
 .homepage-grid .go-to-map:hover {
   color: var(--text-icon);
 }
