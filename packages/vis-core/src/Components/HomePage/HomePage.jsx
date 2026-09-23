@@ -113,7 +113,7 @@ export const HomePage = () => {
   }
 
   const relatedAppsConfig = appContext?.relatedApps || appContext?.homePageRelatedApps || {};
-  const relatedAppsTitle = relatedAppsConfig?.title || "Explore Other Apps";
+  const relatedAppsTitle = relatedAppsConfig?.title || "Explore publicly available Visualisation Framework Apps";
   const relatedAppsLinks = Array.isArray(relatedAppsConfig?.links)
     ? relatedAppsConfig.links.filter((link) => link?.label && link?.url)
     : [];
