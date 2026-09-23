@@ -162,7 +162,7 @@ export const HomePage = () => {
         {relatedAppsLinks.length > 0 && (
           <section className="related-apps-section container-content" aria-label="Related applications">
             <h2>{relatedAppsTitle}</h2>
-            <ul className="related-apps-list">
+            <ol className="related-apps-list">
               {relatedAppsLinks.map((link, idx) => {
                 const openInNewTab = link.openInNewTab !== undefined ? !!link.openInNewTab : true;
                 const target = openInNewTab ? "_blank" : undefined;
@@ -175,17 +175,14 @@ export const HomePage = () => {
                       className="related-app-link"
                       target={target}
                       rel={rel}
-                      aria-label={link.description ? `${link.label}: ${link.description}` : link.label}
+                      aria-label={`Open ${link.label}`}
                     >
-                      <span className="related-app-link-label">{link.label}</span>
-                      {link.description && (
-                        <span className="related-app-link-description">{link.description}</span>
-                      )}
+                      {link.label}
                     </a>
                   </li>
                 );
               })}
-            </ul>
+            </ol>
           </section>
         )}
 

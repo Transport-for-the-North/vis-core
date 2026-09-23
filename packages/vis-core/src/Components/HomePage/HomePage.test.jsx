@@ -477,13 +477,13 @@ describe("HomePage test", () => {
       // Related apps links from app configuration
       expect(screen.getByText("Explore Other Apps")).toBeInTheDocument();
       const accessibilityLink = screen.getByRole("link", {
-        name: "Accessibility Dashboard: View accessibility metrics and trends",
+        name: "Open Accessibility Dashboard",
       });
       expect(accessibilityLink).toHaveAttribute("href", "https://example.com/accessibility");
       expect(accessibilityLink).toHaveAttribute("target", "_blank");
 
       const demandInsightsLink = screen.getByRole("link", {
-        name: "Demand Insights: Explore demand scenarios",
+        name: "Open Demand Insights",
       });
       expect(demandInsightsLink).toHaveAttribute("href", "https://example.com/demand");
       expect(demandInsightsLink).not.toHaveAttribute("target");
