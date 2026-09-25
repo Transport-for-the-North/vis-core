@@ -4,6 +4,7 @@ import { ThemeProvider, createGlobalStyle } from "styled-components";
 import { PageSwitch } from "Components/PageSwitch";
 import { HomePage } from "Components/HomePage";
 import { Navbar } from "Components/Navbar";
+import { CookieBanner } from "Components/CookieBanner";
 import { Login } from "Components/Login";
 import { Unauthorized } from "Components/Login/Unauthorised";
 import { TermsOfUse } from "Components/TermsOfUse";
@@ -318,6 +319,7 @@ export function BaseApp({
             <AppContext.Provider value={contextValue}>
               {beforeDashboard}
               <Navbar />
+              <CookieBanner />
               <Dashboard>
                 <Routes>
                   {standardRoutes}

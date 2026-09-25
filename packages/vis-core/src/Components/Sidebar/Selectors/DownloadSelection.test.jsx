@@ -24,6 +24,10 @@ jest.mock("polished", () => ({
 }));
 jest.mock("utils", () => ({
   checkSecurityRequirements: jest.fn(() => false),
+  sortValues: jest.fn((values) => values),
+  isValidCondition: jest.fn(() => true),
+  applyCondition: jest.fn((rows) => rows),
+  trackClarityEvent: jest.fn(),
 }));
 jest.mock("services", () => ({
   api: {

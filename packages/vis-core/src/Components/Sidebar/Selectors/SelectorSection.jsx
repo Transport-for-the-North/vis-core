@@ -17,7 +17,7 @@ import { CheckboxSelector } from './CheckboxSelector';
 import { MapFeatureSelectAndPan } from './MapFeatureSelectAndPan';
 import { api } from "services";
 import { darken } from "polished";
-import { checkSecurityRequirements } from "utils";
+import { checkSecurityRequirements, trackClarityEvent } from "utils";
 
 const ButtonRow = styled.div`
   display: flex;
@@ -144,8 +144,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
-      // window.clarity('set', 'download_data_clicked', true);
-      window.clarity('event', 'download_data_clicked');
+      trackClarityEvent('download_data_clicked');
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");
@@ -172,7 +171,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         method: requestMethod,
       });
       console.log('Shapefile downloaded successfully');
-      window.clarity('event', 'download_shapefile_clicked');
+      trackClarityEvent('download_shapefile_clicked');
     } catch (error) {
       console.error('Error downloading Shapefile:', error);
       setRequestError(error.message || "Error downloading Shapefile");
