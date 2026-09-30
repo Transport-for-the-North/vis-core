@@ -6,12 +6,9 @@ import { createNavItemClickHandler } from "utils/nav";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { defaultBgColour } from "defaults";
 
-const NAV_ITEM_MAX_WIDTH = "250px";
-const NAV_ITEM_MIN_WIDTH = "150px";
-const NAV_ITEM_TABLET_MAX_WIDTH = "220px";
-const NAV_ITEM_TABLET_MIN_WIDTH = "130px";
-const NAV_ITEM_COMPACT_MAX_WIDTH = "190px";
-const NAV_ITEM_COMPACT_MIN_WIDTH = "100px";
+const NAV_ITEM_MIN_WIDTH = "120px";
+const NAV_ITEM_TABLET_MIN_WIDTH = "100px";
+const NAV_ITEM_COMPACT_MIN_WIDTH = "84px";
 
 /**
  * Styled container for the responsive navigation links.
@@ -26,9 +23,9 @@ const NavLinksContainer = styled.div`
   height: 100%;
 
   > * {
-    flex: 1 1 0;
+    flex: 1 1 auto;
     min-width: ${NAV_ITEM_MIN_WIDTH};
-    max-width: ${NAV_ITEM_MAX_WIDTH};
+    max-width: none;
   }
 
   @media only screen and (max-width: 1400px) {
@@ -36,7 +33,6 @@ const NavLinksContainer = styled.div`
 
     > * {
       min-width: ${NAV_ITEM_TABLET_MIN_WIDTH};
-      max-width: ${NAV_ITEM_TABLET_MAX_WIDTH};
     }
   }
 
@@ -45,7 +41,6 @@ const NavLinksContainer = styled.div`
 
     > * {
       min-width: ${NAV_ITEM_COMPACT_MIN_WIDTH};
-      max-width: ${NAV_ITEM_COMPACT_MAX_WIDTH};
     }
   }
 `;
@@ -83,11 +78,8 @@ const baseNavLinkStyles = css`
   box-sizing: border-box;
 
   .nav-label {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: block;
+    overflow: visible;
     overflow-wrap: anywhere;
     width: 100%;
   }
@@ -98,8 +90,8 @@ const baseNavLinkStyles = css`
   }
 
   @media only screen and (max-width: 1200px) {
-    font-size: 14px;
-    padding: 7px 8px;
+    font-size: 13px;
+    padding: 6px 6px;
   }
 `;
 

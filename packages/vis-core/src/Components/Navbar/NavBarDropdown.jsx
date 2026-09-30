@@ -132,11 +132,8 @@ const DropdownContainer = styled.div`
 const DropdownTitle = styled.span`
   flex-grow: 1;
   text-align: center;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: block;
+  overflow: visible;
   white-space: normal;
   line-height: 1.25;
   overflow-wrap: break-word;
