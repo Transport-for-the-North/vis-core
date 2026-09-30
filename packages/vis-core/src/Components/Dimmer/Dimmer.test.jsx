@@ -7,6 +7,7 @@ describe("Dimmer loader tester", () => {
     // Check that the progress bar is present
     const spinner = screen.getByRole("progressbar");
     expect(spinner).toBeInTheDocument();
+    expect(screen.getByTestId("map-loader-panel")).toBeInTheDocument();
     expect(screen.getByText("Updating your map...")).toBeInTheDocument();
     expect(screen.getByText("Please wait, this should only take a moment.")).toBeInTheDocument();
     // Check that the overlay is present

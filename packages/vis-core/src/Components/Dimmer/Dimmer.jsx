@@ -40,6 +40,13 @@ const LoaderPanel = styled.div`
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.3);
   padding: 18px 18px 16px;
   box-sizing: border-box;
+
+  @media (max-width: 520px) {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+  }
 `;
 
 const Heading = styled.p`
@@ -94,14 +101,14 @@ const DEFAULT_LOADING_MESSAGES = [
   "Almost there, final checks are running",
 ];
 
-const MAX_VISIBLE_PROGRESS = 92;
+const MAX_VISIBLE_PROGRESS = 94;
 
 const getNextProgress = (current) => {
   if (current >= MAX_VISIBLE_PROGRESS) return MAX_VISIBLE_PROGRESS;
 
   const remaining = MAX_VISIBLE_PROGRESS - current;
-  const step = Math.max(1, Math.ceil(remaining / 9));
-  return Math.min(MAX_VISIBLE_PROGRESS, current + step);
+  const step = Math.max(0.35, remaining / 10);
+  return Math.min(MAX_VISIBLE_PROGRESS, Number((current + step).toFixed(2)));
 };
 
 /**
@@ -118,28 +125,37 @@ export const Dimmer = ({ dimmed, showLoader, statusMessages, statusHeading }) =>
     ? statusMessages
     : DEFAULT_LOADING_MESSAGES;
   const headingText = statusHeading || "Updating your map...";
-  const [pseudoProgress, setPseudoProgress] = useState(12);
+  const [progress, setProgress] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
+  const displayedProgress = Math.round(progress);
 
   useEffect(() => {
     if (!dimmed || !showLoader) return undefined;
 
-    setPseudoProgress(12);
-    setMessageIndex(0);
+    setProgress(0);
 
     const progressInterval = setInterval(() => {
-      setPseudoProgress((current) => getNextProgress(current));
+      setProgress((current) => getNextProgress(current));
     }, 230);
+
+    return () => {
+      clearInterval(progressInterval);
+    };
+  }, [dimmed, showLoader]);
+
+  useEffect(() => {
+    if (!dimmed || !showLoader) return undefined;
+
+    setMessageIndex(0);
 
     const messageInterval = messages.length > 1 ? setInterval(() => {
       setMessageIndex((current) => (current + 1) % messages.length);
     }, 1450) : null;
 
     return () => {
-      clearInterval(progressInterval);
       if (messageInterval) clearInterval(messageInterval);
     };
-  }, [dimmed, showLoader, messages]);
+  }, [dimmed, showLoader, messages.length]);
 
   if (!dimmed) {
     return null;
@@ -148,20 +164,20 @@ export const Dimmer = ({ dimmed, showLoader, statusMessages, statusHeading }) =>
   return (
     <>
       {showLoader ? (
-        <LoaderPanel>
+        <LoaderPanel data-testid="map-loader-panel">
           <Heading>{headingText}</Heading>
           <Subheading>Please wait, this should only take a moment.</Subheading>
           <Track>
             <Fill
-              percent={pseudoProgress}
+              percent={progress}
               role="progressbar"
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-valuenow={pseudoProgress}
+              aria-valuenow={displayedProgress}
               aria-label="Map loading progress"
             />
           </Track>
-          <ProgressText>{pseudoProgress}% complete</ProgressText>
+          <ProgressText>{displayedProgress}% complete</ProgressText>
           <ActivityText aria-live="polite">{messages[messageIndex]}</ActivityText>
         </LoaderPanel>
       ) : null}

@@ -397,6 +397,7 @@ export const MapLayout = () => {
         pageName={pageContext.pageName}
         aboutVisualisationText={pageContext.about ?? loremIpsum}
         filters={state.filters}
+        isLoading={isLoading}
         legalText={pageContext.legalText ?? loremIpsum}
         onFilterChange={handleFilterChange}
         bgColor={pageContext.navbarLinkBgColour || defaultBgColour}

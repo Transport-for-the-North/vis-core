@@ -10,6 +10,13 @@ import { FilterProvider } from "contexts";
 import { getScrollbarWidth } from "utils";
 import { MobileBar, SideIcon } from "../MobileBar/MobileBar";
 
+const skeletonShimmer = `
+  @keyframes sidebarSkeletonPulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+`;
+
 // Styled components for the sidebar
 const SidebarHeader = styled.h2`
   font-size: 1.2em;
@@ -155,6 +162,26 @@ const ToggleButton = styled.button`
   }
 `;
 
+const FiltersSkeletonContainer = styled.div`
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+`;
+
+const SkeletonLine = styled.div`
+  height: ${props => props.$height || "12px"};
+  width: ${props => props.$width || "100%"};
+  border-radius: 6px;
+  margin-bottom: ${props => props.$marginBottom || "10px"};
+  background: linear-gradient(90deg, #d9dee8 0%, #eef2f8 45%, #d9dee8 100%);
+  background-size: 220% 100%;
+  animation: sidebarSkeletonPulse 1.2s linear infinite;
+
+  ${skeletonShimmer}
+`;
+
 /**
  * Sidebar component represents a sidebar layout for displaying additional information and options.
  * It contains sections such as about visualisation, filters, additional sections, and legal information.
@@ -180,6 +207,7 @@ export const Sidebar = ({
   downloadPath,
   downloadShapefilePath,
   requestMethod,
+  isLoading = false,
   children,
   setIsOpen
 }) => {
@@ -240,6 +268,8 @@ export const Sidebar = ({
     setIsHovered(false); // Reset hover state when toggling
   };
 
+  const shouldShowFilterSkeleton = isLoading && (!Array.isArray(filters) || filters.length === 0);
+
   return (
     <>
       {/* Mobile full-width toggle */}
@@ -280,6 +310,14 @@ export const Sidebar = ({
           <AccordionSection title="Glossary">
             <Glossary dataDictionary={additionalFeatures.glossary.dataDictionary} />
           </AccordionSection>
+        )}
+        {shouldShowFilterSkeleton && (
+          <FiltersSkeletonContainer aria-label="Loading filters">
+            <SkeletonLine $width="48%" $height="14px" />
+            <SkeletonLine $height="34px" />
+            <SkeletonLine $height="34px" />
+            <SkeletonLine $width="72%" $height="34px" $marginBottom="0" />
+          </FiltersSkeletonContainer>
         )}
         {filters && Array.isArray(filters) && filters.length > 0 && (
           <SelectorSection
