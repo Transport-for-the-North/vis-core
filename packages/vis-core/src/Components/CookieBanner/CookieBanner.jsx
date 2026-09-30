@@ -10,16 +10,28 @@ import {
 
 const COOKIE_POLICY_FALLBACK = "https://www.transportforthenorth.com/cookies-policy";
 
-const BannerContainer = styled.section`
+const BannerBackdrop = styled.div`
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   z-index: 999998;
+  background: rgba(10, 19, 35, 0.55);
+  backdrop-filter: blur(1px);
+`;
+
+const BannerContainer = styled.section`
+  width: 100%;
   background: var(--palette-navy);
   color: var(--palette-white);
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.25);
-  border-top: 2px solid var(--palette-teal);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.35);
+  border-top: 1px solid var(--palette-teal);
+
+  @media (max-width: 768px) {
+    width: calc(100% - 24px);
+    border-radius: 10px;
+  }
 `;
 
 const BannerInner = styled.div`
@@ -108,6 +120,21 @@ export const CookieBanner = () => {
     applyClarityConsent(granted);
   }, [consent]);
 
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   const handleAccept = () => {
     setAnalyticsConsent(ANALYTICS_CONSENT_ACCEPTED);
     setConsent(ANALYTICS_CONSENT_ACCEPTED);
@@ -123,30 +150,33 @@ export const CookieBanner = () => {
   return (
     <>
       {isOpen && (
-        <BannerContainer
-          role="region"
-          aria-label="Cookie consent"
-          aria-live="polite"
-        >
-          <BannerInner>
-            <p>
-              We use essential cookies to make this tool work. If you choose 'accept', we'll also use analytics cookies
-              to understand how you use the tool and improve it. See our{" "}
-              <a href={COOKIE_POLICY_FALLBACK} target="_blank" rel="noreferrer">
-                cookie policy
-              </a>{" "}
-              for more information.
-            </p>
-            <ButtonGroup>
-              <RejectButton type="button" onClick={handleReject} aria-label="Reject analytics cookies">
-                Reject
-              </RejectButton>
-              <AcceptButton type="button" onClick={handleAccept} aria-label="Accept analytics cookies">
-                Accept
-              </AcceptButton>
-            </ButtonGroup>
-          </BannerInner>
-        </BannerContainer>
+        <BannerBackdrop>
+          <BannerContainer
+            role="dialog"
+            aria-modal="true"
+            aria-label="Cookie consent"
+            aria-live="polite"
+          >
+            <BannerInner>
+              <p>
+                We use essential cookies to make this tool work. If you choose 'accept', we'll also use analytics cookies
+                to understand how you use the tool and improve it. See our{" "}
+                <a href={COOKIE_POLICY_FALLBACK} target="_blank" rel="noreferrer">
+                  cookie policy
+                </a>{" "}
+                for more information.
+              </p>
+              <ButtonGroup>
+                <RejectButton type="button" onClick={handleReject} aria-label="Reject analytics cookies">
+                  Reject
+                </RejectButton>
+                <AcceptButton type="button" onClick={handleAccept} aria-label="Accept analytics cookies">
+                  Accept
+                </AcceptButton>
+              </ButtonGroup>
+            </BannerInner>
+          </BannerContainer>
+        </BannerBackdrop>
       )}
     </>
   );
