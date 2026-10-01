@@ -83,7 +83,8 @@ const DropdownMenuScroll = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-flex;
-  width: 100%;
+  width: ${({ $shouldStretchItem }) => ($shouldStretchItem ? "100%" : "auto")};
+  min-width: ${({ $shouldStretchItem }) => ($shouldStretchItem ? "0" : "120px")};
   align-items: center;
   font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   font-size: 16px;
@@ -497,6 +498,7 @@ export function NavBarDropdown({
   dropdownItems,
   activeLink,
   onClick,
+  shouldStretchItem = true,
   $bgColor,
   isActiveSuppressed = false,
   onTopLevelHoverChange = () => {},
@@ -586,6 +588,7 @@ export function NavBarDropdown({
       role="button"
       aria-expanded={open}
       aria-haspopup="menu"
+      $shouldStretchItem={shouldStretchItem}
       $bgColor={$bgColor}
       $isActive={showActive}
       $hovered={navChildHovered || containerHovered || focusWithin}

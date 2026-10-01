@@ -23,16 +23,16 @@ const NavLinksContainer = styled.div`
   height: 100%;
 
   > * {
-    flex: 1 1 auto;
-    min-width: ${NAV_ITEM_MIN_WIDTH};
-    max-width: none;
+    flex: ${({ $shouldStretchItems }) => ($shouldStretchItems ? "1 1 auto" : "0 1 190px")};
+    min-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? NAV_ITEM_MIN_WIDTH : "170px")};
+    max-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? "none" : "fit-content")};
   }
 
   @media only screen and (max-width: 1400px) {
     gap: 8px;
 
     > * {
-      min-width: ${NAV_ITEM_TABLET_MIN_WIDTH};
+      min-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? NAV_ITEM_TABLET_MIN_WIDTH : "150px")};
     }
   }
 
@@ -40,7 +40,7 @@ const NavLinksContainer = styled.div`
     gap: 6px;
 
     > * {
-      min-width: ${NAV_ITEM_COMPACT_MIN_WIDTH};
+      min-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? NAV_ITEM_COMPACT_MIN_WIDTH : "120px")};
     }
   }
 `;
@@ -132,6 +132,7 @@ export const StyledExternalNavLink = styled.a`
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
   const [pendingActiveLink, setPendingActiveLink] = React.useState(null);
+  const shouldStretchItems = links.length > 3;
 
   const effectiveActiveLink = pendingActiveLink || activeLink;
 
@@ -149,7 +150,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
   };
 
   return (
-    <NavLinksContainer>
+    <NavLinksContainer $shouldStretchItems={shouldStretchItems}>
       {links.map((link, index) => {
         if (link.dropdownItems) {
           return (
@@ -159,6 +160,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               dropdownItems={link.dropdownItems}
               activeLink={effectiveActiveLink}
               onClick={handleInternalNavigate}
+              shouldStretchItem={shouldStretchItems}
               $bgColor={link.navbarLinkBgColour || $bgColor}
             />
           );
@@ -169,6 +171,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
+              $shouldStretchItems={shouldStretchItems}
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={false}
             >
@@ -181,6 +184,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
             <StyledNavLink
               key={`internal-${link.label}-${index}`}
               to={link.url}
+              $shouldStretchItems={shouldStretchItems}
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={effectiveActiveLink === link.url}
               onClick={createNavItemClickHandler(link, handleInternalNavigate, $bgColor)}
