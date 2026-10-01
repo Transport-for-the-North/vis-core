@@ -1,4 +1,4 @@
-import { updateUrlParameters, normaliseParamValue } from "utils";
+import { updateUrlParameters, normaliseParamValue, normaliseDisplayMode } from "utils";
 
 /**
  * Finds the first configured colour scheme value from filter options.
@@ -164,6 +164,7 @@ export const actionTypes = {
   SET_DYNAMIC_STYLING_LOADING: "SET_DYNAMIC_STYLING_LOADING",
   SET_DYNAMIC_STYLING_FINISHED: "SET_DYNAMIC_STYLING_FINISHED",
   UPDATE_LEGEND_TEXT: "UPDATE_LEGEND_TEXT",
+  UPDATE_DISPLAY_MODE: "UPDATE_DISPLAY_MODE",
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
   UPDATE_CUSTOM_BANDS: "UPDATE_CUSTOM_BANDS",
   UPDATE_LAYER_WIDTH_FACTOR: "UPDATE_LAYER_WIDTH_FACTOR",
@@ -444,10 +445,20 @@ export const mapReducer = (state, action) => {
     }
 
     case actionTypes.ADD_VISUALISATION: {
-      // Logic to add a visualisation
+      // Logic to add a visualisation.
+      const addedVisualisations = Object.fromEntries(
+        Object.entries(action.payload).map(([visName, visualisation]) => [
+          visName,
+          {
+            ...visualisation,
+            displayMode: normaliseDisplayMode(visualisation?.displayMode),
+          },
+        ])
+      );
+
       const visualisationContent = {
         ...state.visualisations,
-        ...action.payload,
+        ...addedVisualisations,
       };
       return {
         ...state,
@@ -728,6 +739,31 @@ export const mapReducer = (state, action) => {
       });
 
       // Return the new state with updated visualisations
+      return {
+        ...state,
+        visualisations: updatedVisualisations,
+      };
+    }
+    case actionTypes.UPDATE_DISPLAY_MODE: {
+      // Track the display mode on the visualisation itself.
+      const displayMode = normaliseDisplayMode(action.payload.value);
+
+      // A display-mode filter that names no visualisations applies to all of them: the
+      // mode describes the data the page is drawn from, not one layer's styling.
+      const visualisationNames =
+        action.payload.filter?.visualisations ?? Object.keys(state.visualisations);
+
+      const updatedVisualisations = { ...state.visualisations };
+
+      visualisationNames.forEach((visName) => {
+        if (!updatedVisualisations[visName]) return;
+
+        updatedVisualisations[visName] = {
+          ...updatedVisualisations[visName],
+          displayMode,
+        };
+      });
+
       return {
         ...state,
         visualisations: updatedVisualisations,

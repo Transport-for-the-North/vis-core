@@ -120,6 +120,10 @@ const IconWrapper = styled.span`
 export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) => {
   const { state: filterState } = useFilterContext();
 
+  const valuesEqual = (left, right) => String(left) === String(right);
+  const includesValue = (arrayValues, value) =>
+    Array.isArray(arrayValues) && arrayValues.some((item) => valuesEqual(item, value));
+
   const options = useMemo(() => {
     let opts = filter.values.values || [];
     if (excludeValue !== undefined && excludeValue !== null) {
@@ -161,23 +165,23 @@ export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) =>
     const current = filterState[filter.id];
 
     if (!filter.multiSelect) {
-      const currentlyHidden = options.find((o) => o.paramValue === current)?.isHidden;
+      const currentlyHidden = options.find((o) => valuesEqual(o.paramValue, current))?.isHidden;
       const shouldAutoSelectOnlyVisible = current == null && visibleOptions.length === 1;
 
       // Commit the only visible value when nothing has been written yet, and
       // also recover if the current value becomes hidden after validation.
-      if (currentlyHidden || shouldAutoSelectOnlyVisible || (current != null && !options.find(o => o.paramValue === current))) {
+      if (currentlyHidden || shouldAutoSelectOnlyVisible || (current != null && !options.find((o) => valuesEqual(o.paramValue, current)))) {
         const fallback = visibleOptions[0]?.paramValue ?? null;
         onChange(filter, fallback);
         setSelectedButtons(fallback);
       }
     } else {
       const currentArr = Array.isArray(current) ? current : [];
-      const visibleSet = new Set(visibleOptions.map((o) => o.paramValue));
-      const pruned = currentArr.filter((v) => visibleSet.has(v));
+      const visibleValues = visibleOptions.map((o) => o.paramValue);
+      const pruned = currentArr.filter((v) => includesValue(visibleValues, v));
 
-      if (pruned.length !== currentArr.length || currentArr.some(v => !options.find(o => o.paramValue === v))) {
-        const validPruned = pruned.filter(v => options.find(o => o.paramValue === v));
+      if (pruned.length !== currentArr.length || currentArr.some((v) => !options.find((o) => valuesEqual(o.paramValue, v)))) {
+        const validPruned = pruned.filter((v) => options.find((o) => valuesEqual(o.paramValue, v)));
         if (validPruned.length === 0) {
           const fallbackAll = visibleOptions.map((o) => o.paramValue);
           onChange(filter, fallbackAll);
@@ -194,14 +198,14 @@ export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) =>
     if (disabled) return;
     
     // Prevent selecting hidden options
-    const isHidden = options.find((o) => o.paramValue === newSelectedValue)?.isHidden;
+    const isHidden = options.find((o) => valuesEqual(o.paramValue, newSelectedValue))?.isHidden;
     if (isHidden) return;
 
     if (filter.multiSelect) {
       const current = Array.isArray(selectedButtons) ? selectedButtons : [];
       let next;
-      if (current.includes(newSelectedValue)) {
-        next = current.filter((v) => v !== newSelectedValue);
+      if (includesValue(current, newSelectedValue)) {
+        next = current.filter((v) => !valuesEqual(v, newSelectedValue));
       } else {
         next = [...current, newSelectedValue];
       }
@@ -224,7 +228,7 @@ export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) =>
 
     const isAllVisibleSelected =
       current.length === visibleValues.length &&
-      current.every((v) => visibleValues.includes(v));
+      current.every((v) => includesValue(visibleValues, v));
 
     const next = isAllVisibleSelected ? [] : visibleValues;
     onChange(filter, next);
@@ -242,8 +246,8 @@ export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) =>
             $isSelected={
               filter.multiSelect
                 ? Array.isArray(selectedButtons) &&
-                  selectedButtons.includes(option.paramValue)
-                : selectedButtons === option.paramValue
+                  includesValue(selectedButtons, option.paramValue)
+                : valuesEqual(selectedButtons, option.paramValue)
             }
             $isHidden={!!option.isHidden || disabled}
             size={options.length}
@@ -268,7 +272,7 @@ export const Toggle = ({ filter, onChange, bgColor, disabled, excludeValue }) =>
             Array.isArray(selectedButtons) &&
             selectedButtons.length === visibleOptions.length &&
             selectedButtons.every((v) =>
-              visibleOptions.some((o) => o.paramValue === v)
+              visibleOptions.some((o) => valuesEqual(o.paramValue, v))
             )
           }
           $bgColor={bgColor}

@@ -28,6 +28,7 @@
       "layouts/*":    ["layouts/*"],
       "reducers/*":   ["reducers/*"],
       "utils/*":      ["utils/*"],
+      "enums/*":      ["enums/*"],
       "defaults": ["defaults.js"]
     }
   },
