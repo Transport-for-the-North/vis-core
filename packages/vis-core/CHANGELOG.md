@@ -1,3 +1,19 @@
+# [0.14.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.13.0...v0.14.0) (2026-10-01)
+
+
+### Bug Fixes
+
+* expose enums in library export ([dd15a88](https://github.com/Transport-for-the-North/vis-core/commit/dd15a8886ba11cabd8ced4a45e2f204b0203d9fb))
+* keep selected state highlighted for mixed-type values ([0b8ba2e](https://github.com/Transport-for-the-North/vis-core/commit/0b8ba2ec724773773aa4ef71b896822ce5b2a8b6))
+
+
+### Features
+
+* allow for % difference with working classification method change and edit banding. ([df3f576](https://github.com/Transport-for-the-North/vis-core/commit/df3f576e1c6fd01104f68778494ae8780aa826db))
+* have display mode as a enumerable, track it through the state of the visualisation, so hover follows the mode, still has backwards compatibility, documents created. ([13468a5](https://github.com/Transport-for-the-North/vis-core/commit/13468a5f5325f0a2bb090c1e3f3134c3d83b61ce))
+* package lock revert ([#330](https://github.com/Transport-for-the-North/vis-core/issues/330)) ([f147297](https://github.com/Transport-for-the-North/vis-core/commit/f147297ad79c3261a59ef645b855adaabe71d686))
+* Update to dynamicForm.js to accept multi select ([#329](https://github.com/Transport-for-the-North/vis-core/issues/329)) ([2fe75dc](https://github.com/Transport-for-the-North/vis-core/commit/2fe75dc9bfa190e0fb7a4d29784db35e3211c8fb))
+
 # [0.13.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.12.1...v0.13.0) (2026-09-10)
 
 
