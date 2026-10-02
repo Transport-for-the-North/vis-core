@@ -6,12 +6,9 @@ import { createNavItemClickHandler } from "utils/nav";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { defaultBgColour } from "defaults";
 
-const NAV_ITEM_MAX_WIDTH = "250px";
-const NAV_ITEM_MIN_WIDTH = "150px";
-const NAV_ITEM_TABLET_MAX_WIDTH = "220px";
-const NAV_ITEM_TABLET_MIN_WIDTH = "130px";
-const NAV_ITEM_COMPACT_MAX_WIDTH = "190px";
-const NAV_ITEM_COMPACT_MIN_WIDTH = "100px";
+const NAV_ITEM_MIN_WIDTH = "120px";
+const NAV_ITEM_TABLET_MIN_WIDTH = "100px";
+const NAV_ITEM_COMPACT_MIN_WIDTH = "84px";
 
 /**
  * Styled container for the responsive navigation links.
@@ -26,17 +23,16 @@ const NavLinksContainer = styled.div`
   height: 100%;
 
   > * {
-    flex: 1 1 0;
-    min-width: ${NAV_ITEM_MIN_WIDTH};
-    max-width: ${NAV_ITEM_MAX_WIDTH};
+    flex: ${({ $shouldStretchItems }) => ($shouldStretchItems ? "1 1 auto" : "0 1 190px")};
+    min-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? NAV_ITEM_MIN_WIDTH : "170px")};
+    max-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? "none" : "fit-content")};
   }
 
   @media only screen and (max-width: 1400px) {
     gap: 8px;
 
     > * {
-      min-width: ${NAV_ITEM_TABLET_MIN_WIDTH};
-      max-width: ${NAV_ITEM_TABLET_MAX_WIDTH};
+      min-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? NAV_ITEM_TABLET_MIN_WIDTH : "150px")};
     }
   }
 
@@ -44,8 +40,7 @@ const NavLinksContainer = styled.div`
     gap: 6px;
 
     > * {
-      min-width: ${NAV_ITEM_COMPACT_MIN_WIDTH};
-      max-width: ${NAV_ITEM_COMPACT_MAX_WIDTH};
+      min-width: ${({ $shouldStretchItems }) => ($shouldStretchItems ? NAV_ITEM_COMPACT_MIN_WIDTH : "120px")};
     }
   }
 `;
@@ -83,11 +78,8 @@ const baseNavLinkStyles = css`
   box-sizing: border-box;
 
   .nav-label {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: block;
+    overflow: visible;
     overflow-wrap: anywhere;
     width: 100%;
   }
@@ -98,8 +90,8 @@ const baseNavLinkStyles = css`
   }
 
   @media only screen and (max-width: 1200px) {
-    font-size: 14px;
-    padding: 7px 8px;
+    font-size: 13px;
+    padding: 6px 6px;
   }
 `;
 
@@ -140,6 +132,7 @@ export const StyledExternalNavLink = styled.a`
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
   const [pendingActiveLink, setPendingActiveLink] = React.useState(null);
+  const shouldStretchItems = links.length > 3;
 
   const effectiveActiveLink = pendingActiveLink || activeLink;
 
@@ -157,7 +150,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
   };
 
   return (
-    <NavLinksContainer>
+    <NavLinksContainer $shouldStretchItems={shouldStretchItems}>
       {links.map((link, index) => {
         if (link.dropdownItems) {
           return (
@@ -167,6 +160,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               dropdownItems={link.dropdownItems}
               activeLink={effectiveActiveLink}
               onClick={handleInternalNavigate}
+              shouldStretchItem={shouldStretchItems}
               $bgColor={link.navbarLinkBgColour || $bgColor}
             />
           );
@@ -177,6 +171,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
+              $shouldStretchItems={shouldStretchItems}
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={false}
             >
@@ -189,6 +184,7 @@ export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) 
             <StyledNavLink
               key={`internal-${link.label}-${index}`}
               to={link.url}
+              $shouldStretchItems={shouldStretchItems}
               $bgColor={link.navbarLinkBgColour || $bgColor}
               $active={effectiveActiveLink === link.url}
               onClick={createNavItemClickHandler(link, handleInternalNavigate, $bgColor)}

@@ -41,6 +41,9 @@ const BrandGlobalStyles = createGlobalStyle`
   }
 
   :root {
+    --app-navbar-height: 75px;
+    --app-overlay-top-offset: 85px;
+
     --palette-navy: ${brandTokens.palette.navy};
     --palette-teal: ${brandTokens.palette.teal};
     --palette-pale-teal: ${brandTokens.palette.paleTeal};

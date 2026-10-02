@@ -84,6 +84,33 @@
   text-indent: 0em;
 }
 
+.container-content a,
+.container-legalText a,
+.container-methodology a,
+.container-intro a,
+.container-section a {
+  color: inherit;
+  text-decoration-color: currentColor;
+}
+
+.container-content a:hover,
+.container-legalText a:hover,
+.container-methodology a:hover,
+.container-intro a:hover,
+.container-section a:hover {
+  color: inherit;
+  text-decoration-color: currentColor;
+  text-decoration-color: var(--palette-teal);
+}
+
+.container-content a:visited,
+.container-legalText a:visited,
+.container-methodology a:visited,
+.container-intro a:visited,
+.container-section a:visited {
+  color: inherit;
+}
+
 /* --- Legal and Fixed Sections --- */
 .legalText {
   padding: 2rem 10vw 0rem 10vw;

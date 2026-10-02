@@ -19,7 +19,8 @@ const StyledNavbar = styled.nav`
   right: 0;
   z-index: 10005;
   width: 100%;
-  height: 75px;
+  min-height: 75px;
+  height: auto;
   box-sizing: border-box;
   background-color: ${({ theme }) => theme.navbarBg};
   font-family: ${({ theme }) => theme.navFontFamily || theme.standardFontFamily};
@@ -27,14 +28,16 @@ const StyledNavbar = styled.nav`
 
 const HeaderOuter = styled.div`
   width: 100%;
-  height: 75px;
+  min-height: 75px;
+  height: auto;
   box-sizing: border-box;
   border-bottom: 1px solid ${({ theme }) => theme?.colors?.navBorder || "#e5e7eb"};
 `;
 
 const HeaderInner = styled.div`
   width: 100%;
-  height: 100%;
+  min-height: 75px;
+  height: auto;
   max-width: none;
   margin: 0;
   padding: 0 20px;
@@ -57,7 +60,8 @@ const HeaderGrid = styled.div`
   align-items: center;
   column-gap: 20px;
   width: 100%;
-  height: 100%;
+  min-height: 75px;
+  height: auto;
 
   @media only screen and (max-width: 1200px) {
     column-gap: 10px;
@@ -74,7 +78,8 @@ const HeaderNavSearch = styled.div`
   align-items: center;
   justify-content: stretch;
   width: 100%;
-  height: 100%;
+  min-height: 75px;
+  height: auto;
   min-width: 0;
 `;
 
@@ -280,6 +285,11 @@ export function Navbar({ links: propLinks }) {
     const updateSpacerHeight = () => {
       const currentHeight = Math.ceil(navbarRef.current?.getBoundingClientRect()?.height || 75);
       setNavbarSpacerHeight(currentHeight || 75);
+      if (typeof document !== "undefined") {
+        const root = document.documentElement;
+        root.style.setProperty("--app-navbar-height", `${currentHeight || 75}px`);
+        root.style.setProperty("--app-overlay-top-offset", `${(currentHeight || 75) + 10}px`);
+      }
     };
 
     updateSpacerHeight();
