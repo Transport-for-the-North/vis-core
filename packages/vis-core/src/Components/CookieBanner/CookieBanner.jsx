@@ -28,9 +28,9 @@ const BannerContainer = styled.section`
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.35);
   border-top: 1px solid var(--palette-teal);
 
-  @media (max-width: 768px) {
-    width: calc(100% - 24px);
-    border-radius: 10px;
+  @media (max-width: 1024px) {
+    width: 100%;
+    border-radius: 0;
   }
 `;
 
@@ -58,9 +58,10 @@ const BannerInner = styled.div`
     color: var(--palette-pale-teal);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    text-align: center;
     padding: 14px 16px;
   }
 `;
@@ -70,8 +71,9 @@ const ButtonGroup = styled.div`
   gap: 10px;
   flex-shrink: 0;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     width: 100%;
+    justify-content: center;
   }
 `;
 
