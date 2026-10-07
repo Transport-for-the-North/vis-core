@@ -132,7 +132,7 @@ export const StyledExternalNavLink = styled.a`
  */
 export function ResponsiveNavbarLinks({ links, activeLink, onClick, $bgColor }) {
   const [pendingActiveLink, setPendingActiveLink] = React.useState(null);
-  const shouldStretchItems = links.length > 3;
+  const shouldStretchItems = links.length > 6;
 
   const effectiveActiveLink = pendingActiveLink || activeLink;
 

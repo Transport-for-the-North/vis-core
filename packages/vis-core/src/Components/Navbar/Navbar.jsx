@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { AppContext } from "contexts/AppContext";
 import { useAuth } from "contexts/AuthProvider";
 import { useWindowWidth } from "hooks/useWindowWidth";
@@ -56,9 +56,11 @@ const HeaderInner = styled.div`
 
 const HeaderGrid = styled.div`
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: ${({ $stackLogout }) => ($stackLogout ? "auto auto" : "auto")};
   align-items: center;
   column-gap: 20px;
+  row-gap: ${({ $stackLogout }) => ($stackLogout ? "8px" : "0")};
   width: 100%;
   min-height: 75px;
   height: auto;
@@ -81,6 +83,7 @@ const HeaderNavSearch = styled.div`
   min-height: 75px;
   height: auto;
   min-width: 0;
+  overflow: visible;
 `;
 
 const MobileLogoSlot = styled.div`
@@ -127,11 +130,17 @@ const LogoutSection = styled.div`
   width: auto;
   min-width: max-content;
   padding-right: 22px;
+  grid-column: ${({ $stackLogout }) => ($stackLogout ? "2 / 4" : "auto")};
+  grid-row: ${({ $stackLogout }) => ($stackLogout ? "2" : "auto")};
+
+  @media only screen and (max-width: 1600px) {
+    padding-right: 0;
+  }
 
   @media only screen and (max-width: 1200px) {
     gap: 6px;
     min-width: 0;
-    padding-right: 8px;
+    padding-right: 0;
   }
 
   @media only screen and (max-width: 767px) {
@@ -155,6 +164,24 @@ const StyledLogoutButton = styled.button`
   align-items: center;
   gap: 8px;
   transition: background-color 220ms ease, color 220ms ease;
+
+  ${({ $iconOnly }) =>
+    $iconOnly &&
+    css`
+      border: none;
+      border-radius: 0;
+      padding: 4px;
+      gap: 0;
+
+      span {
+        display: none;
+      }
+
+      &:hover {
+        background-color: transparent;
+        color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
+      }
+    `}
 
   @media only screen and (max-width: 1200px) {
     border: none;
@@ -181,8 +208,10 @@ const StyledLogoutButton = styled.button`
   }
 
   &:hover {
-    background-color: ${({ theme }) => theme?.colors?.text || "#0d0f3d"};
-    color: #ffffff;
+    background-color: ${({ $iconOnly, theme }) =>
+      $iconOnly ? "transparent" : theme?.colors?.text || "#0d0f3d"};
+    color: ${({ $iconOnly, theme }) =>
+      $iconOnly ? theme?.colors?.text || "#0d0f3d" : "#ffffff"};
   }
 `;
 
@@ -190,10 +219,10 @@ const LogoutIcon = styled.img`
   width: 16px;
   height: 16px;
   object-fit: contain;
+  transition: filter 220ms ease;
 
-  @media only screen and (max-width: 1200px) {
-    width: 20px;
-    height: 20px;
+  ${StyledLogoutButton}:hover & {
+    filter: ${({ $iconOnly }) => ($iconOnly ? "none" : "brightness(0) invert(1)")};
   }
 `;
 
@@ -240,8 +269,13 @@ export function Navbar({ links: propLinks }) {
   const [logoImage, setLogoImage] = useState(appContext?.logoImage);
   const [$bgColor, setBgColor] = useState(defaultBgColour);
   const [showMobileMenuIcon, setShowMobileMenuIcon] = useState(true);
+  const [isNavCrowded, setIsNavCrowded] = useState(false);
   const navigate = useNavigate();
   const windowWidth = useWindowWidth();
+  const navAreaRef = useRef(null);
+  const headerGridRef = useRef(null);
+  const logoutSectionRef = useRef(null);
+  const logoutButtonRef = useRef(null);
 
   // Use pre-computed links from AppContext (or propLinks if provided),
   // falling back to buildNavbarLinks for backwards compatibility.
@@ -250,6 +284,13 @@ export function Navbar({ links: propLinks }) {
   // Determine mobile view using one shared breakpoint for all apps.
   const MOBILE_BREAKPOINT = 1024;
   const isMobile = windowWidth < MOBILE_BREAKPOINT;
+  const shouldUseIconOnlyLogout =
+    isMobile ||
+    isNavCrowded;
+  const shouldStackLogout = false;
+  const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
+  const isAuthenticated = Boolean(token || user);
+  const hasLogo = typeof logoImage === "string" ? Boolean(logoImage.trim()) : Boolean(logoImage);
 
   // When a link is clicked, update the logo and active bg colour appropriately.
   const onClick = (url, newLogo, navLinkBgColour) => {
@@ -280,6 +321,51 @@ export function Navbar({ links: propLinks }) {
     setActiveLink(location.pathname);
     setSideNavOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (isMobile || !navAreaRef.current) {
+      setIsNavCrowded(false);
+      return;
+    }
+
+    const checkCrowding = () => {
+      const navArea = navAreaRef.current;
+      if (!navArea) return;
+
+      const logoutSection = logoutSectionRef.current;
+      const logoutButton = logoutButtonRef.current;
+      const overflowDelta = navArea.scrollWidth - navArea.clientWidth;
+      const navRect = navArea.getBoundingClientRect();
+      const logoutRect = logoutSection?.getBoundingClientRect();
+      const spaceBetween = logoutRect ? logoutRect.left - navRect.right : Number.POSITIVE_INFINITY;
+      const FULL_LOGOUT_BUTTON_WIDTH = 96;
+      const currentButtonWidth = logoutButton?.getBoundingClientRect()?.width || FULL_LOGOUT_BUTTON_WIDTH;
+      const predictedFullButtonGap = Math.round(
+        spaceBetween - Math.max(0, FULL_LOGOUT_BUTTON_WIDTH - currentButtonWidth)
+      );
+
+      setIsNavCrowded((prevIsCrowded) => {
+        // Hysteresis prevents rapid state toggling near a single threshold.
+        const enterCrowded = overflowDelta > 2 || predictedFullButtonGap < 6;
+        const stayCrowded = overflowDelta > 0 || predictedFullButtonGap < -2;
+        return prevIsCrowded ? stayCrowded : enterCrowded;
+      });
+    };
+
+    checkCrowding();
+    window.addEventListener("resize", checkCrowding);
+
+    let resizeObserver;
+    if ("ResizeObserver" in window && navAreaRef.current) {
+      resizeObserver = new ResizeObserver(checkCrowding);
+      resizeObserver.observe(navAreaRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", checkCrowding);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, [isMobile, windowWidth, links.length, logoPosition, isAuthenticated]);
 
   useEffect(() => {
     const updateSpacerHeight = () => {
@@ -341,9 +427,6 @@ export function Navbar({ links: propLinks }) {
 
   // Simplified logo logic: on mobile the logo is always left, on non-mobile
   // display the logo on the side indicated by appContext.logoPosition.
-  const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
-  const hasLogo = typeof logoImage === "string" ? Boolean(logoImage.trim()) : Boolean(logoImage);
-  const isAuthenticated = Boolean(token || user);
   const logoutImage = appContext.logoutImage || "img/logout.png";
   const logoutImageSrc = `${import.meta.env.VITE_PUBLIC_URL || ""}${logoutImage}`;
   const mobileMenuIconPath = appContext.mobileMenuIcon || appContext.logoutButtonImage || "img/burgerIcon.png";
@@ -354,7 +437,7 @@ export function Navbar({ links: propLinks }) {
       <StyledNavbar ref={navbarRef}>
         <HeaderOuter>
           <HeaderInner>
-            <HeaderGrid>
+            <HeaderGrid ref={headerGridRef} $stackLogout={shouldStackLogout}>
               {isMobile ? (
                 <MobileMenuButton
                   aria-label="Open main menu"
@@ -383,7 +466,7 @@ export function Navbar({ links: propLinks }) {
                 )
               )}
 
-              <HeaderNavSearch>
+              <HeaderNavSearch ref={navAreaRef}>
                 {isMobile ? (
                   hasLogo && (
                     <MobileLogoSlot>
@@ -404,7 +487,7 @@ export function Navbar({ links: propLinks }) {
                 )}
               </HeaderNavSearch>
 
-              <LogoutSection>
+              <LogoutSection ref={logoutSectionRef} $stackLogout={shouldStackLogout}>
                 {!isMobile && hasLogo && logoPosition === "right" && (
                   <Logo
                     logoImage={logoImage}
@@ -414,9 +497,14 @@ export function Navbar({ links: propLinks }) {
                 )}
                 {appContext.authenticationRequired && (
                   isAuthenticated ? (
-                    <StyledLogoutButton onClick={handleLogout} aria-label="Logout">
+                    <StyledLogoutButton
+                      ref={logoutButtonRef}
+                      onClick={handleLogout}
+                      aria-label="Logout"
+                      $iconOnly={shouldUseIconOnlyLogout}
+                    >
                       <span>Logout</span>
-                      <LogoutIcon src={logoutImageSrc} alt="" aria-hidden="true" />
+                      <LogoutIcon src={logoutImageSrc} alt="" aria-hidden="true" $iconOnly={shouldUseIconOnlyLogout} />
                     </StyledLogoutButton>
                   ) : (
                     <AuthActionButton onClick={handleLogin}>Login</AuthActionButton>
