@@ -224,11 +224,6 @@ const LogoutIcon = styled.img`
   ${StyledLogoutButton}:hover & {
     filter: ${({ $iconOnly }) => ($iconOnly ? "none" : "brightness(0) invert(1)")};
   }
-
-  @media only screen and (max-width: 1200px) {
-    width: 20px;
-    height: 20px;
-  }
 `;
 
 const AuthActionButton = styled.button`
@@ -279,6 +274,8 @@ export function Navbar({ links: propLinks }) {
   const windowWidth = useWindowWidth();
   const navAreaRef = useRef(null);
   const headerGridRef = useRef(null);
+  const logoutSectionRef = useRef(null);
+  const logoutButtonRef = useRef(null);
 
   // Use pre-computed links from AppContext (or propLinks if provided),
   // falling back to buildNavbarLinks for backwards compatibility.
@@ -287,10 +284,8 @@ export function Navbar({ links: propLinks }) {
   // Determine mobile view using one shared breakpoint for all apps.
   const MOBILE_BREAKPOINT = 1024;
   const isMobile = windowWidth < MOBILE_BREAKPOINT;
-  const DESKTOP_ICON_ONLY_SAFETY_BREAKPOINT = 1180;
   const shouldUseIconOnlyLogout =
     isMobile ||
-    (!isMobile && windowWidth <= DESKTOP_ICON_ONLY_SAFETY_BREAKPOINT) ||
     isNavCrowded;
   const shouldStackLogout = false;
   const logoPosition = isMobile ? "left" : appContext.logoPosition || "left";
@@ -335,15 +330,25 @@ export function Navbar({ links: propLinks }) {
 
     const checkCrowding = () => {
       const navArea = navAreaRef.current;
-      const headerGrid = headerGridRef.current;
       if (!navArea) return;
+
+      const logoutSection = logoutSectionRef.current;
+      const logoutButton = logoutButtonRef.current;
       const overflowDelta = navArea.scrollWidth - navArea.clientWidth;
-      const headerWidth = headerGrid?.clientWidth || 0;
-      const navUsageRatio = headerWidth > 0 ? navArea.scrollWidth / headerWidth : 0;
+      const navRect = navArea.getBoundingClientRect();
+      const logoutRect = logoutSection?.getBoundingClientRect();
+      const spaceBetween = logoutRect ? logoutRect.left - navRect.right : Number.POSITIVE_INFINITY;
+      const FULL_LOGOUT_BUTTON_WIDTH = 96;
+      const currentButtonWidth = logoutButton?.getBoundingClientRect()?.width || FULL_LOGOUT_BUTTON_WIDTH;
+      const predictedFullButtonGap = Math.round(
+        spaceBetween - Math.max(0, FULL_LOGOUT_BUTTON_WIDTH - currentButtonWidth)
+      );
+
       setIsNavCrowded((prevIsCrowded) => {
-        const enterCrowded = overflowDelta > 3 || navUsageRatio > 0.86;
-        const exitCrowded = overflowDelta > -18 || navUsageRatio > 0.78;
-        return prevIsCrowded ? exitCrowded : enterCrowded;
+        // Hysteresis prevents rapid state toggling near a single threshold.
+        const enterCrowded = overflowDelta > 2 || predictedFullButtonGap < 6;
+        const stayCrowded = overflowDelta > 0 || predictedFullButtonGap < -2;
+        return prevIsCrowded ? stayCrowded : enterCrowded;
       });
     };
 
@@ -482,7 +487,7 @@ export function Navbar({ links: propLinks }) {
                 )}
               </HeaderNavSearch>
 
-              <LogoutSection $stackLogout={shouldStackLogout}>
+              <LogoutSection ref={logoutSectionRef} $stackLogout={shouldStackLogout}>
                 {!isMobile && hasLogo && logoPosition === "right" && (
                   <Logo
                     logoImage={logoImage}
@@ -493,6 +498,7 @@ export function Navbar({ links: propLinks }) {
                 {appContext.authenticationRequired && (
                   isAuthenticated ? (
                     <StyledLogoutButton
+                      ref={logoutButtonRef}
                       onClick={handleLogout}
                       aria-label="Logout"
                       $iconOnly={shouldUseIconOnlyLogout}
