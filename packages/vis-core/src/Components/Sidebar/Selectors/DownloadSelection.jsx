@@ -8,7 +8,7 @@ import { useEffect, useContext, useState } from "react";
 import { useFilterContext } from "hooks/useFilterContext";
 import { InfoBox } from "Components/MessageBox/MessageBox";
 import { api } from "services";
-import { checkSecurityRequirements, sortValues, isValidCondition, applyCondition } from "utils";
+import { checkSecurityRequirements, sortValues, isValidCondition, applyCondition, trackClarityEvent } from "utils";
 import { AppContext } from "contexts/AppContext";
 import { PageContext } from "contexts/PageContext";
 import { darken } from "polished";
@@ -313,11 +313,7 @@ export const DownloadSection = ({ filters, downloadPath, bgColor, requestMethod 
         method: requestMethod,
       });
       console.log('CSV downloaded successfully');
-      
-      // Try both set and event methods
-      // window.clarity('set', 'download_data_clicked', 'true');
-      window.clarity('event', 'download_data_clicked');
-      console.log('Clarity events sent');
+      trackClarityEvent('download_data_clicked');
     } catch (error) {
       console.error('Error downloading CSV:', error);
       setRequestError(error.message || "Error downloading data");

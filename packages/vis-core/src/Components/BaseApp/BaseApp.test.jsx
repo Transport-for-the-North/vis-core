@@ -8,6 +8,11 @@ jest.mock("js-cookie", () => ({
 
 jest.mock("utils", () => ({
   loadBands: jest.fn(),
+  getAnalyticsConsent: jest.fn(() => null),
+  setAnalyticsConsent: jest.fn(),
+  applyClarityConsent: jest.fn(),
+  ANALYTICS_CONSENT_ACCEPTED: "accepted",
+  ANALYTICS_CONSENT_REJECTED: "rejected",
 }));
 
 jest.mock("jwt-decode", () => ({
