@@ -172,11 +172,15 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
   //    `getInitialValue` (if provided) replaces the default computation — map pages pass
   //    `getInitialFilterValue` to pick up URL-param / persisted-state aware values.
   useEffect(() => {
-    if (!filtersWithIds.length) {
+    const configuredFilterCount = (pageContext.config?.filters || []).length;
+
+    if (configuredFilterCount === 0) {
       filterDispatch({ type: "INITIALIZE_FILTERS", payload: {} });
       setIsReady(true);
       return;
     }
+
+    if (!filtersWithIds.length) return;
 
     const computeDefault = getInitialValue || ((f) => {
       if (f.shouldBeBlankOnInit) return null;
@@ -198,7 +202,7 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
     filterDispatch({ type: "INITIALIZE_FILTERS", payload: correctedInitial });
 
     setIsReady(true);
-  }, [filtersWithIds, metadataTables, filterDispatch, getInitialValue]);
+  }, [filtersWithIds, metadataTables, filterDispatch, getInitialValue, pageContext]);
 
   // 4) Apply dependency validation/hiding (same routine used in MapLayout).
   const validatedFilters = useMemo(() => {
