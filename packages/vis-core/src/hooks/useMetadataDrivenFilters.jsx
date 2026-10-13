@@ -172,7 +172,11 @@ export function useMetadataDrivenFilters({ getInitialValue = null } = {}) {
   //    `getInitialValue` (if provided) replaces the default computation — map pages pass
   //    `getInitialFilterValue` to pick up URL-param / persisted-state aware values.
   useEffect(() => {
-    if (!filtersWithIds.length) return;
+    if (!filtersWithIds.length) {
+      filterDispatch({ type: "INITIALIZE_FILTERS", payload: {} });
+      setIsReady(true);
+      return;
+    }
 
     const computeDefault = getInitialValue || ((f) => {
       if (f.shouldBeBlankOnInit) return null;
