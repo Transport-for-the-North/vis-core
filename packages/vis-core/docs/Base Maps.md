@@ -103,9 +103,10 @@ The `labels` object controls how base-map symbol layers are styled and ordered:
 - `layerIds`: Array of exact layer IDs to target.
 - `matches`: Optional function `(layer) => boolean` for custom layer matching.
 - `paint`: Either `"provider"` (preserves the provider's default text colour and halo) or a paint override object containing `default` and optional `byLayerId` overrides.
+- `layout`: Either `"provider"` (or omitted, preserving the provider's layout object by reference) or a layout override object containing `default` and optional `byLayerId` overrides (for example `default: { "text-font": ["Noto Sans Bold"] }`).
 
 > [!NOTE]
-> Label policies only ever modify paint properties (such as `text-color` or `text-halo-color`). Layout objects are preserved by reference identity, avoiding glyph re-layout overhead and font stack conflicts.
+> When `layout` is `"provider"` or omitted, layout objects are preserved by reference identity, avoiding glyph re-layout overhead and font stack conflicts. When configured, layout properties (such as `text-font`) are merged to configure appropriate font weights or styling.
 
 ### Example: adding an Ordnance Survey (OS) vector tile style
 
@@ -129,6 +130,11 @@ export const BASE_MAPS = {
     labels: {
       placement: "above-application",
       layerPrefixes: ["place_", "place-"],
+      layout: {
+        default: {
+          "text-font": ["Noto Sans Bold"],
+        },
+      },
       paint: "provider",
     },
   },

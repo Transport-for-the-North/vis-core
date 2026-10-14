@@ -1,6 +1,7 @@
 /**
  * Pure helpers for base-map label policy.
  *
+ * Supports declarative paint and layout overrides for base symbol layers.
  * These functions are stateless and perform no map operations or dispatches.
  * All live-map work is done by the transition coordinator.
  */
@@ -38,8 +39,6 @@ export function isBaseLabelLayer({ layer, descriptor, baseSourceIds }) {
  * Returns the paint overrides for a base label layer, or null if the descriptor
  * policy is "provider" (no overrides).
  *
- * Only paint properties are ever modified – layout is never touched.
- *
  * @param {Object} descriptor - A base-map descriptor.
  * @param {string} layerId - The layer ID.
  * @returns {Object|null}
@@ -58,9 +57,30 @@ export function getLabelPaintOverride(descriptor, layerId) {
 }
 
 /**
- * Applies the descriptor's label paint policy to the layers of an incoming style spec.
- * Returns a new layers array with paint overrides merged. Layout objects are preserved
- * by reference – they are never cloned or mutated.
+ * Returns the layout overrides for a base label layer, or null if the descriptor
+ * policy is "provider" (or undefined/missing).
+ *
+ * @param {Object} descriptor - A base-map descriptor.
+ * @param {string} layerId - The layer ID.
+ * @returns {Object|null}
+ */
+export function getLabelLayoutOverride(descriptor, layerId) {
+  const policy = descriptor.labels?.layout;
+
+  if (!policy || policy === "provider") {
+    return null;
+  }
+
+  return {
+    ...policy.default,
+    ...policy.byLayerId?.[layerId],
+  };
+}
+
+/**
+ * Applies the descriptor's label paint and layout policies to the layers of an incoming style spec.
+ * Returns a new layers array with overrides merged. When no layout policy is configured (or set to
+ * "provider"), layout objects are preserved by reference identity.
  *
  * @param {Object} params
  * @param {Object} params.style - The incoming base-map style spec.
@@ -75,23 +95,36 @@ export function applyLabelPolicyToStyle({ style, descriptor, baseSourceIds }) {
     }
 
     const paintOverride = getLabelPaintOverride(descriptor, layer.id);
-    if (!paintOverride) {
+    const layoutOverride = getLabelLayoutOverride(descriptor, layer.id);
+
+    if (!paintOverride && !layoutOverride) {
       return layer;
     }
 
-    // Only paint is merged – layout is preserved by identity.
     return {
       ...layer,
-      paint: {
-        ...layer.paint,
-        ...paintOverride,
-      },
+      ...(layoutOverride
+        ? {
+            layout: {
+              ...layer.layout,
+              ...layoutOverride,
+            },
+          }
+        : {}),
+      ...(paintOverride
+        ? {
+            paint: {
+              ...layer.paint,
+              ...paintOverride,
+            },
+          }
+        : {}),
     };
   });
 }
 
 /**
- * Applies the descriptor's label paint policy to a live map instance.
+ * Applies the descriptor's label paint and layout policies to a live map instance.
  * Used post-load after the style is already active.
  *
  * @param {Object} params
@@ -100,7 +133,7 @@ export function applyLabelPolicyToStyle({ style, descriptor, baseSourceIds }) {
  * @param {Set<string>} params.baseSourceIds - Base source IDs for the current style.
  */
 export function applyLabelPolicyToMap({ map, descriptor, baseSourceIds }) {
-  if (!map?.getLayer || !map?.setPaintProperty) return;
+  if (!map?.getLayer) return;
 
   const style = map.getStyle?.();
   if (!style?.layers) return;
@@ -110,14 +143,25 @@ export function applyLabelPolicyToMap({ map, descriptor, baseSourceIds }) {
     if (!map.getLayer(layer.id)) return;
 
     const paintOverride = getLabelPaintOverride(descriptor, layer.id);
-    if (!paintOverride) return;
+    if (paintOverride && map.setPaintProperty) {
+      try {
+        Object.entries(paintOverride).forEach(([property, value]) => {
+          map.setPaintProperty(layer.id, property, value);
+        });
+      } catch {
+        // Ignore layers that do not support text paint properties.
+      }
+    }
 
-    try {
-      Object.entries(paintOverride).forEach(([property, value]) => {
-        map.setPaintProperty(layer.id, property, value);
-      });
-    } catch {
-      // Ignore layers that do not support text paint properties.
+    const layoutOverride = getLabelLayoutOverride(descriptor, layer.id);
+    if (layoutOverride && map.setLayoutProperty) {
+      try {
+        Object.entries(layoutOverride).forEach(([property, value]) => {
+          map.setLayoutProperty(layer.id, property, value);
+        });
+      } catch {
+        // Ignore layers that do not support text layout properties.
+      }
     }
   });
 }

@@ -361,7 +361,7 @@ describe("DualMaps style toggle transform", () => {
       "place_markers",
       "place_town",
     ]);
-    expect(transformed.layers.find((layer) => layer.id === "place_town").layout).toBe(incomingLayout);
+    expect(transformed.layers.find((layer) => layer.id === "place_town").layout["text-font"]).toEqual(["Noto Sans Bold"]);
 
     unmount();
 

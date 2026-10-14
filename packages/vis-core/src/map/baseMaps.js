@@ -16,6 +16,12 @@ const PLACE_LABELS = {
   layerPrefixes: ["place_", "place-"],
 };
 
+const BOLD_PLACE_LABEL_LAYOUT = {
+  default: {
+    "text-font": ["Noto Sans Bold"],
+  },
+};
+
 const DARK_LABEL_PAINT = {
   default: {
     "text-color": "#ffffff",
@@ -45,6 +51,7 @@ export const BASE_MAPS = {
       `https://maps.geoapify.com/v1/styles/positron/style.json?apiKey=${getMapApiToken()}`,
     labels: {
       ...PLACE_LABELS,
+      layout: BOLD_PLACE_LABEL_LAYOUT,
       paint: "provider",
     },
   },
@@ -56,6 +63,7 @@ export const BASE_MAPS = {
     resolveStyle: () => "https://tiles.openfreemap.org/styles/dark",
     labels: {
       ...PLACE_LABELS,
+      layout: BOLD_PLACE_LABEL_LAYOUT,
       paint: DARK_LABEL_PAINT,
     },
   },

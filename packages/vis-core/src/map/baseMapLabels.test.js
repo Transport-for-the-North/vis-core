@@ -1,6 +1,7 @@
 import {
   isBaseLabelLayer,
   getLabelPaintOverride,
+  getLabelLayoutOverride,
   applyLabelPolicyToStyle,
   applyLabelPolicyToMap,
 } from "./baseMapLabels";
@@ -76,8 +77,56 @@ describe("baseMapLabels", () => {
     });
   });
 
+  describe("getLabelLayoutOverride", () => {
+    it("returns null when layout policy is 'provider' or missing", () => {
+      expect(getLabelLayoutOverride({ labels: { layout: "provider" } }, "place_city")).toBeNull();
+      expect(getLabelLayoutOverride({}, "place_city")).toBeNull();
+    });
+
+    it("returns layout overrides for positron and darkMatter", () => {
+      expect(getLabelLayoutOverride(BASE_MAPS.positron, "place_city")).toEqual({
+        "text-font": ["Noto Sans Bold"],
+      });
+      expect(getLabelLayoutOverride(BASE_MAPS.darkMatter, "place_city")).toEqual({
+        "text-font": ["Noto Sans Bold"],
+      });
+    });
+  });
+
   describe("applyLabelPolicyToStyle", () => {
     it("preserves layout object identity and leaves paint unchanged for provider policy", () => {
+      const layoutObj = { "text-field": "{name}", "text-size": 12 };
+      const originalPaint = { "text-color": "#333333" };
+      const incomingStyle = {
+        layers: [
+          {
+            id: "place_city",
+            type: "symbol",
+            source: "openmaptiles",
+            layout: layoutObj,
+            paint: originalPaint,
+          },
+        ],
+      };
+      const providerDescriptor = {
+        labels: {
+          layerPrefixes: ["place_"],
+          layout: "provider",
+          paint: "provider",
+        },
+      };
+
+      const result = applyLabelPolicyToStyle({
+        style: incomingStyle,
+        descriptor: providerDescriptor,
+        baseSourceIds,
+      });
+
+      expect(result[0].layout).toBe(layoutObj);
+      expect(result[0].paint).toBe(originalPaint);
+    });
+
+    it("applies light layout override while keeping provider paint", () => {
       const layoutObj = { "text-field": "{name}", "text-size": 12 };
       const originalPaint = { "text-color": "#333333" };
       const incomingStyle = {
@@ -98,11 +147,12 @@ describe("baseMapLabels", () => {
         baseSourceIds,
       });
 
-      expect(result[0].layout).toBe(layoutObj);
+      expect(result[0].layout["text-font"]).toEqual(["Noto Sans Bold"]);
+      expect(result[0].layout["text-size"]).toBe(12);
       expect(result[0].paint).toBe(originalPaint);
     });
 
-    it("applies dark paint overrides while preserving layout object identity", () => {
+    it("applies dark paint and layout overrides", () => {
       const layoutObj = { "text-field": "{name}", "text-size": 14 };
       const incomingStyle = {
         layers: [
@@ -122,15 +172,17 @@ describe("baseMapLabels", () => {
         baseSourceIds,
       });
 
-      expect(result[0].layout).toBe(layoutObj);
+      expect(result[0].layout["text-font"]).toEqual(["Noto Sans Bold"]);
+      expect(result[0].layout["text-size"]).toBe(14);
       expect(result[0].paint["text-color"]).toBe("#ffffff");
       expect(result[0].paint["text-halo-width"]).toBe(1.5);
     });
   });
 
   describe("applyLabelPolicyToMap", () => {
-    it("applies paint overrides to map instance", () => {
+    it("applies paint and layout overrides to map instance", () => {
       const setPaintProperty = jest.fn();
+      const setLayoutProperty = jest.fn();
       const map = {
         getStyle: () => ({
           layers: [
@@ -143,6 +195,7 @@ describe("baseMapLabels", () => {
         }),
         getLayer: (id) => (id === "place_city" ? { id } : null),
         setPaintProperty,
+        setLayoutProperty,
       };
 
       applyLabelPolicyToMap({
@@ -151,8 +204,21 @@ describe("baseMapLabels", () => {
         baseSourceIds,
       });
 
-      expect(setPaintProperty).toHaveBeenCalledWith("place_city", "text-color", "#ffffff");
-      expect(setPaintProperty).toHaveBeenCalledWith("place_city", "text-halo-width", 1.5);
+      expect(setLayoutProperty).toHaveBeenCalledWith(
+        "place_city",
+        "text-font",
+        ["Noto Sans Bold"]
+      );
+      expect(setPaintProperty).toHaveBeenCalledWith(
+        "place_city",
+        "text-color",
+        "#ffffff"
+      );
+      expect(setPaintProperty).toHaveBeenCalledWith(
+        "place_city",
+        "text-halo-width",
+        1.5
+      );
     });
   });
 });

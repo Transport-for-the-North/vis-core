@@ -105,16 +105,45 @@ describe("mergeBaseMapStyle", () => {
     expect(placeCityIndex).toBeLessThan(appFillIndex);
   });
 
-  it("preserves incoming glyph layout by identity", () => {
+  it("preserves incoming glyph layout by identity when layout policy is provider", () => {
+    const providerDescriptor = {
+      ...BASE_MAPS.positron,
+      labels: {
+        ...BASE_MAPS.positron.labels,
+        layout: "provider",
+      },
+    };
     const merged = mergeBaseMapStyle({
+      previousStyle,
+      incomingStyle,
+      previousBaseSourceIds,
+      descriptor: providerDescriptor,
+    });
+
+    const placeCity = merged.layers.find((l) => l.id === "place_city");
+    expect(placeCity.layout).toBe(incomingLayout);
+  });
+
+  it("applies light and dark label layout overrides", () => {
+    const mergedLight = mergeBaseMapStyle({
+      previousStyle,
+      incomingStyle,
+      previousBaseSourceIds,
+      descriptor: BASE_MAPS.positron,
+    });
+    const lightCity = mergedLight.layers.find((l) => l.id === "place_city");
+    expect(lightCity.layout["text-font"]).toEqual(["Noto Sans Bold"]);
+    expect(lightCity.layout["text-size"]).toBe(incomingLayout["text-size"]);
+
+    const mergedDark = mergeBaseMapStyle({
       previousStyle,
       incomingStyle,
       previousBaseSourceIds,
       descriptor: BASE_MAPS.darkMatter,
     });
-
-    const placeCity = merged.layers.find((l) => l.id === "place_city");
-    expect(placeCity.layout).toBe(incomingLayout);
+    const darkCity = mergedDark.layers.find((l) => l.id === "place_city");
+    expect(darkCity.layout["text-font"]).toEqual(["Noto Sans Bold"]);
+    expect(darkCity.layout["text-size"]).toBe(incomingLayout["text-size"]);
   });
 
   it("applies dark label paint overrides and leaves light provider paint unchanged", () => {
