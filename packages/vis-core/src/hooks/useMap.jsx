@@ -27,6 +27,8 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
   useEffect(() => {
     // Will be assigned after Map construction; transformRequest can still close over it.
     let mapInstance = null;
+    let cleanupLayout = () => {};
+
     /**
      * Initializes the MapLibre map instance.
      */
@@ -44,8 +46,8 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
           const wrapper = document.createElement('div');
           wrapper.className = 'map-stack';
           const parent = container.parentElement;
-          parent.insertBefore(wrapper, container); 
-          wrapper.appendChild(container);            
+          parent.insertBefore(wrapper, container);
+          wrapper.appendChild(container);
           stack = wrapper;
         }
 
@@ -116,6 +118,7 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
             new Set(Object.keys(style.sources))
           );
         }
+
         setIsMapStyleLoaded(true);
       });
       mapInstance.on("load", () => {
@@ -209,11 +212,18 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
         mapInstance.touchZoomRotate.disableRotation(); // optional
       }
 
-      if (mql?.removeEventListener) mql.removeEventListener('change', onMqChange);
+      // Keep listeners active until the effect is cleaned up.
+      cleanupLayout = () => {
+        if (mql.removeEventListener) {
+          mql.removeEventListener('change', onMqChange);
+        } else {
+          mql.removeListener(onMqChange);
+        }
 
-      if (ro) ro.disconnect();
-      window.removeEventListener('resize', updateNavOffset);
-      window.removeEventListener('orientationchange', updateNavOffset);
+        if (ro) ro.disconnect();
+        window.removeEventListener('resize', updateNavOffset);
+        window.removeEventListener('orientationchange', updateNavOffset);
+      };
 
       setMap(mapInstance);
     };
@@ -221,6 +231,8 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
     initializeMap();
 
     return () => {
+      cleanupLayout();
+
       if (mapInstance) {
         mapInstance.remove();
         setMap(null);
