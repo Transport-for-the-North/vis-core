@@ -21,6 +21,7 @@ export * from './getByPath'
 export * from './openApiValidation'
 export * from './mapSpiders'
 export * from './svgGalleryManagerHelpers'
+export * from './cookieConsent'
 export * from './adminPage'
 // Only the invalidator is re-exported: consuming apps need it (registering a scenario changes
 // what the metadata endpoints return), but vis-core's own modules import the cache directly
