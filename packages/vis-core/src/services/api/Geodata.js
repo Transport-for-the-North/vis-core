@@ -16,17 +16,20 @@ function parseVectorTilePath(path) {
   const url = new URL(`http://example.com${path}`);
   const pathParts = url.pathname.split('/');
 
-  if (pathParts[2] !== 'vectortiles') {
+  // Usually /api/vectortiles/...; app-specific routes such as /api/norms/vectortiles/...
+  // sit under a longer prefix, which the feature lookups below reuse.
+  const tilesIndex = pathParts.indexOf('vectortiles', 2);
+  if (tilesIndex === -1) {
     throw new Error('Path must be for vectortiles.');
   }
 
   const isZonePath = pathParts.includes('zones');
-  const tableName = isZonePath ? 'zones' : pathParts[3];
+  const tableName = isZonePath ? 'zones' : pathParts[tilesIndex + 1];
 
-  const result = { tableName };
+  const result = { tableName, prefix: pathParts.slice(0, tilesIndex).join('/'), search: url.search };
 
   if (isZonePath) {
-    const zoneTypeId = pathParts[4];
+    const zoneTypeId = pathParts[tilesIndex + 2];
     result.zoneTypeId = zoneTypeId;
   }
 
@@ -41,6 +44,18 @@ function parseVectorTilePath(path) {
   }
 
   return result;
+}
+
+const DEFAULT_TILE_PREFIX = '/api';
+
+/**
+ * Query string to send with a feature lookup. Paths under the default prefix send none, as before;
+ * prefixed paths pass on the tile path's own query string (e.g. network_spec), repeated keys included.
+ * @param {Object} parsedPath - The result of parseVectorTilePath.
+ * @returns {string} The query string, including its leading '?', or ''.
+ */
+function featureLookupQuery({ prefix, search }) {
+  return prefix === DEFAULT_TILE_PREFIX ? '' : search;
 }
 
 /**
@@ -141,7 +156,11 @@ class GeodataService extends BaseService {
    */
   async fetchMetadataFromPath(path) {
     const parsedParams = parseVectorTilePath(path);
-    const { tableName, zoneTypeId, queryParams } = parsedParams;
+    const { tableName, zoneTypeId, queryParams, prefix } = parsedParams;
+
+    if (prefix !== DEFAULT_TILE_PREFIX) {
+      return await this.get(`${prefix}/spatialdatafeatures/features/${tableName}${featureLookupQuery(parsedParams)}`);
+    }
     const options = {
       ...(zoneTypeId !== undefined && { zoneTypeId }),
       ...queryParams
@@ -158,10 +177,10 @@ class GeodataService extends BaseService {
    */
   async getFeatureGeometryCentroid(path, featureId) {
     const parsedParams = parseVectorTilePath(path);
-    const { tableName } = parsedParams;
+    const { tableName, prefix } = parsedParams;
 
     try {
-      const responseObj = await this.get(`/api/spatialdatafeaturegeometry/centroid/${tableName}/${featureId}`);
+      const responseObj = await this.get(`${prefix}/spatialdatafeaturegeometry/centroid/${tableName}/${featureId}${featureLookupQuery(parsedParams)}`);
       // Read the geojson from the responseData - note janky handling as a result of mapping of sql result to api model
       const data = JSON.parse(responseObj.centroid)
       return data
@@ -179,10 +198,10 @@ class GeodataService extends BaseService {
    */
   async getFeatureGeometry(path, featureId) {
     const parsedParams = parseVectorTilePath(path);
-    const { tableName } = parsedParams;
+    const { tableName, prefix } = parsedParams;
 
     try {
-      const responseObj = await this.get(`/api/spatialdatafeaturegeometry/feature/${tableName}/${featureId}`);
+      const responseObj = await this.get(`${prefix}/spatialdatafeaturegeometry/feature/${tableName}/${featureId}${featureLookupQuery(parsedParams)}`);
       // Parse the response object to extract and parse the geojson strings
       const { centroid, bounds, geometry } = responseObj;
 
@@ -206,10 +225,10 @@ class GeodataService extends BaseService {
    */
   async getFeatureGeometryBounds(path, featureId) {
     const parsedParams = parseVectorTilePath(path);
-    const { tableName } = parsedParams;
+    const { tableName, prefix } = parsedParams;
 
     try {
-      const responseObj = await this.get(`/api/spatialdatafeaturegeometry/bounds/${tableName}/${featureId}`);
+      const responseObj = await this.get(`${prefix}/spatialdatafeaturegeometry/bounds/${tableName}/${featureId}${featureLookupQuery(parsedParams)}`);
       // Read the geojson from the responseData - note janky handling as a result of mapping of sql result to api model
       const data = JSON.parse(responseObj.bounds)
       return data

@@ -333,6 +333,38 @@ export const mapReducer = (state, action) => {
       // Prepare the parameters object for replacement
       const params = { [paramName]: newParamValue };
 
+      // Opt-in for dual maps: a layer with separateSidePaths keeps a separate path per side,
+      // so a "Left"/"Right" filter only changes the tiles on its own map.
+      const layer = state.layers[layerName];
+      const side = action.payload.sides;
+      if (layer.separateSidePaths && (side === "left" || side === "right")) {
+        const sidePaths = layer.sidePaths ?? { left: layer.path, right: layer.path };
+        const previousMissing = layer.sideMissingParams ?? {
+          left: layer.missingParams || [],
+          right: layer.missingParams || [],
+        };
+        const sideMissingParams = {
+          ...previousMissing,
+          [side]: previousMissing[side].filter((param) => param !== paramName),
+        };
+        return {
+          ...state,
+          layers: {
+            ...state.layers,
+            [layerName]: {
+              ...layer,
+              sidePaths: {
+                ...sidePaths,
+                [side]: updateUrlParameters(layer.pathTemplate, sidePaths[side], params),
+              },
+              sideMissingParams,
+              // The layer is added to both maps once neither side is missing anything.
+              missingParams: [...new Set([...sideMissingParams.left, ...sideMissingParams.right])],
+            },
+          },
+        };
+      }
+
       // Update the path of the layer with the new parameters
       const updatedPath = updateUrlParameters(
         state.layers[layerName].pathTemplate,
