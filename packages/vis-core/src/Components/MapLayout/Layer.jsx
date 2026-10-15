@@ -58,7 +58,22 @@ export const Layer = ({ layer }) => {
     return baseUrl;
   }, [layer.type, layer.source, layer.path]);
 
-  
+  // Opt-in for dual maps (see UPDATE_PARAMETERISED_LAYER): a layer with separateSidePaths
+  // uses its left path on maps[0] and its right path on maps[1]. Other layers use layer.path.
+  const usesSidePaths = Boolean(layer.separateSidePaths && maps?.length === 2);
+  const sideOf = (mapInstance) => (mapInstance === maps?.[0] ? "left" : "right");
+  const pathForMap = (mapInstance) =>
+    usesSidePaths ? layer.sidePaths?.[sideOf(mapInstance)] ?? layer.path : layer.path;
+  const missingParamsForMap = (mapInstance) =>
+    usesSidePaths
+      ? layer.sideMissingParams?.[sideOf(mapInstance)] ?? layer.missingParams
+      : layer.missingParams;
+  const tileUrlForMap = (mapInstance) => {
+    if (!usesSidePaths) return computedTileUrl;
+    const path = pathForMap(mapInstance);
+    return layer.source === "api" ? api.geodataService.buildTileLayerUrl(path) : path;
+  };
+
 
   useEffect(() => {
     // Determine the maps to operate on
@@ -69,8 +84,11 @@ export const Layer = ({ layer }) => {
 
 
     // If missingParams are present, remove the layer if it exists
-    if (layer.missingParams?.length > 0) {
-      targetMaps.forEach((mapInstance) => {
+    const mapsMissingParams = targetMaps.filter(
+      (mapInstance) => missingParamsForMap(mapInstance)?.length > 0
+    );
+    if (mapsMissingParams.length > 0) {
+      mapsMissingParams.forEach((mapInstance) => {
         if (!mapInstance || !mapInstance.style) return;
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
@@ -94,12 +112,12 @@ export const Layer = ({ layer }) => {
           mapInstance.removeSource(layer.name);
         }
       });
-      return; // Exit the useEffect early
+      if (mapsMissingParams.length === targetMaps.length) return; // Exit the useEffect early
     }
 
     // Check if the layer is already added to avoid duplicates
     targetMaps.forEach((mapInstance) => {
-      if (!mapInstance) return;
+      if (!mapInstance || mapsMissingParams.includes(mapInstance)) return;
 
       if (!mapInstance.getSource(layer.name)) {
         let sourceConfig = {};
@@ -131,7 +149,7 @@ export const Layer = ({ layer }) => {
           ...(layer.metadata ?? {}),
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
-          path: layer.path ?? null,
+          path: pathForMap(mapInstance) ?? null,
           legendCacheField: layer.legendCacheField ?? null,
           shouldShowInLegend: layer.shouldShowInLegend ?? (layer.isStylable ? true : false),
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true, // opacity control should appear by default
@@ -196,7 +214,7 @@ export const Layer = ({ layer }) => {
         // Handle tile layer type
         else if (layer.type === "tile") {
           const url =
-            computedTileUrl ||
+            tileUrlForMap(mapInstance) ||
             (layer.source === "api"
               ? api.geodataService.buildTileLayerUrl(layer.path)
               : layer.path);
@@ -351,7 +369,7 @@ export const Layer = ({ layer }) => {
         }
       });
     };
-  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType]);
+  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType, layer.sidePaths, layer.sideMissingParams]);
 
   // If this is a tile layer and its computed tile URL changes,
   // update the existing source tiles in-place.
@@ -368,14 +386,15 @@ export const Layer = ({ layer }) => {
       const src = mapInstance.getSource(layer.name);
       if (!src) return;
 
+      const tileUrl = tileUrlForMap(mapInstance);
       const lastUrl = lastTilesUrlByMapRef.current.get(mapInstance);
-      if (lastUrl === computedTileUrl) return;
+      if (lastUrl === tileUrl) return;
 
       // Prefer in-place update if supported by MapLibre.
       if (typeof src.setTiles === "function") {
         try {
-          src.setTiles([computedTileUrl]);
-          lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
+          src.setTiles([tileUrl]);
+          lastTilesUrlByMapRef.current.set(mapInstance, tileUrl);
           return;
         } catch (e) {
           // Fall through to remove/re-add.
@@ -403,7 +422,7 @@ export const Layer = ({ layer }) => {
 
       const sourceConfig = {
         type: "vector",
-        tiles: [computedTileUrl],
+        tiles: [tileUrl],
         promoteId: "id",
       };
       if (typeof layer.minZoom === "number") sourceConfig.minzoom = layer.minZoom;
@@ -428,7 +447,7 @@ export const Layer = ({ layer }) => {
           ...(layer.metadata ?? {}),
           ...(getLayerStyle(layer.geometryType).metadata || {}),
           isStylable: layer.isStylable ?? false,
-          path: layer.path ?? null,
+          path: pathForMap(mapInstance) ?? null,
           shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false),
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true,
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false,
@@ -502,7 +521,7 @@ export const Layer = ({ layer }) => {
       mapInstance.addLayer(selectLayerConfig);
       moveTownCityLabelsToTop(mapInstance);
 
-      lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
+      lastTilesUrlByMapRef.current.set(mapInstance, tileUrl);
     });
   }, [map, maps, layer, computedTileUrl]);
 
