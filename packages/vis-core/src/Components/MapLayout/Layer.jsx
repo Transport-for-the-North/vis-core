@@ -64,10 +64,8 @@ export const Layer = ({ layer }) => {
   const sideOf = (mapInstance) => (mapInstance === maps?.[0] ? "left" : "right");
   const pathForMap = (mapInstance) =>
     usesSidePaths ? layer.sidePaths?.[sideOf(mapInstance)] ?? layer.path : layer.path;
-  const missingParamsForMap = (mapInstance) =>
-    usesSidePaths
-      ? layer.sideMissingParams?.[sideOf(mapInstance)] ?? layer.missingParams
-      : layer.missingParams;
+  // Such a layer's path never changes, so re-add it when its params arrive; null for other layers.
+  const sidePathsMissingCount = usesSidePaths ? layer.missingParams?.length ?? 0 : null;
   const tileUrlForMap = (mapInstance) => {
     if (!usesSidePaths) return computedTileUrl;
     const path = pathForMap(mapInstance);
@@ -84,11 +82,8 @@ export const Layer = ({ layer }) => {
 
 
     // If missingParams are present, remove the layer if it exists
-    const mapsMissingParams = targetMaps.filter(
-      (mapInstance) => missingParamsForMap(mapInstance)?.length > 0
-    );
-    if (mapsMissingParams.length > 0) {
-      mapsMissingParams.forEach((mapInstance) => {
+    if (layer.missingParams?.length > 0) {
+      targetMaps.forEach((mapInstance) => {
         if (!mapInstance || !mapInstance.style) return;
         if (mapInstance.getLayer(layer.name)) {
           mapInstance.removeLayer(layer.name);
@@ -112,12 +107,12 @@ export const Layer = ({ layer }) => {
           mapInstance.removeSource(layer.name);
         }
       });
-      if (mapsMissingParams.length === targetMaps.length) return; // Exit the useEffect early
+      return; // Exit the useEffect early
     }
 
     // Check if the layer is already added to avoid duplicates
     targetMaps.forEach((mapInstance) => {
-      if (!mapInstance || mapsMissingParams.includes(mapInstance)) return;
+      if (!mapInstance) return;
 
       if (!mapInstance.getSource(layer.name)) {
         let sourceConfig = {};
@@ -369,7 +364,7 @@ export const Layer = ({ layer }) => {
         }
       });
     };
-  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType, layer.sidePaths, layer.sideMissingParams]);
+  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType, sidePathsMissingCount]);
 
   // If this is a tile layer and its computed tile URL changes,
   // update the existing source tiles in-place.

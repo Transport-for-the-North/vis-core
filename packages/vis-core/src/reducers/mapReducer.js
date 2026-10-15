@@ -339,9 +339,13 @@ export const mapReducer = (state, action) => {
       const side = action.payload.sides;
       if (layer.separateSidePaths && (side === "left" || side === "right")) {
         const sidePaths = layer.sidePaths ?? { left: layer.path, right: layer.path };
-        const sideMissingParams = layer.sideMissingParams ?? {
+        const previousMissing = layer.sideMissingParams ?? {
           left: layer.missingParams || [],
           right: layer.missingParams || [],
+        };
+        const sideMissingParams = {
+          ...previousMissing,
+          [side]: previousMissing[side].filter((param) => param !== paramName),
         };
         return {
           ...state,
@@ -353,10 +357,9 @@ export const mapReducer = (state, action) => {
                 ...sidePaths,
                 [side]: updateUrlParameters(layer.pathTemplate, sidePaths[side], params),
               },
-              sideMissingParams: {
-                ...sideMissingParams,
-                [side]: sideMissingParams[side].filter((param) => param !== paramName),
-              },
+              sideMissingParams,
+              // The layer is added to both maps once neither side is missing anything.
+              missingParams: [...new Set([...sideMissingParams.left, ...sideMissingParams.right])],
             },
           },
         };
