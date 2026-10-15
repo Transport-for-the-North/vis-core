@@ -8,6 +8,12 @@ import {
   getOpacityProperty,
   moveTownCityLabelsToTop,
 } from "utils";
+import { getBaseMap } from "../../map/baseMaps";
+import {
+  resolveLayerPaint,
+  resolveBoundaryColor,
+  resolveBoundaryPaint,
+} from "../../map/applicationLayerTheme";
 import { useMapContext } from "hooks/useMapContext";
 import { FilterContext } from "contexts/FilterContext";
 import { actionTypes } from "reducers/mapReducer";
@@ -38,6 +44,34 @@ export const Layer = ({ layer }) => {
   // Access the map context to get the current map instance(s)
   const { state, dispatch } = useMapContext();
   const { map, maps, paramNameToUuidMap } = state;
+
+  // Whether the dark base map is currently active
+  const currentBaseMap = getBaseMap(state.baseMapId);
+  const theme = currentBaseMap.theme;
+  const isDarkMode = theme === "dark";
+
+  /**
+   * Resolves the boundary line opacity.
+   * If boundariesOpacityMode is 'fixed', returns boundariesOpacity (or 1).
+   * Otherwise falls back to parent layer defaultOpacity or DEFAULT_LAYER_OPACITY.
+   */
+  const resolveBoundariesOpacity = () => {
+    const mode =
+      layer.boundariesOpacityMode ??
+      (layer.metadata?.boundariesOpacityMode ??
+        (layer.boundariesOpacity != null || layer.metadata?.boundariesOpacity != null
+          ? "fixed"
+          : "inherit"));
+    if (mode === "fixed") {
+      return layer.boundariesOpacity != null && !isNaN(Number(layer.boundariesOpacity))
+        ? Number(layer.boundariesOpacity)
+        : 1;
+    }
+    if (layer.defaultOpacity != null && !isNaN(Number(layer.defaultOpacity))) {
+      return Number(layer.defaultOpacity);
+    }
+    return DEFAULT_LAYER_OPACITY;
+  };
 
   // Access filters from FilterContext
   const filterContext = useContext(FilterContext);
@@ -110,7 +144,7 @@ export const Layer = ({ layer }) => {
           minzoom: layer.minZoom || 0,
           bufferSize: layer.bufferSize
         };
-        layerConfig.paint = layer.customPaint || layerConfig.paint;
+        layerConfig.paint = resolveLayerPaint({ layer, theme });
 
         // Apply defaultOpacity to the layer's paint properties if specified
         const opacityProp = getOpacityProperty(layerConfig.type);
@@ -167,11 +201,11 @@ export const Layer = ({ layer }) => {
                 layout: {
                   visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
                 },
-                paint: {
-                  "line-color": layer.boundariesColor || "#444444",
-                  "line-width": layer.boundariesWidth || 1,
-                  "line-opacity": layer.boundariesOpacity || 0.8
-                },
+                paint: resolveBoundaryPaint({
+                  layer,
+                  theme,
+                  parentOpacity: resolveBoundariesOpacity(),
+                }),
                 metadata: {
                   isStylable: false,
                 }
@@ -274,11 +308,11 @@ export const Layer = ({ layer }) => {
               layout: {
                 visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
               },
-              paint: {
-                "line-color": layer.boundariesColor || "#444444",
-                "line-width": layer.boundariesWidth || 1,
-                "line-opacity": layer.boundariesOpacity || 0.8
-              },
+              paint: resolveBoundaryPaint({
+                layer,
+                theme,
+                parentOpacity: resolveBoundariesOpacity(),
+              }),
               metadata: {
                 isStylable: false,
               }
@@ -419,7 +453,7 @@ export const Layer = ({ layer }) => {
         maxzoom: layer.maxZoom || 24,
         minzoom: layer.minZoom || 0,
         bufferSize: layer.bufferSize,
-        paint: layer.customPaint || getLayerStyle(layer.geometryType).paint,
+        paint: resolveLayerPaint({ layer, theme }),
         layout: {
           ...(getLayerStyle(layer.geometryType).layout || {}),
           visibility: layer?.hiddenByDefault ? "none" : "visible",
@@ -467,11 +501,11 @@ export const Layer = ({ layer }) => {
           layout: {
             visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
           },
-          paint: {
-            "line-color": layer.boundariesColor || "#444444",
-            "line-width": layer.boundariesWidth || 1,
-            "line-opacity": layer.boundariesOpacity || 0.8
-          },
+          paint: resolveBoundaryPaint({
+            layer,
+            theme,
+            parentOpacity: resolveBoundariesOpacity(),
+          }),
           metadata: {
             isStylable: false,
           }
@@ -504,7 +538,8 @@ export const Layer = ({ layer }) => {
 
       lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
     });
-  }, [map, maps, layer, computedTileUrl]);
+  }, [map, maps, layer, computedTileUrl, isDarkMode]);
+
 
   useEffect(() => {
     // Determine target map(s)

@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 import { DynamicLegend } from "Components/DynamicLegend/DynamicLegend";
@@ -12,6 +12,9 @@ import maplibregl from "maplibre-gl";
 import { VisualisationManager } from "./VisualisationManager";
 import { Layer } from "./Layer";
 import { SpiderLayer } from "./SpiderLayer";
+import MapStyleToggle from "./MapStyleToggle";
+import { useBaseMapTransition } from "hooks/useBaseMapTransition";
+import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
   getFeatureStateValue,
@@ -85,8 +88,20 @@ function resolveBaseLayerIdFromSpiderLayerId(layerId) {
 const Map = (props) => {
   const mapContainerRef = useRef(null);
   const { state, dispatch } = useMapContext();
-  const { mapStyle, mapCentre, mapZoom } = state;
+  const { baseMapId, mapStyle, mapCentre, mapZoom } = state;
+  const currentBaseMap = getBaseMap(baseMapId);
   const { map, isMapReady } = useMap(mapContainerRef, mapStyle, mapCentre, mapZoom, props.extraCopyrightText);
+
+  const activeMaps = useMemo(() => [map].filter(Boolean), [map]);
+
+  // Shared transition coordinator: handles setStyle, transformStyle, label policy
+  // and repaint for every base-map change. First render is suppressed because the
+  // map constructor already applied the initial style.
+  useBaseMapTransition({
+    maps: activeMaps,
+    descriptor: currentBaseMap,
+    applicationLayers: state.layers,
+  });
   const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
   const listenerCallbackRef = useRef({});
@@ -137,7 +152,6 @@ const Map = (props) => {
   const pickFeatureAtPoint = useCallback(
     (point) => {
       if (!map) return null;
-      console.log("map.getLayer(id) : ", map.getLayer("id"));
       const filterLayers = memoizedFilters
         .filter((f) => f.type === "map")
         .map((f) => f.layer)
@@ -970,7 +984,7 @@ const Map = (props) => {
         layers: layerNames,
       });
 
-      if (features.length > 0) {
+      if (features && features.length > 0) {
         // Get the top-most feature
         const feature = features[0];
         const layerId = feature.layer.id;
@@ -1475,15 +1489,16 @@ const Map = (props) => {
       dispatch({ type: actionTypes.CLEAR_BOUNDS_AND_CENTROID });
     }
   }, [map, state.mapBoundsAndCentroid, dispatch]);
-  
+
   return (
     <StyledMapContainer ref={mapContainerRef}>
-      {Object.values(state.layers).map((layer) => (
-      <React.Fragment key={layer.name}>
-        <Layer key={layer.name} layer={layer} />
+      <MapStyleToggle map={map} />
+      {Object.values(state.layers).map((layer, index) => (
+      <React.Fragment key={layer.name || layer.id || index}>
+        <Layer layer={layer} />
         { /* Create a sibling 'spider' layer for all point layers, to deal with overlaps */}
         {layer.type === 'tile' && layer.geometryType === 'point' && Boolean(layer.spiderfyOverlappingPoints) && (
-          <SpiderLayer key={`${layer.name}_spider`} baseLayerId={layer.name} />
+          <SpiderLayer key={`${layer.name || layer.id || index}_spider`} baseLayerId={layer.name || layer.id} />
         )}
       </React.Fragment>
       ))}

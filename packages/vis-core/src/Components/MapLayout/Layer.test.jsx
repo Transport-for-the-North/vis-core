@@ -15,6 +15,7 @@ jest.mock("services", () => ({
 import { render, screen, waitFor } from "@testing-library/react";
 import { Layer } from "./Layer";
 import { MapContext, FilterContext } from "contexts";
+import { mapStyles } from "defaults";
 import { api } from "services";
 
 const mockMapContext = {
@@ -129,7 +130,7 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
         layout: { visibility: "none" },
         paint: {
           "line-color": "#444444",
-          "line-opacity": 0.8,
+          "line-opacity": 0.65,
           "line-width": 1,
         },
         metadata: { isStylable: false },
@@ -595,6 +596,244 @@ describe("Cleanup function to remove layers and sources when the component unmou
     );
     expect(mockMapContext.state.maps[0].removeSource).toHaveBeenCalledWith(
       "selected-feature-source"
+    );
+  });
+});
+
+describe("Layer zone boundaries dark mode colour inversion", () => {
+  let layerProps;
+  let customMapContext;
+
+  beforeEach(() => {
+    layerProps = {
+      layer: {
+        name: "TestZones",
+        type: "tile",
+        geometryType: "polygon",
+        source: "api",
+        sourceLayer: "zones",
+        switchableBoundaries: true,
+      },
+    };
+    customMapContext = {
+      state: {
+        baseMapId: "darkMatter",
+        maps: [
+          {
+            getLayer: jest.fn(),
+            removeLayer: jest.fn(),
+            removeSource: jest.fn(),
+            getSource: jest.fn(),
+            addSource: jest.fn(),
+            addLayer: jest.fn(),
+            setPaintProperty: jest.fn(),
+            isStyleLoaded: jest.fn(() => true),
+            style: {},
+          },
+        ],
+      },
+      dispatch: jest.fn(),
+    };
+    api.geodataService.buildTileLayerUrl.mockReturnValue("/test-tiles");
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("sets zone boundaries line-color to white (#ffffff) in dark mode by default", () => {
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-color": "#ffffff",
+        }),
+      })
+    );
+  });
+
+  it("inverts custom black boundariesColor to white in dark mode", () => {
+    layerProps.layer.boundariesColor = "#000000";
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-color": "#ffffff",
+        }),
+      })
+    );
+  });
+
+  it("uses custom boundariesDarkColor when provided in dark mode", () => {
+    layerProps.layer.boundariesDarkColor = "#ff00ff";
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-color": "#ff00ff",
+        }),
+      })
+    );
+  });
+
+
+});
+
+describe("Layer zone boundaries opacity", () => {
+  let layerProps;
+  let customMapContext;
+
+  beforeEach(() => {
+    layerProps = {
+      layer: {
+        name: "TestZones",
+        type: "tile",
+        geometryType: "polygon",
+        source: "api",
+        sourceLayer: "zones",
+        switchableBoundaries: true,
+      },
+    };
+    customMapContext = {
+      state: {
+        mapStyle: mapStyles.geoapifyPositron,
+        maps: [
+          {
+            getLayer: jest.fn(),
+            removeLayer: jest.fn(),
+            removeSource: jest.fn(),
+            getSource: jest.fn(),
+            addSource: jest.fn(),
+            addLayer: jest.fn(),
+            setPaintProperty: jest.fn(),
+            isStyleLoaded: jest.fn(() => true),
+            style: {},
+          },
+        ],
+      },
+      dispatch: jest.fn(),
+    };
+    api.geodataService.buildTileLayerUrl.mockReturnValue("/test-tiles");
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("sets zone boundaries line-opacity to match layer defaultOpacity", () => {
+    layerProps.layer.defaultOpacity = 0.45;
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-opacity": 0.45,
+        }),
+      })
+    );
+  });
+
+  it("prioritises explicit boundariesOpacity over defaultOpacity", () => {
+    layerProps.layer.defaultOpacity = 0.45;
+    layerProps.layer.boundariesOpacity = 0.9;
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-opacity": 0.9,
+        }),
+      })
+    );
+  });
+
+  it("applies boundaryThemePaint overrides when configured", () => {
+    layerProps.layer.boundaryThemePaint = {
+      light: { "line-color": "#112233" },
+      dark: { "line-color": "#445566" },
+    };
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-color": "#112233",
+        }),
+      })
+    );
+  });
+
+  it("respects boundariesOpacityMode fixed", () => {
+    layerProps.layer.boundariesOpacityMode = "fixed";
+    layerProps.layer.boundariesOpacity = 0.85;
+    layerProps.layer.defaultOpacity = 0.3;
+    render(
+      <FilterContext.Provider value={mockFilterContext}>
+        <MapContext.Provider value={customMapContext}>
+          <Layer {...layerProps} />
+        </MapContext.Provider>
+      </FilterContext.Provider>
+    );
+
+    expect(customMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "TestZones-boundaries",
+        type: "line",
+        paint: expect.objectContaining({
+          "line-opacity": 0.85,
+        }),
+      })
     );
   });
 });

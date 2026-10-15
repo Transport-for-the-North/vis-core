@@ -1,4 +1,5 @@
 import { updateUrlParameters, normaliseParamValue, normaliseDisplayMode } from "utils";
+import { getBaseMap } from "../map/baseMaps";
 
 /**
  * Finds the first configured colour scheme value from filter options.
@@ -189,6 +190,7 @@ export const actionTypes = {
   MERGE_CATEGORICAL_LEGEND_CACHE: "MERGE_CATEGORICAL_LEGEND_CACHE",
   CLEAR_CATEGORICAL_LEGEND_CACHE: "CLEAR_CATEGORICAL_LEGEND_CACHE",
   TOGGLE_INVERTED_COLOR_SCHEME: "TOGGLE_INVERTED_COLOR_SCHEME",
+  SET_BASE_MAP: "SET_BASE_MAP",
 };
 
 /**
@@ -264,6 +266,7 @@ export const mapReducer = (state, action) => {
         ...state,
         layers: {},
         colorSchemesByLayer: {},
+        customColorSchemeSelectedByLayer: {},
         visualisations: {},
         filters: [],
         leftVisualisations: {},
@@ -383,6 +386,10 @@ export const mapReducer = (state, action) => {
         colorSchemesByLayer: {
           ...state.colorSchemesByLayer,
           [layerName]: color_scheme,
+        },
+        customColorSchemeSelectedByLayer: {
+          ...state.customColorSchemeSelectedByLayer,
+          [layerName]: true,
         },
       };
     }
@@ -657,6 +664,16 @@ export const mapReducer = (state, action) => {
         map: map, // Store the map instance directly in the state
         // color_scheme: colourValue, // Use either the found or default colourValue
         // class_method: "d",
+      };
+    }
+
+    case actionTypes.SET_BASE_MAP: {
+      const baseMapId = action.payload;
+      const baseMap = getBaseMap(baseMapId);
+      return {
+        ...state,
+        baseMapId,
+        mapStyle: baseMap ? baseMap.resolveStyle() : state.mapStyle,
       };
     }
 
