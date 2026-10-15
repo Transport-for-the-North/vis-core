@@ -135,6 +135,7 @@ const BandCountLabel = styled.span`
  * @param {number[]} props.bands - Array of current band threshold values.
  * @param {Function} props.onChange - Callback function invoked when user updates band values.
  * @param {boolean} props.isDiverging - Whether the color scheme is diverging (affects min band count).
+ * @param {boolean} [props.isSymmetric] - Whether editing a band mirrors the change onto the opposite band.
  * @param {boolean} [props.isCustom] - Whether the current classification method is custom.
  * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
@@ -151,6 +152,7 @@ export const BandEditor = ({
   bands,
   onChange,
   isDiverging,
+  isSymmetric = false,
   isCustom = false,
   onReset = null,
   showLabel = true,
@@ -212,6 +214,10 @@ export const BandEditor = ({
   const handleBandChange = (idx, value) => {
     const newBands = [...localBands];
     newBands[idx] = value === "" ? "" : Number(value);
+    const mirrorIdx = newBands.length - 1 - idx;
+    if (isSymmetric && mirrorIdx !== idx) {
+      newBands[mirrorIdx] = value === "" ? "" : -Number(value);
+    }
     setLocalBands(newBands);
     setHasChanges(true);
   };
@@ -219,13 +225,29 @@ export const BandEditor = ({
   /**
    * Handles changes to the number of bands.
    * Adds new bands with incremental values or truncates existing bands.
+   * Diverging bands are added to, or removed from, both ends so the scale stays centred.
    *
    * @param {Event} e - Change event from the select dropdown.
    */
   const handleBandCountChange = (e) => {
     const count = Number(e.target.value);
     let newBands = [...localBands];
-    if (count > newBands.length) {
+    if (isDiverging) {
+      const diff = Math.abs(count - newBands.length);
+      const lower = Math.floor(diff / 2);
+      const upper = diff - lower;
+      if (count > newBands.length) {
+        const first = newBands.length ? newBands[0] : 0;
+        const last = newBands.length ? newBands[newBands.length - 1] : 0;
+        newBands = [
+          ...Array.from({ length: lower }, (_, i) => first - (lower - i)),
+          ...newBands,
+          ...Array.from({ length: upper }, (_, i) => last + i + 1),
+        ];
+      } else {
+        newBands = newBands.slice(lower, newBands.length - upper);
+      }
+    } else if (count > newBands.length) {
       // Add new bands spaced by 1
       const last = newBands.length ? newBands[newBands.length - 1] : 0;
       for (let i = newBands.length; i < count; i++) {
@@ -250,7 +272,14 @@ export const BandEditor = ({
 
   // Range min/max for the band count
   const minBands = isDiverging ? 3 : 2;
-  const maxBands = 9;
+  const maxBands = Math.max(9, bands.length);
+  const bandStep = isDiverging ? 2 : 1;
+  const bandCounts = [];
+  for (let n = minBands; n <= maxBands; n += bandStep) bandCounts.push(n);
+  if (!bandCounts.includes(localBands.length)) {
+    bandCounts.push(localBands.length);
+    bandCounts.sort((a, b) => a - b);
+  }
 
   const handleResetBands = () => {
     // If the current classification is custom, delegate to parent so it can restore
@@ -282,7 +311,7 @@ export const BandEditor = ({
             value={localBands.length}
             onChange={handleBandCountChange}
           >
-            {Array.from({ length: maxBands - minBands + 1 }, (_, i) => minBands + i).map((n) => (
+            {bandCounts.map((n) => (
               <option key={n} value={n}>{n}</option>
             ))}
           </BandCountSelect>

@@ -511,6 +511,18 @@ export const LayerControlEntry = memo(
       defaultBandValues,
     ]);
 
+    // Diverging line layers are banded on magnitude (width by absolute value, colour by
+    // sign), so the editor mirrors those bands about the first one to show the full range.
+    const isLineDiverging =
+      colorStyle === "diverging" && Boolean(visualisation?.style?.includes("line"));
+    const editorBins = useMemo(
+      () =>
+        isLineDiverging
+          ? [...currentBins.slice(1).reverse().map((v) => -v), ...currentBins]
+          : currentBins,
+      [isLineDiverging, currentBins]
+    );
+
     /**
      * Toggle both the layer and its label layer visibility across all maps.
      *
@@ -815,11 +827,17 @@ export const LayerControlEntry = memo(
               )}
               <BandEditor
                 showLabel={enforceNoClassificationMethod}
-                bands={currentBins}
+                bands={editorBins}
                 onChange={(newBands) => {
-                  handleCustomBandsChange(newBands, layer.id);
+                  handleCustomBandsChange(
+                    isLineDiverging
+                      ? newBands.slice(Math.floor(newBands.length / 2))
+                      : newBands,
+                    layer.id
+                  );
                 }}
                 isDiverging={colorStyle === "diverging"}
+                isSymmetric={isLineDiverging}
                 isCustom={currentClassMethod === "c"}
                 data={bandEditorData}
                 defaultBandValues={defaultBandValues || null}
