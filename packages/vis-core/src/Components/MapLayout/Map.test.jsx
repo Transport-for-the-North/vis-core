@@ -1505,6 +1505,8 @@ describe("Map style toggle and transformStyle", () => {
     const normalTown = normalTransformed.layers.find((l) => l.id === "place_town");
     expect(normalTown.layout["text-font"]).toEqual(["Noto Sans Bold"]);
     expect(normalTown.layout["text-size"]).toBe(12);
-    expect(normalTown.paint["text-color"]).toBe("#333333");
+    expect(normalTown.paint["text-color"]).toBe("#1f1f1f");
+    expect(normalTown.paint["text-halo-color"]).toBe("rgba(255, 255, 255, 0.9)");
+    expect(normalTown.paint["text-halo-width"]).toBe(1.25);
   });
 });

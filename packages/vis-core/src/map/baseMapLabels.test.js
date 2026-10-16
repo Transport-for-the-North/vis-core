@@ -57,8 +57,19 @@ describe("baseMapLabels", () => {
   });
 
   describe("getLabelPaintOverride", () => {
-    it("returns null when paint policy is 'provider'", () => {
-      expect(getLabelPaintOverride(BASE_MAPS.positron, "place_city")).toBeNull();
+    it("returns paint overrides including byLayerId specifics for positron", () => {
+      const defaultOverride = getLabelPaintOverride(BASE_MAPS.positron, "place_village");
+      expect(defaultOverride).toEqual(
+        expect.objectContaining({
+          "text-color": "#1f1f1f",
+          "text-halo-color": "rgba(255, 255, 255, 0.9)",
+          "text-halo-width": 1.25,
+          "text-halo-blur": 0.5,
+        })
+      );
+
+      const cityOverride = getLabelPaintOverride(BASE_MAPS.positron, "place_city");
+      expect(cityOverride["text-halo-width"]).toBe(1.5);
     });
 
     it("returns paint overrides including byLayerId specifics for darkMatter", () => {
@@ -126,7 +137,7 @@ describe("baseMapLabels", () => {
       expect(result[0].paint).toBe(originalPaint);
     });
 
-    it("applies light layout override while keeping provider paint", () => {
+    it("applies light layout and paint overrides", () => {
       const layoutObj = { "text-field": "{name}", "text-size": 12 };
       const originalPaint = { "text-color": "#333333" };
       const incomingStyle = {
@@ -149,7 +160,8 @@ describe("baseMapLabels", () => {
 
       expect(result[0].layout["text-font"]).toEqual(["Noto Sans Bold"]);
       expect(result[0].layout["text-size"]).toBe(12);
-      expect(result[0].paint).toBe(originalPaint);
+      expect(result[0].paint["text-color"]).toBe("#1f1f1f");
+      expect(result[0].paint["text-halo-width"]).toBe(1.5);
     });
 
     it("applies dark paint and layout overrides", () => {

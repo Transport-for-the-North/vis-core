@@ -42,6 +42,26 @@ const DARK_LABEL_PAINT = {
   },
 };
 
+const LIGHT_LABEL_PAINT = {
+  default: {
+    "text-color": "#1f1f1f",
+    "text-halo-color": "rgba(255, 255, 255, 0.9)",
+    "text-halo-width": 1.25,
+    "text-halo-blur": 0.5,
+  },
+  byLayerId: {
+    place_city: {
+      "text-halo-width": 1.5,
+    },
+    place_city_large: {
+      "text-halo-width": 1.5,
+    },
+    place_capital: {
+      "text-halo-width": 1.5,
+    },
+  },
+};
+
 export const BASE_MAPS = {
   positron: {
     id: "positron",
@@ -52,7 +72,7 @@ export const BASE_MAPS = {
     labels: {
       ...PLACE_LABELS,
       layout: BOLD_PLACE_LABEL_LAYOUT,
-      paint: "provider",
+      paint: LIGHT_LABEL_PAINT,
     },
   },
 
