@@ -329,6 +329,41 @@ describe("Tests of reclassifyAndStyleGeoJSONMap function", () => {
       {}
     );
   });
+
+  it("styles a feature_collection object when no tile layer shares the visualisation name", () => {
+    useFetchVisualisationData.mockReturnValue({
+      data: {
+        feature_collection: JSON.stringify({
+          type: "FeatureCollection",
+          features: [{ type: "Feature", geometry: { type: "Polygon" }, properties: { category: "on time" } }],
+        }),
+      },
+      isLoading: false,
+      error: false,
+      dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
+    });
+
+    const contextWithoutMatchingLayer = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: { "Origin Zones": { name: "Origin Zones" } },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={contextWithoutMatchingLayer}>
+        <MapVisualisation {...props} />
+      </MapContext.Provider>
+    );
+
+    expect(hasAnyGeometryNotNull).toHaveBeenCalledWith({
+      type: "FeatureCollection",
+      features: [{ type: "Feature", geometry: { type: "Polygon" }, properties: { category: "on time" } }],
+    });
+  });
 });
 
 describe("reclassifyAndStyleMap is called", () => {
