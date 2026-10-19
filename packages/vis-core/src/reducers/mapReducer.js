@@ -276,6 +276,7 @@ export const mapReducer = (state, action) => {
         selectedFeatures: [],
         isFeatureSelectActive: false,
         visualisedFeatureIds: null,
+        mapBoundsAndCentroid: null,
       };
     case actionTypes.REGISTER_CATEGORICAL_LEGEND_ITEMS:
     case actionTypes.MERGE_CATEGORICAL_LEGEND_CACHE:
@@ -332,6 +333,45 @@ export const mapReducer = (state, action) => {
 
       // Prepare the parameters object for replacement
       const params = { [paramName]: newParamValue };
+
+      // Opt-in for dual maps: a layer with separateSidePaths keeps a separate path per side,
+      // so a "Left"/"Right" filter only changes the tiles on its own map. Any other filter
+      // (sides "both" or unset) changes both sides, and layer.path for single-map use.
+      const layer = state.layers[layerName];
+      if (layer.separateSidePaths) {
+        const side = action.payload.sides;
+        const isOneSide = side === "left" || side === "right";
+        const targetSides = isOneSide ? [side] : ["left", "right"];
+        const sidePaths = { ...(layer.sidePaths ?? { left: layer.path, right: layer.path }) };
+        const sideMissingParams = {
+          ...(layer.sideMissingParams ?? {
+            left: layer.missingParams || [],
+            right: layer.missingParams || [],
+          }),
+        };
+        targetSides.forEach((target) => {
+          sidePaths[target] = updateUrlParameters(layer.pathTemplate, sidePaths[target], params);
+          sideMissingParams[target] = sideMissingParams[target].filter(
+            (param) => param !== paramName
+          );
+        });
+        return {
+          ...state,
+          layers: {
+            ...state.layers,
+            [layerName]: {
+              ...layer,
+              path: isOneSide
+                ? layer.path
+                : updateUrlParameters(layer.pathTemplate, layer.path, params),
+              sidePaths,
+              sideMissingParams,
+              // The layer is added to both maps once neither side is missing anything.
+              missingParams: [...new Set([...sideMissingParams.left, ...sideMissingParams.right])],
+            },
+          },
+        };
+      }
 
       // Update the path of the layer with the new parameters
       const updatedPath = updateUrlParameters(

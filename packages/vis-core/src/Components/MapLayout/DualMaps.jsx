@@ -919,6 +919,37 @@ const DualMaps = (props) => {
     };
   }, [isMapReady, maps, handleMapClick]);
 
+  // **Pan and centre** on a feature chosen by a select-and-pan filter, as Map.jsx does.
+  // Only the left map is moved; the right map follows it through syncMaps.
+  useEffect(() => {
+    if (!leftMap || !state.mapBoundsAndCentroid) return;
+    const { centroid, bounds, layerMetadata = {} } = state.mapBoundsAndCentroid;
+
+    if (bounds && centroid) {
+      const coords = bounds.coordinates[0];
+      const lngs = coords.map((c) => c[0]);
+      const lats = coords.map((c) => c[1]);
+      const minLng = Math.min(...lngs);
+      const maxLng = Math.max(...lngs);
+      const minLat = Math.min(...lats);
+      const maxLat = Math.max(...lats);
+      const maxDiff = Math.max(maxLng - minLng, maxLat - minLat);
+
+      leftMap.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
+        padding: maxDiff < 0.01 ? 150 : maxDiff < 0.05 ? 120 : 100,
+        maxZoom: layerMetadata.zoomToFeatureMaxZoom ?? 14,
+        duration: layerMetadata.zoomToFeatureDuration ?? 1000,
+        linear: layerMetadata.zoomToFeatureLinear ?? false,
+      });
+    } else if (centroid) {
+      leftMap.panTo(centroid.coordinates, {
+        duration: layerMetadata.zoomToFeatureDuration ?? 1000,
+      });
+    }
+
+    dispatch({ type: "CLEAR_BOUNDS_AND_CENTROID" });
+  }, [leftMap, state.mapBoundsAndCentroid, dispatch]);
+
   useEffect(() => {
   if (!leftMap || !rightMap) return;
 
