@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
 import { syncMaps } from "utils";
 import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "defaults";
+import { applyLightBaseLabels, isPositronStyleUrl } from "../map/baseMapLabels";
 
 /**
  * Custom hook to manage two synchronized MapLibre maps.
@@ -33,6 +34,13 @@ export const useDualMaps = (
      */
     const initializeDualMap = () => {      
       const styleValue = typeof mapStyle === "function" ? mapStyle() : (mapStyle || defaultMapStyle);
+      const shouldApplyLightLabels = isPositronStyleUrl(styleValue);
+      const handleStyleLoad = (mapInstance) => {
+        if (shouldApplyLightLabels) {
+          applyLightBaseLabels(mapInstance);
+        }
+        setIsMapStyleLoaded(true);
+      };
       const commonOptions = {
         style: styleValue,
         center: mapCentre || defaultMapCentre,
@@ -64,7 +72,7 @@ export const useDualMaps = (
       });
       
       // Add event listeners after map creation
-      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      leftMapInstance.on("style.load", () => handleStyleLoad(leftMapInstance));
       leftMapInstance.on("load", () => {
         setIsMapLoaded(true);
       });
@@ -80,7 +88,7 @@ export const useDualMaps = (
       });
       
       // Add event listeners after map creation
-      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      rightMapInstance.on("style.load", () => handleStyleLoad(rightMapInstance));
       rightMapInstance.on("load", () => {
         setIsMapLoaded(true);
       });

@@ -5,6 +5,7 @@ import { defaultMapStyle } from "defaults";
 import { defaultMapCentre } from "defaults";
 import { defaultMapZoom } from "defaults";
 import { api } from "services";
+import { applyLightBaseLabels, isPositronStyleUrl } from "../map/baseMapLabels";
 
 /**
  * Custom hook to initialize and manage a MapLibre map.
@@ -57,6 +58,7 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       }
 
       const styleValue = typeof mapStyle === 'function' ? mapStyle() : (mapStyle || defaultMapStyle());
+      const shouldApplyLightLabels = isPositronStyleUrl(styleValue);
 
       // Compute API base once for transformRequest
       let apiBaseOrigin = null;
@@ -107,7 +109,12 @@ export const useMap = (mapContainerRef, mapStyle, mapCentre, mapZoom, extraCopyr
       });
 
       // Add event listeners after map creation
-      mapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      mapInstance.on("style.load", () => {
+        if (shouldApplyLightLabels) {
+          applyLightBaseLabels(mapInstance);
+        }
+        setIsMapStyleLoaded(true);
+      });
       mapInstance.on("load", () => {
         setIsMapLoaded(true);
       });
