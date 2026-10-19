@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
+import { AppContext } from "contexts/AppContext";
 import {
   ANALYTICS_CONSENT_ACCEPTED,
   ANALYTICS_CONSENT_REJECTED,
@@ -104,8 +105,13 @@ const AcceptButton = styled(ActionButton)`
 `;
 
 export const CookieBanner = () => {
+  const appContext = useContext(AppContext);
   const [consent, setConsent] = useState(() => getAnalyticsConsent());
   const [isOpen, setIsOpen] = useState(() => getAnalyticsConsent() === null);
+
+  const cookiePolicyLink = useMemo(() => {
+    return appContext?.footer?.cookiesLink || appContext?.footer?.cookieLink || COOKIE_POLICY_FALLBACK;
+  }, [appContext]);
 
   useEffect(() => {
     const granted = consent === ANALYTICS_CONSENT_ACCEPTED;
@@ -137,6 +143,19 @@ export const CookieBanner = () => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const handleOpenPreferences = () => {
+      setIsOpen(true);
+    };
+
+    window.addEventListener("vis:open-cookie-preferences", handleOpenPreferences);
+    return () => window.removeEventListener("vis:open-cookie-preferences", handleOpenPreferences);
+  }, []);
+
   const handleAccept = () => {
     setAnalyticsConsent(ANALYTICS_CONSENT_ACCEPTED);
     setConsent(ANALYTICS_CONSENT_ACCEPTED);
@@ -163,7 +182,7 @@ export const CookieBanner = () => {
               <p>
                 We use essential cookies to make this tool work. If you choose 'accept', we'll also use analytics cookies
                 to understand how you use the tool and improve it. See our{" "}
-                <a href={COOKIE_POLICY_FALLBACK} target="_blank" rel="noreferrer">
+                <a href={cookiePolicyLink} target="_blank" rel="noreferrer">
                   cookie policy
                 </a>{" "}
                 for more information.
