@@ -946,7 +946,9 @@ const DualMaps = (props) => {
         duration: layerMetadata.zoomToFeatureDuration ?? 1000,
       });
     }
-  }, [leftMap, state.mapBoundsAndCentroid]);
+
+    dispatch({ type: "CLEAR_BOUNDS_AND_CENTROID" });
+  }, [leftMap, state.mapBoundsAndCentroid, dispatch]);
 
   useEffect(() => {
   if (!leftMap || !rightMap) return;
