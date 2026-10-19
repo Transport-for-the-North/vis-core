@@ -894,7 +894,10 @@ export const MapVisualisation = ({
           if (parsedData) {
             reclassifyAndStyleGeoJSONMap(JSON.parse(parsedData), resolvedStyle);
           } else {
-            resetMapStyle(resolvedStyle);
+            const source = map.getSource(visualisationName);
+            if (source) {
+              source.setData({ type: "FeatureCollection", features: [] });
+            }
           }
           hasStyledLayerRef.current = true;
           break;
