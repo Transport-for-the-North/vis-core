@@ -166,10 +166,9 @@ const ImageContainer = styled.div`
   width: 50%;
   min-height: 350px;
   max-height: 350px;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
-   @media (max-width: 1366px) {
+
+  @media (max-width: 1366px) {
     width: 100%;
     min-height: auto;
     max-height: none;
@@ -323,6 +322,24 @@ const CardContent = styled.div`
     box-sizing: border-box;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
+  }
+
+  .row.small {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .row.small .card,
+  .row.small .card.small {
+    flex: 0 0 calc(50% - 8px);
+    max-width: calc(50% - 8px);
+    box-sizing: border-box;
+    margin: 0;
   }
 
   .card .label {
