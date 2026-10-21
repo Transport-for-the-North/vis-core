@@ -371,6 +371,18 @@ describe("Conditional rendering of subcomponents", () => {
     );
     expect(screen.queryByText("DynamicLegend")).not.toBeInTheDocument();
   });
+  it("does not render MapStyleToggle by default", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    expect(screen.queryByTestId("map-style-toggle-btn")).not.toBeInTheDocument();
+  });
 });
 
 describe("Hooks tests", () => {

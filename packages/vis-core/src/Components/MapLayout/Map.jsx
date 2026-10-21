@@ -1492,7 +1492,7 @@ const Map = (props) => {
 
   return (
     <StyledMapContainer ref={mapContainerRef}>
-      <MapStyleToggle map={map} />
+      {props.showMapStyleToggle && <MapStyleToggle map={map} />}
       {Object.values(state.layers).map((layer, index) => (
       <React.Fragment key={layer.name || layer.id || index}>
         <Layer layer={layer} />

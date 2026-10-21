@@ -173,4 +173,35 @@ describe("MapStyleToggle", () => {
 
     expect(container.firstChild).toBeNull();
   });
+
+  it("returns null when enabled prop is false", () => {
+    const mockContext = {
+      state: { baseMapId: "positron", mapStyle: mapStyles.geoapifyPositron },
+      dispatch: mockDispatch,
+    };
+
+    const { container } = render(
+      <MapContext.Provider value={mockContext}>
+        <MapStyleToggle map={mockMap} enabled={false} />
+      </MapContext.Provider>
+    );
+
+    expect(container.firstChild).toBeNull();
+    expect(screen.queryByTestId("map-style-toggle-btn")).not.toBeInTheDocument();
+  });
+
+  it("renders when enabled is explicitly true", () => {
+    const mockContext = {
+      state: { baseMapId: "positron", mapStyle: mapStyles.geoapifyPositron },
+      dispatch: mockDispatch,
+    };
+
+    render(
+      <MapContext.Provider value={mockContext}>
+        <MapStyleToggle map={mockMap} enabled={true} />
+      </MapContext.Provider>
+    );
+
+    expect(screen.getByTestId("map-style-toggle-btn")).toBeInTheDocument();
+  });
 });

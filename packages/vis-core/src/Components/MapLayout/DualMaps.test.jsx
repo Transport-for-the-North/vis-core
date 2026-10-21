@@ -201,6 +201,18 @@ describe("DualMaps component test", () => {
     // Check if the DynamicLegend is displayed
     expect(screen.getByText(/Dynamic Legend: right/)).toBeInTheDocument();
   });
+  it("does not render MapStyleToggle by default", () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    expect(screen.queryByTestId("map-style-toggle-btn")).not.toBeInTheDocument();
+  });
   it("Display the left map on the DynamicLegend component", () => {
     mockMapContext = {
       ...mockMapContext,

@@ -85,7 +85,7 @@ const MoonIcon = () => (
  * @param {string} [props.position="bottom-left"] - The position of the control group.
  * @returns {JSX.Element|null} The rendered toggle button portalled into the control container.
  */
-const MapStyleToggle = ({ map, position = "bottom-left" }) => {
+const MapStyleToggle = ({ map, position = "bottom-left", enabled = true }) => {
   const { state, dispatch } = useMapContext();
   const [controlElement, setControlElement] = useState(null);
 
@@ -104,7 +104,7 @@ const MapStyleToggle = ({ map, position = "bottom-left" }) => {
   }, [next, dispatch]);
 
   useEffect(() => {
-    if (!currentBaseMap || !map || typeof map.getContainer !== "function") {
+    if (!enabled || !currentBaseMap || !map || typeof map.getContainer !== "function") {
       setControlElement(null);
       return undefined;
     }
@@ -143,9 +143,9 @@ const MapStyleToggle = ({ map, position = "bottom-left" }) => {
       observer.disconnect();
       setControlElement(null);
     };
-  }, [currentBaseMap, map, position]);
+  }, [enabled, currentBaseMap, map, position]);
 
-  if (!currentBaseMap || !controlElement) return null;
+  if (!enabled || !currentBaseMap || !controlElement) return null;
 
   return createPortal(
     <MapStyleButton

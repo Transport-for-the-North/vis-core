@@ -990,7 +990,7 @@ const DualMaps = (props) => {
           />}
       </StyledMapContainer>
       <StyledMapContainer ref={rightMapContainerRef}>
-        <MapStyleToggle map={rightMap} />
+        {props.showMapStyleToggle && <MapStyleToggle map={rightMap} />}
         {Object.values(state.layers).map((layer, index) => (
           <Layer key={layer.name || layer.id || index} layer={layer} />
         ))}
