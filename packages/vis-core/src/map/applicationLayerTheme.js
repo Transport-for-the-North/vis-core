@@ -35,10 +35,10 @@ function hslToHex(h, s, l) {
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     const p = 2 * l - q;
     r = hue2rgb(p, q, h + 1 / 3);
-    r = hue2rgb(p, q, h);
+    g = hue2rgb(p, q, h);
     b = hue2rgb(p, q, h - 1 / 3);
   }
-  const toHex = (x) => Math.round(x * 255).toString(16).padStart(2, "0");
+  const toHex = (x) => (Number.isFinite(x) ? Math.min(255, Math.max(0, Math.round(x * 255))) : 0).toString(16).padStart(2, "0");
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
@@ -93,6 +93,7 @@ export function invertColorForDarkMode(color) {
   const [hDeg, s, l] = rgbToHsl(r, g, b);
   const lNew = l < 50 ? Math.max(80, 100 - l) : l;
   const hex = hslToHex(hDeg, s, lNew);
+  if (hex.includes("NaN")) return color;
   if (a < 1) {
     return hex + Math.round(a * 255).toString(16).padStart(2, "0");
   }

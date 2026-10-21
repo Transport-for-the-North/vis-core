@@ -1,4 +1,5 @@
 import {
+  invertColorForDarkMode,
   resolveLayerPaint,
   resolveBoundaryColor,
   resolveBoundaryPaint,
@@ -6,6 +7,17 @@ import {
 } from "./applicationLayerTheme";
 
 describe("applicationLayerTheme", () => {
+  describe("invertColorForDarkMode", () => {
+    it("inverts saturated colours without producing NaN", () => {
+      const saturatedColors = ["#1E90FF", "#0000FF", "rgb(30, 144, 255)"];
+      saturatedColors.forEach((color) => {
+        const inverted = invertColorForDarkMode(color);
+        expect(inverted).toBeDefined();
+        expect(inverted).not.toContain("NaN");
+        expect(inverted).toMatch(/^#[0-9a-f]{6}$/i);
+      });
+    });
+  });
   describe("resolveLayerPaint", () => {
     it("returns customPaint when provided for light theme", () => {
       const layer = {
@@ -38,6 +50,22 @@ describe("applicationLayerTheme", () => {
       };
       const paint = resolveLayerPaint({ layer, theme: "dark" });
       expect(paint["fill-color"]).toBe("#ffffff");
+    });
+
+    it("yields valid hex colors for a point layer in dark theme without NaN", () => {
+      const layer = {
+        name: "NoRMS Nodes",
+        geometryType: "point",
+        customPaint: {
+          "circle-color": "#1E90FF",
+          "circle-stroke-color": "#0000FF",
+        },
+      };
+      const paint = resolveLayerPaint({ layer, theme: "dark" });
+      expect(paint["circle-color"]).not.toContain("NaN");
+      expect(paint["circle-color"]).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(paint["circle-stroke-color"]).not.toContain("NaN");
+      expect(paint["circle-stroke-color"]).toMatch(/^#[0-9a-f]{6}$/i);
     });
   });
 
