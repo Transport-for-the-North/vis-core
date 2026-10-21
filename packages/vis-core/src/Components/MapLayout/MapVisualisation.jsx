@@ -43,12 +43,27 @@ const areNumericArraysEqual = (a, b) => {
 };
 
 /**
+ * A joined visualisation is drawable when it has records.
+ * A GeoJSON visualisation is drawable when the API returned a feature collection,
+ * either as an array of rows or as a single `{ feature_collection }` object.
+ *
+ * @param {Array|Object|null|undefined} data
+ * @returns {boolean}
+ */
+const hasDrawableVisualisationData = (data) => {
+  if (data == null) return false;
+  if (Array.isArray(data)) return data.length > 0;
+  return Boolean(data.feature_collection);
+};
+
+/**
  * Normalises a visualisation's data into an array of records safe to classify.
  *
  * `useFetchVisualisationData` already unwraps the `{ data, metadata }` envelope, so anything
  * else arriving here is an unrecognised response shape. Rather than letting it reach
  * `reclassifyData` (which calls `.map` on it), fall back to an empty array so the layer
- * renders unstyled and log the shape for diagnosis.
+ * renders unstyled and log the shape for diagnosis. A `{ feature_collection }` object is a
+ * recognised GeoJSON payload and is classified on its own path, so it is not a warning.
  *
  * @param {Array|Object|null} data - The visualisation data as returned by the fetch hook.
  * @param {string} visualisationName - Name of the visualisation, used for the warning.
@@ -58,7 +73,7 @@ const toClassifiableArray = (data, visualisationName) => {
   if (Array.isArray(data)) {
     return data;
   }
-  if (data === null || data === undefined) {
+  if (data == null || hasDrawableVisualisationData(data)) {
     return [];
   }
 
@@ -756,13 +771,15 @@ export const MapVisualisation = ({
     if (!map || !visualisation) return;
 
     const layerConfig = state.layers[layerKey];
-    if (!layerConfig) {
+    // GeoJSON draws its own source. It does not need a tile layer registered under the
+    // visualisation name. Joined visualisations do: the target layer is what gets styled.
+    if (!layerConfig && visualisation.type !== "geojson") {
       return;
     }
 
     // If the layer has missing parameters, it will not be added to the map by Layer.jsx.
     // Abort the styling process immediately to prevent infinite waiting.
-    if (layerConfig.missingParams && layerConfig.missingParams.length > 0) {
+    if (layerConfig?.missingParams && layerConfig.missingParams.length > 0) {
       setIsApplyingStyle(false);
       return;
     }
@@ -803,15 +820,14 @@ export const MapVisualisation = ({
       customBandsHasChanged ||
       invertHasChanged;
 
-    const previouslyHadNoData = 
+    const previouslyHadNoData =
       prevVisualisationDataRef.current !== undefined &&
-      (!prevVisualisationDataRef.current || prevVisualisationDataRef.current.length === 0);
-    const nowHasData = visualisationData && visualisationData.length > 0;
+      !hasDrawableVisualisationData(prevVisualisationDataRef.current);
+    const nowHasData = hasDrawableVisualisationData(visualisationData);
     const transitionedFromNoDataToData = previouslyHadNoData && nowHasData;
 
-    const isFirstRun = (!hasStyledLayerRef.current || transitionedFromNoDataToData) && 
-                      visualisationData && 
-                      visualisationData.length > 0;
+    const isFirstRun =
+      (!hasStyledLayerRef.current || transitionedFromNoDataToData) && nowHasData;
 
     const isDeferredUpdate = forceUpdateCounter > 0 && !pendingUpdateRef.current;
 
@@ -878,8 +894,12 @@ export const MapVisualisation = ({
           if (parsedData) {
             reclassifyAndStyleGeoJSONMap(JSON.parse(parsedData), resolvedStyle);
           } else {
-            resetMapStyle(resolvedStyle);
+            const source = map.getSource(visualisationName);
+            if (source) {
+              source.setData({ type: "FeatureCollection", features: [] });
+            }
           }
+          hasStyledLayerRef.current = true;
           break;
         }
         default:
