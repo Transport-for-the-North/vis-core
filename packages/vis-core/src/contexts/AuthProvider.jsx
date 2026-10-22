@@ -26,17 +26,18 @@ export const AuthProvider = ({ children }) => {
             const decodedToken = jwtDecode(jwtToken);
             const userRoles = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || [];
 
-            setUser({ username, roles: userRoles });
-            setToken(jwtToken);
-
             const tokenExpirationTime = decodedToken.exp;
 
             // Calculate the expiration date for the cookie
             const expirationDate = new Date(tokenExpirationTime * 1000);
 
-            // Set the cookie with the calculated expiration date
+            // Set the cookie with the calculated expiration date. Done before the state
+            // updates below, as role checks re-derived on a token change read the cookie.
             Cookies.set('token', jwtToken, { expires: expirationDate, secure: true, sameSite: 'Lax' });
             Cookies.set('toc', false);
+
+            setUser({ username, roles: userRoles });
+            setToken(jwtToken);
             navigate('/');
         } catch (err) {
             console.error('Login failed:', err);
@@ -45,9 +46,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logOut = () => {
+        Cookies.remove('token');
         setUser(null);
         setToken('');
-        Cookies.remove('token');
         navigate('/login');
     };
 

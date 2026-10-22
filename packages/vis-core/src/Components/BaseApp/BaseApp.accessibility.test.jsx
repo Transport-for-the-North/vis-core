@@ -61,6 +61,7 @@ jest.mock("layouts", () => ({
 jest.mock("contexts", () => ({
   AppContext: { Provider: ({ children }) => children },
   AuthProvider: ({ children }) => children,
+  useAuth: () => ({ token: "" }),
   ErrorProvider: ({ children }) => children,
 }));
 
