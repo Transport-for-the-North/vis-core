@@ -420,6 +420,22 @@ describe("HomePage test", () => {
       contactText: "contactText",
       contactEmail: "contactEmail",
       legalText: "legalText",
+      relatedApps: {
+        title: "Explore Other Apps",
+        links: [
+          {
+            label: "Accessibility Dashboard",
+            url: "https://example.com/accessibility",
+            description: "View accessibility metrics and trends",
+          },
+          {
+            label: "Demand Insights",
+            url: "https://example.com/demand",
+            description: "Explore demand scenarios",
+            openInNewTab: false,
+          },
+        ],
+      },
     };
     it("test", async () => {
       render(
@@ -457,6 +473,21 @@ describe("HomePage test", () => {
       expect(images[0]).toHaveAttribute("src", "additionalImage");
       const images2 = screen.getAllByAltText(/ image/i);
       expect(images2[0]).toHaveAttribute("src", "additionalImage");
+
+      // Related apps links from app configuration
+      expect(screen.getByText("Explore Other Apps")).toBeInTheDocument();
+      const accessibilityLink = screen.getByRole("link", {
+        name: "Open Accessibility Dashboard",
+      });
+      expect(accessibilityLink).toHaveAttribute("href", "https://example.com/accessibility");
+      expect(accessibilityLink).toHaveAttribute("target", "_blank");
+
+      const demandInsightsLink = screen.getByRole("link", {
+        name: "Open Demand Insights",
+      });
+      expect(demandInsightsLink).toHaveAttribute("href", "https://example.com/demand");
+      expect(demandInsightsLink).not.toHaveAttribute("target");
+
       // contactText
       expect(screen.getByText("contactText")).toBeInTheDocument();
       const contactEmail = screen.getByText("Email: contactEmail");
