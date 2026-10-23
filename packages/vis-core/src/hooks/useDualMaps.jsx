@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import { syncMaps } from "utils";
 import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "defaults";
+import { registerInitialBaseSources, getInitialBaseSources } from "../map/baseSources";
 
 /**
  * Custom hook to manage two synchronized MapLibre maps.
@@ -11,6 +12,7 @@ import { defaultMapStyle, defaultMapCentre, defaultMapZoom } from "defaults";
  * @param {string} mapStyle - A custom map style to be used for both maps.
  * @param {Array<number>} mapCentre - The initial map center coordinates [longitude, latitude].
  * @param {number} mapZoom - The initial map zoom level.
+ * @param {string} extraCopyrightText - Extra copyright text that needs to go in the bottom right bar.
  * @returns {Object} An object containing the left and right map instances, map style loaded state, map loaded state, and map ready state.
  */
 export const useDualMaps = (
@@ -37,11 +39,6 @@ export const useDualMaps = (
         style: styleValue,
         center: mapCentre || defaultMapCentre,
         zoom: mapZoom != null ? mapZoom : defaultMapZoom,
-        // maxZoom: 16,
-        // maxBounds: [
-        //   [ -10.76418, 49.528423 ],
-        //   [ 1.9134116, 61.331151 ]
-        // ],
         fadeDuration: 0,
         refreshExpiredTiles: false,
         maxTileCacheSize: 500,
@@ -64,7 +61,16 @@ export const useDualMaps = (
       });
       
       // Add event listeners after map creation
-      leftMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      leftMapInstance.on("style.load", () => {
+        const style = leftMapInstance.getStyle?.();
+        if (style?.sources && !getInitialBaseSources(leftMapInstance)) {
+          registerInitialBaseSources(
+            leftMapInstance,
+            new Set(Object.keys(style.sources))
+          );
+        }
+        setIsMapStyleLoaded(true);
+      });
       leftMapInstance.on("load", () => {
         setIsMapLoaded(true);
       });
@@ -80,7 +86,16 @@ export const useDualMaps = (
       });
       
       // Add event listeners after map creation
-      rightMapInstance.on("style.load", () => setIsMapStyleLoaded(true));
+      rightMapInstance.on("style.load", () => {
+        const style = rightMapInstance.getStyle?.();
+        if (style?.sources && !getInitialBaseSources(rightMapInstance)) {
+          registerInitialBaseSources(
+            rightMapInstance,
+            new Set(Object.keys(style.sources))
+          );
+        }
+        setIsMapStyleLoaded(true);
+      });
       rightMapInstance.on("load", () => {
         setIsMapLoaded(true);
       });
@@ -164,8 +179,6 @@ export const useDualMaps = (
       rightMap.setZoom(mapZoom);
     }
   }, [leftMap, rightMap, mapZoom]);
-
-
 
   return { leftMap, rightMap, isMapStyleLoaded, isMapLoaded, isMapReady };
 };

@@ -334,6 +334,8 @@ const SheetSelectorSelect = styled.select`
  *   e.g. [{ sheet: 'LPA Info', cell: 'A3', key: 'lpaName' }]
  *   Extracted values are passed to onDataChange as workbookMeta: { [key]: value }.
  * @param {boolean}  props.disabled               - Disable the component
+ * @param {Object}   props.extraMetadata          - Extra form fields sent with the file
+ * @param {React.ReactNode} props.beforeSubmit    - Content rendered immediately above the upload button
  */
 export const FileUpload = ({
   endpoint = '/api/files/upload',
@@ -351,6 +353,8 @@ export const FileUpload = ({
   disabled = false,
   successTitle = 'Upload Successful',
   successMessage = 'Your file has been received and is being processed. You will be notified once it is ready.',
+  extraMetadata = null,
+  beforeSubmit = null,
 }) => {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -801,6 +805,7 @@ export const FileUpload = ({
             fileSize: file.size,
             validationPassed: validationResult?.isValid ?? true,
             ...(selectedSheet ? { selectedSheet } : {}),
+            ...(extraMetadata || {}),
           },
           onProgress: (progress) => setUploadProgress(progress),
         });
@@ -831,6 +836,7 @@ export const FileUpload = ({
     getSchemaForSheet,
     onUploadSuccess,
     onUploadError,
+    extraMetadata,
   ]);
 
   const fileIsExcel = file ? isExcelFile(file) : false;
@@ -1026,6 +1032,8 @@ export const FileUpload = ({
               stats={validationResult.stats}
             />
           )}
+
+          {beforeSubmit}
 
           <UploadButton
             onClick={handleUpload}

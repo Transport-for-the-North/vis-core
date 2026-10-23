@@ -127,6 +127,42 @@ describe("mapReducer categorical legend cache", () => {
 
     expect(nextState.categoricalLegendCache).toEqual({});
   });
+
+  it("updates baseMapId and mapStyle atomically on SET_BASE_MAP", () => {
+    const initialState = {
+      baseMapId: "positron",
+      mapStyle: "https://maps.geoapify.com/v1/styles/positron/style.json",
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.SET_BASE_MAP,
+      payload: "darkMatter",
+    });
+
+    expect(nextState.baseMapId).toBe("darkMatter");
+    expect(nextState.mapStyle).toBe("https://tiles.openfreemap.org/styles/dark");
+  });
+
+  it("updates colour scheme and marks custom colour scheme as selected", () => {
+    const initialState = {
+      colorSchemesByLayer: {},
+      customColorSchemeSelectedByLayer: {},
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.UPDATE_COLOR_SCHEME,
+      payload: {
+        layerName: "layerA",
+        color_scheme: { value: "Purples", label: "Purples" },
+      },
+    });
+
+    expect(nextState.colorSchemesByLayer.layerA).toEqual({
+      value: "Purples",
+      label: "Purples",
+    });
+    expect(nextState.customColorSchemeSelectedByLayer.layerA).toBe(true);
+  });
 });
 
 describe("mapReducer display mode", () => {
@@ -241,3 +277,65 @@ describe("mapReducer display mode", () => {
   });
 });
 
+describe("mapReducer UPDATE_PARAMETERISED_LAYER with separateSidePaths", () => {
+  const template =
+    "/api/norms/vectortiles/links/{z}/{x}/{y}?network_spec={network_spec}&year={year}";
+  const initialState = {
+    layers: {
+      links: {
+        name: "links",
+        separateSidePaths: true,
+        pathTemplate: template,
+        path: template,
+        missingParams: ["network_spec", "year"],
+      },
+    },
+  };
+  const update = (state, paramName, value, sides) =>
+    mapReducer(state, {
+      type: actionTypes.UPDATE_PARAMETERISED_LAYER,
+      payload: { targetLayer: "links", filter: { paramName }, value, sides },
+    });
+
+  it("changes only its own side for a Left or Right filter", () => {
+    const state = update(initialState, "network_spec", "A", "left");
+    const layer = state.layers.links;
+
+    expect(layer.sidePaths.left).toContain("network_spec=A");
+    expect(layer.sidePaths.right).toContain("network_spec={network_spec}");
+    expect(layer.path).toBe(template);
+    expect(layer.sideMissingParams).toEqual({
+      left: ["year"],
+      right: ["network_spec", "year"],
+    });
+    expect(layer.missingParams).toEqual(["year", "network_spec"]);
+  });
+
+  it.each([
+    ["side filters first", [["network_spec", "A", "left"], ["year", "2030", "both"], ["network_spec", "B", "right"]]],
+    ["shared filter first", [["year", "2030", "both"], ["network_spec", "A", "left"], ["network_spec", "B", "right"]]],
+    ["shared filter without sides", [["network_spec", "A", "left"], ["year", "2030", undefined], ["network_spec", "B", "right"]]],
+  ])("resolves every param whatever the order (%s)", (_, updates) => {
+    const state = updates.reduce(
+      (current, [paramName, value, sides]) => update(current, paramName, value, sides),
+      initialState
+    );
+    const layer = state.layers.links;
+
+    expect(layer.missingParams).toEqual([]);
+    expect(layer.sidePaths.left).toContain("network_spec=A&year=2030");
+    expect(layer.sidePaths.right).toContain("network_spec=B&year=2030");
+  });
+
+  it("applies a later shared filter change to both sides and to layer.path", () => {
+    let state = update(initialState, "network_spec", "A", "left");
+    state = update(state, "network_spec", "B", "right");
+    state = update(state, "year", "2030", "both");
+    state = update(state, "year", "2040", "both");
+    const layer = state.layers.links;
+
+    expect(layer.sidePaths.left).toContain("network_spec=A&year=2040");
+    expect(layer.sidePaths.right).toContain("network_spec=B&year=2040");
+    expect(layer.path).toContain("year=2040");
+  });
+});

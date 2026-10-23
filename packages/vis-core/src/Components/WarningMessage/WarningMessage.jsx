@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const WarningMessage = styled.div`
   position: fixed;
-  top: 85px;
+  top: var(--app-overlay-top-offset, 85px);
   right: 10px;
   max-width: 20vw;
   max-height: calc(35vh);

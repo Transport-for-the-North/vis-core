@@ -83,7 +83,8 @@ const DropdownMenuScroll = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-flex;
-  width: 100%;
+  width: ${({ $shouldStretchItem }) => ($shouldStretchItem ? "100%" : "auto")};
+  min-width: ${({ $shouldStretchItem }) => ($shouldStretchItem ? "0" : "120px")};
   align-items: center;
   font-family: ${({ theme }) => theme.navFontFamily || "var(--font-sans)"};
   font-size: 16px;
@@ -132,11 +133,8 @@ const DropdownContainer = styled.div`
 const DropdownTitle = styled.span`
   flex-grow: 1;
   text-align: center;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: block;
+  overflow: visible;
   white-space: normal;
   line-height: 1.25;
   overflow-wrap: break-word;
@@ -500,6 +498,7 @@ export function NavBarDropdown({
   dropdownItems,
   activeLink,
   onClick,
+  shouldStretchItem = true,
   $bgColor,
   isActiveSuppressed = false,
   onTopLevelHoverChange = () => {},
@@ -589,6 +588,7 @@ export function NavBarDropdown({
       role="button"
       aria-expanded={open}
       aria-haspopup="menu"
+      $shouldStretchItem={shouldStretchItem}
       $bgColor={$bgColor}
       $isActive={showActive}
       $hovered={navChildHovered || containerHovered || focusWithin}

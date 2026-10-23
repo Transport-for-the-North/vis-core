@@ -8,6 +8,12 @@ import {
   getOpacityProperty,
   moveTownCityLabelsToTop,
 } from "utils";
+import { getBaseMap } from "../../map/baseMaps";
+import {
+  resolveLayerPaint,
+  resolveBoundaryColor,
+  resolveBoundaryPaint,
+} from "../../map/applicationLayerTheme";
 import { useMapContext } from "hooks/useMapContext";
 import { FilterContext } from "contexts/FilterContext";
 import { actionTypes } from "reducers/mapReducer";
@@ -39,6 +45,34 @@ export const Layer = ({ layer }) => {
   const { state, dispatch } = useMapContext();
   const { map, maps, paramNameToUuidMap } = state;
 
+  // Whether the dark base map is currently active
+  const currentBaseMap = getBaseMap(state.baseMapId);
+  const theme = currentBaseMap.theme;
+  const isDarkMode = theme === "dark";
+
+  /**
+   * Resolves the boundary line opacity.
+   * If boundariesOpacityMode is 'fixed', returns boundariesOpacity (or 1).
+   * Otherwise falls back to parent layer defaultOpacity or DEFAULT_LAYER_OPACITY.
+   */
+  const resolveBoundariesOpacity = () => {
+    const mode =
+      layer.boundariesOpacityMode ??
+      (layer.metadata?.boundariesOpacityMode ??
+        (layer.boundariesOpacity != null || layer.metadata?.boundariesOpacity != null
+          ? "fixed"
+          : "inherit"));
+    if (mode === "fixed") {
+      return layer.boundariesOpacity != null && !isNaN(Number(layer.boundariesOpacity))
+        ? Number(layer.boundariesOpacity)
+        : 1;
+    }
+    if (layer.defaultOpacity != null && !isNaN(Number(layer.defaultOpacity))) {
+      return Number(layer.defaultOpacity);
+    }
+    return DEFAULT_LAYER_OPACITY;
+  };
+
   // Access filters from FilterContext
   const filterContext = useContext(FilterContext);
   const filters = filterContext?.state || {};
@@ -58,7 +92,20 @@ export const Layer = ({ layer }) => {
     return baseUrl;
   }, [layer.type, layer.source, layer.path]);
 
-  
+  // Opt-in for dual maps (see UPDATE_PARAMETERISED_LAYER): a layer with separateSidePaths
+  // uses its left path on maps[0] and its right path on maps[1]. Other layers use layer.path.
+  const usesSidePaths = Boolean(layer.separateSidePaths && maps?.length === 2);
+  const sideOf = (mapInstance) => (mapInstance === maps?.[0] ? "left" : "right");
+  const pathForMap = (mapInstance) =>
+    usesSidePaths ? layer.sidePaths?.[sideOf(mapInstance)] ?? layer.path : layer.path;
+  // Such a layer's path never changes, so re-add it when its params arrive; null for other layers.
+  const sidePathsMissingCount = usesSidePaths ? layer.missingParams?.length ?? 0 : null;
+  const tileUrlForMap = (mapInstance) => {
+    if (!usesSidePaths) return computedTileUrl;
+    const path = pathForMap(mapInstance);
+    return layer.source === "api" ? api.geodataService.buildTileLayerUrl(path) : path;
+  };
+
 
   useEffect(() => {
     // Determine the maps to operate on
@@ -110,7 +157,7 @@ export const Layer = ({ layer }) => {
           minzoom: layer.minZoom || 0,
           bufferSize: layer.bufferSize
         };
-        layerConfig.paint = layer.customPaint || layerConfig.paint;
+        layerConfig.paint = resolveLayerPaint({ layer, theme });
 
         // Apply defaultOpacity to the layer's paint properties if specified
         const opacityProp = getOpacityProperty(layerConfig.type);
@@ -131,7 +178,7 @@ export const Layer = ({ layer }) => {
           ...(layer.metadata ?? {}),
           ...layerConfig.metadata,
           isStylable: layer.isStylable ?? false,
-          path: layer.path ?? null,
+          path: pathForMap(mapInstance) ?? null,
           legendCacheField: layer.legendCacheField ?? null,
           shouldShowInLegend: layer.shouldShowInLegend ?? (layer.isStylable ? true : false),
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true, // opacity control should appear by default
@@ -167,11 +214,11 @@ export const Layer = ({ layer }) => {
                 layout: {
                   visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
                 },
-                paint: {
-                  "line-color": layer.boundariesColor || "#444444",
-                  "line-width": layer.boundariesWidth || 1,
-                  "line-opacity": layer.boundariesOpacity || 0.8
-                },
+                paint: resolveBoundaryPaint({
+                  layer,
+                  theme,
+                  parentOpacity: resolveBoundariesOpacity(),
+                }),
                 metadata: {
                   isStylable: false,
                 }
@@ -196,7 +243,7 @@ export const Layer = ({ layer }) => {
         // Handle tile layer type
         else if (layer.type === "tile") {
           const url =
-            computedTileUrl ||
+            tileUrlForMap(mapInstance) ||
             (layer.source === "api"
               ? api.geodataService.buildTileLayerUrl(layer.path)
               : layer.path);
@@ -274,11 +321,11 @@ export const Layer = ({ layer }) => {
               layout: {
                 visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
               },
-              paint: {
-                "line-color": layer.boundariesColor || "#444444",
-                "line-width": layer.boundariesWidth || 1,
-                "line-opacity": layer.boundariesOpacity || 0.8
-              },
+              paint: resolveBoundaryPaint({
+                layer,
+                theme,
+                parentOpacity: resolveBoundariesOpacity(),
+              }),
               metadata: {
                 isStylable: false,
               }
@@ -351,7 +398,7 @@ export const Layer = ({ layer }) => {
         }
       });
     };
-  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType]);
+  }, [map, maps, layer.name, layer.path, layer.type, layer.geometryType, sidePathsMissingCount]);
 
   // If this is a tile layer and its computed tile URL changes,
   // update the existing source tiles in-place.
@@ -368,14 +415,15 @@ export const Layer = ({ layer }) => {
       const src = mapInstance.getSource(layer.name);
       if (!src) return;
 
+      const tileUrl = tileUrlForMap(mapInstance);
       const lastUrl = lastTilesUrlByMapRef.current.get(mapInstance);
-      if (lastUrl === computedTileUrl) return;
+      if (lastUrl === tileUrl) return;
 
       // Prefer in-place update if supported by MapLibre.
       if (typeof src.setTiles === "function") {
         try {
-          src.setTiles([computedTileUrl]);
-          lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
+          src.setTiles([tileUrl]);
+          lastTilesUrlByMapRef.current.set(mapInstance, tileUrl);
           return;
         } catch (e) {
           // Fall through to remove/re-add.
@@ -403,7 +451,7 @@ export const Layer = ({ layer }) => {
 
       const sourceConfig = {
         type: "vector",
-        tiles: [computedTileUrl],
+        tiles: [tileUrl],
         promoteId: "id",
       };
       if (typeof layer.minZoom === "number") sourceConfig.minzoom = layer.minZoom;
@@ -419,7 +467,7 @@ export const Layer = ({ layer }) => {
         maxzoom: layer.maxZoom || 24,
         minzoom: layer.minZoom || 0,
         bufferSize: layer.bufferSize,
-        paint: layer.customPaint || getLayerStyle(layer.geometryType).paint,
+        paint: resolveLayerPaint({ layer, theme }),
         layout: {
           ...(getLayerStyle(layer.geometryType).layout || {}),
           visibility: layer?.hiddenByDefault ? "none" : "visible",
@@ -428,7 +476,7 @@ export const Layer = ({ layer }) => {
           ...(layer.metadata ?? {}),
           ...(getLayerStyle(layer.geometryType).metadata || {}),
           isStylable: layer.isStylable ?? false,
-          path: layer.path ?? null,
+          path: pathForMap(mapInstance) ?? null,
           shouldShowInLegend: layer.shouldShowInLegend || (layer.isStylable ? true : false),
           shouldHaveOpacityControl: layer.shouldHaveOpacityControl ?? true,
           enforceNoColourSchemeSelector: layer.enforceNoColourSchemeSelector ?? false,
@@ -467,11 +515,11 @@ export const Layer = ({ layer }) => {
           layout: {
             visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
           },
-          paint: {
-            "line-color": layer.boundariesColor || "#444444",
-            "line-width": layer.boundariesWidth || 1,
-            "line-opacity": layer.boundariesOpacity || 0.8
-          },
+          paint: resolveBoundaryPaint({
+            layer,
+            theme,
+            parentOpacity: resolveBoundariesOpacity(),
+          }),
           metadata: {
             isStylable: false,
           }
@@ -502,9 +550,10 @@ export const Layer = ({ layer }) => {
       mapInstance.addLayer(selectLayerConfig);
       moveTownCityLabelsToTop(mapInstance);
 
-      lastTilesUrlByMapRef.current.set(mapInstance, computedTileUrl);
+      lastTilesUrlByMapRef.current.set(mapInstance, tileUrl);
     });
-  }, [map, maps, layer, computedTileUrl]);
+  }, [map, maps, layer, computedTileUrl, isDarkMode]);
+
 
   useEffect(() => {
     // Determine target map(s)

@@ -20,16 +20,14 @@ import chroma from "chroma-js";
 import { useFetchVisualisationData } from "hooks/useFetchVisualisationData";
 import { useFeatureStateUpdater } from "hooks/useFeatureStateUpdater";
 import { useVisualisationLoadingCounter } from "hooks/useVisualisationLoadingCounter"; // Import the custom hook
+import { registerMapRestorer } from "../../map/runtimeRestorationRegistry";
 import { defaultMapColourMapper } from "defaults";
 import { DataFetchState } from "enums";
 
 // Constants
 const DEFAULT_OPACITY = 0.65;
 const DEFAULT_COLOR_STYLE = "continuous";
-const LAYER_RETRY_CONFIG = {
-  maxRetries: 10,
-  retryDelay: 200,
-};
+
 
 const areNumericArraysEqual = (a, b) => {
   if (a === b) return true;
@@ -43,12 +41,27 @@ const areNumericArraysEqual = (a, b) => {
 };
 
 /**
+ * A joined visualisation is drawable when it has records.
+ * A GeoJSON visualisation is drawable when the API returned a feature collection,
+ * either as an array of rows or as a single `{ feature_collection }` object.
+ *
+ * @param {Array|Object|null|undefined} data
+ * @returns {boolean}
+ */
+const hasDrawableVisualisationData = (data) => {
+  if (data == null) return false;
+  if (Array.isArray(data)) return data.length > 0;
+  return Boolean(data.feature_collection);
+};
+
+/**
  * Normalises a visualisation's data into an array of records safe to classify.
  *
  * `useFetchVisualisationData` already unwraps the `{ data, metadata }` envelope, so anything
  * else arriving here is an unrecognised response shape. Rather than letting it reach
  * `reclassifyData` (which calls `.map` on it), fall back to an empty array so the layer
- * renders unstyled and log the shape for diagnosis.
+ * renders unstyled and log the shape for diagnosis. A `{ feature_collection }` object is a
+ * recognised GeoJSON payload and is classified on its own path, so it is not a warning.
  *
  * @param {Array|Object|null} data - The visualisation data as returned by the fetch hook.
  * @param {string} visualisationName - Name of the visualisation, used for the warning.
@@ -58,7 +71,7 @@ const toClassifiableArray = (data, visualisationName) => {
   if (Array.isArray(data)) {
     return data;
   }
-  if (data === null || data === undefined) {
+  if (data == null || hasDrawableVisualisationData(data)) {
     return [];
   }
 
@@ -198,6 +211,7 @@ export const MapVisualisation = ({
   const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   
   // Ref to track if the layer has been styled
+  const LAYER_RETRY_CONFIG = { maxRetries: 10, retryDelay: 200 };
   const hasStyledLayerRef = useRef(false);
 
   // State for tracking resolved dynamic styles
@@ -205,7 +219,7 @@ export const MapVisualisation = ({
   const [isResolvingStyle, setIsResolvingStyle] = useState(false);
   const [isApplyingStyle, setIsApplyingStyle] = useState(false);
 
-  const { addFeaturesToMap } = useFeatureStateUpdater();
+  const { addFeaturesToMap, replayLayerState } = useFeatureStateUpdater();
 
   // Determine the visualisation based on side (left, right, or single)
   const visualisation = useMemo(() => {
@@ -493,8 +507,12 @@ export const MapVisualisation = ({
       // Calculate the color palette based on the classification
       const invertColorScheme = state.layers[layerKey]?.invertedColorScheme === true;
 
+      const isCustomColorSchemeSelected = Boolean(
+        state.customColorSchemeSelectedByLayer?.[layerKey]
+      );
+
       let colourPalette;
-      if (metric?.colours?.length === reclassifiedData.length) {
+      if (!isCustomColorSchemeSelected && metric?.colours?.length === reclassifiedData.length) {
         colourPalette = metric.colours;
       } else {
         colourPalette = calculateColours(currentColor, reclassifiedData, invertColorScheme);
@@ -756,13 +774,15 @@ export const MapVisualisation = ({
     if (!map || !visualisation) return;
 
     const layerConfig = state.layers[layerKey];
-    if (!layerConfig) {
+    // GeoJSON draws its own source. It does not need a tile layer registered under the
+    // visualisation name. Joined visualisations do: the target layer is what gets styled.
+    if (!layerConfig && visualisation.type !== "geojson") {
       return;
     }
 
     // If the layer has missing parameters, it will not be added to the map by Layer.jsx.
     // Abort the styling process immediately to prevent infinite waiting.
-    if (layerConfig.missingParams && layerConfig.missingParams.length > 0) {
+    if (layerConfig?.missingParams && layerConfig.missingParams.length > 0) {
       setIsApplyingStyle(false);
       return;
     }
@@ -803,15 +823,14 @@ export const MapVisualisation = ({
       customBandsHasChanged ||
       invertHasChanged;
 
-    const previouslyHadNoData = 
+    const previouslyHadNoData =
       prevVisualisationDataRef.current !== undefined &&
-      (!prevVisualisationDataRef.current || prevVisualisationDataRef.current.length === 0);
-    const nowHasData = visualisationData && visualisationData.length > 0;
+      !hasDrawableVisualisationData(prevVisualisationDataRef.current);
+    const nowHasData = hasDrawableVisualisationData(visualisationData);
     const transitionedFromNoDataToData = previouslyHadNoData && nowHasData;
 
-    const isFirstRun = (!hasStyledLayerRef.current || transitionedFromNoDataToData) && 
-                      visualisationData && 
-                      visualisationData.length > 0;
+    const isFirstRun =
+      (!hasStyledLayerRef.current || transitionedFromNoDataToData) && nowHasData;
 
     const isDeferredUpdate = forceUpdateCounter > 0 && !pendingUpdateRef.current;
 
@@ -878,8 +897,12 @@ export const MapVisualisation = ({
           if (parsedData) {
             reclassifyAndStyleGeoJSONMap(JSON.parse(parsedData), resolvedStyle);
           } else {
-            resetMapStyle(resolvedStyle);
+            const source = map.getSource(visualisationName);
+            if (source) {
+              source.setData({ type: "FeatureCollection", features: [] });
+            }
           }
+          hasStyledLayerRef.current = true;
           break;
         }
         default:
@@ -967,6 +990,27 @@ export const MapVisualisation = ({
       setForceUpdateCounter((prev) => prev + 1);
     }
   }, [isResolvingStyle, resolvedStyle, colorStyle]);
+
+  // Register a feature-state restorer with the central registry.
+  // The transition coordinator (useBaseMapTransition) runs all registered
+  // restorers after each style reload — without MapVisualisation needing to
+  // listen for style.load directly.
+  useEffect(() => {
+    if (!map || !layerKey) return undefined;
+
+    const restore = () => replayLayerState(map, state.layers, layerKey);
+
+    return registerMapRestorer(
+      map,
+      `feature-state:${layerKey}`,
+      restore
+    );
+  }, [
+    map,
+    layerKey,
+    replayLayerState,
+    state.layers,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {

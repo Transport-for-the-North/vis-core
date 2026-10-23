@@ -22,6 +22,11 @@ import {
   reclassifyGeoJSONData,
   reclassifyData,
 } from "utils";
+import { registerMapRestorer } from "../../map/runtimeRestorationRegistry";
+
+jest.mock("../../map/runtimeRestorationRegistry", () => ({
+  registerMapRestorer: jest.fn(() => jest.fn()),
+}));
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -329,6 +334,41 @@ describe("Tests of reclassifyAndStyleGeoJSONMap function", () => {
       {}
     );
   });
+
+  it("styles a feature_collection object when no tile layer shares the visualisation name", () => {
+    useFetchVisualisationData.mockReturnValue({
+      data: {
+        feature_collection: JSON.stringify({
+          type: "FeatureCollection",
+          features: [{ type: "Feature", geometry: { type: "Polygon" }, properties: { category: "on time" } }],
+        }),
+      },
+      isLoading: false,
+      error: false,
+      dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
+    });
+
+    const contextWithoutMatchingLayer = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: { "Origin Zones": { name: "Origin Zones" } },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={contextWithoutMatchingLayer}>
+        <MapVisualisation {...props} />
+      </MapContext.Provider>
+    );
+
+    expect(hasAnyGeometryNotNull).toHaveBeenCalledWith({
+      type: "FeatureCollection",
+      features: [{ type: "Feature", geometry: { type: "Polygon" }, properties: { category: "on time" } }],
+    });
+  });
 });
 
 describe("reclassifyAndStyleMap is called", () => {
@@ -501,6 +541,91 @@ describe("the props left is equal to true", () => {
           <MapVisualisation {...props} />
         </MapContext.Provider>
       </AppContext.Provider>
+    );
+  });
+});
+
+describe("MapVisualisation restoration registration", () => {
+  beforeEach(() => {
+    useFetchVisualisationData.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: false,
+      dataWasReturnedButFiltered: false,
+    });
+  });
+
+  it("registers feature-state restorer on mount and cleans up on unmount", () => {
+    const cleanupSpy = jest.fn();
+    registerMapRestorer.mockReturnValue(cleanupSpy);
+
+    const testMap = {
+      getLayer: jest.fn(),
+      getSource: jest.fn(),
+      addSource: jest.fn(),
+      getStyle: jest.fn(),
+      addLayer: jest.fn(),
+      on: jest.fn(),
+      isStyleLoaded: jest.fn(() => true),
+    };
+
+    const { unmount } = render(
+      <AppContext.Provider value={mockAppContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <MapVisualisation visualisationName="visualisationName" map={testMap} />
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    expect(registerMapRestorer).toHaveBeenCalledWith(
+      testMap,
+      "feature-state:visualisationName",
+      expect.any(Function)
+    );
+
+    unmount();
+
+    expect(cleanupSpy).toHaveBeenCalled();
+  });
+
+  it("registers left and right map instances independently", () => {
+    const leftMap = {
+      getLayer: jest.fn(),
+      getSource: jest.fn(),
+      addSource: jest.fn(),
+      getStyle: jest.fn(),
+      addLayer: jest.fn(),
+      on: jest.fn(),
+      isStyleLoaded: jest.fn(() => true),
+    };
+    const rightMap = {
+      getLayer: jest.fn(),
+      getSource: jest.fn(),
+      addSource: jest.fn(),
+      getStyle: jest.fn(),
+      addLayer: jest.fn(),
+      on: jest.fn(),
+      isStyleLoaded: jest.fn(() => true),
+    };
+
+    render(
+      <AppContext.Provider value={mockAppContext}>
+        <MapContext.Provider value={mockMapContext}>
+          <MapVisualisation visualisationName="visualisationName" map={leftMap} left={true} />
+          <MapVisualisation visualisationName="visualisationName" map={rightMap} left={false} />
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    expect(registerMapRestorer).toHaveBeenCalledWith(
+      leftMap,
+      "feature-state:visualisationName",
+      expect.any(Function)
+    );
+    expect(registerMapRestorer).toHaveBeenCalledWith(
+      rightMap,
+      "feature-state:visualisationName",
+      expect.any(Function)
     );
   });
 });
