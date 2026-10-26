@@ -4,13 +4,14 @@ import { ThemeProvider, createGlobalStyle } from "styled-components";
 import { PageSwitch } from "Components/PageSwitch";
 import { HomePage } from "Components/HomePage";
 import { Navbar } from "Components/Navbar";
+import { CookieBanner } from "Components/CookieBanner";
 import { Login } from "Components/Login";
 import { Unauthorized } from "Components/Login/Unauthorised";
 import { TermsOfUse } from "Components/TermsOfUse";
 import { NotFound } from "Components/NotFoundPage/NotFoundPage";
 import { AdminPage } from "Components/AdminPage";
 import { Dashboard } from "layouts";
-import { AppContext, AuthProvider, ErrorProvider } from "contexts";
+import { AppContext, AuthProvider, ErrorProvider, useAuth } from "contexts";
 import { api } from "services";
 import { loadBands } from "utils";
 import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
@@ -41,6 +42,9 @@ const BrandGlobalStyles = createGlobalStyle`
   }
 
   :root {
+    --app-navbar-height: 75px;
+    --app-overlay-top-offset: 85px;
+
     --palette-navy: ${brandTokens.palette.navy};
     --palette-teal: ${brandTokens.palette.teal};
     --palette-pale-teal: ${brandTokens.palette.paleTeal};
@@ -141,6 +145,55 @@ const BrandGlobalStyles = createGlobalStyle`
     }
   }
 `;
+
+/**
+ * Provides AppContext with the role-dependent parts of the config (admin-only pages and
+ * the Admin nav link) derived from the current user's roles. It sits inside AuthProvider
+ * and re-derives whenever the auth token changes, so logging in or out updates the
+ * navbar without a page reload — BaseApp itself does not re-render on login/logout.
+ *
+ * @param {Object} props
+ * @param {Object} props.appConfig - The loaded app config
+ * @param {string} props.appName - The application name
+ * @param {boolean} props.isAuthRequired - Whether the app requires authentication
+ * @param {React.ReactNode} props.children - The app content
+ * @returns {JSX.Element} The AppContext provider
+ */
+function RoleAwareAppContextProvider({ appConfig, appName, isAuthRequired, children }) {
+  // Role checks read the token cookie; `token` is the dependency that signals it changed.
+  const { token } = useAuth();
+
+  const contextValue = useMemo(() => {
+    const normalisedAppName = (appName || '').toLowerCase();
+    const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
+
+    // Filter visible app pages based on role authorization
+    const visibleAppPages = (appConfig.appPages ?? []).filter(
+      page => !page.adminOnly || isAdmin
+    );
+
+    // Pre-compute the complete list of renderable navigation links
+    const navbarLinks = buildNavbarLinks({
+      ...appConfig,
+      appPages: visibleAppPages,
+    });
+
+    if (appConfig.adminPage && isAdmin) {
+      navbarLinks.splice(1, 0, {
+        label: "Admin",
+        url: "/admin",
+      });
+    }
+
+    return {
+      ...appConfig,
+      appPages: visibleAppPages,
+      navbarLinks,
+    };
+  }, [appConfig, appName, isAuthRequired, token]);
+
+  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
+}
 
 /**
  * Base application component that can be used across all TfN apps.
@@ -282,49 +335,27 @@ export function BaseApp({
     </>
   );
 
-  const normalisedAppName = (appName || '').toLowerCase();
-  const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
-
-  // Filter visible app pages based on role authorization
-  const visibleAppPages = (appConfig.appPages ?? []).filter(
-    page => !page.adminOnly || isAdmin
-  );
-
-  // Pre-compute the complete list of renderable navigation links
-  const navbarLinks = buildNavbarLinks({
-    ...appConfig,
-    appPages: visibleAppPages,
-  });
-
-  if (appConfig.adminPage && isAdmin) {
-    navbarLinks.splice(1, 0, {
-      label: "Admin",
-      url: "/admin",
-    });
-  }
-
-  const contextValue = {
-    ...appConfig,
-    appPages: visibleAppPages,
-    navbarLinks,
-  };
-
   const appContent = (
     <div className={appCssClass}>
       <AuthProvider>
         <ErrorProvider>
           <ThemeProvider theme={effectiveTheme}>
             <BrandGlobalStyles />
-            <AppContext.Provider value={contextValue}>
+            <RoleAwareAppContextProvider
+              appConfig={appConfig}
+              appName={appName}
+              isAuthRequired={isAuthRequired}
+            >
               {beforeDashboard}
               <Navbar />
+              <CookieBanner />
               <Dashboard>
                 <Routes>
                   {standardRoutes}
                 </Routes>
               </Dashboard>
               {afterDashboard}
-            </AppContext.Provider>
+            </RoleAwareAppContextProvider>
           </ThemeProvider>
         </ErrorProvider>
       </AuthProvider>

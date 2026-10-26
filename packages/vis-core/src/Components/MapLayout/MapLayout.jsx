@@ -448,12 +448,12 @@ export const MapLayout = () => {
 
       {pageContext.type === "MapLayout" && (
         <MapContainer>
-          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} sidebarIsOpen={sidebarIsOpen}/>
+          <Map extraCopyrightText={pageContext.extraCopyrightText ?? ""} sidebarIsOpen={sidebarIsOpen} showMapStyleToggle={false}/>
         </MapContainer>
       )}
       {pageContext.type === "DualMapLayout" && (
         <MapContainer>
-          <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? ""}/>
+          <DualMaps extraCopyrightText={pageContext.extraCopyrightText ?? "" } showMapStyleToggle={false}/>
         </MapContainer>
       )}
 

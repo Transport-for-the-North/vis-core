@@ -196,7 +196,16 @@ const CardContent = styled.div`
     flex: 0 0 auto;
   }
 
-  .row,
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 0;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
   .row.small {
     display: flex;
     flex-direction: row;
@@ -204,6 +213,14 @@ const CardContent = styled.div`
     gap: 16px;
     padding: 0;
     justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .row.small .card,
+  .row.small .card.small {
+    flex: 0 0 calc(50% - 8px);
+    max-width: calc(50% - 8px);
+    box-sizing: border-box;
   }
 
   .card .label {

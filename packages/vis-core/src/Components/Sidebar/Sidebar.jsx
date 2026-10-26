@@ -42,7 +42,7 @@ const SidebarContainer = styled.div`
   /* Desktop: fixed sidebar */
   position: fixed;
   left: ${({ $isVisible }) => ($isVisible ? '10px' : '-470px')};
-  top: 85px;
+  top: var(--app-overlay-top-offset, 85px);
   z-index: 1000;
 
   /* Mobile/tablet: static sidebar */
@@ -123,7 +123,7 @@ const ToggleButton = styled.button`
 
   ${({ $isVisible }) => !$isVisible && `
     position: fixed;
-    top: 108px;
+    top: calc(var(--app-overlay-top-offset, 85px) + 23px);
     left: 10px;
   `}
 
