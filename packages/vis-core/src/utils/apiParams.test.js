@@ -106,6 +106,14 @@ describe("checkSecurityRequirements", () => {
   it("returns false when path does not exist", () => {
     expect(checkSecurityRequirements(schema, "/missing")).toBe(false);
   });
+
+  it("normalises query strings and trailing slashes before lookup", () => {
+    expect(checkSecurityRequirements(schema, "/secure/?foo=bar")).toBe(true);
+  });
+
+  it("normalises absolute URLs before lookup", () => {
+    expect(checkSecurityRequirements(schema, "https://example.test/secure?foo=bar")).toBe(true);
+  });
 });
 
 describe("normalizeParamValue", () => {
