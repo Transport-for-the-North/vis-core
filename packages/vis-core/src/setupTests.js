@@ -90,5 +90,5 @@ jest.mock('maplibre-gl', () => {
     default: api,   // supports: import maplibregl from 'maplibre-gl'
     ...api,         // supports: import { Map } from 'maplibre-gl' AND import * as maplibregl ...
   };
-});
+}, { virtual: true });
 
