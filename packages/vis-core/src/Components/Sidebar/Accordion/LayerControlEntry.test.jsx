@@ -641,5 +641,45 @@ describe("LayerControlEntry component test", () => {
       0.7
     );
   });
-});
 
+  it("skips undefined map entries during lifecycle timing and still updates active maps", () => {
+    const activeMap = {
+      getLayer: jest.fn((id) => id === "id"),
+      getPaintProperty: jest.fn((layerId, propertyName) =>
+        propertyName?.includes("opacity") ? 0.5 : 1
+      ),
+      setPaintProperty: jest.fn(),
+      setLayoutProperty: jest.fn(),
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry
+            {...props}
+            maps={[undefined, activeMap]}
+          />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    fireEvent.change(screen.getByRole("slider"), { target: { value: "0.4" } });
+
+    expect(activeMap.setPaintProperty).toHaveBeenCalledWith("id", "fill-opacity", 0.4);
+  });
+
+  it("does not render layer search when no map instance is available", () => {
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry
+            {...props}
+            maps={[undefined]}
+          />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+
+    expect(screen.queryByText("Zoom to map feature")).not.toBeInTheDocument();
+  });
+});

@@ -207,6 +207,14 @@ export const LayerControlEntry = memo(
     handleCustomBandsChange,
     state,
   }) => {
+    const isMapUsable = (candidateMap) =>
+      Boolean(candidateMap && typeof candidateMap.getLayer === "function");
+    const resolvedMaps = useMemo(
+      () => (Array.isArray(maps) ? maps.filter(isMapUsable) : []),
+      [maps]
+    );
+    const primaryMap = resolvedMaps[0] ?? null;
+
     const [visibility, setVisibility] = useState(
       layer.layout?.visibility || "visible"
     );
@@ -235,6 +243,9 @@ export const LayerControlEntry = memo(
      * @returns {string[]} Array of linked layer ids present on the map.
      */
     function getLinkedLayerIds(map, baseId) {
+      if (typeof map?.getLayer !== "function") {
+        return [];
+      }
       const candidates = [
         baseId,
         `${baseId}-label`,
@@ -255,6 +266,12 @@ export const LayerControlEntry = memo(
      * @param {any} value - Value or expression to set.
      */
     function setPaintAcross(map, ids, prop, value) {
+      if (
+        typeof map?.getPaintProperty !== "function" ||
+        typeof map?.setPaintProperty !== "function"
+      ) {
+        return;
+      }
       ids.forEach((id) => {
         try {
           const current = map.getPaintProperty(id, prop);
@@ -281,6 +298,12 @@ export const LayerControlEntry = memo(
      * @param {number|undefined} customOffset - Optional custom offset for line layers.
      */
     function setWidthAcross(map, ids, paintProp, factor, customOffset) {
+      if (
+        typeof map?.getPaintProperty !== "function" ||
+        typeof map?.setPaintProperty !== "function"
+      ) {
+        return;
+      }
       ids.forEach((id) => {
         try {
           const currentExpr = map.getPaintProperty(id, paintProp);
@@ -400,11 +423,11 @@ export const LayerControlEntry = memo(
     let currentWidthFactor = null;
     let currentOpacity = null;
 
-    if (maps.length > 0 && maps[0].getLayer(layer.id)) {
+    if (primaryMap?.getLayer(layer.id)) {
       const opacityProp = getOpacityProperty(layer.type);
-      currentOpacity = maps[0].getPaintProperty(layer.id, opacityProp);
+      currentOpacity = primaryMap.getPaintProperty(layer.id, opacityProp);
       currentWidthFactor = widthProp
-        ? maps[0].getPaintProperty(layer.id, widthProp)
+        ? primaryMap.getPaintProperty(layer.id, widthProp)
         : null;
     }
 
@@ -481,7 +504,7 @@ export const LayerControlEntry = memo(
         }
       }
 
-      if (!maps.length || !maps[0].getLayer(layer.id)) {
+      if (!primaryMap?.getLayer(layer.id)) {
         return defaultBandValues || [0, 1, 2, 3, 4];
       }
 
@@ -515,7 +538,7 @@ export const LayerControlEntry = memo(
     }, [
       currentClassMethod,
       customBandsFromState,
-      maps,
+      primaryMap,
       layer.id,
       layer.paint,
       defaultBandValues,
@@ -542,7 +565,7 @@ export const LayerControlEntry = memo(
     const toggleVisibility = () => {
       const newVisibility = visibility === "visible" ? "none" : "visible";
 
-      maps.forEach((map) => {
+      resolvedMaps.forEach((map) => {
         const ids = getLinkedLayerIds(map, layer.id);
         ids.forEach((id) => {
           map.setLayoutProperty(id, "visibility", newVisibility);
@@ -569,7 +592,7 @@ export const LayerControlEntry = memo(
       const newVisibility = isChecked ? "visible" : "none";
       setBoundariesVisibility(newVisibility);
 
-      maps.forEach((mapInstance) => {
+      resolvedMaps.forEach((mapInstance) => {
         if (!mapInstance || !mapInstance.style) return;
         const boundariesId = mapInstance.getLayer?.(`${layer.id}-boundaries`)
           ? `${layer.id}-boundaries`
@@ -610,7 +633,7 @@ export const LayerControlEntry = memo(
       const newOpacity = parseFloat(e.target.value);
       const baseOpacityProp = getOpacityProperty(layer.type);
 
-      maps.forEach((map) => {
+      resolvedMaps.forEach((map) => {
         const ids = getLinkedLayerIds(map, layer.id);
 
         // Update base type opacity across all linked layers that share the prop
@@ -681,7 +704,7 @@ export const LayerControlEntry = memo(
           ? effectiveDefaultLineOffset
           : undefined;
 
-      maps.forEach((map) => {
+      resolvedMaps.forEach((map) => {
         const ids = getLinkedLayerIds(map, layer.id);
 
         // Apply factor to all linked layers that share the same paint prop
@@ -704,7 +727,7 @@ export const LayerControlEntry = memo(
       });
     };
 
-    const showLayerSearch = enableZoomToFeature && layer.metadata?.path;
+    const showLayerSearch = enableZoomToFeature && layer.metadata?.path && Boolean(primaryMap);
 
     const showColourSchemeDropdown =
       layer.metadata?.isStylable &&
@@ -744,7 +767,7 @@ export const LayerControlEntry = memo(
     if (showLayerSearch) {
       collapsibleSections.push({
         key: "search",
-        node: <LayerSearch map={maps[0]} layer={layer} />,
+        node: <LayerSearch map={primaryMap} layer={layer} />,
       });
     }
 
