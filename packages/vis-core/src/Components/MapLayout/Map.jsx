@@ -28,6 +28,8 @@ import {
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
   resolveVisualisationUnit,
+  isValueInRange,
+  applyValueRangeToExpression,
 } from "utils";
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -143,6 +145,24 @@ const Map = (props) => {
 
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
 
+  const getLayerRangeFilter = useCallback(
+    (rawLayerId) => {
+      const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
+      return state.layers?.[layerId]?.valueRangeFilter ?? null;
+    },
+    [state.layers]
+  );
+
+  const isFeatureWithinConfiguredRange = useCallback(
+    (feature) => {
+      if (!feature?.layer?.id) return false;
+      const rangeFilter = getLayerRangeFilter(feature.layer.id);
+      const featureValue = getFeatureStateValue(feature);
+      return isValueInRange(featureValue, rangeFilter);
+    },
+    [getLayerRangeFilter]
+  );
+
   const lastTouchTimeRef = useRef(0);
 
   const lastViewportSignatureRef = useRef({});
@@ -158,7 +178,9 @@ const Map = (props) => {
         .filter((id) => map.getLayer(id));
 
       if (filterLayers.length) {
-        const hits = map.queryRenderedFeatures(point, { layers: filterLayers });
+        const hits = map
+          .queryRenderedFeatures(point, { layers: filterLayers })
+          .filter(isFeatureWithinConfiguredRange);
         if (hits.length) return hits[0]; // top-most feature on a filter layer
       }
 
@@ -169,13 +191,15 @@ const Map = (props) => {
           map.getLayer(id)
       );
       if (otherLayers.length) {
-        const hits = map.queryRenderedFeatures(point, { layers: otherLayers });
+        const hits = map
+          .queryRenderedFeatures(point, { layers: otherLayers })
+          .filter(isFeatureWithinConfiguredRange);
         if (hits.length) return hits[0];
       }
 
       return null;
     },
-    [map, memoizedFilters, state.layers]
+    [map, memoizedFilters, state.layers, isFeatureWithinConfiguredRange]
   );
 
   // **Draw control logic
@@ -404,10 +428,15 @@ const Map = (props) => {
         
         // Safely get feature value - feature.state may be null or undefined
         const featureValue = getFeatureStateValue(feature);
+        const rangeFilter = layerConfig.valueRangeFilter;
         
         // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
         if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
           return false; // Exclude this feature as it has no data
+        }
+
+        if (!isValueInRange(featureValue, rangeFilter)) {
+          return false;
         }
         
         return true; // Include this feature
@@ -794,10 +823,11 @@ const Map = (props) => {
     const feature = map.queryRenderedFeatures(bufferdPoint, {
       layers: [layerId],
     });
-    if (feature.length !== 0) {
+    const inRangeFeature = feature.find(isFeatureWithinConfiguredRange);
+    if (inRangeFeature) {
       const coordinates = e.lngLat;
-      const description = `<p>${feature[0].properties.name ?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
-          feature[0].state.value ?? 0
+      const description = `<p>${inRangeFeature.properties.name ?? ""}</p><p> Id: ${inRangeFeature.properties.id}</p><p>Value: ${
+          inRangeFeature.state.value ?? 0
         }</p>`;
       const newPopup = new maplibregl.Popup({ closeOnClick: false })
         .setLngLat(coordinates)
@@ -826,7 +856,7 @@ const Map = (props) => {
         );
       }
     },
-    [map]
+    [map, state.layers]
   );
 
   /**
@@ -881,7 +911,11 @@ const Map = (props) => {
                 'text-color': '#000000',  // Black text
                 'text-halo-color': '#ffffff',  // White halo for readability
                 'text-halo-width': 2.5,
-                'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                'text-opacity': applyValueRangeToExpression(
+                  labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                  state.layers[layerId]?.valueRangeFilter,
+                  0
+                ),
               }
             });
           }
@@ -982,7 +1016,7 @@ const Map = (props) => {
       // Query for features from all layers specified in mapFilters
       const features = map.queryRenderedFeatures(point, {
         layers: layerNames,
-      });
+      }).filter(isFeatureWithinConfiguredRange);
 
       if (features && features.length > 0) {
         // Get the top-most feature
@@ -1055,7 +1089,7 @@ const Map = (props) => {
         });
       }
     },
-    [isMapReady, map, memoizedFilters, dispatch, filterDispatch]
+    [isMapReady, map, memoizedFilters, dispatch, filterDispatch, isFeatureWithinConfiguredRange]
   );
 
   // **Create map hover/tap handler **

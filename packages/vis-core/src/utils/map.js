@@ -310,6 +310,104 @@ export function getOpacityProperty(layerType) {
   return opacityProp;
 }
 
+/**
+ * Checks whether a numeric value falls within a configured range filter.
+ * Missing/invalid ranges default to permissive behaviour.
+ *
+ * @param {number|null|undefined} value
+ * @param {{min:number,max:number}|null|undefined} range
+ * @returns {boolean}
+ */
+export const isValueInRange = (value, range) => {
+  if (!range || !Number.isFinite(range.min) || !Number.isFinite(range.max)) {
+    return true;
+  }
+
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return false;
+  }
+
+  return numericValue >= range.min && numericValue <= range.max;
+};
+
+/**
+ * Builds a map expression condition that matches feature-state.value in a range.
+ *
+ * @param {{min:number,max:number}|null|undefined} range
+ * @returns {Array|null}
+ */
+export const buildValueRangeCondition = (range) => {
+  if (!range || !Number.isFinite(range.min) || !Number.isFinite(range.max)) {
+    return null;
+  }
+
+  return [
+    "all",
+    ["!=", ["feature-state", "value"], null],
+    [">=", ["to-number", ["feature-state", "value"]], Number(range.min)],
+    ["<=", ["to-number", ["feature-state", "value"]], Number(range.max)],
+  ];
+};
+
+/**
+ * Wraps an existing paint expression so out-of-range values are driven to fallbackValue.
+ *
+ * @param {number|Array} paintValue
+ * @param {{min:number,max:number}|null|undefined} range
+ * @param {number} fallbackValue
+ * @returns {number|Array}
+ */
+export const applyValueRangeToExpression = (
+  paintValue,
+  range,
+  fallbackValue = 0
+) => {
+  const rangeCondition = buildValueRangeCondition(range);
+  if (!rangeCondition) {
+    return paintValue;
+  }
+
+  if (paintValue === undefined || paintValue === null) {
+    return paintValue;
+  }
+
+  return ["case", rangeCondition, paintValue, fallbackValue];
+};
+
+/**
+ * Applies range filtering to paint properties used by map geometries.
+ *
+ * @param {Object} paint
+ * @param {{min:number,max:number}|null|undefined} range
+ * @returns {Object}
+ */
+export const applyValueRangeToPaint = (paint = {}, range) => {
+  const rangeCondition = buildValueRangeCondition(range);
+  if (!rangeCondition || typeof paint !== "object" || paint === null) {
+    return paint;
+  }
+
+  const nextPaint = { ...paint };
+  const geometryVisibilityProps = [
+    "fill-opacity",
+    "line-opacity",
+    "line-width",
+    "circle-opacity",
+    "circle-stroke-opacity",
+    "circle-radius",
+    "text-opacity",
+  ];
+
+  geometryVisibilityProps.forEach((propName) => {
+    if (nextPaint[propName] !== undefined) {
+      nextPaint[propName] = ["case", rangeCondition, nextPaint[propName], 0];
+    }
+  });
+
+  return nextPaint;
+};
+
 
 /**
  * Retrieves thr line width for givens et of bins

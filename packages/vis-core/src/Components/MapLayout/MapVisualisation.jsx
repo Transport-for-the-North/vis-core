@@ -5,6 +5,7 @@ import { AppContext } from "contexts/AppContext";
 import { actionTypes } from "reducers";
 import {
   buildCategoricalLegendKey,
+  applyValueRangeToPaint,
   colorSchemes,
   createPaintProperty,
   resolveCategoricalColours,
@@ -272,6 +273,7 @@ export const MapVisualisation = ({
     mapLayerId: layerKey,
     shouldFilterDataToViewport,
     debounceMs: 0, // visualisation comes from state.visualisations — already gated by MapLayout's debouncedFilterState
+    valueRangeFilter: state.layers[layerKey]?.valueRangeFilter,
   });
 
   // Initialise classification method from visualisation config if not already set in state
@@ -584,10 +586,15 @@ export const MapVisualisation = ({
         layerConfig
       );
 
+      const paintPropertyWithRange = applyValueRangeToPaint(
+        paintProperty,
+        layerConfig?.valueRangeFilter
+      );
+
       // Use visualisationDataForMap to update the map features
       addFeaturesToMap(
         mapItem,
-        paintProperty,
+        paintPropertyWithRange,
         state.layers,
         visualisationDataForMap,
         colorStyle,
@@ -709,6 +716,11 @@ export const MapVisualisation = ({
         state.layers[layerKey]
       );
 
+      const paintPropertyWithRange = applyValueRangeToPaint(
+        paintProperty,
+        state.layers[layerKey]?.valueRangeFilter
+      );
+
       const layers = map.getStyle().layers;
       const layerIndex = layers.findIndex(
         (layer) => layer.id.includes("-hover") || layer.id === "selected-feature-layer"
@@ -721,7 +733,7 @@ export const MapVisualisation = ({
             id: visualisationName,
             type: "fill",
             source: visualisationName,
-            paint: paintProperty,
+            paint: paintPropertyWithRange,
             metadata: {
               colorStyle: colorStyle,
               ...legendMetadata,
@@ -749,7 +761,7 @@ export const MapVisualisation = ({
             ...legendMetadata,
           };
         }
-        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintProperty)) {
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintPropertyWithRange)) {
           map.setPaintProperty(visualisationName, paintPropertyName, paintPropertyArray);
         }
       }

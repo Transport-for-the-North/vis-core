@@ -10,6 +10,7 @@ import { getOpacityProperty, getWidthProperty } from "utils";
 import { LayerSearch } from "./LayerSearch";
 import { ColourSchemeDropdown } from "Components/Sidebar/Selectors/ColourSchemeDropdown";
 import { BandEditor } from "Components/Sidebar/Selectors/BandEditor";
+import { RangeSlider } from "Components/Sidebar/Selectors/RangeSlider";
 import { SelectorLabel } from "Components/Sidebar/Selectors/SelectorLabel";
 import { ClassificationDropdown } from "Components/Sidebar/Selectors/ClassificationDropdown";
 import { AppContext, MapContext, PageContext } from "contexts";
@@ -533,6 +534,42 @@ export const LayerControlEntry = memo(
       [isLineDiverging, currentBins]
     );
 
+    const valueRangeDomain = useMemo(() => {
+      const numericBins = (editorBins || [])
+        .map((value) => Number(value))
+        .filter(Number.isFinite);
+
+      if (numericBins.length === 0) {
+        return { min: 0, max: 100 };
+      }
+
+      return {
+        min: Math.min(...numericBins),
+        max: Math.max(...numericBins),
+      };
+    }, [editorBins]);
+
+    const valueRangeStep = useMemo(() => {
+      const range = valueRangeDomain.max - valueRangeDomain.min;
+      if (!Number.isFinite(range) || range <= 0) return 1;
+      return range <= 10 ? 0.1 : 1;
+    }, [valueRangeDomain]);
+
+    const existingValueRangeFilter = state.layers?.[layer.id]?.valueRangeFilter;
+    const rangeSelection = useMemo(() => {
+      const min = Number(existingValueRangeFilter?.min);
+      const max = Number(existingValueRangeFilter?.max);
+
+      if (!Number.isFinite(min) || !Number.isFinite(max)) {
+        return [valueRangeDomain.min, valueRangeDomain.max];
+      }
+
+      return [
+        Math.max(valueRangeDomain.min, Math.min(min, valueRangeDomain.max)),
+        Math.max(valueRangeDomain.min, Math.min(max, valueRangeDomain.max)),
+      ];
+    }, [existingValueRangeFilter, valueRangeDomain]);
+
     /**
      * Toggle both the layer and its label layer visibility across all maps.
      *
@@ -724,6 +761,10 @@ export const LayerControlEntry = memo(
       !enforceNoCustomBanding &&
       (colorStyle === "continuous" || colorStyle === "diverging");
 
+    const showValueRangeSlider =
+      layer.metadata?.isStylable &&
+      (colorStyle === "continuous" || colorStyle === "diverging");
+
     const showClassificationDropdownStandalone =
       layer.metadata?.isStylable &&
       !enforceNoClassificationMethod &&
@@ -898,6 +939,38 @@ export const LayerControlEntry = memo(
                   handleCustomBandsChange([], layer.id);
                   handleClassificationChange(target, layer.id);
                 }}
+              />
+            </>
+          ),
+        });
+      }
+
+      if (showValueRangeSlider) {
+        stylableSections.push({
+          key: "value-range-filter",
+          node: (
+            <>
+              <SelectorLabel text="Visible value range" />
+              <RangeSlider
+                min={valueRangeDomain.min}
+                max={valueRangeDomain.max}
+                step={valueRangeStep}
+                value={rangeSelection}
+                onChange={([nextMin, nextMax]) => {
+                  mapDispatch?.({
+                    type: actionTypes.UPDATE_LAYER_VALUE_RANGE_FILTER,
+                    payload: {
+                      layerName: layer.id,
+                      rangeFilter: {
+                        min: nextMin,
+                        max: nextMax,
+                        domainMin: valueRangeDomain.min,
+                        domainMax: valueRangeDomain.max,
+                      },
+                    },
+                  });
+                }}
+                ariaLabel={`${layer.id} value range`}
               />
             </>
           ),

@@ -410,6 +410,57 @@ describe("LayerControlEntry component test", () => {
       });
     });
   });
+
+  it("dispatches visible value range updates when the range slider changes", async () => {
+    const dispatch = jest.fn();
+    const testProps = {
+      ...props,
+      layer: {
+        ...props.layer,
+        metadata: {
+          ...props.layer.metadata,
+          isStylable: true,
+          colorStyle: "continuous",
+        },
+      },
+      state: {
+        ...props.state,
+        layers: {
+          id: {},
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={{ state: testProps.state, dispatch }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry {...testProps} />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    fireEvent.change(screen.getByLabelText("id value range minimum"), {
+      target: { value: "1" },
+    });
+
+    await waitFor(() => {
+      expect(dispatch).toHaveBeenCalledWith({
+        type: "UPDATE_LAYER_VALUE_RANGE_FILTER",
+        payload: {
+          layerName: "id",
+          rangeFilter: {
+            min: 1,
+            max: 4,
+            domainMin: 0,
+            domainMax: 4,
+          },
+        },
+      });
+    });
+  });
+
   it("Test", () => {
     const mockMapContext = {
       state: {
