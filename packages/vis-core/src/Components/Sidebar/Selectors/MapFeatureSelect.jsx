@@ -125,7 +125,8 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
   
 
   // Ensure layer and its properties are defined
-  const layerPath = layer?.metadata?.path ?? layer?.path;
+  // Dual maps with separateSidePaths only fill in each side's path, so use the left one.
+  const layerPath = layer?.metadata?.path ?? layer?.sidePaths?.left ?? layer?.path;
 
   /**
    * Handles the change in selected options from the dropdown.

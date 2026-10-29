@@ -32,7 +32,8 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
       `Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
     );
   }
-  const layerPath = layer?.metadata?.path ?? layer?.path;
+  // Dual maps with separateSidePaths only fill in each side's path, so use the left one.
+  const layerPath = layer?.metadata?.path ?? layer?.sidePaths?.left ?? layer?.path;
 
   /**
    * Handles the change in selected options from the dropdown.

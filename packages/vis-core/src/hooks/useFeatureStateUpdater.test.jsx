@@ -5,6 +5,7 @@ import { useFeatureStateUpdater } from "./useFeatureStateUpdater";
 const makeMap = () => ({
   isStyleLoaded: jest.fn(() => true),
   getLayer: jest.fn(() => ({ id: "layer-a", type: "fill", metadata: {} })),
+  getFeatureState: jest.fn(() => ({})),
   setFeatureState: jest.fn(),
   removeFeatureState: jest.fn(),
   setPaintProperty: jest.fn(),
