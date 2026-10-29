@@ -50,12 +50,17 @@ const DEFAULT_TILE_PREFIX = '/api';
 
 /**
  * Query string to send with a feature lookup. Paths under the default prefix send none, as before;
- * prefixed paths pass on the tile path's own query string (e.g. network_spec), repeated keys included.
+ * prefixed paths pass on the tile path's own query string (e.g. network_spec), repeated keys included,
+ * plus zoneTypeId for zone paths.
  * @param {Object} parsedPath - The result of parseVectorTilePath.
  * @returns {string} The query string, including its leading '?', or ''.
  */
-function featureLookupQuery({ prefix, search }) {
-  return prefix === DEFAULT_TILE_PREFIX ? '' : search;
+function featureLookupQuery({ prefix, search, zoneTypeId }) {
+  if (prefix === DEFAULT_TILE_PREFIX) return '';
+  if (zoneTypeId === undefined) return search;
+  const params = new URLSearchParams(search);
+  params.append('zoneTypeId', zoneTypeId);
+  return `?${params}`;
 }
 
 /**
