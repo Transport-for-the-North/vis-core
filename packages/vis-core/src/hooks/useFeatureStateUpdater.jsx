@@ -92,15 +92,15 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
     
     newStates.set(id, value);
     
-    // Only call setFeatureState if the feature is new or its value changed.
-    // This prevents performance stuttering when passing accumulated data on map pans.
-    if (!prevStates.has(id) || prevStates.get(id) !== value) {
+    // Only call setFeatureState if the map does not already hold this value.
+    const featureRef = {
+      source: getLayerSourceId(layer),
+      sourceLayer: layer.sourceLayer,
+      id,
+    };
+    if (map.getFeatureState(featureRef)?.value !== value) {
       map.setFeatureState(
-        {
-          source: getLayerSourceId(layer),
-          sourceLayer: layer.sourceLayer,
-          id,
-        },
+        featureRef,
         {
           value: value,
           valueAbs: isNumeric ? Math.abs(value) : null,
