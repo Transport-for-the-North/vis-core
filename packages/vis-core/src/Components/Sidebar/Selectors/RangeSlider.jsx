@@ -47,21 +47,21 @@ const Handle = styled.input`
     pointer-events: auto;
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 2px solid #0d0f3d;
-    background: #ffffff;
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    border: 0;
+    background: #0d0f3d;
     cursor: pointer;
   }
 
   &::-moz-range-thumb {
     pointer-events: auto;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 2px solid #0d0f3d;
-    background: #ffffff;
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    border: 0;
+    background: #0d0f3d;
     cursor: pointer;
   }
 
