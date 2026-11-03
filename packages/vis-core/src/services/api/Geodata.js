@@ -59,7 +59,7 @@ function featureLookupQuery({ prefix, search, zoneTypeId }) {
   if (prefix === DEFAULT_TILE_PREFIX) return '';
   if (zoneTypeId === undefined) return search;
   const params = new URLSearchParams(search);
-  params.append('zoneTypeId', zoneTypeId);
+  params.set('zoneTypeId', zoneTypeId);
   return `?${params}`;
 }
 

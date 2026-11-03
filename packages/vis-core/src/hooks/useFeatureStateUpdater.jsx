@@ -92,15 +92,15 @@ const updateFeatureStates = (map, layer, data, prevStates) => {
     
     newStates.set(id, value);
     
-    // Only call setFeatureState if the map does not already hold this value.
-    const featureRef = {
-      source: getLayerSourceId(layer),
-      sourceLayer: layer.sourceLayer,
-      id,
-    };
-    if (map.getFeatureState(featureRef)?.value !== value) {
+    // Only call setFeatureState if the feature is new or its value changed.
+    // This prevents performance stuttering when passing accumulated data on map pans.
+    if (!prevStates.has(id) || prevStates.get(id) !== value) {
       map.setFeatureState(
-        featureRef,
+        {
+          source: getLayerSourceId(layer),
+          sourceLayer: layer.sourceLayer,
+          id,
+        },
         {
           value: value,
           valueAbs: isNumeric ? Math.abs(value) : null,
@@ -177,6 +177,7 @@ const applyConfiguredWidthFactor = (map, layer) => {
 export const useFeatureStateUpdater = () => {
   // Changed from tracking Sets to tracking Maps (id -> value) for diffing
   const layerStatesRef = useRef(new Map());
+  const layerSourcesRef = useRef(new Map());
   const retryManagerRef = useRef(createRetryManager());
   // Tracks layers that have already had their defaultWidthFactor applied,
   // so data reloads don't reset the user's slider changes.
@@ -189,6 +190,7 @@ export const useFeatureStateUpdater = () => {
     return () => {
       retryManager.cancelAll();
       layerStatesRef.current.clear();
+      layerSourcesRef.current.clear();
     };
   }, []);
 
@@ -275,6 +277,14 @@ export const useFeatureStateUpdater = () => {
         if (!defaultWidthAppliedRef.current.has(specifiedLayer.name)) {
           applyConfiguredWidthFactor(map, specifiedLayer);
           defaultWidthAppliedRef.current.add(specifiedLayer.name);
+        }
+
+        const source = map.getSource?.(getLayerSourceId(specifiedLayer));
+        const tiles = source?.serialize?.().tiles?.join();
+        const lastSource = layerSourcesRef.current.get(specifiedLayer.name);
+        if (lastSource?.source !== source || lastSource?.tiles !== tiles) {
+          layerStatesRef.current.delete(specifiedLayer.name);
+          layerSourcesRef.current.set(specifiedLayer.name, { source, tiles });
         }
 
         // Get previous feature states (Map of id -> value) for this layer

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMapContext } from "hooks/useMapContext";
-import { BaseMapFeatureSelect } from './MapFeatureSelect';
+import { BaseMapFeatureSelect, getFeatureLookupPath } from './MapFeatureSelect';
 import { api } from 'services';
 import { actionTypes } from 'reducers/mapReducer';
 
@@ -32,8 +32,7 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
       `Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
     );
   }
-  // Dual maps with separateSidePaths only fill in each side's path, so use the left one.
-  const layerPath = layer?.metadata?.path ?? layer?.sidePaths?.left ?? layer?.path;
+  const layerPath = getFeatureLookupPath(layer);
 
   /**
    * Handles the change in selected options from the dropdown.
