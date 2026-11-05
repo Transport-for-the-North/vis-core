@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { BaseMapFeatureSelect } from ".";
+import { BaseMapFeatureSelect, getFeatureLookupPath } from ".";
 import { MapContext } from "contexts";
 import userEvent from "@testing-library/user-event";
 
@@ -154,5 +154,81 @@ describe("BaseMapFeatureSelect component test", () => {
         color: defaultTextColor,
       });
     });
+  });
+});
+describe("getFeatureLookupPath", () => {
+  it("defaults to left side path when left has no missing params", () => {
+    const layer = {
+      sidePaths: {
+        left: "/api/tiles/left",
+        right: "/api/tiles/right",
+      },
+      sideMissingParams: {
+        left: [],
+        right: [],
+      },
+    };
+    expect(getFeatureLookupPath(layer)).toBe("/api/tiles/left");
+    expect(getFeatureLookupPath(layer, "left")).toBe("/api/tiles/left");
+  });
+
+  it("selects right side path when targetSide === 'right' and right has no missing params", () => {
+    const layer = {
+      sidePaths: {
+        left: "/api/tiles/left",
+        right: "/api/tiles/right",
+      },
+      sideMissingParams: {
+        left: [],
+        right: [],
+      },
+    };
+    expect(getFeatureLookupPath(layer, "right")).toBe("/api/tiles/right");
+  });
+
+  it("falls back to right side when left side has missing params", () => {
+    const layer = {
+      sidePaths: {
+        left: "/api/tiles/left",
+        right: "/api/tiles/right",
+      },
+      sideMissingParams: {
+        left: ["year"],
+        right: [],
+      },
+    };
+    expect(getFeatureLookupPath(layer, "left")).toBe("/api/tiles/right");
+    expect(getFeatureLookupPath(layer)).toBe("/api/tiles/right");
+  });
+
+  it("falls back to left side when targetSide is right but right side has missing params", () => {
+    const layer = {
+      sidePaths: {
+        left: "/api/tiles/left",
+        right: "/api/tiles/right",
+      },
+      sideMissingParams: {
+        left: [],
+        right: ["year"],
+      },
+    };
+    expect(getFeatureLookupPath(layer, "right")).toBe("/api/tiles/left");
+  });
+
+  it("returns layer.metadata.path if present", () => {
+    const layer = {
+      metadata: { path: "/api/metadata/tiles" },
+      sidePaths: { left: "/api/tiles/left", right: "/api/tiles/right" },
+    };
+    expect(getFeatureLookupPath(layer)).toBe("/api/metadata/tiles");
+    expect(getFeatureLookupPath(layer, "right")).toBe("/api/metadata/tiles");
+  });
+
+  it("returns layer.path for single-map layers", () => {
+    const layer = {
+      path: "/api/tiles/single",
+    };
+    expect(getFeatureLookupPath(layer)).toBe("/api/tiles/single");
+    expect(getFeatureLookupPath(layer, "right")).toBe("/api/tiles/single");
   });
 });

@@ -2,9 +2,10 @@ import { act, renderHook } from "@testing-library/react";
 
 import { useFeatureStateUpdater } from "./useFeatureStateUpdater";
 
-const makeMap = () => ({
+const makeMap = (source = {}) => ({
   isStyleLoaded: jest.fn(() => true),
   getLayer: jest.fn(() => ({ id: "layer-a", type: "fill", metadata: {} })),
+  getSource: jest.fn(() => source),
   setFeatureState: jest.fn(),
   removeFeatureState: jest.fn(),
   setPaintProperty: jest.fn(),
@@ -127,5 +128,64 @@ describe("useFeatureStateUpdater replayLayerState", () => {
       { source: "custom-source-id", sourceLayer: "source-layer-a", id: 10 },
       { value: 5, valueAbs: 5 }
     );
+  });
+});
+
+describe("useFeatureStateUpdater addFeaturesToMap", () => {
+  const data = [
+    { id: 1, value: 3 },
+    { id: 2, value: 4 },
+  ];
+
+  it("skips unchanged values while the source is the same", () => {
+    const map = makeMap();
+    const { result } = renderHook(() => useFeatureStateUpdater());
+
+    act(() => {
+      result.current.addFeaturesToMap(map, null, layers, data, "continuous", "layerKey");
+    });
+    map.setFeatureState.mockClear();
+
+    act(() => {
+      result.current.addFeaturesToMap(map, null, layers, data, "continuous", "layerKey");
+    });
+
+    expect(map.setFeatureState).not.toHaveBeenCalled();
+  });
+
+  it("re-sets every value once the source has been re-added", () => {
+    const map = makeMap();
+    const { result } = renderHook(() => useFeatureStateUpdater());
+
+    act(() => {
+      result.current.addFeaturesToMap(map, null, layers, data, "continuous", "layerKey");
+    });
+    map.setFeatureState.mockClear();
+    map.getSource.mockReturnValue({});
+
+    act(() => {
+      result.current.addFeaturesToMap(map, null, layers, data, "continuous", "layerKey");
+    });
+
+    expect(map.setFeatureState).toHaveBeenCalledTimes(2);
+    expect(map.removeFeatureState).not.toHaveBeenCalled();
+  });
+
+  it("re-sets every value once the source tile URL changes", () => {
+    let tiles = ["/tiles/a/{z}/{x}/{y}"];
+    const map = makeMap({ serialize: () => ({ tiles }) });
+    const { result } = renderHook(() => useFeatureStateUpdater());
+
+    act(() => {
+      result.current.addFeaturesToMap(map, null, layers, data, "continuous", "layerKey");
+    });
+    map.setFeatureState.mockClear();
+    tiles = ["/tiles/b/{z}/{x}/{y}"];
+
+    act(() => {
+      result.current.addFeaturesToMap(map, null, layers, data, "continuous", "layerKey");
+    });
+
+    expect(map.setFeatureState).toHaveBeenCalledTimes(2);
   });
 });

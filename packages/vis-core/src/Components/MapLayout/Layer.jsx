@@ -79,7 +79,19 @@ export const Layer = ({ layer }) => {
   const loadingRef = useRef(false);
 
   // Track the last tiles URL we applied per map instance (used to avoid redundant updates).
-  const lastTilesUrlByMapRef = useRef(new WeakMap());  
+  const lastTilesUrlByMapRef = useRef(new WeakMap());
+
+  // Boundaries visibility per map, kept across a remove/re-add (e.g. a new zone tile path).
+  const boundariesVisibilityByMapRef = useRef(new WeakMap());
+  const rememberBoundariesVisibility = (mapInstance) => {
+    const id = `${layer.name}-boundaries`;
+    if (mapInstance.getLayer(id)) {
+      boundariesVisibilityByMapRef.current.set(mapInstance, mapInstance.getLayoutProperty(id, "visibility"));
+    }
+  };
+  const boundariesVisibilityFor = (mapInstance) =>
+    boundariesVisibilityByMapRef.current.get(mapInstance) ??
+    (layer.boundariesVisibleByDefault ? "visible" : "none");
 
   const computedTileUrl = useMemo(() => {
     if (layer.type !== "tile") return null;
@@ -134,6 +146,7 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
         }
+        rememberBoundariesVisibility(mapInstance);
         if (mapInstance.getLayer(`${layer.name}-boundaries`)) {
           mapInstance.removeLayer(`${layer.name}-boundaries`);
         }
@@ -212,7 +225,7 @@ export const Layer = ({ layer }) => {
                 type: "line",
                 source: layer.name,
                 layout: {
-                  visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
+                  visibility: boundariesVisibilityFor(mapInstance),
                 },
                 paint: resolveBoundaryPaint({
                   layer,
@@ -319,7 +332,7 @@ export const Layer = ({ layer }) => {
               source: layer.name,
               "source-layer": layer.sourceLayer,
               layout: {
-                visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
+                visibility: boundariesVisibilityFor(mapInstance),
               },
               paint: resolveBoundaryPaint({
                 layer,
@@ -381,6 +394,7 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
         }
+        rememberBoundariesVisibility(mapInstance);
         if (mapInstance.getLayer(`${layer.name}-boundaries`)) {
           mapInstance.removeLayer(`${layer.name}-boundaries`);
         }
@@ -432,6 +446,7 @@ export const Layer = ({ layer }) => {
 
       // Fallback: remove and re-add source + layers.
       try {
+        rememberBoundariesVisibility(mapInstance);
         [
           layer.name,
           `${layer.name}-symbols`,
@@ -513,7 +528,7 @@ export const Layer = ({ layer }) => {
           source: layer.name,
           "source-layer": layer.sourceLayer,
           layout: {
-            visibility: layer.boundariesVisibleByDefault ? "visible" : "none",
+            visibility: boundariesVisibilityFor(mapInstance),
           },
           paint: resolveBoundaryPaint({
             layer,
