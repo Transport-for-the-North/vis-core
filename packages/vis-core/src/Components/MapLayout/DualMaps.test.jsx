@@ -533,6 +533,57 @@ describe("Test with shouldHaveLabel = true", () => {
       </ThemeProvider>
     );
   });
+
+  it.each([
+    ["visible", "visible"],
+    ["none", "none"],
+  ])(
+    "when zoomed in and the parent layer is '%s', sets label visibility to '%s'",
+    (parentVisibility, expectedLabelVisibility) => {
+      const zoomOn = jest.fn((event, callback) => {
+        if (event === "zoomend") callback();
+      });
+      const makeMap = (type) => ({
+        off: jest.fn(),
+        on: zoomOn,
+        getCanvas: jest.fn(() => ({ style: {} })),
+        getLayer: jest.fn(() => true),
+        getZoom: jest.fn(() => 14), // above the default label zoom of 12
+        getLayoutProperty: jest.fn(() => parentVisibility),
+        setLayoutProperty: jest.fn(),
+        type,
+        ...mockMapControls,
+      });
+      const leftMap = makeMap("left");
+      const rightMap = makeMap("right");
+      useDualMaps.mockReturnValue({
+        leftMap,
+        rightMap,
+        isMapStyleLoaded: "isMapStyleLoaded",
+        isMapLoaded: "isMapLoaded",
+        isMapReady: "isMapReady",
+      });
+
+      render(
+        <ThemeProvider theme={theme}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapContext.Provider value={mockMapContext}>
+              <DualMaps {...props} />
+            </MapContext.Provider>
+          </FilterContext.Provider>
+        </ThemeProvider>
+      );
+
+      [leftMap, rightMap].forEach((map) => {
+        expect(map.getLayoutProperty).toHaveBeenCalledWith("first", "visibility");
+        expect(map.setLayoutProperty).toHaveBeenCalledWith(
+          "first-label",
+          "visibility",
+          expectedLabelVisibility
+        );
+      });
+    }
+  );
 });
 
 describe("Tests when apiRequest is not null", () => {

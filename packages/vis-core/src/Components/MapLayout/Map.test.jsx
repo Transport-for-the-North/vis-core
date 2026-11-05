@@ -219,6 +219,7 @@ const getZoom = jest.fn();
 const querySourceFeatures = jest.fn();
 const addLayer = jest.fn();
 const setLayoutProperty = jest.fn();
+const getLayoutProperty = jest.fn();
 const fitBounds = jest.fn();
 const panTo = jest.fn();
 const setStyle = jest.fn();
@@ -246,6 +247,7 @@ beforeEach(() => {
     },
   });
   getLayer.mockReturnValue(true);
+  getLayoutProperty.mockReturnValue("visible");
   useMap.mockReturnValue({
     map: {
       addControl,
@@ -261,6 +263,7 @@ beforeEach(() => {
       querySourceFeatures,
       addLayer,
       setLayoutProperty,
+      getLayoutProperty,
       fitBounds,
       panTo,
       setStyle,
@@ -430,6 +433,7 @@ describe("Hooks tests", () => {
       setFilter,
       setFeatureState,
       setLayoutProperty,
+      getLayoutProperty,
       once,
       setStyle,
     });
@@ -1156,6 +1160,41 @@ describe("handleZoom function tests", () => {
         "text-opacity": ["case", expect.any(Array), 0, 1],
       },
     });
+  });
+
+  it("keeps labels hidden when zoomed in but the parent layer is hidden", () => {
+    getZoom.mockReturnValue(14); // 14 > 12
+    getLayoutProperty.mockReturnValue("none");
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    expect(getLayoutProperty).toHaveBeenCalledWith("id", "visibility");
+    expect(setLayoutProperty).toHaveBeenCalledWith("id-label", "visibility", "none");
+    expect(setLayoutProperty).not.toHaveBeenCalledWith("id-label", "visibility", "visible");
+  });
+
+  it("does not create the label layer when the parent layer is hidden", () => {
+    getLayer.mockImplementation((id) => (id === "id-label" ? null : true));
+    getZoom.mockReturnValue(14); // 14 > 12
+    getLayoutProperty.mockReturnValue("none");
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    expect(addLayer).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: "id-label" })
+    );
   });
 });
 

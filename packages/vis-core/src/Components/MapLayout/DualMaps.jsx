@@ -689,8 +689,11 @@ const DualMaps = (props) => {
       ["left", "right"].forEach((side) => {
         const map = maps[side];
         const mapZoomLevel = map.getZoom();
+        // Labels must never show while their parent layer is hidden
+        const parentHidden =
+          !!map.getLayer(layerId) && map.getLayoutProperty(layerId, 'visibility') === 'none';
 
-        if (mapZoomLevel <= labelZoomLevel) {
+        if (mapZoomLevel <= labelZoomLevel || parentHidden) {
           if (map.getLayer(`${layerId}-label`)) {
             map.setLayoutProperty(`${layerId}-label`, 'visibility', 'none');
           }
