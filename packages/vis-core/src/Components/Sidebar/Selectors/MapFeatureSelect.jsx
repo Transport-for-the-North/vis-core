@@ -81,10 +81,12 @@ const EnableSelectButton = styled.button`
  * @param {Object} layer - The layer from mapState.
  * @returns {string|undefined} The feature lookup path.
  */
-export const getFeatureLookupPath = (layer) => {
+export const getFeatureLookupPath = (layer, targetSide = "left") => {
   if (layer?.metadata?.path) return layer.metadata.path;
   if (layer?.sidePaths) {
-    return layer.sideMissingParams?.left?.length ? layer.sidePaths.right : layer.sidePaths.left;
+    const side = targetSide === "right" ? "right" : "left";
+    const other = side === "left" ? "right" : "left";
+    return layer.sideMissingParams?.[side]?.length ? layer.sidePaths[other] : layer.sidePaths[side];
   }
   return layer?.path;
 };
@@ -140,7 +142,8 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
   
 
   // Ensure layer and its properties are defined
-  const layerPath = getFeatureLookupPath(layer);
+  const targetSide = filter?.sides || filter?.side || (filter?.filterName?.includes("Right") ? "right" : "left");
+  const layerPath = getFeatureLookupPath(layer, targetSide);
 
   /**
    * Handles the change in selected options from the dropdown.

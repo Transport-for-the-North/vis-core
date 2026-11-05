@@ -32,7 +32,8 @@ export const MapFeatureSelectAndPan = ({ filter, onChange, ...props }) => {
       `Layer '${filter.layer}' not found in mapState while attempting to instantiate a mapFeatureSelect filter.`
     );
   }
-  const layerPath = getFeatureLookupPath(layer);
+  const targetSide = filter?.sides || filter?.side || (filter?.filterName?.includes("Right") ? "right" : "left");
+  const layerPath = getFeatureLookupPath(layer, targetSide);
 
   /**
    * Handles the change in selected options from the dropdown.
