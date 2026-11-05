@@ -19,8 +19,68 @@ const normalisePages = (appConfig) => {
   return Array.isArray(pages) ? pages : [];
 };
 
-const isRoutePresentInSchema = (apiSchema, apiRoute) => {
-  return Boolean(apiSchema?.paths && Object.prototype.hasOwnProperty.call(apiSchema.paths, apiRoute));
+const normaliseRouteForLookup = (apiRoute) => {
+  if (typeof apiRoute !== "string") return "";
+
+  const trimmed = apiRoute.trim();
+  if (!trimmed) return "";
+
+  const routePath = /^[A-Za-z][A-Za-z\d+.-]*:\/\//.test(trimmed)
+    ? new URL(trimmed).pathname
+    : trimmed.split("?")[0];
+
+  return routePath.replace(/\/+$/, "") || "/";
+};
+
+const buildSchemaPathLowerCaseLookup = (apiSchema) => {
+  const lookup = new Map();
+  const schemaPaths = Object.keys(apiSchema?.paths || {});
+
+  for (const schemaPath of schemaPaths) {
+    const trimmed = schemaPath.trim();
+    if (!trimmed) continue;
+
+    if (!lookup.has(trimmed.toLowerCase())) {
+      lookup.set(trimmed.toLowerCase(), trimmed);
+    }
+
+    // Also index the normalised form so route variants (query strings, trailing slashes)
+    // still resolve to the canonical schema path.
+    const normalised = normaliseRouteForLookup(trimmed);
+    if (normalised && !lookup.has(normalised.toLowerCase())) {
+      lookup.set(normalised.toLowerCase(), trimmed);
+    }
+  }
+
+  return lookup;
+};
+
+const resolveSchemaRoute = (apiSchema, apiRoute, lowerCaseLookup) => {
+  const schemaPaths = apiSchema?.paths || {};
+  const trimmedRoute = typeof apiRoute === "string" ? apiRoute.trim() : "";
+
+  // Prefer exact matches first to avoid changing behavior when route casing already matches.
+  if (trimmedRoute && Object.prototype.hasOwnProperty.call(schemaPaths, trimmedRoute)) {
+    return trimmedRoute;
+  }
+
+  const normalisedRoute = normaliseRouteForLookup(trimmedRoute);
+  if (normalisedRoute && Object.prototype.hasOwnProperty.call(schemaPaths, normalisedRoute)) {
+    return normalisedRoute;
+  }
+
+  if (trimmedRoute) {
+    // Fallback to case-insensitive lookup so "/API/FOO" resolves to "/api/foo".
+    const matchedTrimmed = lowerCaseLookup.get(trimmedRoute.toLowerCase());
+    if (matchedTrimmed) return matchedTrimmed;
+  }
+
+  if (normalisedRoute) {
+    const matchedNormalised = lowerCaseLookup.get(normalisedRoute.toLowerCase());
+    if (matchedNormalised) return matchedNormalised;
+  }
+
+  return null;
 };
 
 const getEffectiveParamsMaps = (apiSchema, apiRoute, filters) => {
@@ -69,6 +129,7 @@ export function validateAppConfigAgainstOpenApi(appConfig, apiSchema, options = 
 
   const errors = [];
   const warnings = [];
+  const schemaPathLowerCaseLookup = buildSchemaPathLowerCaseLookup(apiSchema);
 
   const pages = normalisePages(appConfig);
   if (!pages.length) return { errors, warnings };
@@ -101,8 +162,9 @@ export function validateAppConfigAgainstOpenApi(appConfig, apiSchema, options = 
 
     for (const endpoint of endpoints) {
       const apiRoute = endpoint.route;
+      const resolvedSchemaRoute = resolveSchemaRoute(apiSchema, apiRoute, schemaPathLowerCaseLookup);
 
-      if (!isRoutePresentInSchema(apiSchema, apiRoute)) {
+      if (!resolvedSchemaRoute) {
         warnings.push({
           type: "missing_schema_path",
           pageName,
@@ -115,7 +177,7 @@ export function validateAppConfigAgainstOpenApi(appConfig, apiSchema, options = 
         continue;
       }
 
-      const { queryParams, pathParams } = getEffectiveParamsMaps(apiSchema, apiRoute, pageFilters);
+      const { queryParams, pathParams } = getEffectiveParamsMaps(apiSchema, resolvedSchemaRoute, pageFilters);
 
       const { pathParams: specifiedPathParams, queryParams: specifiedQueryParams } =
         extractParamsWithValuesSeparated(apiRoute);
