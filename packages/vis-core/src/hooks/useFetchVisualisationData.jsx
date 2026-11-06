@@ -158,41 +158,6 @@ const determineFetchState = ({
   return DataFetchState.SUCCESS;
 };
 
-const filterDataByValueRange = (data, valueRangeFilter) => {
-  if (!Array.isArray(data)) return data;
-  if (
-    !valueRangeFilter ||
-    !Number.isFinite(valueRangeFilter.min) ||
-    !Number.isFinite(valueRangeFilter.max)
-  ) {
-    return data;
-  }
-
-  return data.filter((record) => {
-    if (record == null || typeof record !== "object") return true;
-
-    const candidateValue =
-      record.value ??
-      record.metric ??
-      record.score ??
-      null;
-
-    if (candidateValue === null || candidateValue === undefined) {
-      return true;
-    }
-
-    const numericValue = Number(candidateValue);
-    if (!Number.isFinite(numericValue)) {
-      return true;
-    }
-
-    return (
-      numericValue >= valueRangeFilter.min &&
-      numericValue <= valueRangeFilter.max
-    );
-  });
-};
-
 /**
  * Custom hook to fetch data for a visualisation and (optionally) filter that data
  * to only include records visible in the map viewport.
@@ -232,7 +197,6 @@ export const useFetchVisualisationData = (
     mapLayerId = null,
     shouldFilterDataToViewport = false,
     debounceMs = 400,
-    valueRangeFilter = null,
   } = {}
 ) => {
   const [isLoading, setLoading] = useState(false);
@@ -678,17 +642,9 @@ export const useFetchVisualisationData = (
   // }, [map, mapLayerId, rawData, shouldFilterDataToViewport]);
 
   // Compute derived values
-  const baseData = filteredData ?? rawData;
-  const data = useMemo(
-    () => filterDataByValueRange(baseData, valueRangeFilter),
-    [baseData, valueRangeFilter]
-  );
+  const data = filteredData ?? rawData;
   
-  const dataWasReturnedButFiltered =
-    Array.isArray(baseData) &&
-    baseData.length > 0 &&
-    Array.isArray(data) &&
-    data.length === 0;
+  const dataWasReturnedButFiltered = false;
 
   // Determine the current fetch state
   const fetchState = determineFetchState({

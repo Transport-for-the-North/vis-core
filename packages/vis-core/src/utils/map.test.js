@@ -5,9 +5,15 @@ import {
   reclassifyData,
   getWidthProperty,
   isValueInRange,
+  isValueInCategoryFilter,
+  isValueMatchingFilter,
   buildValueRangeCondition,
+  buildValueCategoryCondition,
+  buildValueFilterCondition,
   applyValueRangeToExpression,
+  applyValueFilterToExpression,
   applyValueRangeToPaint,
+  applyValueFilterToPaint,
   isBasePlaceLabelLayer,
   moveTownCityLabelsToTop,
   TOWN_CITY_LABEL_LAYER_IDS,
@@ -430,6 +436,58 @@ describe("value range helpers", () => {
     expect(nextPaint["fill-opacity"][0]).toBe("case");
     expect(nextPaint["line-width"][0]).toBe("case");
     expect(nextPaint["fill-color"]).toBe("#00AA88");
+  });
+
+  it("matches category selections when category filters are set", () => {
+    expect(isValueInCategoryFilter("A", ["A", "B"])) .toBe(true);
+    expect(isValueInCategoryFilter("C", ["A", "B"])) .toBe(false);
+    expect(isValueInCategoryFilter("A", null)).toBe(true);
+  });
+
+  it("matches combined range and category filters", () => {
+    expect(isValueMatchingFilter(10, { min: 5, max: 20 }, ["10", "30"])) .toBe(true);
+    expect(isValueMatchingFilter(4, { min: 5, max: 20 }, ["4"])) .toBe(false);
+    expect(isValueMatchingFilter(10, { min: 5, max: 20 }, ["12"])) .toBe(false);
+  });
+
+  it("builds category and combined map conditions", () => {
+    expect(buildValueCategoryCondition(["A", "B"])) .toEqual([
+      "in",
+      ["to-string", ["feature-state", "value"]],
+      ["literal", ["A", "B"]],
+    ]);
+
+    expect(buildValueFilterCondition({ min: 1, max: 2 }, ["1"])) .toEqual([
+      "all",
+      [
+        "all",
+        ["!=", ["feature-state", "value"], null],
+        [">=", ["to-number", ["feature-state", "value"]], 1],
+        ["<=", ["to-number", ["feature-state", "value"]], 2],
+      ],
+      ["in", ["to-string", ["feature-state", "value"]], ["literal", ["1"]]],
+    ]);
+  });
+
+  it("wraps expressions and paint with combined filter conditions", () => {
+    const expr = applyValueFilterToExpression(
+      ["feature-state", "value"],
+      { min: 2, max: 8 },
+      ["4"]
+    );
+    expect(expr[0]).toBe("case");
+
+    const paint = applyValueFilterToPaint(
+      {
+        "fill-opacity": 0.7,
+        "line-width": ["interpolate", ["linear"], ["feature-state", "value"], 0, 1, 10, 4],
+      },
+      { min: 1, max: 9 },
+      ["4", "5"]
+    );
+
+    expect(Array.isArray(paint["fill-opacity"])).toBe(true);
+    expect(Array.isArray(paint["line-width"])).toBe(true);
   });
 });
 

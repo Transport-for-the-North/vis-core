@@ -89,6 +89,17 @@ jest.mock("./MapFeatureSelectAndPan", () => ({
     </div>
   ),
 }));
+jest.mock("./RangeSlider", () => ({
+  RangeSlider: ({ onChange }) => (
+    <button
+      type="button"
+      data-testid="mock-range-slider"
+      onClick={() => onChange([2, 8])}
+    >
+      range
+    </button>
+  ),
+}));
 
 const mockAppContexte = {
   //   state: {
@@ -451,5 +462,102 @@ describe("SelectorSection component test", () => {
     // Ensure we checked exactly the number of filters total (1 target + 7 dependent = 8)
     expect(disabledNodes.length).toBe(8);
     expect(excludeValueNodes.length).toBe(8);
+  });
+
+  it("renders layer value filtering for continuous styles and dispatches range updates", async () => {
+    const mapDispatch = jest.fn();
+    const localMapState = {
+      ...mockState,
+      layers: {
+        links: {
+          metadata: { isStylable: true, colorStyle: "continuous" },
+          visualisationName: "links",
+        },
+      },
+      visualisations: {
+        links: {
+          name: "links",
+          style: "line-continuous",
+          data: [{ value: 1 }, { value: 5 }, { value: 9 }],
+        },
+      },
+    };
+
+    props = {
+      ...props,
+      filters: [],
+    };
+
+    render(
+      <AppContext.Provider value={mockAppContexte}>
+        <MapContext.Provider value={{ state: localMapState, dispatch: mapDispatch }}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <SelectorSection {...props} />
+          </FilterContext.Provider>
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    await userEvent.click(screen.getByText("Layer value filtering"));
+    await userEvent.click(screen.getByTestId("mock-range-slider"));
+
+    expect(mapDispatch).toHaveBeenCalledWith({
+      type: "UPDATE_LAYER_VALUE_RANGE_FILTER",
+      payload: {
+        layerName: "links",
+        rangeFilter: {
+          min: 2,
+          max: 8,
+          domainMin: 1,
+          domainMax: 9,
+        },
+      },
+    });
+  });
+
+  it("renders layer value filtering for categorical styles and dispatches category updates", async () => {
+    const mapDispatch = jest.fn();
+    const localMapState = {
+      ...mockState,
+      layers: {
+        links: {
+          metadata: { isStylable: true, colorStyle: "categorical" },
+          visualisationName: "links",
+        },
+      },
+      visualisations: {
+        links: {
+          name: "links",
+          style: "line-categorical",
+          data: [{ value: "A" }, { value: "B" }, { value: "A" }],
+        },
+      },
+    };
+
+    props = {
+      ...props,
+      filters: [],
+    };
+
+    render(
+      <AppContext.Provider value={mockAppContexte}>
+        <MapContext.Provider value={{ state: localMapState, dispatch: mapDispatch }}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <SelectorSection {...props} />
+          </FilterContext.Provider>
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+    await userEvent.click(screen.getByText("Layer value filtering"));
+    await userEvent.click(screen.getByLabelText("A"));
+
+    expect(mapDispatch).toHaveBeenCalledWith({
+      type: "UPDATE_LAYER_VALUE_CATEGORY_FILTER",
+      payload: {
+        layerName: "links",
+        categoryFilter: ["B"],
+      },
+    });
   });
 });

@@ -24,8 +24,8 @@ import {
   resolveTooltipRequestUrl,
   resolveVisualisationUnit,
   getFeatureStateValue,
-  isValueInRange,
-  applyValueRangeToExpression,
+  isValueMatchingFilter,
+  applyValueFilterToExpression,
 } from "utils";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
@@ -116,6 +116,11 @@ const DualMaps = (props) => {
 
   const getLayerRangeFilter = useCallback(
     (layerId) => state.layers?.[layerId]?.valueRangeFilter ?? null,
+    [state.layers]
+  );
+
+  const getLayerCategoryFilter = useCallback(
+    (layerId) => state.layers?.[layerId]?.valueCategoryFilter ?? null,
     [state.layers]
   );
 
@@ -262,13 +267,14 @@ const DualMaps = (props) => {
           const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
           const featureValue = getFeatureStateValue(feature);
           const rangeFilter = layerConfig?.valueRangeFilter;
+          const categoryFilter = layerConfig?.valueCategoryFilter;
           
           // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
           if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
             return false; // Exclude this feature as it has no data
           }
 
-          if (!isValueInRange(featureValue, rangeFilter)) {
+          if (!isValueMatchingFilter(featureValue, rangeFilter, categoryFilter)) {
             return false;
           }
           
@@ -640,7 +646,11 @@ const DualMaps = (props) => {
       const features = map.queryRenderedFeatures(bufferedPoint, {
         layers: [layerId],
       }).filter((feature) =>
-        isValueInRange(getFeatureStateValue(feature), getLayerRangeFilter(layerId))
+        isValueMatchingFilter(
+          getFeatureStateValue(feature),
+          getLayerRangeFilter(layerId),
+          getLayerCategoryFilter(layerId)
+        )
       );
 
       if (features.length !== 0) {
@@ -744,9 +754,10 @@ const DualMaps = (props) => {
                   'text-color': '#000000',  // Black text
                   'text-halo-color': '#ffffff',  // White halo for readability
                   'text-halo-width': 2.5,
-                  'text-opacity': applyValueRangeToExpression(
+                  'text-opacity': applyValueFilterToExpression(
                     labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
                     state.layers[layerId]?.valueRangeFilter,
+                    state.layers[layerId]?.valueCategoryFilter,
                     0
                   ),
                 }
@@ -856,7 +867,11 @@ const DualMaps = (props) => {
           const features = map.queryRenderedFeatures(point, {
             layers: [filter.layer],
           }).filter((feature) =>
-            isValueInRange(getFeatureStateValue(feature), getLayerRangeFilter(filter.layer))
+            isValueMatchingFilter(
+              getFeatureStateValue(feature),
+              getLayerRangeFilter(filter.layer),
+              getLayerCategoryFilter(filter.layer)
+            )
           );
           if (features.length > 0) {
             // Assuming the first feature is the one we're interested in

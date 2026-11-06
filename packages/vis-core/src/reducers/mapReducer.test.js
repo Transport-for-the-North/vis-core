@@ -372,4 +372,26 @@ describe("mapReducer value range filter", () => {
     });
     expect(nextState.layers.links.class_method).toBe("q");
   });
+
+  it("stores the selected categories on the target layer", () => {
+    const initialState = {
+      layers: {
+        links: {
+          id: "links",
+          class_method: "q",
+        },
+      },
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.UPDATE_LAYER_VALUE_CATEGORY_FILTER,
+      payload: {
+        layerName: "links",
+        categoryFilter: ["A", "B"],
+      },
+    });
+
+    expect(nextState.layers.links.valueCategoryFilter).toEqual(["A", "B"]);
+    expect(nextState.layers.links.class_method).toBe("q");
+  });
 });

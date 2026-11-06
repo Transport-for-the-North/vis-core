@@ -411,8 +411,7 @@ describe("LayerControlEntry component test", () => {
     });
   });
 
-  it("dispatches visible value range updates when the range slider changes", async () => {
-    const dispatch = jest.fn();
+  it("does not render visible value range controls in map layer control", () => {
     const testProps = {
       ...props,
       layer: {
@@ -432,7 +431,7 @@ describe("LayerControlEntry component test", () => {
     };
 
     render(
-      <MapContext.Provider value={{ state: testProps.state, dispatch }}>
+      <MapContext.Provider value={{ state: testProps.state, dispatch: jest.fn() }}>
         <PageContext.Provider value={mockPageContext}>
           <AppContext.Provider value={mockAppContexte}>
             <LayerControlEntry {...testProps} />
@@ -441,24 +440,7 @@ describe("LayerControlEntry component test", () => {
       </MapContext.Provider>
     );
 
-    fireEvent.change(screen.getByLabelText("id value range minimum"), {
-      target: { value: "1" },
-    });
-
-    await waitFor(() => {
-      expect(dispatch).toHaveBeenCalledWith({
-        type: "UPDATE_LAYER_VALUE_RANGE_FILTER",
-        payload: {
-          layerName: "id",
-          rangeFilter: {
-            min: 1,
-            max: 4,
-            domainMin: 0,
-            domainMax: 4,
-          },
-        },
-      });
-    });
+    expect(screen.queryByText("Visible value range")).not.toBeInTheDocument();
   });
 
   it("Test", () => {

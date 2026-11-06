@@ -28,8 +28,8 @@ import {
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
   resolveVisualisationUnit,
-  isValueInRange,
-  applyValueRangeToExpression,
+  isValueMatchingFilter,
+  applyValueFilterToExpression,
 } from "utils";
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -153,14 +153,23 @@ const Map = (props) => {
     [state.layers]
   );
 
+  const getLayerCategoryFilter = useCallback(
+    (rawLayerId) => {
+      const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
+      return state.layers?.[layerId]?.valueCategoryFilter ?? null;
+    },
+    [state.layers]
+  );
+
   const isFeatureWithinConfiguredRange = useCallback(
     (feature) => {
       if (!feature?.layer?.id) return false;
       const rangeFilter = getLayerRangeFilter(feature.layer.id);
+      const categoryFilter = getLayerCategoryFilter(feature.layer.id);
       const featureValue = getFeatureStateValue(feature);
-      return isValueInRange(featureValue, rangeFilter);
+      return isValueMatchingFilter(featureValue, rangeFilter, categoryFilter);
     },
-    [getLayerRangeFilter]
+    [getLayerRangeFilter, getLayerCategoryFilter]
   );
 
   const lastTouchTimeRef = useRef(0);
@@ -429,13 +438,14 @@ const Map = (props) => {
         // Safely get feature value - feature.state may be null or undefined
         const featureValue = getFeatureStateValue(feature);
         const rangeFilter = layerConfig.valueRangeFilter;
+        const categoryFilter = layerConfig.valueCategoryFilter;
         
         // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
         if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
           return false; // Exclude this feature as it has no data
         }
 
-        if (!isValueInRange(featureValue, rangeFilter)) {
+        if (!isValueMatchingFilter(featureValue, rangeFilter, categoryFilter)) {
           return false;
         }
         
@@ -911,9 +921,10 @@ const Map = (props) => {
                 'text-color': '#000000',  // Black text
                 'text-halo-color': '#ffffff',  // White halo for readability
                 'text-halo-width': 2.5,
-                'text-opacity': applyValueRangeToExpression(
+                'text-opacity': applyValueFilterToExpression(
                   labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
                   state.layers[layerId]?.valueRangeFilter,
+                  state.layers[layerId]?.valueCategoryFilter,
                   0
                 ),
               }
@@ -1014,9 +1025,11 @@ const Map = (props) => {
       const layerNames = mapFilters.map((filter) => filter.layer);
 
       // Query for features from all layers specified in mapFilters
-      const features = map.queryRenderedFeatures(point, {
-        layers: layerNames,
-      }).filter(isFeatureWithinConfiguredRange);
+      const features = (
+        map.queryRenderedFeatures(point, {
+          layers: layerNames,
+        }) || []
+      ).filter(isFeatureWithinConfiguredRange);
 
       if (features && features.length > 0) {
         // Get the top-most feature

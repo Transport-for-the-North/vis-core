@@ -332,6 +332,50 @@ export const isValueInRange = (value, range) => {
 };
 
 /**
+ * Checks whether a value matches a selected category filter.
+ * Missing/empty filters default to permissive behaviour.
+ *
+ * @param {string|number|null|undefined} value
+ * @param {Array<string|number>|null|undefined} categoryFilter
+ * @returns {boolean}
+ */
+export const isValueInCategoryFilter = (value, categoryFilter) => {
+  if (categoryFilter === null || categoryFilter === undefined) {
+    return true;
+  }
+
+  if (!Array.isArray(categoryFilter)) {
+    return true;
+  }
+
+  if (categoryFilter.length === 0) {
+    return false;
+  }
+
+  if (value === null || value === undefined) {
+    return false;
+  }
+
+  const normalisedValue = String(value);
+  return categoryFilter.some((category) => String(category) === normalisedValue);
+};
+
+/**
+ * Checks whether a value matches both range and category filters.
+ *
+ * @param {string|number|null|undefined} value
+ * @param {{min:number,max:number}|null|undefined} range
+ * @param {Array<string|number>|null|undefined} categoryFilter
+ * @returns {boolean}
+ */
+export const isValueMatchingFilter = (value, range, categoryFilter) => {
+  return (
+    isValueInRange(value, range) &&
+    isValueInCategoryFilter(value, categoryFilter)
+  );
+};
+
+/**
  * Builds a map expression condition that matches feature-state.value in a range.
  *
  * @param {{min:number,max:number}|null|undefined} range
@@ -351,6 +395,54 @@ export const buildValueRangeCondition = (range) => {
 };
 
 /**
+ * Builds a map expression condition that matches feature-state.value in selected categories.
+ *
+ * @param {Array<string|number>|null|undefined} categoryFilter
+ * @returns {Array|null}
+ */
+export const buildValueCategoryCondition = (categoryFilter) => {
+  if (categoryFilter === null || categoryFilter === undefined) {
+    return null;
+  }
+
+  if (!Array.isArray(categoryFilter)) {
+    return null;
+  }
+
+  if (categoryFilter.length === 0) {
+    return ["literal", false];
+  }
+
+  return [
+    "in",
+    ["to-string", ["feature-state", "value"]],
+    ["literal", categoryFilter.map((value) => String(value))],
+  ];
+};
+
+/**
+ * Builds a combined map expression condition for range/category filters.
+ *
+ * @param {{min:number,max:number}|null|undefined} range
+ * @param {Array<string|number>|null|undefined} categoryFilter
+ * @returns {Array|null}
+ */
+export const buildValueFilterCondition = (range, categoryFilter) => {
+  const rangeCondition = buildValueRangeCondition(range);
+  const categoryCondition = buildValueCategoryCondition(categoryFilter);
+
+  if (!rangeCondition && !categoryCondition) {
+    return null;
+  }
+
+  if (rangeCondition && categoryCondition) {
+    return ["all", rangeCondition, categoryCondition];
+  }
+
+  return rangeCondition ?? categoryCondition;
+};
+
+/**
  * Wraps an existing paint expression so out-of-range values are driven to fallbackValue.
  *
  * @param {number|Array} paintValue
@@ -363,8 +455,26 @@ export const applyValueRangeToExpression = (
   range,
   fallbackValue = 0
 ) => {
-  const rangeCondition = buildValueRangeCondition(range);
-  if (!rangeCondition) {
+  return applyValueFilterToExpression(paintValue, range, null, fallbackValue);
+};
+
+/**
+ * Wraps an existing paint expression so filtered-out values are driven to fallbackValue.
+ *
+ * @param {number|Array} paintValue
+ * @param {{min:number,max:number}|null|undefined} range
+ * @param {Array<string|number>|null|undefined} categoryFilter
+ * @param {number} fallbackValue
+ * @returns {number|Array}
+ */
+export const applyValueFilterToExpression = (
+  paintValue,
+  range,
+  categoryFilter,
+  fallbackValue = 0
+) => {
+  const filterCondition = buildValueFilterCondition(range, categoryFilter);
+  if (!filterCondition) {
     return paintValue;
   }
 
@@ -372,7 +482,7 @@ export const applyValueRangeToExpression = (
     return paintValue;
   }
 
-  return ["case", rangeCondition, paintValue, fallbackValue];
+  return ["case", filterCondition, paintValue, fallbackValue];
 };
 
 /**
@@ -383,8 +493,20 @@ export const applyValueRangeToExpression = (
  * @returns {Object}
  */
 export const applyValueRangeToPaint = (paint = {}, range) => {
-  const rangeCondition = buildValueRangeCondition(range);
-  if (!rangeCondition || typeof paint !== "object" || paint === null) {
+  return applyValueFilterToPaint(paint, range, null);
+};
+
+/**
+ * Applies combined range/category filtering to paint properties used by map geometries.
+ *
+ * @param {Object} paint
+ * @param {{min:number,max:number}|null|undefined} range
+ * @param {Array<string|number>|null|undefined} categoryFilter
+ * @returns {Object}
+ */
+export const applyValueFilterToPaint = (paint = {}, range, categoryFilter) => {
+  const filterCondition = buildValueFilterCondition(range, categoryFilter);
+  if (!filterCondition || typeof paint !== "object" || paint === null) {
     return paint;
   }
 
@@ -401,7 +523,7 @@ export const applyValueRangeToPaint = (paint = {}, range) => {
 
   geometryVisibilityProps.forEach((propName) => {
     if (nextPaint[propName] !== undefined) {
-      nextPaint[propName] = ["case", rangeCondition, nextPaint[propName], 0];
+      nextPaint[propName] = ["case", filterCondition, nextPaint[propName], 0];
     }
   });
 
