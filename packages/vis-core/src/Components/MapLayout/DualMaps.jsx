@@ -66,6 +66,55 @@ const StyledMapContainer = styled.div`
   }
 `;
 
+const SIDES = ["left", "right"];
+
+const SELECTED_FEATURE_LAYER = "selected-feature-layer";
+const SELECTED_FEATURE_SOURCE = "selected-feature-source";
+
+/**
+ * Replaces the selection highlight on a map with the given feature, or just removes it when
+ * there is no feature.
+ *
+ * @param {maplibregl.Map} map - The map to update.
+ * @param {Object|null} feature - The rendered feature to highlight, or null to clear.
+ */
+const highlightSelectedFeature = (map, feature) => {
+  if (map.getLayer(SELECTED_FEATURE_LAYER)) {
+    map.removeLayer(SELECTED_FEATURE_LAYER);
+    map.removeSource(SELECTED_FEATURE_SOURCE);
+  }
+  if (!feature) return;
+
+  // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
+  // for the circle paintProp, however we currently dont have full functionality.
+  let paintProp = {};
+  if (feature.layer.type === "circle") {
+    paintProp = {
+      "circle-radius": 6,
+      "circle-color": "green",
+      "circle-opacity": 0.75,
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "black",
+    };
+  } else if (feature.layer.type === "fill") {
+    paintProp = {
+      "fill-color": "#f00",
+      "fill-opacity": 0.5,
+    };
+  }
+
+  map.addSource(SELECTED_FEATURE_SOURCE, {
+    type: "geojson",
+    data: feature.toJSON(),
+  });
+  map.addLayer({
+    id: SELECTED_FEATURE_LAYER,
+    type: feature.layer.type,
+    source: SELECTED_FEATURE_SOURCE,
+    paint: paintProp,
+  });
+};
+
 /**
  * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
@@ -815,88 +864,65 @@ const DualMaps = (props) => {
   }, [maps, handleLayerLeave, state.layers, state.visualisations]);
 
   /**
-   * Handles map click events and dispatches actions based on the clicked feature.
+   * Handles map click events for `type: "map"` filters.
+   *
+   * Each side takes the feature under the clicked point on its own map, so the two sides can use
+   * different layers' features (e.g. different zoning systems) and each fetches its own data.
+   * A side with no feature under the point is cleared: its selection highlight is removed and its
+   * param is set to null. A click with no feature on either side is ignored.
    *
    * @property {Object} event - The event object containing information about the click event.
    */
   const handleMapClick = useCallback(
     (event) => {
-      if (!isMapReady || (!maps.left && !maps.right)) return;
+      if (!isMapReady || !maps.left || !maps.right) return;
 
       const point = event.point;
+      const clickedSide = event.target === maps.right ? "right" : "left";
 
       // Get all map filters
       const mapFilters = state.filters.filter(
         (filter) => filter.type === "map"
       );
 
-      // For each map filter, check if the clicked point has a feature from the layer
       mapFilters.forEach((filter) => {
-        ["left", "right"].forEach((side) => {
+        const featureBySide = {};
+        SIDES.forEach((side) => {
+          featureBySide[side] =
+            maps[side].queryRenderedFeatures(point, { layers: [filter.layer] })[0] ?? null;
+        });
+
+        if (!featureBySide.left && !featureBySide.right) return;
+
+        const valueBySide = {};
+        SIDES.forEach((side) => {
           const map = maps[side];
-          const features = map.queryRenderedFeatures(point, {
-            layers: [filter.layer],
+          const feature = featureBySide[side];
+          const value = feature ? feature.properties[filter.field] : null;
+          valueBySide[side] = value;
+
+          highlightSelectedFeature(map, feature);
+
+          filter.actions.forEach((action) => {
+            dispatch({
+              type: action.action,
+              payload: { filter, value, sides: side },
+            });
           });
-          if (features.length > 0) {
-            // Assuming the first feature is the one we're interested in
-            const feature = features[0];
-            const value = feature.properties[filter.field];
+        });
 
-            // Remove the previous selection layer if it exists
-            if (map.getLayer("selected-feature-layer")) {
-              map.removeLayer("selected-feature-layer");
-              map.removeSource("selected-feature-source");
-            }
-
-            let paintProp = {};
-
-            // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
-            // for the circle paintProp, however we currently dont have full functionality.
-
-            if (feature.layer.type == "circle") {
-              paintProp = {
-                "circle-radius": 6,
-                "circle-color": "green",
-                "circle-opacity": 0.75,
-                "circle-stroke-width": 2,
-                "circle-stroke-color": "black",
-              };
-            } else if (feature.layer.type == "fill") {
-              paintProp = {
-                "fill-color": "#f00",
-                "fill-opacity": 0.5,
-              };
-            }
-
-            // Add a new source and layer for the selected feature
-            map.addSource("selected-feature-source", {
-              type: "geojson",
-              data: feature.toJSON(),
-            });
-
-            map.addLayer({
-              id: "selected-feature-layer",
-              type: feature.layer.type,
-              source: "selected-feature-source",
-              paint: paintProp,
-            });
-
-            // Dispatch the action with the value from the clicked feature
-            filterDispatch({
-              type: 'SET_FILTER_VALUE',
-              payload: { filterId: filter.id, value },
-            });
-            filter.actions.map((action) => {
-              dispatch({
-                type: action.action,
-                payload: { filter, value, sides: "both" },
-              });
-            });
-          }
+        // The filter holds one value, so show the clicked side's (or the other side's if the
+        // clicked side had none).
+        filterDispatch({
+          type: 'SET_FILTER_VALUE',
+          payload: {
+            filterId: filter.id,
+            value: valueBySide[clickedSide] ?? valueBySide[clickedSide === "left" ? "right" : "left"],
+          },
         });
       });
     },
-    [isMapReady, maps, state.filters, dispatch]
+    [isMapReady, maps, state.filters, dispatch, filterDispatch]
   );
 
   // Run once to set the state of the map
