@@ -3,6 +3,7 @@ import DualMaps from "./DualMaps";
 import { MapContext } from "contexts/MapContext";
 import { FilterContext } from "contexts/FilterContext";
 import { useDualMaps } from "hooks/useDualMaps";
+import { recordSliderOpacity } from "utils/map";
 import { ThemeProvider } from "styled-components";
 
 import { registerInitialBaseSources } from "../../map/baseSources";
@@ -482,6 +483,190 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
   });
 
+  describe("hidden layers", () => {
+    const mockFeatures = [
+      {
+        id: 1,
+        layer: { id: "layer1", source: "source1" },
+        properties: { name: "Test Feature" },
+        state: { value: 100 },
+      },
+    ];
+    const makeMap = (visibility) => ({
+      on: jest.fn(),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue(mockFeatures),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue(true),
+      getLayoutProperty: jest.fn((layerId) => visibility[layerId] ?? "visible"),
+      ...mockMapControls,
+    });
+    const hoverOver = (leftMap) => {
+      render(
+        <ThemeProvider theme={theme}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapContext.Provider value={mockMapContext}>
+              <DualMaps {...props} />
+            </MapContext.Provider>
+          </FilterContext.Provider>
+        </ThemeProvider>
+      );
+      const mousemoveCall = leftMap.on.mock.calls.find((call) => call[0] === "mousemove");
+      mousemoveCall[1]({ point: { x: 150, y: 150 }, lngLat: { lng: -0.1, lat: 51.5 } });
+    };
+
+    it("does not query a hidden layer on either map", () => {
+      const leftMap = makeMap({ layer1: "none" });
+      const rightMap = makeMap({ layer1: "none" });
+      useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+
+      hoverOver(leftMap);
+
+      [leftMap, rightMap].forEach((map) => {
+        expect(map.queryRenderedFeatures).toHaveBeenCalledWith(expect.anything(), {
+          layers: ["first"],
+        });
+      });
+    });
+
+    it("produces no hover effect on either map when every hoverable layer is hidden", () => {
+      const hidden = { first: "none", layer1: "none" };
+      const leftMap = makeMap(hidden);
+      const rightMap = makeMap(hidden);
+      useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+
+      hoverOver(leftMap);
+
+      [leftMap, rightMap].forEach((map) => {
+        expect(map.queryRenderedFeatures).not.toHaveBeenCalled();
+        expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+      });
+    });
+  });
+
+  describe("invisible no-data features", () => {
+    const NULL_GATED_OPACITY = ["case", ["==", ["feature-state", "value"], null], 0, 0.65];
+    const makeMap = (features) => ({
+      on: jest.fn(),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue(features),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue({ type: "fill" }),
+      getLayoutProperty: jest.fn(() => "visible"),
+      getPaintProperty: jest.fn(() => NULL_GATED_OPACITY),
+      ...mockMapControls,
+    });
+    const hoverOver = (layers, features, prepareMap) => {
+      const leftMap = makeMap(features);
+      const rightMap = makeMap(features);
+      prepareMap?.(leftMap);
+      prepareMap?.(rightMap);
+      useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+      const context = {
+        ...mockMapContext,
+        state: { ...mockMapContext.state, layers },
+      };
+      render(
+        <ThemeProvider theme={theme}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapContext.Provider value={context}>
+              <DualMaps {...props} />
+            </MapContext.Provider>
+          </FilterContext.Provider>
+        </ThemeProvider>
+      );
+      const mousemoveCall = leftMap.on.mock.calls.find((call) => call[0] === "mousemove");
+      mousemoveCall[1]({ point: { x: 150, y: 150 }, lngLat: { lng: -0.1, lat: 51.5 } });
+      return [leftMap, rightMap];
+    };
+    const feature = (state) => ({
+      id: 1,
+      layer: { id: "zones", source: "zones" },
+      properties: { name: "Test Feature" },
+      state,
+    });
+
+    it("gives no hover effect on either map to an invisible no-data feature", () => {
+      const maps = hoverOver(
+        { zones: { shouldHaveTooltipOnHover: true, isStylable: true } },
+        [feature({})]
+      );
+
+      maps.forEach((map) => {
+        expect(map.queryRenderedFeatures).toHaveBeenCalled();
+        expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+      });
+    });
+
+    it("still hovers a feature with data on both maps", () => {
+      const maps = hoverOver(
+        { zones: { shouldHaveTooltipOnHover: true, isStylable: true } },
+        [feature({ value: 5 })]
+      );
+
+      maps.forEach((map) => {
+        expect(map.setFeatureState).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 1 }),
+          { hover: true }
+        );
+      });
+    });
+
+    it("hovers an invisible no-data feature on both maps when hoverNulls is true", () => {
+      const maps = hoverOver(
+        { zones: { shouldHaveTooltipOnHover: true, isStylable: true, hoverNulls: true } },
+        [feature({})]
+      );
+
+      maps.forEach((map) => {
+        expect(map.setFeatureState).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 1 }),
+          { hover: true }
+        );
+      });
+    });
+
+    describe("with the opacity slider at 0", () => {
+      const setSliderToZero = (map) => {
+        map.getPaintProperty.mockReturnValue([
+          "case",
+          ["==", ["feature-state", "value"], null],
+          0,
+          0,
+        ]);
+        recordSliderOpacity(map, "zones", 0);
+      };
+
+      it("gives no hover effect on either map to a feature with data", () => {
+        const maps = hoverOver(
+          { zones: { shouldHaveTooltipOnHover: true, isStylable: true } },
+          [feature({ value: 5 })],
+          setSliderToZero
+        );
+
+        maps.forEach((map) => {
+          expect(map.queryRenderedFeatures).toHaveBeenCalled();
+          expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+        });
+      });
+
+      it("gives no hover effect on either map when hoverNulls is true", () => {
+        const maps = hoverOver(
+          { zones: { shouldHaveTooltipOnHover: true, isStylable: true, hoverNulls: true } },
+          [feature({})],
+          setSliderToZero
+        );
+
+        maps.forEach((map) => {
+          expect(map.queryRenderedFeatures).toHaveBeenCalled();
+          expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+        });
+      });
+    });
+  });
+
   it("Test function getCanvas() is called", () => {
     render(
       <ThemeProvider theme={theme}>
@@ -533,6 +718,57 @@ describe("Test with shouldHaveLabel = true", () => {
       </ThemeProvider>
     );
   });
+
+  it.each([
+    ["visible", "visible"],
+    ["none", "none"],
+  ])(
+    "when zoomed in and the parent layer is '%s', sets label visibility to '%s'",
+    (parentVisibility, expectedLabelVisibility) => {
+      const zoomOn = jest.fn((event, callback) => {
+        if (event === "zoomend") callback();
+      });
+      const makeMap = (type) => ({
+        off: jest.fn(),
+        on: zoomOn,
+        getCanvas: jest.fn(() => ({ style: {} })),
+        getLayer: jest.fn(() => true),
+        getZoom: jest.fn(() => 14), // above the default label zoom of 12
+        getLayoutProperty: jest.fn(() => parentVisibility),
+        setLayoutProperty: jest.fn(),
+        type,
+        ...mockMapControls,
+      });
+      const leftMap = makeMap("left");
+      const rightMap = makeMap("right");
+      useDualMaps.mockReturnValue({
+        leftMap,
+        rightMap,
+        isMapStyleLoaded: "isMapStyleLoaded",
+        isMapLoaded: "isMapLoaded",
+        isMapReady: "isMapReady",
+      });
+
+      render(
+        <ThemeProvider theme={theme}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapContext.Provider value={mockMapContext}>
+              <DualMaps {...props} />
+            </MapContext.Provider>
+          </FilterContext.Provider>
+        </ThemeProvider>
+      );
+
+      [leftMap, rightMap].forEach((map) => {
+        expect(map.getLayoutProperty).toHaveBeenCalledWith("first", "visibility");
+        expect(map.setLayoutProperty).toHaveBeenCalledWith(
+          "first-label",
+          "visibility",
+          expectedLabelVisibility
+        );
+      });
+    }
+  );
 });
 
 describe("Tests when apiRequest is not null", () => {

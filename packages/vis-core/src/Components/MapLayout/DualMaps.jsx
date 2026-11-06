@@ -14,6 +14,9 @@ import { useBaseMapTransition } from "hooks/useBaseMapTransition";
 import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
+  isFeatureHoverable,
+  isLayerVisibleOnMap,
+  isLayerZeroedBySlider,
   numberWithCommas,
   replacePlaceholders,
   buildDefaultTooltip,
@@ -151,10 +154,10 @@ const DualMaps = (props) => {
       const otherMap = maps[otherMapType];
       if (!map || !otherMap || !e.point) return;
 
-      // Get layers that have shouldHaveTooltipOnHover set to true and are available on the map
+      // Get layers that have shouldHaveTooltipOnHover set to true and are visible on the map.
       const hoverableLayers = Object.keys(state.layers).filter(
         (layerId) =>
-          state.layers[layerId].shouldHaveTooltipOnHover && map.getLayer(layerId)
+          state.layers[layerId].shouldHaveTooltipOnHover && isLayerVisibleOnMap(map, layerId)
       );
 
       if (hoverableLayers.length === 0) {
@@ -247,20 +250,13 @@ const DualMaps = (props) => {
           return;
         }
 
-        // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
-        const filteredFeatures = features.filter((feature) => {
-          const layerId = feature.layer.id;
-          const layerConfig = state.layers[layerId];
-          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
-          const featureValue = feature.state.value;
-          
-          // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
-          if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
-            return false; // Exclude this feature as it has no data
-          }
-          
-          return true; // Include this feature
-        });
+        // Filter out layers set to 0 with the slider, and no-data features that are invisible
+        // or that the layer opts out of hovering
+        const filteredFeatures = features.filter(
+          (feature) =>
+            !isLayerZeroedBySlider(map, feature.layer.id) &&
+            isFeatureHoverable(map, feature, state.layers[feature.layer.id])
+        );
 
         // If after filtering we have no features, cleanup and return
         if (filteredFeatures.length === 0) {
@@ -384,15 +380,10 @@ const DualMaps = (props) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const customTooltip = layerConfig?.customTooltip;
-          const hoverNulls = layerConfig.hoverNulls ?? true;
           // Check if additional metadata should be appended
           const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
-          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
           const featureValue = feature.state.value;
-          if (!hoverNulls && (featureValue === null || featureValue === undefined)) {
-            return; // Skip this feature
-          }
 
           const featureName = feature.properties.name || "";
           const featureValueDisplay =
@@ -689,8 +680,11 @@ const DualMaps = (props) => {
       ["left", "right"].forEach((side) => {
         const map = maps[side];
         const mapZoomLevel = map.getZoom();
+        // Labels must never show while their parent layer is hidden
+        const parentHidden =
+          !!map.getLayer(layerId) && map.getLayoutProperty(layerId, 'visibility') === 'none';
 
-        if (mapZoomLevel <= labelZoomLevel) {
+        if (mapZoomLevel <= labelZoomLevel || parentHidden) {
           if (map.getLayer(`${layerId}-label`)) {
             map.setLayoutProperty(`${layerId}-label`, 'visibility', 'none');
           }

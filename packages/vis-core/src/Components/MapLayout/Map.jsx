@@ -18,6 +18,9 @@ import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
   getFeatureStateValue,
+  isFeatureHoverable,
+  isLayerVisibleOnMap,
+  isLayerZeroedBySlider,
   isValidPoint,
   formatNumber,
   replacePlaceholders,
@@ -55,8 +58,8 @@ function allSpiderOverlayLayerIds(map, stateLayers) {
   Object.keys(stateLayers).forEach((layerId) => {
     const pointsId = `${layerId}-spider`;
     const linksId = `${layerId}-spider-links`;
-    if (map.getLayer(pointsId)) ids.push(pointsId);
-    if (map.getLayer(linksId)) ids.push(linksId);
+    if (isLayerVisibleOnMap(map, pointsId)) ids.push(pointsId);
+    if (isLayerVisibleOnMap(map, linksId)) ids.push(linksId);
   });
   return ids;
 }
@@ -283,11 +286,23 @@ const Map = (props) => {
       // Treat click-tooltips as hover-tooltips on touch devices
       const isTouchonMobile = window.matchMedia('(hover: none)').matches;
       
+      // Hidden layers (visibility: "none") are skipped so invisible features never get hover effects
       const hoverableLayers = Object.keys(state.layers).filter((layerId) => {
         const cfg = state.layers[layerId];
         const showOnTouch = isTouchonMobile && cfg.shouldHaveTooltipOnClick;
-        return (cfg.shouldHaveTooltipOnHover || showOnTouch) && map.getLayer(layerId);
+        return (cfg.shouldHaveTooltipOnHover || showOnTouch) && isLayerVisibleOnMap(map, layerId);
       });
+
+      // NB if it's a spider layer, we resolve to the base layer to get custom hover handling.
+      const canHoverFeature = (feature) => {
+        const baseLayerId = resolveBaseLayerIdFromSpiderLayerId(feature.layer.id);
+        const layerConfig = state.layers[baseLayerId];
+        return (
+          Boolean(layerConfig) &&
+          !isLayerZeroedBySlider(map, baseLayerId) &&
+          isFeatureHoverable(map, feature, layerConfig)
+        );
+      };
 
       let features = [];
       if (forcedFeatures && forcedFeatures.length) {
@@ -359,9 +374,11 @@ const Map = (props) => {
            layers: [...hoverableLayers, ...spiderOverlayLayerIds],
          });
         
-        // Filter out any features that don't have required properties
+        // Filter out any features that don't have required properties, and invisible no-data
+        // features. This happens before picking the first feature and removing duplicates below,
+        // so an invisible feature can't block a visible one underneath it.
         const validFeatures = (featuresWithDuplicates || []).filter(
-          (f) => f && f.id != null && f.layer && f.layer.id
+          (f) => f && f.id != null && f.layer && f.layer.id && canHoverFeature(f)
         );
         
         if (isTouchonMobile) {
@@ -392,26 +409,8 @@ const Map = (props) => {
         return;
       }
 
-      // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
-      // NB if it's a spider layer, we resolve to the base layer to get custom hover handling.
-      const filteredFeatures = features.filter((feature) => {
-        const rawLayerId = feature.layer.id;
-        const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
-        const layerConfig = state.layers[layerId];
-        if (!layerConfig) return false;
-        
-        const shouldHaveHoverOnlyOnData = layerConfig.shouldHaveHoverOnlyOnData ?? false;
-        
-        // Safely get feature value - feature.state may be null or undefined
-        const featureValue = getFeatureStateValue(feature);
-        
-        // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
-        if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
-          return false; // Exclude this feature as it has no data
-        }
-        
-        return true; // Include this feature
-      });
+      // Forced features (from a tap) skip the query above, so they are checked here as well
+      const filteredFeatures = features.filter(canHoverFeature);
 
       // If after filtering we have no features, cleanup and return
       if (filteredFeatures.length === 0) {
@@ -537,28 +536,11 @@ const Map = (props) => {
         const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
         const layerConfig = state.layers[layerId];
         const customTooltip = layerConfig?.customTooltip;
-        const hoverNulls = layerConfig?.hoverNulls ?? true;
         const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
-        const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
         // Safely get feature value
         const featureValue = getFeatureStateValue(feature);
-        const hideValueInTooltip = layerConfig.hideValueInTooltip ?? false; 
-
-        if (
-          !hoverNulls &&
-          (featureValue === null || featureValue === undefined)
-        ) {
-          return; // Skip this feature
-        }
-
-        // If shouldHaveHoverOnlyOnData is enabled, only show hover for features with data
-        if (
-          shouldHaveHoverOnlyOnData &&
-          (featureValue === null || featureValue === undefined)
-        ) {
-          return; // Skip this feature as it has no data
-        }
+        const hideValueInTooltip = layerConfig.hideValueInTooltip ?? false;
 
         const featureName = feature.properties?.name || "";
         const featureValueDisplay =
@@ -841,8 +823,11 @@ const Map = (props) => {
   const handleZoom = useCallback(
     (labelZoomLevel, layerId, sourceLayerName, labelNulls) => {
       const mapZoomLevel = map.getZoom();
+      // Labels must never show while their parent layer is hidden
+      const parentHidden =
+        !!map.getLayer(layerId) && map.getLayoutProperty(layerId, 'visibility') === 'none';
 
-      if (mapZoomLevel <= labelZoomLevel) {
+      if (mapZoomLevel <= labelZoomLevel || parentHidden) {
         if (map.getLayer(`${layerId}-label`)) {
           map.setLayoutProperty(`${layerId}-label`, 'visibility', 'none');
         }
