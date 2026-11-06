@@ -736,3 +736,137 @@ describe("Tests when features is null", () => {
     // expect(setFeatureState).toHaveBeenCalled();
   });
 });
+
+describe("map filter clicks with a different feature on each side", () => {
+  const zoneFilter = {
+    id: "zone-filter",
+    type: "map",
+    layer: "Zone Pairs",
+    field: "id",
+    paramName: "zoneId",
+    visualisations: ["Zone Pairs Side-by-Side"],
+    actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+  };
+
+  /** A fake rendered feature from the zones fill layer. */
+  const zoneFeature = (id) => ({
+    layer: { type: "fill" },
+    properties: { id },
+    toJSON: () => ({ type: "Feature", properties: { id } }),
+  });
+
+  /** A fake map whose click handlers are kept so the test can fire them. */
+  const createMap = (type, features, { hasSelection = false } = {}) => {
+    const handlers = {};
+    return {
+      type,
+      handlers,
+      on: jest.fn((event, cb) => { handlers[event] = cb; }),
+      off: jest.fn(),
+      getCanvas: jest.fn(() => ({ style: {} })),
+      getLayer: jest.fn((id) => (id === "selected-feature-layer" ? hasSelection : undefined)),
+      queryRenderedFeatures: jest.fn(() => features),
+      addSource: jest.fn(),
+      addLayer: jest.fn(),
+      removeLayer: jest.fn(),
+      removeSource: jest.fn(),
+      ...mockMapControls,
+    };
+  };
+
+  let dispatch;
+  let filterDispatch;
+
+  const renderWithMaps = (leftMap, rightMap) => {
+    useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+    dispatch = jest.fn();
+    filterDispatch = jest.fn();
+    const context = {
+      ...mockMapContext,
+      state: { ...mockMapContext.state, layers: {}, filters: [zoneFilter] },
+      dispatch,
+    };
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={{ ...mockFilterContext, dispatch: filterDispatch }}>
+          <MapContext.Provider value={context}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+  };
+
+  const queryParamDispatches = () =>
+    dispatch.mock.calls
+      .map(([action]) => action)
+      .filter((action) => action.type === "UPDATE_DUAL_QUERY_PARAMS");
+
+  it("sends each side the zone under the cursor on its own map", () => {
+    const leftMap = createMap("left", [zoneFeature(101)]);
+    const rightMap = createMap("right", [zoneFeature(9001)]);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(queryParamDispatches().map(({ payload }) => [payload.sides, payload.value])).toEqual([
+      ["left", 101],
+      ["right", 9001],
+    ]);
+    expect(leftMap.addSource).toHaveBeenCalledWith(
+      "selected-feature-source",
+      expect.objectContaining({ data: { type: "Feature", properties: { id: 101 } } })
+    );
+    expect(rightMap.addSource).toHaveBeenCalledWith(
+      "selected-feature-source",
+      expect.objectContaining({ data: { type: "Feature", properties: { id: 9001 } } })
+    );
+  });
+
+  it("shows the clicked side's zone in the sidebar filter", () => {
+    const leftMap = createMap("left", [zoneFeature(101)]);
+    const rightMap = createMap("right", [zoneFeature(9001)]);
+    renderWithMaps(leftMap, rightMap);
+
+    rightMap.handlers.click({ point: { x: 10, y: 10 }, target: rightMap });
+
+    expect(filterDispatch).toHaveBeenCalledTimes(1);
+    expect(filterDispatch).toHaveBeenCalledWith({
+      type: "SET_FILTER_VALUE",
+      payload: { filterId: "zone-filter", value: 9001 },
+    });
+  });
+
+  it("clears a side that has no zone under the cursor", () => {
+    const leftMap = createMap("left", [], { hasSelection: true });
+    const rightMap = createMap("right", [zoneFeature(9001)]);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(queryParamDispatches().map(({ payload }) => [payload.sides, payload.value])).toEqual([
+      ["left", null],
+      ["right", 9001],
+    ]);
+    expect(leftMap.removeLayer).toHaveBeenCalledWith("selected-feature-layer");
+    expect(leftMap.addLayer).not.toHaveBeenCalled();
+    // Falls back to the other side's zone, since the clicked side has none.
+    expect(filterDispatch).toHaveBeenCalledWith({
+      type: "SET_FILTER_VALUE",
+      payload: { filterId: "zone-filter", value: 9001 },
+    });
+  });
+
+  it("ignores a click with no zone on either side", () => {
+    const leftMap = createMap("left", [], { hasSelection: true });
+    const rightMap = createMap("right", [], { hasSelection: true });
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(queryParamDispatches()).toEqual([]);
+    expect(filterDispatch).not.toHaveBeenCalled();
+    expect(leftMap.removeLayer).not.toHaveBeenCalled();
+    expect(rightMap.removeLayer).not.toHaveBeenCalled();
+  });
+});
