@@ -1557,6 +1557,47 @@ export const isNoDataHiddenByPaint = (map, layerId, layerConfig) => {
   return condition.includes('["feature-state","value"]') && condition.includes("null");
 };
 
+// Layers the user has set to 0 with the opacity slider, per map. This can't be read from
+// the paint value alone, because some layers are invisible by design so that they can be
+// hovered and clicked, and those must keep working.
+const layersZeroedBySlider = new WeakMap();
+
+/**
+ * Records a new opacity slider value for a layer on a map.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The ID of the layer the slider controls.
+ * @param {number} opacity - The new slider value.
+ */
+export const recordSliderOpacity = (map, layerId, opacity) => {
+  if (opacity !== 0) {
+    layersZeroedBySlider.get(map)?.delete(layerId);
+    return;
+  }
+  if (!layersZeroedBySlider.has(map)) layersZeroedBySlider.set(map, new Set());
+  layersZeroedBySlider.get(map).add(layerId);
+};
+
+/**
+ * Returns true if the user has set a layer to 0 with the opacity slider, which makes
+ * the whole layer invisible. Also checks the live opacity, so an out-of-date record
+ * can't block hover on a layer that is being drawn.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The layer ID to check. For a spider layer, pass its base layer.
+ * @returns {boolean} True if the slider has made this layer invisible.
+ */
+export const isLayerZeroedBySlider = (map, layerId) => {
+  if (!layersZeroedBySlider.get(map)?.has(layerId)) return false;
+
+  const layerType = map.getLayer(layerId)?.type;
+  if (!layerType) return false;
+
+  // The slider only changes the last value of an opacity expression
+  const opacity = map.getPaintProperty(layerId, getOpacityProperty(layerType));
+  return (Array.isArray(opacity) ? opacity[opacity.length - 1] : opacity) === 0;
+};
+
 /**
  * Decides whether a feature under the cursor should get hover effects and a
  * tooltip. Features with data are always hoverable. For a feature with no data:

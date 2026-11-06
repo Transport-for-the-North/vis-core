@@ -9,7 +9,9 @@ import {
   TOWN_CITY_LABEL_LAYER_IDS,
   createPaintProperty,
   isFeatureHoverable,
+  isLayerZeroedBySlider,
   isNoDataHiddenByPaint,
+  recordSliderOpacity,
   updateOpacityExpression,
 } from "./map";
 import { DisplayMode } from "enums";
@@ -577,6 +579,65 @@ describe("isFeatureHoverable", () => {
 
   it("treats a feature without a state object as having no data", () => {
     expect(isFeatureHoverable(hidingMap, { layer: { id: "layer" } }, {})).toBe(false);
+  });
+});
+
+describe("isLayerZeroedBySlider", () => {
+  const makeMap = (opacity, type = "fill") => ({
+    getLayer: () => ({ type }),
+    getPaintProperty: () => opacity,
+  });
+  const NULL_RULE = ["==", ["feature-state", "value"], null];
+
+  it("is true after the slider sets a layer to 0, for a rule or a plain number", () => {
+    [["case", NULL_RULE, 0, 0], 0].forEach((opacity) => {
+      const map = makeMap(opacity);
+      recordSliderOpacity(map, "layer", 0);
+
+      expect(isLayerZeroedBySlider(map, "layer")).toBe(true);
+    });
+  });
+
+  it("covers icon layers", () => {
+    const map = makeMap(["case", ["boolean", ["feature-state", "hover"], false], 0, 0], "symbol");
+    recordSliderOpacity(map, "layer", 0);
+
+    expect(isLayerZeroedBySlider(map, "layer")).toBe(true);
+  });
+
+  it("is false for a layer that is invisible by design, as the slider never touched it", () => {
+    expect(isLayerZeroedBySlider(makeMap(0), "layer")).toBe(false);
+  });
+
+  it("is false again once the slider moves back up", () => {
+    const map = makeMap(["case", NULL_RULE, 0, 0.3]);
+    recordSliderOpacity(map, "layer", 0);
+    recordSliderOpacity(map, "layer", 0.3);
+
+    expect(isLayerZeroedBySlider(map, "layer")).toBe(false);
+  });
+
+  it("ignores an out-of-date record when the layer is being drawn", () => {
+    const map = makeMap(["case", NULL_RULE, 0, 0.65]);
+    recordSliderOpacity(map, "layer", 0);
+
+    expect(isLayerZeroedBySlider(map, "layer")).toBe(false);
+  });
+
+  it("keeps records separate for each map and layer", () => {
+    const map = makeMap(0);
+    const otherMap = makeMap(0);
+    recordSliderOpacity(map, "layer", 0);
+
+    expect(isLayerZeroedBySlider(otherMap, "layer")).toBe(false);
+    expect(isLayerZeroedBySlider(map, "otherLayer")).toBe(false);
+  });
+
+  it("is false if the layer no longer exists", () => {
+    const map = { getLayer: () => undefined, getPaintProperty: () => 0 };
+    recordSliderOpacity(map, "layer", 0);
+
+    expect(isLayerZeroedBySlider(map, "layer")).toBe(false);
   });
 });
 

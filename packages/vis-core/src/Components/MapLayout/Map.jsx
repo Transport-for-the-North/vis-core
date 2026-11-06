@@ -20,6 +20,7 @@ import {
   getFeatureStateValue,
   isFeatureHoverable,
   isLayerVisibleOnMap,
+  isLayerZeroedBySlider,
   isValidPoint,
   formatNumber,
   replacePlaceholders,
@@ -294,8 +295,13 @@ const Map = (props) => {
 
       // NB if it's a spider layer, we resolve to the base layer to get custom hover handling.
       const canHoverFeature = (feature) => {
-        const layerConfig = state.layers[resolveBaseLayerIdFromSpiderLayerId(feature.layer.id)];
-        return Boolean(layerConfig) && isFeatureHoverable(map, feature, layerConfig);
+        const baseLayerId = resolveBaseLayerIdFromSpiderLayerId(feature.layer.id);
+        const layerConfig = state.layers[baseLayerId];
+        return (
+          Boolean(layerConfig) &&
+          !isLayerZeroedBySlider(map, baseLayerId) &&
+          isFeatureHoverable(map, feature, layerConfig)
+        );
       };
 
       let features = [];

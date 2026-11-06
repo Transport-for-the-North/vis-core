@@ -2,6 +2,7 @@ import { render, screen, act } from "@testing-library/react";
 import { FilterContext } from "contexts/FilterContext";
 import { MapContext } from "contexts/MapContext";
 import { useMap } from "hooks/useMap";
+import { recordSliderOpacity } from "utils/map";
 import { api } from "services";
 import { registerInitialBaseSources } from "../../map/baseSources";
 
@@ -1120,6 +1121,82 @@ describe("handleMapHover ignores invisible no-data features", () => {
     });
 
     expectHoverOn("bottomLayer", 1);
+  });
+
+  describe("with the opacity slider at 0", () => {
+    const ZEROED_OPACITY = ["case", ["==", ["feature-state", "value"], null], 0, 0];
+    const setSliderToZero = (layerId) => {
+      getPaintProperty.mockReturnValue(ZEROED_OPACITY);
+      recordSliderOpacity(useMap().map, layerId, 0);
+    };
+    const expectNoHover = () => {
+      expect(queryRenderedFeatures).toHaveBeenCalled();
+      expect(setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+    };
+
+    it("gives no hover effect to a feature with data", () => {
+      setSliderToZero("zones");
+      queryRenderedFeatures.mockReturnValue([makeFeature(1, "zones", { value: 5 })]);
+
+      renderWithLayers({ zones: { shouldHaveTooltipOnHover: true, isStylable: true } });
+
+      expectNoHover();
+    });
+
+    it("gives no hover effect to a no-data feature even when hoverNulls is true", () => {
+      setSliderToZero("zones");
+      queryRenderedFeatures.mockReturnValue([makeFeature(1, "zones", {})]);
+
+      renderWithLayers({
+        zones: { shouldHaveTooltipOnHover: true, isStylable: true, hoverNulls: true },
+      });
+
+      expectNoHover();
+    });
+
+    it("gives no hover effect to a spider overlay point of that layer", () => {
+      setSliderToZero("stations");
+      queryRenderedFeatures.mockReturnValue([makeFeature(1, "stations-spider", { value: 5 })]);
+
+      renderWithLayers({ stations: { shouldHaveTooltipOnHover: true } });
+
+      expectNoHover();
+    });
+
+    it("lets a feature on another layer still be hovered", () => {
+      setSliderToZero("zones");
+      queryRenderedFeatures.mockReturnValue([
+        makeFeature(1, "zones", { value: 5 }),
+        makeFeature(2, "stations", { value: 5 }),
+      ]);
+
+      renderWithLayers({
+        zones: { shouldHaveTooltipOnHover: true, isStylable: true },
+        stations: { shouldHaveTooltipOnHover: true },
+      });
+
+      expectHoverOn("stations", 2);
+    });
+
+    it("hovers again once the slider moves back up", () => {
+      setSliderToZero("zones");
+      recordSliderOpacity(useMap().map, "zones", 0.3);
+      getPaintProperty.mockReturnValue(["case", ["==", ["feature-state", "value"], null], 0, 0.3]);
+      queryRenderedFeatures.mockReturnValue([makeFeature(1, "zones", { value: 5 })]);
+
+      renderWithLayers({ zones: { shouldHaveTooltipOnHover: true, isStylable: true } });
+
+      expectHoverOn("zones", 1);
+    });
+
+    it("still hovers a layer that is invisible by design, as the slider never touched it", () => {
+      getPaintProperty.mockReturnValue(0);
+      queryRenderedFeatures.mockReturnValue([makeFeature(1, "originZones", {})]);
+
+      renderWithLayers({ originZones: { shouldHaveTooltipOnHover: true, isStylable: false } });
+
+      expectHoverOn("originZones", 1);
+    });
   });
 });
 

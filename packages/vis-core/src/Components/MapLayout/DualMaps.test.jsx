@@ -3,6 +3,7 @@ import DualMaps from "./DualMaps";
 import { MapContext } from "contexts/MapContext";
 import { FilterContext } from "contexts/FilterContext";
 import { useDualMaps } from "hooks/useDualMaps";
+import { recordSliderOpacity } from "utils/map";
 import { ThemeProvider } from "styled-components";
 
 import { registerInitialBaseSources } from "../../map/baseSources";
@@ -557,9 +558,11 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
       getPaintProperty: jest.fn(() => NULL_GATED_OPACITY),
       ...mockMapControls,
     });
-    const hoverOver = (layers, features) => {
+    const hoverOver = (layers, features, prepareMap) => {
       const leftMap = makeMap(features);
       const rightMap = makeMap(features);
+      prepareMap?.(leftMap);
+      prepareMap?.(rightMap);
       useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
       const context = {
         ...mockMapContext,
@@ -622,6 +625,44 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
           expect.objectContaining({ id: 1 }),
           { hover: true }
         );
+      });
+    });
+
+    describe("with the opacity slider at 0", () => {
+      const setSliderToZero = (map) => {
+        map.getPaintProperty.mockReturnValue([
+          "case",
+          ["==", ["feature-state", "value"], null],
+          0,
+          0,
+        ]);
+        recordSliderOpacity(map, "zones", 0);
+      };
+
+      it("gives no hover effect on either map to a feature with data", () => {
+        const maps = hoverOver(
+          { zones: { shouldHaveTooltipOnHover: true, isStylable: true } },
+          [feature({ value: 5 })],
+          setSliderToZero
+        );
+
+        maps.forEach((map) => {
+          expect(map.queryRenderedFeatures).toHaveBeenCalled();
+          expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+        });
+      });
+
+      it("gives no hover effect on either map when hoverNulls is true", () => {
+        const maps = hoverOver(
+          { zones: { shouldHaveTooltipOnHover: true, isStylable: true, hoverNulls: true } },
+          [feature({})],
+          setSliderToZero
+        );
+
+        maps.forEach((map) => {
+          expect(map.queryRenderedFeatures).toHaveBeenCalled();
+          expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+        });
       });
     });
   });

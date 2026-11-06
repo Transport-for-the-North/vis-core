@@ -1,6 +1,7 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { LayerControlEntry } from "Components/Sidebar/Accordion/LayerControlEntry";
 import { AppContext, MapContext, PageContext } from "contexts";
+import { isLayerZeroedBySlider } from "utils/map";
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -589,6 +590,119 @@ describe("LayerControlEntry component test", () => {
       "line-opacity",
       0.3
     );
+  });
+
+  it("records a slider value of 0 on every map, and clears it when moved back up", () => {
+    const makeMap = () => {
+      let opacity = ["case", ["==", ["feature-state", "value"], null], 0, 0.5];
+      return {
+        getLayer: jest.fn((id) => (id === "id" ? { type: "fill" } : undefined)),
+        getPaintProperty: jest.fn(() => opacity),
+        setPaintProperty: jest.fn((id, prop, value) => {
+          opacity = value;
+        }),
+      };
+    };
+    const maps = [makeMap(), makeMap()];
+    const testProps = {
+      ...props,
+      maps,
+      layer: {
+        id: "id",
+        type: "fill",
+        layout: { visibility: true },
+        metadata: { path: "/", shouldHaveOpacityControl: true },
+      },
+    };
+
+    render(
+      <PageContext.Provider value={mockPageContext}>
+        <AppContext.Provider value={mockAppContexte}>
+          <LayerControlEntry {...testProps} />
+        </AppContext.Provider>
+      </PageContext.Provider>
+    );
+    const slider = screen.getByRole("slider");
+
+    maps.forEach((map) => expect(isLayerZeroedBySlider(map, "id")).toBe(false));
+
+    fireEvent.change(slider, { target: { value: "0" } });
+    maps.forEach((map) => expect(isLayerZeroedBySlider(map, "id")).toBe(true));
+
+    fireEvent.change(slider, { target: { value: "0.3" } });
+    maps.forEach((map) => expect(isLayerZeroedBySlider(map, "id")).toBe(false));
+  });
+
+  describe("circle outlines and the opacity slider", () => {
+    const NULL_RULE = ["in", ["feature-state", "value"], ["literal", [null]]];
+    const moveSlider = (layerTypes, strokeOpacity, value) => {
+      const setPaintProperty = jest.fn();
+      const map = {
+        getLayer: jest.fn((id) => (layerTypes[id] ? { type: layerTypes[id] } : undefined)),
+        getPaintProperty: jest.fn((id, prop) => {
+          if (prop === "circle-stroke-opacity") return strokeOpacity;
+          return prop.endsWith("opacity") ? 0.5 : undefined;
+        }),
+        setPaintProperty,
+      };
+      render(
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry
+              {...props}
+              maps={[map]}
+              layer={{
+                id: "id",
+                type: layerTypes.id,
+                layout: { visibility: true },
+                metadata: { path: "/", shouldHaveOpacityControl: true },
+              }}
+            />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      );
+      fireEvent.change(screen.getByRole("slider", { name: "Opacity" }), { target: { value } });
+      return setPaintProperty;
+    };
+
+    it("sets a circle layer's outline to the slider value, including 0", () => {
+      const setPaintProperty = moveSlider({ id: "circle" }, undefined, "0");
+
+      expect(setPaintProperty).toHaveBeenCalledWith("id", "circle-stroke-opacity", 0);
+    });
+
+    it("keeps an outline's no-data rule when the slider moves", () => {
+      const setPaintProperty = moveSlider({ id: "circle" }, ["case", NULL_RULE, 0, 0.2], "0.3");
+
+      expect(setPaintProperty).toHaveBeenCalledWith(
+        "id",
+        "circle-stroke-opacity",
+        ["case", NULL_RULE, 0, 0.3]
+      );
+    });
+
+    it("also fades the spider overlay points, but not its other linked layers", () => {
+      const setPaintProperty = moveSlider(
+        { id: "circle", "id-label": "symbol", "id-spider": "circle", "id-spider-links": "line" },
+        undefined,
+        "0"
+      );
+      const outlineLayers = setPaintProperty.mock.calls
+        .filter(([, prop]) => prop === "circle-stroke-opacity")
+        .map(([id]) => id);
+
+      expect(outlineLayers).toEqual(["id", "id-spider"]);
+    });
+
+    it("does not set an outline on other layer types", () => {
+      const setPaintProperty = moveSlider({ id: "fill" }, undefined, "0");
+
+      expect(setPaintProperty).not.toHaveBeenCalledWith(
+        expect.anything(),
+        "circle-stroke-opacity",
+        expect.anything()
+      );
+    });
   });
 
   it("synchronises zone boundaries line-opacity when toggling boundaries visible", () => {

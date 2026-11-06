@@ -16,6 +16,7 @@ import {
   getSourceLayer,
   isFeatureHoverable,
   isLayerVisibleOnMap,
+  isLayerZeroedBySlider,
   numberWithCommas,
   replacePlaceholders,
   buildDefaultTooltip,
@@ -249,9 +250,12 @@ const DualMaps = (props) => {
           return;
         }
 
-        // Filter out no-data features that are invisible or that the layer opts out of hovering
-        const filteredFeatures = features.filter((feature) =>
-          isFeatureHoverable(map, feature, state.layers[feature.layer.id])
+        // Filter out layers set to 0 with the slider, and no-data features that are invisible
+        // or that the layer opts out of hovering
+        const filteredFeatures = features.filter(
+          (feature) =>
+            !isLayerZeroedBySlider(map, feature.layer.id) &&
+            isFeatureHoverable(map, feature, state.layers[feature.layer.id])
         );
 
         // If after filtering we have no features, cleanup and return
