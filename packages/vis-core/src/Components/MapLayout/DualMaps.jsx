@@ -14,6 +14,7 @@ import { useBaseMapTransition } from "hooks/useBaseMapTransition";
 import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
+  isFeatureHoverable,
   isLayerVisibleOnMap,
   numberWithCommas,
   replacePlaceholders,
@@ -248,20 +249,10 @@ const DualMaps = (props) => {
           return;
         }
 
-        // Filter features based on their individual layer's shouldHaveHoverOnlyOnData setting
-        const filteredFeatures = features.filter((feature) => {
-          const layerId = feature.layer.id;
-          const layerConfig = state.layers[layerId];
-          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
-          const featureValue = feature.state.value;
-          
-          // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
-          if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
-            return false; // Exclude this feature as it has no data
-          }
-          
-          return true; // Include this feature
-        });
+        // Filter out no-data features that are invisible or that the layer opts out of hovering
+        const filteredFeatures = features.filter((feature) =>
+          isFeatureHoverable(map, feature, state.layers[feature.layer.id])
+        );
 
         // If after filtering we have no features, cleanup and return
         if (filteredFeatures.length === 0) {
@@ -385,15 +376,10 @@ const DualMaps = (props) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const customTooltip = layerConfig?.customTooltip;
-          const hoverNulls = layerConfig.hoverNulls ?? true;
           // Check if additional metadata should be appended
           const shouldIncludeMetadata = layerConfig?.hoverTipShouldIncludeMetadata;
-          const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
 
           const featureValue = feature.state.value;
-          if (!hoverNulls && (featureValue === null || featureValue === undefined)) {
-            return; // Skip this feature
-          }
 
           const featureName = feature.properties.name || "";
           const featureValueDisplay =

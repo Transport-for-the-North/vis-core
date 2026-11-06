@@ -544,6 +544,88 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     });
   });
 
+  describe("invisible no-data features", () => {
+    const NULL_GATED_OPACITY = ["case", ["==", ["feature-state", "value"], null], 0, 0.65];
+    const makeMap = (features) => ({
+      on: jest.fn(),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue(features),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue({ type: "fill" }),
+      getLayoutProperty: jest.fn(() => "visible"),
+      getPaintProperty: jest.fn(() => NULL_GATED_OPACITY),
+      ...mockMapControls,
+    });
+    const hoverOver = (layers, features) => {
+      const leftMap = makeMap(features);
+      const rightMap = makeMap(features);
+      useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+      const context = {
+        ...mockMapContext,
+        state: { ...mockMapContext.state, layers },
+      };
+      render(
+        <ThemeProvider theme={theme}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapContext.Provider value={context}>
+              <DualMaps {...props} />
+            </MapContext.Provider>
+          </FilterContext.Provider>
+        </ThemeProvider>
+      );
+      const mousemoveCall = leftMap.on.mock.calls.find((call) => call[0] === "mousemove");
+      mousemoveCall[1]({ point: { x: 150, y: 150 }, lngLat: { lng: -0.1, lat: 51.5 } });
+      return [leftMap, rightMap];
+    };
+    const feature = (state) => ({
+      id: 1,
+      layer: { id: "zones", source: "zones" },
+      properties: { name: "Test Feature" },
+      state,
+    });
+
+    it("gives no hover effect on either map to an invisible no-data feature", () => {
+      const maps = hoverOver(
+        { zones: { shouldHaveTooltipOnHover: true, isStylable: true } },
+        [feature({})]
+      );
+
+      maps.forEach((map) => {
+        expect(map.queryRenderedFeatures).toHaveBeenCalled();
+        expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+      });
+    });
+
+    it("still hovers a feature with data on both maps", () => {
+      const maps = hoverOver(
+        { zones: { shouldHaveTooltipOnHover: true, isStylable: true } },
+        [feature({ value: 5 })]
+      );
+
+      maps.forEach((map) => {
+        expect(map.setFeatureState).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 1 }),
+          { hover: true }
+        );
+      });
+    });
+
+    it("hovers an invisible no-data feature on both maps when hoverNulls is true", () => {
+      const maps = hoverOver(
+        { zones: { shouldHaveTooltipOnHover: true, isStylable: true, hoverNulls: true } },
+        [feature({})]
+      );
+
+      maps.forEach((map) => {
+        expect(map.setFeatureState).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 1 }),
+          { hover: true }
+        );
+      });
+    });
+  });
+
   it("Test function getCanvas() is called", () => {
     render(
       <ThemeProvider theme={theme}>

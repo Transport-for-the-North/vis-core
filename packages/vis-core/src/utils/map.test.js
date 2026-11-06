@@ -7,6 +7,10 @@ import {
   isBasePlaceLabelLayer,
   moveTownCityLabelsToTop,
   TOWN_CITY_LABEL_LAYER_IDS,
+  createPaintProperty,
+  isFeatureHoverable,
+  isNoDataHiddenByPaint,
+  updateOpacityExpression,
 } from "./map";
 import { DisplayMode } from "enums";
 
@@ -469,6 +473,110 @@ describe("isBasePlaceLabelLayer", () => {
         baseSourceIds
       )
     ).toBe(true);
+  });
+});
+
+describe("isNoDataHiddenByPaint", () => {
+  const makeMap = (type, opacity) => ({
+    getLayer: () => ({ type }),
+    getPaintProperty: () => opacity,
+  });
+  const opacityPropByType = { fill: "fill-opacity", line: "line-opacity", circle: "circle-opacity" };
+
+  it.each([
+    ["polygon-continuous", "fill"],
+    ["polygon-diverging", "fill"],
+    ["line-continuous", "line"],
+    ["line-diverging", "line"],
+    ["line-categorical", "line"],
+    ["circle-continuous", "circle"],
+    ["circle-diverging", "circle"],
+    ["circle-categorical", "circle"],
+    ["point-continuous", "circle"],
+    ["point-diverging", "circle"],
+  ])("detects the no-data rule in the real %s paint", (style, type) => {
+    const paint = createPaintProperty([0, 10], style, ["#000", "#fff"], 0.5);
+    const map = makeMap(type, paint[opacityPropByType[type]]);
+
+    expect(isNoDataHiddenByPaint(map, "layer", { isStylable: true })).toBe(true);
+  });
+
+  it("does not treat real polygon-categorical paint as hiding no-data features", () => {
+    const paint = createPaintProperty([0, 10], "polygon-categorical", ["#000", "#fff"], 0.5);
+    const map = makeMap("fill", paint["fill-opacity"]);
+
+    expect(isNoDataHiddenByPaint(map, "layer", { isStylable: true })).toBe(false);
+  });
+
+  it("still detects the rule after the opacity slider has changed it, including to 0", () => {
+    const paint = createPaintProperty([0, 10], "polygon-continuous", ["#000", "#fff"], 0.5);
+
+    [0.3, 0].forEach((sliderValue) => {
+      const opacity = updateOpacityExpression(paint["fill-opacity"], sliderValue);
+      expect(isNoDataHiddenByPaint(makeMap("fill", opacity), "layer")).toBe(true);
+    });
+  });
+
+  it("treats a constant 0 as hidden only on stylable layers", () => {
+    expect(isNoDataHiddenByPaint(makeMap("fill", 0), "layer", { isStylable: true })).toBe(true);
+    expect(isNoDataHiddenByPaint(makeMap("fill", 0), "layer", { isStylable: false })).toBe(false);
+  });
+
+  it("does not treat other opacity values as hiding no-data features", () => {
+    const stylable = { isStylable: true };
+    const unrelatedRule = ["case", ["get", "isOpen"], 0, 1];
+
+    expect(isNoDataHiddenByPaint(makeMap("fill", 0.65), "layer", stylable)).toBe(false);
+    expect(isNoDataHiddenByPaint(makeMap("fill", undefined), "layer", stylable)).toBe(false);
+    expect(isNoDataHiddenByPaint(makeMap("fill", unrelatedRule), "layer", stylable)).toBe(false);
+  });
+
+  it("returns false for other layer types and for missing layers", () => {
+    const stylable = { isStylable: true };
+
+    expect(isNoDataHiddenByPaint(makeMap("symbol", 0), "layer", stylable)).toBe(false);
+    expect(isNoDataHiddenByPaint({ getLayer: () => undefined }, "layer", stylable)).toBe(false);
+  });
+});
+
+describe("isFeatureHoverable", () => {
+  const hidingMap = {
+    getLayer: () => ({ type: "fill" }),
+    getPaintProperty: () => ["case", ["==", ["feature-state", "value"], null], 0, 0.65],
+  };
+  const visibleMap = {
+    getLayer: () => ({ type: "fill" }),
+    getPaintProperty: () => 0.65,
+  };
+  const noData = { layer: { id: "layer" }, state: {} };
+
+  it("always allows features with data, including a value of 0", () => {
+    const strictest = { shouldHaveHoverOnlyOnData: true, hoverNulls: false };
+
+    [5, 0].forEach((value) => {
+      const feature = { layer: { id: "layer" }, state: { value } };
+      expect(isFeatureHoverable(hidingMap, feature, strictest)).toBe(true);
+    });
+  });
+
+  it("follows the paint when no flags are set", () => {
+    expect(isFeatureHoverable(hidingMap, noData, {})).toBe(false);
+    expect(isFeatureHoverable(visibleMap, noData, {})).toBe(true);
+  });
+
+  it("lets hoverNulls override the paint in both directions", () => {
+    expect(isFeatureHoverable(hidingMap, noData, { hoverNulls: true })).toBe(true);
+    expect(isFeatureHoverable(visibleMap, noData, { hoverNulls: false })).toBe(false);
+  });
+
+  it("gives shouldHaveHoverOnlyOnData priority over hoverNulls", () => {
+    const config = { shouldHaveHoverOnlyOnData: true, hoverNulls: true };
+
+    expect(isFeatureHoverable(visibleMap, noData, config)).toBe(false);
+  });
+
+  it("treats a feature without a state object as having no data", () => {
+    expect(isFeatureHoverable(hidingMap, { layer: { id: "layer" } }, {})).toBe(false);
   });
 });
 

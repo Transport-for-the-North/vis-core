@@ -1533,6 +1533,51 @@ export const isLayerVisibleOnMap = (map, layerId) => {
 };
 
 /**
+ * Returns true if a layer currently draws features that have no data at zero
+ * opacity, which makes those features invisible.
+ *
+ * This reads the live paint value instead of relying on the layer's config, so
+ * it stays correct for layers that draw no-data features visibly, such as
+ * "polygon-categorical" styles, non-stylable layers and custom app paint.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The layer ID to check.
+ * @param {Object} [layerConfig] - The layer's page configuration.
+ * @returns {boolean} True if no-data features on this layer are invisible.
+ */
+export const isNoDataHiddenByPaint = (map, layerId, layerConfig) => {
+  const layerType = map?.getLayer(layerId)?.type;
+  if (!["fill", "line", "circle"].includes(layerType)) return false;
+
+  const opacity = map.getPaintProperty?.(layerId, getOpacityProperty(layerType));
+  if (opacity === 0) return Boolean(layerConfig?.isStylable);
+  if (!Array.isArray(opacity) || opacity[0] !== "case" || opacity[2] !== 0) return false;
+
+  const condition = JSON.stringify(opacity[1]);
+  return condition.includes('["feature-state","value"]') && condition.includes("null");
+};
+
+/**
+ * Decides whether a feature under the cursor should get hover effects and a
+ * tooltip. Features with data are always hoverable. For a feature with no data:
+ * 1. `shouldHaveHoverOnlyOnData: true` on the layer excludes it.
+ * 2. Otherwise an explicit `hoverNulls` on the layer decides.
+ * 3. Otherwise it is excluded only if the layer draws it invisibly.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {Object} feature - The feature returned by `queryRenderedFeatures`.
+ * @param {Object} [layerConfig] - The page configuration of the feature's layer.
+ * @returns {boolean} True if the feature should respond to hover.
+ */
+export const isFeatureHoverable = (map, feature, layerConfig) => {
+  const value = getFeatureStateValue(feature);
+  if (value !== null && value !== undefined) return true;
+  if (layerConfig?.shouldHaveHoverOnlyOnData) return false;
+  if (typeof layerConfig?.hoverNulls === "boolean") return layerConfig.hoverNulls;
+  return !isNoDataHiddenByPaint(map, feature.layer.id, layerConfig);
+};
+
+/**
  * Returns true if a MapLibre layer belongs to the application (i.e. not part
  * of the basemap style).
  *
