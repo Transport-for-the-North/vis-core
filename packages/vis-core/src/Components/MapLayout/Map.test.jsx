@@ -902,6 +902,97 @@ describe("Tests of handleMapHover function", () => {
   });
 });
 
+describe("handleMapHover skips hidden layers", () => {
+  const renderMap = () =>
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+  beforeEach(() => {
+    // Desktop browser: the mousemove handler is only attached on non-touch devices
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }));
+    mockMapContext = {
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        layers: {
+          visibleLayer: { shouldHaveTooltipOnHover: true, hoverNulls: true },
+          hiddenLayer: { shouldHaveTooltipOnHover: true, hoverNulls: true },
+        },
+      },
+    };
+    on.mockImplementation((event, callback) => {
+      if (event === "mousemove") {
+        callback({
+          point: { x: 100, y: 200 },
+          lngLat: { lng: 2.3522, lat: 48.8566 },
+        });
+      }
+    });
+    getLayer.mockReturnValue(true);
+    queryRenderedFeatures.mockReturnValue([
+      {
+        id: "feature-1",
+        layer: { id: "visibleLayer", source: "source", "source-layer": "source-layer" },
+        state: { value: 15 },
+        properties: { name: "name" },
+      },
+    ]);
+    useMap.mockReturnValue({
+      map: {
+        addControl,
+        on,
+        getCanvas,
+        off,
+        getLayer,
+        getLayoutProperty,
+        queryRenderedFeatures,
+        setFilter,
+        setFeatureState,
+        getZoom,
+      },
+      isMapReady: true,
+    });
+  });
+
+  it("does not query a layer or its spider overlays when visibility is 'none'", () => {
+    getLayoutProperty.mockImplementation((layerId) =>
+      layerId.startsWith("hiddenLayer") ? "none" : "visible"
+    );
+
+    renderMap();
+
+    expect(queryRenderedFeatures).toHaveBeenCalledWith(expect.anything(), {
+      layers: ["visibleLayer", "visibleLayer-spider", "visibleLayer-spider-links"],
+    });
+    expect(setFeatureState).toHaveBeenCalledWith(
+      { source: "source", id: "feature-1", sourceLayer: "source-layer" },
+      { hover: true }
+    );
+  });
+
+  it("produces no hover effect when every hoverable layer is hidden", () => {
+    getLayoutProperty.mockReturnValue("none");
+
+    renderMap();
+
+    expect(on).toHaveBeenCalledWith("mousemove", expect.any(Function));
+    expect(queryRenderedFeatures).not.toHaveBeenCalled();
+    expect(setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+  });
+});
+
 describe("handleLayerClick function test", () => {
   beforeEach(() => {
     mockMapContext = {

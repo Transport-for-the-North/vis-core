@@ -14,6 +14,7 @@ import { useBaseMapTransition } from "hooks/useBaseMapTransition";
 import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
+  isLayerVisibleOnMap,
   numberWithCommas,
   replacePlaceholders,
   buildDefaultTooltip,
@@ -151,10 +152,10 @@ const DualMaps = (props) => {
       const otherMap = maps[otherMapType];
       if (!map || !otherMap || !e.point) return;
 
-      // Get layers that have shouldHaveTooltipOnHover set to true and are available on the map
+      // Get layers that have shouldHaveTooltipOnHover set to true and are visible on the map.
       const hoverableLayers = Object.keys(state.layers).filter(
         (layerId) =>
-          state.layers[layerId].shouldHaveTooltipOnHover && map.getLayer(layerId)
+          state.layers[layerId].shouldHaveTooltipOnHover && isLayerVisibleOnMap(map, layerId)
       );
 
       if (hoverableLayers.length === 0) {

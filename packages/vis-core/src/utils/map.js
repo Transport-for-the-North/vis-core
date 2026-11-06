@@ -1515,6 +1515,24 @@ export const getFeatureStateValue = (feature) => {
 };
 
 /**
+ * Returns true if the layer exists on the map and is not hidden via
+ * `layout.visibility: "none"`.
+ *
+ * `map.getLayer()` alone is not enough to decide whether a layer can be
+ * interacted with, as it still returns layers that the user has switched off.
+ * `queryRenderedFeatures` can also still return the layer's features until the
+ * next frame after it is hidden.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The layer ID to check.
+ * @returns {boolean} True if the layer exists and is visible.
+ */
+export const isLayerVisibleOnMap = (map, layerId) => {
+  if (!map?.getLayer(layerId)) return false;
+  return map.getLayoutProperty?.(layerId, "visibility") !== "none";
+};
+
+/**
  * Returns true if a MapLibre layer belongs to the application (i.e. not part
  * of the basemap style).
  *

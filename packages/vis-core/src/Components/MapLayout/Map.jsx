@@ -18,6 +18,7 @@ import { getBaseMap } from "../../map/baseMaps";
 import {
   getSourceLayer,
   getFeatureStateValue,
+  isLayerVisibleOnMap,
   isValidPoint,
   formatNumber,
   replacePlaceholders,
@@ -55,8 +56,8 @@ function allSpiderOverlayLayerIds(map, stateLayers) {
   Object.keys(stateLayers).forEach((layerId) => {
     const pointsId = `${layerId}-spider`;
     const linksId = `${layerId}-spider-links`;
-    if (map.getLayer(pointsId)) ids.push(pointsId);
-    if (map.getLayer(linksId)) ids.push(linksId);
+    if (isLayerVisibleOnMap(map, pointsId)) ids.push(pointsId);
+    if (isLayerVisibleOnMap(map, linksId)) ids.push(linksId);
   });
   return ids;
 }
@@ -283,10 +284,11 @@ const Map = (props) => {
       // Treat click-tooltips as hover-tooltips on touch devices
       const isTouchonMobile = window.matchMedia('(hover: none)').matches;
       
+      // Hidden layers (visibility: "none") are skipped so invisible features never get hover effects
       const hoverableLayers = Object.keys(state.layers).filter((layerId) => {
         const cfg = state.layers[layerId];
         const showOnTouch = isTouchonMobile && cfg.shouldHaveTooltipOnClick;
-        return (cfg.shouldHaveTooltipOnHover || showOnTouch) && map.getLayer(layerId);
+        return (cfg.shouldHaveTooltipOnHover || showOnTouch) && isLayerVisibleOnMap(map, layerId);
       });
 
       let features = [];

@@ -482,6 +482,68 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
   });
 
+  describe("hidden layers", () => {
+    const mockFeatures = [
+      {
+        id: 1,
+        layer: { id: "layer1", source: "source1" },
+        properties: { name: "Test Feature" },
+        state: { value: 100 },
+      },
+    ];
+    const makeMap = (visibility) => ({
+      on: jest.fn(),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue(mockFeatures),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue(true),
+      getLayoutProperty: jest.fn((layerId) => visibility[layerId] ?? "visible"),
+      ...mockMapControls,
+    });
+    const hoverOver = (leftMap) => {
+      render(
+        <ThemeProvider theme={theme}>
+          <FilterContext.Provider value={mockFilterContext}>
+            <MapContext.Provider value={mockMapContext}>
+              <DualMaps {...props} />
+            </MapContext.Provider>
+          </FilterContext.Provider>
+        </ThemeProvider>
+      );
+      const mousemoveCall = leftMap.on.mock.calls.find((call) => call[0] === "mousemove");
+      mousemoveCall[1]({ point: { x: 150, y: 150 }, lngLat: { lng: -0.1, lat: 51.5 } });
+    };
+
+    it("does not query a hidden layer on either map", () => {
+      const leftMap = makeMap({ layer1: "none" });
+      const rightMap = makeMap({ layer1: "none" });
+      useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+
+      hoverOver(leftMap);
+
+      [leftMap, rightMap].forEach((map) => {
+        expect(map.queryRenderedFeatures).toHaveBeenCalledWith(expect.anything(), {
+          layers: ["first"],
+        });
+      });
+    });
+
+    it("produces no hover effect on either map when every hoverable layer is hidden", () => {
+      const hidden = { first: "none", layer1: "none" };
+      const leftMap = makeMap(hidden);
+      const rightMap = makeMap(hidden);
+      useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+
+      hoverOver(leftMap);
+
+      [leftMap, rightMap].forEach((map) => {
+        expect(map.queryRenderedFeatures).not.toHaveBeenCalled();
+        expect(map.setFeatureState).not.toHaveBeenCalledWith(expect.anything(), { hover: true });
+      });
+    });
+  });
+
   it("Test function getCanvas() is called", () => {
     render(
       <ThemeProvider theme={theme}>
