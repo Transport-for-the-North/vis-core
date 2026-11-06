@@ -23,6 +23,9 @@ import {
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
   resolveVisualisationUnit,
+  getFeatureStateValue,
+  isValueMatchingFilter,
+  applyValueFilterToExpression,
 } from "utils";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
@@ -110,6 +113,16 @@ const DualMaps = (props) => {
   const hoverEventIdRef = useRef(0);
   const hoverInfoRef = useRef({ left: {}, right: {} });
   const prevHoveredFeaturesRef = useRef({ left: [], right: [] });
+
+  const getLayerRangeFilter = useCallback(
+    (layerId) => state.layers?.[layerId]?.valueRangeFilter ?? null,
+    [state.layers]
+  );
+
+  const getLayerCategoryFilter = useCallback(
+    (layerId) => state.layers?.[layerId]?.valueCategoryFilter ?? null,
+    [state.layers]
+  );
 
   /**
    * Generates HTML for metadata section of tooltips
@@ -252,11 +265,17 @@ const DualMaps = (props) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
-          const featureValue = feature.state.value;
+          const featureValue = getFeatureStateValue(feature);
+          const rangeFilter = layerConfig?.valueRangeFilter;
+          const categoryFilter = layerConfig?.valueCategoryFilter;
           
           // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
           if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
             return false; // Exclude this feature as it has no data
+          }
+
+          if (!isValueMatchingFilter(featureValue, rangeFilter, categoryFilter)) {
+            return false;
           }
           
           return true; // Include this feature
@@ -626,7 +645,13 @@ const DualMaps = (props) => {
 
       const features = map.queryRenderedFeatures(bufferedPoint, {
         layers: [layerId],
-      });
+      }).filter((feature) =>
+        isValueMatchingFilter(
+          getFeatureStateValue(feature),
+          getLayerRangeFilter(layerId),
+          getLayerCategoryFilter(layerId)
+        )
+      );
 
       if (features.length !== 0) {
         const coordinates = e.lngLat;
@@ -672,7 +697,7 @@ const DualMaps = (props) => {
         }
       });
     },
-    [maps]
+    [maps, state.layers]
   );
 
    /**
@@ -729,7 +754,12 @@ const DualMaps = (props) => {
                   'text-color': '#000000',  // Black text
                   'text-halo-color': '#ffffff',  // White halo for readability
                   'text-halo-width': 2.5,
-                  'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                  'text-opacity': applyValueFilterToExpression(
+                    labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                    state.layers[layerId]?.valueRangeFilter,
+                    state.layers[layerId]?.valueCategoryFilter,
+                    0
+                  ),
                 }
               });
             }
@@ -836,7 +866,13 @@ const DualMaps = (props) => {
           const map = maps[side];
           const features = map.queryRenderedFeatures(point, {
             layers: [filter.layer],
-          });
+          }).filter((feature) =>
+            isValueMatchingFilter(
+              getFeatureStateValue(feature),
+              getLayerRangeFilter(filter.layer),
+              getLayerCategoryFilter(filter.layer)
+            )
+          );
           if (features.length > 0) {
             // Assuming the first feature is the one we're interested in
             const feature = features[0];
@@ -896,7 +932,7 @@ const DualMaps = (props) => {
         });
       });
     },
-    [isMapReady, maps, state.filters, dispatch]
+    [isMapReady, maps, state.filters, dispatch, filterDispatch, getLayerRangeFilter]
   );
 
   // Run once to set the state of the map

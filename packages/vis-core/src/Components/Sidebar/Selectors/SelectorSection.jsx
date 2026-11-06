@@ -8,9 +8,10 @@ import { Dropdown } from "./Dropdown";
 import { SelectorLabel } from "./SelectorLabel";
 import { Slider } from "./Slider";
 import { Toggle } from "./Toggle";
+import { RangeSlider } from "./RangeSlider";
 import { AppContext } from "contexts/AppContext";
 import { useToast } from "contexts/ToastContext";
-import { useState, useContext, useEffect, useCallback, useRef } from "react";
+import { useState, useContext, useEffect, useCallback, useRef, useMemo } from "react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { MapFeatureSelect, MapFeatureSelectWithControls } from "./MapFeatureSelect";
 import { CheckboxSelector } from './CheckboxSelector';
@@ -18,6 +19,7 @@ import { MapFeatureSelectAndPan } from './MapFeatureSelectAndPan';
 import { api } from "services";
 import { darken } from "polished";
 import { checkSecurityRequirements, trackClarityEvent } from "utils";
+import { actionTypes } from "reducers";
 
 const ButtonRow = styled.div`
   display: flex;
@@ -69,6 +71,41 @@ const SelectorContainer = styled.div`
 
 const NoDataParagraph = styled.p``;
 
+const ValueFilterSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+`;
+
+const CategoryActions = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const CategoryActionButton = styled.button`
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+`;
+
+const CategoryList = styled.div`
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 0.45rem;
+`;
+
+const CategoryItem = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.15rem 0;
+`;
+
 /**
  * Inline warning icon that shows a tooltip message on hover.
  * @component WarningStatus
@@ -107,7 +144,7 @@ const WarningStatus = ({ message }) => {
  */
 export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath, downloadShapefilePath, requestMethod = 'GET' }) => {
   const appContext = useContext(AppContext);
-  const { state: mapState } = useMapContext();
+  const { state: mapState, dispatch: mapDispatch } = useMapContext();
   const { state: filterState, dispatch: filterDispatch } = useFilterContext();
   const { addToast, removeToast } = useToast();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -289,6 +326,162 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     ? <WarningStatus message={noDataMessage} /> 
     : null;
 
+  const activeVisualisationEntry = useMemo(
+    () => Object.entries(mapState.visualisations || {})[0] || null,
+    [mapState.visualisations]
+  );
+
+  const [activeVisualisationKey, activeVisualisation] = activeVisualisationEntry || [];
+
+  const activeLayerEntry = useMemo(() => {
+    const layers = Object.entries(mapState.layers || {});
+    if (layers.length === 0) return null;
+
+    const byVisualisation = layers.find(([, layer]) => {
+      if (!(layer?.metadata?.isStylable || layer?.isStylable)) return false;
+      return (
+        layer?.visualisationName === activeVisualisationKey ||
+        layer?.visualisationName === activeVisualisation?.name
+      );
+    });
+
+    if (byVisualisation) return byVisualisation;
+
+    return (
+      layers.find(([, layer]) => layer?.metadata?.isStylable || layer?.isStylable) ||
+      null
+    );
+  }, [mapState.layers, activeVisualisationKey, activeVisualisation?.name]);
+
+  const [activeLayerId, activeLayerConfig] = activeLayerEntry || [];
+
+  const activeColorStyle =
+    activeLayerConfig?.metadata?.colorStyle ||
+    activeVisualisation?.style?.split("-")?.[1] ||
+    null;
+
+  const extractedValues = useMemo(() => {
+    if (!Array.isArray(activeVisualisation?.data)) {
+      return [];
+    }
+
+    return activeVisualisation.data
+      .map((row) => {
+        if (row == null || typeof row !== "object") {
+          return row;
+        }
+        return row.value ?? row.metric ?? row.score ?? row.category ?? null;
+      })
+      .filter((value) => value !== null && value !== undefined);
+  }, [activeVisualisation?.data]);
+
+  const numericValues = useMemo(
+    () => extractedValues.map((value) => Number(value)).filter(Number.isFinite),
+    [extractedValues]
+  );
+
+  const categoryValues = useMemo(
+    () => [...new Set(extractedValues.map((value) => String(value)))].sort(),
+    [extractedValues]
+  );
+
+  const isContinuousStyle =
+    activeColorStyle === "continuous" || activeColorStyle === "diverging";
+  const isCategoricalStyle =
+    activeColorStyle === "categorical" || activeColorStyle === "discrete";
+
+  const existingRangeFilter = activeLayerConfig?.valueRangeFilter;
+  const valueRangeDomain = useMemo(() => {
+    if (numericValues.length > 0) {
+      return {
+        min: Math.min(...numericValues),
+        max: Math.max(...numericValues),
+      };
+    }
+
+    const fallbackMin = Number(existingRangeFilter?.domainMin);
+    const fallbackMax = Number(existingRangeFilter?.domainMax);
+    if (Number.isFinite(fallbackMin) && Number.isFinite(fallbackMax)) {
+      return { min: fallbackMin, max: fallbackMax };
+    }
+
+    return { min: 0, max: 100 };
+  }, [numericValues, existingRangeFilter]);
+
+  const valueRangeStep = useMemo(() => {
+    const span = valueRangeDomain.max - valueRangeDomain.min;
+    if (!Number.isFinite(span) || span <= 0) return 1;
+    if (span <= 10) return 0.1;
+    if (span <= 100) return 1;
+    return 5;
+  }, [valueRangeDomain]);
+
+  const rangeSelection = useMemo(() => {
+    const min = Number(existingRangeFilter?.min);
+    const max = Number(existingRangeFilter?.max);
+
+    if (!Number.isFinite(min) || !Number.isFinite(max)) {
+      return [valueRangeDomain.min, valueRangeDomain.max];
+    }
+
+    return [
+      Math.max(valueRangeDomain.min, Math.min(min, valueRangeDomain.max)),
+      Math.max(valueRangeDomain.min, Math.min(max, valueRangeDomain.max)),
+    ];
+  }, [existingRangeFilter, valueRangeDomain]);
+
+  const selectedCategories = Array.isArray(activeLayerConfig?.valueCategoryFilter)
+    ? activeLayerConfig.valueCategoryFilter.map((value) => String(value))
+    : null;
+
+  const resolvedSelectedCategories =
+    selectedCategories === null ? categoryValues : selectedCategories;
+
+  const handleRangeFilterChange = useCallback(
+    ([nextMin, nextMax]) => {
+      if (!activeLayerId || !mapDispatch) return;
+
+      mapDispatch({
+        type: actionTypes.UPDATE_LAYER_VALUE_RANGE_FILTER,
+        payload: {
+          layerName: activeLayerId,
+          rangeFilter: {
+            min: Math.min(nextMin, nextMax),
+            max: Math.max(nextMin, nextMax),
+            domainMin: valueRangeDomain.min,
+            domainMax: valueRangeDomain.max,
+          },
+        },
+      });
+    },
+    [activeLayerId, mapDispatch, valueRangeDomain]
+  );
+
+  const updateCategorySelection = useCallback(
+    (nextCategories) => {
+      if (!activeLayerId || !mapDispatch) return;
+
+      const normalisedCategories = Array.isArray(nextCategories)
+        ? [...new Set(nextCategories.map((value) => String(value)))]
+        : [];
+
+      mapDispatch({
+        type: actionTypes.UPDATE_LAYER_VALUE_CATEGORY_FILTER,
+        payload: {
+          layerName: activeLayerId,
+          categoryFilter:
+            normalisedCategories.length === categoryValues.length
+              ? null
+              : normalisedCategories,
+        },
+      });
+    },
+    [activeLayerId, mapDispatch, categoryValues]
+  );
+
+  const canRenderLayerValueFiltering =
+    Boolean(activeLayerId) && (isContinuousStyle || isCategoricalStyle);
+
   return (
     <AccordionSection 
       title="Filtering and data selection" 
@@ -449,9 +642,71 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
               </DownloadButton>
             )}
           </ButtonRow>
+
         </>
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
+      )}
+
+      {canRenderLayerValueFiltering && (
+        <AccordionSection title="Layer value filtering" defaultValue={false}>
+          <ValueFilterSection>
+            {isContinuousStyle && (
+              <>
+                <SelectorLabel text="Visible value range" />
+                <RangeSlider
+                  min={valueRangeDomain.min}
+                  max={valueRangeDomain.max}
+                  step={valueRangeStep}
+                  value={rangeSelection}
+                  onChange={handleRangeFilterChange}
+                  ariaLabel={`${activeLayerId} value range`}
+                />
+              </>
+            )}
+
+            {isCategoricalStyle && (
+              <>
+                <SelectorLabel text="Visible categories" />
+                <CategoryActions>
+                  <CategoryActionButton
+                    type="button"
+                    onClick={() => updateCategorySelection(categoryValues)}
+                  >
+                    Select all
+                  </CategoryActionButton>
+                  <CategoryActionButton
+                    type="button"
+                    onClick={() => updateCategorySelection([])}
+                  >
+                    Clear all
+                  </CategoryActionButton>
+                </CategoryActions>
+                <CategoryList>
+                  {categoryValues.map((category) => {
+                    const isChecked = resolvedSelectedCategories.includes(category);
+
+                    return (
+                      <CategoryItem key={`cat-${category}`}>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(event) => {
+                            const nextCategories = event.target.checked
+                              ? [...resolvedSelectedCategories, category]
+                              : resolvedSelectedCategories.filter((value) => value !== category);
+                            updateCategorySelection(nextCategories);
+                          }}
+                        />
+                        <span>{category}</span>
+                      </CategoryItem>
+                    );
+                  })}
+                </CategoryList>
+              </>
+            )}
+          </ValueFilterSection>
+        </AccordionSection>
       )}
     </AccordionSection>
   );
