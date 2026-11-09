@@ -349,6 +349,11 @@ export const MapLayout = () => {
           });
         });
       } else {
+        // On dual maps, DualMaps dispatches map-click filters itself, with each side's own
+        // feature. The filter state holds a single value, so re-dispatching it here would
+        // overwrite one side with the other side's feature.
+        if (filter.type === "map") return;
+
         filter.actions.forEach((action) => {
           let sides = "";
 

@@ -66,6 +66,78 @@ const StyledMapContainer = styled.div`
   }
 `;
 
+const SIDES = ["left", "right"];
+
+const SELECTED_FEATURE_LAYER = "selected-feature-layer";
+const SELECTED_FEATURE_SOURCE = "selected-feature-source";
+
+/**
+ * Replaces the selection highlight on a map with the given feature, or just removes it when
+ * there is no feature.
+ *
+ * A feature with an id is selected through feature state, which the layer's own `-select` layer
+ * draws (as Map.jsx does). That draws the whole feature, not the tile-clipped piece, and is cheap:
+ * adding a layer on an existing vector source would make MapLibre reload every tile of it.
+ * Features without an id fall back to a GeoJSON copy in a temporary layer.
+ *
+ * @param {maplibregl.Map} map - The map to update.
+ * @param {Object|null} feature - The rendered feature to highlight, or null to clear.
+ * @param {Object|null} previous - The feature-state target this returned last time, if any.
+ * @returns {Object|null} The feature-state target now selected, to pass back as `previous`.
+ */
+const highlightSelectedFeature = (map, feature, previous) => {
+  if (previous && map.getSource(previous.source)) {
+    map.setFeatureState(previous, { selected: false });
+  }
+  if (map.getLayer(SELECTED_FEATURE_LAYER)) {
+    map.removeLayer(SELECTED_FEATURE_LAYER);
+  }
+  if (map.getSource(SELECTED_FEATURE_SOURCE)) {
+    map.removeSource(SELECTED_FEATURE_SOURCE);
+  }
+  if (!feature) return null;
+
+  if (feature.id != null && feature.layer.source) {
+    const target = {
+      source: feature.layer.source,
+      ...(feature.layer["source-layer"] && { sourceLayer: feature.layer["source-layer"] }),
+      id: feature.id,
+    };
+    map.setFeatureState(target, { selected: true });
+    return target;
+  }
+
+  // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
+  // for the circle paintProp, however we currently dont have full functionality.
+  let paintProp = {};
+  if (feature.layer.type === "circle") {
+    paintProp = {
+      "circle-radius": 6,
+      "circle-color": "green",
+      "circle-opacity": 0.75,
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "black",
+    };
+  } else if (feature.layer.type === "fill") {
+    paintProp = {
+      "fill-color": "#f00",
+      "fill-opacity": 0.5,
+    };
+  }
+
+  map.addSource(SELECTED_FEATURE_SOURCE, {
+    type: "geojson",
+    data: feature.toJSON(),
+  });
+  map.addLayer({
+    id: SELECTED_FEATURE_LAYER,
+    type: feature.layer.type,
+    source: SELECTED_FEATURE_SOURCE,
+    paint: paintProp,
+  });
+  return null;
+};
+
 /**
  * DualMaps component that renders two synchronized maps side by side using MapLibre GL and handles layers,
  * including hover and click interactions.
@@ -101,15 +173,17 @@ const DualMaps = (props) => {
 
   const { dispatch: filterDispatch } = useFilterContext();
 
-  const maps = { left: leftMap, right: rightMap };
+  // Memoised so the callbacks and effects that depend on it don't re-run on every render.
+  const maps = React.useMemo(() => ({ left: leftMap, right: rightMap }), [leftMap, rightMap]);
   const popups = { left: null, right: null };
-  const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({ left: {}, right: {} });
 
   // Refs to manage hover state
   const hoverEventIdRef = useRef(0);
   const hoverInfoRef = useRef({ left: {}, right: {} });
   const prevHoveredFeaturesRef = useRef({ left: [], right: [] });
+  // Feature-state target of each side's clicked feature, so the next click can unselect it.
+  const selectedFeatureRef = useRef({ left: null, right: null });
 
   /**
    * Generates HTML for metadata section of tooltips
@@ -742,161 +816,150 @@ const DualMaps = (props) => {
     [maps]
   );
 
+  // Hover: one mousemove listener per map, registered once, calling the latest handleMapHover
+  // through a ref and coalescing moves to one per animation frame. handleMapHover works out the
+  // hoverable layers itself, so it doesn't need a listener per layer, nor re-registering whenever
+  // the layers or visualisations change.
+  const handleMapHoverRef = useRef(handleMapHover);
+  handleMapHoverRef.current = handleMapHover;
+
+  useEffect(() => {
+    if (!leftMap || !rightMap) return;
+
+    const registrations = [];
+    [["left", leftMap], ["right", rightMap]].forEach(([side, map]) => {
+      let frameId = null;
+      let lastEvent = null;
+      const onMouseMove = (e) => {
+        lastEvent = e;
+        if (frameId !== null) return;
+        frameId = requestAnimationFrame(() => {
+          frameId = null;
+          handleMapHoverRef.current(lastEvent, side);
+        });
+      };
+      // A hover pass still pending when the mouse leaves would re-hover a feature after leaving.
+      const cancelPendingHover = () => {
+        if (frameId !== null) cancelAnimationFrame(frameId);
+        frameId = null;
+      };
+      map.on("mousemove", onMouseMove);
+      map.on("mouseout", cancelPendingHover);
+      registrations.push(() => {
+        map.off("mousemove", onMouseMove);
+        map.off("mouseout", cancelPendingHover);
+        cancelPendingHover();
+      });
+    });
+
+    return () => registrations.forEach((unregister) => unregister());
+  }, [leftMap, rightMap]);
+
   useEffect(() => {
     if (!maps.left || !maps.right) return;
 
+    // Everything registered here is recorded so the cleanup removes exactly that.
+    const registrations = [];
+    const listen = (map, ...args) => {
+      map.on(...args);
+      registrations.push(() => map.off(...args));
+    };
+
     Object.keys(state.layers).forEach((layerId) => {
+      const layerData = state.layers[layerId];
       ["left", "right"].forEach((side) => {
         const map = maps[side];
-        if (state.layers[layerId].shouldHaveLabel) {
-          const layerData = state.layers[layerId];
+        if (layerData.shouldHaveLabel) {
           const zoomLevel = layerData.labelZoomLevel || 12;
-          const sourceLayer = layerData.sourceLayer;
-          const labelNulls = layerData.labelNulls;
-
-          const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
-          map.on('zoomend', zoomHandler);
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+          const zoomHandler = () =>
+            handleZoom(zoomLevel, layerId, layerData.sourceLayer, layerData.labelNulls);
+          listen(map, "zoomend", zoomHandler);
         }
-        if (state.layers[layerId].shouldHaveTooltipOnHover) {
-          const hoverCallback = (e) => handleMapHover(e, side);
-          map.on("mousemove", hoverCallback);
-          map.on("mouseleave", layerId, () => handleLayerLeave(layerId, side));
-          map.on("mouseenter", layerId, () => {
+        if (layerData.shouldHaveTooltipOnHover || layerData.shouldHaveTooltipOnClick) {
+          listen(map, "mouseenter", layerId, () => {
             map.getCanvas().style.cursor = "pointer";
           });
-          map.on("mouseleave", layerId, () => {
+          listen(map, "mouseleave", layerId, () => {
             map.getCanvas().style.cursor = "grab";
           });
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].hoverCallback = hoverCallback;
         }
-        if (state.layers[layerId].shouldHaveTooltipOnClick) {
-          const bufferSize = state.layers[layerId].bufferSize ?? 0;
-          const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
-          map.on("click", clickCallback);
-          map.on("mouseenter", layerId, () => {
-            map.getCanvas().style.cursor = "pointer";
-          });
-          map.on("mouseleave", layerId, () => {
-            map.getCanvas().style.cursor = "grab";
-          });
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].clickCallback = clickCallback;
+        if (layerData.shouldHaveTooltipOnHover) {
+          listen(map, "mouseleave", layerId, () => handleLayerLeave(layerId, side));
+        }
+        if (layerData.shouldHaveTooltipOnClick) {
+          const bufferSize = layerData.bufferSize ?? 0;
+          listen(map, "click", (e) => handleLayerClick(e, layerId, bufferSize));
         }
       });
     });
 
-    return () => {
-      Object.keys(state.layers).forEach((layerId) => {
-        ["left", "right"].forEach((side) => {
-          const map = maps[side];
-          if (state.layers[layerId].shouldHaveTooltipOnClick) {
-            const { clickCallback, hoverCallback, zoomHandler } =
-              listenerCallbackRef.current[layerId];
-            map.off("click", clickCallback);
-            map.off("mousemove", hoverCallback);
-            map.off('zoomend', zoomHandler);
-          }
-          if (state.layers[layerId].shouldHaveLabel) {
-            const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-            map.off('zoomend', zoomHandler);
-          }
-        });
-      });
-    };
-  }, [maps, handleLayerLeave, state.layers, state.visualisations]);
+    return () => registrations.forEach((unregister) => unregister());
+  }, [maps, handleLayerLeave, handleZoom, state.layers, state.visualisations]);
 
   /**
-   * Handles map click events and dispatches actions based on the clicked feature.
+   * Handles map click events for `type: "map"` filters.
+   *
+   * Each side takes the feature under the clicked point on its own map, so the two sides can use
+   * different layers' features (e.g. different zoning systems) and each fetches its own data.
+   * A side with no feature under the point is cleared: its selection highlight is removed and its
+   * param is set to null. A click with no feature on either side is ignored.
    *
    * @property {Object} event - The event object containing information about the click event.
    */
   const handleMapClick = useCallback(
     (event) => {
-      if (!isMapReady || (!maps.left && !maps.right)) return;
+      if (!isMapReady || !maps.left || !maps.right) return;
 
       const point = event.point;
+      const clickedSide = event.target === maps.right ? "right" : "left";
 
       // Get all map filters
       const mapFilters = state.filters.filter(
         (filter) => filter.type === "map"
       );
 
-      // For each map filter, check if the clicked point has a feature from the layer
       mapFilters.forEach((filter) => {
-        ["left", "right"].forEach((side) => {
+        const featureBySide = {};
+        SIDES.forEach((side) => {
+          featureBySide[side] =
+            maps[side].queryRenderedFeatures(point, { layers: [filter.layer] })[0] ?? null;
+        });
+
+        if (!featureBySide.left && !featureBySide.right) return;
+
+        const valueBySide = {};
+        SIDES.forEach((side) => {
           const map = maps[side];
-          const features = map.queryRenderedFeatures(point, {
-            layers: [filter.layer],
+          const feature = featureBySide[side];
+          const value = feature ? feature.properties[filter.field] : null;
+          valueBySide[side] = value;
+
+          selectedFeatureRef.current[side] = highlightSelectedFeature(
+            map,
+            feature,
+            selectedFeatureRef.current[side]
+          );
+
+          filter.actions.forEach((action) => {
+            dispatch({
+              type: action.action,
+              payload: { filter, value, sides: side },
+            });
           });
-          if (features.length > 0) {
-            // Assuming the first feature is the one we're interested in
-            const feature = features[0];
-            const value = feature.properties[filter.field];
+        });
 
-            // Remove the previous selection layer if it exists
-            if (map.getLayer("selected-feature-layer")) {
-              map.removeLayer("selected-feature-layer");
-              map.removeSource("selected-feature-source");
-            }
-
-            let paintProp = {};
-
-            // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
-            // for the circle paintProp, however we currently dont have full functionality.
-
-            if (feature.layer.type == "circle") {
-              paintProp = {
-                "circle-radius": 6,
-                "circle-color": "green",
-                "circle-opacity": 0.75,
-                "circle-stroke-width": 2,
-                "circle-stroke-color": "black",
-              };
-            } else if (feature.layer.type == "fill") {
-              paintProp = {
-                "fill-color": "#f00",
-                "fill-opacity": 0.5,
-              };
-            }
-
-            // Add a new source and layer for the selected feature
-            map.addSource("selected-feature-source", {
-              type: "geojson",
-              data: feature.toJSON(),
-            });
-
-            map.addLayer({
-              id: "selected-feature-layer",
-              type: feature.layer.type,
-              source: "selected-feature-source",
-              paint: paintProp,
-            });
-
-            // Dispatch the action with the value from the clicked feature
-            filterDispatch({
-              type: 'SET_FILTER_VALUE',
-              payload: { filterId: filter.id, value },
-            });
-            filter.actions.map((action) => {
-              dispatch({
-                type: action.action,
-                payload: { filter, value, sides: "both" },
-              });
-            });
-          }
+        // The filter holds one value, so show the clicked side's (or the other side's if the
+        // clicked side had none).
+        filterDispatch({
+          type: 'SET_FILTER_VALUE',
+          payload: {
+            filterId: filter.id,
+            value: valueBySide[clickedSide] ?? valueBySide[clickedSide === "left" ? "right" : "left"],
+          },
         });
       });
     },
-    [isMapReady, maps, state.filters, dispatch]
+    [isMapReady, maps, state.filters, dispatch, filterDispatch]
   );
 
   // Run once to set the state of the map

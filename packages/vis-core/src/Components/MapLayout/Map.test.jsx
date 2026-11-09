@@ -857,6 +857,8 @@ describe("Tests of handleMapHover function", () => {
         point: { x: 100, y: 200 },
         lngLat: { lng: 0, lat: 0 },
       });
+      // Hover runs on the next animation frame.
+      jest.advanceTimersByTime(16);
     });
 
     act(() => {
@@ -1365,12 +1367,71 @@ describe("mouseLeaveCallback function test", () => {
         point: { x: 100, y: 200 },
         lngLat: { lng: 2.3522, lat: 48.8566 },
       });
+      // Hover runs on the next animation frame.
+      jest.advanceTimersByTime(16);
     });
 
     expect(setFeatureState).toHaveBeenCalledWith(
       { source: "test-source", id: 123, sourceLayer: "test-source-layer" },
       { hover: true }
     );
+  });
+
+  it("coalesces a burst of mouse moves into one hover pass per frame", async () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    const mousemoveCallback = on.mock.calls.find((call) => call[0] === "mousemove")[1];
+    // Let anything the mocked on() triggered during render settle first.
+    await act(async () => {
+      jest.advanceTimersByTime(16);
+    });
+    queryRenderedFeatures.mockClear();
+
+    await act(async () => {
+      for (let i = 0; i < 5; i++) {
+        mousemoveCallback({ point: { x: 100 + i, y: 200 }, lngLat: { lng: 2.35, lat: 48.85 } });
+      }
+    });
+    expect(queryRenderedFeatures).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(16);
+    });
+    expect(queryRenderedFeatures).toHaveBeenCalledTimes(1);
+  });
+
+  it("drops a pending hover pass when the mouse leaves the map", async () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    const mousemoveCallback = on.mock.calls.find((call) => call[0] === "mousemove")[1];
+    const mouseLeaveCallback = canvasMock.addEventListener.mock.calls.find(
+      (call) => call[0] === "mouseleave"
+    )[1];
+    await act(async () => {
+      jest.advanceTimersByTime(16);
+    });
+    queryRenderedFeatures.mockClear();
+
+    await act(async () => {
+      mousemoveCallback({ point: { x: 100, y: 200 }, lngLat: { lng: 2.35, lat: 48.85 } });
+      mouseLeaveCallback();
+      jest.advanceTimersByTime(16);
+    });
+    expect(queryRenderedFeatures).not.toHaveBeenCalled();
   });
 });
 
@@ -1520,5 +1581,55 @@ describe("Map style toggle and transformStyle", () => {
     expect(normalTown.paint["text-color"]).toBe("#1f1f1f");
     expect(normalTown.paint["text-halo-color"]).toBe("rgba(255, 255, 255, 0.9)");
     expect(normalTown.paint["text-halo-width"]).toBe(1.25);
+  });
+});
+
+describe("layer listener cleanup", () => {
+  it("removes the click and cursor listeners it adds for click-tooltip layers, however often it re-runs", () => {
+    on.mockReset();
+    // Desktop, so click tooltips are registered.
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }));
+    const contextWithLayers = (n) => ({
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        // A new layers object each time, as a data update would give, re-runs the effect.
+        layers: {
+          clickable: { shouldHaveTooltipOnClick: true, bufferSize: n },
+          labelled: { shouldHaveLabel: true },
+        },
+      },
+    });
+    const tree = (context) => (
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={context}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    const { rerender, unmount } = render(tree(contextWithLayers(1)));
+    rerender(tree(contextWithLayers(2)));
+    rerender(tree(contextWithLayers(3)));
+    unmount();
+
+    const key = (args) => args.map((a) => (typeof a === "function" ? a : String(a)));
+    const removed = off.mock.calls.map(key);
+    const layerScoped = on.mock.calls.filter(
+      ([event, layer]) => ["mouseenter", "mouseleave"].includes(event) && layer === "clickable"
+    );
+    expect(layerScoped.length).toBeGreaterThan(0);
+    [...layerScoped, ...on.mock.calls.filter(([event]) => event === "zoomend")].forEach((args) => {
+      expect(removed).toContainEqual(key(args));
+    });
   });
 });
