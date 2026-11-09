@@ -173,9 +173,9 @@ const DualMaps = (props) => {
 
   const { dispatch: filterDispatch } = useFilterContext();
 
-  const maps = { left: leftMap, right: rightMap };
+  // Memoised so the callbacks and effects that depend on it don't re-run on every render.
+  const maps = React.useMemo(() => ({ left: leftMap, right: rightMap }), [leftMap, rightMap]);
   const popups = { left: null, right: null };
-  const listenerCallbackRef = useRef({});
   const hoverIdRef = useRef({ left: {}, right: {} });
 
   // Refs to manage hover state
@@ -816,77 +816,78 @@ const DualMaps = (props) => {
     [maps]
   );
 
+  // Hover: one mousemove listener per map, registered once, calling the latest handleMapHover
+  // through a ref and coalescing moves to one per animation frame. handleMapHover works out the
+  // hoverable layers itself, so it doesn't need a listener per layer, nor re-registering whenever
+  // the layers or visualisations change.
+  const handleMapHoverRef = useRef(handleMapHover);
+  handleMapHoverRef.current = handleMapHover;
+
+  useEffect(() => {
+    if (!leftMap || !rightMap) return;
+
+    const registrations = [];
+    [["left", leftMap], ["right", rightMap]].forEach(([side, map]) => {
+      let frameId = null;
+      let lastEvent = null;
+      const onMouseMove = (e) => {
+        lastEvent = e;
+        if (frameId !== null) return;
+        frameId = requestAnimationFrame(() => {
+          frameId = null;
+          handleMapHoverRef.current(lastEvent, side);
+        });
+      };
+      map.on("mousemove", onMouseMove);
+      registrations.push(() => {
+        map.off("mousemove", onMouseMove);
+        if (frameId !== null) cancelAnimationFrame(frameId);
+      });
+    });
+
+    return () => registrations.forEach((unregister) => unregister());
+  }, [leftMap, rightMap]);
+
   useEffect(() => {
     if (!maps.left || !maps.right) return;
 
+    // Everything registered here is recorded so the cleanup removes exactly that.
+    const registrations = [];
+    const listen = (map, ...args) => {
+      map.on(...args);
+      registrations.push(() => map.off(...args));
+    };
+
     Object.keys(state.layers).forEach((layerId) => {
+      const layerData = state.layers[layerId];
       ["left", "right"].forEach((side) => {
         const map = maps[side];
-        if (state.layers[layerId].shouldHaveLabel) {
-          const layerData = state.layers[layerId];
+        if (layerData.shouldHaveLabel) {
           const zoomLevel = layerData.labelZoomLevel || 12;
-          const sourceLayer = layerData.sourceLayer;
-          const labelNulls = layerData.labelNulls;
-
-          const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
-          map.on('zoomend', zoomHandler);
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+          const zoomHandler = () =>
+            handleZoom(zoomLevel, layerId, layerData.sourceLayer, layerData.labelNulls);
+          listen(map, "zoomend", zoomHandler);
         }
-        if (state.layers[layerId].shouldHaveTooltipOnHover) {
-          const hoverCallback = (e) => handleMapHover(e, side);
-          map.on("mousemove", hoverCallback);
-          map.on("mouseleave", layerId, () => handleLayerLeave(layerId, side));
-          map.on("mouseenter", layerId, () => {
+        if (layerData.shouldHaveTooltipOnHover || layerData.shouldHaveTooltipOnClick) {
+          listen(map, "mouseenter", layerId, () => {
             map.getCanvas().style.cursor = "pointer";
           });
-          map.on("mouseleave", layerId, () => {
+          listen(map, "mouseleave", layerId, () => {
             map.getCanvas().style.cursor = "grab";
           });
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].hoverCallback = hoverCallback;
         }
-        if (state.layers[layerId].shouldHaveTooltipOnClick) {
-          const bufferSize = state.layers[layerId].bufferSize ?? 0;
-          const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
-          map.on("click", clickCallback);
-          map.on("mouseenter", layerId, () => {
-            map.getCanvas().style.cursor = "pointer";
-          });
-          map.on("mouseleave", layerId, () => {
-            map.getCanvas().style.cursor = "grab";
-          });
-          if (!listenerCallbackRef.current[layerId]) {
-            listenerCallbackRef.current[layerId] = {};
-          }
-          listenerCallbackRef.current[layerId].clickCallback = clickCallback;
+        if (layerData.shouldHaveTooltipOnHover) {
+          listen(map, "mouseleave", layerId, () => handleLayerLeave(layerId, side));
+        }
+        if (layerData.shouldHaveTooltipOnClick) {
+          const bufferSize = layerData.bufferSize ?? 0;
+          listen(map, "click", (e) => handleLayerClick(e, layerId, bufferSize));
         }
       });
     });
 
-    return () => {
-      Object.keys(state.layers).forEach((layerId) => {
-        ["left", "right"].forEach((side) => {
-          const map = maps[side];
-          if (state.layers[layerId].shouldHaveTooltipOnClick) {
-            const { clickCallback, hoverCallback, zoomHandler } =
-              listenerCallbackRef.current[layerId];
-            map.off("click", clickCallback);
-            map.off("mousemove", hoverCallback);
-            map.off('zoomend', zoomHandler);
-          }
-          if (state.layers[layerId].shouldHaveLabel) {
-            const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-            map.off('zoomend', zoomHandler);
-          }
-        });
-      });
-    };
-  }, [maps, handleLayerLeave, state.layers, state.visualisations]);
+    return () => registrations.forEach((unregister) => unregister());
+  }, [maps, handleLayerLeave, handleZoom, state.layers, state.visualisations]);
 
   /**
    * Handles map click events for `type: "map"` filters.

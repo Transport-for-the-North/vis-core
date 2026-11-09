@@ -430,7 +430,34 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     // Off function to have been called
     expect(off).toHaveBeenCalledWith("click", expect.any(Function));
     expect(off).toHaveBeenCalledWith("mousemove", expect.any(Function));
-    expect(off).toHaveBeenCalledWith("zoomend", undefined);
+  });
+
+  it("removes every map listener it adds, and adds one mousemove per map however often it re-renders", () => {
+    const tree = (
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    const { rerender, unmount } = render(tree);
+    rerender(tree);
+    rerender(tree);
+
+    // Both maps share the same mocked on/off here, so one listener per map is two calls.
+    expect(on.mock.calls.filter(([event]) => event === "mousemove")).toHaveLength(2);
+
+    unmount();
+    // Every (event, [layer,] handler) registered must have been unregistered with the same args.
+    const key = (args) => args.map((a) => (typeof a === "function" ? a : String(a)));
+    const removed = off.mock.calls.map(key);
+    on.mock.calls
+      .filter(([event]) => ["mousemove", "mouseenter", "mouseleave", "click", "zoomend"].includes(event))
+      .forEach((args) => {
+        expect(removed).toContainEqual(key(args));
+      });
   });
 
   it("should handle hover events on the map", () => {
@@ -475,11 +502,25 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
       point: { x: 150, y: 150 },
       lngLat: { lng: -0.1, lat: 51.5 },
     };
-    // Call the callback
-    handleMapHoverCallback(mockEvent);
-    // Check the effects
-    expect(mockLeftMap.queryRenderedFeatures).toHaveBeenCalled();
-    expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
+    // Hover work runs on the next animation frame, coalescing a burst of moves into one.
+    const frames = [];
+    const rafSpy = jest
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((cb) => frames.push(cb));
+    try {
+      handleMapHoverCallback(mockEvent);
+      handleMapHoverCallback(mockEvent);
+      handleMapHoverCallback(mockEvent);
+      expect(mockLeftMap.queryRenderedFeatures).not.toHaveBeenCalled();
+      expect(frames).toHaveLength(1);
+
+      frames.shift()();
+      // One hover pass queries each map once (the right map shares the left's mocks here).
+      expect(mockLeftMap.queryRenderedFeatures).toHaveBeenCalledTimes(2);
+      expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
+    } finally {
+      rafSpy.mockRestore();
+    }
   });
 
   it("Test function getCanvas() is called", () => {
