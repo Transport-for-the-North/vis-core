@@ -766,6 +766,7 @@ describe("map filter clicks with a different feature on each side", () => {
       getCanvas: jest.fn(() => ({ style: {} })),
       getLayer: jest.fn((id) => (id === "selected-feature-layer" ? hasSelection : undefined)),
       getSource: jest.fn(),
+      setFeatureState: jest.fn(),
       queryRenderedFeatures: jest.fn(() => features),
       addSource: jest.fn(),
       addLayer: jest.fn(),
@@ -824,28 +825,45 @@ describe("map filter clicks with a different feature on each side", () => {
     );
   });
 
-  it("highlights a tiled zone from its own source, so the fill is not cut at tile edges", () => {
-    const tiledZone = {
-      id: 101,
-      layer: { type: "fill", source: "Zones", "source-layer": "zones" },
-      properties: { id: 101 },
-      toJSON: () => ({ type: "Feature", properties: { id: 101 } }),
-    };
-    const leftMap = createMap("left", [tiledZone]);
+  /** A fake rendered feature from a tiled zones layer, which has an id. */
+  const tiledZone = (id) => ({
+    id,
+    layer: { type: "fill", source: "Zones", "source-layer": "zones" },
+    properties: { id },
+    toJSON: () => ({ type: "Feature", properties: { id } }),
+  });
+
+  it("selects a tiled zone through feature state, without adding a layer on its source", () => {
+    const leftMap = createMap("left", [tiledZone(101)]);
     const rightMap = createMap("right", []);
     renderWithMaps(leftMap, rightMap);
 
     leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
 
+    // Adding a layer on the vector source would make MapLibre reload all its tiles.
     expect(leftMap.addSource).not.toHaveBeenCalled();
-    expect(leftMap.addLayer).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: "selected-feature-layer",
-        source: "Zones",
-        "source-layer": "zones",
-        filter: ["==", ["id"], 101],
-      })
+    expect(leftMap.addLayer).not.toHaveBeenCalled();
+    expect(leftMap.setFeatureState).toHaveBeenCalledWith(
+      { source: "Zones", sourceLayer: "zones", id: 101 },
+      { selected: true }
     );
+  });
+
+  it("unselects a side's previous zone when the next click selects another", () => {
+    const leftMap = createMap("left", [tiledZone(101)]);
+    leftMap.getSource.mockImplementation((id) => (id === "Zones" ? {} : undefined));
+    const rightMap = createMap("right", []);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+    leftMap.queryRenderedFeatures.mockReturnValue([tiledZone(202)]);
+    leftMap.setFeatureState.mockClear();
+    leftMap.handlers.click({ point: { x: 20, y: 20 }, target: leftMap });
+
+    expect(leftMap.setFeatureState.mock.calls).toEqual([
+      [{ source: "Zones", sourceLayer: "zones", id: 101 }, { selected: false }],
+      [{ source: "Zones", sourceLayer: "zones", id: 202 }, { selected: true }],
+    ]);
   });
 
   it("shows the clicked side's zone in the sidebar filter", () => {

@@ -75,17 +75,37 @@ const SELECTED_FEATURE_SOURCE = "selected-feature-source";
  * Replaces the selection highlight on a map with the given feature, or just removes it when
  * there is no feature.
  *
+ * A feature with an id is selected through feature state, which the layer's own `-select` layer
+ * draws (as Map.jsx does). That draws the whole feature, not the tile-clipped piece, and is cheap:
+ * adding a layer on an existing vector source would make MapLibre reload every tile of it.
+ * Features without an id fall back to a GeoJSON copy in a temporary layer.
+ *
  * @param {maplibregl.Map} map - The map to update.
  * @param {Object|null} feature - The rendered feature to highlight, or null to clear.
+ * @param {Object|null} previous - The feature-state target this returned last time, if any.
+ * @returns {Object|null} The feature-state target now selected, to pass back as `previous`.
  */
-const highlightSelectedFeature = (map, feature) => {
+const highlightSelectedFeature = (map, feature, previous) => {
+  if (previous && map.getSource(previous.source)) {
+    map.setFeatureState(previous, { selected: false });
+  }
   if (map.getLayer(SELECTED_FEATURE_LAYER)) {
     map.removeLayer(SELECTED_FEATURE_LAYER);
   }
   if (map.getSource(SELECTED_FEATURE_SOURCE)) {
     map.removeSource(SELECTED_FEATURE_SOURCE);
   }
-  if (!feature) return;
+  if (!feature) return null;
+
+  if (feature.id != null && feature.layer.source) {
+    const target = {
+      source: feature.layer.source,
+      ...(feature.layer["source-layer"] && { sourceLayer: feature.layer["source-layer"] }),
+      id: feature.id,
+    };
+    map.setFeatureState(target, { selected: true });
+    return target;
+  }
 
   // Here is where we should use the colourSchemeSelectionColour[state.color_scheme]
   // for the circle paintProp, however we currently dont have full functionality.
@@ -105,22 +125,17 @@ const highlightSelectedFeature = (map, feature) => {
     };
   }
 
-  // A rendered feature is clipped to its tile, so draw from the layer's own source by id.
-  const fromSource = feature.id != null && Boolean(feature.layer.source);
-  if (!fromSource) {
-    map.addSource(SELECTED_FEATURE_SOURCE, {
-      type: "geojson",
-      data: feature.toJSON(),
-    });
-  }
+  map.addSource(SELECTED_FEATURE_SOURCE, {
+    type: "geojson",
+    data: feature.toJSON(),
+  });
   map.addLayer({
     id: SELECTED_FEATURE_LAYER,
     type: feature.layer.type,
-    source: fromSource ? feature.layer.source : SELECTED_FEATURE_SOURCE,
-    ...(fromSource && feature.layer["source-layer"] && { "source-layer": feature.layer["source-layer"] }),
-    ...(fromSource && { filter: ["==", ["id"], feature.id] }),
+    source: SELECTED_FEATURE_SOURCE,
     paint: paintProp,
   });
+  return null;
 };
 
 /**
@@ -167,6 +182,8 @@ const DualMaps = (props) => {
   const hoverEventIdRef = useRef(0);
   const hoverInfoRef = useRef({ left: {}, right: {} });
   const prevHoveredFeaturesRef = useRef({ left: [], right: [] });
+  // Feature-state target of each side's clicked feature, so the next click can unselect it.
+  const selectedFeatureRef = useRef({ left: null, right: null });
 
   /**
    * Generates HTML for metadata section of tooltips
@@ -909,7 +926,11 @@ const DualMaps = (props) => {
           const value = feature ? feature.properties[filter.field] : null;
           valueBySide[side] = value;
 
-          highlightSelectedFeature(map, feature);
+          selectedFeatureRef.current[side] = highlightSelectedFeature(
+            map,
+            feature,
+            selectedFeatureRef.current[side]
+          );
 
           filter.actions.forEach((action) => {
             dispatch({
