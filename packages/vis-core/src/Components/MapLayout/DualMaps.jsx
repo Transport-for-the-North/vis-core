@@ -81,6 +81,8 @@ const SELECTED_FEATURE_SOURCE = "selected-feature-source";
 const highlightSelectedFeature = (map, feature) => {
   if (map.getLayer(SELECTED_FEATURE_LAYER)) {
     map.removeLayer(SELECTED_FEATURE_LAYER);
+  }
+  if (map.getSource(SELECTED_FEATURE_SOURCE)) {
     map.removeSource(SELECTED_FEATURE_SOURCE);
   }
   if (!feature) return;
@@ -103,14 +105,20 @@ const highlightSelectedFeature = (map, feature) => {
     };
   }
 
-  map.addSource(SELECTED_FEATURE_SOURCE, {
-    type: "geojson",
-    data: feature.toJSON(),
-  });
+  // A rendered feature is clipped to its tile, so draw from the layer's own source by id.
+  const fromSource = feature.id != null && Boolean(feature.layer.source);
+  if (!fromSource) {
+    map.addSource(SELECTED_FEATURE_SOURCE, {
+      type: "geojson",
+      data: feature.toJSON(),
+    });
+  }
   map.addLayer({
     id: SELECTED_FEATURE_LAYER,
     type: feature.layer.type,
-    source: SELECTED_FEATURE_SOURCE,
+    source: fromSource ? feature.layer.source : SELECTED_FEATURE_SOURCE,
+    ...(fromSource && feature.layer["source-layer"] && { "source-layer": feature.layer["source-layer"] }),
+    ...(fromSource && { filter: ["==", ["id"], feature.id] }),
     paint: paintProp,
   });
 };

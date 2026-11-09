@@ -765,6 +765,7 @@ describe("map filter clicks with a different feature on each side", () => {
       off: jest.fn(),
       getCanvas: jest.fn(() => ({ style: {} })),
       getLayer: jest.fn((id) => (id === "selected-feature-layer" ? hasSelection : undefined)),
+      getSource: jest.fn(),
       queryRenderedFeatures: jest.fn(() => features),
       addSource: jest.fn(),
       addLayer: jest.fn(),
@@ -820,6 +821,30 @@ describe("map filter clicks with a different feature on each side", () => {
     expect(rightMap.addSource).toHaveBeenCalledWith(
       "selected-feature-source",
       expect.objectContaining({ data: { type: "Feature", properties: { id: 9001 } } })
+    );
+  });
+
+  it("highlights a tiled zone from its own source, so the fill is not cut at tile edges", () => {
+    const tiledZone = {
+      id: 101,
+      layer: { type: "fill", source: "Zones", "source-layer": "zones" },
+      properties: { id: 101 },
+      toJSON: () => ({ type: "Feature", properties: { id: 101 } }),
+    };
+    const leftMap = createMap("left", [tiledZone]);
+    const rightMap = createMap("right", []);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(leftMap.addSource).not.toHaveBeenCalled();
+    expect(leftMap.addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "selected-feature-layer",
+        source: "Zones",
+        "source-layer": "zones",
+        filter: ["==", ["id"], 101],
+      })
     );
   });
 

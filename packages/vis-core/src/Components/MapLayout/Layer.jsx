@@ -150,6 +150,9 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-boundaries`)) {
           mapInstance.removeLayer(`${layer.name}-boundaries`);
         }
+        if (mapInstance.getLayer("selected-feature-layer")?.source === layer.name) {
+          mapInstance.removeLayer("selected-feature-layer");
+        }
         if (mapInstance.getSource(layer.name)) {
           mapInstance.removeSource(layer.name);
         }
@@ -401,11 +404,11 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-label`)) {
           mapInstance.removeLayer(`${layer.name}-label`);
         }
-        if (mapInstance.getSource(layer.name)) {
-          mapInstance.removeSource(layer.name);
-        }
         if (mapInstance.getLayer("selected-feature-layer")) {
           mapInstance.removeLayer("selected-feature-layer");
+        }
+        if (mapInstance.getSource(layer.name)) {
+          mapInstance.removeSource(layer.name);
         }
         if (mapInstance.getSource("selected-feature-source")) {
           mapInstance.removeSource("selected-feature-source");
@@ -458,6 +461,9 @@ export const Layer = ({ layer }) => {
         ].forEach((layerId) => {
           if (mapInstance.getLayer(layerId)) mapInstance.removeLayer(layerId);
         });
+        if (mapInstance.getLayer("selected-feature-layer")?.source === layer.name) {
+          mapInstance.removeLayer("selected-feature-layer");
+        }
         if (mapInstance.getSource(layer.name)) mapInstance.removeSource(layer.name);
       } catch {
         // If removal fails, don't try to re-add.
