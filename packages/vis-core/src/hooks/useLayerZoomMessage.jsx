@@ -24,6 +24,7 @@ export const useLayerZoomMessage = () => {
             (id) => layer.id === id || layer.id.startsWith(`${id}-`)
           ) &&
           !layer.id.endsWith("-hover") &&
+          !layer.id.endsWith("-hover-halo") &&
           layer.id !== "selected-feature-layer" &&
           !layer.id.startsWith("gl-draw")
       );
