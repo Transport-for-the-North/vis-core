@@ -899,6 +899,15 @@ const Map = (props) => {
     if (!map) return;
     const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
+    // Everything registered here is recorded so the cleanup removes exactly that. The cursor
+    // handlers are layer-scoped, so MapLibre queries rendered features for each one on every
+    // mouse move; left behind, they pile up each time the layers or visualisations change.
+    const registrations = [];
+    const listen = (...args) => {
+      map.on(...args);
+      registrations.push(() => map.off(...args));
+    };
+
     Object.keys(state.layers).forEach((layerId) => {
       if (state.layers[layerId].shouldHaveLabel) {
         const layerData = state.layers[layerId];
@@ -906,31 +915,22 @@ const Map = (props) => {
         const sourceLayer = layerData.sourceLayer;
         const labelNulls = layerData.labelNulls;
 
-        const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
-        map.on('zoomend', zoomHandler);
-        if (!listenerCallbackRef.current[layerId]) {
-          listenerCallbackRef.current[layerId] = {};
-        }
-        listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+        listen('zoomend', () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls));
       }
       if (!isTouch && state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
-        const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
-        map.on("click", clickCallback);
-        map.on("mouseenter", layerId, () => {
+        listen("click", (e) => handleLayerClick(e, layerId, bufferSize));
+        listen("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
         });
-        map.on("mouseleave", layerId, () => {
+        listen("mouseleave", layerId, () => {
           map.getCanvas().style.cursor = "grab";
         });
-        if (!listenerCallbackRef.current[layerId]) {
-          listenerCallbackRef.current[layerId] = {};
-        }
-        listenerCallbackRef.current[layerId].clickCallback = clickCallback;
       }
     });
 
     return () => {
+      registrations.forEach((unregister) => unregister());
       Object.keys(state.layers).forEach((layerId) => {
         if (popups[layerId]?.length) {
           popups[layerId].forEach((popup) => popup.remove());
@@ -939,11 +939,6 @@ const Map = (props) => {
         if (
           state.layers[layerId].shouldHaveTooltipOnClick
         ) {
-          const { clickCallback, zoomHandler } =
-            listenerCallbackRef.current[layerId];
-          if (clickCallback) {map.off("click", clickCallback)};
-          map.off('zoomend', zoomHandler);
-
           // Clean up hover info
           if (hoverInfoRef.current[layerId]) {
             const { timeoutId, abortController, popup } =
@@ -953,10 +948,6 @@ const Map = (props) => {
             if (popup) popup.remove();
             hoverInfoRef.current[layerId] = null;
           }
-        }
-        if (state.layers[layerId].shouldHaveLabel) {
-          const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-          map.off('zoomend', zoomHandler);
         }
       });
     };

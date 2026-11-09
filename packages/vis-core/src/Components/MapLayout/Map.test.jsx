@@ -1522,3 +1522,53 @@ describe("Map style toggle and transformStyle", () => {
     expect(normalTown.paint["text-halo-width"]).toBe(1.25);
   });
 });
+
+describe("layer listener cleanup", () => {
+  it("removes the click and cursor listeners it adds for click-tooltip layers, however often it re-runs", () => {
+    on.mockReset();
+    // Desktop, so click tooltips are registered.
+    window.matchMedia = jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }));
+    const contextWithLayers = (n) => ({
+      ...mockMapContext,
+      state: {
+        ...mockMapContext.state,
+        // A new layers object each time, as a data update would give, re-runs the effect.
+        layers: {
+          clickable: { shouldHaveTooltipOnClick: true, bufferSize: n },
+          labelled: { shouldHaveLabel: true },
+        },
+      },
+    });
+    const tree = (context) => (
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={context}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    const { rerender, unmount } = render(tree(contextWithLayers(1)));
+    rerender(tree(contextWithLayers(2)));
+    rerender(tree(contextWithLayers(3)));
+    unmount();
+
+    const key = (args) => args.map((a) => (typeof a === "function" ? a : String(a)));
+    const removed = off.mock.calls.map(key);
+    const layerScoped = on.mock.calls.filter(
+      ([event, layer]) => ["mouseenter", "mouseleave"].includes(event) && layer === "clickable"
+    );
+    expect(layerScoped.length).toBeGreaterThan(0);
+    [...layerScoped, ...on.mock.calls.filter(([event]) => event === "zoomend")].forEach((args) => {
+      expect(removed).toContainEqual(key(args));
+    });
+  });
+});
