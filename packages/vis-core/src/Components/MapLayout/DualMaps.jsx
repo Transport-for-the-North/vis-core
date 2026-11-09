@@ -838,10 +838,17 @@ const DualMaps = (props) => {
           handleMapHoverRef.current(lastEvent, side);
         });
       };
+      // A hover pass still pending when the mouse leaves would re-hover a feature after leaving.
+      const cancelPendingHover = () => {
+        if (frameId !== null) cancelAnimationFrame(frameId);
+        frameId = null;
+      };
       map.on("mousemove", onMouseMove);
+      map.on("mouseout", cancelPendingHover);
       registrations.push(() => {
         map.off("mousemove", onMouseMove);
-        if (frameId !== null) cancelAnimationFrame(frameId);
+        map.off("mouseout", cancelPendingHover);
+        cancelPendingHover();
       });
     });
 

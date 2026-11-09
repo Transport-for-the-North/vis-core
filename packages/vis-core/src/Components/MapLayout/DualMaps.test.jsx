@@ -523,6 +523,51 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     }
   });
 
+  it("drops a pending hover pass when the mouse leaves the map", () => {
+    const handlers = {};
+    const mockLeftMap = {
+      on: jest.fn((event, ...rest) => { if (rest.length === 1) handlers[event] = rest[0]; }),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue([]),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue(true),
+      ...mockMapControls,
+    };
+    useDualMaps.mockReturnValue({
+      leftMap: mockLeftMap,
+      rightMap: { ...mockLeftMap, on: jest.fn() },
+      isMapReady: true,
+    });
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    const frames = new Map();
+    let nextId = 1;
+    const rafSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      frames.set(nextId, cb);
+      return nextId++;
+    });
+    const cafSpy = jest.spyOn(window, "cancelAnimationFrame").mockImplementation((id) => frames.delete(id));
+    try {
+      handlers.mousemove({ point: { x: 150, y: 150 }, lngLat: { lng: -0.1, lat: 51.5 } });
+      expect(frames.size).toBe(1);
+      handlers.mouseout();
+      expect(frames.size).toBe(0);
+      expect(mockLeftMap.queryRenderedFeatures).not.toHaveBeenCalled();
+    } finally {
+      rafSpy.mockRestore();
+      cafSpy.mockRestore();
+    }
+  });
+
   it("Test function getCanvas() is called", () => {
     render(
       <ThemeProvider theme={theme}>

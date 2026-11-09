@@ -104,7 +104,8 @@ const Map = (props) => {
   });
   const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
-  const listenerCallbackRef = useRef({});
+  // Latest handleMapHover, so the mousemove listener always calls the current one.
+  const handleMapHoverRef = useRef(null);
   const hoverIdRef = useRef({});
   const sidebarIsOpen = props.sidebarIsOpen
   
@@ -775,6 +776,7 @@ const Map = (props) => {
     },
     [map, state.layers, state.visualisations, generateMetadataHtml]
   );
+  handleMapHoverRef.current = handleMapHover;
 
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
@@ -1057,10 +1059,26 @@ const Map = (props) => {
 
     if (!isTouch) {
       // ----- DESKTOP: normal hover -----
-      const hoverCallback = (e) => handleMapHover(e);
+      // Coalesce mouse moves to one hover pass per animation frame, using the latest handler.
+      let frameId = null;
+      let lastEvent = null;
+      const cancelPendingHover = () => {
+        if (frameId !== null) cancelAnimationFrame(frameId);
+        frameId = null;
+      };
+      const hoverCallback = (e) => {
+        lastEvent = e;
+        if (frameId !== null) return;
+        frameId = requestAnimationFrame(() => {
+          frameId = null;
+          handleMapHoverRef.current(lastEvent);
+        });
+      };
       map.on("mousemove", hoverCallback);
 
       const mouseLeaveCallback = () => {
+        // A hover pass still pending would bring the tooltip back after leaving.
+        cancelPendingHover();
         if (hoverInfoRef.current.popup) {
           hoverInfoRef.current.popup.remove();
           hoverInfoRef.current.popup = null;
@@ -1078,18 +1096,13 @@ const Map = (props) => {
         });
         prevHoveredFeaturesRef.current = [];
       };
-      map.getCanvas().addEventListener("mouseleave", mouseLeaveCallback);
-
-      listenerCallbackRef.current.hoverCallback = hoverCallback;
-      listenerCallbackRef.current.mouseLeaveCallback = mouseLeaveCallback;
+      const canvas = map.getCanvas();
+      canvas.addEventListener("mouseleave", mouseLeaveCallback);
 
       return () => {
-        if (listenerCallbackRef.current.hoverCallback) {
-          map.off("mousemove", listenerCallbackRef.current.hoverCallback);
-        }
-        if (listenerCallbackRef.current.mouseLeaveCallback) {
-          map.getCanvas().removeEventListener("mouseleave", listenerCallbackRef.current.mouseLeaveCallback);
-        }
+        cancelPendingHover();
+        map.off("mousemove", hoverCallback);
+        canvas.removeEventListener("mouseleave", mouseLeaveCallback);
       };
     }
 

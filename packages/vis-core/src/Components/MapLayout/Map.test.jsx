@@ -857,6 +857,8 @@ describe("Tests of handleMapHover function", () => {
         point: { x: 100, y: 200 },
         lngLat: { lng: 0, lat: 0 },
       });
+      // Hover runs on the next animation frame.
+      jest.advanceTimersByTime(16);
     });
 
     act(() => {
@@ -1365,12 +1367,71 @@ describe("mouseLeaveCallback function test", () => {
         point: { x: 100, y: 200 },
         lngLat: { lng: 2.3522, lat: 48.8566 },
       });
+      // Hover runs on the next animation frame.
+      jest.advanceTimersByTime(16);
     });
 
     expect(setFeatureState).toHaveBeenCalledWith(
       { source: "test-source", id: 123, sourceLayer: "test-source-layer" },
       { hover: true }
     );
+  });
+
+  it("coalesces a burst of mouse moves into one hover pass per frame", async () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    const mousemoveCallback = on.mock.calls.find((call) => call[0] === "mousemove")[1];
+    // Let anything the mocked on() triggered during render settle first.
+    await act(async () => {
+      jest.advanceTimersByTime(16);
+    });
+    queryRenderedFeatures.mockClear();
+
+    await act(async () => {
+      for (let i = 0; i < 5; i++) {
+        mousemoveCallback({ point: { x: 100 + i, y: 200 }, lngLat: { lng: 2.35, lat: 48.85 } });
+      }
+    });
+    expect(queryRenderedFeatures).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(16);
+    });
+    expect(queryRenderedFeatures).toHaveBeenCalledTimes(1);
+  });
+
+  it("drops a pending hover pass when the mouse leaves the map", async () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    const mousemoveCallback = on.mock.calls.find((call) => call[0] === "mousemove")[1];
+    const mouseLeaveCallback = canvasMock.addEventListener.mock.calls.find(
+      (call) => call[0] === "mouseleave"
+    )[1];
+    await act(async () => {
+      jest.advanceTimersByTime(16);
+    });
+    queryRenderedFeatures.mockClear();
+
+    await act(async () => {
+      mousemoveCallback({ point: { x: 100, y: 200 }, lngLat: { lng: 2.35, lat: 48.85 } });
+      mouseLeaveCallback();
+      jest.advanceTimersByTime(16);
+    });
+    expect(queryRenderedFeatures).not.toHaveBeenCalled();
   });
 });
 
