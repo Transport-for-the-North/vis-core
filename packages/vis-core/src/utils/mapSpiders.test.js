@@ -186,6 +186,7 @@ describe("mapSpiders utilities", () => {
       ensureSpiderHoverSelectLayers(mockMap, "base", "dark");
 
       expect(mapUtils.getHoverLayerStyle).toHaveBeenCalledWith("point", {}, "dark");
+      expect(mapUtils.getSelectedLayerStyle).toHaveBeenCalledWith("point", "dark");
     });
 
     it("defaults the spider hover ring to the light theme", () => {

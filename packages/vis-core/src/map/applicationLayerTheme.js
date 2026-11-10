@@ -1,4 +1,4 @@
-import { applyHoverTheme, getLayerStyle, syncHoverLayerToBase } from "../utils/map";
+import { applyHighlightTheme, getLayerStyle, syncHighlightsToBase } from "../utils/map";
 
 /** Converts sRGB (0-255 each) to HSL (degrees, %, %). @private */
 function rgbToHsl(r, g, b) {
@@ -264,6 +264,15 @@ export function resolveBoundaryPaint({
   };
 }
 
+/** Highlight layers recoloured on a theme change, as suffixes of the application layer name. */
+const HIGHLIGHT_LAYER_SUFFIXES = [
+  "-hover",
+  "-select",
+  "-select-inner",
+  "-spider-hover",
+  "-spider-select",
+];
+
 /**
  * Applies the application theme to all layers currently mounted on a map instance.
  *
@@ -287,13 +296,14 @@ export function applyApplicationTheme({ map, layers, theme }) {
             // Ignore unsupported properties.
           }
         });
-        syncHoverLayerToBase(map, layer.name);
+        syncHighlightsToBase(map, layer.name);
       }
     }
 
-    // Hover highlights (including spider overlays) take the theme's hover colour.
-    applyHoverTheme(map, `${layer.name}-hover`, theme);
-    applyHoverTheme(map, `${layer.name}-spider-hover`, theme);
+    // Hover and select highlights (including spider overlays) take the theme's colours.
+    HIGHLIGHT_LAYER_SUFFIXES.forEach((suffix) => {
+      applyHighlightTheme(map, `${layer.name}${suffix}`, theme);
+    });
 
     if (layer.switchableBoundaries !== false && layer.geometryType === "polygon") {
       const boundaryLayerId = `${layer.name}-boundaries`;

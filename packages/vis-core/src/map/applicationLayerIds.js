@@ -1,6 +1,7 @@
 const COMPANION_SUFFIXES = [
   "-hover",
   "-select",
+  "-select-inner",
   "-label",
   "-boundaries",
   "-spider",

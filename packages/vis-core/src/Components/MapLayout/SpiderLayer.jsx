@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useMapContext } from "hooks/useMapContext";
-import { getSourceLayer, syncHoverLayerToBase } from 'utils';
+import { getSourceLayer, syncHighlightsToBase } from 'utils';
 import { getBaseMap } from "../../map/baseMaps";
 import {
   ensureSpiderHoverSelectLayers,
@@ -57,8 +57,9 @@ function mirrorToOverlay(map, baseLayerId) {
     } catch {}
   });
 
-  // The spider points now carry the parent's radius, so size their hover ring to match.
-  syncHoverLayerToBase(map, pointLayerId, `${baseLayerId}-spider-hover`);
+  // The spider points now carry the parent's radius, so size their hover ring and
+  // select circle (`<base>-spider-hover` / `<base>-spider-select`) to match.
+  syncHighlightsToBase(map, pointLayerId);
 
   // For links, match visibility and basic opacity
   const linkLayerId = `${baseLayerId}-spider-links`;

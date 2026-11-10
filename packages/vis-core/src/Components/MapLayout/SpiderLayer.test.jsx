@@ -7,7 +7,7 @@ import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { SpiderLayer } from "./SpiderLayer";
 import { useMapContext } from "hooks";
-import { syncHoverLayerToBase } from "utils";
+import { syncHighlightsToBase } from "utils";
 import {
   ensureSpiderHoverSelectLayers,
   buildSpiderDataOffsetOne,
@@ -21,7 +21,7 @@ jest.mock("hooks/useMapContext", () => ({
 
 jest.mock("utils", () => ({
   getSourceLayer: jest.fn(() => "mock-source-layer"),
-  syncHoverLayerToBase: jest.fn(),
+  syncHighlightsToBase: jest.fn(),
 }));
 
 jest.mock("utils/mapSpiders", () => ({
@@ -109,7 +109,7 @@ describe("SpiderLayer Component", () => {
     });
   });
 
-  it("sizes the spider hover ring from the mirrored spider points", () => {
+  it("sizes the spider hover ring and select circle from the mirrored spider points", () => {
     mockMap.getLayer.mockImplementation((id) =>
       id === "baseLayer" || id === "baseLayer-spider" ? { type: "circle" } : null
     );
@@ -118,11 +118,8 @@ describe("SpiderLayer Component", () => {
     const idleCallback = mockMap.on.mock.calls.find((call) => call[0] === "idle")[1];
     idleCallback();
 
-    expect(syncHoverLayerToBase).toHaveBeenCalledWith(
-      mockMap,
-      "baseLayer-spider",
-      "baseLayer-spider-hover"
-    );
+    // syncHighlightsToBase covers `baseLayer-spider-hover` and `baseLayer-spider-select`.
+    expect(syncHighlightsToBase).toHaveBeenCalledWith(mockMap, "baseLayer-spider");
   });
 
   /**

@@ -4,8 +4,9 @@ import {
   appendQueryParams,
   getHoverLayerStyle,
   getLayerStyle,
-  syncHoverLayerToBase,
+  syncHighlightsToBase,
   getSelectedLayerStyle,
+  getSelectedInnerLayerStyle,
   getOpacityProperty,
   moveTownCityLabelsToTop,
 } from "utils";
@@ -144,6 +145,9 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);
         }
+        if (mapInstance.getLayer(`${layer.name}-select-inner`)) {
+          mapInstance.removeLayer(`${layer.name}-select-inner`);
+        }
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
         }
@@ -248,13 +252,18 @@ export const Layer = ({ layer }) => {
               const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer, theme);
               hoverLayerConfig.id = `${layer.name}-hover`;
               mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
-              syncHoverLayerToBase(mapInstance, layer.name);
             }
 
-            // Add the select layer
-            const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
+            // Add the select layers: the inner fill (lines/polygons only) under the outline
+            const selectInnerLayerConfig = getSelectedInnerLayerStyle(layer.geometryType, theme);
+            if (selectInnerLayerConfig) {
+              selectInnerLayerConfig.id = `${layer.name}-select-inner`;
+              mapInstance.addLayer({ ...selectInnerLayerConfig, source: layer.name });
+            }
+            const selectLayerConfig = getSelectedLayerStyle(layer.geometryType, theme);
             selectLayerConfig.id = `${layer.name}-select`;
             mapInstance.addLayer({ ...selectLayerConfig, source: layer.name });
+            syncHighlightsToBase(mapInstance, layer.name);
             moveTownCityLabelsToTop(mapInstance);
           });
         }
@@ -362,11 +371,20 @@ export const Layer = ({ layer }) => {
               isStylable: false,
             };
             mapInstance.addLayer(hoverLayerConfig);
-            syncHoverLayerToBase(mapInstance, layer.name);
           }
 
-          // Add the select layer
-          const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
+          // Add the select layers: the inner fill (lines/polygons only) under the outline
+          const selectInnerLayerConfig = getSelectedInnerLayerStyle(layer.geometryType, theme);
+          if (selectInnerLayerConfig) {
+            mapInstance.addLayer({
+              ...selectInnerLayerConfig,
+              id: `${layer.name}-select-inner`,
+              source: layer.name,
+              "source-layer": layer.sourceLayer,
+              metadata: { isStylable: false },
+            });
+          }
+          const selectLayerConfig = getSelectedLayerStyle(layer.geometryType, theme);
           selectLayerConfig.id = `${layer.name}-select`;
           selectLayerConfig.source = layer.name;
           selectLayerConfig["source-layer"] = layer.sourceLayer;
@@ -375,6 +393,7 @@ export const Layer = ({ layer }) => {
             isStylable: false,
           };
           mapInstance.addLayer(selectLayerConfig);
+          syncHighlightsToBase(mapInstance, layer.name);
           moveTownCityLabelsToTop(mapInstance);
         }
       }
@@ -396,6 +415,9 @@ export const Layer = ({ layer }) => {
         }
         if (mapInstance.getLayer(`${layer.name}-hover`)) {
           mapInstance.removeLayer(`${layer.name}-hover`);
+        }
+        if (mapInstance.getLayer(`${layer.name}-select-inner`)) {
+          mapInstance.removeLayer(`${layer.name}-select-inner`);
         }
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
@@ -458,6 +480,7 @@ export const Layer = ({ layer }) => {
           `${layer.name}-symbols`,
           `${layer.name}-symbols-hover`,
           `${layer.name}-hover`,
+          `${layer.name}-select-inner`,
           `${layer.name}-select`,
           `${layer.name}-boundaries`,
           `${layer.name}-label`,
@@ -561,10 +584,19 @@ export const Layer = ({ layer }) => {
           isStylable: false,
         };
         mapInstance.addLayer(hoverLayerConfig);
-        syncHoverLayerToBase(mapInstance, layer.name);
       }
 
-      const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
+      const selectInnerLayerConfig = getSelectedInnerLayerStyle(layer.geometryType, theme);
+      if (selectInnerLayerConfig) {
+        mapInstance.addLayer({
+          ...selectInnerLayerConfig,
+          id: `${layer.name}-select-inner`,
+          source: layer.name,
+          "source-layer": layer.sourceLayer,
+          metadata: { isStylable: false },
+        });
+      }
+      const selectLayerConfig = getSelectedLayerStyle(layer.geometryType, theme);
       selectLayerConfig.id = `${layer.name}-select`;
       selectLayerConfig.source = layer.name;
       selectLayerConfig["source-layer"] = layer.sourceLayer;
@@ -573,6 +605,7 @@ export const Layer = ({ layer }) => {
         isStylable: false,
       };
       mapInstance.addLayer(selectLayerConfig);
+      syncHighlightsToBase(mapInstance, layer.name);
       moveTownCityLabelsToTop(mapInstance);
 
       lastTilesUrlByMapRef.current.set(mapInstance, tileUrl);

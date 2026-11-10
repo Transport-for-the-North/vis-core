@@ -152,14 +152,30 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
       })
     );
 
-    // last addLayer called when type = "tile"
+    // select inner fill (white on a light base map) goes under the select outline
     expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
       4,
+      expect.objectContaining({
+        id: "Accessibility-select-inner",
+        type: "fill",
+        paint: {
+          "fill-color": ["case", expect.any(Array), "#ffffff", "transparent"],
+          "fill-opacity": 1,
+        },
+        source: "Accessibility",
+        "source-layer": "zones",
+        metadata: { isStylable: false },
+      })
+    );
+
+    // last addLayer called when type = "tile"
+    expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
+      5,
       expect.objectContaining({
         id: "Accessibility-select",
         type: "line",
         paint: {
-          "line-color": ["case", expect.any(Array), "#f00", "transparent"],
+          "line-color": ["case", expect.any(Array), "#1f1f1f", "transparent"],
           "line-width": 2,
         },
         source: "Accessibility",
@@ -323,10 +339,19 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
 
     await waitFor(() => {
       expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith({
+        id: "Accessibility-select-inner",
+        type: "fill",
+        paint: {
+          "fill-color": ["case", expect.any(Array), "#ffffff", "transparent"],
+          "fill-opacity": 1,
+        },
+        source: "Accessibility",
+      });
+      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith({
         id: "Accessibility-select",
         type: "line",
         paint: {
-          "line-color": ["case", expect.any(Array), "#f00", "transparent"],
+          "line-color": ["case", expect.any(Array), "#1f1f1f", "transparent"],
           "line-width": 2,
         },
         source: "Accessibility",

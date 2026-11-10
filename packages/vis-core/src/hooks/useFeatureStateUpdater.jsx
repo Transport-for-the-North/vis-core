@@ -6,7 +6,7 @@ import {
   applyPaintProperties,
   applyWidthFactor,
   getWidthProperty,
-  syncHoverLayerToBase,
+  syncHighlightsToBase,
 } from 'utils/map';
 
 // Constants
@@ -281,8 +281,8 @@ export const useFeatureStateUpdater = () => {
         }
 
         // The base width/offset/radius may have just changed, 
-        // so keep the hover highlight the same size and position.
-        syncHoverLayerToBase(map, specifiedLayer.name);
+        // so keep the hover and select highlights the same size and position.
+        syncHighlightsToBase(map, specifiedLayer.name);
 
         const source = map.getSource?.(getLayerSourceId(specifiedLayer));
         const tiles = source?.serialize?.().tiles?.join();

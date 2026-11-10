@@ -19,7 +19,7 @@ import {
   applyWidthFactor,
   updateOpacityExpression,
   getMetricDefinition,
-  syncHoverLayerToBase,
+  syncHighlightsToBase,
 } from "utils/map";
 import { getVisualisationDisplayMode } from "utils/displayMode";
 
@@ -304,8 +304,8 @@ export const LayerControlEntry = memo(
         } catch {
           // ignore if layer doesn't have that prop or setPaintProperty throws
         }
-        // Keep `${id}-hover` (e.g. the base hover or `-spider-hover`) matching the new width.
-        syncHoverLayerToBase(map, id);
+        // Keep `${id}-hover` and `${id}-select` (incl. the spider ones) matching the new width.
+        syncHighlightsToBase(map, id);
       });
     }
 

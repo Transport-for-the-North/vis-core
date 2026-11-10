@@ -191,9 +191,9 @@ describe("useFeatureStateUpdater addFeaturesToMap", () => {
 });
 
 describe("useFeatureStateUpdater hover sync", () => {
-  it("gives a line layer's hover the same width and offset as the restyled base, after the width factor", () => {
-    const paint = { "line-links": {}, "line-links-hover": {} };
-    const types = { "line-links": "line", "line-links-hover": "line" };
+  it("gives a line layer's hover and select the same width and offset as the restyled base, after the width factor", () => {
+    const paint = { "line-links": {}, "line-links-hover": {}, "line-links-select": {} };
+    const types = { "line-links": "line", "line-links-hover": "line", "line-links-select": "line" };
     const map = {
       ...makeMap(),
       getLayer: jest.fn((id) => (types[id] ? { id, type: types[id], metadata: {} } : undefined)),
@@ -220,5 +220,7 @@ describe("useFeatureStateUpdater hover sync", () => {
     expect(baseWidth).not.toEqual(paintProperty["line-width"]);
     expect(paint["line-links-hover"]["line-gap-width"]).toEqual(baseWidth);
     expect(paint["line-links-hover"]["line-offset"]).toEqual(paint["line-links"]["line-offset"]);
+    expect(paint["line-links-select"]["line-gap-width"]).toEqual(baseWidth);
+    expect(paint["line-links-select"]["line-offset"]).toEqual(paint["line-links"]["line-offset"]);
   });
 });

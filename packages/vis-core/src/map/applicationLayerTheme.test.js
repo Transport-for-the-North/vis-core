@@ -190,6 +190,40 @@ describe("applicationLayerTheme", () => {
       expect(paint["roads-hover"]["line-offset"]).toBe(-2);
     });
 
+    it("switches select, select-inner and spider select colours with the theme", () => {
+      const paint = {
+        "links-select": {},
+        "links-select-inner": {},
+        "stations-spider-select": {},
+      };
+      const types = {
+        "links-select": "line",
+        "links-select-inner": "line",
+        "stations-spider-select": "circle",
+      };
+      const map = {
+        getLayer: jest.fn((id) => (types[id] ? { id, type: types[id] } : null)),
+        getPaintProperty: jest.fn((id, prop) => paint[id]?.[prop]),
+        setPaintProperty: jest.fn((id, prop, value) => {
+          paint[id][prop] = value;
+        }),
+      };
+      const layers = {
+        links: { name: "links", geometryType: "line", isStylable: true },
+        stations: { name: "stations", geometryType: "point", isStylable: true },
+      };
+
+      applyApplicationTheme({ map, layers, theme: "dark" });
+      expect(paint["links-select"]["line-color"][2]).toBe("#ffffff");
+      expect(paint["links-select-inner"]["line-color"][2]).toBe("#1f1f1f");
+      expect(paint["stations-spider-select"]["circle-color"][2]).toBe("#1f1f1f");
+
+      applyApplicationTheme({ map, layers, theme: "light" });
+      expect(paint["links-select"]["line-color"][2]).toBe("#1f1f1f");
+      expect(paint["links-select-inner"]["line-color"][2]).toBe("#ffffff");
+      expect(paint["stations-spider-select"]["circle-stroke-color"][2]).toBe("#1f1f1f");
+    });
+
     it("switches hover and spider hover colours with the theme, stylable layers included", () => {
       const paint = { "links-hover": {}, "stations-hover": {}, "stations-spider-hover": {} };
       const types = { "links-hover": "line", "stations-hover": "circle", "stations-spider-hover": "circle" };

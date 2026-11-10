@@ -8,8 +8,12 @@ import {
   moveTownCityLabelsToTop,
   TOWN_CITY_LABEL_LAYER_IDS,
   getHoverLayerStyle,
-  syncHoverLayerToBase,
-  applyHoverTheme,
+  syncHighlightLayerToBase,
+  syncHighlightsToBase,
+  getSelectedLayerStyle,
+  applyHighlightTheme,
+  getSelectedInnerLayerStyle,
+  SELECT_COLORS,
   HOVER_COLORS,
 } from "./map";
 import { DisplayMode } from "enums";
@@ -607,7 +611,7 @@ describe("hover colour by theme", () => {
   });
 });
 
-describe("applyHoverTheme", () => {
+describe("applyHighlightTheme", () => {
   it("recolours line and circle hover layers and skips symbols and missing layers", () => {
     const map = makePaintMap({
       "Links-hover": { type: "line", paint: getHoverLayerStyle("line").paint },
@@ -615,18 +619,41 @@ describe("applyHoverTheme", () => {
       "Icons-hover": { type: "symbol", paint: {} },
     });
 
-    applyHoverTheme(map, "Links-hover", "dark");
-    applyHoverTheme(map, "Stations-hover", "dark");
-    applyHoverTheme(map, "Icons-hover", "dark");
-    applyHoverTheme(map, "Missing-hover", "dark");
+    applyHighlightTheme(map, "Links-hover", "dark");
+    applyHighlightTheme(map, "Stations-hover", "dark");
+    applyHighlightTheme(map, "Icons-hover", "dark");
+    applyHighlightTheme(map, "Missing-hover", "dark");
 
     expect(map.paintOf("Links-hover")["line-color"][2]).toBe("#ffffff");
     expect(map.paintOf("Stations-hover")["circle-stroke-color"][2]).toBe("#ffffff");
-    expect(map.setPaintProperty).toHaveBeenCalledTimes(2);
+    const touched = map.setPaintProperty.mock.calls.map(([id]) => id);
+    expect(touched).not.toContain("Icons-hover");
+    expect(touched).not.toContain("Missing-hover");
+  });
+
+  it("swaps the select outline and inside colours, including the inner fill, on a theme change", () => {
+    const map = makePaintMap({
+      "Links-select": { type: "line", paint: getSelectedLayerStyle("line").paint },
+      "Links-select-inner": { type: "line", paint: getSelectedInnerLayerStyle("line").paint },
+      "Zones-select-inner": { type: "fill", paint: getSelectedInnerLayerStyle("polygon").paint },
+      "Stations-spider-select": { type: "circle", paint: getSelectedLayerStyle("point").paint },
+    });
+
+    ["Links-select", "Links-select-inner", "Zones-select-inner", "Stations-spider-select"].forEach((id) =>
+      applyHighlightTheme(map, id, "dark")
+    );
+
+    expect(map.paintOf("Links-select")["line-color"][2]).toBe("#ffffff");
+    expect(map.paintOf("Links-select-inner")["line-color"][2]).toBe("#1f1f1f");
+    expect(map.paintOf("Zones-select-inner")["fill-color"][2]).toBe("#1f1f1f");
+    expect(map.paintOf("Stations-spider-select")["circle-stroke-color"][2]).toBe("#ffffff");
+    expect(map.paintOf("Stations-spider-select")["circle-color"][2]).toBe("#1f1f1f");
+    // Only colours change; sizes stay as they were.
+    expect(map.paintOf("Links-select")["line-width"]).toBe(2);
   });
 });
 
-describe("syncHoverLayerToBase", () => {
+describe("syncHighlightsToBase", () => {
   const dataWidth = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 1, 100, 8.5];
   const dataOffset = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, -1.25, 100, -5];
 
@@ -636,7 +663,7 @@ describe("syncHoverLayerToBase", () => {
       "Links-hover": { type: "line", paint: getHoverLayerStyle("line").paint },
     });
 
-    syncHoverLayerToBase(map, "Links");
+    syncHighlightsToBase(map, "Links");
 
     expect(map.paintOf("Links-hover")["line-gap-width"]).toEqual(dataWidth);
     expect(map.paintOf("Links-hover")["line-offset"]).toEqual(dataOffset);
@@ -649,13 +676,13 @@ describe("syncHoverLayerToBase", () => {
       Links: { type: "line", paint: { "line-width": dataWidth, "line-offset": dataOffset } },
       "Links-hover": { type: "line", paint: {} },
     });
-    syncHoverLayerToBase(map, "Links");
+    syncHighlightsToBase(map, "Links");
 
     const widened = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 2, 100, 17];
     const widenedOffset = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, -1.75, 100, -9.25];
     map.setPaintProperty("Links", "line-width", widened);
     map.setPaintProperty("Links", "line-offset", widenedOffset);
-    syncHoverLayerToBase(map, "Links");
+    syncHighlightsToBase(map, "Links");
 
     expect(map.paintOf("Links-hover")["line-gap-width"]).toEqual(widened);
     expect(map.paintOf("Links-hover")["line-offset"]).toEqual(widenedOffset);
@@ -667,7 +694,7 @@ describe("syncHoverLayerToBase", () => {
       "Roads-hover": { type: "line", paint: { "line-gap-width": 9, "line-offset": -4 } },
     });
 
-    syncHoverLayerToBase(map, "Roads");
+    syncHighlightsToBase(map, "Roads");
 
     expect(map.paintOf("Roads-hover")["line-gap-width"]).toBe(1);
     expect(map.paintOf("Roads-hover")["line-offset"]).toBe(0);
@@ -680,7 +707,7 @@ describe("syncHoverLayerToBase", () => {
       "Stations-spider-hover": { type: "circle", paint: { "circle-radius": 5 } },
     });
 
-    syncHoverLayerToBase(map, "Stations-spider", "Stations-spider-hover");
+    syncHighlightLayerToBase(map, "Stations-spider", "Stations-spider-hover");
 
     expect(map.paintOf("Stations-spider-hover")["circle-radius"]).toEqual(radius);
   });
@@ -691,7 +718,7 @@ describe("syncHoverLayerToBase", () => {
       "Zones-hover": { type: "line", paint: { "line-width": 3 } },
     });
 
-    syncHoverLayerToBase(map, "Zones");
+    syncHighlightsToBase(map, "Zones");
 
     expect(map.setPaintProperty).not.toHaveBeenCalled();
   });
@@ -699,9 +726,129 @@ describe("syncHoverLayerToBase", () => {
   it("does nothing when the base or hover layer is missing", () => {
     const map = makePaintMap({ Links: { type: "line", paint: { "line-width": 4 } } });
 
-    expect(() => syncHoverLayerToBase(map, "Links")).not.toThrow();
-    expect(() => syncHoverLayerToBase(map, "Missing")).not.toThrow();
-    expect(() => syncHoverLayerToBase(null, "Links")).not.toThrow();
+    expect(() => syncHighlightsToBase(map, "Links")).not.toThrow();
+    expect(() => syncHighlightsToBase(map, "Missing")).not.toThrow();
+    expect(() => syncHighlightsToBase(null, "Links")).not.toThrow();
     expect(map.setPaintProperty).not.toHaveBeenCalled();
+  });
+});
+
+describe("selected highlight style", () => {
+  const selected = (colour) => ["case", ["boolean", ["feature-state", "selected"], false], colour, "transparent"];
+
+  it("uses the theme's hover colour for the outline and the opposite colour inside", () => {
+    expect(SELECT_COLORS.light).toEqual({ outline: "#1f1f1f", inside: "#ffffff" });
+    expect(SELECT_COLORS.dark).toEqual({ outline: "#ffffff", inside: "#1f1f1f" });
+  });
+
+  it("draws a selected line as an outline around the line, filled by the inner layer", () => {
+    const { paint } = getSelectedLayerStyle("line");
+    expect(paint["line-color"]).toEqual(selected("#1f1f1f"));
+    expect(paint["line-width"]).toBe(2);
+    expect(paint["line-gap-width"]).toBe(1);
+    expect(paint["line-offset"]).toBe(0);
+
+    const inner = getSelectedInnerLayerStyle("line");
+    expect(inner.type).toBe("line");
+    expect(inner.paint["line-color"]).toEqual(selected("#ffffff"));
+  });
+
+  it("fills a selected polygon under its outline", () => {
+    expect(getSelectedLayerStyle("polygon").paint["line-color"]).toEqual(selected("#1f1f1f"));
+    const inner = getSelectedInnerLayerStyle("polygon");
+    expect(inner.type).toBe("fill");
+    expect(inner.paint).toEqual({ "fill-color": selected("#ffffff"), "fill-opacity": 1 });
+  });
+
+  it("fills a selected point inside its ring, with no inner layer", () => {
+    const { paint } = getSelectedLayerStyle("point");
+    expect(paint["circle-color"]).toEqual(selected("#ffffff"));
+    expect(paint["circle-opacity"]).toBe(1);
+    expect(paint["circle-stroke-color"]).toEqual(selected("#1f1f1f"));
+    expect(paint["circle-stroke-width"]).toBe(2);
+    expect(getSelectedInnerLayerStyle("point")).toBeNull();
+    expect(getSelectedInnerLayerStyle("symbol")).toBeNull();
+  });
+
+  it("reverses the colours on a dark base map", () => {
+    expect(getSelectedLayerStyle("line", "dark").paint["line-color"]).toEqual(selected("#ffffff"));
+    expect(getSelectedInnerLayerStyle("line", "dark").paint["line-color"]).toEqual(selected("#1f1f1f"));
+    expect(getSelectedLayerStyle("point", "dark").paint["circle-color"]).toEqual(selected("#1f1f1f"));
+  });
+});
+
+describe("syncHighlightsToBase select layer", () => {
+  const dataWidth = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 1, 100, 8.5];
+  const dataOffset = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, -1.25, 100, -5];
+
+  it("gives the select outline the same width and offset as the base line, alongside the hover", () => {
+    const map = makePaintMap({
+      Links: { type: "line", paint: { "line-width": dataWidth, "line-offset": dataOffset } },
+      "Links-hover": { type: "line", paint: getHoverLayerStyle("line").paint },
+      "Links-select": { type: "line", paint: getSelectedLayerStyle("line").paint },
+    });
+
+    syncHighlightsToBase(map, "Links");
+
+    for (const id of ["Links-hover", "Links-select"]) {
+      expect(map.paintOf(id)["line-gap-width"]).toEqual(dataWidth);
+      expect(map.paintOf(id)["line-offset"]).toEqual(dataOffset);
+    }
+    expect(map.paintOf("Links-select")["line-color"][2]).toBe("#1f1f1f");
+  });
+
+  it("gives the inner line exactly the base line's width and offset, so the outline wraps it", () => {
+    const map = makePaintMap({
+      Links: { type: "line", paint: { "line-width": dataWidth, "line-offset": dataOffset } },
+      "Links-select": { type: "line", paint: getSelectedLayerStyle("line").paint },
+      "Links-select-inner": { type: "line", paint: getSelectedInnerLayerStyle("line").paint },
+    });
+
+    syncHighlightsToBase(map, "Links");
+
+    expect(map.paintOf("Links-select-inner")["line-width"]).toEqual(dataWidth);
+    expect(map.paintOf("Links-select-inner")["line-offset"]).toEqual(dataOffset);
+    expect(map.paintOf("Links-select-inner")["line-gap-width"]).toBeUndefined();
+    expect(map.paintOf("Links-select")["line-gap-width"]).toEqual(dataWidth);
+  });
+
+  it("leaves a polygon's inner fill alone", () => {
+    const map = makePaintMap({
+      Zones: { type: "fill", paint: {} },
+      "Zones-select-inner": { type: "fill", paint: getSelectedInnerLayerStyle("polygon").paint },
+    });
+
+    syncHighlightsToBase(map, "Zones");
+
+    expect(map.setPaintProperty).not.toHaveBeenCalled();
+  });
+
+  it("syncs the select layer on its own when the layer is not hoverable", () => {
+    const map = makePaintMap({
+      Links: { type: "line", paint: { "line-width": dataWidth, "line-offset": dataOffset } },
+      "Links-select": { type: "line", paint: getSelectedLayerStyle("line").paint },
+    });
+
+    syncHighlightsToBase(map, "Links");
+
+    expect(map.paintOf("Links-select")["line-gap-width"]).toEqual(dataWidth);
+    expect(map.paintOf("Links-select")["line-offset"]).toEqual(dataOffset);
+  });
+
+  it("sizes the selected point circle from the base radius and leaves polygon select alone", () => {
+    const radius = ["interpolate", ["linear"], ["to-number", ["feature-state", "valueAbs"]], 0, 2, 50, 25];
+    const map = makePaintMap({
+      Stations: { type: "circle", paint: { "circle-radius": radius } },
+      "Stations-select": { type: "circle", paint: getSelectedLayerStyle("point").paint },
+      Zones: { type: "fill", paint: {} },
+      "Zones-select": { type: "line", paint: getSelectedLayerStyle("polygon").paint },
+    });
+
+    syncHighlightsToBase(map, "Stations");
+    syncHighlightsToBase(map, "Zones");
+
+    expect(map.paintOf("Stations-select")["circle-radius"]).toEqual(radius);
+    expect(map.paintOf("Zones-select")["line-width"]).toBe(2);
+    expect(map.paintOf("Zones-select")["line-gap-width"]).toBeUndefined();
   });
 });

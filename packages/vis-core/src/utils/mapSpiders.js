@@ -226,7 +226,7 @@ export function getSpiderOverlayLayerIds(map, layerId) {
  *
  * @param {maplibregl.Map} map - MapLibre instance
  * @param {string} baseLayerId - Parent layer id (e.g., "Stations")
- * @param {'light'|'dark'} [theme='light'] - Base map theme, which picks the hover ring colour.
+ * @param {'light'|'dark'} [theme='light'] - Base map theme, which picks the hover and select colours.
  */
 export function ensureSpiderHoverSelectLayers(map, baseLayerId, theme = "light") {
   const pointSrcId = `${baseLayerId}-spider-src`;
@@ -244,7 +244,7 @@ export function ensureSpiderHoverSelectLayers(map, baseLayerId, theme = "light")
 
   // Points select
   if (!map.getLayer(pointSelectId) && map.getSource(pointSrcId)) {
-    const selectLayer = getSelectedLayerStyle('point');
+    const selectLayer = getSelectedLayerStyle('point', theme);
     selectLayer.id = pointSelectId;
     selectLayer.source = pointSrcId;
     selectLayer.metadata = { isStylable: false };

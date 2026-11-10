@@ -1286,8 +1286,9 @@ const HOVER_SYNC_DEFAULTS = {
 };
 
 /**
- * Base paint property -> hover paint property, per base layer type. Polygon
- * (fill) layers are not listed: their hover is an outline with its own width.
+ * Base paint property -> highlight (hover/select) paint property, per base layer
+ * type. Polygon (fill) layers are not listed: their highlights are outlines with
+ * their own width.
  */
 const HOVER_SYNC_PROPERTIES = {
   line: [
@@ -1298,22 +1299,40 @@ const HOVER_SYNC_PROPERTIES = {
 };
 
 /**
- * Copies the base layer's live size and position onto its hover layer, so the
- * hover highlight sits exactly on the feature it highlights. Lines copy the
- * base `line-width` into the hover's `line-gap-width` (the outline wraps the
- * line) and copy `line-offset` as is; circles copy `circle-radius`.
+ * Base paint property -> `-select-inner` paint property. The inner line is drawn
+ * exactly over the base line, so width and offset are copied as they are.
+ * Polygon inners are fills and need no sync.
+ */
+const SELECT_INNER_SYNC_PROPERTIES = {
+  line: [
+    ["line-width", "line-width"],
+    ["line-offset", "line-offset"],
+  ],
+};
+
+/**
+ * Copies the base layer's live size and position onto one highlight layer
+ * (hover or select), so the highlight sits exactly on the feature it highlights.
+ * Lines copy the base `line-width` into the highlight's `line-gap-width` (the
+ * outline wraps the line) and copy `line-offset` as is; circles copy `circle-radius`.
  *
  * @param {maplibregl.Map} map - MapLibre map instance.
  * @param {string} baseLayerId - Id of the base layer.
- * @param {string} [hoverLayerId] - Id of the hover layer; defaults to `${baseLayerId}-hover`.
+ * @param {string} hoverLayerId - Id of the highlight layer.
+ * @param {Object} [syncProperties] - Base -> highlight property pairs per base layer type.
  */
-export const syncHoverLayerToBase = (map, baseLayerId, hoverLayerId = `${baseLayerId}-hover`) => {
+export const syncHighlightLayerToBase = (
+  map,
+  baseLayerId,
+  hoverLayerId,
+  syncProperties = HOVER_SYNC_PROPERTIES
+) => {
   if (!map?.getLayer || !baseLayerId) return;
   const baseLayer = map.getLayer(baseLayerId);
   const hoverLayer = map.getLayer(hoverLayerId);
   if (!baseLayer || !hoverLayer || baseLayer.type !== hoverLayer.type) return;
 
-  const properties = HOVER_SYNC_PROPERTIES[baseLayer.type];
+  const properties = syncProperties[baseLayer.type];
   if (!properties) return;
 
   properties.forEach(([baseProp, hoverProp]) => {
@@ -1327,6 +1346,25 @@ export const syncHoverLayerToBase = (map, baseLayerId, hoverLayerId = `${baseLay
 };
 
 /**
+ * Syncs the highlight layers of a base layer to its live size and
+ * position. Call this after any change to the base layer's width, offset or
+ * radius. Missing layers are skipped.
+ *
+ * @param {maplibregl.Map} map - MapLibre map instance.
+ * @param {string} baseLayerId - Id of the base layer.
+ */
+export const syncHighlightsToBase = (map, baseLayerId) => {
+  syncHighlightLayerToBase(map, baseLayerId, `${baseLayerId}-hover`);
+  syncHighlightLayerToBase(map, baseLayerId, `${baseLayerId}-select`);
+  syncHighlightLayerToBase(
+    map,
+    baseLayerId,
+    `${baseLayerId}-select-inner`,
+    SELECT_INNER_SYNC_PROPERTIES
+  );
+};
+
+/**
  * Hover highlight colour per base map theme. 
  */
 export const HOVER_COLORS = {
@@ -1335,39 +1373,44 @@ export const HOVER_COLORS = {
 };
 
 /**
- * @param {'light'|'dark'} [theme='light'] - Base map theme.
- * @returns {Array} Expression that shows the hover colour on the hovered feature only.
+ * Selected highlight colours per base map theme: the outline is the theme's hover
+ * colour and the feature is filled with the opposite one, so selecting reads as
+ * "hover, filled in".
  */
-export const getHoverColorExpression = (theme = "light") => [
-  "case",
-  ["boolean", ["feature-state", "hover"], false],
-  HOVER_COLORS[theme] ?? HOVER_COLORS.light,
-  "transparent",
-];
-
-/** Paint property holding the hover colour, per hover layer type. Symbols swap icons instead. */
-const HOVER_COLOR_PROPERTY = {
-  line: "line-color",
-  circle: "circle-stroke-color",
+export const SELECT_COLORS = {
+  light: { outline: HOVER_COLORS.light, inside: HOVER_COLORS.dark },
+  dark: { outline: HOVER_COLORS.dark, inside: HOVER_COLORS.light },
 };
 
 /**
- * Sets a hover layer's highlight colour for the given base map theme.
- * Does nothing when the layer is missing or is a symbol layer.
- *
- * @param {maplibregl.Map} map - MapLibre map instance.
- * @param {string} hoverLayerId - Id of the hover layer.
- * @param {'light'|'dark'} theme - Base map theme.
+ * @param {'hover'|'selected'} state - Feature-state flag to test.
+ * @param {string} color - Colour shown while the flag is true.
+ * @returns {Array} Expression showing `color` on flagged features and transparent elsewhere.
  */
-export const applyHoverTheme = (map, hoverLayerId, theme) => {
-  const hoverLayer = map?.getLayer?.(hoverLayerId);
-  const colorProperty = HOVER_COLOR_PROPERTY[hoverLayer?.type];
-  if (!colorProperty) return;
-  try {
-    map.setPaintProperty(hoverLayerId, colorProperty, getHoverColorExpression(theme));
-  } catch (error) {
-    console.warn(`Failed to set hover colour on "${hoverLayerId}":`, error);
-  }
+const featureStateColor = (state, color) => [
+  "case",
+  ["boolean", ["feature-state", state], false],
+  color,
+  "transparent",
+];
+
+/**
+ * @param {'light'|'dark'} [theme='light'] - Base map theme.
+ * @returns {Array} Expression that shows the hover colour on the hovered feature only.
+ */
+export const getHoverColorExpression = (theme = "light") =>
+  featureStateColor("hover", HOVER_COLORS[theme] ?? HOVER_COLORS.light);
+
+/**
+ * @param {'light'|'dark'} [theme='light'] - Base map theme.
+ * @returns {{outline: Array, inside: Array}} Outline and inside colour expressions for selected features.
+ */
+const getSelectColorExpressions = (theme = "light") => {
+  const colors = SELECT_COLORS[theme] ?? SELECT_COLORS.light;
+  return {
+    outline: featureStateColor("selected", colors.outline),
+    inside: featureStateColor("selected", colors.inside),
+  };
 };
 
 /**
@@ -1458,21 +1501,17 @@ export const getHoverLayerStyle = (geometryType, layerConfig = {}, theme = "ligh
  * @property {string} layerType - The type of layer. Possible values are "fill", "line", "circle", "symbol", "polygon", "point", etc.
  * @returns {Object} The style configuration object for the selected layer.
  */
-export const getSelectedLayerStyle = (layerType) => {
+export const getSelectedLayerStyle = (layerType, theme = "light") => {
+  const selectColor = getSelectColorExpressions(theme);
   switch (layerType) {
     case "fill":
     case "polygon":
-      // Handle fill layers (polygons) by drawing an outline
+      // Outline only
       return {
         id: "",
         type: "line",
         paint: {
-          "line-color": [
-            "case",
-            ["==", ["feature-state", "selected"], true],
-            "#f00",
-            "transparent",
-          ],
+          "line-color": selectColor.outline,
           "line-width": 2,
         },
       };
@@ -1482,13 +1521,10 @@ export const getSelectedLayerStyle = (layerType) => {
         id: "",
         type: "line",
         paint: {
-          "line-color": [
-            "case",
-            ["boolean", ["feature-state", "selected"], false],
-            "#f00",
-            "transparent",
-          ],
-          "line-width": 4,
+          "line-color": selectColor.outline,
+          "line-width": HOVER_LINE_OUTLINE_WIDTH,
+          "line-gap-width": HOVER_SYNC_DEFAULTS["line-width"],
+          "line-offset": 0,
         },
       };
     case "symbol":
@@ -1532,28 +1568,11 @@ export const getSelectedLayerStyle = (layerType) => {
         id: "",
         type: "circle",
         paint: {
-          "circle-radius": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            0, 2,
-            12, 8,
-            22, 15
-          ],
-          "circle-color": [
-            "case",
-            ["==", ["feature-state", "selected"], true],
-            "blue",
-            "transparent",
-          ],
-          "circle-opacity": 0.75,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": [
-            "case",
-            ["==", ["feature-state", "selected"], true],
-            "black",
-            "transparent"
-          ],
+          "circle-radius": HOVER_SYNC_DEFAULTS["circle-radius"],
+          "circle-color": selectColor.inside,
+          "circle-opacity": 1,
+          "circle-stroke-width": HOVER_POINT_RING_WIDTH,
+          "circle-stroke-color": selectColor.outline,
         },
       };
     default:
@@ -1561,6 +1580,86 @@ export const getSelectedLayerStyle = (layerType) => {
       console.warn(`Unhandled layer type: ${layerType}`);
       return {}; // Return empty object if the layer type is not supported
   }
+};
+
+/**
+ * Generates the `-select-inner` layer that fills a selected line or polygon with
+ * the inside colour, under the `-select` outline. Points need no inner layer
+ * and symbols swap icons, so they return null.
+ *
+ * @param {string} layerType - "polygon"/"fill" or "line"; anything else returns null.
+ * @param {'light'|'dark'} [theme='light'] - Base map theme.
+ * @returns {Object|null} The style configuration object, or null when not needed.
+ */
+export const getSelectedInnerLayerStyle = (layerType, theme = "light") => {
+  const { inside } = getSelectColorExpressions(theme);
+  switch (layerType) {
+    case "fill":
+    case "polygon":
+      return {
+        id: "",
+        type: "fill",
+        paint: {
+          "fill-color": inside,
+          "fill-opacity": 1,
+        },
+      };
+    case "line":
+      // syncHighlightsToBase copies the base layer's live width and offset.
+      return {
+        id: "",
+        type: "line",
+        paint: {
+          "line-color": inside,
+          "line-width": HOVER_SYNC_DEFAULTS["line-width"],
+          "line-offset": 0,
+        },
+      };
+    default:
+      return null;
+  }
+};
+
+/** Layer id suffix -> style factory, used to recolour highlight layers for a theme. */
+const HIGHLIGHT_STYLE_BY_SUFFIX = [
+  ["-select-inner", (geometryType, theme) => getSelectedInnerLayerStyle(geometryType, theme)],
+  ["-select", (geometryType, theme) => getSelectedLayerStyle(geometryType, theme)],
+  ["-hover", (geometryType, theme) => getHoverLayerStyle(geometryType, {}, theme)],
+];
+
+/** Highlight layer type -> geometry type to pass to the style factories. */
+const GEOMETRY_BY_HIGHLIGHT_TYPE = {
+  line: "line",
+  circle: "point",
+  fill: "polygon",
+};
+
+/**
+ * Sets a hover, select or select-inner layer's colours for the given base map
+ * theme, taking them from the same style factories that created the layer.
+ * Does nothing when the layer is missing, is a symbol layer, or has an
+ * unrecognised id suffix.
+ *
+ * @param {maplibregl.Map} map - MapLibre map instance.
+ * @param {string} highlightLayerId - Id of the highlight layer (ending -hover, -select or -select-inner).
+ * @param {'light'|'dark'} theme - Base map theme.
+ */
+export const applyHighlightTheme = (map, highlightLayerId, theme) => {
+  const layer = map?.getLayer?.(highlightLayerId);
+  const geometryType = GEOMETRY_BY_HIGHLIGHT_TYPE[layer?.type];
+  const entry = HIGHLIGHT_STYLE_BY_SUFFIX.find(([suffix]) => highlightLayerId.endsWith(suffix));
+  if (!geometryType || !entry) return;
+
+  const paint = entry[1](geometryType, theme)?.paint ?? {};
+  Object.entries(paint)
+    .filter(([prop]) => prop.endsWith("-color"))
+    .forEach(([prop, value]) => {
+      try {
+        map.setPaintProperty(highlightLayerId, prop, value);
+      } catch (error) {
+        console.warn(`Failed to set "${prop}" on "${highlightLayerId}":`, error);
+      }
+    });
 };
 
 /**
