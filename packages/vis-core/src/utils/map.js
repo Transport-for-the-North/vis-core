@@ -1513,6 +1513,110 @@ export const getFeatureStateValue = (feature) => {
 };
 
 /**
+ * Returns true if the layer exists on the map and is not hidden via
+ * `layout.visibility: "none"`.
+ *
+ * `map.getLayer()` alone is not enough to decide whether a layer can be
+ * interacted with, as it still returns layers that the user has switched off.
+ * `queryRenderedFeatures` can also still return the layer's features until the
+ * next frame after it is hidden.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The layer ID to check.
+ * @returns {boolean} True if the layer exists and is visible.
+ */
+export const isLayerVisibleOnMap = (map, layerId) => {
+  if (!map?.getLayer(layerId)) return false;
+  return map.getLayoutProperty?.(layerId, "visibility") !== "none";
+};
+
+/**
+ * Returns true if a layer currently draws features that have no data at zero
+ * opacity, which makes those features invisible.
+ *
+ * This reads the live paint value instead of relying on the layer's config, so
+ * it stays correct for layers that draw no-data features visibly, such as
+ * "polygon-categorical" styles, non-stylable layers and custom app paint.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The layer ID to check.
+ * @param {Object} [layerConfig] - The layer's page configuration.
+ * @returns {boolean} True if no-data features on this layer are invisible.
+ */
+export const isNoDataHiddenByPaint = (map, layerId, layerConfig) => {
+  const layerType = map?.getLayer(layerId)?.type;
+  if (!["fill", "line", "circle"].includes(layerType)) return false;
+
+  const opacity = map.getPaintProperty?.(layerId, getOpacityProperty(layerType));
+  if (opacity === 0) return Boolean(layerConfig?.isStylable);
+  if (!Array.isArray(opacity) || opacity[0] !== "case" || opacity[2] !== 0) return false;
+
+  const condition = JSON.stringify(opacity[1]);
+  return condition.includes('["feature-state","value"]') && condition.includes("null");
+};
+
+// Layers the user has set to 0 with the opacity slider, per map. This can't be read from
+// the paint value alone, because some layers are invisible by design so that they can be
+// hovered and clicked, and those must keep working.
+const layersZeroedBySlider = new WeakMap();
+
+/**
+ * Records a new opacity slider value for a layer on a map.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The ID of the layer the slider controls.
+ * @param {number} opacity - The new slider value.
+ */
+export const recordSliderOpacity = (map, layerId, opacity) => {
+  if (opacity !== 0) {
+    layersZeroedBySlider.get(map)?.delete(layerId);
+    return;
+  }
+  if (!layersZeroedBySlider.has(map)) layersZeroedBySlider.set(map, new Set());
+  layersZeroedBySlider.get(map).add(layerId);
+};
+
+/**
+ * Returns true if the user has set a layer to 0 with the opacity slider, which makes
+ * the whole layer invisible. Also checks the live opacity, so an out-of-date record
+ * can't block hover on a layer that is being drawn.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {string} layerId - The layer ID to check. For a spider layer, pass its base layer.
+ * @returns {boolean} True if the slider has made this layer invisible.
+ */
+export const isLayerZeroedBySlider = (map, layerId) => {
+  if (!layersZeroedBySlider.get(map)?.has(layerId)) return false;
+
+  const layerType = map.getLayer(layerId)?.type;
+  if (!layerType) return false;
+
+  // The slider only changes the last value of an opacity expression
+  const opacity = map.getPaintProperty(layerId, getOpacityProperty(layerType));
+  return (Array.isArray(opacity) ? opacity[opacity.length - 1] : opacity) === 0;
+};
+
+/**
+ * Decides whether a feature under the cursor should get hover effects and a
+ * tooltip. Features with data are always hoverable. For a feature with no data:
+ * 1. `shouldHaveHoverOnlyOnData: true` on the layer excludes it.
+ * 2. Otherwise an explicit `hoverNulls` on the layer decides.
+ * 3. Otherwise it is excluded only if the layer draws it invisibly.
+ *
+ * @param {Object} map - The MapLibre map instance.
+ * @param {Object} feature - The feature returned by `queryRenderedFeatures`.
+ * @param {Object} [layerConfig] - The page configuration of the feature's layer.
+ * @returns {boolean} True if the feature should respond to hover.
+ */
+export const isFeatureHoverable = (map, feature, layerConfig) => {
+  const value = getFeatureStateValue(feature);
+  if (value !== null && value !== undefined) return true;
+  if (layerConfig?.shouldHaveHoverOnlyOnData) return false;
+  if (typeof layerConfig?.hoverNulls === "boolean") return layerConfig.hoverNulls;
+  return !isNoDataHiddenByPaint(map, feature.layer.id, layerConfig);
+};
+
+/**
  * Returns true if a MapLibre layer belongs to the application (i.e. not part
  * of the basemap style).
  *
