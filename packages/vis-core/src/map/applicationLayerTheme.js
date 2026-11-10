@@ -1,4 +1,4 @@
-import { getLayerStyle, syncHoverLayerToBase } from "../utils/map";
+import { applyHoverTheme, getLayerStyle, syncHoverLayerToBase } from "../utils/map";
 
 /** Converts sRGB (0-255 each) to HSL (degrees, %, %). @private */
 function rgbToHsl(r, g, b) {
@@ -290,6 +290,10 @@ export function applyApplicationTheme({ map, layers, theme }) {
         syncHoverLayerToBase(map, layer.name);
       }
     }
+
+    // Hover highlights (including spider overlays) take the theme's hover colour.
+    applyHoverTheme(map, `${layer.name}-hover`, theme);
+    applyHoverTheme(map, `${layer.name}-spider-hover`, theme);
 
     if (layer.switchableBoundaries !== false && layer.geometryType === "polygon") {
       const boundaryLayerId = `${layer.name}-boundaries`;

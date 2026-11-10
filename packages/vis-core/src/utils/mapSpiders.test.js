@@ -179,6 +179,24 @@ describe("mapSpiders utilities", () => {
       );
     });
 
+    it("colours the spider hover ring for the given theme, with or without a parent hover layer", () => {
+      mockMap.getLayer.mockReturnValue(false); // no parent hover layer, no spider layers yet
+      mockMap.getSource.mockReturnValue(true);
+
+      ensureSpiderHoverSelectLayers(mockMap, "base", "dark");
+
+      expect(mapUtils.getHoverLayerStyle).toHaveBeenCalledWith("point", {}, "dark");
+    });
+
+    it("defaults the spider hover ring to the light theme", () => {
+      mockMap.getLayer.mockReturnValue(false);
+      mockMap.getSource.mockReturnValue(true);
+
+      ensureSpiderHoverSelectLayers(mockMap, "base");
+
+      expect(mapUtils.getHoverLayerStyle).toHaveBeenCalledWith("point", {}, "light");
+    });
+
     it("should not add layers if source does not exist", () => {
       mockMap.getLayer.mockReturnValue(false);
       mockMap.getSource.mockReturnValue(false); // Source missing

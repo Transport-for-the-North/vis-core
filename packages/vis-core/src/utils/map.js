@@ -1327,34 +1327,76 @@ export const syncHoverLayerToBase = (map, baseLayerId, hoverLayerId = `${baseLay
 };
 
 /**
+ * Hover highlight colour per base map theme. 
+ */
+export const HOVER_COLORS = {
+  light: "#1f1f1f",
+  dark: "#ffffff",
+};
+
+/**
+ * @param {'light'|'dark'} [theme='light'] - Base map theme.
+ * @returns {Array} Expression that shows the hover colour on the hovered feature only.
+ */
+export const getHoverColorExpression = (theme = "light") => [
+  "case",
+  ["boolean", ["feature-state", "hover"], false],
+  HOVER_COLORS[theme] ?? HOVER_COLORS.light,
+  "transparent",
+];
+
+/** Paint property holding the hover colour, per hover layer type. Symbols swap icons instead. */
+const HOVER_COLOR_PROPERTY = {
+  line: "line-color",
+  circle: "circle-stroke-color",
+};
+
+/**
+ * Sets a hover layer's highlight colour for the given base map theme.
+ * Does nothing when the layer is missing or is a symbol layer.
+ *
+ * @param {maplibregl.Map} map - MapLibre map instance.
+ * @param {string} hoverLayerId - Id of the hover layer.
+ * @param {'light'|'dark'} theme - Base map theme.
+ */
+export const applyHoverTheme = (map, hoverLayerId, theme) => {
+  const hoverLayer = map?.getLayer?.(hoverLayerId);
+  const colorProperty = HOVER_COLOR_PROPERTY[hoverLayer?.type];
+  if (!colorProperty) return;
+  try {
+    map.setPaintProperty(hoverLayerId, colorProperty, getHoverColorExpression(theme));
+  } catch (error) {
+    console.warn(`Failed to set hover colour on "${hoverLayerId}":`, error);
+  }
+};
+
+/**
  * Generates the style configuration for a hover layer based on the geometry
  * type of the layer.
  * @component
  * @property {string} geometryType - The type of geometry for the hover layer. Possible values are "polygon", "line", or "point".
+ * @property {Object} [layerConfig] - Layer config; `defaultLineOffset` sets the line hover's starting offset.
+ * @property {'light'|'dark'} [theme='light'] - Base map theme, which picks the hover colour.
  * @returns {Object} The style configuration object for the hover layer.
  */
-export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
+export const getHoverLayerStyle = (geometryType, layerConfig = {}, theme = "light") => {
   const hasCustomOffset = layerConfig.defaultLineOffset !== undefined && layerConfig.defaultLineOffset !== null;
+  const hoverColor = getHoverColorExpression(theme);
   switch (geometryType) {
     case "polygon":
       return {
         id: "",
         type: "line",
         paint: {
-          "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
+          "line-color": hoverColor,
           "line-width": [
             "interpolate",
             ["linear"],
             ["zoom"],
-            // Specify zoom levels and corresponding line widths
-            5,
-            1, // At zoom level 5, line width will be 1
-            10,
-            2, // At zoom level 10, line width will be 2
-            15,
-            4, // At zoom level 15, line width will be 4
-            20,
-            8, // At zoom level 20, line width will be 8
+            5, 1.5,
+            10, 2,
+            15, 3,
+            20, 4,
           ],
         }
       };
@@ -1364,8 +1406,8 @@ export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
         id: "",
         type: "line",
         paint: {
-          "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
-          "line-opacity": 0.8,
+          "line-color": hoverColor,
+          "line-opacity": 1,
           "line-width": HOVER_LINE_OUTLINE_WIDTH,
           "line-gap-width": HOVER_SYNC_DEFAULTS["line-width"],
           "line-offset": hasCustomOffset ? layerConfig.defaultLineOffset : 0,
@@ -1379,7 +1421,7 @@ export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
           "circle-radius": HOVER_SYNC_DEFAULTS["circle-radius"],
           "circle-color": "transparent",
           "circle-stroke-width": HOVER_POINT_RING_WIDTH,
-          "circle-stroke-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
+          "circle-stroke-color": hoverColor,
         }
       };
     case "symbol":

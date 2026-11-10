@@ -190,6 +190,31 @@ describe("applicationLayerTheme", () => {
       expect(paint["roads-hover"]["line-offset"]).toBe(-2);
     });
 
+    it("switches hover and spider hover colours with the theme, stylable layers included", () => {
+      const paint = { "links-hover": {}, "stations-hover": {}, "stations-spider-hover": {} };
+      const types = { "links-hover": "line", "stations-hover": "circle", "stations-spider-hover": "circle" };
+      const map = {
+        getLayer: jest.fn((id) => (types[id] ? { id, type: types[id] } : null)),
+        getPaintProperty: jest.fn((id, prop) => paint[id]?.[prop]),
+        setPaintProperty: jest.fn((id, prop, value) => {
+          paint[id][prop] = value;
+        }),
+      };
+      const layers = {
+        links: { name: "links", geometryType: "line", isStylable: true },
+        stations: { name: "stations", geometryType: "point", isStylable: true },
+      };
+
+      applyApplicationTheme({ map, layers, theme: "dark" });
+      expect(paint["links-hover"]["line-color"][2]).toBe("#ffffff");
+      expect(paint["stations-hover"]["circle-stroke-color"][2]).toBe("#ffffff");
+      expect(paint["stations-spider-hover"]["circle-stroke-color"][2]).toBe("#ffffff");
+
+      applyApplicationTheme({ map, layers, theme: "light" });
+      expect(paint["links-hover"]["line-color"][2]).toBe("#1f1f1f");
+      expect(paint["stations-spider-hover"]["circle-stroke-color"][2]).toBe("#1f1f1f");
+    });
+
     it("updates layer paint and boundary paint on map", () => {
       const setPaintProperty = jest.fn();
       const getLayer = jest.fn((id) => {

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useMapContext } from "hooks/useMapContext";
 import { getSourceLayer, syncHoverLayerToBase } from 'utils';
+import { getBaseMap } from "../../map/baseMaps";
 import {
   ensureSpiderHoverSelectLayers,
   buildSpiderDataOffsetOne,
@@ -89,6 +90,9 @@ export function SpiderLayer({ baseLayerId }) {
   const debounce = useRef(null);
   const baseFilterRef = useRef(null); // to restore on unmount
   const prevExcludeIds = useRef([]); 
+  // Read through a ref so the map event handlers below always see the current theme.
+  const themeRef = useRef(getBaseMap(state.baseMapId).theme);
+  themeRef.current = getBaseMap(state.baseMapId).theme;
 
   useEffect(() => {
     if (!map) return;
@@ -180,7 +184,7 @@ export function SpiderLayer({ baseLayerId }) {
       }
 
       // Add hover/select for overlay
-      ensureSpiderHoverSelectLayers(map, baseLayerId);
+      ensureSpiderHoverSelectLayers(map, baseLayerId, themeRef.current);
 
       // Initialise state: copy current state from parent to spider
       // The mirror handles updates, but we need to copy the state that exists now.

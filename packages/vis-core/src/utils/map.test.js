@@ -9,6 +9,8 @@ import {
   TOWN_CITY_LABEL_LAYER_IDS,
   getHoverLayerStyle,
   syncHoverLayerToBase,
+  applyHoverTheme,
+  HOVER_COLORS,
 } from "./map";
 import { DisplayMode } from "enums";
 
@@ -568,10 +570,59 @@ describe("getHoverLayerStyle point", () => {
     expect(paint["circle-stroke-color"]).toEqual([
       "case",
       ["boolean", ["feature-state", "hover"], false],
-      "red",
+      "#1f1f1f",
       "transparent",
     ]);
     expect(paint["circle-radius"]).toBe(5);
+  });
+});
+
+describe("hover colour by theme", () => {
+  const colourOf = (style) => {
+    const { paint } = style;
+    return (paint["line-color"] ?? paint["circle-stroke-color"])[2];
+  };
+
+  it.each(["polygon", "line", "point"])("uses near-black on light and white on dark base maps for %s", (geometryType) => {
+    expect(colourOf(getHoverLayerStyle(geometryType))).toBe(HOVER_COLORS.light);
+    expect(colourOf(getHoverLayerStyle(geometryType, {}, "light"))).toBe("#1f1f1f");
+    expect(colourOf(getHoverLayerStyle(geometryType, {}, "dark"))).toBe("#ffffff");
+  });
+
+  it("only shows the colour on the hovered feature", () => {
+    const [op, condition, , otherwise] = getHoverLayerStyle("line", {}, "dark").paint["line-color"];
+    expect(op).toBe("case");
+    expect(condition).toEqual(["boolean", ["feature-state", "hover"], false]);
+    expect(otherwise).toBe("transparent");
+  });
+
+  it("falls back to the light colour for an unknown theme", () => {
+    expect(colourOf(getHoverLayerStyle("polygon", {}, "sepia"))).toBe(HOVER_COLORS.light);
+  });
+
+  it("draws line hover at full opacity and polygon outlines no wider than 4px", () => {
+    expect(getHoverLayerStyle("line").paint["line-opacity"]).toBe(1);
+    const widths = getHoverLayerStyle("polygon").paint["line-width"].slice(3).filter((_, i) => i % 2 === 1);
+    expect(Math.max(...widths)).toBe(4);
+  });
+});
+
+describe("applyHoverTheme", () => {
+  it("recolours line and circle hover layers and skips symbols and missing layers", () => {
+    const map = makePaintMap({
+      "Links-hover": { type: "line", paint: getHoverLayerStyle("line").paint },
+      "Stations-hover": { type: "circle", paint: getHoverLayerStyle("point").paint },
+      "Icons-hover": { type: "symbol", paint: {} },
+    });
+
+    applyHoverTheme(map, "Links-hover", "dark");
+    applyHoverTheme(map, "Stations-hover", "dark");
+    applyHoverTheme(map, "Icons-hover", "dark");
+    applyHoverTheme(map, "Missing-hover", "dark");
+
+    expect(map.paintOf("Links-hover")["line-color"][2]).toBe("#ffffff");
+    expect(map.paintOf("Stations-hover")["circle-stroke-color"][2]).toBe("#ffffff");
+    expect(map.setPaintProperty).toHaveBeenCalledTimes(2);
   });
 });
 

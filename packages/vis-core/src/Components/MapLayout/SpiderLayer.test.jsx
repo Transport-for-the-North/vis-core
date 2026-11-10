@@ -96,6 +96,19 @@ describe("SpiderLayer Component", () => {
     expect(mockMap.on).toHaveBeenCalledWith("styledata", expect.any(Function));
   });
 
+  it("creates the spider hover ring in the current base map's theme", async () => {
+    mockMapContext.state.baseMapId = "darkMatter";
+    render(<SpiderLayer baseLayerId="baseLayer" />);
+
+    const sourceDataCallback = mockMap.on.mock.calls.find((call) => call[0] === "sourcedata")[1];
+    sourceDataCallback({ sourceId: "baseLayer", isSourceLoaded: true });
+    jest.advanceTimersByTime(100);
+
+    await waitFor(() => {
+      expect(ensureSpiderHoverSelectLayers).toHaveBeenCalledWith(mockMap, "baseLayer", "dark");
+    });
+  });
+
   it("sizes the spider hover ring from the mirrored spider points", () => {
     mockMap.getLayer.mockImplementation((id) =>
       id === "baseLayer" || id === "baseLayer-spider" ? { type: "circle" } : null
