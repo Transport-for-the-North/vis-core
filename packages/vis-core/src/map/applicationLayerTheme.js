@@ -1,4 +1,4 @@
-import { getLayerStyle } from "../utils/map";
+import { getLayerStyle, syncHoverLayerToBase } from "../utils/map";
 
 /** Converts sRGB (0-255 each) to HSL (degrees, %, %). @private */
 function rgbToHsl(r, g, b) {
@@ -287,6 +287,7 @@ export function applyApplicationTheme({ map, layers, theme }) {
             // Ignore unsupported properties.
           }
         });
+        syncHoverLayerToBase(map, layer.name);
       }
     }
 

@@ -166,6 +166,30 @@ describe("applicationLayerTheme", () => {
   });
 
   describe("applyApplicationTheme", () => {
+    it("re-syncs a non-stylable line layer's hover after repainting it", () => {
+      const paint = { roads: {}, "roads-hover": {} };
+      const map = {
+        getLayer: jest.fn((id) => (paint[id] ? { id, type: "line" } : null)),
+        getPaintProperty: jest.fn((id, prop) => paint[id][prop]),
+        setPaintProperty: jest.fn((id, prop, value) => {
+          paint[id][prop] = value;
+        }),
+      };
+      const layers = {
+        roads: {
+          name: "roads",
+          geometryType: "line",
+          isStylable: false,
+          customPaint: { "line-color": "#000000", "line-width": 6, "line-offset": -2 },
+        },
+      };
+
+      applyApplicationTheme({ map, layers, theme: "dark" });
+
+      expect(paint["roads-hover"]["line-gap-width"]).toBe(6);
+      expect(paint["roads-hover"]["line-offset"]).toBe(-2);
+    });
+
     it("updates layer paint and boundary paint on map", () => {
       const setPaintProperty = jest.fn();
       const getLayer = jest.fn((id) => {

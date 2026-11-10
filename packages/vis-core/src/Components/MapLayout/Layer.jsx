@@ -4,6 +4,7 @@ import {
   appendQueryParams,
   getHoverLayerStyle,
   getLayerStyle,
+  syncHoverLayerToBase,
   getSelectedLayerStyle,
   getOpacityProperty,
   moveTownCityLabelsToTop,
@@ -247,6 +248,7 @@ export const Layer = ({ layer }) => {
               const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
               hoverLayerConfig.id = `${layer.name}-hover`;
               mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
+              syncHoverLayerToBase(mapInstance, layer.name);
             }
 
             // Add the select layer
@@ -360,6 +362,7 @@ export const Layer = ({ layer }) => {
               isStylable: false,
             };
             mapInstance.addLayer(hoverLayerConfig);
+            syncHoverLayerToBase(mapInstance, layer.name);
           }
 
           // Add the select layer
@@ -558,6 +561,7 @@ export const Layer = ({ layer }) => {
           isStylable: false,
         };
         mapInstance.addLayer(hoverLayerConfig);
+        syncHoverLayerToBase(mapInstance, layer.name);
       }
 
       const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);

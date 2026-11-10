@@ -189,3 +189,36 @@ describe("useFeatureStateUpdater addFeaturesToMap", () => {
     expect(map.setFeatureState).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("useFeatureStateUpdater hover sync", () => {
+  it("gives a line layer's hover the same width and offset as the restyled base, after the width factor", () => {
+    const paint = { "line-links": {}, "line-links-hover": {} };
+    const types = { "line-links": "line", "line-links-hover": "line" };
+    const map = {
+      ...makeMap(),
+      getLayer: jest.fn((id) => (types[id] ? { id, type: types[id], metadata: {} } : undefined)),
+      getPaintProperty: jest.fn((id, prop) => paint[id]?.[prop]),
+      setPaintProperty: jest.fn((id, prop, value) => {
+        paint[id][prop] = value;
+      }),
+    };
+    const lineLayers = {
+      links: { name: "line-links", isStylable: true, defaultWidthFactor: 2 },
+    };
+    const paintProperty = {
+      "line-width": ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 1, 100, 8.5],
+      "line-offset": ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, -1, 100, -5],
+    };
+    const { result } = renderHook(() => useFeatureStateUpdater());
+
+    act(() => {
+      result.current.addFeaturesToMap(map, paintProperty, lineLayers, [{ id: 1, value: 50 }], "continuous", "links");
+    });
+
+    const baseWidth = paint["line-links"]["line-width"];
+    // The width factor has changed the base width, so the hover must carry the factored one.
+    expect(baseWidth).not.toEqual(paintProperty["line-width"]);
+    expect(paint["line-links-hover"]["line-gap-width"]).toEqual(baseWidth);
+    expect(paint["line-links-hover"]["line-offset"]).toEqual(paint["line-links"]["line-offset"]);
+  });
+});

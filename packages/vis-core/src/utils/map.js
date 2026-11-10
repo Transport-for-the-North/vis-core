@@ -1272,6 +1272,60 @@ export const getLayerStyle = (geometryType) => {
   }
 };
 
+/** Thickness (px) of the hover outline drawn either side of a hovered line. */
+const HOVER_LINE_OUTLINE_WIDTH = 2;
+
+/** Thickness (px) of the hover ring drawn around a hovered point. */
+const HOVER_POINT_RING_WIDTH = 2;
+
+/** MapLibre's own defaults, used when the base layer leaves a property unset. */
+const HOVER_SYNC_DEFAULTS = {
+  "line-width": 1,
+  "line-offset": 0,
+  "circle-radius": 5,
+};
+
+/**
+ * Base paint property -> hover paint property, per base layer type. Polygon
+ * (fill) layers are not listed: their hover is an outline with its own width.
+ */
+const HOVER_SYNC_PROPERTIES = {
+  line: [
+    ["line-width", "line-gap-width"],
+    ["line-offset", "line-offset"],
+  ],
+  circle: [["circle-radius", "circle-radius"]],
+};
+
+/**
+ * Copies the base layer's live size and position onto its hover layer, so the
+ * hover highlight sits exactly on the feature it highlights. Lines copy the
+ * base `line-width` into the hover's `line-gap-width` (the outline wraps the
+ * line) and copy `line-offset` as is; circles copy `circle-radius`.
+ *
+ * @param {maplibregl.Map} map - MapLibre map instance.
+ * @param {string} baseLayerId - Id of the base layer.
+ * @param {string} [hoverLayerId] - Id of the hover layer; defaults to `${baseLayerId}-hover`.
+ */
+export const syncHoverLayerToBase = (map, baseLayerId, hoverLayerId = `${baseLayerId}-hover`) => {
+  if (!map?.getLayer || !baseLayerId) return;
+  const baseLayer = map.getLayer(baseLayerId);
+  const hoverLayer = map.getLayer(hoverLayerId);
+  if (!baseLayer || !hoverLayer || baseLayer.type !== hoverLayer.type) return;
+
+  const properties = HOVER_SYNC_PROPERTIES[baseLayer.type];
+  if (!properties) return;
+
+  properties.forEach(([baseProp, hoverProp]) => {
+    try {
+      const value = map.getPaintProperty(baseLayerId, baseProp);
+      map.setPaintProperty(hoverLayerId, hoverProp, value ?? HOVER_SYNC_DEFAULTS[baseProp]);
+    } catch (error) {
+      console.warn(`Failed to sync "${hoverProp}" on hover layer "${hoverLayerId}":`, error);
+    }
+  });
+};
+
 /**
  * Generates the style configuration for a hover layer based on the geometry
  * type of the layer.
@@ -1305,42 +1359,16 @@ export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
         }
       };
     case "line":
+      // Drawn as an outline around the base line
       return {
         id: "",
         type: "line",
         paint: {
           "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
           "line-opacity": 0.8,
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            // Specify zoom levels and corresponding line widths
-            5,
-            2, // At zoom level 5, line width will be 1
-            10,
-            4, // At zoom level 10, line width will be 2
-            15,
-            8, // At zoom level 15, line width will be 4
-            20,
-            16, // At zoom level 20, line width will be 8
-          ],
-          "line-offset": hasCustomOffset
-            ? layerConfig.defaultLineOffset
-            : [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                // Specify zoom levels and corresponding line offsets - increased for better gap
-                5,
-                -2, // At zoom level 5, line offset increased to -2
-                10,
-                -4, // At zoom level 10, line offset increased to -4
-                15,
-                -8, // At zoom level 15, line offset increased to -8
-                20,
-                -12, // At zoom level 20, line offset increased to -12
-              ],
+          "line-width": HOVER_LINE_OUTLINE_WIDTH,
+          "line-gap-width": HOVER_SYNC_DEFAULTS["line-width"],
+          "line-offset": hasCustomOffset ? layerConfig.defaultLineOffset : 0,
         }
       };
     case "point":
@@ -1348,8 +1376,10 @@ export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
         id: "",
         type: "circle",
         paint: {
-          "circle-radius": 5,
-          "circle-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
+          "circle-radius": HOVER_SYNC_DEFAULTS["circle-radius"],
+          "circle-color": "transparent",
+          "circle-stroke-width": HOVER_POINT_RING_WIDTH,
+          "circle-stroke-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
         }
       };
     case "symbol":

@@ -6,6 +6,7 @@ import {
   applyPaintProperties,
   applyWidthFactor,
   getWidthProperty,
+  syncHoverLayerToBase,
 } from 'utils/map';
 
 // Constants
@@ -278,6 +279,10 @@ export const useFeatureStateUpdater = () => {
           applyConfiguredWidthFactor(map, specifiedLayer);
           defaultWidthAppliedRef.current.add(specifiedLayer.name);
         }
+
+        // The base width/offset/radius may have just changed, 
+        // so keep the hover highlight the same size and position.
+        syncHoverLayerToBase(map, specifiedLayer.name);
 
         const source = map.getSource?.(getLayerSourceId(specifiedLayer));
         const tiles = source?.serialize?.().tiles?.join();

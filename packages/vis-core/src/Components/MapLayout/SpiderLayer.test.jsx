@@ -7,6 +7,7 @@ import React from "react";
 import { render, waitFor } from "@testing-library/react";
 import { SpiderLayer } from "./SpiderLayer";
 import { useMapContext } from "hooks";
+import { syncHoverLayerToBase } from "utils";
 import {
   ensureSpiderHoverSelectLayers,
   buildSpiderDataOffsetOne,
@@ -20,6 +21,7 @@ jest.mock("hooks/useMapContext", () => ({
 
 jest.mock("utils", () => ({
   getSourceLayer: jest.fn(() => "mock-source-layer"),
+  syncHoverLayerToBase: jest.fn(),
 }));
 
 jest.mock("utils/mapSpiders", () => ({
@@ -92,6 +94,22 @@ describe("SpiderLayer Component", () => {
     expect(mockMap.on).toHaveBeenCalledWith("zoomend", expect.any(Function));
     expect(mockMap.on).toHaveBeenCalledWith("idle", expect.any(Function));
     expect(mockMap.on).toHaveBeenCalledWith("styledata", expect.any(Function));
+  });
+
+  it("sizes the spider hover ring from the mirrored spider points", () => {
+    mockMap.getLayer.mockImplementation((id) =>
+      id === "baseLayer" || id === "baseLayer-spider" ? { type: "circle" } : null
+    );
+    render(<SpiderLayer baseLayerId="baseLayer" />);
+
+    const idleCallback = mockMap.on.mock.calls.find((call) => call[0] === "idle")[1];
+    idleCallback();
+
+    expect(syncHoverLayerToBase).toHaveBeenCalledWith(
+      mockMap,
+      "baseLayer-spider",
+      "baseLayer-spider-hover"
+    );
   });
 
   /**

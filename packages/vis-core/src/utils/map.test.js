@@ -7,6 +7,8 @@ import {
   isBasePlaceLabelLayer,
   moveTownCityLabelsToTop,
   TOWN_CITY_LABEL_LAYER_IDS,
+  getHoverLayerStyle,
+  syncHoverLayerToBase,
 } from "./map";
 import { DisplayMode } from "enums";
 
@@ -523,5 +525,132 @@ describe("moveTownCityLabelsToTop", () => {
   it("safely handles maps without getLayer or moveLayer", () => {
     expect(() => moveTownCityLabelsToTop(null)).not.toThrow();
     expect(() => moveTownCityLabelsToTop({})).not.toThrow();
+  });
+});
+
+/**
+ * Minimal stateful map: layers keyed by id, each with a type and a paint object
+ * that getPaintProperty / setPaintProperty read and write.
+ */
+const makePaintMap = (layers) => {
+  const store = Object.fromEntries(
+    Object.entries(layers).map(([id, { type, paint = {} }]) => [id, { id, type, paint: { ...paint } }])
+  );
+  return {
+    getLayer: jest.fn((id) => store[id]),
+    getPaintProperty: jest.fn((id, prop) => store[id]?.paint[prop]),
+    setPaintProperty: jest.fn((id, prop, value) => {
+      store[id].paint[prop] = value;
+    }),
+    paintOf: (id) => store[id].paint,
+  };
+};
+
+describe("getHoverLayerStyle line", () => {
+  it("draws an outline around the line instead of a zoom-scaled line", () => {
+    const { paint } = getHoverLayerStyle("line");
+    expect(paint["line-width"]).toBe(2);
+    expect(paint["line-gap-width"]).toBe(1);
+    expect(paint["line-offset"]).toBe(0);
+  });
+
+  it("starts from the layer's custom offset when one is set", () => {
+    const { paint } = getHoverLayerStyle("line", { defaultLineOffset: -3 });
+    expect(paint["line-offset"]).toBe(-3);
+  });
+});
+
+describe("getHoverLayerStyle point", () => {
+  it("draws a ring that leaves the point's data colour visible", () => {
+    const { paint } = getHoverLayerStyle("point");
+    expect(paint["circle-color"]).toBe("transparent");
+    expect(paint["circle-stroke-width"]).toBe(2);
+    expect(paint["circle-stroke-color"]).toEqual([
+      "case",
+      ["boolean", ["feature-state", "hover"], false],
+      "red",
+      "transparent",
+    ]);
+    expect(paint["circle-radius"]).toBe(5);
+  });
+});
+
+describe("syncHoverLayerToBase", () => {
+  const dataWidth = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 1, 100, 8.5];
+  const dataOffset = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, -1.25, 100, -5];
+
+  it("copies a line layer's data-driven width into the hover gap width and copies the offset", () => {
+    const map = makePaintMap({
+      Links: { type: "line", paint: { "line-width": dataWidth, "line-offset": dataOffset } },
+      "Links-hover": { type: "line", paint: getHoverLayerStyle("line").paint },
+    });
+
+    syncHoverLayerToBase(map, "Links");
+
+    expect(map.paintOf("Links-hover")["line-gap-width"]).toEqual(dataWidth);
+    expect(map.paintOf("Links-hover")["line-offset"]).toEqual(dataOffset);
+    // The outline thickness itself is left alone.
+    expect(map.paintOf("Links-hover")["line-width"]).toBe(2);
+  });
+
+  it("follows the base layer when its width and offset change", () => {
+    const map = makePaintMap({
+      Links: { type: "line", paint: { "line-width": dataWidth, "line-offset": dataOffset } },
+      "Links-hover": { type: "line", paint: {} },
+    });
+    syncHoverLayerToBase(map, "Links");
+
+    const widened = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 2, 100, 17];
+    const widenedOffset = ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, -1.75, 100, -9.25];
+    map.setPaintProperty("Links", "line-width", widened);
+    map.setPaintProperty("Links", "line-offset", widenedOffset);
+    syncHoverLayerToBase(map, "Links");
+
+    expect(map.paintOf("Links-hover")["line-gap-width"]).toEqual(widened);
+    expect(map.paintOf("Links-hover")["line-offset"]).toEqual(widenedOffset);
+  });
+
+  it("uses MapLibre's defaults when the base layer leaves width or offset unset", () => {
+    const map = makePaintMap({
+      Roads: { type: "line", paint: {} },
+      "Roads-hover": { type: "line", paint: { "line-gap-width": 9, "line-offset": -4 } },
+    });
+
+    syncHoverLayerToBase(map, "Roads");
+
+    expect(map.paintOf("Roads-hover")["line-gap-width"]).toBe(1);
+    expect(map.paintOf("Roads-hover")["line-offset"]).toBe(0);
+  });
+
+  it("copies a circle layer's radius, including onto a custom hover id", () => {
+    const radius = ["interpolate", ["linear"], ["to-number", ["feature-state", "valueAbs"]], 0, 2, 50, 25];
+    const map = makePaintMap({
+      "Stations-spider": { type: "circle", paint: { "circle-radius": radius } },
+      "Stations-spider-hover": { type: "circle", paint: { "circle-radius": 5 } },
+    });
+
+    syncHoverLayerToBase(map, "Stations-spider", "Stations-spider-hover");
+
+    expect(map.paintOf("Stations-spider-hover")["circle-radius"]).toEqual(radius);
+  });
+
+  it("leaves polygon hover outlines alone", () => {
+    const map = makePaintMap({
+      Zones: { type: "fill", paint: {} },
+      "Zones-hover": { type: "line", paint: { "line-width": 3 } },
+    });
+
+    syncHoverLayerToBase(map, "Zones");
+
+    expect(map.setPaintProperty).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when the base or hover layer is missing", () => {
+    const map = makePaintMap({ Links: { type: "line", paint: { "line-width": 4 } } });
+
+    expect(() => syncHoverLayerToBase(map, "Links")).not.toThrow();
+    expect(() => syncHoverLayerToBase(map, "Missing")).not.toThrow();
+    expect(() => syncHoverLayerToBase(null, "Links")).not.toThrow();
+    expect(map.setPaintProperty).not.toHaveBeenCalled();
   });
 });

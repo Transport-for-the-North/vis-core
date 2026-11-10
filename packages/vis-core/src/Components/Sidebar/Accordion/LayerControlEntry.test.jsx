@@ -410,6 +410,55 @@ describe("LayerControlEntry component test", () => {
       });
     });
   });
+  it("keeps the hover outline the same width and offset as the line when the width slider moves", async () => {
+    const paint = {
+      id: {
+        "line-width": ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, 1, 10, 8.5],
+        "line-opacity": 1,
+      },
+      "id-hover": {},
+    };
+    const mapWithHover = {
+      getLayer: jest.fn((layerId) => (paint[layerId] ? { id: layerId, type: "line" } : undefined)),
+      getPaintProperty: jest.fn((layerId, prop) => paint[layerId]?.[prop]),
+      setPaintProperty: jest.fn((layerId, prop, value) => {
+        paint[layerId][prop] = value;
+      }),
+    };
+
+    render(
+      <MapContext.Provider value={{ state: props.state, dispatch: jest.fn() }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry
+              {...props}
+              maps={[mapWithHover]}
+              layer={{
+                id: "id",
+                type: "line",
+                layout: { visibility: false },
+                metadata: { path: "/", shouldHaveOpacityControl: true },
+              }}
+            />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    fireEvent.change(screen.getByLabelText("Width factor"), {
+      target: { value: "0.6" },
+    });
+
+    await waitFor(() => {
+      expect(paint.id["line-width"]).toEqual(
+        ["interpolate", ["linear"], ["feature-state", "valueAbs"], 0, expect.any(Number), 10, expect.any(Number)]
+      );
+      expect(paint.id["line-width"][6]).not.toBe(8.5);
+    });
+    expect(paint["id-hover"]["line-gap-width"]).toEqual(paint.id["line-width"]);
+    expect(paint["id-hover"]["line-offset"]).toEqual(paint.id["line-offset"]);
+  });
+
   it("Test", () => {
     const mockMapContext = {
       state: {
