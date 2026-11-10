@@ -2,9 +2,7 @@ import { useEffect, useContext, useMemo, useRef } from "react";
 import { api } from "services";
 import {
   appendQueryParams,
-  getHoverLayerStyle,
   getLayerStyle,
-  getSelectedLayerStyle,
   getOpacityProperty,
   moveTownCityLabelsToTop,
 } from "utils";
@@ -19,6 +17,7 @@ import { FilterContext } from "contexts/FilterContext";
 import { actionTypes } from "reducers/mapReducer";
 import { DEFAULT_LAYER_OPACITY } from "defaults";
 import { loadImagesFromTileFeatures } from "utils/imageLoader";
+import { addHoverLayers, removeHoverLayers } from "../../map/hoverStyle";
 
 /**
  * Layer component that adds a layer to the map(s) and handles its lifecycle.
@@ -140,9 +139,7 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-symbols-hover`)) {
           mapInstance.removeLayer(`${layer.name}-symbols-hover`);
         }
-        if (mapInstance.getLayer(`${layer.name}-hover`)) {
-          mapInstance.removeLayer(`${layer.name}-hover`);
-        }
+        removeHoverLayers(mapInstance, layer.name);
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
         }
@@ -244,15 +241,24 @@ export const Layer = ({ layer }) => {
 
             // Add the hover layer if the layer is hoverable
             if (layer.isHoverable) {
-              const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
-              hoverLayerConfig.id = `${layer.name}-hover`;
-              mapInstance.addLayer({ ...hoverLayerConfig, source: layer.name });
+              addHoverLayers(mapInstance, {
+                baseLayerId: layer.name,
+                geometryType: layer.geometryType,
+                source: layer.name,
+                theme,
+                basePaint: layerConfig.paint,
+              });
             }
 
-            // Add the select layer
-            const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
-            selectLayerConfig.id = `${layer.name}-select`;
-            mapInstance.addLayer({ ...selectLayerConfig, source: layer.name });
+            // Add the select layers
+            addHoverLayers(mapInstance, {
+              kind: "selected",
+              baseLayerId: layer.name,
+              geometryType: layer.geometryType,
+              source: layer.name,
+              theme,
+              basePaint: layerConfig.paint,
+            });
             moveTownCityLabelsToTop(mapInstance);
           });
         }
@@ -351,27 +357,26 @@ export const Layer = ({ layer }) => {
 
           // Add the hover layer if the layer is hoverable
           if (layer.isHoverable) {
-            const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
-            hoverLayerConfig.id = `${layer.name}-hover`;
-            hoverLayerConfig.source = layer.name;
-            hoverLayerConfig["source-layer"] = layer.sourceLayer;
-            hoverLayerConfig.metadata = {
-              ...hoverLayerConfig.metadata,
-              isStylable: false,
-            };
-            mapInstance.addLayer(hoverLayerConfig);
+            addHoverLayers(mapInstance, {
+              baseLayerId: layer.name,
+              geometryType: layer.geometryType,
+              source: layer.name,
+              sourceLayer: layer.sourceLayer,
+              theme,
+              basePaint: layerConfig.paint,
+            });
           }
 
-          // Add the select layer
-          const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
-          selectLayerConfig.id = `${layer.name}-select`;
-          selectLayerConfig.source = layer.name;
-          selectLayerConfig["source-layer"] = layer.sourceLayer;
-          selectLayerConfig.metadata = {
-            ...selectLayerConfig.metadata,
-            isStylable: false,
-          };
-          mapInstance.addLayer(selectLayerConfig);
+          // Add the select layers
+          addHoverLayers(mapInstance, {
+            kind: "selected",
+            baseLayerId: layer.name,
+            geometryType: layer.geometryType,
+            source: layer.name,
+            sourceLayer: layer.sourceLayer,
+            theme,
+            basePaint: layerConfig.paint,
+          });
           moveTownCityLabelsToTop(mapInstance);
         }
       }
@@ -391,9 +396,7 @@ export const Layer = ({ layer }) => {
         if (mapInstance.getLayer(`${layer.name}-symbols-hover`)) {
           mapInstance.removeLayer(`${layer.name}-symbols-hover`);
         }
-        if (mapInstance.getLayer(`${layer.name}-hover`)) {
-          mapInstance.removeLayer(`${layer.name}-hover`);
-        }
+        removeHoverLayers(mapInstance, layer.name);
         if (mapInstance.getLayer(`${layer.name}-select`)) {
           mapInstance.removeLayer(`${layer.name}-select`);
         }
@@ -454,7 +457,9 @@ export const Layer = ({ layer }) => {
           layer.name,
           `${layer.name}-symbols`,
           `${layer.name}-symbols-hover`,
+          `${layer.name}-hover-halo`,
           `${layer.name}-hover`,
+          `${layer.name}-select-halo`,
           `${layer.name}-select`,
           `${layer.name}-boundaries`,
           `${layer.name}-label`,
@@ -549,26 +554,25 @@ export const Layer = ({ layer }) => {
       }
 
       if (layer.isHoverable) {
-        const hoverLayerConfig = getHoverLayerStyle(layer.geometryType, layer);
-        hoverLayerConfig.id = `${layer.name}-hover`;
-        hoverLayerConfig.source = layer.name;
-        hoverLayerConfig["source-layer"] = layer.sourceLayer;
-        hoverLayerConfig.metadata = {
-          ...hoverLayerConfig.metadata,
-          isStylable: false,
-        };
-        mapInstance.addLayer(hoverLayerConfig);
+        addHoverLayers(mapInstance, {
+          baseLayerId: layer.name,
+          geometryType: layer.geometryType,
+          source: layer.name,
+          sourceLayer: layer.sourceLayer,
+          theme,
+          basePaint: baseLayerConfig.paint,
+        });
       }
 
-      const selectLayerConfig = getSelectedLayerStyle(layer.geometryType);
-      selectLayerConfig.id = `${layer.name}-select`;
-      selectLayerConfig.source = layer.name;
-      selectLayerConfig["source-layer"] = layer.sourceLayer;
-      selectLayerConfig.metadata = {
-        ...selectLayerConfig.metadata,
-        isStylable: false,
-      };
-      mapInstance.addLayer(selectLayerConfig);
+      addHoverLayers(mapInstance, {
+        kind: "selected",
+        baseLayerId: layer.name,
+        geometryType: layer.geometryType,
+        source: layer.name,
+        sourceLayer: layer.sourceLayer,
+        theme,
+        basePaint: baseLayerConfig.paint,
+      });
       moveTownCityLabelsToTop(mapInstance);
 
       lastTilesUrlByMapRef.current.set(mapInstance, tileUrl);

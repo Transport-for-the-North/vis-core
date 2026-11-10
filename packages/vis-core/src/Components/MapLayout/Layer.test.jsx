@@ -138,30 +138,52 @@ describe("Basic use Layer compoennt with type = 'tile'", () => {
       })
     );
 
-    // isHoverable = true, test if this part is well throw
+    // isHoverable = true: the two-tone hover outline, halo underneath the core
     expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
       3,
+      expect.objectContaining({
+        id: "Accessibility-hover-halo",
+        source: "Accessibility",
+        "source-layer": "zones",
+        type: "line",
+        paint: expect.objectContaining({ "line-color": "#ffffff" }),
+        metadata: { isStylable: false },
+      })
+    );
+    expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
+      4,
       expect.objectContaining({
         id: "Accessibility-hover",
         source: "Accessibility",
         "source-layer": "zones",
         type: "line",
-        metadata: expect.objectContaining({
-          isStylable: false,
-        }),
+        paint: expect.objectContaining({ "line-color": "#0d0f3d" }),
+        metadata: { isStylable: false },
       })
     );
 
     // last addLayer called when type = "tile"
+    // the selection outline: same shape as hover, drawn above it
     expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
-      4,
+      5,
+      expect.objectContaining({
+        id: "Accessibility-select-halo",
+        type: "line",
+        paint: expect.objectContaining({ "line-color": "#ffffff" }),
+        source: "Accessibility",
+        "source-layer": "zones",
+        metadata: { isStylable: false },
+      })
+    );
+    expect(mockMapContext.state.maps[0].addLayer).toHaveBeenNthCalledWith(
+      6,
       expect.objectContaining({
         id: "Accessibility-select",
         type: "line",
-        paint: {
-          "line-color": ["case", expect.any(Array), "#f00", "transparent"],
-          "line-width": 2,
-        },
+        paint: expect.objectContaining({
+          "line-color": "#e3002b",
+          "line-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0],
+        }),
         source: "Accessibility",
         "source-layer": "zones",
         metadata: { isStylable: false },
@@ -298,38 +320,32 @@ describe("Basic use Layer compoennt with type = 'geojson'", () => {
 
     // isHoverable = true, test if this part is well throw
     await waitFor(() => {
-      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith({
-        id: "Accessibility-hover",
-        type: "line",
-        paint: {
-          "line-color": ["case", expect.any(Array), "red", "transparent"],
-          "line-width": [
-            "interpolate",
-            expect.any(Array),
-            expect.any(Array),
-            5,
-            1,
-            10,
-            2,
-            15,
-            4,
-            20,
-            8,
-          ],
-        },
-        source: "Accessibility",
+      ["Accessibility-hover-halo", "Accessibility-hover"].forEach((id) => {
+        expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+          expect.objectContaining({
+            id,
+            type: "line",
+            source: "Accessibility",
+            paint: expect.objectContaining({
+              "line-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 1, 0],
+            }),
+          })
+        );
       });
     });
 
     await waitFor(() => {
-      expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith({
-        id: "Accessibility-select",
-        type: "line",
-        paint: {
-          "line-color": ["case", expect.any(Array), "#f00", "transparent"],
-          "line-width": 2,
-        },
-        source: "Accessibility",
+      ["Accessibility-select-halo", "Accessibility-select"].forEach((id) => {
+        expect(mockMapContext.state.maps[0].addLayer).toHaveBeenCalledWith(
+          expect.objectContaining({
+            id,
+            type: "line",
+            source: "Accessibility",
+            paint: expect.objectContaining({
+              "line-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0],
+            }),
+          })
+        );
       });
     });
   });
