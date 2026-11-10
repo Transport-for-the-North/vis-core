@@ -11,12 +11,11 @@
  * always clears the 3:1 non-text contrast threshold (WCAG 1.4.11). It is deliberately not red:
  * red is the selection colour and the negative end of the diverging palettes.
  *
- * The highlight wraps the feature instead of covering it, so the data colour stays readable:
- * - polygons: an outline along the boundary
- * - lines: a casing either side of the line, following its live width and offset. A line drawn
- *   offset from its centreline usually has a twin on the other side (the two directions of a
- *   link), so its casing only extends on the outer side and never covers the twin.
- * - points: a ring around the circle, following its live radius
+ * - polygons: an outline along the boundary, leaving the data colour visible
+ * - lines: the line itself lights up - the core is drawn over it at its live width and offset,
+ *   with a thin halo edge. Nothing is drawn beside the line, so it never reads as a second link
+ *   and a twin alongside (the two directions of a link) stays visible.
+ * - points: a ring around the circle, following its live radius, leaving the data colour visible
  */
 
 export const HOVER_HALO_SUFFIX = "-hover-halo";
@@ -63,9 +62,8 @@ const POLYGON_CORE_WIDTH = ["interpolate", ["linear"], ["zoom"], 5, 2.5, 10, 3, 
 const POLYGON_HALO_WIDTH = ["interpolate", ["linear"], ["zoom"], 5, 5.5, 10, 6, 15, 8];
 const BAND_HALO_WIDTH = 1.5;
 const BAND_CORE_WIDTH = 2.5;
-/** Offset lines: a hairline that fits in the gap between twins, and the band on the outer side. */
-const SIDED_HAIRLINE_WIDTH = 1;
-const SIDED_CORE_WIDTH = 3;
+/** Edge of a highlighted offset line: a hairline, so it barely touches the twin alongside. */
+const OFFSET_LINE_EDGE_WIDTH = 1;
 
 /** MapLibre's defaults for the base-layer properties the highlight follows. */
 const DEFAULT_LINE_WIDTH = 1;
@@ -77,17 +75,8 @@ export const resolveHoverColours = (theme) => HOVER_COLOURS[theme] ?? HOVER_COLO
 
 const isZoomInput = (input) => Array.isArray(input) && input[0] === "zoom";
 
-/** Whether an expression reads ["zoom"] anywhere, which stops it being nested in arithmetic. */
-const usesZoom = (value) =>
-  Array.isArray(value) && (value[0] === "zoom" || value.some((item) => usesZoom(item)));
-
 const isNumberOrExpression = (value) =>
   (typeof value === "number" && Number.isFinite(value)) || (Array.isArray(value) && value.length > 0);
-
-/** Arithmetic that folds constants and otherwise builds a MapLibre expression. */
-const bothNumbers = (a, b) => typeof a === "number" && typeof b === "number";
-const add = (a, b) => (bothNumbers(a, b) ? a + b : ["+", a, b]);
-const multiply = (a, b) => (bothNumbers(a, b) ? a * b : ["*", a, b]);
 
 /**
  * Adds a constant to a numeric paint value or expression.
@@ -141,37 +130,18 @@ export function buildHoverGeometryPaint(geometryType, basePaint = {}) {
       : DEFAULT_LINE_WIDTH;
     const offset = isNumberOrExpression(basePaint["line-offset"]) ? basePaint["line-offset"] : 0;
 
-    if (offset !== 0 && !usesZoom(width) && !usesZoom(offset)) {
-      // Offset line: hairline on both edges, core band on the outer side only (the side the line
-      // is offset towards), so a twin on the inner side stays fully visible.
-      const side = typeof offset === "number" ? Math.sign(offset) : ["case", ["<", offset, 0], -1, 1];
-      const outerEdge = add(multiply(width, 0.5), SIDED_HAIRLINE_WIDTH + SIDED_CORE_WIDTH / 2);
-      return {
-        halo: {
-          "line-gap-width": width,
-          "line-width": SIDED_HAIRLINE_WIDTH,
-          "line-offset": offset,
-        },
-        core: {
-          "line-gap-width": 0,
-          "line-width": SIDED_CORE_WIDTH,
-          "line-offset": add(offset, multiply(side, outerEdge)),
-        },
-      };
-    }
-
-    // Centred line: the casing starts at the edge of the line, halo band first, then the core
-    // band outside it, on both sides.
+    // The line itself lights up: the core is drawn over it at the same width and offset, with a
+    // contrasting edge either side. An offset line usually has a twin alongside (the two
+    // directions of a link), so its edge is a hairline that barely touches the twin.
     return {
       halo: {
         "line-gap-width": width,
-        "line-width": BAND_HALO_WIDTH,
+        "line-width": offset === 0 ? BAND_HALO_WIDTH : OFFSET_LINE_EDGE_WIDTH,
         "line-offset": offset,
       },
       core: {
-        "line-gap-width":
-          offsetNumericExpression(width, BAND_HALO_WIDTH * 2) ?? DEFAULT_LINE_WIDTH + BAND_HALO_WIDTH * 2,
-        "line-width": BAND_CORE_WIDTH,
+        "line-gap-width": 0,
+        "line-width": width,
         "line-offset": offset,
       },
     };

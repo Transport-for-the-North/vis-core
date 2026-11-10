@@ -175,40 +175,36 @@ describe("getHoverLayerSpecs", () => {
     });
   });
 
-  it("cases a centred line either side instead of covering it", () => {
+  it("lights up a centred line itself, with an edge either side", () => {
     const [halo, core] = getHoverLayerSpecs("line", { basePaint: { "line-width": 4 } });
     expect(halo.layer.paint).toMatchObject({ "line-gap-width": 4, "line-width": 1.5, "line-offset": 0 });
-    expect(core.layer.paint).toMatchObject({ "line-gap-width": 7, "line-width": 2.5, "line-offset": 0 });
+    expect(core.layer.paint).toMatchObject({ "line-gap-width": 0, "line-width": 4, "line-offset": 0 });
   });
 
-  it.each([
-    [-3, -7.5],
-    [3, 7.5],
-  ])("keeps the band on the outer side of a line offset by %d, clear of its twin", (offset, coreOffset) => {
+  it.each([-3, 3])("draws nothing beside a line offset by %d but a hairline edge", (offset) => {
     const [halo, core] = getHoverLayerSpecs("line", {
       basePaint: { "line-width": 4, "line-offset": offset },
     });
-    // A hairline on both edges: narrow enough to sit in the gap between the twins.
     expect(halo.layer.paint).toMatchObject({
       "line-gap-width": 4,
       "line-width": 1,
       "line-offset": offset,
     });
-    // The band runs beyond the outer edge only: 2 (half width) + 1 (hairline) + 1.5 (half band).
     expect(core.layer.paint).toMatchObject({
       "line-gap-width": 0,
-      "line-width": 3,
-      "line-offset": coreOffset,
+      "line-width": 4,
+      "line-offset": offset,
     });
   });
 
-  it("falls back to a two-sided casing when a zoom expression rules out offset arithmetic", () => {
+  it("follows zoom-driven widths and offsets as they are", () => {
+    const width = ["interpolate", ["linear"], ["zoom"], 5, 1, 15, 6];
     const offset = ["interpolate", ["linear"], ["zoom"], 5, -2, 15, -8];
     const [halo, core] = getHoverLayerSpecs("line", {
-      basePaint: { "line-width": 4, "line-offset": offset },
+      basePaint: { "line-width": width, "line-offset": offset },
     });
-    expect(halo.layer.paint["line-offset"]).toEqual(offset);
-    expect(core.layer.paint).toMatchObject({ "line-gap-width": 7, "line-offset": offset });
+    expect(halo.layer.paint).toMatchObject({ "line-gap-width": width, "line-offset": offset });
+    expect(core.layer.paint).toMatchObject({ "line-width": width, "line-offset": offset });
   });
 
   it("swaps image markers to their hover image", () => {
@@ -319,12 +315,8 @@ describe("syncHoverLayers", () => {
     });
     expect(map.store["links-hover"].paint).toEqual({
       "line-gap-width": 0,
-      "line-width": 3,
-      "line-offset": [
-        "+",
-        offset,
-        ["*", ["case", ["<", offset, 0], -1, 1], ["+", ["*", width, 0.5], 2.5]],
-      ],
+      "line-width": width,
+      "line-offset": offset,
     });
   });
 
