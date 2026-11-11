@@ -18,12 +18,13 @@ import { CheckboxSelector } from './CheckboxSelector';
 import { MapFeatureSelectAndPan } from './MapFeatureSelectAndPan';
 import { api } from "services";
 import { darken } from "polished";
-import { checkSecurityRequirements, trackClarityEvent } from "utils";
+import { analyzeDataType, checkSecurityRequirements, trackClarityEvent } from "utils";
 import { actionTypes } from "reducers";
 
 const ButtonRow = styled.div`
   display: flex;
   gap: 10px; /* Adds space between the buttons */
+  margin-top: 0.7rem;
 `;
 
 const DownloadButton = styled.button`
@@ -326,39 +327,59 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
     ? <WarningStatus message={noDataMessage} /> 
     : null;
 
-  const activeVisualisationEntry = useMemo(
-    () => Object.entries(mapState.visualisations || {})[0] || null,
-    [mapState.visualisations]
-  );
-
-  const [activeVisualisationKey, activeVisualisation] = activeVisualisationEntry || [];
-
   const activeLayerEntry = useMemo(() => {
     const layers = Object.entries(mapState.layers || {});
     if (layers.length === 0) return null;
 
-    const byVisualisation = layers.find(([, layer]) => {
-      if (!(layer?.metadata?.isStylable || layer?.isStylable)) return false;
-      return (
-        layer?.visualisationName === activeVisualisationKey ||
-        layer?.visualisationName === activeVisualisation?.name
+    const stylableLayers = layers.filter(
+      ([, layer]) => layer?.metadata?.isStylable || layer?.isStylable
+    );
+
+    if (stylableLayers.length === 0) {
+      return null;
+    }
+
+    const byVisualisation = stylableLayers.find(([, layer]) => {
+      const layerVisualisationName = layer?.visualisationName;
+      if (!layerVisualisationName) return false;
+      return Object.entries(mapState.visualisations || {}).some(
+        ([visualisationKey, visualisation]) =>
+          visualisationKey === layerVisualisationName ||
+          visualisation?.name === layerVisualisationName
       );
     });
 
-    if (byVisualisation) return byVisualisation;
+    if (byVisualisation) {
+      return byVisualisation;
+    }
 
     return (
-      layers.find(([, layer]) => layer?.metadata?.isStylable || layer?.isStylable) ||
+      stylableLayers[0] ||
       null
     );
-  }, [mapState.layers, activeVisualisationKey, activeVisualisation?.name]);
+  }, [mapState.layers, mapState.visualisations]);
 
   const [activeLayerId, activeLayerConfig] = activeLayerEntry || [];
 
-  const activeColorStyle =
-    activeLayerConfig?.metadata?.colorStyle ||
-    activeVisualisation?.style?.split("-")?.[1] ||
-    null;
+  const activeVisualisationEntry = useMemo(() => {
+    if (!activeLayerConfig?.visualisationName) {
+      return Object.entries(mapState.visualisations || {})[0] || null;
+    }
+
+    const matchingEntry = Object.entries(mapState.visualisations || {}).find(
+      ([visualisationKey, visualisation]) =>
+        visualisationKey === activeLayerConfig.visualisationName ||
+        visualisation?.name === activeLayerConfig.visualisationName
+    );
+
+    return matchingEntry || (Object.entries(mapState.visualisations || {})[0] || null);
+  }, [mapState.visualisations, activeLayerConfig?.visualisationName]);
+
+  const [activeVisualisationKey, activeVisualisation] = activeVisualisationEntry || [];
+
+  const styleSuffixFromVisualisation = activeVisualisation?.style?.split("-")?.[1] || null;
+
+  const valueFieldKey = activeVisualisation?.valueField || "value";
 
   const extractedValues = useMemo(() => {
     if (!Array.isArray(activeVisualisation?.data)) {
@@ -370,10 +391,32 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
         if (row == null || typeof row !== "object") {
           return row;
         }
+
+        if (row[valueFieldKey] !== undefined && row[valueFieldKey] !== null) {
+          return row[valueFieldKey];
+        }
+
         return row.value ?? row.metric ?? row.score ?? row.category ?? null;
       })
       .filter((value) => value !== null && value !== undefined);
-  }, [activeVisualisation?.data]);
+  }, [activeVisualisation?.data, valueFieldKey]);
+
+  const inferredColorStyle = useMemo(() => {
+    if (styleSuffixFromVisualisation) {
+      return styleSuffixFromVisualisation;
+    }
+
+    if (!activeVisualisation?.dynamicStyling || extractedValues.length === 0) {
+      return null;
+    }
+
+    return analyzeDataType(extractedValues);
+  }, [styleSuffixFromVisualisation, activeVisualisation?.dynamicStyling, extractedValues]);
+
+  const activeColorStyle =
+    activeLayerConfig?.metadata?.colorStyle ||
+    inferredColorStyle ||
+    null;
 
   const numericValues = useMemo(
     () => extractedValues.map((value) => Number(value)).filter(Number.isFinite),
@@ -429,6 +472,29 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       Math.max(valueRangeDomain.min, Math.min(max, valueRangeDomain.max)),
     ];
   }, [existingRangeFilter, valueRangeDomain]);
+
+  const histogramBins = useMemo(() => {
+    if (!isContinuousStyle || numericValues.length === 0) {
+      return [];
+    }
+
+    const bucketCount = 22;
+    const min = valueRangeDomain.min;
+    const max = valueRangeDomain.max;
+    const span = Math.max(max - min, Number.EPSILON);
+    const bins = Array.from({ length: bucketCount }, () => 0);
+
+    numericValues.forEach((numericValue) => {
+      const normalised = (numericValue - min) / span;
+      const index = Math.min(
+        bucketCount - 1,
+        Math.max(0, Math.floor(normalised * bucketCount))
+      );
+      bins[index] += 1;
+    });
+
+    return bins;
+  }, [isContinuousStyle, numericValues, valueRangeDomain]);
 
   const selectedCategories = Array.isArray(activeLayerConfig?.valueCategoryFilter)
     ? activeLayerConfig.valueCategoryFilter.map((value) => String(value))
@@ -614,42 +680,13 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                 </SelectorContainer>
               );
             })}
-          <ButtonRow>
-            {downloadPath && (
-              <DownloadButton 
-                onClick={handleDownload} 
-                $bgColor={bgColor}
-                disabled={isRequestTooLarge || isDownloading}
-              >
-                {isDownloading ? (
-                  <>Downloading CSV <Spinner /></>
-                ) : (
-                  isRequestTooLarge ? "Request Too Large" : "Download as CSV"
-                )}
-              </DownloadButton>
-            )}
-            {downloadShapefilePath && (
-              <DownloadButton 
-                onClick={handleShapefileDownload} 
-                $bgColor={bgColor}
-                disabled={isRequestTooLarge || isShapefileDownloading}
-              >
-                {isShapefileDownloading ? (
-                  <>Downloading Shapefile <Spinner /></>
-                ) : (
-                  isRequestTooLarge ? "Request Too Large" : "Download as Shapefile"
-                )}
-              </DownloadButton>
-            )}
-          </ButtonRow>
-
         </>
       ) : (
         <NoDataParagraph>Loading filters...</NoDataParagraph>
       )}
 
       {canRenderLayerValueFiltering && (
-        <AccordionSection title="Layer value filtering" defaultValue={false}>
+        <AccordionSection title="Layer value filtering" defaultValue={true}>
           <ValueFilterSection>
             {isContinuousStyle && (
               <>
@@ -661,6 +698,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                   value={rangeSelection}
                   onChange={handleRangeFilterChange}
                   ariaLabel={`${activeLayerId} value range`}
+                  histogramBins={histogramBins}
                 />
               </>
             )}
@@ -707,6 +745,37 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
             )}
           </ValueFilterSection>
         </AccordionSection>
+      )}
+
+      {(downloadPath || downloadShapefilePath) && (
+        <ButtonRow>
+          {downloadPath && (
+            <DownloadButton
+              onClick={handleDownload}
+              $bgColor={bgColor}
+              disabled={isRequestTooLarge || isDownloading}
+            >
+              {isDownloading ? (
+                <>Downloading CSV <Spinner /></>
+              ) : (
+                isRequestTooLarge ? "Request Too Large" : "Download as CSV"
+              )}
+            </DownloadButton>
+          )}
+          {downloadShapefilePath && (
+            <DownloadButton
+              onClick={handleShapefileDownload}
+              $bgColor={bgColor}
+              disabled={isRequestTooLarge || isShapefileDownloading}
+            >
+              {isShapefileDownloading ? (
+                <>Downloading Shapefile <Spinner /></>
+              ) : (
+                isRequestTooLarge ? "Request Too Large" : "Download as Shapefile"
+              )}
+            </DownloadButton>
+          )}
+        </ButtonRow>
       )}
     </AccordionSection>
   );

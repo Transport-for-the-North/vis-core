@@ -38,4 +38,19 @@ describe("RangeSlider", () => {
 
     expect(onChange).toHaveBeenCalledWith([8, 10]);
   });
+
+  it("renders histogram bars when bins are supplied", () => {
+    render(
+      <RangeSlider
+        min={0}
+        max={10}
+        value={[2, 8]}
+        onChange={jest.fn()}
+        ariaLabel="Histogram range"
+        histogramBins={[1, 3, 2, 5, 1]}
+      />
+    );
+
+    expect(screen.getAllByTestId("histogram-bar")).toHaveLength(5);
+  });
 });

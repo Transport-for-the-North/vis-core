@@ -498,7 +498,12 @@ describe("SelectorSection component test", () => {
       </AppContext.Provider>
     );
 
-    await userEvent.click(screen.getByText("Layer value filtering"));
+    const layerValueFilteringToggle = screen.getByRole("button", {
+      name: "Layer value filtering",
+    });
+    if (layerValueFilteringToggle.getAttribute("aria-expanded") === "false") {
+      await userEvent.click(layerValueFilteringToggle);
+    }
     await userEvent.click(screen.getByTestId("mock-range-slider"));
 
     expect(mapDispatch).toHaveBeenCalledWith({
@@ -549,7 +554,12 @@ describe("SelectorSection component test", () => {
       </AppContext.Provider>
     );
 
-    await userEvent.click(screen.getByText("Layer value filtering"));
+    const layerValueFilteringToggle = screen.getByRole("button", {
+      name: "Layer value filtering",
+    });
+    if (layerValueFilteringToggle.getAttribute("aria-expanded") === "false") {
+      await userEvent.click(layerValueFilteringToggle);
+    }
     await userEvent.click(screen.getByLabelText("A"));
 
     expect(mapDispatch).toHaveBeenCalledWith({

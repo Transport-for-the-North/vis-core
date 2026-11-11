@@ -142,6 +142,7 @@ const Map = (props) => {
   
   // Keep track of previously selected features per layer
   const prevSelectedFeatures = useRef({});
+  const activeSelectionRef = useRef(null);
 
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
 
@@ -1035,6 +1036,7 @@ const Map = (props) => {
         // Get the top-most feature
         const feature = features[0];
         const layerId = feature.layer.id;
+        const selectedFeatureValue = getFeatureStateValue(feature);
 
         // Unset the 'selected' state of the previously selected feature for this layer
         if (prevSelectedFeatures.current[layerId]) {
@@ -1072,6 +1074,30 @@ const Map = (props) => {
         if (filter) {
           const value = feature.properties[filter.field];
 
+          activeSelectionRef.current = {
+            id: feature.id,
+            layerId,
+            source: feature.layer.source,
+            sourceLayer: feature.layer["source-layer"],
+            filter,
+            featureValue: selectedFeatureValue,
+          };
+
+          dispatch({
+            type: actionTypes.SET_SELECTED_FEATURES,
+            payload: [
+              {
+                type: "Feature",
+                id: feature.id,
+                properties: {
+                  name: feature.properties?.name,
+                  value: selectedFeatureValue,
+                },
+                layerId,
+              },
+            ],
+          });
+
           // Dispatch the action with the value from the clicked feature
           filterDispatch({
             type: "SET_FILTER_VALUE",
@@ -1100,10 +1126,65 @@ const Map = (props) => {
             delete prevSelectedFeatures.current[layerId];
           }
         });
+
+        activeSelectionRef.current = null;
+        dispatch({ type: actionTypes.SET_SELECTED_FEATURES, payload: [] });
       }
     },
     [isMapReady, map, memoizedFilters, dispatch, filterDispatch, isFeatureWithinConfiguredRange]
   );
+
+  // If the currently selected feature falls outside active layer value filters,
+  // clear that selection and reset the originating filter-driven params so
+  // dependent callouts refresh/hide with the filtered map state.
+  useEffect(() => {
+    if (!map) return;
+
+    const activeSelection = activeSelectionRef.current;
+    if (!activeSelection) return;
+
+    const layerConfig = state.layers?.[activeSelection.layerId];
+    if (!layerConfig) return;
+
+    const stillMatchesFilter = isValueMatchingFilter(
+      activeSelection.featureValue,
+      layerConfig.valueRangeFilter,
+      layerConfig.valueCategoryFilter
+    );
+
+    if (stillMatchesFilter) {
+      return;
+    }
+
+    if (map.getLayer(activeSelection.layerId)) {
+      map.setFeatureState(
+        {
+          source: activeSelection.source,
+          sourceLayer: activeSelection.sourceLayer,
+          id: activeSelection.id,
+        },
+        { selected: false }
+      );
+    }
+
+    delete prevSelectedFeatures.current[activeSelection.layerId];
+    activeSelectionRef.current = null;
+    dispatch({ type: actionTypes.SET_SELECTED_FEATURES, payload: [] });
+
+    if (activeSelection.filter?.id) {
+      filterDispatch({
+        type: "SET_FILTER_VALUE",
+        payload: { filterId: activeSelection.filter.id, value: null },
+      });
+
+      (activeSelection.filter.actions || []).forEach((action) => {
+        dispatch({
+          type: action.action,
+          payload: { filter: activeSelection.filter, value: null, ...action.payload },
+        });
+      });
+    }
+  }, [map, state.layers, dispatch, filterDispatch]);
 
   // **Create map hover/tap handler **
   useEffect(() => {
