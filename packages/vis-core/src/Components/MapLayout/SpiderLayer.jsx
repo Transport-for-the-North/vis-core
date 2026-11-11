@@ -63,10 +63,9 @@ function mirrorToOverlay(map, baseLayerId) {
       map.setLayoutProperty(linkLayerId, "visibility", vis);
     } catch {}
     const co = map.getPaintProperty(baseLayerId, "circle-opacity");
-    const fallback = Array.isArray(co) ? co[co.length - 1] : co;
-    if (fallback != null) {
+    if (co != null) {
       try {
-        map.setPaintProperty(linkLayerId, "line-opacity", fallback);
+        map.setPaintProperty(linkLayerId, "line-opacity", co);
       } catch {}
     }
   }

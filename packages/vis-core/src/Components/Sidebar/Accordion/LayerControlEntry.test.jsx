@@ -410,6 +410,39 @@ describe("LayerControlEntry component test", () => {
       });
     });
   });
+
+  it("does not render visible value range controls in map layer control", () => {
+    const testProps = {
+      ...props,
+      layer: {
+        ...props.layer,
+        metadata: {
+          ...props.layer.metadata,
+          isStylable: true,
+          colorStyle: "continuous",
+        },
+      },
+      state: {
+        ...props.state,
+        layers: {
+          id: {},
+        },
+      },
+    };
+
+    render(
+      <MapContext.Provider value={{ state: testProps.state, dispatch: jest.fn() }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry {...testProps} />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+
+    expect(screen.queryByText("Visible value range")).not.toBeInTheDocument();
+  });
+
   it("Test", () => {
     const mockMapContext = {
       state: {

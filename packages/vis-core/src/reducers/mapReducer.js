@@ -169,6 +169,8 @@ export const actionTypes = {
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
   UPDATE_CUSTOM_BANDS: "UPDATE_CUSTOM_BANDS",
   UPDATE_LAYER_WIDTH_FACTOR: "UPDATE_LAYER_WIDTH_FACTOR",
+  UPDATE_LAYER_VALUE_RANGE_FILTER: "UPDATE_LAYER_VALUE_RANGE_FILTER",
+  UPDATE_LAYER_VALUE_CATEGORY_FILTER: "UPDATE_LAYER_VALUE_CATEGORY_FILTER",
   UPDATE_METADATA_FILTER: "UPDATE_METADATA_FILTER",
   SET_METADATA_TABLES: "SET_METADATA_TABLES",
   SET_METADATA_ERROR: "SET_METADATA_ERROR",
@@ -472,6 +474,34 @@ export const mapReducer = (state, action) => {
           [layerName]: {
             ...state.layers[layerName],
             widthFactor,
+          },
+        },
+      };
+    }
+
+    case actionTypes.UPDATE_LAYER_VALUE_RANGE_FILTER: {
+      const { layerName, rangeFilter } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            valueRangeFilter: rangeFilter,
+          },
+        },
+      };
+    }
+
+    case actionTypes.UPDATE_LAYER_VALUE_CATEGORY_FILTER: {
+      const { layerName, categoryFilter } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            valueCategoryFilter: categoryFilter,
           },
         },
       };

@@ -23,6 +23,9 @@ import {
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
   resolveVisualisationUnit,
+  getFeatureStateValue,
+  isValueMatchingFilter,
+  applyValueFilterToExpression,
 } from "utils";
 import "./MapLayout.css";
 import { VisualisationManager } from "./VisualisationManager";
@@ -185,6 +188,16 @@ const DualMaps = (props) => {
   // Feature-state target of each side's clicked feature, so the next click can unselect it.
   const selectedFeatureRef = useRef({ left: null, right: null });
 
+  const getLayerRangeFilter = useCallback(
+    (layerId) => state.layers?.[layerId]?.valueRangeFilter ?? null,
+    [state.layers]
+  );
+
+  const getLayerCategoryFilter = useCallback(
+    (layerId) => state.layers?.[layerId]?.valueCategoryFilter ?? null,
+    [state.layers]
+  );
+
   /**
    * Generates HTML for metadata section of tooltips
    * @param {Object} properties - Feature properties object
@@ -326,11 +339,17 @@ const DualMaps = (props) => {
           const layerId = feature.layer.id;
           const layerConfig = state.layers[layerId];
           const shouldHaveHoverOnlyOnData = layerConfig?.shouldHaveHoverOnlyOnData ?? false;
-          const featureValue = feature.state.value;
+          const featureValue = getFeatureStateValue(feature);
+          const rangeFilter = layerConfig?.valueRangeFilter;
+          const categoryFilter = layerConfig?.valueCategoryFilter;
           
           // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
           if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
             return false; // Exclude this feature as it has no data
+          }
+
+          if (!isValueMatchingFilter(featureValue, rangeFilter, categoryFilter)) {
+            return false;
           }
           
           return true; // Include this feature
@@ -700,7 +719,13 @@ const DualMaps = (props) => {
 
       const features = map.queryRenderedFeatures(bufferedPoint, {
         layers: [layerId],
-      });
+      }).filter((feature) =>
+        isValueMatchingFilter(
+          getFeatureStateValue(feature),
+          getLayerRangeFilter(layerId),
+          getLayerCategoryFilter(layerId)
+        )
+      );
 
       if (features.length !== 0) {
         const coordinates = e.lngLat;
@@ -746,7 +771,7 @@ const DualMaps = (props) => {
         }
       });
     },
-    [maps]
+    [maps, state.layers]
   );
 
    /**
@@ -803,7 +828,12 @@ const DualMaps = (props) => {
                   'text-color': '#000000',  // Black text
                   'text-halo-color': '#ffffff',  // White halo for readability
                   'text-halo-width': 2.5,
-                  'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                  'text-opacity': applyValueFilterToExpression(
+                    labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                    state.layers[layerId]?.valueRangeFilter,
+                    state.layers[layerId]?.valueCategoryFilter,
+                    0
+                  ),
                 }
               });
             }
@@ -922,7 +952,15 @@ const DualMaps = (props) => {
         const featureBySide = {};
         SIDES.forEach((side) => {
           featureBySide[side] =
-            maps[side].queryRenderedFeatures(point, { layers: [filter.layer] })[0] ?? null;
+            maps[side]
+              .queryRenderedFeatures(point, { layers: [filter.layer] })
+              .filter((feature) =>
+                isValueMatchingFilter(
+                  getFeatureStateValue(feature),
+                  getLayerRangeFilter(filter.layer),
+                  getLayerCategoryFilter(filter.layer)
+                )
+              )[0] ?? null;
         });
 
         if (!featureBySide.left && !featureBySide.right) return;
@@ -959,7 +997,7 @@ const DualMaps = (props) => {
         });
       });
     },
-    [isMapReady, maps, state.filters, dispatch, filterDispatch]
+    [isMapReady, maps, state.filters, dispatch, filterDispatch, getLayerRangeFilter]
   );
 
   // Run once to set the state of the map

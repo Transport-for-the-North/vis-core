@@ -28,6 +28,8 @@ import {
   insertCustomIntoDefault,
   resolveTooltipRequestUrl,
   resolveVisualisationUnit,
+  isValueMatchingFilter,
+  applyValueFilterToExpression,
 } from "utils";
 import "./MapLayout.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -141,8 +143,36 @@ const Map = (props) => {
   
   // Keep track of previously selected features per layer
   const prevSelectedFeatures = useRef({});
+  const activeSelectionRef = useRef(null);
 
   const memoizedFilters = useMemo(() => state.filters, [state.filters]);
+
+  const getLayerRangeFilter = useCallback(
+    (rawLayerId) => {
+      const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
+      return state.layers?.[layerId]?.valueRangeFilter ?? null;
+    },
+    [state.layers]
+  );
+
+  const getLayerCategoryFilter = useCallback(
+    (rawLayerId) => {
+      const layerId = resolveBaseLayerIdFromSpiderLayerId(rawLayerId);
+      return state.layers?.[layerId]?.valueCategoryFilter ?? null;
+    },
+    [state.layers]
+  );
+
+  const isFeatureWithinConfiguredRange = useCallback(
+    (feature) => {
+      if (!feature?.layer?.id) return false;
+      const rangeFilter = getLayerRangeFilter(feature.layer.id);
+      const categoryFilter = getLayerCategoryFilter(feature.layer.id);
+      const featureValue = getFeatureStateValue(feature);
+      return isValueMatchingFilter(featureValue, rangeFilter, categoryFilter);
+    },
+    [getLayerRangeFilter, getLayerCategoryFilter]
+  );
 
   const lastTouchTimeRef = useRef(0);
 
@@ -159,7 +189,9 @@ const Map = (props) => {
         .filter((id) => map.getLayer(id));
 
       if (filterLayers.length) {
-        const hits = map.queryRenderedFeatures(point, { layers: filterLayers });
+        const hits = map
+          .queryRenderedFeatures(point, { layers: filterLayers })
+          .filter(isFeatureWithinConfiguredRange);
         if (hits.length) return hits[0]; // top-most feature on a filter layer
       }
 
@@ -170,13 +202,15 @@ const Map = (props) => {
           map.getLayer(id)
       );
       if (otherLayers.length) {
-        const hits = map.queryRenderedFeatures(point, { layers: otherLayers });
+        const hits = map
+          .queryRenderedFeatures(point, { layers: otherLayers })
+          .filter(isFeatureWithinConfiguredRange);
         if (hits.length) return hits[0];
       }
 
       return null;
     },
-    [map, memoizedFilters, state.layers]
+    [map, memoizedFilters, state.layers, isFeatureWithinConfiguredRange]
   );
 
   // **Draw control logic
@@ -405,10 +439,16 @@ const Map = (props) => {
         
         // Safely get feature value - feature.state may be null or undefined
         const featureValue = getFeatureStateValue(feature);
+        const rangeFilter = layerConfig.valueRangeFilter;
+        const categoryFilter = layerConfig.valueCategoryFilter;
         
         // If this layer has shouldHaveHoverOnlyOnData enabled, only include features with data
         if (shouldHaveHoverOnlyOnData && (featureValue === null || featureValue === undefined)) {
           return false; // Exclude this feature as it has no data
+        }
+
+        if (!isValueMatchingFilter(featureValue, rangeFilter, categoryFilter)) {
+          return false;
         }
         
         return true; // Include this feature
@@ -796,10 +836,11 @@ const Map = (props) => {
     const feature = map.queryRenderedFeatures(bufferdPoint, {
       layers: [layerId],
     });
-    if (feature.length !== 0) {
+    const inRangeFeature = feature.find(isFeatureWithinConfiguredRange);
+    if (inRangeFeature) {
       const coordinates = e.lngLat;
-      const description = `<p>${feature[0].properties.name ?? ""}</p><p> Id: ${feature[0].properties.id}</p><p>Value: ${
-          feature[0].state.value ?? 0
+      const description = `<p>${inRangeFeature.properties.name ?? ""}</p><p> Id: ${inRangeFeature.properties.id}</p><p>Value: ${
+          inRangeFeature.state.value ?? 0
         }</p>`;
       const newPopup = new maplibregl.Popup({ closeOnClick: false })
         .setLngLat(coordinates)
@@ -828,7 +869,7 @@ const Map = (props) => {
         );
       }
     },
-    [map]
+    [map, state.layers]
   );
 
   /**
@@ -883,7 +924,12 @@ const Map = (props) => {
                 'text-color': '#000000',  // Black text
                 'text-halo-color': '#ffffff',  // White halo for readability
                 'text-halo-width': 2.5,
-                'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                'text-opacity': applyValueFilterToExpression(
+                  labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                  state.layers[layerId]?.valueRangeFilter,
+                  state.layers[layerId]?.valueCategoryFilter,
+                  0
+                ),
               }
             });
           }
@@ -973,14 +1019,17 @@ const Map = (props) => {
       const layerNames = mapFilters.map((filter) => filter.layer);
 
       // Query for features from all layers specified in mapFilters
-      const features = map.queryRenderedFeatures(point, {
-        layers: layerNames,
-      });
+      const features = (
+        map.queryRenderedFeatures(point, {
+          layers: layerNames,
+        }) || []
+      ).filter(isFeatureWithinConfiguredRange);
 
       if (features && features.length > 0) {
         // Get the top-most feature
         const feature = features[0];
         const layerId = feature.layer.id;
+        const selectedFeatureValue = getFeatureStateValue(feature);
 
         // Unset the 'selected' state of the previously selected feature for this layer
         if (prevSelectedFeatures.current[layerId]) {
@@ -1018,6 +1067,30 @@ const Map = (props) => {
         if (filter) {
           const value = feature.properties[filter.field];
 
+          activeSelectionRef.current = {
+            id: feature.id,
+            layerId,
+            source: feature.layer.source,
+            sourceLayer: feature.layer["source-layer"],
+            filter,
+            featureValue: selectedFeatureValue,
+          };
+
+          dispatch({
+            type: actionTypes.SET_SELECTED_FEATURES,
+            payload: [
+              {
+                type: "Feature",
+                id: feature.id,
+                properties: {
+                  name: feature.properties?.name,
+                  value: selectedFeatureValue,
+                },
+                layerId,
+              },
+            ],
+          });
+
           // Dispatch the action with the value from the clicked feature
           filterDispatch({
             type: "SET_FILTER_VALUE",
@@ -1046,10 +1119,65 @@ const Map = (props) => {
             delete prevSelectedFeatures.current[layerId];
           }
         });
+
+        activeSelectionRef.current = null;
+        dispatch({ type: actionTypes.SET_SELECTED_FEATURES, payload: [] });
       }
     },
-    [isMapReady, map, memoizedFilters, dispatch, filterDispatch]
+    [isMapReady, map, memoizedFilters, dispatch, filterDispatch, isFeatureWithinConfiguredRange]
   );
+
+  // If the currently selected feature falls outside active layer value filters,
+  // clear that selection and reset the originating filter-driven params so
+  // dependent callouts refresh/hide with the filtered map state.
+  useEffect(() => {
+    if (!map) return;
+
+    const activeSelection = activeSelectionRef.current;
+    if (!activeSelection) return;
+
+    const layerConfig = state.layers?.[activeSelection.layerId];
+    if (!layerConfig) return;
+
+    const stillMatchesFilter = isValueMatchingFilter(
+      activeSelection.featureValue,
+      layerConfig.valueRangeFilter,
+      layerConfig.valueCategoryFilter
+    );
+
+    if (stillMatchesFilter) {
+      return;
+    }
+
+    if (map.getLayer(activeSelection.layerId)) {
+      map.setFeatureState(
+        {
+          source: activeSelection.source,
+          sourceLayer: activeSelection.sourceLayer,
+          id: activeSelection.id,
+        },
+        { selected: false }
+      );
+    }
+
+    delete prevSelectedFeatures.current[activeSelection.layerId];
+    activeSelectionRef.current = null;
+    dispatch({ type: actionTypes.SET_SELECTED_FEATURES, payload: [] });
+
+    if (activeSelection.filter?.id) {
+      filterDispatch({
+        type: "SET_FILTER_VALUE",
+        payload: { filterId: activeSelection.filter.id, value: null },
+      });
+
+      (activeSelection.filter.actions || []).forEach((action) => {
+        dispatch({
+          type: action.action,
+          payload: { filter: activeSelection.filter, value: null, ...action.payload },
+        });
+      });
+    }
+  }, [map, state.layers, dispatch, filterDispatch]);
 
   // **Create map hover/tap handler **
   useEffect(() => {
