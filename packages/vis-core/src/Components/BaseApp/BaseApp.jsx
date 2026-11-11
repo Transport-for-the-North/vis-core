@@ -142,25 +142,31 @@ const BrandGlobalStyles = createGlobalStyle`
   }
 `;
 
-function RoleAwareAppContextProvider({
-  appConfig,
-  appName,
-  isAuthRequired,
-  children,
-}) {
+/**
+ * Provides AppContext with the role-dependent parts of the config (admin-only pages and
+ * the Admin nav link) derived from the current user's roles. It sits inside AuthProvider
+ * and re-derives whenever the auth token changes, so logging in or out updates the
+ * navbar without a page reload — BaseApp itself does not re-render on login/logout.
+ *
+ * @param {Object} props
+ * @param {Object} props.appConfig - The loaded app config
+ * @param {string} props.appName - The application name
+ * @param {boolean} props.isAuthRequired - Whether the app requires authentication
+ * @param {React.ReactNode} props.children - The app content
+ * @returns {JSX.Element} The AppContext provider
+ */
+function RoleAwareAppContextProvider({ appConfig, appName, isAuthRequired, children }) {
   const { token } = useAuth();
 
   const contextValue = useMemo(() => {
     const normalisedAppName = (appName || "").toLowerCase();
-    const isAdmin =
-      !isAuthRequired ||
-      isAppAdmin(normalisedAppName) ||
-      isAppSuperuser(normalisedAppName);
-
+    const isAdmin = !isAuthRequired || isAppAdmin(normalisedAppName) || isAppSuperuser(normalisedAppName);
+    // Filter visible app pages based on role authorization
     const visibleAppPages = (appConfig.appPages ?? []).filter(
       (page) => !page.adminOnly || isAdmin,
     );
 
+  // Pre-compute the complete list of renderable navigation links
     const navbarLinks = buildNavbarLinks({
       ...appConfig,
       appPages: visibleAppPages,
@@ -180,13 +186,25 @@ function RoleAwareAppContextProvider({
     };
   }, [appConfig, appName, isAuthRequired, token]);
 
-  return (
-    <AppContext.Provider value={contextValue}>
-      {children}
-    </AppContext.Provider>
-  );
+  return ( <AppContext.Provider value={contextValue}>{children} </AppContext.Provider>);
 }
 
+/**
+ * Base application component that can be used across all TfN apps.
+ * Handles dynamic config loading, routing, and authentication.
+ * 
+ * @param {Object} props
+ * @param {Object} props.theme - Styled-components theme object
+ * @param {Function} props.configLoader - Function that returns config modules
+ * @param {Function} props.bandsLoader - Function that returns bands modules
+ * @param {string} props.appName - The application name (from VITE_APP_NAME env variable)
+ * @param {string} [props.appCssClass="App"] - Optional CSS class for the app wrapper
+ * @param {JSX.Element} [props.customRoutes=null] - Optional additional Route components to inject into the router
+ * @param {Function} [props.customProviders=null] - Optional function that wraps the app content with custom context providers
+ * @param {JSX.Element} [props.beforeDashboard=null] - Optional content to render before the Dashboard component
+ * @param {JSX.Element} [props.afterDashboard=null] - Optional content to render after the Dashboard component
+ * @returns {JSX.Element} The rendered application component
+ */
 function BaseAppContent({
   theme,
   configLoader,
@@ -266,6 +284,13 @@ function BaseAppContent({
   }, [appConfig, isAuthRequired]);
 
   useEffect(() => {
+    /**
+     * Dynamically imports the appConfig based on the provided appName.
+     * Uses import.meta.glob to ensure Vite bundles all possible configs in production.
+     * @function loadAppConfig
+     * @async
+     */
+
     if (isPublicRoute) {
       return;
     }
@@ -276,6 +301,7 @@ function BaseAppContent({
           throw new Error("appName prop is required");
         }
 
+        // Get config modules from the app-specific loader
         const configModules = configLoader();
         const bandModules = bandsLoader();
 
@@ -289,15 +315,13 @@ function BaseAppContent({
         const configModule = await configModules[configPath]();
         const initialAppConfig = configModule.appConfig;
 
-        const bands = await loadBands({
-          bandModules,
-          bandsPath,
-          appName,
-        });
+        // Load bands with fallback logic.
+        // Uses the shared loader, which is tolerant and returns [] if the module
+        // is missing/invalid/throws.
+        const bands = await loadBands({ bandModules, bandsPath, appName });
 
         const apiSchema = await api.metadataService.getSwaggerFile();
-        const authenticationRequired =
-          initialAppConfig.authenticationRequired ?? true;
+        const authenticationRequired = initialAppConfig.authenticationRequired ?? true;
 
         const adminPageEntry =
           initialAppConfig.appPages?.find(
@@ -326,11 +350,6 @@ function BaseAppContent({
           error,
         );
 
-        if (error?.status === 401) {
-          window.location.assign("/login");
-          return;
-        }
-
         dispatch({
           type: errorActionTypes.SET_ERROR,
           payload: normaliseStartupError(error),
@@ -344,7 +363,6 @@ function BaseAppContent({
   if (isPublicRoute) {
     return (
       <div className={appCssClass}>
-        <AuthProvider>
           <ThemeProvider theme={effectiveTheme}>
             <BrandGlobalStyles />
             <Routes>
@@ -355,7 +373,6 @@ function BaseAppContent({
               />
             </Routes>
           </ThemeProvider>
-        </AuthProvider>
       </div>
     );
   }
@@ -367,35 +384,21 @@ function BaseAppContent({
   const standardRoutes = (
     <>
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/unauthorized"
-        element={<Unauthorized />}
-      />
-      <Route
-        path="/"
-        element={<HomePageWithRoleValidation />}
-      />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/" element={<HomePageWithRoleValidation />} />
 
-      {appConfig.adminPage && (
-        <Route
-          path="/admin"
-          element={<AdminPageWithAuth />}
-        />
+      {appConfig.adminPage && ( <Route path="/admin" element={<AdminPageWithAuth />} />
       )}
 
       {pageRoutes}
       {customRoutes}
 
-      <Route
-        path="*"
-        element={<NotFoundWithRoleValidation />}
-      />
+      <Route path="*" element={<NotFoundWithRoleValidation />} />
     </>
   );
 
   const appContent = (
     <div className={appCssClass}>
-      <AuthProvider>
         <ThemeProvider theme={effectiveTheme}>
           <BrandGlobalStyles />
           <RoleAwareAppContextProvider
@@ -412,7 +415,6 @@ function BaseAppContent({
             {afterDashboard}
           </RoleAwareAppContextProvider>
         </ThemeProvider>
-      </AuthProvider>
     </div>
   );
 
@@ -426,7 +428,9 @@ function BaseAppContent({
 export function BaseApp(props) {
   return (
     <ErrorProvider>
+      <AuthProvider>
       <BaseAppContent {...props} />
+      </AuthProvider>
     </ErrorProvider>
   );
 }
