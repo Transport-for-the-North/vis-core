@@ -1026,8 +1026,6 @@ const calculateLineWidth = (bins, functionType, binValue) => {
 
   let width;
 
-  console.log(functionType);
-
   if (functionType === "root") {
     // get maximum value and normalise each value  
     const maxAbs = Math.max(...bins.map(b => Math.abs(b)));

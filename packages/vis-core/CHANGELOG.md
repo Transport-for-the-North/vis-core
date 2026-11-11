@@ -1,3 +1,40 @@
+# [0.15.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.14.0...v0.15.0) (2026-10-26)
+
+
+### Bug Fixes
+
+* add clear bounds dispatch on side-by-side maps to counter stale values. ([66b21f0](https://github.com/Transport-for-the-North/vis-core/commit/66b21f003ff447ef743093235576934474059438))
+* cookie banner mobile/tablet amends ([c00c0b7](https://github.com/Transport-for-the-North/vis-core/commit/c00c0b7ad05aff9355c650afe674faf835c05329))
+* enforced 2x2 layout for small card rows and repaired fullscreen styles ([#352](https://github.com/Transport-for-the-North/vis-core/issues/352)) ([b600d6d](https://github.com/Transport-for-the-North/vis-core/commit/b600d6d941f10e69152d13a5d50ac30e90c8a000))
+* initialize empty filter state and set readiness on no-filter pages to prevent continuous loading loop in MapLayout ([#344](https://github.com/Transport-for-the-North/vis-core/issues/344)) ([8473c7f](https://github.com/Transport-for-the-North/vis-core/commit/8473c7fa57c0f34914b5da4b4381b710668bb9cd))
+* layer.missingParams block reinstated, as it was causing non-renders of visualisations on side-by-side. ([b6036c5](https://github.com/Transport-for-the-North/vis-core/commit/b6036c512a053751dcd31ee3041c366ed68fb8a8))
+* **map:** clean up responsive layout listeners on useMap unmount ([25b58fb](https://github.com/Transport-for-the-North/vis-core/commit/25b58fb5e2514dfd73ab99f0c062ee8776138907))
+* **map:** preserve application layers and replay feature state ([10a66dd](https://github.com/Transport-for-the-North/vis-core/commit/10a66dd55db25a000a2d8058f31a6bfe4592aeed))
+* **map:** prevent NaN in hex color inversion for dark mode ([25daff4](https://github.com/Transport-for-the-North/vis-core/commit/25daff4d4c76b492635b17e18242ef9de3c8d2b4))
+* mapReducer allows both-sides params for dual map parameterised layer ([6beb749](https://github.com/Transport-for-the-North/vis-core/commit/6beb749e43ab57838077f298bb186deaf02a6379))
+* **map:** retain explicit colour-scheme selections ([ada238c](https://github.com/Transport-for-the-North/vis-core/commit/ada238ceadfc683b6f55dcb29d53f5434a79415d))
+* only mark metadata filters ready for true no-filter pages ([#346](https://github.com/Transport-for-the-North/vis-core/issues/346)) ([e222a2a](https://github.com/Transport-for-the-North/vis-core/commit/e222a2a5f65017584a1c2dd1d9838c2fd77eebd2))
+* removed a hardcoded value and replaced with a token ([#337](https://github.com/Transport-for-the-North/vis-core/issues/337)) ([7462ad9](https://github.com/Transport-for-the-North/vis-core/commit/7462ad914a2a3bdb125e309e641de272ed3cd12d))
+* removed laptop logout padding, restore stretch for 7+ items, and… ([#338](https://github.com/Transport-for-the-North/vis-core/issues/338)) ([5e5174f](https://github.com/Transport-for-the-North/vis-core/commit/5e5174fd0d263056a6aad18d91e805ad7832808a))
+* **sidebar:** identify configured application map layers ([4d878a3](https://github.com/Transport-for-the-North/vis-core/commit/4d878a3e8def239c7bb2a07cff8d1d47f50112f4))
+* support AppContext policy link and footer manage-cookies reopen flow ([7669877](https://github.com/Transport-for-the-North/vis-core/commit/76698779aa4902cab2cde9de4507078adff41bd8))
+* update admin nav link and admin-only pages on login/logout ([443878f](https://github.com/Transport-for-the-North/vis-core/commit/443878f9faf7eaceb9ad1adf1d767e1b62618dd7))
+
+
+### Features
+
+* Add metadata and pre-submit slot to upload ([#343](https://github.com/Transport-for-the-North/vis-core/issues/343)) ([6c83126](https://github.com/Transport-for-the-North/vis-core/commit/6c8312680ab3ced62f90784be54719085713e205))
+* allow e.g. api/norms/vectortiles to search and pan to features. ([a608c6b](https://github.com/Transport-for-the-North/vis-core/commit/a608c6bb262abe464c0aee826889a310f9f4d53b))
+* allow for left/right visualisations to have individual endpoints. ([ff80f22](https://github.com/Transport-for-the-North/vis-core/commit/ff80f2268b0ce67592e39ca8ab308cc8924c5bca))
+* GeoJSON styling without matching tile layer ([#350](https://github.com/Transport-for-the-North/vis-core/issues/350)) ([af6532c](https://github.com/Transport-for-the-North/vis-core/commit/af6532c8aa6196e3d3ddd3b8ef88d85d43051123))
+* implemented app-wide cookie consent banner and separated analytics consent from ToU ([3a38752](https://github.com/Transport-for-the-North/vis-core/commit/3a38752b291976a89936116d6cb4c70ccd0b5e91))
+* **layers:** define boundary theme and opacity behaviour ([4dd5eee](https://github.com/Transport-for-the-North/vis-core/commit/4dd5eee903bc36c5dbb83b55737f8c371f3aa9ab))
+* **map:** add explicit light and dark base-map selection ([f34bd51](https://github.com/Transport-for-the-North/vis-core/commit/f34bd518640581b79100ec9114e3b6568794490a))
+* **map:** disable dark mode toggle by default in map layouts ([fc8cd49](https://github.com/Transport-for-the-North/vis-core/commit/fc8cd4924e3ff343ac4567cf75b54a1810f396b7))
+* **map:** support bold font layout policy for base-map place labels ([4df7fc5](https://github.com/Transport-for-the-North/vis-core/commit/4df7fc581dc10f53027c15c461d4bbc12a8c1415))
+* pan and centre for dual maps for zone filtering on side-by-side maps. ([45b0eef](https://github.com/Transport-for-the-North/vis-core/commit/45b0eef8c4a89944cef8a8c70b665054746abfe2))
+* refined cookie consent UX with a overlay ([6ea33cb](https://github.com/Transport-for-the-North/vis-core/commit/6ea33cbe502d7b2b9353d6c3764cdc51dfa37072))
+
 # [0.14.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.13.0...v0.14.0) (2026-10-01)
 
 
