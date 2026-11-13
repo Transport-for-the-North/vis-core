@@ -28,6 +28,7 @@ const mockMapContext = {
     maps: [
       {
         getLayer: jest.fn(),
+        getLayoutProperty: jest.fn(),
         removeLayer: jest.fn(),
         removeSource: jest.fn(),
         getSource: jest.fn(),
