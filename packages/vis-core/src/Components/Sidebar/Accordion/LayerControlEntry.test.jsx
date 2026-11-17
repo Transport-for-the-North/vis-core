@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act, cleanup } from "@testing-library/react";
 import { LayerControlEntry } from "Components/Sidebar/Accordion/LayerControlEntry";
 import { AppContext, MapContext, PageContext } from "contexts";
 
@@ -640,6 +640,117 @@ describe("LayerControlEntry component test", () => {
       "line-opacity",
       0.7
     );
+  });
+});
+
+describe("LayerControlEntry band editor", () => {
+  /** A fill-color ramp over the given bins, as MapVisualisation paints it. */
+  const colourRamp = (bins) => [
+    "interpolate",
+    ["linear"],
+    ["feature-state", "value"],
+    ...bins.flatMap((bin, i) => [bin, `#00000${i}`]),
+  ];
+
+  /** A map whose fill-color can be repainted and whose styledata listeners can be fired. */
+  const makeLiveMap = (bins) => {
+    let fillColour = colourRamp(bins);
+    const listeners = new Set();
+    return {
+      getLayer: jest.fn(() => true),
+      getPaintProperty: jest.fn((_id, prop) => (prop === "fill-color" ? fillColour : 0.5)),
+      on: jest.fn((event, fn) => event === "styledata" && listeners.add(fn)),
+      off: jest.fn((event, fn) => event === "styledata" && listeners.delete(fn)),
+      repaint: (newBins) => {
+        fillColour = colourRamp(newBins);
+        listeners.forEach((fn) => fn());
+      },
+    };
+  };
+
+  const renderEntry = ({ map, layerState = { class_method: "q" } }) => {
+    const dispatch = jest.fn();
+    const state = {
+      visualisations: {
+        id: {
+          id: "id",
+          style: "polygon-continuous",
+          queryParams: {},
+          data: [{ value: 10 }, { value: 20 }, { value: 30 }],
+        },
+      },
+      layers: { id: layerState },
+    };
+    render(
+      <MapContext.Provider value={{ state, dispatch }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry
+              {...props}
+              handleCustomBandsChange={jest.fn()}
+              layer={{
+                id: "id",
+                type: "fill",
+                layout: { visibility: "visible" },
+                metadata: { isStylable: true },
+              }}
+              maps={[map]}
+              state={state}
+            />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+    return { dispatch };
+  };
+
+  const bandValues = () =>
+    screen.getAllByRole("spinbutton").map((input) => Number(input.value));
+
+  it("shows the bins the map is painted with, and follows a restyle", async () => {
+    const map = makeLiveMap([0, 10, 20, 30, 40]);
+    renderEntry({ map });
+
+    expect(bandValues()).toEqual([0, 10, 20, 30, 40]);
+
+    act(() => map.repaint([0, 15, 30]));
+
+    await waitFor(() => expect(bandValues()).toEqual([0, 15, 30]));
+  });
+
+  it("stops listening for restyles when unmounted", () => {
+    const map = makeLiveMap([0, 10, 20]);
+    renderEntry({ map });
+    cleanup();
+
+    expect(map.off).toHaveBeenCalledWith("styledata", expect.any(Function));
+  });
+
+  it("dispatches the new band count, not custom bands, for a non-custom method", () => {
+    const map = makeLiveMap([0, 10, 20, 30, 40]);
+    const { dispatch } = renderEntry({ map });
+
+    // Two comboboxes: the classification method, then the number of bands.
+    const countSelect = screen.getAllByRole("combobox").at(-1);
+    fireEvent.change(countSelect, { target: { value: "3" } });
+    fireEvent.click(screen.getByRole("button", { name: "Update" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_BAND_COUNT",
+      payload: { bandCount: 3, layerName: "id" },
+    });
+  });
+
+  it("clears a chosen band count on Reset", () => {
+    const map = makeLiveMap([0, 10, 20]);
+    const { dispatch } = renderEntry({ map, layerState: { class_method: "q", bandCount: 3 } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_BAND_COUNT",
+      payload: { bandCount: null, layerName: "id" },
+    });
   });
 });
 

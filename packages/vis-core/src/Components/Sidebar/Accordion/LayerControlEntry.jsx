@@ -186,6 +186,60 @@ const SectionDivider = styled.hr`
 `;
 
 /**
+ * Reads the classification bins a layer is currently painted with, straight from the map.
+ *
+ * The bins are the stop inputs of the colour ramp:
+ * ["interpolate", ["linear"], ["feature-state", <field>], bin1, out1, bin2, out2, ...].
+ *
+ * @param {maplibregl.Map} map - The map the layer is drawn on.
+ * @param {Object} layer - The layer ({ id, type }).
+ * @returns {number[]|null} The bins, or null when the layer has no banded ramp.
+ */
+const readBinsFromMap = (map, layer) => {
+  if (!map?.getLayer?.(layer.id)) return null;
+
+  const readPaint = (prop) => {
+    try {
+      return map.getPaintProperty(layer.id, prop);
+    } catch {
+      return undefined;
+    }
+  };
+
+  const colorProp = { line: "line-color", circle: "circle-color", fill: "fill-color" }[layer.type];
+  const colorExpression = colorProp ? readPaint(colorProp) : undefined;
+  const binExpression =
+    Array.isArray(colorExpression) && colorExpression[0] === "interpolate"
+      ? colorExpression
+      : layer.type === "line"
+        ? readPaint("line-width")
+        : undefined;
+
+  if (!Array.isArray(binExpression) || binExpression[0] !== "interpolate") return null;
+
+  const stops = binExpression.slice(3);
+  const bins = [];
+  for (let i = 0; i < stops.length; i += 2) {
+    bins.push(stops[i]);
+  }
+  return bins.length > 0 ? bins : null;
+};
+
+/**
+ * Whether two bin arrays hold the same values in the same order.
+ *
+ * @param {number[]|null} a
+ * @param {number[]|null} b
+ * @returns {boolean}
+ */
+const binsAreEqual = (a, b) =>
+  a === b ||
+  (Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === b.length &&
+    a.every((value, i) => value === b[i]));
+
+/**
  * LayerControlEntry component represents a single layer control entry in the map layer control panel.
  *
  * @component
@@ -466,11 +520,28 @@ export const LayerControlEntry = memo(
     const canEditBands = bandEditorData.length >= 2 || hasExistingCustomBands;
 
     const customBandsFromState = state.layers?.[layer.id]?.customBands;
+    const bandCountFromState = state.layers?.[layer.id]?.bandCount ?? null;
+
+    // Bins the layer is painted with right now, read from the map. `layer.paint` can't be
+    // used: MapLayerSection keeps the same `layer` object while only its paint changes, so
+    // it goes stale after a restyle (new method, new band count). Re-read whenever the
+    // map's style changes; state only changes when the bins actually do.
+    const [liveBins, setLiveBins] = useState(() => readBinsFromMap(maps[0], layer));
+    useEffect(() => {
+      const map = maps[0];
+      const refresh = () => {
+        const bins = readBinsFromMap(map, layer);
+        setLiveBins((prev) => (binsAreEqual(prev, bins) ? prev : bins));
+      };
+      refresh();
+      if (typeof map?.on !== "function") return undefined;
+      map.on("styledata", refresh);
+      return () => map.off?.("styledata", refresh);
+    }, [maps, layer]);
 
     // Extract current bins for BandEditor.
-    // Prefer the canonical state-driven custom bands (when in custom mode), because
-    // the `layer.paint` object often doesn't update in lockstep with runtime map
-    // paint changes and can lead to the editor snapping back after the first update.
+    // Prefer the canonical state-driven custom bands (when in custom mode), so the editor
+    // shows exactly what the user typed rather than a re-read of the paint.
     const currentBins = useMemo(() => {
       if (currentClassMethod === "c") {
         if (
@@ -481,45 +552,8 @@ export const LayerControlEntry = memo(
         }
       }
 
-      if (!maps.length || !maps[0].getLayer(layer.id)) {
-        return defaultBandValues || [0, 1, 2, 3, 4];
-      }
-
-      const paintProps = layer.paint;
-      const colorExpression =
-        paintProps?.["line-color"] ||
-        paintProps?.["circle-color"] ||
-        paintProps?.["fill-color"];
-
-      // Diverging line layers colour by sign alone -- a "case" expression carrying no
-      // stops -- and hold their bands in the width ramp instead. Read that when the
-      // colour ramp has no stops to offer, otherwise the editor can never reflect the
-      // live classification on those layers and silently shows the configured defaults.
-      const binExpression =
-        Array.isArray(colorExpression) && colorExpression[0] === "interpolate"
-          ? colorExpression
-          : paintProps?.["line-width"];
-
-      if (!Array.isArray(binExpression) || binExpression[0] !== "interpolate") {
-        return defaultBandValues || [0, 1, 2, 3, 4];
-      }
-
-      // ["interpolate", ["linear"], ["feature-state", <field>], bin1, out1, bin2, out2, ...]
-      const stops = binExpression.slice(3);
-      const bins = [];
-      for (let i = 0; i < stops.length; i += 2) {
-        bins.push(stops[i]);
-      }
-
-      return bins.length > 0 ? bins : defaultBandValues || [0, 1, 2, 3, 4];
-    }, [
-      currentClassMethod,
-      customBandsFromState,
-      maps,
-      layer.id,
-      layer.paint,
-      defaultBandValues,
-    ]);
+      return liveBins ?? defaultBandValues ?? [0, 1, 2, 3, 4];
+    }, [currentClassMethod, customBandsFromState, liveBins, defaultBandValues]);
 
     // Diverging line layers are banded on magnitude (width by absolute value, colour by
     // sign), so the editor mirrors those bands about the first one to show the full range.
@@ -891,6 +925,13 @@ export const LayerControlEntry = memo(
                 isDiverging={colorStyle === "diverging"}
                 isSymmetric={isLineDiverging}
                 isCustom={currentClassMethod === "c"}
+                onBandCountChange={(bandCount) => {
+                  mapDispatch?.({
+                    type: actionTypes.UPDATE_BAND_COUNT,
+                    payload: { bandCount, layerName: layer.id },
+                  });
+                }}
+                hasBandCount={bandCountFromState !== null}
                 data={bandEditorData}
                 defaultBandValues={defaultBandValues || null}
                 onReset={() => {
