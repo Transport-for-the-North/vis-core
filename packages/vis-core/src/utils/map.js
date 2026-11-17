@@ -922,6 +922,49 @@ export const resetPaintProperty = (style) => {
 }
 
 /**
+ * Fits a fixed list of band values to a requested band count, without reclassifying.
+ *
+ * Used for the "Default" classification, whose bands come from app config and so cannot
+ * be recomputed from the data. The configured values are always the source: shrinking
+ * trims them and growing restores them, then pads with made-up values spaced by 1.
+ * Continuous bands are trimmed/padded at the top end. Diverging bands are trimmed/padded
+ * at both ends so the scale stays centred on its midpoint.
+ *
+ * @param {number[]} values - The configured band values.
+ * @param {number} count - The number of bands wanted.
+ * @param {Object} [options]
+ * @param {boolean} [options.diverging=false] - Trim/pad both ends instead of the top end only.
+ * @returns {number[]} A new array of exactly `count` band values.
+ */
+export const fitBandsToCount = (values, count, { diverging = false } = {}) => {
+  const source = Array.isArray(values) ? values : [];
+  if (!Number.isInteger(count) || count < 1 || count === source.length) {
+    return [...source];
+  }
+
+  const diff = Math.abs(count - source.length);
+
+  if (!diverging) {
+    if (count < source.length) return source.slice(0, count);
+    const last = source.length ? source[source.length - 1] : 0;
+    return [...source, ...Array.from({ length: diff }, (_, i) => last + i + 1)];
+  }
+
+  const lower = Math.floor(diff / 2);
+  const upper = diff - lower;
+  if (count < source.length) {
+    return source.slice(lower, source.length - upper);
+  }
+  const first = source.length ? source[0] : 0;
+  const last = source.length ? source[source.length - 1] : 0;
+  return [
+    ...Array.from({ length: lower }, (_, i) => first - (lower - i)),
+    ...source,
+    ...Array.from({ length: upper }, (_, i) => last + i + 1),
+  ];
+};
+
+/**
  * Reclassifies data based on the specified style and rounds the values to ensure
  * that successive rounded values are not identical.
  * @function reclassifyData
@@ -932,6 +975,7 @@ export const resetPaintProperty = (style) => {
  * @param {Object} currentPage - The current page configuration.
  * @param {Object} queryParams - Query parameters from the visualisation.
  * @param {Object} options - Additional options, e.g., { bandMetricName: 'trse' }
+ * @param {number} [options.bandCount] - Number of bands the user asked for.
  * @returns {Array.<number>} The different breaks we want for the data we have.
  */
 export const reclassifyData = (
@@ -950,6 +994,12 @@ export const reclassifyData = (
     console.warn("reclassifyData received non-array data; returning no bins.", data);
     return [];
   }
+
+  // A user-chosen band count, or null to keep each method's natural count.
+  const bandCount =
+    Number.isInteger(options.bandCount) && options.bandCount >= 2
+      ? options.bandCount
+      : null;
 
   /**
    * Normalises continuous-classification bins so the scale starts at zero.
@@ -1042,7 +1092,8 @@ export const reclassifyData = (
       if (metric?.values?.length) {
         // Return explicit band values as-is; the user configured these intentionally
         // (e.g. values: [5, 20, 40, 60, 80]) and normalising to 0 would discard that.
-        return metric.values;
+        // A chosen band count trims or pads them rather than reclassifying.
+        return bandCount ? fitBandsToCount(metric.values, bandCount) : metric.values;
       }
       // Fallback to page-level defaultClassification if specified, otherwise quantile.
       // A display-mode entry that only defines difference bands lands here for continuous
@@ -1055,32 +1106,39 @@ export const reclassifyData = (
 
     let unroundedBins;
 
-    // Apply the appropriate classification method
+    // Apply the appropriate classification method. Each call below yields `bandCount`
+    // values (lower bounds) when one is chosen; the literals are each method's natural count.
     switch (classificationMethod) {
-      case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(values, 8);
+      case "j": // Jenks Natural Breaks (returns numClasses values)
+        unroundedBins = jenksBreaks(values, bandCount ?? 8);
         break;
-      
+
       case "s": // Standard Deviation
-        unroundedBins = standardDeviationBreaks(values, 7);
+        unroundedBins = standardDeviationBreaks(values, bandCount ?? 7);
         break;
-      
-      case "h": // Head/Tail Breaks
+
+      case "h": // Head/Tail Breaks 
         unroundedBins = headTailBreaks(values);
         break;
-      
+
       case "q": // Quantile
       case "l": // Logarithmic
       case "k": // K-means
       default:
         // Use chroma for these methods
-        unroundedBins = [...new Set(chroma.limits(values, classificationMethod, 8))];
+        unroundedBins = [
+          ...new Set(chroma.limits(values, classificationMethod, (bandCount ?? 9) - 1)),
+        ];
         break;
     }
 
     let roundedBins = [...new Set(roundValues(unroundedBins, 2))];
     if (classificationMethod === "l") {
       roundedBins = roundedBins.map(replaceZeroPointValues);
+    }
+
+    if (bandCount) {
+      roundedBins = roundedBins.slice(0, bandCount);
     }
     return normaliseContinuousBins(roundedBins);
   } else if (style.includes("categorical")) {
@@ -1113,9 +1171,14 @@ export const reclassifyData = (
       // Use getMetricDefinition to get the appropriate metric definition
       const metric = getMetricDefinition(defaultBands, currentPage, queryParams, options);
       if (metric?.differenceValues?.length) {
+        // A chosen band count trims or pads the configured values at both ends, keeping
+        // them centred, rather than reclassifying. Line layers then keep the upper half.
+        const differenceValues = bandCount
+          ? fitBandsToCount(metric.differenceValues, bandCount, { diverging: true })
+          : metric.differenceValues;
         return !style.includes("line")
-          ? metric.differenceValues
-          : metric.differenceValues.slice(metric.differenceValues.length / 2);
+          ? differenceValues
+          : differenceValues.slice(differenceValues.length / 2);
       }
       // Fallback to page-level defaultClassification if specified, otherwise quantile.
       // A display-mode entry with no difference bands is classified from the data rather
@@ -1126,29 +1189,35 @@ export const reclassifyData = (
       absValues = absValues.map(replaceZeroValues);
     }
 
+    // Bands are classified on magnitude, then mirrored about zero. `perSide` is how many
+    // bands sit above zero: 4 naturally (9 in total), or (bandCount - 1) / 2 when chosen.
+    const perSide = bandCount ? Math.max(1, Math.floor((bandCount - 1) / 2)) : 4;
+    // Standard deviation and head/tail produce some breaks that are later dropped (zero,
+    // the low end), so they are asked for more than `perSide`; 6 at the natural 4 per side.
+    const overSample = Math.max(perSide, 2 * perSide - 2);
+
     let unroundedBins;
 
     // Apply the appropriate classification method
     switch (classificationMethod) {
       case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(absValues, 4);
+        unroundedBins = jenksBreaks(absValues, perSide);
         break;
-      
+
       case "s": // Standard Deviation
-        unroundedBins = standardDeviationBreaks(absValues, 6);
+        unroundedBins = standardDeviationBreaks(absValues, overSample);
         break;
-      
+
       case "h": // Head/Tail Breaks
         unroundedBins = headTailBreaks(absValues);
-        // Limit to 3 classes for diverging
-        unroundedBins = unroundedBins.slice(0, Math.min(6, unroundedBins.length));
+        unroundedBins = unroundedBins.slice(0, Math.min(overSample, unroundedBins.length));
         break;
-      
+
       case "q": // Quantile
       case "l": // Logarithmic
       case "k": // K-means
       default:
-        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, 4))];
+        unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, perSide))];
         break;
     }
 
@@ -1157,8 +1226,8 @@ export const reclassifyData = (
       roundedBins = roundedBins.map(replaceZeroPointValues);
     }
     roundedBins = roundedBins.filter((value) => value !== 0);
-    roundedBins = [...new Set(roundedBins)]; 
-    roundedBins = roundedBins.slice(-4);  
+    roundedBins = [...new Set(roundedBins)];
+    roundedBins = roundedBins.slice(-perSide);
     if (style.includes("line")) return [0, ...roundedBins];
     const negativeBins = roundedBins.slice().reverse().map((val) => -val);
     return [...negativeBins, 0, ...roundedBins];
