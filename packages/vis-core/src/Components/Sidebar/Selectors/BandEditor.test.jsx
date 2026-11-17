@@ -110,6 +110,50 @@ describe("BandEditor number of bands", () => {
   });
 });
 
+describe("BandEditor preview of a reclassification", () => {
+  it("shows the real preview and keeps it after Update", () => {
+    const previewBandsForCount = jest.fn(() => [0, 5, 15, 45, 90]);
+    const { onBandCountChange } = renderEditor({ previewBandsForCount });
+
+    setCount(5);
+    expect(previewBandsForCount).toHaveBeenCalledWith(5);
+    expect(bandValues()).toEqual([0, 5, 15, 45, 90]);
+
+    clickUpdate();
+    expect(onBandCountChange).toHaveBeenCalledWith(5);
+    expect(bandValues()).toEqual([0, 5, 15, 45, 90]);
+  });
+
+  it("sends the picked count when the method gives fewer bands", () => {
+    const { onBandCountChange } = renderEditor({
+      previewBandsForCount: () => [0, 20, 60],
+    });
+
+    setCount(6);
+    expect(screen.getByRole("combobox")).toHaveValue("6");
+    expect(bandValues()).toEqual([0, 20, 60]);
+
+    clickUpdate();
+    expect(onBandCountChange).toHaveBeenCalledWith(6);
+  });
+
+  it("falls back to trimming when there is no preview", () => {
+    renderEditor({ previewBandsForCount: () => null });
+
+    setCount(5);
+    expect(bandValues()).toEqual([0, 10, 20, 30, 40]);
+  });
+
+  it("does not preview for the custom method", () => {
+    const previewBandsForCount = jest.fn(() => [0, 5, 15, 45, 90]);
+    renderEditor({ isCustom: true, previewBandsForCount });
+
+    setCount(5);
+    expect(previewBandsForCount).not.toHaveBeenCalled();
+    expect(bandValues()).toEqual([0, 10, 20, 30, 40]);
+  });
+});
+
 describe("BandEditor reset", () => {
   it("clears a chosen band count on a non-custom reset", () => {
     const { onBandCountChange, onReset } = renderEditor({ hasBandCount: true });

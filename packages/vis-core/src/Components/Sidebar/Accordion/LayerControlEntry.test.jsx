@@ -1,6 +1,7 @@
 import { render, screen, waitFor, fireEvent, act, cleanup } from "@testing-library/react";
 import { LayerControlEntry } from "Components/Sidebar/Accordion/LayerControlEntry";
 import { AppContext, MapContext, PageContext } from "contexts";
+import { reclassifyData } from "utils/map";
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -668,7 +669,11 @@ describe("LayerControlEntry band editor", () => {
     };
   };
 
-  const renderEntry = ({ map, layerState = { class_method: "q" } }) => {
+  const renderEntry = ({
+    map,
+    layerState = { class_method: "q" },
+    data = [{ value: 10 }, { value: 20 }, { value: 30 }],
+  }) => {
     const dispatch = jest.fn();
     const state = {
       visualisations: {
@@ -676,7 +681,7 @@ describe("LayerControlEntry band editor", () => {
           id: "id",
           style: "polygon-continuous",
           queryParams: {},
-          data: [{ value: 10 }, { value: 20 }, { value: 30 }],
+          data,
         },
       },
       layers: { id: layerState },
@@ -739,6 +744,26 @@ describe("LayerControlEntry band editor", () => {
       type: "UPDATE_BAND_COUNT",
       payload: { bandCount: 3, layerName: "id" },
     });
+  });
+
+  it("previews the values the method will produce at the new count", () => {
+    const data = Array.from({ length: 20 }, (_, i) => ({ value: (i + 1) * 10 }));
+    const map = makeLiveMap([0, 10, 20, 30, 40]);
+    renderEntry({ map, data });
+
+    fireEvent.change(screen.getAllByRole("combobox").at(-1), { target: { value: "3" } });
+
+    const expected = reclassifyData(
+      data,
+      "polygon-continuous",
+      "q",
+      mockAppContexte.defaultBands,
+      mockPageContext,
+      {},
+      { bandCount: 3 }
+    );
+    expect(expected).toHaveLength(3);
+    expect(bandValues()).toEqual(expected);
   });
 
   it("clears a chosen band count on Reset", () => {

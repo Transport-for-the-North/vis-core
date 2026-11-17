@@ -140,6 +140,7 @@ const BandCountLabel = styled.span`
  * @param {boolean} [props.isCustom] - Whether the current classification method is custom.
  * @param {Function} [props.onBandCountChange] - Count-change callback; null restores natural count.
  * @param {boolean} [props.hasBandCount] - Whether a band count is chosen.
+ * @param {Function} [props.previewBandsForCount] - Count → bands the method will produce, or null.
  * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
  *
@@ -160,6 +161,7 @@ export const BandEditor = ({
   onReset = null,
   onBandCountChange = null,
   hasBandCount = false,
+  previewBandsForCount = null,
   showLabel = true,
   ..._unusedProps
 }) => {
@@ -168,6 +170,8 @@ export const BandEditor = ({
   const [hasChanges, setHasChanges] = useState(false);
   // Whether a band value was typed since sync.
   const [valuesEdited, setValuesEdited] = useState(false);
+  const [pendingCount, setPendingCount] = useState(null);
+  const [hasRealPreview, setHasRealPreview] = useState(false);
 
   /**
    * Synchronize local band state with incoming bands prop.
@@ -177,6 +181,8 @@ export const BandEditor = ({
     setLocalBands(bands);
     setHasChanges(false);
     setValuesEdited(false);
+    setPendingCount(null);
+    setHasRealPreview(false);
   }, [bands]);
 
   /**
@@ -229,6 +235,8 @@ export const BandEditor = ({
     setLocalBands(newBands);
     setHasChanges(true);
     setValuesEdited(true);
+    setPendingCount(null);
+    setHasRealPreview(false);
   };
 
   /**
@@ -240,7 +248,17 @@ export const BandEditor = ({
    */
   const handleBandCountChange = (e) => {
     const count = Number(e.target.value);
-    setLocalBands(fitBandsToCount(localBands, count, { diverging: isDiverging }));
+    // Under a non-custom method, show what the method will really produce at this count.
+    const preview =
+      shouldReclassify && typeof previewBandsForCount === "function"
+        ? previewBandsForCount(count)
+        : null;
+    const hasPreview = Array.isArray(preview) && preview.length > 0;
+    setLocalBands(
+      hasPreview ? preview : fitBandsToCount(localBands, count, { diverging: isDiverging })
+    );
+    setPendingCount(shouldReclassify ? count : null);
+    setHasRealPreview(hasPreview);
     setHasChanges(true);
   };
 
@@ -255,9 +273,13 @@ export const BandEditor = ({
    */
   const handleUpdate = () => {
     if (shouldReclassify) {
-      onBandCountChange(localBands.length);
-      // Clear preview in case bands never change.
-      setLocalBands(bands);
+      onBandCountChange(pendingCount ?? localBands.length);
+      // Keep a real preview until the new bins arrive; drop a trim/pad fallback in case
+      // bands never change.
+      if (!hasRealPreview) {
+        setLocalBands(bands);
+        setPendingCount(null);
+      }
       setHasChanges(false);
       return;
     }
@@ -272,8 +294,10 @@ export const BandEditor = ({
   const bandStep = isDiverging ? 2 : 1;
   const bandCounts = [];
   for (let n = minBands; n <= maxBands; n += bandStep) bandCounts.push(n);
-  if (!bandCounts.includes(localBands.length)) {
-    bandCounts.push(localBands.length);
+  // The picked count, which a method may not fully produce.
+  const selectedCount = pendingCount ?? localBands.length;
+  if (!bandCounts.includes(selectedCount)) {
+    bandCounts.push(selectedCount);
     bandCounts.sort((a, b) => a - b);
   }
 
@@ -297,6 +321,8 @@ export const BandEditor = ({
     setLocalBands(bands);
     setHasChanges(false);
     setValuesEdited(false);
+    setPendingCount(null);
+    setHasRealPreview(false);
     if (hasBandCount && typeof onBandCountChange === "function") {
       onBandCountChange(null);
     }
@@ -309,7 +335,7 @@ export const BandEditor = ({
         <BandHeader>
           <BandCountLabel>Number of bands:</BandCountLabel>
           <BandCountSelect
-            value={localBands.length}
+            value={selectedCount}
             onChange={handleBandCountChange}
           >
             {bandCounts.map((n) => (

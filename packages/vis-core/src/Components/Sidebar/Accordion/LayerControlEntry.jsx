@@ -19,6 +19,7 @@ import {
   applyWidthFactor,
   updateOpacityExpression,
   getMetricDefinition,
+  reclassifyData,
 } from "utils/map";
 import { getVisualisationDisplayMode } from "utils/displayMode";
 
@@ -375,9 +376,11 @@ export const LayerControlEntry = memo(
     const selectedMetricParamName = currentPage.config.filters.find(
       (filter) => filter.containsLegendInfo === true
     );
-    const visualisation =
+    const isSideBySidePage =
       currentPage.pageName.includes("Side-by-Side") ||
-      currentPage.pageName.includes("Side by Side")
+      currentPage.pageName.includes("Side by Side");
+    const visualisation =
+      isSideBySidePage
         ? state.leftVisualisations[Object.keys(state.leftVisualisations)[0]]
         : state.visualisations[Object.keys(state.visualisations)[0]];
 
@@ -566,6 +569,59 @@ export const LayerControlEntry = memo(
           : currentBins,
       [isLineDiverging, currentBins]
     );
+
+    /**
+     * Previews the bins the current (non-custom) method will produce at a new band count,
+     * by calling reclassifyData with the same inputs MapVisualisation styles the map with.
+     * Dual maps classify left and right data together, as the map does.
+     *
+     * @param {number} bandCount - The band count being previewed, as shown in the editor.
+     * @returns {number[]|null} The bins in editor form, or null when there is nothing to
+     *   classify (the editor then falls back to trimming/padding).
+     */
+    const previewBandsForCount = (bandCount) => {
+      const visualisationKey = isSideBySidePage
+        ? Object.keys(state.leftVisualisations ?? {})[0]
+        : null;
+      const toArray = (data) => (Array.isArray(data) ? data : []);
+      const data = isSideBySidePage
+        ? [
+            ...toArray(state.leftVisualisations?.[visualisationKey]?.data),
+            ...toArray(state.rightVisualisations?.[visualisationKey]?.data),
+          ]
+        : toArray(visualisation?.data);
+      if (!data.length || !visualisation?.style) return null;
+
+      // Dynamically styled visualisations hold only the geometry; the map resolves the
+      // colour style, which this entry already knows as `colorStyle`.
+      const style = visualisation.style.includes("-")
+        ? visualisation.style
+        : `${visualisation.style}-${colorStyle}`;
+
+      try {
+        const bins = reclassifyData(
+          data,
+          style,
+          currentClassMethod,
+          appConfig.defaultBands,
+          currentPage,
+          visualisation.queryParams,
+          {
+            bandMetricName: state.layers?.[layer.id]?.bandMetricName,
+            customBands: customBandsFromState,
+            bandCount,
+            defaultClassification: visualisation.defaultClassification,
+            displayMode,
+          }
+        );
+        if (!Array.isArray(bins) || bins.length === 0) return null;
+        return isLineDiverging
+          ? [...bins.slice(1).reverse().map((v) => -v), ...bins]
+          : bins;
+      } catch {
+        return null;
+      }
+    };
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -932,6 +988,7 @@ export const LayerControlEntry = memo(
                   });
                 }}
                 hasBandCount={bandCountFromState !== null}
+                previewBandsForCount={previewBandsForCount}
                 data={bandEditorData}
                 defaultBandValues={defaultBandValues || null}
                 onReset={() => {
