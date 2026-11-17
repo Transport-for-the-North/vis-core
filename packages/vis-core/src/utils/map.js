@@ -2,8 +2,9 @@ import { roundToSignificantFigures } from "./math";
 import chroma from "chroma-js";
 import { 
   jenksBreaks, 
-  standardDeviationBreaks, 
-  headTailBreaks
+  standardDeviationBreaks,
+  headTailBreaks,
+  kMeansBreaks
 } from './classificationMethods';
 
 export const TOWN_CITY_LABEL_LAYER_IDS = [
@@ -1117,13 +1118,16 @@ export const reclassifyData = (
         unroundedBins = standardDeviationBreaks(values, bandCount ?? 7);
         break;
 
-      case "h": // Head/Tail Breaks 
+      case "h": // Head/Tail Breaks
         unroundedBins = headTailBreaks(values);
+        break;
+
+      case "k": // K-means
+        unroundedBins = kMeansBreaks(values, bandCount ?? 9);
         break;
 
       case "q": // Quantile
       case "l": // Logarithmic
-      case "k": // K-means
       default:
         // Use chroma for these methods
         unroundedBins = [
@@ -1192,8 +1196,8 @@ export const reclassifyData = (
     // Bands are classified on magnitude, then mirrored about zero. `perSide` is how many
     // bands sit above zero: 4 naturally (9 in total), or (bandCount - 1) / 2 when chosen.
     const perSide = bandCount ? Math.max(1, Math.floor((bandCount - 1) / 2)) : 4;
-    // Standard deviation and head/tail produce some breaks that are later dropped (zero,
-    // the low end), so they are asked for more than `perSide`; 6 at the natural 4 per side.
+    // Head/tail produces some breaks that are later dropped (zero, the low end), so it is
+    // cut at more than `perSide`; 6 at the natural 4 per side.
     const overSample = Math.max(perSide, 2 * perSide - 2);
 
     let unroundedBins;
@@ -1201,11 +1205,15 @@ export const reclassifyData = (
     // Apply the appropriate classification method
     switch (classificationMethod) {
       case "j": // Jenks Natural Breaks
-        unroundedBins = jenksBreaks(absValues, perSide);
+        unroundedBins = jenksBreaks(absValues, perSide + 1);
         break;
 
       case "s": // Standard Deviation
-        unroundedBins = standardDeviationBreaks(absValues, overSample);
+        unroundedBins = standardDeviationBreaks(absValues, perSide + 1);
+        break;
+
+      case "k": // K-means
+        unroundedBins = kMeansBreaks(absValues, perSide + 1);
         break;
 
       case "h": // Head/Tail Breaks
@@ -1215,7 +1223,6 @@ export const reclassifyData = (
 
       case "q": // Quantile
       case "l": // Logarithmic
-      case "k": // K-means
       default:
         unroundedBins = [...new Set(chroma.limits(absValues, classificationMethod, perSide))];
         break;

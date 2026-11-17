@@ -388,20 +388,42 @@ describe("reclassifyData bandCount", () => {
   const classify = (data, style, method, options = {}) =>
     reclassifyData(data, style, method, [], {}, {}, options);
 
-  describe("continuous", () => {
-    it.each(["q", "e", "j"])(
-      "method %s returns exactly the chosen number of bands, starting at 0",
-      (method) => {
-        [3, 5, 7].forEach((bandCount) => {
-          const bins = classify(continuousData, "polygon-continuous", method, { bandCount });
-          expect(bins).toHaveLength(bandCount);
-          expect(bins[0]).toBe(0);
-        });
-      }
-    );
+  // Skewed like real transport data: most values low, a long tail of high ones. This is
+  // what broke chroma's k-means and the old standard deviation breaks.
+  let seed = 1;
+  const random = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+  const skewedValues = Array.from({ length: 2000 }, () =>
+    Math.round(Math.exp(random() * 3 + random() * 3 + random() * 2))
+  );
+  const skewedData = skewedValues.map((value, id) => ({ id, value }));
+  // Same magnitudes with mixed signs, and some zeros (no change).
+  const skewedDivergingData = skewedValues.map((value, id) => ({
+    id,
+    value: id % 10 === 0 ? 0 : id % 2 === 0 ? -value : value,
+  }));
 
-    // K-means can merge classes on evenly spread data, so it is not guaranteed a full set.
-    it.each(["l", "k", "s", "h"])(
+  describe("continuous", () => {
+    describe.each([
+      ["evenly spread", continuousData],
+      ["skewed", skewedData],
+    ])("%s data", (_label, data) => {
+      it.each(["q", "e", "j", "k", "s"])(
+        "method %s returns exactly the chosen number of bands, starting at 0",
+        (method) => {
+          [3, 4, 5, 6, 7, 9].forEach((bandCount) => {
+            const bins = classify(data, "polygon-continuous", method, { bandCount });
+            expect(bins).toHaveLength(bandCount);
+            expect(bins[0]).toBe(0);
+            bins.slice(1).forEach((value, i) => expect(value).toBeGreaterThan(bins[i]));
+          });
+        }
+      );
+    });
+
+    it.each(["l", "h"])(
       "method %s never returns more than the chosen number of bands",
       (method) => {
         [2, 4, 6].forEach((bandCount) => {
@@ -416,6 +438,7 @@ describe("reclassifyData bandCount", () => {
       ["q", 9],
       ["e", 9],
       ["j", 8],
+      ["k", 9],
       ["s", 7],
     ])("method %s at its natural count (%i) matches the output with no bandCount", (method, n) => {
       expect(
@@ -432,38 +455,38 @@ describe("reclassifyData bandCount", () => {
   });
 
   describe("diverging", () => {
-    it.each(["q", "e"])(
-      "method %s returns the chosen odd count, mirrored about a 0 midpoint",
-      (method) => {
-        [3, 5, 7, 9].forEach((bandCount) => {
-          const bins = classify(divergingData, "polygon-diverging", method, { bandCount });
-          expect(bins).toHaveLength(bandCount);
-          const mid = (bandCount - 1) / 2;
-          expect(bins[mid]).toBe(0);
-          bins.forEach((value, i) => {
-            expect(value).toBeCloseTo(-bins[bins.length - 1 - i]);
+    describe.each([
+      ["evenly spread", divergingData],
+      ["skewed, with zeros", skewedDivergingData],
+    ])("%s data", (_label, data) => {
+      it.each(["q", "e", "j", "k", "s"])(
+        "method %s returns the chosen odd count, mirrored about a 0 midpoint",
+        (method) => {
+          [3, 5, 7, 9].forEach((bandCount) => {
+            const bins = classify(data, "polygon-diverging", method, { bandCount });
+            expect(bins).toHaveLength(bandCount);
+            const mid = (bandCount - 1) / 2;
+            expect(bins[mid]).toBe(0);
+            bins.forEach((value, i) => {
+              expect(value).toBeCloseTo(-bins[bins.length - 1 - i]);
+            });
           });
-        });
-      }
-    );
+        }
+      );
+    });
 
-    // jenksBreaks returns a duplicate of the minimum as its second break, which is then
-    // de-duplicated away, so diverging Jenks can come back short of the chosen count.
-    it.each(["j", "s", "h"])(
-      "method %s keeps the 0 midpoint and never exceeds the chosen count",
-      (method) => {
-        [3, 5, 7].forEach((bandCount) => {
-          const bins = classify(divergingData, "polygon-diverging", method, { bandCount });
-          expect(bins.length).toBeLessThanOrEqual(bandCount);
-          expect(bins[(bins.length - 1) / 2]).toBe(0);
-          bins.forEach((value, i) => {
-            expect(value).toBeCloseTo(-bins[bins.length - 1 - i]);
-          });
+    it("head/tail keeps the 0 midpoint and never exceeds the chosen count", () => {
+      [3, 5, 7].forEach((bandCount) => {
+        const bins = classify(divergingData, "polygon-diverging", "h", { bandCount });
+        expect(bins.length).toBeLessThanOrEqual(bandCount);
+        expect(bins[(bins.length - 1) / 2]).toBe(0);
+        bins.forEach((value, i) => {
+          expect(value).toBeCloseTo(-bins[bins.length - 1 - i]);
         });
-      }
-    );
+      });
+    });
 
-    it.each(["q", "e", "j", "s", "h"])(
+    it.each(["q", "e", "j", "k", "s", "h"])(
       "method %s at 9 bands matches the output with no bandCount",
       (method) => {
         expect(
