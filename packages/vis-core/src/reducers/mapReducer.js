@@ -685,8 +685,20 @@ export const mapReducer = (state, action) => {
     case actionTypes.SET_DATA_REQUESTED:
       return { ...state, dataRequested: action.payload };
 
-      case actionTypes.SET_NO_DATA_RETURNED:
-        return { ...state, noDataReturned: action.payload };
+    case actionTypes.SET_NO_DATA_RETURNED: {
+      const { key, value } = action.payload;
+      const noDataVisualisations = { ...state.noDataVisualisations };
+      if (value) {
+        noDataVisualisations[key] = true;
+      } else {
+        delete noDataVisualisations[key];
+      }
+      return {
+        ...state,
+        noDataVisualisations,
+        noDataReturned: Object.keys(noDataVisualisations).length > 0,
+      };
+    }
 
     case actionTypes.SET_MAP: {
       const { map } = action.payload;
