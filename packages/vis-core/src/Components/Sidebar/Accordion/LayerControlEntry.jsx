@@ -623,6 +623,22 @@ export const LayerControlEntry = memo(
       }
     };
 
+    // Head/Tail Breaks decides its own band count from the data
+    const maxBandCount = useMemo(
+      () => (currentClassMethod === "h" ? previewBandsForCount(null)?.length ?? null : null),
+      [
+        currentClassMethod,
+        visualisation,
+        state.leftVisualisations,
+        state.rightVisualisations,
+        isSideBySidePage,
+        colorStyle,
+        currentPage,
+        displayMode,
+        isLineDiverging,
+      ]
+    );
+
     /**
      * Toggle both the layer and its label layer visibility across all maps.
      *
@@ -989,6 +1005,7 @@ export const LayerControlEntry = memo(
                 }}
                 hasBandCount={bandCountFromState !== null}
                 previewBandsForCount={previewBandsForCount}
+                maxBandCount={maxBandCount}
                 data={bandEditorData}
                 defaultBandValues={defaultBandValues || null}
                 onReset={() => {

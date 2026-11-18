@@ -777,5 +777,39 @@ describe("LayerControlEntry band editor", () => {
       payload: { bandCount: null, layerName: "id" },
     });
   });
+
+  const disabledCounts = () =>
+    [...screen.getAllByRole("combobox").at(-1).options]
+      .filter((option) => option.disabled)
+      .map((option) => Number(option.value));
+
+  it("disables counts above what Head/Tail Breaks can give for the data", () => {
+    const data = [0, 2, 5, 10, 20, 40, 80, 900, 1000, 1005, 1010].map((value) => ({ value }));
+    const natural = reclassifyData(
+      data,
+      "polygon-continuous",
+      "h",
+      mockAppContexte.defaultBands,
+      mockPageContext,
+      {},
+      {}
+    );
+    const map = makeLiveMap(natural);
+    renderEntry({ map, data, layerState: { class_method: "h" } });
+
+    expect(natural.length).toBeLessThan(9);
+    expect(disabledCounts()).toEqual(
+      Array.from({ length: 9 - natural.length }, (_, i) => natural.length + 1 + i)
+    );
+    expect(screen.getByText(`This method gives at most ${natural.length} bands for this data.`))
+      .toBeInTheDocument();
+  });
+
+  it("disables no counts for methods that can give any count", () => {
+    const data = Array.from({ length: 20 }, (_, i) => ({ value: (i + 1) * 10 }));
+    renderEntry({ map: makeLiveMap([0, 10, 20, 30, 40]), data });
+
+    expect(disabledCounts()).toEqual([]);
+  });
 });
 

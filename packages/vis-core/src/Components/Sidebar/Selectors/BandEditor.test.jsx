@@ -190,3 +190,36 @@ describe("BandEditor reset", () => {
     expect(onBandCountChange).not.toHaveBeenCalled();
   });
 });
+
+describe("BandEditor count limit", () => {
+  const optionStates = () =>
+    [...screen.getByRole("combobox").options].map((option) => [
+      Number(option.value),
+      option.disabled,
+    ]);
+
+  it("disables counts above the method's limit and says why", () => {
+    renderEditor({ bands: [0, 10, 20, 30, 40, 50, 60], maxBandCount: 7 });
+
+    expect(optionStates()).toEqual([
+      [2, false], [3, false], [4, false], [5, false], [6, false], [7, false],
+      [8, true], [9, true],
+    ]);
+    expect(screen.getByText("This method gives at most 7 bands for this data."))
+      .toBeInTheDocument();
+  });
+
+  it("ignores the limit for custom bands, which can be any count", () => {
+    renderEditor({ bands: [0, 10, 20], maxBandCount: 3, isCustom: true });
+
+    expect(optionStates().some(([, disabled]) => disabled)).toBe(false);
+    expect(screen.queryByText(/gives at most/)).not.toBeInTheDocument();
+  });
+
+  it("shows no hint when the limit allows every count", () => {
+    renderEditor({ maxBandCount: 9 });
+
+    expect(optionStates().some(([, disabled]) => disabled)).toBe(false);
+    expect(screen.queryByText(/gives at most/)).not.toBeInTheDocument();
+  });
+});

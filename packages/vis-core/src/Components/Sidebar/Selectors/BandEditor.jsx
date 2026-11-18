@@ -126,6 +126,12 @@ const BandCountLabel = styled.span`
   font-weight: 500;
 `;
 
+const BandCountHint = styled.div`
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: #666;
+`;
+
 /**
  * BandEditor component allows users to customize classification band values for map layers.
  * Provides an interface to edit the number of bands and their individual threshold values.
@@ -141,6 +147,7 @@ const BandCountLabel = styled.span`
  * @param {Function} [props.onBandCountChange] - Count-change callback; null restores natural count.
  * @param {boolean} [props.hasBandCount] - Whether a band count is chosen.
  * @param {Function} [props.previewBandsForCount] - Count → bands the method will produce, or null.
+ * @param {number} [props.maxBandCount] - Most bands the method can give; higher counts are disabled.
  * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
  *
@@ -162,6 +169,7 @@ export const BandEditor = ({
   onBandCountChange = null,
   hasBandCount = false,
   previewBandsForCount = null,
+  maxBandCount = null,
   showLabel = true,
   ..._unusedProps
 }) => {
@@ -300,6 +308,11 @@ export const BandEditor = ({
     bandCounts.push(selectedCount);
     bandCounts.sort((a, b) => a - b);
   }
+  // Only for reclassifying methods that cap the count (Head/Tail Breaks).
+  const countLimit =
+    shouldReclassify && Number.isInteger(maxBandCount) && maxBandCount >= minBands
+      ? maxBandCount
+      : null;
 
   const handleResetBands = () => {
     // If the current classification is custom, delegate to parent so it can restore
@@ -339,10 +352,19 @@ export const BandEditor = ({
             onChange={handleBandCountChange}
           >
             {bandCounts.map((n) => (
-              <option key={n} value={n}>{n}</option>
+              <option
+                key={n}
+                value={n}
+                disabled={countLimit !== null && n > countLimit && n !== selectedCount}
+              >
+                {n}
+              </option>
             ))}
           </BandCountSelect>
         </BandHeader>
+        {countLimit !== null && countLimit < bandCounts[bandCounts.length - 1] && (
+          <BandCountHint>This method gives at most {countLimit} bands for this data.</BandCountHint>
+        )}
       </BandMetaContainer>
       {validation.error && (
         <ErrorMessage>{validation.error}</ErrorMessage>
