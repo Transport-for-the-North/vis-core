@@ -623,14 +623,20 @@ export const LayerControlEntry = memo(
       }
     };
 
-    // Head/Tail Breaks decides its own band count from the data
-    const maxBandCount = useMemo(
-      () => (currentClassMethod === "h" ? previewBandsForCount(null)?.length ?? null : null),
+    // Band count with none chosen, so the editor keeps offering it (e.g. 11 configured
+    // values). Only Default (cheap: configured values) and Head/Tail need it.
+    const naturalBandCount = useMemo(
+      () =>
+        ["d", "h"].includes(currentClassMethod)
+          ? previewBandsForCount(null)?.length ?? null
+          : null,
       [
         currentClassMethod,
         visualisation,
         state.leftVisualisations,
         state.rightVisualisations,
+        state.layers?.[layer.id]?.bandMetricName,
+        appConfig.defaultBands,
         isSideBySidePage,
         colorStyle,
         currentPage,
@@ -638,6 +644,8 @@ export const LayerControlEntry = memo(
         isLineDiverging,
       ]
     );
+    // Head/Tail Breaks decides its own band count from the data
+    const maxBandCount = currentClassMethod === "h" ? naturalBandCount : null;
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -1006,6 +1014,7 @@ export const LayerControlEntry = memo(
                 hasBandCount={bandCountFromState !== null}
                 previewBandsForCount={previewBandsForCount}
                 maxBandCount={maxBandCount}
+                naturalBandCount={naturalBandCount}
                 data={bandEditorData}
                 defaultBandValues={defaultBandValues || null}
                 onReset={() => {

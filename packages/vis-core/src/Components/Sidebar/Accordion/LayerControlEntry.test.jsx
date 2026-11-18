@@ -673,13 +673,15 @@ describe("LayerControlEntry band editor", () => {
     map,
     layerState = { class_method: "q" },
     data = [{ value: 10 }, { value: 20 }, { value: 30 }],
+    style = "polygon-continuous",
+    appContext = mockAppContexte,
   }) => {
     const dispatch = jest.fn();
     const state = {
       visualisations: {
         id: {
           id: "id",
-          style: "polygon-continuous",
+          style,
           queryParams: {},
           data,
         },
@@ -689,7 +691,7 @@ describe("LayerControlEntry band editor", () => {
     render(
       <MapContext.Provider value={{ state, dispatch }}>
         <PageContext.Provider value={mockPageContext}>
-          <AppContext.Provider value={mockAppContexte}>
+          <AppContext.Provider value={appContext}>
             <LayerControlEntry
               {...props}
               handleCustomBandsChange={jest.fn()}
@@ -803,6 +805,29 @@ describe("LayerControlEntry band editor", () => {
     );
     expect(screen.getByText(`This method gives at most ${natural.length} bands for this data.`))
       .toBeInTheDocument();
+  });
+
+  it("keeps offering all 11 configured Default bands after showing fewer", () => {
+    const eleven = [-500, -250, -50, -10, -1, 0, 1, 10, 50, 250, 500];
+    const appContext = {
+      ...mockAppContexte,
+      defaultBands: [
+        { name: "pageName", metric: [{ name: "demand", differenceValues: eleven }] },
+      ],
+    };
+    // The map is painted with 7 after choosing 7; the dropdown must still reach 11.
+    const map = makeLiveMap([-250, -50, -10, 0, 10, 50, 250]);
+    renderEntry({
+      map,
+      style: "polygon-diverging",
+      appContext,
+      layerState: { class_method: "d", bandCount: 7, bandMetricName: "demand" },
+    });
+
+    const counts = [...screen.getAllByRole("combobox").at(-1).options].map((o) =>
+      Number(o.value)
+    );
+    expect(counts.at(-1)).toBe(11);
   });
 
   it("disables no counts for methods that can give any count", () => {
