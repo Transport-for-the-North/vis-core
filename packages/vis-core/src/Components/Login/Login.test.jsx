@@ -2,7 +2,14 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { Login } from "Components/Login";
 import { useAuth } from "contexts/AuthProvider";
+import { AppContext } from "contexts/AppContext";
 import { useNavigate } from "react-router-dom";
+
+// The TfN defaults. Apps that set no login keys must keep seeing exactly these.
+const DEFAULT_LOGIN_LOGO_IMAGE = "/img/tfn-logo-fullsize.png";
+const DEFAULT_LOGIN_LOGO_ALT = "Transport for the North";
+const DEFAULT_LOGIN_TEXT =
+  "Log in to Transport for the North to continue to the Appraisal Platform.";
 import userEvent from "@testing-library/user-event";
 import { Unauthorized } from "Components/Login";
 
@@ -100,6 +107,57 @@ describe("Login component test", () => {
         screen.getByText("Invalid username or password")
       ).toBeInTheDocument();
     });
+  });
+
+  it("shows the default TfN logo and text when the app config sets none", () => {
+    useAuth.mockReturnValue({ loginAction: jest.fn() });
+
+    renderLogin();
+
+    const logo = screen.getByRole("img", { name: DEFAULT_LOGIN_LOGO_ALT });
+    expect(logo).toHaveAttribute("src", DEFAULT_LOGIN_LOGO_IMAGE);
+    expect(screen.getByText(DEFAULT_LOGIN_TEXT)).toBeInTheDocument();
+  });
+
+  it("uses the logo and text from the app config when provided", () => {
+    useAuth.mockReturnValue({ loginAction: jest.fn() });
+
+    render(
+      <AppContext.Provider
+        value={{
+          loginLogoImage: "/img/custom-logo.png",
+          loginLogoAlt: "Custom Authority",
+          loginText: "Log in to Custom Authority to continue.",
+        }}
+      >
+        <BrowserRouter>
+          <Login />
+        </BrowserRouter>
+      </AppContext.Provider>
+    );
+
+    const logo = screen.getByRole("img", { name: "Custom Authority" });
+    expect(logo).toHaveAttribute("src", "/img/custom-logo.png");
+    expect(
+      screen.getByText("Log in to Custom Authority to continue.")
+    ).toBeInTheDocument();
+    expect(screen.queryByText(DEFAULT_LOGIN_TEXT)).not.toBeInTheDocument();
+  });
+
+  it("falls back to the defaults for any login key the app config leaves out", () => {
+    useAuth.mockReturnValue({ loginAction: jest.fn() });
+
+    render(
+      <AppContext.Provider value={{ loginText: "Only the text is custom." }}>
+        <BrowserRouter>
+          <Login />
+        </BrowserRouter>
+      </AppContext.Provider>
+    );
+
+    const logo = screen.getByRole("img", { name: DEFAULT_LOGIN_LOGO_ALT });
+    expect(logo).toHaveAttribute("src", DEFAULT_LOGIN_LOGO_IMAGE);
+    expect(screen.getByText("Only the text is custom.")).toBeInTheDocument();
   });
 });
 describe("Unauthorized component test", () => {
