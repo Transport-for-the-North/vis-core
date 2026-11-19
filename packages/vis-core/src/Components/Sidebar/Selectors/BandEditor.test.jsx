@@ -224,22 +224,28 @@ describe("BandEditor count limit", () => {
   });
 });
 
-describe("BandEditor natural count", () => {
+describe("BandEditor configured count", () => {
   const counts = () =>
     [...screen.getByRole("combobox").options].map((option) => Number(option.value));
 
-  it("keeps the method's natural count on offer after fewer bands are shown", () => {
+  it("keeps the page's configured count on offer after fewer bands are shown", () => {
     renderEditor({
       bands: [-250, -50, -10, 0, 10, 50, 250],
       isDiverging: true,
-      naturalBandCount: 11,
+      configuredBandCount: 11,
     });
 
     expect(counts()).toEqual([3, 5, 7, 9, 11]);
   });
 
-  it("still offers up to 9 when the natural count is lower", () => {
-    renderEditor({ bands: [0, 10, 20], naturalBandCount: 5 });
+  it("does not widen the range for a method that can give more", () => {
+    renderEditor({ configuredBandCount: 11, maxBandCount: 15 });
+
+    expect(counts().at(-1)).toBe(11);
+  });
+
+  it("still offers up to 9 when the configured count is lower", () => {
+    renderEditor({ bands: [0, 10, 20], configuredBandCount: 5 });
 
     expect(counts().at(-1)).toBe(9);
   });

@@ -830,6 +830,92 @@ describe("LayerControlEntry band editor", () => {
     expect(counts.at(-1)).toBe(11);
   });
 
+  const elevenBandsApp = {
+    ...mockAppContexte,
+    defaultBands: [
+      {
+        name: "pageName",
+        metric: [
+          { name: "demand", differenceValues: [-500, -250, -50, -10, -1, 0, 1, 10, 50, 250, 500] },
+        ],
+      },
+    ],
+  };
+
+  const pickMethod = (label) => {
+    // The classification method is a react-select just above the band count select.
+    const input = screen.getAllByRole("combobox").at(-2);
+    fireEvent.focus(input);
+    fireEvent.keyDown(input, { key: "ArrowDown", keyCode: 40 });
+    fireEvent.click(screen.getByText(label));
+  };
+
+  it("offers the configured 11 under another method after choosing fewer", () => {
+    renderEntry({
+      map: makeLiveMap([-250, -50, -10, 0, 10, 50, 250]),
+      style: "polygon-diverging",
+      appContext: elevenBandsApp,
+      layerState: { class_method: "e", bandCount: 7, bandMetricName: "demand" },
+    });
+
+    const counts = [...screen.getAllByRole("combobox").at(-1).options].map((o) =>
+      Number(o.value)
+    );
+    expect(counts.at(-1)).toBe(11);
+  });
+
+  it("keeps the band count on screen when the method changes", () => {
+    const { dispatch } = renderEntry({
+      map: makeLiveMap([-500, -250, -50, -10, -1, 0, 1, 10, 50, 250, 500]),
+      style: "polygon-diverging",
+      appContext: elevenBandsApp,
+      layerState: { class_method: "d", bandMetricName: "demand" },
+    });
+
+    pickMethod("Equidistant");
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_BAND_COUNT",
+      payload: { bandCount: 11, layerName: "id" },
+    });
+  });
+
+  it("does not store a band count when switching to Custom", () => {
+    const { dispatch } = renderEntry({ map: makeLiveMap([0, 10, 20, 30, 40]) });
+
+    pickMethod("Custom");
+
+    expect(dispatch).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: "UPDATE_BAND_COUNT" })
+    );
+  });
+
+  it("does not disable diverging Head/Tail counts the data can give", () => {
+    // Skewed values either side of zero: Head/Tail gives far more than 4 per side, though
+    // with no count chosen it keeps 4 per side (9 bands).
+    let seed = 7;
+    const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const data = Array.from({ length: 3000 }, () => {
+      const v = Math.round(Math.exp(random() * 3 + random() * 3 + random() * 2));
+      return { value: random() < 0.5 ? -v : v };
+    });
+    renderEntry({
+      map: makeLiveMap([-250, -50, -10, 0, 10, 50, 250]),
+      data,
+      style: "polygon-diverging",
+      appContext: elevenBandsApp,
+      layerState: { class_method: "h", bandCount: 7, bandMetricName: "demand" },
+    });
+
+    const counts = [...screen.getAllByRole("combobox").at(-1).options].map((o) =>
+      Number(o.value)
+    );
+    // Offered up to the configured 11 (not Head/Tail's own most), none greyed out.
+    expect(counts.at(-1)).toBe(11);
+    expect(disabledCounts()).toEqual([]);
+    expect(screen.queryByText(/gives at most/)).not.toBeInTheDocument();
+  });
+
   it("disables no counts for methods that can give any count", () => {
     const data = Array.from({ length: 20 }, (_, i) => ({ value: (i + 1) * 10 }));
     renderEntry({ map: makeLiveMap([0, 10, 20, 30, 40]), data });

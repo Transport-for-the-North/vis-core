@@ -148,7 +148,7 @@ const BandCountHint = styled.div`
  * @param {boolean} [props.hasBandCount] - Whether a band count is chosen.
  * @param {Function} [props.previewBandsForCount] - Count → bands the method will produce, or null.
  * @param {number} [props.maxBandCount] - Most bands the method can give; higher counts are disabled.
- * @param {number} [props.naturalBandCount] - The method's count with none chosen; always offered.
+ * @param {number} [props.configuredBandCount] - The page's Default count; always offered.
  * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
  *
@@ -171,7 +171,7 @@ export const BandEditor = ({
   hasBandCount = false,
   previewBandsForCount = null,
   maxBandCount = null,
-  naturalBandCount = null,
+  configuredBandCount = null,
   showLabel = true,
   ..._unusedProps
 }) => {
@@ -300,11 +300,12 @@ export const BandEditor = ({
 
   // Range min/max for the band count
   const minBands = isDiverging ? 3 : 2;
-  // Natural count kept in range, so it can be picked again after choosing fewer.
+  // Up to 9, or the page's configured count if higher, so it can be picked again after
+  // fewer. A method's own limit only disables counts, never widens the range.
   const maxBands = Math.max(
     9,
     bands.length,
-    Number.isInteger(naturalBandCount) ? naturalBandCount : 0
+    Number.isInteger(configuredBandCount) ? configuredBandCount : 0
   );
   const bandStep = isDiverging ? 2 : 1;
   const bandCounts = [];

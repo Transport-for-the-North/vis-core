@@ -576,10 +576,11 @@ export const LayerControlEntry = memo(
      * Dual maps classify left and right data together, as the map does.
      *
      * @param {number} bandCount - The band count being previewed, as shown in the editor.
+     * @param {string} [method] - Classification method; defaults to the layer's current one.
      * @returns {number[]|null} The bins in editor form, or null when there is nothing to
      *   classify (the editor then falls back to trimming/padding).
      */
-    const previewBandsForCount = (bandCount) => {
+    const previewBandsForCount = (bandCount, method = currentClassMethod) => {
       const visualisationKey = isSideBySidePage
         ? Object.keys(state.leftVisualisations ?? {})[0]
         : null;
@@ -602,7 +603,7 @@ export const LayerControlEntry = memo(
         const bins = reclassifyData(
           data,
           style,
-          currentClassMethod,
+          method,
           appConfig.defaultBands,
           currentPage,
           visualisation.queryParams,
@@ -623,13 +624,15 @@ export const LayerControlEntry = memo(
       }
     };
 
-    // Band count with none chosen, so the editor keeps offering it (e.g. 11 configured
-    // values). Only Default (cheap: configured values) and Head/Tail need it.
-    const naturalBandCount = useMemo(
-      () =>
-        ["d", "h"].includes(currentClassMethod)
-          ? previewBandsForCount(null)?.length ?? null
-          : null,
+    // configuredBandCount: the page's Default count (e.g. 11 configured values), offered
+    // under every method. maxBandCount: Head/Tail decides its own count from the data, so
+    // asking for far more than any option shows the most it can give.
+    const { configuredBandCount, maxBandCount } = useMemo(
+      () => ({
+        configuredBandCount: previewBandsForCount(null, "d")?.length ?? null,
+        maxBandCount:
+          currentClassMethod === "h" ? previewBandsForCount(99)?.length ?? null : null,
+      }),
       [
         currentClassMethod,
         visualisation,
@@ -644,8 +647,6 @@ export const LayerControlEntry = memo(
         isLineDiverging,
       ]
     );
-    // Head/Tail Breaks decides its own band count from the data
-    const maxBandCount = currentClassMethod === "h" ? naturalBandCount : null;
 
     /**
      * Toggle both the layer and its label layer visibility across all maps.
@@ -987,7 +988,17 @@ export const LayerControlEntry = memo(
                       "Head/Tail Breaks": "h",
                     }}
                     classification={state.layers[layer.id]?.class_method ?? "d"}
-                    onChange={(value) => handleClassificationChange(value, layer.id)}
+                    onChange={(value) => {
+                      if (value !== "c" && value !== currentClassMethod) {
+                        if (editorBins.length !== bandCountFromState) {
+                          mapDispatch?.({
+                            type: actionTypes.UPDATE_BAND_COUNT,
+                            payload: { bandCount: editorBins.length, layerName: layer.id },
+                          });
+                        }
+                      }
+                      handleClassificationChange(value, layer.id);
+                    }}
                   />
                 </>
               )}
@@ -1014,7 +1025,7 @@ export const LayerControlEntry = memo(
                 hasBandCount={bandCountFromState !== null}
                 previewBandsForCount={previewBandsForCount}
                 maxBandCount={maxBandCount}
-                naturalBandCount={naturalBandCount}
+                configuredBandCount={configuredBandCount}
                 data={bandEditorData}
                 defaultBandValues={defaultBandValues || null}
                 onReset={() => {
