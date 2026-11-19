@@ -175,4 +175,19 @@ describe("BaseApp", () => {
 
     consoleSpy.mockRestore();
   });
+
+  it("exposes vis-core build info on window", async () => {
+    render(
+      <MemoryRouter>
+        <BaseApp {...defaultProps} />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(window.__TFN_VIS_CORE_BUILD_INFO__).toEqual({
+        version: "0.15.0-test",
+        commitHash: "abcdef123456",
+      });
+    }, { timeout: 3000 });
+  });
 });

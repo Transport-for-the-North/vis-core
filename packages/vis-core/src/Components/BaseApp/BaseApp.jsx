@@ -14,6 +14,7 @@ import { Dashboard } from "layouts";
 import { AppContext, AuthProvider, ErrorProvider, useAuth } from "contexts";
 import { api } from "services";
 import { loadBands } from "utils";
+import { getVisCoreBuildInfo } from "utils/buildInfo";
 import { brandTokens, mergeThemeWithBrandDefaults } from "../../defaults";
 import { buildNavbarLinks } from "utils/nav";
 import { isAppAdmin, isAppSuperuser } from "utils/auth";
@@ -224,6 +225,12 @@ export function BaseApp({
 }) {
   const [appConfig, setAppConfig] = useState(null);
   const effectiveTheme = useMemo(() => mergeThemeWithBrandDefaults(theme), [theme]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.__TFN_VIS_CORE_BUILD_INFO__ = getVisCoreBuildInfo();
+    }
+  }, []);
 
   useEffect(() => {
     /**
