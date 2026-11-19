@@ -1,12 +1,48 @@
 import { defineConfig } from "vite";
 import react from '@vitejs/plugin-react';
 import dts from "vite-plugin-dts";
+import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import path from "node:path";
+
+const readVisCoreVersion = () => {
+  try {
+    const packageJsonPath = path.resolve(__dirname, "package.json");
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+    const version = String(packageJson?.version ?? "").trim();
+    return version || "unknown";
+  } catch (error) {
+    console.warn("[vis-core] Failed to resolve package version for build metadata.", error);
+    return "unknown";
+  }
+};
+
+const readVisCoreCommitHash = () => {
+  try {
+    const commitHash = execSync("git rev-parse --short=12 HEAD", {
+      cwd: __dirname,
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+    return commitHash || "unknown";
+  } catch (error) {
+    console.warn("[vis-core] Failed to resolve git commit hash for build metadata.", error);
+    return "unknown";
+  }
+};
+
+const visCoreVersion = readVisCoreVersion();
+const visCoreCommitHash = readVisCoreCommitHash();
 
 // @ts-ignore - using vite for build only, not for testing
 export default defineConfig(({ command }) => ({
   // Explicitly disable test mode to prevent vitest from running
   ...(command === 'serve' || command === 'build' ? {} : { test: undefined }),
+  define: {
+    "import.meta.env.VITE_VIS_CORE_VERSION": JSON.stringify(visCoreVersion),
+    "import.meta.env.VITE_VIS_CORE_COMMIT_HASH": JSON.stringify(visCoreCommitHash),
+  },
   plugins: [
     react(),
     dts({
