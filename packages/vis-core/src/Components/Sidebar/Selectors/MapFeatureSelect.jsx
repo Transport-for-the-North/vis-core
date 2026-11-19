@@ -75,6 +75,23 @@ const EnableSelectButton = styled.button`
 `;
 
 /**
+ * Gets the path to look up a layer's features, using the right side path for dual maps
+ * when the left side still has missing params.
+ *
+ * @param {Object} layer - The layer from mapState.
+ * @returns {string|undefined} The feature lookup path.
+ */
+export const getFeatureLookupPath = (layer, targetSide = "left") => {
+  if (layer?.metadata?.path) return layer.metadata.path;
+  if (layer?.sidePaths) {
+    const side = targetSide === "right" ? "right" : "left";
+    const other = side === "left" ? "right" : "left";
+    return layer.sideMissingParams?.[side]?.length ? layer.sidePaths[other] : layer.sidePaths[side];
+  }
+  return layer?.path;
+};
+
+/**
  * BaseMapFeatureSelect component provides the core functionality for selecting map features.
  * It can optionally render controls for selection mode and enabling/disabling selection.
  *
@@ -125,7 +142,8 @@ export const BaseMapFeatureSelect = ({ key, filter, value, onChange, showControl
   
 
   // Ensure layer and its properties are defined
-  const layerPath = layer?.metadata?.path ?? layer?.path;
+  const targetSide = filter?.sides || filter?.side || (filter?.filterName?.includes("Right") ? "right" : "left");
+  const layerPath = getFeatureLookupPath(layer, targetSide);
 
   /**
    * Handles the change in selected options from the dropdown.

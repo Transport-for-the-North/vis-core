@@ -216,7 +216,7 @@ describe("Case of no data", () => {
     );
     expect(mockMapContext.dispatch).toHaveBeenCalledWith({
       type: actionTypes.SET_NO_DATA_RETURNED,
-      payload: true,
+      payload: { key: "visualisationName", value: true },
     });
   });
 
@@ -236,7 +236,7 @@ describe("Case of no data", () => {
     );
     expect(mockMapContext.dispatch).toHaveBeenCalledWith({
       type: actionTypes.SET_NO_DATA_RETURNED,
-      payload: false,
+      payload: { key: "visualisationName", value: false },
     });
   });
 
@@ -255,7 +255,7 @@ describe("Case of no data", () => {
     );
     expect(mockMapContext.dispatch).toHaveBeenCalledWith({
       type: actionTypes.SET_NO_DATA_RETURNED,
-      payload: true,
+      payload: { key: "visualisationName", value: true },
     });
   });
 });

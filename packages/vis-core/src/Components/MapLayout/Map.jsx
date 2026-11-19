@@ -104,7 +104,8 @@ const Map = (props) => {
   });
   const { dispatch: filterDispatch } = useFilterContext();
   const popups = {};
-  const listenerCallbackRef = useRef({});
+  // Latest handleMapHover, so the mousemove listener always calls the current one.
+  const handleMapHoverRef = useRef(null);
   const hoverIdRef = useRef({});
   const sidebarIsOpen = props.sidebarIsOpen
   
@@ -775,6 +776,7 @@ const Map = (props) => {
     },
     [map, state.layers, state.visualisations, generateMetadataHtml]
   );
+  handleMapHoverRef.current = handleMapHover;
 
   /**
    * Handles click events on a layer and displays a popup with information about the clicked feature.
@@ -899,6 +901,15 @@ const Map = (props) => {
     if (!map) return;
     const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
+    // Everything registered here is recorded so the cleanup removes exactly that. The cursor
+    // handlers are layer-scoped, so MapLibre queries rendered features for each one on every
+    // mouse move; left behind, they pile up each time the layers or visualisations change.
+    const registrations = [];
+    const listen = (...args) => {
+      map.on(...args);
+      registrations.push(() => map.off(...args));
+    };
+
     Object.keys(state.layers).forEach((layerId) => {
       if (state.layers[layerId].shouldHaveLabel) {
         const layerData = state.layers[layerId];
@@ -906,31 +917,22 @@ const Map = (props) => {
         const sourceLayer = layerData.sourceLayer;
         const labelNulls = layerData.labelNulls;
 
-        const zoomHandler = () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls);
-        map.on('zoomend', zoomHandler);
-        if (!listenerCallbackRef.current[layerId]) {
-          listenerCallbackRef.current[layerId] = {};
-        }
-        listenerCallbackRef.current[layerId].zoomHandler = zoomHandler;
+        listen('zoomend', () => handleZoom(zoomLevel, layerId, sourceLayer, labelNulls));
       }
       if (!isTouch && state.layers[layerId].shouldHaveTooltipOnClick) {
         const bufferSize = state.layers[layerId].bufferSize ?? 0;
-        const clickCallback = (e) => handleLayerClick(e, layerId, bufferSize);
-        map.on("click", clickCallback);
-        map.on("mouseenter", layerId, () => {
+        listen("click", (e) => handleLayerClick(e, layerId, bufferSize));
+        listen("mouseenter", layerId, () => {
           map.getCanvas().style.cursor = "pointer";
         });
-        map.on("mouseleave", layerId, () => {
+        listen("mouseleave", layerId, () => {
           map.getCanvas().style.cursor = "grab";
         });
-        if (!listenerCallbackRef.current[layerId]) {
-          listenerCallbackRef.current[layerId] = {};
-        }
-        listenerCallbackRef.current[layerId].clickCallback = clickCallback;
       }
     });
 
     return () => {
+      registrations.forEach((unregister) => unregister());
       Object.keys(state.layers).forEach((layerId) => {
         if (popups[layerId]?.length) {
           popups[layerId].forEach((popup) => popup.remove());
@@ -939,11 +941,6 @@ const Map = (props) => {
         if (
           state.layers[layerId].shouldHaveTooltipOnClick
         ) {
-          const { clickCallback, zoomHandler } =
-            listenerCallbackRef.current[layerId];
-          if (clickCallback) {map.off("click", clickCallback)};
-          map.off('zoomend', zoomHandler);
-
           // Clean up hover info
           if (hoverInfoRef.current[layerId]) {
             const { timeoutId, abortController, popup } =
@@ -953,10 +950,6 @@ const Map = (props) => {
             if (popup) popup.remove();
             hoverInfoRef.current[layerId] = null;
           }
-        }
-        if (state.layers[layerId].shouldHaveLabel) {
-          const zoomHandler = listenerCallbackRef.current[layerId]?.zoomHandler;
-          map.off('zoomend', zoomHandler);
         }
       });
     };
@@ -1066,10 +1059,26 @@ const Map = (props) => {
 
     if (!isTouch) {
       // ----- DESKTOP: normal hover -----
-      const hoverCallback = (e) => handleMapHover(e);
+      // Coalesce mouse moves to one hover pass per animation frame, using the latest handler.
+      let frameId = null;
+      let lastEvent = null;
+      const cancelPendingHover = () => {
+        if (frameId !== null) cancelAnimationFrame(frameId);
+        frameId = null;
+      };
+      const hoverCallback = (e) => {
+        lastEvent = e;
+        if (frameId !== null) return;
+        frameId = requestAnimationFrame(() => {
+          frameId = null;
+          handleMapHoverRef.current(lastEvent);
+        });
+      };
       map.on("mousemove", hoverCallback);
 
       const mouseLeaveCallback = () => {
+        // A hover pass still pending would bring the tooltip back after leaving.
+        cancelPendingHover();
         if (hoverInfoRef.current.popup) {
           hoverInfoRef.current.popup.remove();
           hoverInfoRef.current.popup = null;
@@ -1087,18 +1096,13 @@ const Map = (props) => {
         });
         prevHoveredFeaturesRef.current = [];
       };
-      map.getCanvas().addEventListener("mouseleave", mouseLeaveCallback);
-
-      listenerCallbackRef.current.hoverCallback = hoverCallback;
-      listenerCallbackRef.current.mouseLeaveCallback = mouseLeaveCallback;
+      const canvas = map.getCanvas();
+      canvas.addEventListener("mouseleave", mouseLeaveCallback);
 
       return () => {
-        if (listenerCallbackRef.current.hoverCallback) {
-          map.off("mousemove", listenerCallbackRef.current.hoverCallback);
-        }
-        if (listenerCallbackRef.current.mouseLeaveCallback) {
-          map.getCanvas().removeEventListener("mouseleave", listenerCallbackRef.current.mouseLeaveCallback);
-        }
+        cancelPendingHover();
+        map.off("mousemove", hoverCallback);
+        canvas.removeEventListener("mouseleave", mouseLeaveCallback);
       };
     }
 

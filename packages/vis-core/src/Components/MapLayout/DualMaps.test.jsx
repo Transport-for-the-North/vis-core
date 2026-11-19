@@ -430,7 +430,34 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
     // Off function to have been called
     expect(off).toHaveBeenCalledWith("click", expect.any(Function));
     expect(off).toHaveBeenCalledWith("mousemove", expect.any(Function));
-    expect(off).toHaveBeenCalledWith("zoomend", undefined);
+  });
+
+  it("removes every map listener it adds, and adds one mousemove per map however often it re-renders", () => {
+    const tree = (
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    const { rerender, unmount } = render(tree);
+    rerender(tree);
+    rerender(tree);
+
+    // Both maps share the same mocked on/off here, so one listener per map is two calls.
+    expect(on.mock.calls.filter(([event]) => event === "mousemove")).toHaveLength(2);
+
+    unmount();
+    // Every (event, [layer,] handler) registered must have been unregistered with the same args.
+    const key = (args) => args.map((a) => (typeof a === "function" ? a : String(a)));
+    const removed = off.mock.calls.map(key);
+    on.mock.calls
+      .filter(([event]) => ["mousemove", "mouseenter", "mouseleave", "click", "zoomend"].includes(event))
+      .forEach((args) => {
+        expect(removed).toContainEqual(key(args));
+      });
   });
 
   it("should handle hover events on the map", () => {
@@ -475,11 +502,70 @@ describe("Test with shouldHaveTooltipOnHover, shouldHaveTooltipOnClick, hoverNul
       point: { x: 150, y: 150 },
       lngLat: { lng: -0.1, lat: 51.5 },
     };
-    // Call the callback
-    handleMapHoverCallback(mockEvent);
-    // Check the effects
-    expect(mockLeftMap.queryRenderedFeatures).toHaveBeenCalled();
-    expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
+    // Hover work runs on the next animation frame, coalescing a burst of moves into one.
+    const frames = [];
+    const rafSpy = jest
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((cb) => frames.push(cb));
+    try {
+      handleMapHoverCallback(mockEvent);
+      handleMapHoverCallback(mockEvent);
+      handleMapHoverCallback(mockEvent);
+      expect(mockLeftMap.queryRenderedFeatures).not.toHaveBeenCalled();
+      expect(frames).toHaveLength(1);
+
+      frames.shift()();
+      // One hover pass queries each map once (the right map shares the left's mocks here).
+      expect(mockLeftMap.queryRenderedFeatures).toHaveBeenCalledTimes(2);
+      expect(mockLeftMap.setFeatureState).toHaveBeenCalled();
+    } finally {
+      rafSpy.mockRestore();
+    }
+  });
+
+  it("drops a pending hover pass when the mouse leaves the map", () => {
+    const handlers = {};
+    const mockLeftMap = {
+      on: jest.fn((event, ...rest) => { if (rest.length === 1) handlers[event] = rest[0]; }),
+      off: jest.fn(),
+      project: jest.fn().mockReturnValue({ x: 100, y: 100 }),
+      queryRenderedFeatures: jest.fn().mockReturnValue([]),
+      setFeatureState: jest.fn(),
+      getLayer: jest.fn().mockReturnValue(true),
+      ...mockMapControls,
+    };
+    useDualMaps.mockReturnValue({
+      leftMap: mockLeftMap,
+      rightMap: { ...mockLeftMap, on: jest.fn() },
+      isMapReady: true,
+    });
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+
+    const frames = new Map();
+    let nextId = 1;
+    const rafSpy = jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+      frames.set(nextId, cb);
+      return nextId++;
+    });
+    const cafSpy = jest.spyOn(window, "cancelAnimationFrame").mockImplementation((id) => frames.delete(id));
+    try {
+      handlers.mousemove({ point: { x: 150, y: 150 }, lngLat: { lng: -0.1, lat: 51.5 } });
+      expect(frames.size).toBe(1);
+      handlers.mouseout();
+      expect(frames.size).toBe(0);
+      expect(mockLeftMap.queryRenderedFeatures).not.toHaveBeenCalled();
+    } finally {
+      rafSpy.mockRestore();
+      cafSpy.mockRestore();
+    }
   });
 
   it("Test function getCanvas() is called", () => {
@@ -734,5 +820,182 @@ describe("Tests when features is null", () => {
     );
 
     // expect(setFeatureState).toHaveBeenCalled();
+  });
+});
+
+describe("map filter clicks with a different feature on each side", () => {
+  const zoneFilter = {
+    id: "zone-filter",
+    type: "map",
+    layer: "Zone Pairs",
+    field: "id",
+    paramName: "zoneId",
+    visualisations: ["Zone Pairs Side-by-Side"],
+    actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+  };
+
+  /** A fake rendered feature from the zones fill layer. */
+  const zoneFeature = (id) => ({
+    layer: { type: "fill" },
+    properties: { id },
+    toJSON: () => ({ type: "Feature", properties: { id } }),
+  });
+
+  /** A fake map whose click handlers are kept so the test can fire them. */
+  const createMap = (type, features, { hasSelection = false } = {}) => {
+    const handlers = {};
+    return {
+      type,
+      handlers,
+      on: jest.fn((event, cb) => { handlers[event] = cb; }),
+      off: jest.fn(),
+      getCanvas: jest.fn(() => ({ style: {} })),
+      getLayer: jest.fn((id) => (id === "selected-feature-layer" ? hasSelection : undefined)),
+      getSource: jest.fn(),
+      setFeatureState: jest.fn(),
+      queryRenderedFeatures: jest.fn(() => features),
+      addSource: jest.fn(),
+      addLayer: jest.fn(),
+      removeLayer: jest.fn(),
+      removeSource: jest.fn(),
+      ...mockMapControls,
+    };
+  };
+
+  let dispatch;
+  let filterDispatch;
+
+  const renderWithMaps = (leftMap, rightMap) => {
+    useDualMaps.mockReturnValue({ leftMap, rightMap, isMapReady: true });
+    dispatch = jest.fn();
+    filterDispatch = jest.fn();
+    const context = {
+      ...mockMapContext,
+      state: { ...mockMapContext.state, layers: {}, filters: [zoneFilter] },
+      dispatch,
+    };
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={{ ...mockFilterContext, dispatch: filterDispatch }}>
+          <MapContext.Provider value={context}>
+            <DualMaps {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+  };
+
+  const queryParamDispatches = () =>
+    dispatch.mock.calls
+      .map(([action]) => action)
+      .filter((action) => action.type === "UPDATE_DUAL_QUERY_PARAMS");
+
+  it("sends each side the zone under the cursor on its own map", () => {
+    const leftMap = createMap("left", [zoneFeature(101)]);
+    const rightMap = createMap("right", [zoneFeature(9001)]);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(queryParamDispatches().map(({ payload }) => [payload.sides, payload.value])).toEqual([
+      ["left", 101],
+      ["right", 9001],
+    ]);
+    expect(leftMap.addSource).toHaveBeenCalledWith(
+      "selected-feature-source",
+      expect.objectContaining({ data: { type: "Feature", properties: { id: 101 } } })
+    );
+    expect(rightMap.addSource).toHaveBeenCalledWith(
+      "selected-feature-source",
+      expect.objectContaining({ data: { type: "Feature", properties: { id: 9001 } } })
+    );
+  });
+
+  /** A fake rendered feature from a tiled zones layer, which has an id. */
+  const tiledZone = (id) => ({
+    id,
+    layer: { type: "fill", source: "Zones", "source-layer": "zones" },
+    properties: { id },
+    toJSON: () => ({ type: "Feature", properties: { id } }),
+  });
+
+  it("selects a tiled zone through feature state, without adding a layer on its source", () => {
+    const leftMap = createMap("left", [tiledZone(101)]);
+    const rightMap = createMap("right", []);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    // Adding a layer on the vector source would make MapLibre reload all its tiles.
+    expect(leftMap.addSource).not.toHaveBeenCalled();
+    expect(leftMap.addLayer).not.toHaveBeenCalled();
+    expect(leftMap.setFeatureState).toHaveBeenCalledWith(
+      { source: "Zones", sourceLayer: "zones", id: 101 },
+      { selected: true }
+    );
+  });
+
+  it("unselects a side's previous zone when the next click selects another", () => {
+    const leftMap = createMap("left", [tiledZone(101)]);
+    leftMap.getSource.mockImplementation((id) => (id === "Zones" ? {} : undefined));
+    const rightMap = createMap("right", []);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+    leftMap.queryRenderedFeatures.mockReturnValue([tiledZone(202)]);
+    leftMap.setFeatureState.mockClear();
+    leftMap.handlers.click({ point: { x: 20, y: 20 }, target: leftMap });
+
+    expect(leftMap.setFeatureState.mock.calls).toEqual([
+      [{ source: "Zones", sourceLayer: "zones", id: 101 }, { selected: false }],
+      [{ source: "Zones", sourceLayer: "zones", id: 202 }, { selected: true }],
+    ]);
+  });
+
+  it("shows the clicked side's zone in the sidebar filter", () => {
+    const leftMap = createMap("left", [zoneFeature(101)]);
+    const rightMap = createMap("right", [zoneFeature(9001)]);
+    renderWithMaps(leftMap, rightMap);
+
+    rightMap.handlers.click({ point: { x: 10, y: 10 }, target: rightMap });
+
+    expect(filterDispatch).toHaveBeenCalledTimes(1);
+    expect(filterDispatch).toHaveBeenCalledWith({
+      type: "SET_FILTER_VALUE",
+      payload: { filterId: "zone-filter", value: 9001 },
+    });
+  });
+
+  it("clears a side that has no zone under the cursor", () => {
+    const leftMap = createMap("left", [], { hasSelection: true });
+    const rightMap = createMap("right", [zoneFeature(9001)]);
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(queryParamDispatches().map(({ payload }) => [payload.sides, payload.value])).toEqual([
+      ["left", null],
+      ["right", 9001],
+    ]);
+    expect(leftMap.removeLayer).toHaveBeenCalledWith("selected-feature-layer");
+    expect(leftMap.addLayer).not.toHaveBeenCalled();
+    // Falls back to the other side's zone, since the clicked side has none.
+    expect(filterDispatch).toHaveBeenCalledWith({
+      type: "SET_FILTER_VALUE",
+      payload: { filterId: "zone-filter", value: 9001 },
+    });
+  });
+
+  it("ignores a click with no zone on either side", () => {
+    const leftMap = createMap("left", [], { hasSelection: true });
+    const rightMap = createMap("right", [], { hasSelection: true });
+    renderWithMaps(leftMap, rightMap);
+
+    leftMap.handlers.click({ point: { x: 10, y: 10 }, target: leftMap });
+
+    expect(queryParamDispatches()).toEqual([]);
+    expect(filterDispatch).not.toHaveBeenCalled();
+    expect(leftMap.removeLayer).not.toHaveBeenCalled();
+    expect(rightMap.removeLayer).not.toHaveBeenCalled();
   });
 });

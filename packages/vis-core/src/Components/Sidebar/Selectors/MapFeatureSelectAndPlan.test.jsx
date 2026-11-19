@@ -6,6 +6,7 @@ import { actionTypes } from "reducers/mapReducer";
 import { api } from "services";
 
 jest.mock("./MapFeatureSelect.jsx", () => ({
+  getFeatureLookupPath: jest.requireActual("./MapFeatureSelect.jsx").getFeatureLookupPath,
   BaseMapFeatureSelect: ({ filter, onChange }) => {
     return (
       <>

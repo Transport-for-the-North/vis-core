@@ -392,6 +392,22 @@ export const MapVisualisation = ({
     }
   }, [isLoading, dispatch]);
 
+  // "No data" is tracked per visualisation (and per side on dual maps) so one
+  // visualisation's result cannot overwrite another's on the same page.
+  const noDataKey = left === null
+    ? visualisationName
+    : `${left ? "left" : "right"}:${visualisationName}`;
+
+  const setNoDataReturned = useCallback(
+    (value) => {
+      dispatch({
+        type: actionTypes.SET_NO_DATA_RETURNED,
+        payload: { key: noDataKey, value },
+      });
+    },
+    [dispatch, noDataKey]
+  );
+
   // Handle no data returned state based on fetch state machine
   useEffect(() => {
     switch (fetchState) {
@@ -402,21 +418,24 @@ export const MapVisualisation = ({
       case DataFetchState.LOADING:
         // Clear the "no data" message while loading
         // This prevents stale "no data" from previous page/query
-        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
+        setNoDataReturned(false);
         break;
       case DataFetchState.ERROR:
       case DataFetchState.EMPTY:
         // Genuinely no data or error occurred
-        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+        setNoDataReturned(true);
         break;
       case DataFetchState.SUCCESS:
         // Data loaded successfully
-        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: false });
+        setNoDataReturned(false);
         break;
       default:
         break;
     }
-  }, [fetchState, dispatch]);
+  }, [fetchState, setNoDataReturned]);
+
+  // Drop this visualisation's "no data" entry when it unmounts or is renamed.
+  useEffect(() => () => setNoDataReturned(false), [setNoDataReturned]);
 
   // Update the visualisation data in the global state when fetched
   useEffect(() => {
@@ -648,7 +667,7 @@ export const MapVisualisation = ({
         if (map.getLayer(visualisationName)) {
           map.removeLayer(visualisationName);
         }
-        dispatch({ type: actionTypes.SET_NO_DATA_RETURNED, payload: true });
+        setNoDataReturned(true);
         return;
       }
       
@@ -764,6 +783,7 @@ export const MapVisualisation = ({
       state.layers,
       state.categoricalLegendCache,
       visualisation,
+      setNoDataReturned,
     ]
   );
 

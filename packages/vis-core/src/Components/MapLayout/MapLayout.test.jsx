@@ -449,3 +449,64 @@ describe("tests when !filter.visualisations[0].includes(`Side`)", () => {
     });
   });
 });
+
+describe("map-click filters on dual maps", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("leaves map-click filters to DualMaps instead of sending their single value to both sides", () => {
+    const zoneFilter = {
+      id: "zone-filter",
+      type: "map",
+      filterName: "Select a zone in the map",
+      paramName: "zoneId",
+      visualisations: ["Zone Pairs Side-by-Side"],
+      actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+    };
+    const timePeriodFilter = {
+      id: "left-time-period",
+      type: "toggle",
+      filterName: "Left Time Period",
+      paramName: "timePeriodCode",
+      visualisations: ["Zone Pairs Side-by-Side"],
+      actions: [{ action: "UPDATE_DUAL_QUERY_PARAMS" }],
+    };
+    const filterContext = {
+      ...mockFilterContext,
+      state: { "zone-filter": 2399, "left-time-period": "AM" },
+      dispatch: jest.fn(),
+    };
+    const mapContext = {
+      ...mockMapContext,
+      dispatch: jest.fn(),
+      state: { ...mockMapContext.state, filters: [zoneFilter, timePeriodFilter] },
+    };
+
+    render(
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider value={mockAppContexte}>
+          <PageContext.Provider value={mockPageContext}>
+            <FilterContext.Provider value={filterContext}>
+              <MapContext.Provider value={mapContext}>
+                <MapLayout />
+              </MapContext.Provider>
+            </FilterContext.Provider>
+          </PageContext.Provider>
+        </AppContext.Provider>
+      </ThemeProvider>
+    );
+
+    const payloads = mapContext.dispatch.mock.calls
+      .map(([action]) => action)
+      .filter((action) => action.type === "UPDATE_DUAL_QUERY_PARAMS")
+      .map(({ payload }) => payload);
+
+    expect(payloads).toContainEqual(
+      expect.objectContaining({ filter: timePeriodFilter, value: "AM", sides: "left" })
+    );
+    expect(payloads).not.toContainEqual(
+      expect.objectContaining({ filter: zoneFilter, value: 2399 })
+    );
+  });
+});
