@@ -339,3 +339,59 @@ describe("mapReducer UPDATE_PARAMETERISED_LAYER with separateSidePaths", () => {
     expect(layer.path).toContain("year=2040");
   });
 });
+
+describe("mapReducer value range filter", () => {
+  it("stores the selected range on the target layer", () => {
+    const initialState = {
+      layers: {
+        links: {
+          id: "links",
+          class_method: "q",
+        },
+      },
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.UPDATE_LAYER_VALUE_RANGE_FILTER,
+      payload: {
+        layerName: "links",
+        rangeFilter: {
+          min: 12,
+          max: 98,
+          domainMin: 0,
+          domainMax: 100,
+        },
+      },
+    });
+
+    expect(nextState.layers.links.valueRangeFilter).toEqual({
+      min: 12,
+      max: 98,
+      domainMin: 0,
+      domainMax: 100,
+    });
+    expect(nextState.layers.links.class_method).toBe("q");
+  });
+
+  it("stores the selected categories on the target layer", () => {
+    const initialState = {
+      layers: {
+        links: {
+          id: "links",
+          class_method: "q",
+        },
+      },
+    };
+
+    const nextState = mapReducer(initialState, {
+      type: actionTypes.UPDATE_LAYER_VALUE_CATEGORY_FILTER,
+      payload: {
+        layerName: "links",
+        categoryFilter: ["A", "B"],
+      },
+    });
+
+    expect(nextState.layers.links.valueCategoryFilter).toEqual(["A", "B"]);
+    expect(nextState.layers.links.class_method).toBe("q");
+  });
+});

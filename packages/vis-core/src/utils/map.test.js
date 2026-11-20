@@ -4,6 +4,16 @@ import {
   getMetricDefinition,
   reclassifyData,
   getWidthProperty,
+  isValueInRange,
+  isValueInCategoryFilter,
+  isValueMatchingFilter,
+  buildValueRangeCondition,
+  buildValueCategoryCondition,
+  buildValueFilterCondition,
+  applyValueRangeToExpression,
+  applyValueFilterToExpression,
+  applyValueRangeToPaint,
+  applyValueFilterToPaint,
   isBasePlaceLabelLayer,
   moveTownCityLabelsToTop,
   TOWN_CITY_LABEL_LAYER_IDS,
@@ -377,6 +387,107 @@ describe("getWidthProperty", () => {
   it("warns and returns undefined for unknown layer types", () => {
     expect(getWidthProperty("unknown-type")).toBeUndefined();
     expect(warnSpy).toHaveBeenCalledWith("Unable to get width property name for layerType unknown-type");
+  });
+});
+
+describe("value range helpers", () => {
+  it("treats missing ranges as permissive", () => {
+    expect(isValueInRange(5, null)).toBe(true);
+    expect(isValueInRange(5, undefined)).toBe(true);
+  });
+
+  it("applies inclusive numeric bounds", () => {
+    const range = { min: 10, max: 20 };
+    expect(isValueInRange(10, range)).toBe(true);
+    expect(isValueInRange(15, range)).toBe(true);
+    expect(isValueInRange(20, range)).toBe(true);
+    expect(isValueInRange(9, range)).toBe(false);
+    expect(isValueInRange(21, range)).toBe(false);
+    expect(isValueInRange("not-a-number", range)).toBe(false);
+  });
+
+  it("builds a feature-state range expression condition", () => {
+    expect(buildValueRangeCondition({ min: 1, max: 3 })).toEqual([
+      "all",
+      ["!=", ["feature-state", "value"], null],
+      [">=", ["to-number", ["feature-state", "value"]], 1],
+      ["<=", ["to-number", ["feature-state", "value"]], 3],
+    ]);
+  });
+
+  it("wraps an existing expression with a case guard", () => {
+    const original = ["interpolate", ["linear"], ["feature-state", "value"], 0, 0.2, 10, 1];
+    const wrapped = applyValueRangeToExpression(original, { min: 2, max: 8 }, 0);
+
+    expect(wrapped[0]).toBe("case");
+    expect(wrapped[2]).toEqual(original);
+    expect(wrapped[3]).toBe(0);
+  });
+
+  it("only wraps geometry visibility paint properties", () => {
+    const paint = {
+      "fill-opacity": ["interpolate", ["linear"], ["feature-state", "value"], 0, 0.2, 10, 1],
+      "line-width": ["interpolate", ["linear"], ["feature-state", "value"], 0, 1, 10, 4],
+      "fill-color": "#00AA88",
+    };
+
+    const nextPaint = applyValueRangeToPaint(paint, { min: 3, max: 7 });
+
+    expect(nextPaint["fill-opacity"][0]).toBe("case");
+    expect(nextPaint["line-width"][0]).toBe("case");
+    expect(nextPaint["fill-color"]).toBe("#00AA88");
+  });
+
+  it("matches category selections when category filters are set", () => {
+    expect(isValueInCategoryFilter("A", ["A", "B"])) .toBe(true);
+    expect(isValueInCategoryFilter("C", ["A", "B"])) .toBe(false);
+    expect(isValueInCategoryFilter("A", null)).toBe(true);
+  });
+
+  it("matches combined range and category filters", () => {
+    expect(isValueMatchingFilter(10, { min: 5, max: 20 }, ["10", "30"])) .toBe(true);
+    expect(isValueMatchingFilter(4, { min: 5, max: 20 }, ["4"])) .toBe(false);
+    expect(isValueMatchingFilter(10, { min: 5, max: 20 }, ["12"])) .toBe(false);
+  });
+
+  it("builds category and combined map conditions", () => {
+    expect(buildValueCategoryCondition(["A", "B"])) .toEqual([
+      "in",
+      ["to-string", ["feature-state", "value"]],
+      ["literal", ["A", "B"]],
+    ]);
+
+    expect(buildValueFilterCondition({ min: 1, max: 2 }, ["1"])) .toEqual([
+      "all",
+      [
+        "all",
+        ["!=", ["feature-state", "value"], null],
+        [">=", ["to-number", ["feature-state", "value"]], 1],
+        ["<=", ["to-number", ["feature-state", "value"]], 2],
+      ],
+      ["in", ["to-string", ["feature-state", "value"]], ["literal", ["1"]]],
+    ]);
+  });
+
+  it("wraps expressions and paint with combined filter conditions", () => {
+    const expr = applyValueFilterToExpression(
+      ["feature-state", "value"],
+      { min: 2, max: 8 },
+      ["4"]
+    );
+    expect(expr[0]).toBe("case");
+
+    const paint = applyValueFilterToPaint(
+      {
+        "fill-opacity": 0.7,
+        "line-width": ["interpolate", ["linear"], ["feature-state", "value"], 0, 1, 10, 4],
+      },
+      { min: 1, max: 9 },
+      ["4", "5"]
+    );
+
+    expect(Array.isArray(paint["fill-opacity"])).toBe(true);
+    expect(Array.isArray(paint["line-width"])).toBe(true);
   });
 });
 

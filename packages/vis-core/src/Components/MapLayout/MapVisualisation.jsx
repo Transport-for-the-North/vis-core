@@ -5,6 +5,7 @@ import { AppContext } from "contexts/AppContext";
 import { actionTypes } from "reducers";
 import {
   buildCategoricalLegendKey,
+  applyValueFilterToPaint,
   colorSchemes,
   createPaintProperty,
   resolveCategoricalColours,
@@ -37,6 +38,34 @@ const areNumericArraysEqual = (a, b) => {
     // Normalise to numbers so ["1", 2] and [1, 2] compare equal.
     if (Number(a[i]) !== Number(b[i])) return false;
   }
+  return true;
+};
+
+const areRangeFiltersEqual = (left, right) => {
+  if (left === right) return true;
+  if (!left && !right) return true;
+  if (!left || !right) return false;
+
+  return (
+    Number(left.min) === Number(right.min) &&
+    Number(left.max) === Number(right.max) &&
+    Number(left.domainMin) === Number(right.domainMin) &&
+    Number(left.domainMax) === Number(right.domainMax)
+  );
+};
+
+const areCategoryFiltersEqual = (left, right) => {
+  if (left === right) return true;
+  if (!left && !right) return true;
+  if (!Array.isArray(left) || !Array.isArray(right)) return false;
+  if (left.length !== right.length) return false;
+
+  for (let index = 0; index < left.length; index += 1) {
+    if (String(left[index]) !== String(right[index])) {
+      return false;
+    }
+  }
+
   return true;
 };
 
@@ -203,6 +232,8 @@ export const MapVisualisation = ({
   const prevClassMethodRef = useRef({});
   const prevCustomBandsRef = useRef({});
   const prevInvertRef = useRef({});
+  const prevRangeFilterRef = useRef({});
+  const prevCategoryFilterRef = useRef({});
 
   // Ref to track pending updates during style resolution and timeouts
   const pendingUpdateRef = useRef(false);
@@ -324,6 +355,8 @@ export const MapVisualisation = ({
     prevCombinedDataRef.current = undefined;
     prevVisualisationDataRef.current = undefined;
     delete prevInvertRef.current[layerKey];
+    delete prevRangeFilterRef.current[layerKey];
+    delete prevCategoryFilterRef.current[layerKey];
   }, [visualisationName, resetFetchState]);
 
   // Effect to resolve dynamic styling when visualisation data is available
@@ -603,10 +636,16 @@ export const MapVisualisation = ({
         layerConfig
       );
 
+      const paintPropertyWithRange = applyValueFilterToPaint(
+        paintProperty,
+        layerConfig?.valueRangeFilter,
+        layerConfig?.valueCategoryFilter
+      );
+
       // Use visualisationDataForMap to update the map features
       addFeaturesToMap(
         mapItem,
-        paintProperty,
+        paintPropertyWithRange,
         state.layers,
         visualisationDataForMap,
         colorStyle,
@@ -728,6 +767,12 @@ export const MapVisualisation = ({
         state.layers[layerKey]
       );
 
+      const paintPropertyWithRange = applyValueFilterToPaint(
+        paintProperty,
+        state.layers[layerKey]?.valueRangeFilter,
+        state.layers[layerKey]?.valueCategoryFilter
+      );
+
       const layers = map.getStyle().layers;
       const layerIndex = layers.findIndex(
         (layer) => layer.id.includes("-hover") || layer.id === "selected-feature-layer"
@@ -740,7 +785,7 @@ export const MapVisualisation = ({
             id: visualisationName,
             type: "fill",
             source: visualisationName,
-            paint: paintProperty,
+            paint: paintPropertyWithRange,
             metadata: {
               colorStyle: colorStyle,
               ...legendMetadata,
@@ -768,7 +813,7 @@ export const MapVisualisation = ({
             ...legendMetadata,
           };
         }
-        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintProperty)) {
+        for (const [paintPropertyName, paintPropertyArray] of Object.entries(paintPropertyWithRange)) {
           map.setPaintProperty(visualisationName, paintPropertyName, paintPropertyArray);
         }
       }
@@ -835,13 +880,29 @@ export const MapVisualisation = ({
       (layerKey in prevInvertRef.current) &&
       Boolean(state.layers[layerKey]?.invertedColorScheme) !== Boolean(prevInvertRef.current[layerKey]);
 
+    const rangeFilterHasChanged =
+      (layerKey in prevRangeFilterRef.current) &&
+      !areRangeFiltersEqual(
+        layerConfig?.valueRangeFilter,
+        prevRangeFilterRef.current[layerKey]
+      );
+
+    const categoryFilterHasChanged =
+      (layerKey in prevCategoryFilterRef.current) &&
+      !areCategoryFiltersEqual(
+        layerConfig?.valueCategoryFilter,
+        prevCategoryFilterRef.current[layerKey]
+      );
+
     const needUpdate =
       dataHasChanged ||
       visualisationDataHasChanged ||
       colorHasChanged ||
       classificationHasChanged ||
       customBandsHasChanged ||
-      invertHasChanged;
+      invertHasChanged ||
+      rangeFilterHasChanged ||
+      categoryFilterHasChanged;
 
     const previouslyHadNoData =
       prevVisualisationDataRef.current !== undefined &&
@@ -884,6 +945,8 @@ export const MapVisualisation = ({
       prevColorRef.current[layerKey] = layerColorScheme;
       prevClassMethodRef.current[layerKey] = classificationMethod;
       prevInvertRef.current[layerKey] = state.layers[layerKey]?.invertedColorScheme;
+      prevRangeFilterRef.current[layerKey] = layerConfig?.valueRangeFilter;
+      prevCategoryFilterRef.current[layerKey] = layerConfig?.valueCategoryFilter;
       // Store a stable snapshot of bands to avoid false negatives from accidental mutation.
       prevCustomBandsRef.current[layerKey] = Array.isArray(currentCustomBands)
         ? [...currentCustomBands]

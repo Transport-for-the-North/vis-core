@@ -644,12 +644,7 @@ export const useFetchVisualisationData = (
   // Compute derived values
   const data = filteredData ?? rawData;
   
-  const dataWasReturnedButFiltered =
-    rawData !== null &&
-    Array.isArray(rawData) &&
-    rawData.length > 0 &&
-    Array.isArray(filteredData) &&
-    filteredData.length === 0;
+  const dataWasReturnedButFiltered = false;
 
   // Determine the current fetch state
   const fetchState = determineFetchState({
