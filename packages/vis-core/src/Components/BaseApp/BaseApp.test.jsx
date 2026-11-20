@@ -1,6 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { BaseApp } from "Components/BaseApp/BaseApp";
+import { api } from "services";
+import { normaliseStartupError } from "utils";
+import { errorActionTypes } from "../../reducers";
+
 
 jest.mock("js-cookie", () => ({
   default: { get: jest.fn(), set: jest.fn(), remove: jest.fn() },
@@ -13,6 +17,10 @@ jest.mock("utils", () => ({
   applyClarityConsent: jest.fn(),
   ANALYTICS_CONSENT_ACCEPTED: "accepted",
   ANALYTICS_CONSENT_REJECTED: "rejected",
+  normaliseStartupError: jest.fn((error) => ({
+    title: "Test startup error",
+    message: error.message,
+  })),
 }));
 
 jest.mock("jwt-decode", () => ({
@@ -46,12 +54,21 @@ jest.mock("layouts", () => ({
   Dashboard: ({ children }) => <div>{children}</div>,
 }));
 
-jest.mock("contexts", () => ({
-  AppContext: { Provider: ({ children }) => children },
-  AuthProvider: ({ children }) => children,
-  useAuth: () => ({ token: "" }),
-  ErrorProvider: ({ children }) => children,
-}));
+jest.mock("contexts", () => {
+  const React = require("react");
+  const mockDispatch = jest.fn();
+
+  return {
+    AppContext: { Provider: ({ children }) => children },
+    ErrorContext: React.createContext({ dispatch: mockDispatch }),
+    AuthProvider: ({ children }) => children,
+    useAuth: () => ({ token: "" }),
+    ErrorProvider: ({ children }) => children,
+    __mockDispatch: mockDispatch,
+  };
+});
+
+const { __mockDispatch: mockDispatch } = jest.requireMock("contexts");
 
 jest.mock("hocs", () => ({
   withRoleValidation: jest.fn((Component) => Component),
@@ -171,6 +188,43 @@ describe("BaseApp", () => {
         "Failed to load app configuration:",
         expect.any(Error)
       );
+    }, { timeout: 3000 });
+
+    consoleSpy.mockRestore();
+  });
+
+  it("normalises and dispatches an error when Swagger loading fails", async () => {
+    const error = Object.assign(new Error("Access denied"), {
+      status: 403,
+      url: "/swagger/v1/swagger.json",
+    });
+
+    const normalizedError = {
+    title: "Test startup error",
+    message: "Access denied",
+    };
+
+    normaliseStartupError.mockReturnValue(normalizedError);
+    api.metadataService.getSwaggerFile.mockRejectedValueOnce(error);
+    mockDispatch.mockClear();
+
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <BaseApp {...defaultProps} />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(normaliseStartupError).toHaveBeenCalledWith(error);
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: errorActionTypes.SET_ERROR,
+        payload: 
+          normalizedError,
+      });
     }, { timeout: 3000 });
 
     consoleSpy.mockRestore();
