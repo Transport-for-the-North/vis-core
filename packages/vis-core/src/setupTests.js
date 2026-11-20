@@ -21,6 +21,8 @@ global.importMeta = {
     VITE_PUBLIC_URL: '/',
     VITE_APP_MAP_API_TOKEN: 'test-token',
     VITE_PROD_OR_DEV: 'development',
+    VITE_VIS_CORE_VERSION: '0.15.0-test',
+    VITE_VIS_CORE_COMMIT_HASH: 'abcdef123456',
   }
 };
 

@@ -77,6 +77,16 @@ describe("HomePage test", () => {
   });
 
   describe("Footer test", () => {
+    it("renders vis-core build info", () => {
+      linkRouter();
+      const buildInfoLink = screen.getByRole("link", { name: "Built with TfN vis-core 0.15.0-test" });
+      expect(buildInfoLink).toBeInTheDocument();
+      expect(buildInfoLink).toHaveAttribute(
+        "href",
+        "https://github.com/Transport-for-the-North/vis-core"
+      );
+    });
+
     it("navigate to Cookies", async () => {
       linkRouter();
       const cookie = screen.getByText("Cookies");
