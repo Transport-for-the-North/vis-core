@@ -2,15 +2,17 @@
     min-width: 75px;
     width: auto;
     height: auto;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    color: var(--palette-navy, #0d0f3d);
+    /* The outline keeps the tooltip distinct from pale base maps and pale data colours. */
+    box-shadow: 0 0 0 1px rgba(13, 15, 61, 0.2), 0 4px 12px rgba(13, 15, 61, 0.25);
     font-family: var(--font-sans);
     font-size: 0.875rem;
     padding: 10px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    align-items: left;
+    align-items: stretch;
     justify-content: center;
     pointer-events: none;
   }
@@ -66,8 +68,34 @@
     background-color: darkgrey; /* Color when hovered */
   }
   
+  /* The tooltip never takes the pointer, so it cannot cause hover flicker. */
+  .custom-popup {
+    pointer-events: none;
+  }
+
+  /* The tip matches the tooltip body whichever side MapLibre anchors it on. */
+  .custom-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+  .custom-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+  .custom-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+    border-top-color: #ffffff;
+  }
+
+  .custom-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+  .custom-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+  .custom-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+    border-bottom-color: #ffffff;
+  }
+
+  .custom-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: #ffffff;
+  }
+
+  .custom-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: #ffffff;
+  }
+
   .custom-popup .maplibregl-popup-tip {
-    border-top-color: rgba(255, 255, 255, 0.8);
+    filter: drop-shadow(0 0 1px rgba(13, 15, 61, 0.35));
   }
 
   

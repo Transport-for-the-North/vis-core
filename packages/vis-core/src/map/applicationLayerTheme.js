@@ -1,4 +1,5 @@
 import { getLayerStyle } from "../utils/map";
+import { applyHoverTheme } from "./hoverStyle";
 
 /** Converts sRGB (0-255 each) to HSL (degrees, %, %). @private */
 function rgbToHsl(r, g, b) {
@@ -276,6 +277,9 @@ export function applyApplicationTheme({ map, layers, theme }) {
   if (!map?.getLayer || !map?.setPaintProperty || !layers) return;
 
   Object.values(layers).forEach((layer) => {
+    applyHoverTheme(map, layer.name, theme);
+    applyHoverTheme(map, `${layer.name}-spider`, theme);
+
     const isStylable = Boolean(layer.isStylable ?? layer.metadata?.isStylable);
     if (!isStylable) {
       const paint = resolveLayerPaint({ layer, theme });

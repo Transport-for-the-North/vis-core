@@ -12,6 +12,8 @@ import { api } from "services";
 
 import { useBaseMapTransition } from "hooks/useBaseMapTransition";
 import { getBaseMap } from "../../map/baseMaps";
+import { SELECTED_COLOURS, syncHoverLayers } from "../../map/hoverStyle";
+import { queryNearestRenderedFeatures } from "../../map/hoverPicking";
 import {
   getSourceLayer,
   numberWithCommas,
@@ -68,6 +70,9 @@ const StyledMapContainer = styled.div`
 
 const SIDES = ["left", "right"];
 
+// Gap between the cursor and the hover tooltip, so the tooltip doesn't sit on the hovered feature.
+const HOVER_POPUP_OFFSET = 14;
+
 const SELECTED_FEATURE_LAYER = "selected-feature-layer";
 const SELECTED_FEATURE_SOURCE = "selected-feature-source";
 
@@ -103,6 +108,7 @@ const highlightSelectedFeature = (map, feature, previous) => {
       ...(feature.layer["source-layer"] && { sourceLayer: feature.layer["source-layer"] }),
       id: feature.id,
     };
+    syncHoverLayers(map, feature.layer.id);
     map.setFeatureState(target, { selected: true });
     return target;
   }
@@ -113,14 +119,13 @@ const highlightSelectedFeature = (map, feature, previous) => {
   if (feature.layer.type === "circle") {
     paintProp = {
       "circle-radius": 6,
-      "circle-color": "green",
-      "circle-opacity": 0.75,
-      "circle-stroke-width": 2,
-      "circle-stroke-color": "black",
+      "circle-opacity": 0,
+      "circle-stroke-width": 2.5,
+      "circle-stroke-color": SELECTED_COLOURS.light.core,
     };
   } else if (feature.layer.type === "fill") {
     paintProp = {
-      "fill-color": "#f00",
+      "fill-color": SELECTED_COLOURS.light.core,
       "fill-opacity": 0.5,
     };
   }
@@ -278,24 +283,40 @@ const DualMaps = (props) => {
       const pointOnLeftMap = maps.left.project(lngLat);
       const pointOnRightMap = maps.right.project(lngLat);
 
-      const bufferedPointLeft = [
-        [pointOnLeftMap.x - maxBufferSize, pointOnLeftMap.y - maxBufferSize],
-        [pointOnLeftMap.x + maxBufferSize, pointOnLeftMap.y + maxBufferSize],
-      ];
+      // Query features on both maps at the corresponding points. Nearest feature first, so the
+      // feature under the pointer beats a neighbour that is merely within tolerance; features
+      // that would not get a hover don't end the search.
+      const isHoverCandidate = (f) => {
+        const value = f.state?.value;
+        return !(
+          state.layers[f.layer?.id]?.shouldHaveHoverOnlyOnData &&
+          (value === null || value === undefined)
+        );
+      };
+      const isCurrentOn = (side) =>
+        prevHoveredFeaturesRef.current[side]?.length
+          ? (f) =>
+              prevHoveredFeaturesRef.current[side].some(
+                (prev) => prev.layerId === f.layer?.id && prev.featureId === f.id
+              )
+          : null;
+      const featuresOnLeftMap = queryNearestRenderedFeatures(
+        maps.left,
+        pointOnLeftMap,
+        hoverableLayers,
+        maxBufferSize,
+        isHoverCandidate,
+        isCurrentOn("left")
+      );
 
-      const bufferedPointRight = [
-        [pointOnRightMap.x - maxBufferSize, pointOnRightMap.y - maxBufferSize],
-        [pointOnRightMap.x + maxBufferSize, pointOnRightMap.y + maxBufferSize],
-      ];
-
-      // Query features on both maps at the corresponding points
-      const featuresOnLeftMap = maps.left.queryRenderedFeatures(bufferedPointLeft, {
-        layers: hoverableLayers,
-      });
-
-      const featuresOnRightMap = maps.right.queryRenderedFeatures(bufferedPointRight, {
-        layers: hoverableLayers,
-      });
+      const featuresOnRightMap = queryNearestRenderedFeatures(
+        maps.right,
+        pointOnRightMap,
+        hoverableLayers,
+        maxBufferSize,
+        isHoverCandidate,
+        isCurrentOn("right")
+      );
 
       // Prepare hover info for both maps
       const hoverData = {
@@ -388,6 +409,8 @@ const DualMaps = (props) => {
               prevFeature.featureId === currFeature.featureId
           );
           if (!wasHovered) {
+            // Match the highlight to the layer's current width/size before showing it.
+            syncHoverLayers(map, currFeature.layerId);
             map.setFeatureState(
               {
                 source: currFeature.source,
@@ -566,6 +589,7 @@ const DualMaps = (props) => {
             className: "custom-popup",
             closeButton: false,
             closeOnClick: false,
+            offset: HOVER_POPUP_OFFSET,
           })
             .setLngLat(coordinates)
             .setHTML(aggregatedHtml)

@@ -8,6 +8,7 @@
 import Cookies from "js-cookie";
 
 import { api } from "services";
+import { HOVER_COLOURS, SELECTED_COLOURS } from "../map/hoverStyle";
 
 const DEFAULT_ICON_SIZE = 128;
 
@@ -50,7 +51,7 @@ const loadHtmlImageFromUrl = (url) =>
  * @param {string} frameColor - Frame fill color (e.g., '#ffffff').
  * @returns {ImageData} RGBA pixel data for MapLibre.
  */
-const drawCircularFramedImage = (img, size = DEFAULT_ICON_SIZE, frameColor = "#ffffff") => {
+const drawCircularFramedImage = (img, size = DEFAULT_ICON_SIZE, frameColor = "#ffffff", borderColor = "#333333") => {
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
@@ -63,7 +64,7 @@ const drawCircularFramedImage = (img, size = DEFAULT_ICON_SIZE, frameColor = "#f
   ctx.fill();
 
   // Border
-  ctx.strokeStyle = "#333333";
+  ctx.strokeStyle = borderColor;
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -95,9 +96,9 @@ const drawCircularFramedImage = (img, size = DEFAULT_ICON_SIZE, frameColor = "#f
  * @param {string} frameColor - Frame color (default '#ffffff').
  * @returns {Promise<ImageData>} RGBA pixel data.
  */
-const createCircularFramedImageFromUrl = async (url, size = DEFAULT_ICON_SIZE, frameColor = "#ffffff") => {
+const createCircularFramedImageFromUrl = async (url, size = DEFAULT_ICON_SIZE, frameColor = "#ffffff", borderColor = "#333333") => {
   const img = await loadHtmlImageFromUrl(url);
-  return drawCircularFramedImage(img, size, frameColor);
+  return drawCircularFramedImage(img, size, frameColor, borderColor);
 };
 
 /**
@@ -107,7 +108,7 @@ const createCircularFramedImageFromUrl = async (url, size = DEFAULT_ICON_SIZE, f
  * @returns {Promise<ImageData>} RGBA pixel data for hover.
  */
 const createHighlightedCircularImageFromUrl = (url, size = DEFAULT_ICON_SIZE) =>
-  createCircularFramedImageFromUrl(url, size, "red");
+  createCircularFramedImageFromUrl(url, size, HOVER_COLOURS.light.core, HOVER_COLOURS.light.halo);
 
 /**
  * Creates ImageData for a hover (highlighted) circular-framed icon from a URL.
@@ -116,7 +117,7 @@ const createHighlightedCircularImageFromUrl = (url, size = DEFAULT_ICON_SIZE) =>
  * @returns {Promise<ImageData>} RGBA pixel data for hover.
  */
 const createSelectedCircularImageFromUrl = (url, size = DEFAULT_ICON_SIZE) =>
-  createCircularFramedImageFromUrl(url, size, "blue");
+  createCircularFramedImageFromUrl(url, size, SELECTED_COLOURS.light.core, SELECTED_COLOURS.light.halo);
 
 /**
  * Loads and registers the normal and hover icons for a single feature.

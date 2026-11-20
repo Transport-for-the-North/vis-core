@@ -6,6 +6,7 @@ import {
   buildSpiderDataOffsetOne,
   collectSourcePoints,
 } from "utils/mapSpiders";
+import { getBaseMap } from "../../map/baseMaps";
 
 /**
  * Applies or updates a filter on the parent layer to hide spiderfied duplicates.
@@ -83,6 +84,9 @@ function mirrorToOverlay(map, baseLayerId) {
 export function SpiderLayer({ baseLayerId }) {
   const { state } = useMapContext();
   const { map } = state;
+  // Latest base-map theme, so overlay hover layers created later get the right colours.
+  const themeRef = useRef("light");
+  themeRef.current = getBaseMap(state.baseMapId)?.theme ?? "light";
   const debounce = useRef(null);
   const baseFilterRef = useRef(null); // to restore on unmount
   const prevExcludeIds = useRef([]); 
@@ -177,7 +181,7 @@ export function SpiderLayer({ baseLayerId }) {
       }
 
       // Add hover/select for overlay
-      ensureSpiderHoverSelectLayers(map, baseLayerId);
+      ensureSpiderHoverSelectLayers(map, baseLayerId, themeRef.current);
 
       // Initialise state: copy current state from parent to spider
       // The mirror handles updates, but we need to copy the state that exists now.
@@ -226,18 +230,21 @@ export function SpiderLayer({ baseLayerId }) {
         map.setFilter(baseLayerId, baseFilterRef.current);
       } catch {}
 
+      // Remove hover/select layers for overlay (before the source they read from)
+      [
+        `${baseLayerId}-spider-hover-halo`,
+        `${baseLayerId}-spider-hover`,
+        `${baseLayerId}-spider-select-halo`,
+        `${baseLayerId}-spider-select`,
+      ].forEach((id) => {
+        if (map.getLayer(id)) map.removeLayer(id);
+      });
+
       // Remove overlay
       if (map.getLayer(pointLayerId)) map.removeLayer(pointLayerId);
       if (map.getSource(pointSourceId)) map.removeSource(pointSourceId);
       if (map.getLayer(linkLayerId)) map.removeLayer(linkLayerId);
       if (map.getSource(linkSourceId)) map.removeSource(linkSourceId);
-
-      // Remove hover/select layers for overlay
-      [`${baseLayerId}-spider-hover`, `${baseLayerId}-spider-select`].forEach(
-        (id) => {
-          if (map.getLayer(id)) map.removeLayer(id);
-        }
-      );
       if (map.__spiderIndex) delete map.__spiderIndex[baseLayerId];
     };
   }, [map, baseLayerId]);

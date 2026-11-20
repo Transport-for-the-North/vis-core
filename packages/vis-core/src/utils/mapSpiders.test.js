@@ -18,8 +18,6 @@ import * as mapUtils from "./map";
 // Mock the module and explicitly declare it as an ES Module
 jest.mock("./map", () => ({
   __esModule: true,
-  getSelectedLayerStyle: jest.fn(() => ({ type: "circle", paint: {} })),
-  getHoverLayerStyle: jest.fn(() => ({ type: "circle", paint: {} })),
   getSourceLayer: jest.fn(),
 }));
 
@@ -31,8 +29,6 @@ describe("mapSpiders utilities", () => {
     
     // Access the mocked functions via the namespace and return valid objects
     mapUtils.getSourceLayer.mockReturnValue("mock-source-layer");
-    mapUtils.getHoverLayerStyle.mockReturnValue({ type: "circle", paint: {} });
-    mapUtils.getSelectedLayerStyle.mockReturnValue({ type: "circle", paint: {} });
 
     mockMap = {
       querySourceFeatures: jest.fn(),
@@ -170,7 +166,13 @@ describe("mapSpiders utilities", () => {
 
       ensureSpiderHoverSelectLayers(mockMap, "base");
 
-      expect(mockMap.addLayer).toHaveBeenCalledTimes(2);
+      expect(mockMap.addLayer).toHaveBeenCalledTimes(4);
+      expect(mockMap.addLayer).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "base-spider-select-halo", source: "base-spider-src" })
+      );
+      expect(mockMap.addLayer).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "base-spider-hover-halo", source: "base-spider-src" })
+      );
       expect(mockMap.addLayer).toHaveBeenCalledWith(
         expect.objectContaining({ id: "base-spider-hover", source: "base-spider-src" })
       );

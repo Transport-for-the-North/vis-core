@@ -1,4 +1,5 @@
-import { getSelectedLayerStyle, getHoverLayerStyle, getSourceLayer } from "./map";
+import { getSourceLayer } from "./map";
+import { addHoverLayers } from "../map/hoverStyle";
 
 /**
  * Collects all currently loaded point features for a vector-tile source,
@@ -226,27 +227,29 @@ export function getSpiderOverlayLayerIds(map, layerId) {
  *
  * @param {maplibregl.Map} map - MapLibre instance
  * @param {string} baseLayerId - Parent layer id (e.g., "Stations")
+ * @param {'light'|'dark'} [theme='light'] - Base-map theme, for the hover colours.
  */
-export function ensureSpiderHoverSelectLayers(map, baseLayerId) {
+export function ensureSpiderHoverSelectLayers(map, baseLayerId, theme = "light") {
   const pointSrcId = `${baseLayerId}-spider-src`;
-  const pointHoverId  = `${baseLayerId}-spider-hover`;
-  const pointSelectId = `${baseLayerId}-spider-select`;
 
-  // Points hover
-  if (!map.getLayer(pointHoverId) && map.getSource(pointSrcId)) {
-    const hoverLayer = getHoverLayerStyle('point');
-    hoverLayer.id = pointHoverId;
-    hoverLayer.source = pointSrcId;
-    hoverLayer.metadata = { isStylable: false };
-    map.addLayer(hoverLayer);
+  // Points hover: a ring around the overlay point, sized from the overlay layer when hovered.
+  if (map.getSource(pointSrcId)) {
+    addHoverLayers(map, {
+      baseLayerId: `${baseLayerId}-spider`,
+      geometryType: "point",
+      source: pointSrcId,
+      theme,
+    });
   }
 
-  // Points select
-  if (!map.getLayer(pointSelectId) && map.getSource(pointSrcId)) {
-    const selectLayer = getSelectedLayerStyle('point');
-    selectLayer.id = pointSelectId;
-    selectLayer.source = pointSrcId;
-    selectLayer.metadata = { isStylable: false };
-    map.addLayer(selectLayer);
+  // Points select: same ring, in the selection colour, above the hover ring.
+  if (map.getSource(pointSrcId)) {
+    addHoverLayers(map, {
+      kind: "selected",
+      baseLayerId: `${baseLayerId}-spider`,
+      geometryType: "point",
+      source: pointSrcId,
+      theme,
+    });
   }
 }

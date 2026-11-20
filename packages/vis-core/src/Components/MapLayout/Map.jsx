@@ -15,6 +15,8 @@ import { SpiderLayer } from "./SpiderLayer";
 import MapStyleToggle from "./MapStyleToggle";
 import { useBaseMapTransition } from "hooks/useBaseMapTransition";
 import { getBaseMap } from "../../map/baseMaps";
+import { syncHoverLayers } from "../../map/hoverStyle";
+import { queryNearestRenderedFeatures } from "../../map/hoverPicking";
 import {
   getSourceLayer,
   getFeatureStateValue,
@@ -34,6 +36,9 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { RectangleMode } from "@ookla/mapbox-gl-draw-rectangle";
 import debounce from "lodash.debounce";
 import { mapKeys, uniq } from "lodash";
+
+// Gap between the cursor and the hover tooltip, so the tooltip doesn't sit on the hovered feature.
+const HOVER_POPUP_OFFSET = 14;
 
 const StyledMapContainer = styled.div`
   width: 100%;
@@ -356,9 +361,28 @@ const Map = (props) => {
         }
         
         const spiderOverlayLayerIds = allSpiderOverlayLayerIds(map, state.layers); // Added so we can account for spider layers (dupe points)
-        const featuresWithDuplicates = map.queryRenderedFeatures(bufferedPoint, {
-           layers: [...hoverableLayers, ...spiderOverlayLayerIds],
-         });
+        // Nearest feature first, so the feature under the pointer beats a neighbour that is
+        // merely within tolerance. Features that would not get a hover don't end the search.
+        const isHoverCandidate = (f) => {
+          if (f.id == null || !f.layer?.id) return false;
+          const cfg = state.layers[resolveBaseLayerIdFromSpiderLayerId(f.layer.id)];
+          if (!cfg) return false;
+          const value = getFeatureStateValue(f);
+          return !(cfg.shouldHaveHoverOnlyOnData && (value === null || value === undefined));
+        };
+        const featuresWithDuplicates = queryNearestRenderedFeatures(
+          map,
+          { x: pointX, y: pointY },
+          [...hoverableLayers, ...spiderOverlayLayerIds],
+          buffer,
+          isHoverCandidate,
+          prevHoveredFeaturesRef.current.length
+            ? (f) =>
+                prevHoveredFeaturesRef.current.some(
+                  (prev) => prev.layerId === f.layer?.id && prev.featureId === f.id
+                )
+            : null
+        );
         
         // Filter out any features that don't have required properties
         const validFeatures = (featuresWithDuplicates || []).filter(
@@ -466,6 +490,8 @@ const Map = (props) => {
             prevFeature.featureId === currFeature.featureId
         );
         if (!wasHovered) {
+          // Match the highlight to the layer's current width/size before showing it.
+          syncHoverLayers(map, currFeature.layerId);
           map.setFeatureState(
             {
               source: currFeature.source,
@@ -662,6 +688,7 @@ const Map = (props) => {
           closeButton: false,
           closeOnClick: false,
           closeOnMove: false,
+          offset: HOVER_POPUP_OFFSET,
         })
           .setLngLat(coordinates)
           .setHTML(aggregatedHtml)
@@ -996,6 +1023,7 @@ const Map = (props) => {
         }
 
         // Set the 'selected' state of the currently selected feature
+        syncHoverLayers(map, layerId);
         map.setFeatureState(
           {
             source: feature.layer.source,

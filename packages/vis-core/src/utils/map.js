@@ -1,4 +1,5 @@
 import { roundToSignificantFigures } from "./math";
+import { getHoverLayerSpecs } from "../map/hoverStyle";
 import chroma from "chroma-js";
 import { 
   jenksBreaks, 
@@ -1280,102 +1281,9 @@ export const getLayerStyle = (geometryType) => {
  * @returns {Object} The style configuration object for the hover layer.
  */
 export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
-  const hasCustomOffset = layerConfig.defaultLineOffset !== undefined && layerConfig.defaultLineOffset !== null;
-  switch (geometryType) {
-    case "polygon":
-      return {
-        id: "",
-        type: "line",
-        paint: {
-          "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            // Specify zoom levels and corresponding line widths
-            5,
-            1, // At zoom level 5, line width will be 1
-            10,
-            2, // At zoom level 10, line width will be 2
-            15,
-            4, // At zoom level 15, line width will be 4
-            20,
-            8, // At zoom level 20, line width will be 8
-          ],
-        }
-      };
-    case "line":
-      return {
-        id: "",
-        type: "line",
-        paint: {
-          "line-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
-          "line-opacity": 0.8,
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            // Specify zoom levels and corresponding line widths
-            5,
-            2, // At zoom level 5, line width will be 1
-            10,
-            4, // At zoom level 10, line width will be 2
-            15,
-            8, // At zoom level 15, line width will be 4
-            20,
-            16, // At zoom level 20, line width will be 8
-          ],
-          "line-offset": hasCustomOffset
-            ? layerConfig.defaultLineOffset
-            : [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                // Specify zoom levels and corresponding line offsets - increased for better gap
-                5,
-                -2, // At zoom level 5, line offset increased to -2
-                10,
-                -4, // At zoom level 10, line offset increased to -4
-                15,
-                -8, // At zoom level 15, line offset increased to -8
-                20,
-                -12, // At zoom level 20, line offset increased to -12
-              ],
-        }
-      };
-    case "point":
-      return {
-        id: "",
-        type: "circle",
-        paint: {
-          "circle-radius": 5,
-          "circle-color": ["case", ["boolean", ["feature-state", "hover"], false], "red", "transparent"],
-        }
-      };
-    case "symbol":
-      return {
-        id: "",
-        type: "symbol",
-        source: "",
-        "source-layer": "",
-        layout: {
-          "icon-image": ["concat", ["get", "icon_name"], "-hover"],
-          "icon-size": 1.2,
-          "icon-allow-overlap": true,
-          "icon-ignore-placement": true
-        },
-        paint: {
-          "icon-opacity": [
-            "case",
-            ["boolean", ["feature-state", "hover"], false],
-            1,
-            0
-          ]
-        }
-      }
-    default:
-      return {};
-  }
+  const specs = getHoverLayerSpecs(geometryType, { basePaint: layerConfig?.customPaint });
+  const core = specs[specs.length - 1];
+  return core ? { id: "", ...core.layer } : {};
 };
 
 /**
@@ -1387,108 +1295,14 @@ export const getHoverLayerStyle = (geometryType, layerConfig = {}) => {
  * @returns {Object} The style configuration object for the selected layer.
  */
 export const getSelectedLayerStyle = (layerType) => {
-  switch (layerType) {
-    case "fill":
-    case "polygon":
-      // Handle fill layers (polygons) by drawing an outline
-      return {
-        id: "",
-        type: "line",
-        paint: {
-          "line-color": [
-            "case",
-            ["==", ["feature-state", "selected"], true],
-            "#f00",
-            "transparent",
-          ],
-          "line-width": 2,
-        },
-      };
-    case "line":
-      // Handle line layers
-      return {
-        id: "",
-        type: "line",
-        paint: {
-          "line-color": [
-            "case",
-            ["boolean", ["feature-state", "selected"], false],
-            "#f00",
-            "transparent",
-          ],
-          "line-width": 4,
-        },
-      };
-    case "symbol":
-      // Handle symbol layers (e.g., icons or labels)
-      return {
-        id: "",
-        type: "symbol",
-        source: "",
-        "source-layer": "",
-        layout: {
-          "icon-image": ["concat", ["get", "icon_name"], "-select"],
-          "icon-size": 1.2,
-          "icon-allow-overlap": true,
-          "icon-ignore-placement": true
-        },
-        paint: {
-          "icon-opacity": [
-            "case",
-            ["boolean", ["feature-state", "selected"], false],
-            1,
-            0
-          ],
-          "text-color": [
-            "case",
-            ["boolean", ["feature-state", "selected"], false],
-            "#f00",
-            "#000",
-          ],
-          "icon-color": [
-            "case",
-            ["boolean", ["feature-state", "selected"], false],
-            "#f00",
-            "#000",
-          ],
-        },
-      };
-    case "circle":
-    case "point":
-      // Handle point layers
-      return {
-        id: "",
-        type: "circle",
-        paint: {
-          "circle-radius": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            0, 2,
-            12, 8,
-            22, 15
-          ],
-          "circle-color": [
-            "case",
-            ["==", ["feature-state", "selected"], true],
-            "blue",
-            "transparent",
-          ],
-          "circle-opacity": 0.75,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": [
-            "case",
-            ["==", ["feature-state", "selected"], true],
-            "black",
-            "transparent"
-          ],
-        },
-      };
-    default:
-      // Handle other layer types if necessary
-      console.warn(`Unhandled layer type: ${layerType}`);
-      return {}; // Return empty object if the layer type is not supported
+  const geometryType = { fill: "polygon", circle: "point" }[layerType] ?? layerType;
+  const specs = getHoverLayerSpecs(geometryType, { kind: "selected" });
+  const core = specs[specs.length - 1];
+  if (!core) {
+    console.warn(`Unhandled layer type: ${layerType}`);
+    return {};
   }
+  return { id: "", ...core.layer };
 };
 
 /**
