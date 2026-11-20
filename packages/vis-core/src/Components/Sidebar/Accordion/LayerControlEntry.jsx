@@ -19,6 +19,7 @@ import {
   applyWidthFactor,
   updateOpacityExpression,
   getMetricDefinition,
+  recordSliderOpacity,
 } from "utils/map";
 import { getVisualisationDisplayMode } from "utils/displayMode";
 
@@ -613,8 +614,19 @@ export const LayerControlEntry = memo(
       maps.forEach((map) => {
         const ids = getLinkedLayerIds(map, layer.id);
 
+        // Hover checks use this to skip a layer the user has set to 0
+        recordSliderOpacity(map, layer.id, newOpacity);
+
         // Update base type opacity across all linked layers that share the prop
         setPaintAcross(map, ids, baseOpacityProp, newOpacity);
+
+        // Circle outlines have their own opacity, so fade them too or they stay visible at 0
+        setPaintAcross(
+          map,
+          ids.filter((id) => map.getLayer(id)?.type === "circle"),
+          "circle-stroke-opacity",
+          newOpacity
+        );
 
         // Additionally, ensure spider link layer tracks opacity even if base is circle/fill
         // (link layer uses 'line-opacity' for connector visibility)
