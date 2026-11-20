@@ -3,6 +3,7 @@ import {
   resolveCategoricalColours,
   getMetricDefinition,
   reclassifyData,
+  fitBandsToCount,
   getWidthProperty,
   isBasePlaceLabelLayer,
   moveTownCityLabelsToTop,
@@ -342,6 +343,209 @@ describe("reclassifyData", () => {
     expect(Array.isArray(bins)).toBe(true);
     expect(bins.length).toBeGreaterThan(1);
     expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("fitBandsToCount", () => {
+  it("trims continuous bands from the top end", () => {
+    expect(fitBandsToCount([0, 10, 20, 30], 2)).toEqual([0, 10]);
+  });
+
+  it("pads continuous bands upwards in steps of 1", () => {
+    expect(fitBandsToCount([0, 10, 20], 5)).toEqual([0, 10, 20, 21, 22]);
+  });
+
+  it("trims diverging bands from both ends", () => {
+    expect(
+      fitBandsToCount([-40, -20, -10, 0, 10, 20, 40], 3, { diverging: true })
+    ).toEqual([-10, 0, 10]);
+  });
+
+  it("pads diverging bands at both ends in steps of 1", () => {
+    expect(fitBandsToCount([-10, 0, 10], 7, { diverging: true })).toEqual([
+      -12, -11, -10, 0, 10, 11, 12,
+    ]);
+  });
+
+  it("returns an unchanged copy for the same or an invalid count", () => {
+    const source = [0, 10, 20];
+    expect(fitBandsToCount(source, 3)).toEqual(source);
+    expect(fitBandsToCount(source, 3)).not.toBe(source);
+    expect(fitBandsToCount(source, undefined)).toEqual(source);
+    expect(fitBandsToCount(source, 0)).toEqual(source);
+  });
+});
+
+describe("reclassifyData bandCount", () => {
+  // 1..100: enough distinct values for every method to produce a full set of bands.
+  const continuousData = Array.from({ length: 100 }, (_, i) => ({ id: i, value: i + 1 }));
+  // -100..100 without zero, so diverging bands can be mirrored about zero.
+  const divergingData = Array.from({ length: 200 }, (_, i) => ({
+    id: i,
+    value: i < 100 ? -(i + 1) : i - 99,
+  }));
+
+  const classify = (data, style, method, options = {}) =>
+    reclassifyData(data, style, method, [], {}, {}, options);
+
+  // Skewed like real transport data: most values low, a long tail of high ones. This is
+  // what broke chroma's k-means and the old standard deviation breaks.
+  let seed = 1;
+  const random = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+  const skewedValues = Array.from({ length: 2000 }, () =>
+    Math.round(Math.exp(random() * 3 + random() * 3 + random() * 2))
+  );
+  const skewedData = skewedValues.map((value, id) => ({ id, value }));
+  // Same magnitudes with mixed signs, and some zeros (no change).
+  const skewedDivergingData = skewedValues.map((value, id) => ({
+    id,
+    value: id % 10 === 0 ? 0 : id % 2 === 0 ? -value : value,
+  }));
+
+  describe("continuous", () => {
+    describe.each([
+      ["evenly spread", continuousData],
+      ["skewed", skewedData],
+    ])("%s data", (_label, data) => {
+      it.each(["q", "e", "j", "k", "s"])(
+        "method %s returns exactly the chosen number of bands, starting at 0",
+        (method) => {
+          [3, 4, 5, 6, 7, 9].forEach((bandCount) => {
+            const bins = classify(data, "polygon-continuous", method, { bandCount });
+            expect(bins).toHaveLength(bandCount);
+            expect(bins[0]).toBe(0);
+            bins.slice(1).forEach((value, i) => expect(value).toBeGreaterThan(bins[i]));
+          });
+        }
+      );
+    });
+
+    it.each(["l", "h"])(
+      "method %s never returns more than the chosen number of bands",
+      (method) => {
+        [2, 4, 6].forEach((bandCount) => {
+          const bins = classify(continuousData, "polygon-continuous", method, { bandCount });
+          expect(bins.length).toBeLessThanOrEqual(bandCount);
+          expect(bins.length).toBeGreaterThan(0);
+        });
+      }
+    );
+
+    it.each([
+      ["q", 9],
+      ["e", 9],
+      ["j", 8],
+      ["k", 9],
+      ["s", 7],
+    ])("method %s at its natural count (%i) matches the output with no bandCount", (method, n) => {
+      expect(
+        classify(continuousData, "polygon-continuous", method, { bandCount: n })
+      ).toEqual(classify(continuousData, "polygon-continuous", method));
+    });
+
+    it("ignores bandCount for custom bands", () => {
+      const customBands = [0, 50, 75];
+      expect(
+        classify(continuousData, "polygon-continuous", "c", { customBands, bandCount: 7 })
+      ).toEqual(customBands);
+    });
+  });
+
+  describe("diverging", () => {
+    describe.each([
+      ["evenly spread", divergingData],
+      ["skewed, with zeros", skewedDivergingData],
+    ])("%s data", (_label, data) => {
+      it.each(["q", "e", "j", "k", "s"])(
+        "method %s returns the chosen odd count, mirrored about a 0 midpoint",
+        (method) => {
+          [3, 5, 7, 9].forEach((bandCount) => {
+            const bins = classify(data, "polygon-diverging", method, { bandCount });
+            expect(bins).toHaveLength(bandCount);
+            const mid = (bandCount - 1) / 2;
+            expect(bins[mid]).toBe(0);
+            bins.forEach((value, i) => {
+              expect(value).toBeCloseTo(-bins[bins.length - 1 - i]);
+            });
+          });
+        }
+      );
+    });
+
+    it("head/tail keeps the 0 midpoint and never exceeds the chosen count", () => {
+      [3, 5, 7].forEach((bandCount) => {
+        const bins = classify(divergingData, "polygon-diverging", "h", { bandCount });
+        expect(bins.length).toBeLessThanOrEqual(bandCount);
+        expect(bins[(bins.length - 1) / 2]).toBe(0);
+        bins.forEach((value, i) => {
+          expect(value).toBeCloseTo(-bins[bins.length - 1 - i]);
+        });
+      });
+    });
+
+    it.each(["q", "e", "j", "k", "s", "h"])(
+      "method %s at 9 bands matches the output with no bandCount",
+      (method) => {
+        expect(
+          classify(divergingData, "polygon-diverging", method, { bandCount: 9 })
+        ).toEqual(classify(divergingData, "polygon-diverging", method));
+      }
+    );
+
+    it("returns the zero-and-above half for line layers", () => {
+      const bins = classify(divergingData, "line-diverging", "q", { bandCount: 5 });
+      expect(bins).toHaveLength(3);
+      expect(bins[0]).toBe(0);
+    });
+  });
+
+  describe("default classification with configured bands", () => {
+    const defaultBands = [
+      {
+        name: "trse",
+        metric: [
+          {
+            name: "trse",
+            values: [0, 10, 20, 30],
+            differenceValues: [-20, -10, 0, 10, 20],
+          },
+        ],
+      },
+    ];
+    const classifyDefault = (style, bandCount) =>
+      reclassifyData(continuousData, style, "d", defaultBands, { category: "trse" }, {}, {
+        bandMetricName: "trse",
+        bandCount,
+      });
+
+    it("trims continuous configured values from the top end", () => {
+      expect(classifyDefault("polygon-continuous", 2)).toEqual([0, 10]);
+    });
+
+    it("restores, then pads, continuous configured values when growing", () => {
+      expect(classifyDefault("polygon-continuous", 4)).toEqual([0, 10, 20, 30]);
+      expect(classifyDefault("polygon-continuous", 6)).toEqual([0, 10, 20, 30, 31, 32]);
+    });
+
+    it("trims diverging configured values from both ends", () => {
+      expect(classifyDefault("polygon-diverging", 3)).toEqual([-10, 0, 10]);
+    });
+
+    it("pads diverging configured values at both ends", () => {
+      expect(classifyDefault("polygon-diverging", 7)).toEqual([-21, -20, -10, 0, 10, 20, 21]);
+    });
+
+    it("returns the zero-and-above half for diverging line layers", () => {
+      expect(classifyDefault("line-diverging", 7)).toEqual([0, 10, 20, 21]);
+    });
+
+    it("leaves configured values untouched without a bandCount", () => {
+      expect(classifyDefault("polygon-continuous", undefined)).toEqual([0, 10, 20, 30]);
+      expect(classifyDefault("polygon-diverging", undefined)).toEqual([-20, -10, 0, 10, 20]);
+    });
   });
 });
 

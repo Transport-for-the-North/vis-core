@@ -165,6 +165,65 @@ describe("mapReducer categorical legend cache", () => {
   });
 });
 
+describe("mapReducer UPDATE_BAND_COUNT", () => {
+  const makeState = () => ({
+    layers: {
+      layerA: { class_method: "q", customBands: [0, 10], bandMetricName: "trse" },
+      layerB: { class_method: "j" },
+    },
+  });
+
+  it("stores the count without changing the classification method", () => {
+    const nextState = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_BAND_COUNT,
+      payload: { layerName: "layerA", bandCount: 5 },
+    });
+
+    expect(nextState.layers.layerA).toEqual({
+      class_method: "q",
+      customBands: [0, 10],
+      bandMetricName: "trse",
+      bandCount: 5,
+    });
+  });
+
+  it("leaves other layers untouched", () => {
+    const state = makeState();
+    const nextState = mapReducer(state, {
+      type: actionTypes.UPDATE_BAND_COUNT,
+      payload: { layerName: "layerA", bandCount: 5 },
+    });
+
+    expect(nextState.layers.layerB).toBe(state.layers.layerB);
+  });
+
+  it.each([null, undefined])("clears the count when given %s", (bandCount) => {
+    const withCount = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_BAND_COUNT,
+      payload: { layerName: "layerA", bandCount: 5 },
+    });
+    const nextState = mapReducer(withCount, {
+      type: actionTypes.UPDATE_BAND_COUNT,
+      payload: { layerName: "layerA", bandCount },
+    });
+
+    expect(nextState.layers.layerA.bandCount).toBeNull();
+  });
+
+  it("keeps the count when the classification method changes", () => {
+    const withCount = mapReducer(makeState(), {
+      type: actionTypes.UPDATE_BAND_COUNT,
+      payload: { layerName: "layerA", bandCount: 5 },
+    });
+    const nextState = mapReducer(withCount, {
+      type: actionTypes.UPDATE_CLASSIFICATION_METHOD,
+      payload: { layerName: "layerA", class_method: "j" },
+    });
+
+    expect(nextState.layers.layerA.bandCount).toBe(5);
+  });
+});
+
 describe("mapReducer display mode", () => {
   const makeState = () => ({
     visualisations: {

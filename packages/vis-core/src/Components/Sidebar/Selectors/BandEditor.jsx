@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { SelectorLabel } from "./SelectorLabel";
 import { AppButton } from "Components/AppButton";
 import { defaultBgColour } from "defaults";
+import { fitBandsToCount } from "utils/map";
 
 const BandEditorContainer = styled.div`
   margin-top: 12px;
@@ -125,6 +126,12 @@ const BandCountLabel = styled.span`
   font-weight: 500;
 `;
 
+const BandCountHint = styled.div`
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: #666;
+`;
+
 /**
  * BandEditor component allows users to customize classification band values for map layers.
  * Provides an interface to edit the number of bands and their individual threshold values.
@@ -137,6 +144,11 @@ const BandCountLabel = styled.span`
  * @param {boolean} props.isDiverging - Whether the color scheme is diverging (affects min band count).
  * @param {boolean} [props.isSymmetric] - Whether editing a band mirrors the change onto the opposite band.
  * @param {boolean} [props.isCustom] - Whether the current classification method is custom.
+ * @param {Function} [props.onBandCountChange] - Count-change callback; null restores natural count.
+ * @param {boolean} [props.hasBandCount] - Whether a band count is chosen.
+ * @param {Function} [props.previewBandsForCount] - Count → bands the method will produce, or null.
+ * @param {number} [props.maxBandCount] - Most bands the method can give; higher counts are disabled.
+ * @param {number} [props.configuredBandCount] - The page's Default count; always offered.
  * @param {number[]} [props.data] - Optional: raw data array for quantile binning.
  * @returns {JSX.Element} The rendered BandEditor component.
  *
@@ -155,12 +167,21 @@ export const BandEditor = ({
   isSymmetric = false,
   isCustom = false,
   onReset = null,
+  onBandCountChange = null,
+  hasBandCount = false,
+  previewBandsForCount = null,
+  maxBandCount = null,
+  configuredBandCount = null,
   showLabel = true,
   ..._unusedProps
 }) => {
   void _unusedProps;
   const [localBands, setLocalBands] = useState(bands);
   const [hasChanges, setHasChanges] = useState(false);
+  // Whether a band value was typed since sync.
+  const [valuesEdited, setValuesEdited] = useState(false);
+  const [pendingCount, setPendingCount] = useState(null);
+  const [hasRealPreview, setHasRealPreview] = useState(false);
 
   /**
    * Synchronize local band state with incoming bands prop.
@@ -169,6 +190,9 @@ export const BandEditor = ({
   useEffect(() => {
     setLocalBands(bands);
     setHasChanges(false);
+    setValuesEdited(false);
+    setPendingCount(null);
+    setHasRealPreview(false);
   }, [bands]);
 
   /**
@@ -220,6 +244,9 @@ export const BandEditor = ({
     }
     setLocalBands(newBands);
     setHasChanges(true);
+    setValuesEdited(true);
+    setPendingCount(null);
+    setHasRealPreview(false);
   };
 
   /**
@@ -231,40 +258,41 @@ export const BandEditor = ({
    */
   const handleBandCountChange = (e) => {
     const count = Number(e.target.value);
-    let newBands = [...localBands];
-    if (isDiverging) {
-      const diff = Math.abs(count - newBands.length);
-      const lower = Math.floor(diff / 2);
-      const upper = diff - lower;
-      if (count > newBands.length) {
-        const first = newBands.length ? newBands[0] : 0;
-        const last = newBands.length ? newBands[newBands.length - 1] : 0;
-        newBands = [
-          ...Array.from({ length: lower }, (_, i) => first - (lower - i)),
-          ...newBands,
-          ...Array.from({ length: upper }, (_, i) => last + i + 1),
-        ];
-      } else {
-        newBands = newBands.slice(lower, newBands.length - upper);
-      }
-    } else if (count > newBands.length) {
-      // Add new bands spaced by 1
-      const last = newBands.length ? newBands[newBands.length - 1] : 0;
-      for (let i = newBands.length; i < count; i++) {
-        newBands.push(last + (i - newBands.length + 1));
-      }
-    } else {
-      newBands = newBands.slice(0, count);
-    }
-    setLocalBands(newBands);
+    // Under a non-custom method, show what the method will really produce at this count.
+    const preview =
+      shouldReclassify && typeof previewBandsForCount === "function"
+        ? previewBandsForCount(count)
+        : null;
+    const hasPreview = Array.isArray(preview) && preview.length > 0;
+    setLocalBands(
+      hasPreview ? preview : fitBandsToCount(localBands, count, { diverging: isDiverging })
+    );
+    setPendingCount(shouldReclassify ? count : null);
+    setHasRealPreview(hasPreview);
     setHasChanges(true);
   };
+
+  // Count-only change on a non-custom method reclassifies.
+  const shouldReclassify =
+    !isCustom && !valuesEdited && typeof onBandCountChange === "function";
 
   /**
    * Handles the update button click.
    * Filters out invalid values and invokes the onChange callback with valid bands.
+   * A count-only change reclassifies instead.
    */
   const handleUpdate = () => {
+    if (shouldReclassify) {
+      onBandCountChange(pendingCount ?? localBands.length);
+      // Keep a real preview until the new bins arrive; drop a trim/pad fallback in case
+      // bands never change.
+      if (!hasRealPreview) {
+        setLocalBands(bands);
+        setPendingCount(null);
+      }
+      setHasChanges(false);
+      return;
+    }
     const validBands = localBands.filter(v => v !== "" && !isNaN(v)).map(Number);
     onChange(validBands);
     setHasChanges(false);
@@ -272,14 +300,27 @@ export const BandEditor = ({
 
   // Range min/max for the band count
   const minBands = isDiverging ? 3 : 2;
-  const maxBands = Math.max(9, bands.length);
+  // Up to 9, or the page's configured count if higher, so it can be picked again after
+  // fewer. A method's own limit only disables counts, never widens the range.
+  const maxBands = Math.max(
+    9,
+    bands.length,
+    Number.isInteger(configuredBandCount) ? configuredBandCount : 0
+  );
   const bandStep = isDiverging ? 2 : 1;
   const bandCounts = [];
   for (let n = minBands; n <= maxBands; n += bandStep) bandCounts.push(n);
-  if (!bandCounts.includes(localBands.length)) {
-    bandCounts.push(localBands.length);
+  // The picked count, which a method may not fully produce.
+  const selectedCount = pendingCount ?? localBands.length;
+  if (!bandCounts.includes(selectedCount)) {
+    bandCounts.push(selectedCount);
     bandCounts.sort((a, b) => a - b);
   }
+  // Only for reclassifying methods that cap the count (Head/Tail Breaks).
+  const countLimit =
+    shouldReclassify && Number.isInteger(maxBandCount) && maxBandCount >= minBands
+      ? maxBandCount
+      : null;
 
   const handleResetBands = () => {
     // If the current classification is custom, delegate to parent so it can restore
@@ -297,8 +338,15 @@ export const BandEditor = ({
     }
 
     // Otherwise, just revert any unsaved local edits back to the current non-custom bands.
+    // Also drops a chosen band count.
     setLocalBands(bands);
     setHasChanges(false);
+    setValuesEdited(false);
+    setPendingCount(null);
+    setHasRealPreview(false);
+    if (hasBandCount && typeof onBandCountChange === "function") {
+      onBandCountChange(null);
+    }
   };
 
   return (
@@ -308,14 +356,23 @@ export const BandEditor = ({
         <BandHeader>
           <BandCountLabel>Number of bands:</BandCountLabel>
           <BandCountSelect
-            value={localBands.length}
+            value={selectedCount}
             onChange={handleBandCountChange}
           >
             {bandCounts.map((n) => (
-              <option key={n} value={n}>{n}</option>
+              <option
+                key={n}
+                value={n}
+                disabled={countLimit !== null && n > countLimit && n !== selectedCount}
+              >
+                {n}
+              </option>
             ))}
           </BandCountSelect>
         </BandHeader>
+        {countLimit !== null && countLimit < bandCounts[bandCounts.length - 1] && (
+          <BandCountHint>This method gives at most {countLimit} bands for this data.</BandCountHint>
+        )}
       </BandMetaContainer>
       {validation.error && (
         <ErrorMessage>{validation.error}</ErrorMessage>
@@ -354,7 +411,7 @@ export const BandEditor = ({
             $fontWeight="500"
             type="button"
             onClick={handleResetBands}
-            disabled={localBands.length < 2 || (!hasChanges && !isCustom)}
+            disabled={localBands.length < 2 || (!hasChanges && !isCustom && !hasBandCount)}
           >
             Reset
           </ResetButton>

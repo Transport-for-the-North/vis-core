@@ -431,7 +431,7 @@ describe("reclassifyAndStyleMap is called", () => {
         undefined,
         { url: "/" },
         undefined,
-        { bandMetricName: undefined, customBands: undefined, defaultClassification: undefined, displayMode: "absolute" }
+        { bandMetricName: undefined, customBands: undefined, bandCount: undefined, defaultClassification: undefined, displayMode: "absolute" }
       );
     });
   });
@@ -510,6 +510,109 @@ describe("customBandsHasChanged triggers reclassification", () => {
     );
 
     await waitFor(() => expect(reclassifyData).toHaveBeenCalled());
+  });
+});
+
+describe("bandCount changes trigger reclassification", () => {
+  const baseVisualisation = {
+    shouldFilterDataToViewport: true,
+    style: "line-continuous",
+    type: "joinDataToMap",
+    joinLayer: "visualisationName",
+  };
+
+  /** Renders with the given layer config, or rerenders when `rerender` is passed. */
+  const renderWithLayer = (layerConfig, rerender = render) =>
+    rerender(
+      <AppContext.Provider value={mockAppContext}>
+        <MapContext.Provider
+          value={{
+            ...mockMapContext,
+            state: {
+              ...mockMapContext.state,
+              visualisations: { visualisationName: baseVisualisation },
+              layers: { visualisationName: layerConfig },
+            },
+          }}
+        >
+          <MapVisualisation {...props} />
+        </MapContext.Provider>
+      </AppContext.Provider>
+    );
+
+  /** Renders, waits for the first styling, then clears the mocks. */
+  const renderAndSettle = async (layerConfig) => {
+    const result = renderWithLayer(layerConfig);
+    await waitFor(() => expect(reclassifyData).toHaveBeenCalled());
+    jest.clearAllMocks();
+    reclassifyData.mockReturnValue("#More9Caracters");
+    return result;
+  };
+
+  beforeEach(() => {
+    useFetchVisualisationData.mockReturnValue({
+      data: [{ feature_collection: JSON.stringify({ element: "first" }) }],
+      isLoading: false,
+      error: false,
+      dataWasReturnedButFiltered: false,
+      fetchState: DataFetchState.SUCCESS,
+      resetFetchState: jest.fn(),
+    });
+    hasAnyGeometryNotNull.mockReturnValue(true);
+    reclassifyData.mockReturnValue("#More9Caracters");
+    props.map.getStyle.mockReturnValue({ layers: [{ id: "firstLayersID" }] });
+    props.map.getLayer.mockReturnValue({ id: "mock-layer" });
+    props.map.isStyleLoaded.mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("reclassifies with the new count, keeping the classification method", async () => {
+    const { rerender } = await renderAndSettle({ class_method: "q" });
+
+    renderWithLayer({ class_method: "q", bandCount: 5 }, rerender);
+
+    await waitFor(() =>
+      expect(reclassifyData).toHaveBeenCalledWith(
+        expect.anything(),
+        "line-continuous",
+        "q",
+        undefined,
+        expect.anything(),
+        undefined,
+        expect.objectContaining({ bandCount: 5 })
+      )
+    );
+  });
+
+  it("reclassifies when the count is cleared back to the natural count", async () => {
+    const { rerender } = await renderAndSettle({ class_method: "q", bandCount: 5 });
+
+    renderWithLayer({ class_method: "q", bandCount: null }, rerender);
+
+    await waitFor(() =>
+      expect(reclassifyData).toHaveBeenCalledWith(
+        expect.anything(),
+        "line-continuous",
+        "q",
+        undefined,
+        expect.anything(),
+        undefined,
+        expect.objectContaining({ bandCount: undefined })
+      )
+    );
+  });
+
+  it("does not reclassify when the layer config changes but the count does not", async () => {
+    const { rerender } = await renderAndSettle({ class_method: "q", bandCount: 5 });
+
+    renderWithLayer({ class_method: "q", bandCount: 5 }, rerender);
+
+    // Give any (wrongly) scheduled restyle a chance to run.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(reclassifyData).not.toHaveBeenCalled();
   });
 });
 

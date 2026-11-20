@@ -202,6 +202,7 @@ export const MapVisualisation = ({
   const prevColorRef = useRef({});
   const prevClassMethodRef = useRef({});
   const prevCustomBandsRef = useRef({});
+  const prevBandCountRef = useRef({});
   const prevInvertRef = useRef({});
 
   // Ref to track pending updates during style resolution and timeouts
@@ -493,6 +494,8 @@ export const MapVisualisation = ({
       // Get bandMetricName and customBands from state.layers
       const bandMetricName = state.layers[layerKey]?.bandMetricName;
       const customBands = state.layers[layerKey]?.customBands;
+      // Number of bands chosen in the band editor; unset keeps each method's natural count.
+      const bandCount = state.layers[layerKey]?.bandCount ?? undefined;
 
       // Get defaultClassification from visualisation
       const defaultClassification = visualisation?.defaultClassification;
@@ -504,7 +507,7 @@ export const MapVisualisation = ({
         appContext.defaultBands,
         currentPage,
         visualisation.queryParams,
-        { bandMetricName, customBands, defaultClassification, displayMode: activeDisplayMode } // Pass bandMetricName, customBands, defaultClassification and the active display mode in options
+        { bandMetricName, customBands, bandCount, defaultClassification, displayMode: activeDisplayMode } // Pass bandMetricName, customBands, bandCount, defaultClassification and the active display mode in options
       );
 
       // Get the metric definition for the current page/metric
@@ -831,6 +834,13 @@ export const MapVisualisation = ({
       (layerKey in prevCustomBandsRef.current) &&
       !areNumericArraysEqual(currentCustomBands, prevCustomBands);
 
+    // Same `in` guard as custom bands: only a change after the first styling counts.
+    // null and undefined both mean "natural count", so they compare equal.
+    const currentBandCount = layerConfig?.bandCount ?? null;
+    const bandCountHasChanged =
+      (layerKey in prevBandCountRef.current) &&
+      currentBandCount !== prevBandCountRef.current[layerKey];
+
     const invertHasChanged =
       (layerKey in prevInvertRef.current) &&
       Boolean(state.layers[layerKey]?.invertedColorScheme) !== Boolean(prevInvertRef.current[layerKey]);
@@ -841,6 +851,7 @@ export const MapVisualisation = ({
       colorHasChanged ||
       classificationHasChanged ||
       customBandsHasChanged ||
+      bandCountHasChanged ||
       invertHasChanged;
 
     const previouslyHadNoData =
@@ -888,7 +899,8 @@ export const MapVisualisation = ({
       prevCustomBandsRef.current[layerKey] = Array.isArray(currentCustomBands)
         ? [...currentCustomBands]
         : currentCustomBands;
-      
+      prevBandCountRef.current[layerKey] = currentBandCount;
+
       switch (visualisation.type) {
         case "joinDataToMap": {
           // A join needs an array of records; treat anything else (including an

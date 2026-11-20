@@ -168,6 +168,7 @@ export const actionTypes = {
   UPDATE_DISPLAY_MODE: "UPDATE_DISPLAY_MODE",
   UPDATE_CLASSIFICATION_METHOD: "UPDATE_CLASSIFICATION_METHOD",
   UPDATE_CUSTOM_BANDS: "UPDATE_CUSTOM_BANDS",
+  UPDATE_BAND_COUNT: "UPDATE_BAND_COUNT",
   UPDATE_LAYER_WIDTH_FACTOR: "UPDATE_LAYER_WIDTH_FACTOR",
   UPDATE_METADATA_FILTER: "UPDATE_METADATA_FILTER",
   SET_METADATA_TABLES: "SET_METADATA_TABLES",
@@ -458,6 +459,24 @@ export const mapReducer = (state, action) => {
             ...state.layers[layerName],
             customBands,
             class_method: 'c', // Set to custom classification
+          },
+        },
+      };
+    }
+
+    // Number of bands to reclassify into, as chosen in the band editor. Unlike
+    // UPDATE_CUSTOM_BANDS this keeps the current classification method, which then
+    // recomputes its bands at this count. A null or undefined count restores each
+    // method's natural count.
+    case actionTypes.UPDATE_BAND_COUNT: {
+      const { bandCount, layerName } = action.payload;
+      return {
+        ...state,
+        layers: {
+          ...state.layers,
+          [layerName]: {
+            ...state.layers[layerName],
+            bandCount: bandCount ?? null,
           },
         },
       };

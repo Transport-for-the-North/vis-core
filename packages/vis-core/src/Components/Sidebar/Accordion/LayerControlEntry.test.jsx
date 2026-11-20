@@ -1,6 +1,7 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act, cleanup } from "@testing-library/react";
 import { LayerControlEntry } from "Components/Sidebar/Accordion/LayerControlEntry";
 import { AppContext, MapContext, PageContext } from "contexts";
+import { reclassifyData } from "utils/map";
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -640,6 +641,286 @@ describe("LayerControlEntry component test", () => {
       "line-opacity",
       0.7
     );
+  });
+});
+
+describe("LayerControlEntry band editor", () => {
+  /** A fill-color ramp over the given bins, as MapVisualisation paints it. */
+  const colourRamp = (bins) => [
+    "interpolate",
+    ["linear"],
+    ["feature-state", "value"],
+    ...bins.flatMap((bin, i) => [bin, `#00000${i}`]),
+  ];
+
+  /** A map whose fill-color can be repainted and whose styledata listeners can be fired. */
+  const makeLiveMap = (bins) => {
+    let fillColour = colourRamp(bins);
+    const listeners = new Set();
+    return {
+      getLayer: jest.fn(() => true),
+      getPaintProperty: jest.fn((_id, prop) => (prop === "fill-color" ? fillColour : 0.5)),
+      on: jest.fn((event, fn) => event === "styledata" && listeners.add(fn)),
+      off: jest.fn((event, fn) => event === "styledata" && listeners.delete(fn)),
+      repaint: (newBins) => {
+        fillColour = colourRamp(newBins);
+        listeners.forEach((fn) => fn());
+      },
+    };
+  };
+
+  const renderEntry = ({
+    map,
+    layerState = { class_method: "q" },
+    data = [{ value: 10 }, { value: 20 }, { value: 30 }],
+    style = "polygon-continuous",
+    appContext = mockAppContexte,
+  }) => {
+    const dispatch = jest.fn();
+    const state = {
+      visualisations: {
+        id: {
+          id: "id",
+          style,
+          queryParams: {},
+          data,
+        },
+      },
+      layers: { id: layerState },
+    };
+    render(
+      <MapContext.Provider value={{ state, dispatch }}>
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={appContext}>
+            <LayerControlEntry
+              {...props}
+              handleCustomBandsChange={jest.fn()}
+              layer={{
+                id: "id",
+                type: "fill",
+                layout: { visibility: "visible" },
+                metadata: { isStylable: true },
+              }}
+              maps={[map]}
+              state={state}
+            />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      </MapContext.Provider>
+    );
+    return { dispatch };
+  };
+
+  const bandValues = () =>
+    screen.getAllByRole("spinbutton").map((input) => Number(input.value));
+
+  it("shows the bins the map is painted with, and follows a restyle", async () => {
+    const map = makeLiveMap([0, 10, 20, 30, 40]);
+    renderEntry({ map });
+
+    expect(bandValues()).toEqual([0, 10, 20, 30, 40]);
+
+    act(() => map.repaint([0, 15, 30]));
+
+    await waitFor(() => expect(bandValues()).toEqual([0, 15, 30]));
+  });
+
+  it("stops listening for restyles when unmounted", () => {
+    const map = makeLiveMap([0, 10, 20]);
+    renderEntry({ map });
+    cleanup();
+
+    expect(map.off).toHaveBeenCalledWith("styledata", expect.any(Function));
+  });
+
+  it("dispatches the new band count, not custom bands, for a non-custom method", () => {
+    const map = makeLiveMap([0, 10, 20, 30, 40]);
+    const { dispatch } = renderEntry({ map });
+
+    // Two comboboxes: the classification method, then the number of bands.
+    const countSelect = screen.getAllByRole("combobox").at(-1);
+    fireEvent.change(countSelect, { target: { value: "3" } });
+    fireEvent.click(screen.getByRole("button", { name: "Update" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_BAND_COUNT",
+      payload: { bandCount: 3, layerName: "id" },
+    });
+  });
+
+  it("previews the values the method will produce at the new count", () => {
+    const data = Array.from({ length: 20 }, (_, i) => ({ value: (i + 1) * 10 }));
+    const map = makeLiveMap([0, 10, 20, 30, 40]);
+    renderEntry({ map, data });
+
+    fireEvent.change(screen.getAllByRole("combobox").at(-1), { target: { value: "3" } });
+
+    const expected = reclassifyData(
+      data,
+      "polygon-continuous",
+      "q",
+      mockAppContexte.defaultBands,
+      mockPageContext,
+      {},
+      { bandCount: 3 }
+    );
+    expect(expected).toHaveLength(3);
+    expect(bandValues()).toEqual(expected);
+  });
+
+  it("clears a chosen band count on Reset", () => {
+    const map = makeLiveMap([0, 10, 20]);
+    const { dispatch } = renderEntry({ map, layerState: { class_method: "q", bandCount: 3 } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_BAND_COUNT",
+      payload: { bandCount: null, layerName: "id" },
+    });
+  });
+
+  const disabledCounts = () =>
+    [...screen.getAllByRole("combobox").at(-1).options]
+      .filter((option) => option.disabled)
+      .map((option) => Number(option.value));
+
+  it("disables counts above what Head/Tail Breaks can give for the data", () => {
+    const data = [0, 2, 5, 10, 20, 40, 80, 900, 1000, 1005, 1010].map((value) => ({ value }));
+    const natural = reclassifyData(
+      data,
+      "polygon-continuous",
+      "h",
+      mockAppContexte.defaultBands,
+      mockPageContext,
+      {},
+      {}
+    );
+    const map = makeLiveMap(natural);
+    renderEntry({ map, data, layerState: { class_method: "h" } });
+
+    expect(natural.length).toBeLessThan(9);
+    expect(disabledCounts()).toEqual(
+      Array.from({ length: 9 - natural.length }, (_, i) => natural.length + 1 + i)
+    );
+    expect(screen.getByText(`This method gives at most ${natural.length} bands for this data.`))
+      .toBeInTheDocument();
+  });
+
+  it("keeps offering all 11 configured Default bands after showing fewer", () => {
+    const eleven = [-500, -250, -50, -10, -1, 0, 1, 10, 50, 250, 500];
+    const appContext = {
+      ...mockAppContexte,
+      defaultBands: [
+        { name: "pageName", metric: [{ name: "demand", differenceValues: eleven }] },
+      ],
+    };
+    // The map is painted with 7 after choosing 7; the dropdown must still reach 11.
+    const map = makeLiveMap([-250, -50, -10, 0, 10, 50, 250]);
+    renderEntry({
+      map,
+      style: "polygon-diverging",
+      appContext,
+      layerState: { class_method: "d", bandCount: 7, bandMetricName: "demand" },
+    });
+
+    const counts = [...screen.getAllByRole("combobox").at(-1).options].map((o) =>
+      Number(o.value)
+    );
+    expect(counts.at(-1)).toBe(11);
+  });
+
+  const elevenBandsApp = {
+    ...mockAppContexte,
+    defaultBands: [
+      {
+        name: "pageName",
+        metric: [
+          { name: "demand", differenceValues: [-500, -250, -50, -10, -1, 0, 1, 10, 50, 250, 500] },
+        ],
+      },
+    ],
+  };
+
+  const pickMethod = (label) => {
+    // The classification method is a react-select just above the band count select.
+    const input = screen.getAllByRole("combobox").at(-2);
+    fireEvent.focus(input);
+    fireEvent.keyDown(input, { key: "ArrowDown", keyCode: 40 });
+    fireEvent.click(screen.getByText(label));
+  };
+
+  it("offers the configured 11 under another method after choosing fewer", () => {
+    renderEntry({
+      map: makeLiveMap([-250, -50, -10, 0, 10, 50, 250]),
+      style: "polygon-diverging",
+      appContext: elevenBandsApp,
+      layerState: { class_method: "e", bandCount: 7, bandMetricName: "demand" },
+    });
+
+    const counts = [...screen.getAllByRole("combobox").at(-1).options].map((o) =>
+      Number(o.value)
+    );
+    expect(counts.at(-1)).toBe(11);
+  });
+
+  it("keeps the band count on screen when the method changes", () => {
+    const { dispatch } = renderEntry({
+      map: makeLiveMap([-500, -250, -50, -10, -1, 0, 1, 10, 50, 250, 500]),
+      style: "polygon-diverging",
+      appContext: elevenBandsApp,
+      layerState: { class_method: "d", bandMetricName: "demand" },
+    });
+
+    pickMethod("Equidistant");
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "UPDATE_BAND_COUNT",
+      payload: { bandCount: 11, layerName: "id" },
+    });
+  });
+
+  it("does not store a band count when switching to Custom", () => {
+    const { dispatch } = renderEntry({ map: makeLiveMap([0, 10, 20, 30, 40]) });
+
+    pickMethod("Custom");
+
+    expect(dispatch).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: "UPDATE_BAND_COUNT" })
+    );
+  });
+
+  it("does not disable diverging Head/Tail counts the data can give", () => {
+    // Skewed values either side of zero: Head/Tail gives far more than 4 per side, though
+    // with no count chosen it keeps 4 per side (9 bands).
+    let seed = 7;
+    const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const data = Array.from({ length: 3000 }, () => {
+      const v = Math.round(Math.exp(random() * 3 + random() * 3 + random() * 2));
+      return { value: random() < 0.5 ? -v : v };
+    });
+    renderEntry({
+      map: makeLiveMap([-250, -50, -10, 0, 10, 50, 250]),
+      data,
+      style: "polygon-diverging",
+      appContext: elevenBandsApp,
+      layerState: { class_method: "h", bandCount: 7, bandMetricName: "demand" },
+    });
+
+    const counts = [...screen.getAllByRole("combobox").at(-1).options].map((o) =>
+      Number(o.value)
+    );
+    // Offered up to the configured 11 (not Head/Tail's own most), none greyed out.
+    expect(counts.at(-1)).toBe(11);
+    expect(disabledCounts()).toEqual([]);
+    expect(screen.queryByText(/gives at most/)).not.toBeInTheDocument();
+  });
+
+  it("disables no counts for methods that can give any count", () => {
+    const data = Array.from({ length: 20 }, (_, i) => ({ value: (i + 1) * 10 }));
+    renderEntry({ map: makeLiveMap([0, 10, 20, 30, 40]), data });
+
+    expect(disabledCounts()).toEqual([]);
   });
 });
 
