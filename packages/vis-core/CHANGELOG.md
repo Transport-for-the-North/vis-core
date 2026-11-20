@@ -1,3 +1,10 @@
+# [0.16.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.15.0...v0.16.0) (2026-11-19)
+
+
+### Features
+
+* release 0.16.0 ([8e13777](https://github.com/Transport-for-the-North/vis-core/commit/8e137771b631f6830cbec255617a26a162c4c667))
+
 # [0.15.0](https://github.com/Transport-for-the-North/vis-core/compare/v0.14.0...v0.15.0) (2026-10-26)
 
 
