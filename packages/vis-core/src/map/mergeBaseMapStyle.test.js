@@ -155,6 +155,7 @@ describe("mergeBaseMapStyle", () => {
     });
     const darkCity = mergedDark.layers.find((l) => l.id === "place_city");
     expect(darkCity.paint["text-color"]).toBe("#ffffff");
+    expect(darkCity.paint["text-opacity"]).toBe(1);
 
     const mergedLight = mergeBaseMapStyle({
       previousStyle,
@@ -163,7 +164,8 @@ describe("mergeBaseMapStyle", () => {
       descriptor: BASE_MAPS.positron,
     });
     const lightCity = mergedLight.layers.find((l) => l.id === "place_city");
-    expect(lightCity.paint["text-color"]).toBe("#1f1f1f");
+    expect(lightCity.paint["text-color"]).toBe("#4a4a52");
+    expect(lightCity.paint["text-opacity"]).toBe(1);
     expect(lightCity.paint["text-halo-width"]).toBe(1.5);
   });
 
