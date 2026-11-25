@@ -132,7 +132,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (!["fixed", "hidetoggle", "mapViewport"].includes(filter.type) && filter.paramName) {
+      if (!["fixed", "hidetoggle", "mapViewport"].includes(filter.type) && filter.paramName && filterState[filter.id] != null) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -159,7 +159,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
 
     const queryParams = {};
     filters.forEach(filter => {
-      if (!["fixed", "mapViewport"].includes(filter.type) && filter.paramName) {
+      if (!["fixed", "mapViewport"].includes(filter.type) && filter.paramName && filterState[filter.id] != null) {
         queryParams[filter.paramName] = filterState[filter.id];
       }
     });
@@ -306,7 +306,7 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
       {Array.isArray(filters) && filters.length > 0 ? (
         <>
           {filters
-            .filter((filter) => !["fixed", "hidetoggle", "mapViewport"].includes(filter.type))
+            .filter((filter) => !["fixed", "hidetoggle", "mapViewport", "hidden"].includes(filter.type))
             .map((filter) => {
               const checkDisabled = (filter) => {
                 if (!filter.disabledWhen) return false;
@@ -351,7 +351,8 @@ export const SelectorSection = ({ filters, onFilterChange, bgColor, downloadPath
                     <Slider
                       key={filter.id}
                       filter={filter}
-                      value={filterState[filter.id] || filter.min || filter.values[0]}
+                      filters={filters}
+                      value={filterState[filter.id] ?? filter.defaultValue ?? filter.min ?? filter.values?.[0]}
                       onChange={handleFilterChange}
                       disabled={isDisabled}
                       excludeValue={excludeValue}

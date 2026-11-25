@@ -119,4 +119,47 @@ describe("Slider component test", () => {
     // clean
     consoleWarnSpy.mockRestore();
   });
+
+  it("supports two-way range mode with manual min and max inputs", () => {
+    const onChange = jest.fn();
+    const minFilter = {
+      id: "min_filter",
+      filterName: "Value Range",
+      paramName: "minValue",
+      maxParamName: "maxValue",
+      isRange: true,
+      min: 1,
+      max: 500,
+      interval: 1,
+      defaultValue: 5,
+    };
+    const maxFilter = {
+      id: "max_filter",
+      filterName: "Maximum Value",
+      paramName: "maxValue",
+      type: "hidden",
+      defaultValue: null,
+    };
+    const rangeContext = {
+      state: { min_filter: 5, max_filter: null },
+      dispatch: jest.fn(),
+    };
+
+    render(
+      <FilterContext.Provider value={rangeContext}>
+        <Slider filter={minFilter} filters={[minFilter, maxFilter]} onChange={onChange} />
+      </FilterContext.Provider>
+    );
+
+    const minInput = screen.getByLabelText("Value Range minimum input");
+    const maxInput = screen.getByLabelText("Value Range maximum input");
+
+    fireEvent.change(minInput, { target: { value: "60" } });
+    fireEvent.keyDown(minInput, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledWith(minFilter, 60);
+
+    fireEvent.change(maxInput, { target: { value: "250" } });
+    fireEvent.blur(maxInput);
+    expect(onChange).toHaveBeenCalledWith(maxFilter, 250);
+  });
 });
