@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import styled from 'styled-components';
 import { useFilterContext } from "hooks/useFilterContext";
+import { useMapContext } from "hooks/useMapContext";
 
 const StyledSliderContainer = styled.div`
   display: flex;
@@ -120,25 +121,138 @@ const RangeInputGroup = styled.label`
   color: #475569;
 `;
 
+const getStepDecimals = (step) => {
+  if (!Number.isFinite(step) || step <= 0) return 0;
+  const str = String(step);
+  const dotIndex = str.indexOf(".");
+  return dotIndex === -1 ? 0 : str.length - dotIndex - 1;
+};
+
+const snapRangeToStep = (minVal, maxVal, step) => {
+  if (!Number.isFinite(step) || step <= 0) {
+    return { min: minVal, max: maxVal };
+  }
+  const decimals = getStepDecimals(step);
+  return {
+    min: Number((Math.floor(minVal / step) * step).toFixed(decimals)),
+    max: Number((Math.ceil(maxVal / step) * step).toFixed(decimals)),
+  };
+};
+
+const extractDataRange = (mapState, filter) => {
+  if (!mapState) return null;
+
+  const visMaps = [
+    mapState.visualisations,
+    mapState.leftVisualisations,
+    mapState.rightVisualisations,
+  ].filter(Boolean);
+
+  const targetNames =
+    Array.isArray(filter?.visualisations) && filter.visualisations.length > 0
+      ? filter.visualisations
+      : null;
+
+  let min = Infinity;
+  let max = -Infinity;
+  let found = false;
+
+  visMaps.forEach((visMap) => {
+    const entries = targetNames
+      ? targetNames.map((name) => visMap[name]).filter(Boolean)
+      : Object.values(visMap);
+
+    entries.forEach((vis) => {
+      if (!Array.isArray(vis?.data)) return;
+      const valueField = vis.valueField;
+      for (let i = 0; i < vis.data.length; i++) {
+        const item = vis.data[i];
+        if (!item || typeof item !== "object") continue;
+        const raw =
+          valueField && item[valueField] !== undefined ? item[valueField] : item.value;
+        if (raw === null || raw === undefined || raw === "") continue;
+        const num = Number(raw);
+        if (!Number.isFinite(num)) continue;
+        if (num < min) min = num;
+        if (num > max) max = num;
+        found = true;
+      }
+    });
+  });
+
+  return found ? { min, max } : null;
+};
+
 /**
- * Renders a two-way range slider using `filter.min`, `filter.max`, and a paired max filter.
+ * Renders a two-way range slider using `filter.min`/`filter.max` when provided, falling back to the active visualisation data range, and a paired max filter.
  */
 const RangeSlider = ({ filter, filters, onChange, disabled }) => {
   const { state: filterState } = useFilterContext();
+  const mapContext = useMapContext();
+  const mapState = mapContext?.state;
   const maxFilter = filter.maxParamName
     ? filters.find((f) => f.paramName === filter.maxParamName)
     : null;
 
-  const trackMin = filter.min;
-  const trackMax = filter.max;
+  const maxFilterId = maxFilter?.id;
+  const nonRangeFilterStateKey = useMemo(
+    () =>
+      JSON.stringify(
+        Object.keys(filterState)
+          .filter((key) => key !== filter.id && key !== maxFilterId)
+          .sort()
+          .map((key) => [key, filterState[key]])
+      ),
+    [filterState, filter.id, maxFilterId]
+  );
+
+  const rawDataRange = useMemo(
+    () => extractDataRange(mapState, filter),
+    [mapState?.visualisations, mapState?.leftVisualisations, mapState?.rightVisualisations, filter]
+  );
+
+  const [observedRange, setObservedRange] = useState(rawDataRange);
+  const prevFilterKeyRef = useRef(nonRangeFilterStateKey);
+
+  useEffect(() => {
+    const filtersChanged = prevFilterKeyRef.current !== nonRangeFilterStateKey;
+    if (filtersChanged) {
+      prevFilterKeyRef.current = nonRangeFilterStateKey;
+    }
+
+    if (!rawDataRange) {
+      if (filtersChanged) {
+        setObservedRange(null);
+      }
+      return;
+    }
+
+    setObservedRange((prev) => {
+      const base = filtersChanged ? null : prev;
+      if (!base) return rawDataRange;
+      const nextMin = Math.min(base.min, rawDataRange.min);
+      const nextMax = Math.max(base.max, rawDataRange.max);
+      if (nextMin === base.min && nextMax === base.max) return base;
+      return { min: nextMin, max: nextMax };
+    });
+  }, [nonRangeFilterStateKey, rawDataRange]);
+
   const step = filter.interval ?? 1;
+  const effectiveRange =
+    observedRange ?? (prevFilterKeyRef.current === nonRangeFilterStateKey ? rawDataRange : null);
+  const snappedDataRange = effectiveRange
+    ? snapRangeToStep(effectiveRange.min, effectiveRange.max, step)
+    : null;
+
+  const trackMin = filter.min ?? snappedDataRange?.min ?? 0;
+  const trackMax = filter.max ?? snappedDataRange?.max ?? trackMin + 100;
   const initialMin = filter.defaultValue ?? trackMin;
   const currentMaxState = maxFilter ? filterState[maxFilter.id] : undefined;
 
   const [localMin, setLocalMin] = useState(filterState[filter.id] ?? initialMin);
   const [localMax, setLocalMax] = useState(currentMaxState ?? trackMax);
   const [minText, setMinText] = useState(String(filterState[filter.id] ?? initialMin));
-  const [maxText, setMaxText] = useState(currentMaxState != null ? String(currentMaxState) : "");
+  const [maxText, setMaxText] = useState(String(currentMaxState ?? trackMax));
   const draggingRef = useRef(false);
 
   useEffect(() => {
@@ -148,7 +262,7 @@ const RangeSlider = ({ filter, filters, onChange, disabled }) => {
     setLocalMin(nextMin);
     setLocalMax(nextMax);
     setMinText(String(nextMin));
-    setMaxText(currentMaxState != null ? String(currentMaxState) : "");
+    setMaxText(String(nextMax));
   }, [filterState, filter.id, initialMin, currentMaxState, trackMax]);
 
   const commitMin = (num) => {
@@ -166,13 +280,13 @@ const RangeSlider = ({ filter, filters, onChange, disabled }) => {
     const trimmed = String(raw).trim();
     if (trimmed === "") {
       setLocalMax(trackMax);
-      setMaxText("");
+      setMaxText(String(trackMax));
       onChange(maxFilter, null);
       return;
     }
     const parsed = parseFloat(trimmed);
     if (!Number.isFinite(parsed)) {
-      setMaxText(currentMaxState != null ? String(currentMaxState) : "");
+      setMaxText(String(currentMaxState ?? trackMax));
       return;
     }
     const clamped = Math.max(parsed, localMin);
@@ -244,7 +358,7 @@ const RangeSlider = ({ filter, filters, onChange, disabled }) => {
             draggingRef.current = true;
             const next = Math.max(parseFloat(e.target.value), localMin);
             setLocalMax(next);
-            setMaxText(next >= trackMax ? "" : String(next));
+            setMaxText(String(next));
           }}
           onMouseUp={commitMaxDrag}
           onTouchEnd={commitMaxDrag}
@@ -280,7 +394,7 @@ const RangeSlider = ({ filter, filters, onChange, disabled }) => {
             disabled={disabled}
             min={trackMin}
             step={step}
-            placeholder="No max"
+            placeholder={String(trackMax)}
             value={maxText}
             aria-label={`${filter.filterName || "Range"} maximum input`}
             onChange={(e) => setMaxText(e.target.value)}
@@ -319,7 +433,9 @@ export const Slider = ({ filter, filters = [], onChange, disabled }) => {
   // If using discrete values from filter.values, use the first item's paramValue.
   // Otherwise, if a defaultValue is provided, validate it; if invalid, fall back to filter.min.
   const initialValue = (() => {
-    if (filter.values) {
+    if (filter.isRange) {
+      return filter.defaultValue ?? filter.min;
+    } else if (filter.values) {
       return filter.values.values[0].paramValue;
     } else {
       const { min, max, interval, defaultValue } = filter;
