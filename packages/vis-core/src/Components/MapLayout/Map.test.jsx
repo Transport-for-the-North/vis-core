@@ -1532,12 +1532,12 @@ describe("Map style toggle and transformStyle", () => {
       "place_village",
     ]);
 
-    // Base place labels in dark mode should have enhanced paint properties and bold font layout
+    // Base place labels in dark mode should have enhanced paint properties and font layout
     const placeTown = transformed.layers.find((l) => l.id === "place_town");
     expect(placeTown.paint["text-color"]).toBe("#ffffff");
     expect(placeTown.paint["text-halo-color"]).toBe("rgba(0, 0, 0, 0.85)");
     expect(placeTown.paint["text-halo-width"]).toBe(1.25);
-    expect(placeTown.layout["text-font"]).toEqual(["Noto Sans Bold"]);
+    expect(placeTown.layout["text-font"]).toEqual(["Noto Sans Regular"]);
     expect(placeTown.layout["text-size"]).toEqual(incomingDarkLayout["text-size"]);
     expect(placeTown.layout["text-anchor"]).toBe("center");
 
@@ -1576,10 +1576,11 @@ describe("Map style toggle and transformStyle", () => {
       ],
     });
     const normalTown = normalTransformed.layers.find((l) => l.id === "place_town");
-    expect(normalTown.layout["text-font"]).toEqual(["Noto Sans Bold"]);
+    expect(normalTown.layout["text-font"]).toEqual(["Noto Sans Regular"]);
     expect(normalTown.layout["text-size"]).toBe(12);
-    expect(normalTown.paint["text-color"]).toBe("#1f1f1f");
-    expect(normalTown.paint["text-halo-color"]).toBe("rgba(255, 255, 255, 0.9)");
+    expect(normalTown.paint["text-color"]).toBe("#767680");
+    expect(normalTown.paint["text-opacity"]).toBe(0.75);
+    expect(normalTown.paint["text-halo-color"]).toBe("rgba(255, 255, 255, 0.85)");
     expect(normalTown.paint["text-halo-width"]).toBe(1.25);
   });
 });

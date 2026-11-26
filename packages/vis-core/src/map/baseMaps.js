@@ -18,25 +18,43 @@ const PLACE_LABELS = {
 
 const BOLD_PLACE_LABEL_LAYOUT = {
   default: {
-    "text-font": ["Noto Sans Bold"],
+    "text-font": ["Noto Sans Regular"],
+  },
+  byLayerId: {
+    place_city: {
+      "text-font": ["Noto Sans Bold"],
+    },
+    place_city_large: {
+      "text-font": ["Noto Sans Bold"],
+    },
+    place_capital: {
+      "text-font": ["Noto Sans Bold"],
+    },
   },
 };
 
 const DARK_LABEL_PAINT = {
   default: {
     "text-color": "#ffffff",
+    "text-opacity": 0.75,
     "text-halo-color": "rgba(0, 0, 0, 0.85)",
     "text-halo-width": 1.25,
     "text-halo-blur": 0.5,
   },
   byLayerId: {
     place_city: {
+      "text-color": "#ffffff",
+      "text-opacity": 1,
       "text-halo-width": 1.5,
     },
     place_city_large: {
+      "text-color": "#ffffff",
+      "text-opacity": 1,
       "text-halo-width": 1.5,
     },
     place_capital: {
+      "text-color": "#ffffff",
+      "text-opacity": 1,
       "text-halo-width": 1.5,
     },
   },
@@ -44,19 +62,26 @@ const DARK_LABEL_PAINT = {
 
 const LIGHT_LABEL_PAINT = {
   default: {
-    "text-color": "#1f1f1f",
-    "text-halo-color": "rgba(255, 255, 255, 0.9)",
+    "text-color": "#767680",
+    "text-opacity": 0.75,
+    "text-halo-color": "rgba(255, 255, 255, 0.85)",
     "text-halo-width": 1.25,
     "text-halo-blur": 0.5,
   },
   byLayerId: {
     place_city: {
+      "text-color": "#4a4a52",
+      "text-opacity": 1,
       "text-halo-width": 1.5,
     },
     place_city_large: {
+      "text-color": "#4a4a52",
+      "text-opacity": 1,
       "text-halo-width": 1.5,
     },
     place_capital: {
+      "text-color": "#33333b",
+      "text-opacity": 1,
       "text-halo-width": 1.5,
     },
   },

@@ -61,8 +61,9 @@ describe("baseMapLabels", () => {
       const defaultOverride = getLabelPaintOverride(BASE_MAPS.positron, "place_village");
       expect(defaultOverride).toEqual(
         expect.objectContaining({
-          "text-color": "#1f1f1f",
-          "text-halo-color": "rgba(255, 255, 255, 0.9)",
+          "text-color": "#767680",
+          "text-opacity": 0.75,
+          "text-halo-color": "rgba(255, 255, 255, 0.85)",
           "text-halo-width": 1.25,
           "text-halo-blur": 0.5,
         })
@@ -70,6 +71,8 @@ describe("baseMapLabels", () => {
 
       const cityOverride = getLabelPaintOverride(BASE_MAPS.positron, "place_city");
       expect(cityOverride["text-halo-width"]).toBe(1.5);
+      expect(cityOverride["text-color"]).toBe("#4a4a52");
+      expect(cityOverride["text-opacity"]).toBe(1);
     });
 
     it("returns paint overrides including byLayerId specifics for darkMatter", () => {
@@ -77,6 +80,7 @@ describe("baseMapLabels", () => {
       expect(defaultOverride).toEqual(
         expect.objectContaining({
           "text-color": "#ffffff",
+          "text-opacity": 0.75,
           "text-halo-color": "rgba(0, 0, 0, 0.85)",
           "text-halo-width": 1.25,
           "text-halo-blur": 0.5,
@@ -85,6 +89,8 @@ describe("baseMapLabels", () => {
 
       const cityOverride = getLabelPaintOverride(BASE_MAPS.darkMatter, "place_city");
       expect(cityOverride["text-halo-width"]).toBe(1.5);
+      expect(cityOverride["text-color"]).toBe("#ffffff");
+      expect(cityOverride["text-opacity"]).toBe(1);
     });
   });
 
@@ -160,7 +166,8 @@ describe("baseMapLabels", () => {
 
       expect(result[0].layout["text-font"]).toEqual(["Noto Sans Bold"]);
       expect(result[0].layout["text-size"]).toBe(12);
-      expect(result[0].paint["text-color"]).toBe("#1f1f1f");
+      expect(result[0].paint["text-color"]).toBe("#4a4a52");
+      expect(result[0].paint["text-opacity"]).toBe(1);
       expect(result[0].paint["text-halo-width"]).toBe(1.5);
     });
 
@@ -187,6 +194,7 @@ describe("baseMapLabels", () => {
       expect(result[0].layout["text-font"]).toEqual(["Noto Sans Bold"]);
       expect(result[0].layout["text-size"]).toBe(14);
       expect(result[0].paint["text-color"]).toBe("#ffffff");
+      expect(result[0].paint["text-opacity"]).toBe(1);
       expect(result[0].paint["text-halo-width"]).toBe(1.5);
     });
   });

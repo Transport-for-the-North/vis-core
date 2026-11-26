@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { Slider } from "./Slider";
-import { FilterContext } from "contexts";
+import { FilterContext, MapContext } from "contexts";
 
 jest.mock("maplibre-gl", () => ({
   Map: jest.fn(() => ({
@@ -118,5 +118,226 @@ describe("Slider component test", () => {
     );
     // clean
     consoleWarnSpy.mockRestore();
+  });
+
+  it("supports two-way range mode with manual min and max inputs", () => {
+    const onChange = jest.fn();
+    const minFilter = {
+      id: "min_filter",
+      filterName: "Value Range",
+      paramName: "minValue",
+      maxParamName: "maxValue",
+      isRange: true,
+      min: 1,
+      max: 500,
+      interval: 1,
+      defaultValue: 5,
+    };
+    const maxFilter = {
+      id: "max_filter",
+      filterName: "Maximum Value",
+      paramName: "maxValue",
+      type: "hidden",
+      defaultValue: null,
+    };
+    const rangeContext = {
+      state: { min_filter: 5, max_filter: null },
+      dispatch: jest.fn(),
+    };
+
+    render(
+      <FilterContext.Provider value={rangeContext}>
+        <Slider filter={minFilter} filters={[minFilter, maxFilter]} onChange={onChange} />
+      </FilterContext.Provider>
+    );
+
+    const minInput = screen.getByLabelText("Value Range minimum input");
+    const maxInput = screen.getByLabelText("Value Range maximum input");
+
+    fireEvent.change(minInput, { target: { value: "60" } });
+    fireEvent.keyDown(minInput, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledWith(minFilter, 60);
+
+    fireEvent.change(maxInput, { target: { value: "250" } });
+    fireEvent.blur(maxInput);
+    expect(onChange).toHaveBeenCalledWith(maxFilter, 250);
+  });
+
+  it("falls back to actual visualisation data min/max when filter.min or filter.max is not provided", () => {
+    const minFilter = {
+      id: "min_filter",
+      filterName: "Value Range",
+      paramName: "minValue",
+      maxParamName: "maxValue",
+      isRange: true,
+      interval: 1,
+      defaultValue: 5,
+      visualisations: ["Link Flows"],
+    };
+    const maxFilter = {
+      id: "max_filter",
+      filterName: "Maximum Value",
+      paramName: "maxValue",
+      type: "hidden",
+      defaultValue: null,
+    };
+    const rangeContext = {
+      state: { min_filter: 5, max_filter: null, scenario: "am" },
+      dispatch: jest.fn(),
+    };
+    const mapContext = {
+      state: {
+        visualisations: {
+          "Link Flows": {
+            data: [
+              { id: 1, value: 2.3 },
+              { id: 2, value: 500 },
+              { id: 3, value: 2000 },
+            ],
+          },
+          "Other Vis": {
+            data: [{ id: 4, value: 9999 }],
+          },
+        },
+      },
+      dispatch: jest.fn(),
+    };
+
+    const { rerender } = render(
+      <MapContext.Provider value={mapContext}>
+        <FilterContext.Provider value={rangeContext}>
+          <Slider filter={minFilter} filters={[minFilter, maxFilter]} onChange={jest.fn()} />
+        </FilterContext.Provider>
+      </MapContext.Provider>
+    );
+
+    const minSlider = screen.getByLabelText("Value Range minimum");
+    const maxSlider = screen.getByLabelText("Value Range maximum");
+    expect(minSlider).toHaveAttribute("min", "2");
+    expect(minSlider).toHaveAttribute("max", "2000");
+    expect(maxSlider).toHaveAttribute("min", "2");
+    expect(maxSlider).toHaveAttribute("max", "2000");
+    expect(screen.getByLabelText("Value Range maximum input")).toHaveValue(2000);
+
+    // When the range filter narrows the returned data, the track keeps the full observed range
+    rerender(
+      <MapContext.Provider
+        value={{
+          state: {
+            visualisations: {
+              "Link Flows": {
+                data: [
+                  { id: 1, value: 10 },
+                  { id: 2, value: 290 },
+                ],
+              },
+            },
+          },
+          dispatch: jest.fn(),
+        }}
+      >
+        <FilterContext.Provider
+          value={{ state: { min_filter: 10, max_filter: 300, scenario: "am" }, dispatch: jest.fn() }}
+        >
+          <Slider filter={minFilter} filters={[minFilter, maxFilter]} onChange={jest.fn()} />
+        </FilterContext.Provider>
+      </MapContext.Provider>
+    );
+
+    expect(screen.getByLabelText("Value Range maximum")).toHaveAttribute("max", "2000");
+    expect(screen.getByLabelText("Value Range minimum")).toHaveAttribute("min", "2");
+
+    // When a non-range filter changes, the observed range resets to the new dataset's bounds
+    rerender(
+      <MapContext.Provider
+        value={{
+          state: {
+            visualisations: {
+              "Link Flows": {
+                data: [
+                  { id: 1, value: 4 },
+                  { id: 2, value: 850 },
+                ],
+              },
+            },
+          },
+          dispatch: jest.fn(),
+        }}
+      >
+        <FilterContext.Provider
+          value={{ state: { min_filter: 5, max_filter: null, scenario: "ip" }, dispatch: jest.fn() }}
+        >
+          <Slider filter={minFilter} filters={[minFilter, maxFilter]} onChange={jest.fn()} />
+        </FilterContext.Provider>
+      </MapContext.Provider>
+    );
+
+    expect(screen.getByLabelText("Value Range minimum")).toHaveAttribute("min", "4");
+    expect(screen.getByLabelText("Value Range maximum")).toHaveAttribute("max", "850");
+  });
+
+  it("prefers explicit filter.min and filter.max over visualisation data bounds", () => {
+    const minFilter = {
+      id: "min_filter",
+      filterName: "Value Range",
+      paramName: "minValue",
+      maxParamName: "maxValue",
+      isRange: true,
+      min: 1,
+      interval: 1,
+      defaultValue: 5,
+    };
+    const maxFilter = {
+      id: "max_filter",
+      filterName: "Maximum Value",
+      paramName: "maxValue",
+      type: "hidden",
+      defaultValue: null,
+    };
+    const rangeContext = {
+      state: { min_filter: 5, max_filter: null },
+      dispatch: jest.fn(),
+    };
+    const mapContext = {
+      state: {
+        visualisations: {
+          "Link Flows": {
+            data: [
+              { id: 1, value: 10 },
+              { id: 2, value: 2000 },
+            ],
+          },
+        },
+      },
+      dispatch: jest.fn(),
+    };
+
+    const { rerender } = render(
+      <MapContext.Provider value={mapContext}>
+        <FilterContext.Provider value={rangeContext}>
+          <Slider filter={minFilter} filters={[minFilter, maxFilter]} onChange={jest.fn()} />
+        </FilterContext.Provider>
+      </MapContext.Provider>
+    );
+
+    // filter.min (1) is used while missing filter.max falls back to data max (2000)
+    expect(screen.getByLabelText("Value Range minimum")).toHaveAttribute("min", "1");
+    expect(screen.getByLabelText("Value Range maximum")).toHaveAttribute("max", "2000");
+
+    // When both filter.min and filter.max are provided, both take precedence over data
+    rerender(
+      <MapContext.Provider value={mapContext}>
+        <FilterContext.Provider value={rangeContext}>
+          <Slider
+            filter={{ ...minFilter, min: 1, max: 500 }}
+            filters={[minFilter, maxFilter]}
+            onChange={jest.fn()}
+          />
+        </FilterContext.Provider>
+      </MapContext.Provider>
+    );
+
+    expect(screen.getByLabelText("Value Range minimum")).toHaveAttribute("min", "1");
+    expect(screen.getByLabelText("Value Range maximum")).toHaveAttribute("max", "500");
   });
 });
