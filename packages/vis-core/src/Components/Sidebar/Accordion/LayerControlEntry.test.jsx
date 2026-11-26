@@ -703,6 +703,74 @@ describe("LayerControlEntry component test", () => {
         expect.anything()
       );
     });
+
+    it("hides the label layer via text-opacity when the slider is set to 0", () => {
+      const setPaintProperty = moveSlider(
+        { id: "fill", "id-label": "symbol" },
+        undefined,
+        "0"
+      );
+      expect(setPaintProperty).toHaveBeenCalledWith("id-label", "text-opacity", 0);
+    });
+
+    it("updates the label layer via text-opacity when the slider is moved above 0", () => {
+      const setPaintProperty = moveSlider(
+        { id: "fill", "id-label": "symbol" },
+        undefined,
+        "0.4"
+      );
+      expect(setPaintProperty).toHaveBeenCalledWith("id-label", "text-opacity", 0.4);
+    });
+
+    it("preserves a label layer's null-value text-opacity rule when hiding and restoring", () => {
+      const setPaintProperty = jest.fn();
+      const labelExpr = ["case", NULL_RULE, 0, 1];
+      const map = {
+        getLayer: jest.fn((id) =>
+          id === "id" ? { type: "fill" } : id === "id-label" ? { type: "symbol" } : undefined
+        ),
+        getPaintProperty: jest.fn((id, prop) => {
+          if (id === "id-label" && prop === "text-opacity") return labelExpr;
+          return prop.endsWith("opacity") ? 0.5 : undefined;
+        }),
+        setPaintProperty,
+      };
+
+      render(
+        <PageContext.Provider value={mockPageContext}>
+          <AppContext.Provider value={mockAppContexte}>
+            <LayerControlEntry
+              {...props}
+              maps={[map]}
+              layer={{
+                id: "id",
+                type: "fill",
+                layout: { visibility: true },
+                metadata: { path: "/", shouldHaveOpacityControl: true },
+              }}
+            />
+          </AppContext.Provider>
+        </PageContext.Provider>
+      );
+
+      fireEvent.change(screen.getByRole("slider", { name: "Opacity" }), { target: { value: "0" } });
+      expect(setPaintProperty).toHaveBeenCalledWith("id-label", "text-opacity", [
+        "case",
+        NULL_RULE,
+        0,
+        0,
+      ]);
+
+      fireEvent.change(screen.getByRole("slider", { name: "Opacity" }), {
+        target: { value: "0.5" },
+      });
+      expect(setPaintProperty).toHaveBeenCalledWith("id-label", "text-opacity", [
+        "case",
+        NULL_RULE,
+        0,
+        0.5,
+      ]);
+    });
   });
 
   it("synchronises zone boundaries line-opacity when toggling boundaries visible", () => {

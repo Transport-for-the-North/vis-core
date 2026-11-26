@@ -1494,6 +1494,54 @@ describe("handleZoom function tests", () => {
       expect.objectContaining({ id: "id-label" })
     );
   });
+
+  it("creates the label layer with text-opacity 0 when the parent layer is zeroed by the slider", () => {
+    getLayer.mockImplementation((id) => (id === "id-label" ? null : { type: "fill" }));
+    getZoom.mockReturnValue(14);
+    const testMap = {
+      addControl,
+      on,
+      once,
+      getCanvas,
+      off,
+      getLayer,
+      queryRenderedFeatures,
+      setFilter,
+      setFeatureState,
+      getZoom,
+      querySourceFeatures,
+      addLayer,
+      setLayoutProperty,
+      getLayoutProperty,
+      getPaintProperty: jest.fn(() => 0),
+      fitBounds,
+      panTo,
+      setStyle,
+    };
+    useMap.mockReturnValue({
+      map: testMap,
+      isMapReady: true,
+      knownBaseSourceIds: { current: new Set(["default"]) },
+    });
+    recordSliderOpacity(testMap, "id", 0);
+    render(
+      <ThemeProvider theme={theme}>
+        <FilterContext.Provider value={mockFilterContext}>
+          <MapContext.Provider value={mockMapContext}>
+            <Map {...props} />
+          </MapContext.Provider>
+        </FilterContext.Provider>
+      </ThemeProvider>
+    );
+    expect(addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "id-label",
+        paint: expect.objectContaining({
+          "text-opacity": ["case", expect.any(Array), 0, 0],
+        }),
+      })
+    );
+  });
 });
 
 describe("Pan and centre map", () => {

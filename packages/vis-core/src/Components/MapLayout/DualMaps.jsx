@@ -704,6 +704,8 @@ const DualMaps = (props) => {
                 symbolPlacement = 'line';
               }
 
+              const labelOpacity = isLayerZeroedBySlider(map, layerId) ? 0 : 1;
+
               // Create the layer if it does not exist
               map.addLayer({
                 id: `${layerId}-label`,
@@ -723,7 +725,9 @@ const DualMaps = (props) => {
                   'text-color': '#000000',  // Black text
                   'text-halo-color': '#ffffff',  // White halo for readability
                   'text-halo-width': 2.5,
-                  'text-opacity': labelNulls ? 1 : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, 1],
+                  'text-opacity': labelNulls
+                    ? labelOpacity
+                    : ['case', ["in", ["feature-state", "value"], ["literal", [null]]], 0, labelOpacity],
                 }
               });
             }

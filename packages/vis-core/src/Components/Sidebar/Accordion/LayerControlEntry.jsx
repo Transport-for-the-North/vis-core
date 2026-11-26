@@ -628,6 +628,17 @@ export const LayerControlEntry = memo(
           newOpacity
         );
 
+        // Labels are symbol layers so they don't share the base opacity prop; track the
+        // slider via text-opacity so zoom-based layout visibility is preserved
+        if (ids.includes(`${layer.id}-label`)) {
+          setPaintAcross(
+            map,
+            [`${layer.id}-label`],
+            "text-opacity",
+            newOpacity
+          );
+        }
+
         // Additionally, ensure spider link layer tracks opacity even if base is circle/fill
         // (link layer uses 'line-opacity' for connector visibility)
         if (ids.includes(`${layer.id}-spider-links`)) {
