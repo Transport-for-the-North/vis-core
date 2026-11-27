@@ -3,7 +3,6 @@ import { HttpError } from "./HttpError";
 
 export { HttpError };
 
-
 /**
  * A service class for fetching metadata.
  * @extends BaseService
@@ -20,7 +19,7 @@ class MetadataService extends BaseService {
   /**
    * Fetches the Swagger file.
    * @returns {Promise<Object>} A promise that resolves with the Swagger file data.
-   * @throws {Error} If there is an error fetching the Swagger file.
+   * @throws {HttpError} If the server returns a non-success response.
    */
   async getSwaggerFile() {
     const url = this._buildUrl('/swagger/v1/swagger.json');
@@ -30,12 +29,12 @@ class MetadataService extends BaseService {
     try {
       const contentType = (response.headers.get("content-type") || "").toLowerCase();
       if (contentType.includes("application/json")) {
-          responseBody = await response.json();
-      }   else {
-          responseBody = await response.text();
+        responseBody = await response.json();
+      } else {
+        responseBody = await response.text();
       }
     } catch {
-        responseBody = null;
+      responseBody = null;
     }
 
     if (!response.ok) {
@@ -43,7 +42,7 @@ class MetadataService extends BaseService {
         response.status,
         `HTTP error! status: ${response.status}`,
         url,
-        responseBody
+        responseBody,
       );
     }
     return responseBody;

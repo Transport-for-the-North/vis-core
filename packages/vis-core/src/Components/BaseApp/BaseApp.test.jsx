@@ -67,7 +67,6 @@ jest.mock("contexts", () => {
     __mockDispatch: mockDispatch,
   };
 });
-
 const { __mockDispatch: mockDispatch } = jest.requireMock("contexts");
 
 jest.mock("hocs", () => ({
@@ -200,8 +199,8 @@ describe("BaseApp", () => {
     });
 
     const normalizedError = {
-    title: "Test startup error",
-    message: "Access denied",
+      title: "Test startup error",
+      message: "Access denied",
     };
 
     normaliseStartupError.mockReturnValue(normalizedError);
@@ -212,21 +211,21 @@ describe("BaseApp", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
 
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <BaseApp {...defaultProps} />
-      </MemoryRouter>
-    );
+    try {
+      render(
+        <MemoryRouter initialEntries={["/"]}>
+          <BaseApp {...defaultProps} />
+        </MemoryRouter>
+      );
 
-    await waitFor(() => {
-      expect(normaliseStartupError).toHaveBeenCalledWith(error);
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: errorActionTypes.SET_ERROR,
-        payload: 
-          normalizedError,
+      await waitFor(() => {
+        expect(normaliseStartupError).toHaveBeenCalledWith(error);
+        expect(mockDispatch).toHaveBeenCalledWith({
+          type: errorActionTypes.SET_ERROR,
+          payload: normalizedError,
       });
     }, { timeout: 3000 });
-
-    consoleSpy.mockRestore();
+  } finally {
+    consoleSpy.mockRestore();}
   });
 });

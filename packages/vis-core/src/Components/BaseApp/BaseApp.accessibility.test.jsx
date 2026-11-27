@@ -63,12 +63,22 @@ jest.mock("layouts", () => ({
   Dashboard: ({ children }) => <div>{children}</div>,
 }));
 
-jest.mock("contexts", () => ({
-  AppContext: { Provider: ({ children }) => children },
-  AuthProvider: ({ children }) => children,
-  useAuth: () => ({ token: "" }),
-  ErrorProvider: ({ children }) => children,
-}));
+jest.mock("contexts", () => {
+  const React = jest.requireActual("react");
+  const mockDispatch = jest.fn();
+  const ErrorContext = React.createContext({ dispatch: mockDispatch });
+  return {
+    AppContext: { Provider: ({ children }) => children },
+    AuthProvider: ({ children }) => children,
+    useAuth: () => ({ token: "" }),
+    ErrorContext,
+    ErrorProvider: ({ children }) => (
+      <ErrorContext.Provider value={{ dispatch: mockDispatch }}>
+        {children}
+      </ErrorContext.Provider>
+    ),
+  };
+});
 
 jest.mock("hocs", () => ({
   withRoleValidation: jest.fn((Component) => Component),
