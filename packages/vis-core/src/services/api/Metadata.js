@@ -1,4 +1,7 @@
 import BaseService from "./Base";
+import { HttpError } from "./HttpError";
+
+export { HttpError };
 
 /**
  * A service class for fetching metadata.
@@ -16,22 +19,34 @@ class MetadataService extends BaseService {
   /**
    * Fetches the Swagger file.
    * @returns {Promise<Object>} A promise that resolves with the Swagger file data.
-   * @throws {Error} If there is an error fetching the Swagger file.
+   * @throws {HttpError} If the server returns a non-success response.
    */
   async getSwaggerFile() {
-    try {
-      const url = this._buildUrl('/swagger/v1/swagger.json');
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const swaggerData = await response.json();
-      return swaggerData;
-    } catch (error) {
-      console.error('Error fetching Swagger file:', error);
-      throw error; // Rethrow the error for further handling if necessary
-    }
-  }
-}
+    const url = this._buildUrl('/swagger/v1/swagger.json');
+    const response = await fetch(url);
+    let responseBody = null;
 
+    try {
+      const contentType = (response.headers.get("content-type") || "").toLowerCase();
+      if (contentType.includes("application/json")) {
+        responseBody = await response.json();
+      } else {
+        responseBody = await response.text();
+      }
+    } catch {
+      responseBody = null;
+    }
+
+    if (!response.ok) {
+      throw new HttpError(
+        response.status,
+        `HTTP error! status: ${response.status}`,
+        url,
+        responseBody,
+      );
+    }
+    return responseBody;
+  }
+
+}
 export { MetadataService };

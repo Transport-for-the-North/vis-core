@@ -5,6 +5,8 @@ import { DownloadService } from "./downloadData";
 import { EndpointDefinitionClient } from "./EndpointDefinitionClient";
 import { FileUploadService } from "./FileUpload";
 
+export { HttpError } from "./HttpError";
+
 /**
  * Object containing instances of various services.
  * @property {BaseService} baseService - Instance of BaseService.
